@@ -1,3 +1,12 @@
+import * as govukFrontend from 'govuk-frontend'
+import * as mojFrontend from '@ministryofjustice/frontend'
+import './appInsights'
+import './backendSortableTable'
+import './predictors'
+
+govukFrontend.initAll()
+mojFrontend.initAll()
+
 /* eslint-disable no-restricted-globals */
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-repeating-frequency]')

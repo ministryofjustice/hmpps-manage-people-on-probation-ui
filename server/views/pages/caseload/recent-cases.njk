@@ -60,6 +60,7 @@
                         }
                         anchor.href = "./case/" + recentCase.crn
                         anchor.text = lao(recentCase.limitedAccess, recentCase.name, "Restricted access")
+                        anchor.setAttribute("data-ai-id", "recentCasesPersonNameLink")
                         const span1 = document.createElement("span")
                         span1.className = "govuk-!-font-weight-bold secondary-text"
                         span1.innerText = recentCase.crn

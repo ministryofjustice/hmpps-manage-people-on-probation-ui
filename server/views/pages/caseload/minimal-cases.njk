@@ -144,7 +144,7 @@
 
                {% set rows = (rows.push(
                  [
-                   { html: "<a class='govuk-!-font-weight-bold' href='./case/" + case.crn + "'>" + fullName + "</a></br><span class='govuk-!-font-weight-bold secondary-text'>" + crn + "</span>",
+                   { html: "<a data-ai-id = 'myCasesPersonNameLink' class='govuk-!-font-weight-bold' href='./case/" + case.crn + "'>" + fullName + "</a></br><span class='govuk-!-font-weight-bold secondary-text'>" + crn + "</span>",
                      attributes: { 'data-qa': 'nameOrCrnValue' + loop.index} },
                    { html: case.dob | dateWithYearShortMonth  + "</br><span class='secondary-text'>Age " + case.dob | yearsSince + "</span>" if case.dob else "Restricted",
                      attributes: { 'data-qa': 'dobValue' + loop.index }
@@ -171,11 +171,11 @@
              },
              head: [
                {
-                 text: "Name</br>CRN",
+                 html: "Name</br>CRN",
                  attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'action': 'case'}
                },
                {
-                 text: "Date of birth</br>Age",
+                 html: "Date of birth</br>Age",
                  attributes: {'aria-sort': setSortOrder('dob', caseload.sortedBy) , 'col-name': 'dob', 'data-qa': 'dob', 'action': 'case' },
                  classes: "nowrap"
                },
@@ -212,7 +212,7 @@
                  {% for case in caseload.caseload %}
                    <tr class="govuk-table__row">
                      <td class="govuk-table__cell" data-qa="case{{loop.index}}Value">
-                       <a href="/case/{{ case.crn }}" class="govuk-!-font-weight-bold">{{ case.caseName | fullName }}</a><br />
+                       <a data-ai-id="teamCasesPersonNameLink" href="/case/{{ case.crn }}" class="govuk-!-font-weight-bold">{{ case.caseName | fullName }}</a><br />
                        <span class="app-!-font-family-tabular govuk-!-margin-bottom-0">{{ case.crn }}</span>
                      </td>
                       {% if currentNavSection == 'teamCases' and caseload.team %}

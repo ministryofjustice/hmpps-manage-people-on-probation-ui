@@ -470,7 +470,7 @@
     }) }}
 
     <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">
-    <input type="hidden" id="name" name="name" value="{{ overview.personalDetails.name.surname }},{{ overview.personalDetails.name.forename }}">
+    <input type="hidden" id="name" name="name" value="{{ overview.personalDetails.name.surname }}, {{ overview.personalDetails.name.forename }}">
     <input type="hidden" id="dob" name="dob" value="{{ headerDob | dateWithYear }}">
     <input type="hidden" id="age" name="age" value="{{ headerDob | yearsSince }}">
     <input type="hidden" id="tier" name="age" value="{{ tierCalculation.tierScore }}">

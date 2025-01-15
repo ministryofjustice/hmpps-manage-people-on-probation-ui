@@ -16,7 +16,6 @@ import setUpStaticResources from './middleware/setUpStaticResources'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import setUpWebSecurity from './middleware/setUpWebSecurity'
 import setUpWebSession from './middleware/setUpWebSession'
-
 import routes from './routes'
 import type { Services } from './services'
 import limitedAccess from './middleware/limitedAccessMiddleware'
@@ -24,6 +23,7 @@ import config from './config'
 import './sentry'
 import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
+import baseController from './baseController'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -39,6 +39,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebSession())
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
+  app.use(baseController())
   nunjucksSetup(app, services.applicationInfo)
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
@@ -50,7 +51,7 @@ export default function createApp(services: Services): express.Application {
   app.use(routes(services))
 
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)
-  app.use((req, res, next) => next(createError(404, 'Not found')))
+  app.use((_req, _res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))
 
   return app

@@ -16,13 +16,15 @@ export default function setUpStaticResources(): Router {
   const staticResourcesConfig = { maxAge: config.staticResourceCacheDuration, redirect: false }
 
   Array.of(
-    '/assets',
-    '/assets/stylesheets',
-    '/assets/js',
+    '/dist/assets',
+    '/dist/assets/css',
+    '/dist/assets/js',
     '/node_modules/govuk-frontend/dist/govuk/assets',
     '/node_modules/govuk-frontend/dist',
     '/node_modules/@ministryofjustice/frontend/moj/assets',
     '/node_modules/@ministryofjustice/frontend',
+    '/node_modules/jquery/dist',
+    '/node_modules/accessible-autocomplete/dist',
   ).forEach(dir => {
     router.use('/assets', express.static(path.join(process.cwd(), dir), staticResourcesConfig))
   })
