@@ -49,8 +49,8 @@ export interface PersonalDetailsUpdateRequest extends Validateable {
   startDate?: string
   endDate?: string
   notes?: string
-  verified?: boolean
-  noFixedAddress?: boolean
+  verified?: string | boolean
+  noFixedAddress?: string | boolean
 }
 
 export interface PersonalContact {
@@ -99,8 +99,8 @@ export interface PersonAddress {
   type?: string
   typeCode?: string
   status?: string
-  verified?: boolean
-  noFixedAddress?: boolean
+  verified?: string | boolean
+  noFixedAddress?: string | boolean
   notes?: string
 }
 

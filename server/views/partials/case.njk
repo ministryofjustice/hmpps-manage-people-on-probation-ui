@@ -21,10 +21,9 @@
         }) }}
     {% endif %}
 
-    <div>
+ {% if not hidePageHeader %}
         <div class="moj-page-header-actions govuk-!-static-margin-bottom-0">
             <div class="moj-page-header-actions__title">
-
                 <div class="govuk-flex">
                     <div>
                         <ul class="govuk-list govuk-caption-m inline-list-from-tablet">
@@ -49,7 +48,6 @@
                         <div class="govuk-!-margin-left-4">{{ predictorTimelineItem(predictorScores.scores.RSR) }}</div>
                     {% endif %}
                 </div>
-
                 <h1 class="govuk-heading-l govuk-!-margin-bottom-4">
                     <span data-qa='name'>{{ headerPersonName }}</span>
                 </h1>
@@ -59,8 +57,8 @@
                 {% endblock %}
             </div>
         </div>
-    </div>
 {% include "../partials/case-nav.njk" %}
+  {% endif %}
 {% if currentSectionName %}
     {% if lastUpdatedDate %}
         <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">{{ currentSectionName }}</h2>

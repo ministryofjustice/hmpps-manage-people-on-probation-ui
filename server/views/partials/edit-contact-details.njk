@@ -1,0 +1,76 @@
+{% extends "../partials/case.njk" %}
+{% set pageTitle = makePageTitle({ pageHeading: ["Edit contact details", "Personal details"] }) %}
+{% set currentNavSection = 'personal-details' %}
+{% set headerPersonName = personalDetails.name.forename + ' ' + personalDetails.name.surname %}
+{% set headerCRN = crn %}
+{% set headerDob = personalDetails.dateOfBirth %}
+{% set headerGender = personalDetails.preferredGender %}
+{% set dateWarning = 'An end date will change this to a previous address and you will need to add a new main address.' %}
+
+
+{% block beforeContent %}
+
+    {% set bannerHtml %}
+        <h2 class="govuk-heading-m govuk-!-font-weight-regular">{{ dateWarning }}</h2>
+    {% endset %}
+ 
+    {{ govukBreadcrumbs({
+        items: [
+            {
+                text: "My cases",
+                href: "/case"
+            },
+            {
+                text: headerPersonName,
+                href: "/case/" + crn,
+                attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+            },
+            {
+                text: "Personal details",
+                href: "/case/" + crn + "/personal-details"
+            }
+        ]
+    }) }}
+
+    {{ mojBanner({
+        type: 'information',
+        html: bannerHtml,
+        attributes: { "data-qa": "infoBanner"},
+        classes: 'govuk-!-margin-bottom-2'
+    }) if personalDetails.mainAddress.to }}
+
+    {% if errorMessages %}
+    {% set errorList = errorMessages | toErrorList %}
+        {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+        {% endif %}
+    {% endif %}
+
+{% endblock %}
+
+{% block pageContent %}
+<h1 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7">{{title}}</h1>
+    <div class="govuk-!-width-one-half">
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+           
+            {% if personalDetails.mainAddress.to %}
+                <input type="hidden" name="endDateWarningDisplayed" value="true">
+            {% endif %}
+ {% block editForm %}{% endblock %}
+ <div class="govuk-button-group">
+            {{ govukButton({
+                html: "Save changes",
+                attributes: {
+                    'data-qa': 'submit-btn'
+                }
+            }) }}
+             <a class="govuk-link" href="{{backLink}}">Cancel</a>
+             </div>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        </form>
+    </div>
+{% endblock %}

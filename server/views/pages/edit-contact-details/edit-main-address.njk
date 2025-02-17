@@ -1,0 +1,299 @@
+{% extends "../../partials/edit-contact-details.njk" %}
+{% set title = 'Edit main address for ' + personalDetails.name.forename %}
+{% set pageTitle = makePageTitle({ pageHeading: ["Edit main address", "Personal details"] }) %}
+{% set addressTypeSelectItems = [] %}
+{% set addressTypeSelectItems = [{text: "Select address type", value: null }] %}
+  {% for addressType in personalDetails.addressTypes|sort(attribute='description') %}
+      {% set addressTypeSelectItems = (addressTypeSelectItems.push({
+          selected: personalDetails.mainAddress.typeCode === addressType.code,
+          text: addressType.description,
+          value: addressType.code
+      }), addressTypeSelectItems) %}
+  {% endfor %}
+
+{% block editForm %}
+ <p class="govuk-label--s">Main address</p>
+
+            <p class="govuk-label--s">Select if they have no fixed main address</p>
+
+            {{ govukCheckboxes ({
+                id: 'noFixedAddress',
+                name: 'noFixedAddress',
+                items: [
+                    {
+                        'value': true,
+                        'text': 'No fixed address',
+                        'checked': personalDetails.mainAddress.postcode === 'NF1 1NF' or personalDetails.mainAddress.noFixedAddress === true,
+                        'attributes': { "data-qa": "noFixedAddress"}
+                    }
+                ]
+            }) }}
+
+            <div fixed-address-section>
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.buildingName if personalDetails.mainAddress.buildingName,
+                    label: {
+                        text: "Building name (optional)",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'buildingName',
+                    name: 'buildingName',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'buildingName'
+                        }
+                    },
+                    classes: "govuk-input",
+                    errorMessage: {
+                        text: errorMessages.buildingName,
+                        attributes: {
+                            'data-qa': 'buildingNameError'
+                        }
+                    } if errorMessages.buildingName
+                }) }}
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.buildingNumber if personalDetails.mainAddress.buildingNumber,
+                    label: {
+                        text: "House number (optional)",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'buildingNumber',
+                    name: 'buildingNumber',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'buildingNumber'
+                        }
+                    },
+                    classes: "govuk-input--width-3",
+                    errorMessage: {
+                        text: errorMessages.buildingNumber,
+                        attributes: {
+                            'data-qa': 'buildingNumber'
+                        }
+                    } if errorMessages.buildingNumber
+                }) }}
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.streetName if personalDetails.mainAddress.streetName,
+                    label: {
+                        text: "Street name (optional)",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'streetName',
+                    name: 'streetName',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'streetName'
+                        }
+                    },
+                    classes: "govuk-input",
+                    errorMessage: {
+                        text: errorMessages.streetName,
+                        attributes: {
+                            'data-qa': 'streetNameError'
+                        }
+                    } if errorMessages.streetName
+                }) }}
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.district if personalDetails.mainAddress.district,
+                    label: {
+                        text: "District (optional)",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'district',
+                    name: 'district',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'district'
+                        }
+                    },
+                    classes: "govuk-input",
+                    errorMessage: {
+                        text: errorMessages.district,
+                        attributes: {
+                            'data-qa': 'districtError'
+                        }
+                    } if errorMessages.district
+                }) }}
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.town if personalDetails.mainAddress.town,
+                    label: {
+                        text: "Town or city (optional)",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'town',
+                    name: 'town',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'town'
+                        }
+                    },
+                    classes: "govuk-input--width-20",
+                    errorMessage: {
+                        text: errorMessages.town,
+                        attributes: {
+                            'data-qa': 'townError'
+                        }
+                    } if errorMessages.town
+                }) }}
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.county if personalDetails.mainAddress.county,
+                    label: {
+                        text: "County (optional)",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'county',
+                    name: 'county',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'county'
+                        }
+                    },
+                    classes: "govuk-input--width-20",
+                    errorMessage: {
+                        text: errorMessages.county,
+                        attributes: {
+                            'data-qa': 'countyError'
+                        }
+                    } if errorMessages.county
+                }) }}
+
+
+                {{ govukInput({
+                    value: personalDetails.mainAddress.postcode if personalDetails.mainAddress.postcode,
+                    label: {
+                        text: "Postcode",
+                        classes: "govuk-label--s govuk-!-font-weight-regular"
+                    },
+                    id: 'postcode',
+                    name: 'postcode',
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'postcode'
+                        }
+                    },
+                    classes: "govuk-input--width-10",
+                    errorMessage: {
+                        text: errorMessages.postcode,
+                        attributes: {
+                            'data-qa': 'postcodeError'
+                        }
+                    } if errorMessages.postcode
+                }) }}
+            </div>
+            {{ govukSelect({
+                label: {
+                    text: "Type",
+                    classes: "govuk-label--s govuk-!-font-weight-bold"
+                },
+                classes: "govuk-select--width-30",
+                id: 'addressTypeCode',
+                name: 'addressTypeCode',
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'addressType'
+                    }
+                },
+                items: addressTypeSelectItems,
+                errorMessage: {
+                    text: errorMessages.addressTypeCode,
+                    attributes: {
+                        'data-qa': 'addressTypeError'
+                    }
+                } if errorMessages.addressTypeCode
+            }) }}
+
+            {{ govukRadios({
+                classes: "govuk-radios--inline",
+                fieldset: {
+                    legend: {
+                        text: "Is the address verified?",
+                        classes: "govuk-label--s govuk-!-font-weight-bold"
+                    }
+                },
+                name: "verified",
+                attributes: { "data-qa": "verified"},
+                items: [
+                    {
+                        checked: personalDetails.mainAddress.verified === true,
+                        text: "Yes",
+                        value: true
+                    },
+                    {
+                        checked: personalDetails.mainAddress.verified === false,
+                        text: "No",
+                        value: false
+                    }
+                ],
+                errorMessage: {
+                    text: errorMessages.verified,
+                    attributes: {
+                        'data-qa': 'verfiedError'
+                    }
+                } if errorMessages.verified
+            }) }}
+
+            {{ mojDatePicker({
+                value: fromIsoDateToPicker(personalDetails.mainAddress.from),
+                id: "startDate",
+                name: "startDate",
+                label: {
+                    text: "Start date",
+                    classes: "govuk-label--s"
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'startDate'
+                    }
+                },
+                hint: {
+                    text: "For example, 17/5/2024."
+                },
+                errorMessage: {
+                    text: errorMessages.startDate,
+                    attributes: {
+                        'data-qa': 'startDateError'
+                    }
+                } if errorMessages.startDate
+            }) }}
+
+            {{ mojDatePicker({
+                value:  fromIsoDateToPicker(personalDetails.mainAddress.to),
+                id: "endDate",
+                name: "endDate",
+                label: {
+                    text: "End date (optional)",
+                    classes: "govuk-label--s"
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'endDate'
+                    }
+                },
+                hint: {
+                    text: "For example, 17/5/2024."
+                },
+                errorMessage: {
+                    text: errorMessages.endDate,
+                    attributes: {
+                        'data-qa': 'endDateError'
+                    }
+                } if errorMessages.endDate
+            }) }}
+
+            {{ govukTextarea({
+                id: "notes",
+                name: "notes",
+                attributes: { "data-qa": "notes"},
+                value: personalDetails.mainAddress.notes,
+                label: {
+                    text: "Notes  (optional)",
+                    classes: 'govuk-label--s'
+                }
+            }) }}
+{% endblock %}
