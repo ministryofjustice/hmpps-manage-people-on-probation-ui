@@ -40,16 +40,12 @@ context('Edit contact details', () => {
     ['phone number', 'Enter a phone number.'],
     ['mobile number', 'Enter a mobile number.'],
     ['email address', 'Enter an email address.'],
-    // ['postcode', 'Enter a postcode.'],
   ]
 
   for (const field of mandatoryFields) {
     it(`Submitting with no ${field[0]} should show error messages`, () => {
       cy.visit('/case/X000001/personal-details/edit-contact-details')
       const page = Page.verifyOnPage(EditContactDetails)
-      // if (field[0] === 'postcode') {
-      //   page.getCheckboxField('noFixedAddress').click()
-      // }
       page.getElementInput(toCamelCase(field[0])).clear()
       page.getElement('submitBtn').click()
       page.getErrorSummaryLink(0).should('contain.text', field[1])
@@ -127,35 +123,4 @@ context('Edit contact details', () => {
     page.getElement('submitBtn').click()
     page.getElement('updateBanner').should('contain.text', 'Contact details updated')
   })
-
-  // it('Submitting with invalid data with over 35 chars should show error messages', () => {
-  //   cy.visit('/case/X000001/personal-details/edit-contact-details')
-  //   const page = Page.verifyOnPage(EditContactDetails)
-  //   page.getElementInput('phoneNumber').clear().type('1'.repeat(36))
-  //   page.getElementInput('mobileNumber').clear().type('1'.repeat(36))
-  //   page.getElementInput('emailAddress').clear().type('1'.repeat(36))
-  //   // page.getCheckboxField('noFixedAddress').click()
-  //   // page.getElementInput('buildingName').clear().type('1'.repeat(36))
-  //   // page.getElementInput('buildingNumber').clear().type('1'.repeat(36))
-  //   // page.getElementInput('streetName').clear().type('1'.repeat(36))
-  //   // page.getElementInput('district').clear().type('1'.repeat(36))
-  //   // page.getElementInput('town').clear().type('1'.repeat(36))
-  //   // page.getElementInput('county').clear().type('1'.repeat(36))
-  //   // page.getElementInput('postcode').clear().type('1'.repeat(36))
-
-  //   page.getElement('submit-btn').click()
-  //   page.getElement('phoneNumberError').should('contain.text', 'Phone number must be 35 characters or less.')
-  //   page.getElement('mobileNumberError').should('contain.text', 'Mobile number must be 35 characters or less.')
-  //   page.getElement('emailAddress').should('contain.text', 'Enter an email address in the correct format.')
-
-  // page.getElement('buildingName').should('contain.text', 'Building name must be 35 characters or less.')
-  // page.getElement('buildingNumber').should('contain.text', 'House number must be 35 characters or less.')
-  // page.getElement('streetName').should('contain.text', 'Street name must be 35 characters or less.')
-  // page.getElement('district').should('contain.text', 'District must be 35 characters or less.')
-  // page.getElement('town').should('contain.text', 'Town or city must be 35 characters or less.')
-  // page.getElement('county').should('contain.text', 'County must be 35 characters or less.')
-  // page.getElement('postcode').should('contain.text', 'Enter a full UK postcode.')
-
-  // page.getElement('errorList').should('contain.text', 'Enter a full UK postcode.')
-  //  })
 })
