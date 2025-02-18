@@ -14,6 +14,7 @@
 {% block editForm %}
  <p class="govuk-label--s">Main address</p>
 
+<div data-qa="noFixedAddressGroup">
             <p class="govuk-label--s">Select if they have no fixed main address</p>
 
             {{ govukCheckboxes ({
@@ -28,9 +29,8 @@
                     }
                 ]
             }) }}
-
+</div>
             <div fixed-address-section>
-
                 {{ govukInput({
                     value: personalDetails.mainAddress.buildingName if personalDetails.mainAddress.buildingName,
                     label: {
@@ -167,7 +167,7 @@
                 {{ govukInput({
                     value: personalDetails.mainAddress.postcode if personalDetails.mainAddress.postcode,
                     label: {
-                        text: "Postcode",
+                        text: "Postcode (optional)",
                         classes: "govuk-label--s govuk-!-font-weight-regular"
                     },
                     id: 'postcode',
@@ -216,8 +216,12 @@
                         classes: "govuk-label--s govuk-!-font-weight-bold"
                     }
                 },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'verified'
+                    }
+                },
                 name: "verified",
-                attributes: { "data-qa": "verified"},
                 items: [
                     {
                         checked: personalDetails.mainAddress.verified === true,
@@ -289,10 +293,12 @@
             {{ govukTextarea({
                 id: "notes",
                 name: "notes",
-                attributes: { "data-qa": "notes"},
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                },
                 value: personalDetails.mainAddress.notes,
                 label: {
-                    text: "Notes  (optional)",
+                    text: "Notes (optional)",
                     classes: 'govuk-label--s'
                 }
             }) }}

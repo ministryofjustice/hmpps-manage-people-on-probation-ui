@@ -70,7 +70,7 @@ export const personDetailsValidation = (editingMainAddress: boolean): Validation
       {
         validator: charsOrLess,
         length: 35,
-        msg: `Mobile number must be 35 characters or less.`,
+        msg: `Email address must be 35 characters or less.`,
       },
     ],
   },

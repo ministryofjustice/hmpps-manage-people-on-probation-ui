@@ -53,7 +53,7 @@
 {% endblock %}
 
 {% block pageContent %}
-<h1 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7">{{title}}</h1>
+<h1 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7" data-qa="pageHeading">{{title}}</h1>
     <div class="govuk-!-width-one-half">
         <form method="post" autocomplete="off" action="{{ paths.current }}">
            
@@ -65,10 +65,10 @@
             {{ govukButton({
                 html: "Save changes",
                 attributes: {
-                    'data-qa': 'submit-btn'
+                    'data-qa': 'submitBtn'
                 }
             }) }}
-             <a class="govuk-link" href="{{backLink}}">Cancel</a>
+             <a class="govuk-link" href="{{backLink}}" data-qa="cancelBtn">Cancel</a>
              </div>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         </form>
