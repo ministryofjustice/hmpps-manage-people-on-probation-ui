@@ -1,0 +1,21 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/arns/needs/crn/X778160",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "identifiedNeeds": [],
+          "notIdentifiedNeeds": [],
+          "unansweredNeeds": []
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

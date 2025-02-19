@@ -72,8 +72,7 @@
               "name": "Emotional wellbeing"
             }
           ],
-          "unansweredNeeds": [],
-          "assessedOn": "2023-07-26T11:29:10"
+          "unansweredNeeds": []
         },
         "headers": {
           "Content-Type": "application/json"

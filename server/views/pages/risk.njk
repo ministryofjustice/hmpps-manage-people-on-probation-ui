@@ -227,7 +227,7 @@
           <h2 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h2>
           {% include './risk/_no-oasys-risk-assessment.njk' %}
         {% endset %}
-        {{ govukNotificationBanner({ html: html }) }}
+        {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
       {% endif %}
 {#      TBD {% include './risk/_risk-in-the-community.njk' %}#}
 {#      TBD {% include './risk/_risk-to-themselves.njk' %}#}
@@ -243,6 +243,7 @@
       <p class='govuk-body' data-qa='ogp-missing'>Eligible</p>
       {% else %}
          <p class='govuk-body' data-qa='ogp-missing'>Not eligible</p>
+         </div>
       {% endif %}
    </div>   
 

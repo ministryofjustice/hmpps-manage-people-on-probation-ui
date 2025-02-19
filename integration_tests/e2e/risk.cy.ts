@@ -133,9 +133,31 @@ context('Risk', () => {
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
   })
   it('Risk page is rendered with create a risk assessment on OASys link', () => {
-    cy.visit('/case/X778160/risk')
+    cy.visit('/case/X801756/risk')
     const page = new RiskDetailPage()
     page.getElementData('oasysViewRiskAssessmentLink').should('not.exist')
     page.getElementData('oasysCreateRiskAssessmentLink').should('exist')
+  })
+  it('Risk page is rendered with no OASys Layer 3 risk assessment', () => {
+    cy.visit('/case/X778160/risk')
+    const page = new RiskDetailPage()
+    page
+      .getElementData('noOasysRiskBanner')
+      .should('exist')
+      .find('h2')
+      .should('contain.text', 'There is no OASys Layer 3 risk assessment for Alton Berge')
+
+    cy.get('[data-qa="noOasysRiskBanner"]')
+      .find('.govuk-notification-banner__content')
+      .should('contain.text', 'We do not know:')
+      .should('contain.text', 'Risk of serious harm (ROSH) in the community')
+      .should('contain.text', 'Risk of serious harm to themselves')
+
+    page
+      .getElementData('noOasysRiskBanner')
+      .find('a')
+      .should('contain.text', 'View OASys')
+      .should('have.attr', 'target', '_blank')
+      .should('have.attr', 'href', 'https://oasys-dummy-url')
   })
 })
