@@ -62,15 +62,18 @@ context('Compliance', () => {
     page
       .getRowData('sentence2', 'mainOffenceDescription', 'Value')
       .should('contain.text', 'Another main offence - 18502')
-    page.getRowData('sentence2', 'orderDescription', 'Value').should('contain.text', 'No order details')
-    page.getRowData('sentence2', 'startDate', 'Value').should('contain.text', 'No start date on current order')
-    page.getRowData('sentence2', 'breach', 'Value').should('contain.text', 'No breaches on current order')
-    page
-      .getRowData('previousOrder1', 'mainOffenceDescription', 'Value')
-      .should('contain.text', 'Common Assault and Battery')
-    page.getRowData('previousOrder1', 'status', 'Value').should('contain.text', 'No status on previous order')
-    page.getRowData('previousOrder1', 'startDate', 'Value').should('contain.text', 'No start date on previous order')
-    page.getRowData('previousOrder1', 'endDate', 'Value').should('contain.text', 'No end date on previous order')
-    page.getRowData('previousOrder1', 'breaches', 'Value').should('contain.text', 'No breaches on previous order')
+    ;[
+      ['sentence2', 'mainOffenceDescription', 'Another main offence - 18502'],
+      ['sentence2', 'orderDescription', 'No order details'],
+      ['sentence2', 'startDate', 'No start date on current order'],
+      ['sentence2', 'breach', 'No breaches on current order'],
+      ['previousOrder1', 'mainOffenceDescription', 'Common Assault and Battery'],
+      ['previousOrder1', 'status', 'No status on previous order'],
+      ['previousOrder1', 'startDate', 'No start date on previous order'],
+      ['previousOrder1', 'endDate', 'No end date on previous order'],
+      ['previousOrder1', 'breaches', 'No breaches on previous order'],
+    ].forEach(([card, row, value]) => {
+      page.getRowData(card, row, 'Value').should('contain.text', value)
+    })
   })
 })
