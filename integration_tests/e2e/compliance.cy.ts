@@ -57,7 +57,7 @@ context('Compliance', () => {
       .within(() => cy.get('[aria-label="12 month Community Order (Ended 12 December 1991)"]').should('be.visible'))
   })
   it('Compliance page is rendered with incomplete order', () => {
-    cy.visit('/case/X000001/compliance?qaView=2')
+    cy.visit('/case/X777916/compliance')
     const page = Page.verifyOnPage(CompliancePage)
     page
       .getRowData('sentence2', 'mainOffenceDescription', 'Value')

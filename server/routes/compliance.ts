@@ -13,7 +13,6 @@ export default function complianceRoutes(router: Router, { hmppsAuthClient }: Se
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get('/case/:crn/compliance', async (req, res, _next) => {
-    const { qaView = '1' } = req.query as Record<string, string>
     const { crn } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
 
@@ -31,7 +30,7 @@ export default function complianceRoutes(router: Router, { hmppsAuthClient }: Se
     const tierClient = new TierApiClient(token)
 
     const [personCompliance, tierCalculation, risks, predictors] = await Promise.all([
-      masClient.getPersonCompliance(crn, qaView),
+      masClient.getPersonCompliance(crn),
       tierClient.getCalculationDetails(crn),
       arnsClient.getRisks(crn),
       arnsClient.getPredictorsAll(crn),
