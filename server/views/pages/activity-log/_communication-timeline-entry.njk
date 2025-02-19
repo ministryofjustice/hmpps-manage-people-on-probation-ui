@@ -1,3 +1,6 @@
+{% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed  %}
+
 {% set titleHtml %}
   <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="govuk-!-font-weight-bold">{% include './_communication-title.njk' %} at&nbsp;{{ entry.startDateTime | govukTime }}<span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 {% endset %}
@@ -18,5 +21,5 @@
   titleHtml: titleHtml,
   classes: 'govuk-!-margin-bottom-2 app-summary-card--white-header',
   html: html,
-  actionsHtml: 'comm'
+  actionsHtml: actionsHtml
 }) }}

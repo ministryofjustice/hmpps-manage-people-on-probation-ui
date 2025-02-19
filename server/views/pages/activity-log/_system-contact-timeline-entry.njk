@@ -16,10 +16,6 @@
 {% endset %}
 
 {% set html %}
-{{ 'is in past:' + hasAppointmentStartTimePassed }}
-{{ 'has outcome:' + entry.hasOutcome }}
-{{ 'record outcome:' + shouldPromptToRecordAnOutcome }}
-
   {% include './_timeline-notes.njk' %}
 {% endset %}
 
