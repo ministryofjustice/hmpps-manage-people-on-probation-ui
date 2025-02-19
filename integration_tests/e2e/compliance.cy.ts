@@ -56,4 +56,24 @@ context('Compliance', () => {
       .getCardHeader('previousOrder1')
       .within(() => cy.get('[aria-label="12 month Community Order (Ended 12 December 1991)"]').should('be.visible'))
   })
+  it('Compliance page is rendered with incomplete order', () => {
+    cy.visit('/case/X777916/compliance')
+    const page = Page.verifyOnPage(CompliancePage)
+    page
+      .getRowData('sentence2', 'mainOffenceDescription', 'Value')
+      .should('contain.text', 'Another main offence - 18502')
+    ;[
+      ['sentence2', 'mainOffenceDescription', 'Another main offence - 18502'],
+      ['sentence2', 'orderDescription', 'No order details'],
+      ['sentence2', 'startDate', 'No start date on current order'],
+      ['sentence2', 'breach', 'No breaches on current order'],
+      ['previousOrder1', 'mainOffenceDescription', 'Common Assault and Battery'],
+      ['previousOrder1', 'status', 'No status on previous order'],
+      ['previousOrder1', 'startDate', 'No start date on previous order'],
+      ['previousOrder1', 'endDate', 'No end date on previous order'],
+      ['previousOrder1', 'breaches', 'No breaches on previous order'],
+    ].forEach(([card, row, value]) => {
+      page.getRowData(card, row, 'Value').should('contain.text', value)
+    })
+  })
 })

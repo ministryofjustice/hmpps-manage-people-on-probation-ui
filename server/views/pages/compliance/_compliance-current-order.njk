@@ -46,6 +46,22 @@
       </p>
     </div>
 
+    {% set order %}
+{% if sentence.order.description and sentence.order.startDate %}
+{{ sentence.order.description + ' (' + sentence.order.startDate | monthsOrDaysElapsed + ' elapsed)' }}
+{% else %}
+No order details
+{% endif %}
+    {% endset %}
+
+{% set startDateOnCurrentOrder %}
+  {% if sentence.order.startDate %}
+{{ sentence.order.startDate | dateWithYear }}
+  {% else %}
+No start date on current order
+  {% endif %}
+{% endset %}
+
     {% set breachesOnCurrentOrder %}
       <ul class="govuk-list">
         {% if sentence.compliance.breachStarted %}<li>A breach is in progress</li>{% endif %}
@@ -69,7 +85,7 @@
               text: 'Order'
             },
             value: {
-              html: '<span data-qa="orderDescriptionValue">' + sentence.order.description + ' (' +  sentence.order.startDate | monthsOrDaysElapsed + ' elapsed)</span>'
+              html: '<span data-qa="orderDescriptionValue">' + order + '</span>'
             }
           },
           {
@@ -77,7 +93,7 @@
               text: 'Start date'
             },
             value: {
-              html: '<span data-qa="startDateValue">' + sentence.order.startDate | dateWithYear + '</span>'
+              html: '<span data-qa="startDateValue">' + startDateOnCurrentOrder + '</span>'
             }
           },
           {

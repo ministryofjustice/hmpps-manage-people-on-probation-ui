@@ -4,13 +4,38 @@
     {% if personCompliance.previousOrders.orders.length > 0 %}
         <h3 class="govuk-heading-s">Previous orders ending within the last 2 years</h3>
         {% for order in personCompliance.previousOrders.orders %}
-            {% set breaches %}
+            {% set breachesOnPreviousOrder %}
                 {% if order.breaches > 0 %}
                     {{ order.breaches }}
                 {% else %}
-                    None
+                    No breaches on previous order
                 {% endif %}
             {% endset %}
+
+  {% set statusOnPreviousOrder %}
+   {% if order.status %}
+    {{ order.status }}
+   {% else %}
+    No status on previous order
+   {% endif %}
+  {% endset %}
+
+  {% set startDateOnPreviousOrder %}
+    {% if order.startDate %}
+      {{ order.startDate | dateWithYear }}
+    {% else %}
+      No start date on previous order
+    {% endif %}
+  {% endset %}
+
+  {% set endDateOnPreviousOrder %}
+    {% if order.endDate %}
+      {{ order.endDate | dateWithYear }}
+    {% else %}
+      No end date on previous order
+    {% endif %}
+  {% endset %}
+
             {% set previousOrder %}
               {{ govukSummaryList({
                 rows: [
@@ -27,7 +52,7 @@
                       text: 'Status'
                     },
                     value: {
-                      html:  '<span data-qa="statusValue">' + order.status + '</span>'
+                      html:  '<span data-qa="statusValue">' + statusOnPreviousOrder + '</span>'
                     }
                   },
                   {
@@ -35,7 +60,7 @@
                       text: 'Start date'
                     },
                     value: {
-                      html: '<span data-qa="startDateValue">' + order.startDate | dateWithYear + '</span>'
+                      html: '<span data-qa="startDateValue">' + startDateOnPreviousOrder + '</span>'
                     }
                   },
                   {
@@ -43,7 +68,7 @@
                       text: 'End date'
                     },
                     value: {
-                      html: '<span data-qa="endDateValue">' + order.endDate | dateWithYear + '</span>'
+                      html: '<span data-qa="endDateValue">' + endDateOnPreviousOrder + '</span>'
                     }
                   },
                   {
@@ -51,7 +76,7 @@
                       text: 'Breaches'
                     },
                     value: {
-                      html:  '<span data-qa="breachesValue">' + breaches + '</span>'
+                      html:  '<span data-qa="breachesValue">' + breachesOnPreviousOrder + '</span>'
                     }
                   }
                 ]
