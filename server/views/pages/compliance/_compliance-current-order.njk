@@ -47,8 +47,8 @@
     </div>
 
     {% set order %}
-{% if sentence.order %}
-{{ sentence.order.description + ' (' +  sentence.order.startDate | monthsOrDaysElapsed + ' elapsed)' }}
+{% if sentence.order.description and sentence.order.startDate %}
+{{ sentence.order.description + ' (' + sentence.order.startDate | monthsOrDaysElapsed + ' elapsed)' }}
 {% else %}
 No order details
 {% endif %}
