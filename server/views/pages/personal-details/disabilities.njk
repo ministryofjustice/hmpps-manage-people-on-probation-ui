@@ -36,21 +36,7 @@
 {% for disability in disabilities.disabilities %}
   {% set notes = '' %}
   {% for disabilityNote in disability.disabilityNotes %}
-    {% set note %}
-      {% if disabilityNote.hasNoteBeenTruncated === true  %}
-        <p class="govuk-body line-break govuk-!-margin-bottom-1">{{ disabilityNote.note }}...<a href="/case/{{ crn }}/personal-details/disability/{{ disability.disabilityId }}/note/{{ disabilityNote.id }}">View full note</a>
-        </p>
-      {% else %}
-        <p class="govuk-body line-break govuk-!-margin-bottom-1">{{ disabilityNote.note }} </p>
-      {% endif %}
-
-      {% if disabilityNote.createdBy %}
-        <p class="govuk-body-s secondary-text govuk-!-padding-bottom-2">Comment added by {{ disabilityNote.createdBy }} on {{ disabilityNote.createdByDate | dateWithYear }}</p>
-      {% else %}
-        <p class="govuk-body-s secondary-text govuk-!-padding-bottom-2">Comment added by not entered</p>
-      {% endif %}
-    {% endset %}
-    {% set notes = notes.concat(note) %}
+    {% set notes = notes.concat(appNote(disabilityNote, "/case/" + crn + "/personal-details/disability/" + disability.disabilityId + "/note/" + disabilityNote.id)) %}
   {% endfor  %}
 
   {% set disabilitiesHtml %}

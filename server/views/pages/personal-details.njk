@@ -62,26 +62,7 @@
                         <span data-qa="mainAddressNotesValue">
                             {% if mainAddress.addressNotes.length  %}
                                 {% for addressNote in mainAddress.addressNotes %}
-                                    {% if addressNote.hasNoteBeenTruncated === true  %}
-                                        <p class="govuk-body line-break govuk-!-margin-bottom-1">{{ addressNote.note }}...<a href="/case/{{ crn }}/personal-details/main-address/note/{{ addressNote.id }}">View full note</a>
-                                        </p>
-                                    {% else %}
-                                        <p class="govuk-body line-break govuk-!-margin-bottom-1" >{{ addressNote.note }} </p>
-                                    {% endif %}
-
-                                    {% if addressNote.createdBy %}
-                                        {% if loop.last %}
-                                            <p class="govuk-body-s secondary-text">Comment added by {{ addressNote.createdBy }} on {{ addressNote.createdByDate | dateWithYear }}</p>
-                                        {% else %}
-                                            <p class="govuk-body-s secondary-text govuk-!-padding-bottom-2">Comment added by {{ addressNote.createdBy }} on {{ addressNote.createdByDate | dateWithYear }}</p>
-                                        {% endif %}
-                                    {% else %}
-                                        {% if loop.last %}
-                                            <p class="govuk-body-s secondary-text">Comment added by not entered</p>
-                                        {% else %}
-                                            <p class="govuk-body-s secondary-text govuk-!-padding-bottom-2">Comment added by not entered</p>
-                                        {% endif %}
-                                    {% endif %}
+                                    {{ appNote(addressNote, "/case/" + crn + "/personal-details/main-address/note/" + addressNote.id) }}
                                 {% endfor %}
                             {% else %}
                                 No notes

@@ -21,10 +21,7 @@
   {% set hasNote = address.addressNote %}
   {% if address.addressNotes  %}
     {% for addressNote in address.addressNotes %}
-      {% set note %}
-        {{ appNote(addressNote, '/case/' + crn + '/personal-details/addresses/' + address.id + '/note/' + addressNote.id) }}
-      {% endset %}
-      {% set notes = notes.concat(note) %}
+      {% set notes = notes.concat(appNote(addressNote, '/case/' + crn + '/personal-details/addresses/' + address.id + '/note/' + addressNote.id)) %}
     {% endfor  %}
   {% elseif address.addressNote %}
     {% set note = address.addressNote.note %}
