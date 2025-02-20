@@ -174,7 +174,7 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
 
   function getQueryString(params: Query): string[] {
     const queryParams: string[] = []
-    const usedParams = ['view', 'requirement', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page']
+    const usedParams = ['view', 'requirement', 'keywords', 'dateFrom', 'dateTo', 'contactType', 'contactStatus', 'page']
     for (const usedParam of usedParams) {
       if (params[usedParam]) {
         if (!Array.isArray(params[usedParam])) {

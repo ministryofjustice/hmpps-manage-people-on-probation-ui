@@ -345,7 +345,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"No results\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": []}"
+            "equalToJson": "{\"keywords\": \"No results\", \"dateFrom\": \"\", \"dateTo\": \"\", \"contactType\": [], \"contactStatus\": []}"
           }
         ]
       },
@@ -377,7 +377,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": []}"
+            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"\", \"dateTo\": \"\", \"contactType\": [], \"contactStatus\": []}"
           }
         ]
       },
@@ -434,7 +434,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"filters\": [\"noOutcome\", \"complied\", \"notComplied\"]}"
+            "equalToJson": "{\"keywords\": \"Phone call\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\",  \"contactType\": ['nationalStandard'], \"contactStatus\": [\"absenceWaitingForEvidence\", \"acceptableAbsence\", \"complied\"]}"
           }
         ]
       },
@@ -491,7 +491,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"filters\": []}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"2025-01-20\", \"dateTo\": \"2025-01-27\", \"contactType\": [], \"contactStatus\": []}"
           }
         ]
       },
@@ -548,7 +548,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\", \"complied\", \"notComplied\"]}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"contactType\": ['nationalStandard'], \"contactStatus\": [\"absenceWaitingForEvidence\", \"acceptableAbsence\", \"complied\"]}"
           }
         ]
       },
@@ -659,7 +659,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\", \"complied\"]}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"contactType\": ['nationalStandard'], \"contactStatus\": [\"absenceWaitingForEvidence\", \"acceptableAbsence\"]}"
           }
         ]
       },
@@ -742,7 +742,7 @@
         "urlPathPattern": "/mas/activity/X000001",
         "bodyPatterns": [
           {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\"]}"
+            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"contactType\": ['nationalStandard'], \"contactStatus\": [\"absenceWaitingForEvidence\"]}"
           }
         ]
       },
