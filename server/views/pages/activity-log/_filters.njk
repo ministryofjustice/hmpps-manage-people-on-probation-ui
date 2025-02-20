@@ -28,7 +28,7 @@
       classes: "govuk-label--s govuk-!-font-weight-bold"
   },
   formGroup: {
-      classes: "govuk-!-margin-bottom-3",
+      classes: "govuk-!-margin-bottom-4",
       attributes: {
         'data-qa': 'date-from'
       }
@@ -47,7 +47,7 @@
       classes: "govuk-label--s govuk-!-font-weight-bold"
   },
   formGroup: {
-    classes: "govuk-!-margin-bottom-3",
+    classes: "govuk-!-margin-bottom-4",
     attributes: {
         'data-qa': 'date-to'
       }
@@ -58,22 +58,41 @@
     text: filters.errors.errorMessages.dateTo.text
   } if filters.errors.errorMessages.dateTo.text
 }) }}
-  {{ govukCheckboxes({
-    idPrefix: 'compliance',
-    name: 'compliance',
+{{ govukCheckboxes({
+    idPrefix: 'contactType',
+    name: 'contactType',
     classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
-        text: 'Compliance filters',
+        text: 'Contact type',
+        classes: 'govuk-fieldset__legend--s'
+      }
+    },
+    formGroup: {
+      classes: "govuk-!-margin-bottom-3",
+      attributes: {
+        'data-qa': 'contactType'
+      }
+    },
+    items: filters.contactTypeOptions
+  }) }}
+
+  {{ govukCheckboxes({
+    idPrefix: 'contactStatus',
+    name: 'contactStatus',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: 'Contact status',
         classes: 'govuk-fieldset__legend--s'
       }
     },
     formGroup: {
       attributes: {
-        'data-qa': 'compliance'
+        'data-qa': 'contactStatus'
       }
     },
-    items: filters.complianceOptions
+    items: filters.contactStatusOptions
   }) }}
 
   
@@ -98,11 +117,20 @@
         items: filters.selectedFilterItems.dateRange
    }), filterCategories) %}
 {% endif %}
+{% if filters.selectedFilterItems.contactType.length %}
+  {% set filterCategories = (filterCategories.push(
+    {
+        heading: {
+          text: 'Contact type'
+        },
+        items: filters.selectedFilterItems.contactType
+   }), filterCategories) %}
+{% endif %}
 {% if filters.selectedFilterItems.compliance.length %}
   {% set filterCategories = (filterCategories.push(
     {
         heading: {
-          text: 'Compliance filters'
+          text: 'Contact status'
         },
         items: filters.selectedFilterItems.compliance
    }), filterCategories) %}

@@ -13,7 +13,7 @@ export const getPersonActivity = async (
 ): Promise<[TierCalculation, PersonActivity]> => {
   const { filters } = res.locals
   const { params, query } = req
-  const { keywords, dateFrom, dateTo, compliance } = filters
+  const { keywords, dateFrom, dateTo, contactType, contactStatus } = filters
   const { crn } = params
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -29,8 +29,10 @@ export const getPersonActivity = async (
         keywords === cacheItem.keywords &&
         dateFrom === cacheItem.dateFrom &&
         dateTo === cacheItem.dateTo &&
-        compliance.every(option => cacheItem.compliance.includes(option)) &&
-        cacheItem.compliance.length === compliance.length &&
+        contactType.every(option => cacheItem.contactType.includes(option)) &&
+        cacheItem.contactType.length === contactType.length &&
+        contactStatus.every(option => cacheItem.contactStatus.includes(option)) &&
+        cacheItem.contactStatus.length === contactStatus.length &&
         parseInt(page as string, 10) === cacheItem.personActivity.page,
     )
     if (cache) {
@@ -43,7 +45,8 @@ export const getPersonActivity = async (
       keywords,
       dateFrom: dateFrom ? toISODate(dateFrom) : '',
       dateTo: dateTo ? toISODate(dateTo) : '',
-      filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
+      contactType: contactType ? contactType.map(option => toCamelCase(option)) : [],
+      contactStatus: contactStatus ? contactStatus.map(option => toCamelCase(option)) : [],
     }
     ;[personActivity, tierCalculation] = await Promise.all([
       masClient.postPersonActivityLog(crn, body, page as string),
@@ -56,7 +59,8 @@ export const getPersonActivity = async (
         keywords,
         dateFrom,
         dateTo,
-        compliance,
+        contactType,
+        contactStatus,
         personActivity,
         tierCalculation,
       },

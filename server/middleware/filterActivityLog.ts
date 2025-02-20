@@ -3,6 +3,12 @@
 import { DateTime } from 'luxon'
 import { Route, ActivityLogFilters, ActivityLogFiltersResponse, SelectedFilterItem, Option } from '../@types'
 
+const contactFilters = ['contactType', 'contactStatus'] as const
+
+type FilterOptions = {
+  [K in (typeof contactFilters)[number]]: Option[]
+}
+
 export const filterActivityLog: Route<void> = (req, res, next) => {
   if (req?.query?.submit) {
     let url = req.url.split('&page=')[0]
@@ -12,20 +18,36 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
   const { crn } = req.params
   const { keywords = '', dateFrom = '', dateTo = '', clearFilterKey, clearFilterValue } = req.query
   const errors = req?.session?.errors
-  const { compliance: complianceQuery = [] } = req.query
-  let compliance = complianceQuery as string[] | string
+  const { contactType: contactTypeQuery = [], contactStatus: contactStatusQuery = [] } = req.query
+  let contactType = contactTypeQuery as string[] | string
+  let contactStatus = contactStatusQuery as string[] | string
   const baseUrl = `/case/${crn}/activity-log`
-  if (!Array.isArray(compliance)) {
-    compliance = [compliance]
+  if (!Array.isArray(contactType)) {
+    contactType = [contactType]
   }
-  if (compliance?.length && clearFilterKey === 'compliance') {
-    compliance = compliance.filter(value => value !== clearFilterValue)
+  if (!Array.isArray(contactStatus)) {
+    contactStatus = [contactStatus]
   }
-  const complianceFilterOptions: Option[] = [
-    { text: 'Without an outcome', value: 'no outcome' },
-    { text: 'Complied', value: 'complied' },
-    { text: 'Not complied', value: 'not complied' },
-  ]
+  if (contactType?.length && clearFilterKey === 'contactType') {
+    contactType = contactType.filter(value => value !== clearFilterValue)
+  }
+  if (contactStatus?.length && clearFilterKey === 'contactStatus') {
+    contactStatus = contactStatus.filter(value => value !== clearFilterValue)
+  }
+
+  const contactFilterOptions: FilterOptions = {
+    contactType: [{ text: 'National Standard', value: 'national standard' }],
+    contactStatus: [
+      { text: 'Absence waiting for evidence', value: 'absence waiting for evidence' },
+      { text: 'Acceptable absence', value: 'acceptable absence' },
+      { text: 'Complied', value: 'complied' },
+      { text: 'Failed to comply', value: 'failed to comply' },
+      { text: 'Rescheduled', value: 'rescheduled' },
+      { text: 'No outcome', value: 'no outcome' },
+      { text: 'Warning letter', value: 'warning letter' },
+    ],
+  }
+
   const filters: ActivityLogFilters = {
     keywords: keywords && clearFilterKey !== 'keywords' ? (keywords as string) : '',
     dateFrom:
@@ -34,7 +56,8 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
         : '',
     dateTo:
       dateTo && dateFrom && !errors?.errorMessages?.dateTo && clearFilterKey !== 'dateRange' ? (dateTo as string) : '',
-    compliance,
+    contactType,
+    contactStatus,
   }
 
   const getQueryString = (values: ActivityLogFilters | Record<string, string>): string => {
@@ -76,11 +99,13 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
     .filter(([_key, value]) => value)
     .reduce((acc, [filterKey, filterValue]) => {
       let value: string | SelectedFilterItem[] = null
-      if (Array.isArray(filterValue)) {
+      if (['contactType', 'contactStatus'].includes(filterKey) && Array.isArray(filterValue)) {
         value = []
         for (const text of filterValue) {
           value.push({
-            text: complianceFilterOptions.find(option => option.value === text).text,
+            text: contactFilterOptions[filterKey as (typeof contactFilters)[number]].find(
+              option => option.value === text,
+            ).text,
             href: filterHref(filterKey, text),
           })
         }
@@ -97,10 +122,16 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
       return filterKey !== 'dateTo' ? { ...acc, [filterKey]: value } : acc
     }, {})
 
-  const complianceOptions: Option[] = complianceFilterOptions.map(({ text, value }) => ({
+  const contactTypeOptions: Option[] = contactFilterOptions.contactType.map(({ text, value }) => ({
     text,
     value,
-    checked: filters.compliance.includes(value),
+    checked: filters.contactType.includes(value),
+  }))
+
+  const contactStatusOptions: Option[] = contactFilterOptions.contactStatus.map(({ text, value }) => ({
+    text,
+    value,
+    checked: filters.contactStatus.includes(value),
   }))
 
   const today = new Date()
@@ -109,13 +140,15 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
   const filtersResponse: ActivityLogFiltersResponse = {
     errors,
     selectedFilterItems,
-    complianceOptions,
+    contactTypeOptions,
+    contactStatusOptions,
     baseUrl,
     queryStr,
     queryStrPrefix,
     queryStrSuffix,
     keywords: filters.keywords,
-    compliance: filters.compliance,
+    contactType: filters.contactType,
+    contactStatus: filters.contactStatus,
     dateFrom: filters.dateFrom,
     dateTo: filters.dateTo,
     maxDate,

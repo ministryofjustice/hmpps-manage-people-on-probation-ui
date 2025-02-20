@@ -133,14 +133,16 @@ describe('/middleware/getPersonActivity', () => {
     keywords: 'Some keywords',
     dateFrom: '14/1/2025',
     dateTo: '21/1/2025',
-    compliance: ['complied', 'not complied'],
+    contactType: ['national standard'],
+    contactStatus: ['complied', 'not complied'],
   }
 
   it('should request the filtered results from the api, if matching cache does not exist', async () => {
     req.query = { page: '0' }
     res.locals.filters = {
       ...filterVals,
-      complianceOptions: [],
+      contactTypeOptions: [],
+      contactStatusOptions: [],
       errors: null,
       selectedFilterItems: {},
       baseUrl: '',

@@ -6,7 +6,8 @@ export interface ActivityLogFilters {
   keywords: string
   dateFrom: string
   dateTo: string
-  compliance: string[]
+  contactType: string[]
+  contactStatus: string[]
   clearFilterKey?: string
   clearFilterValue?: string
 }
@@ -15,7 +16,8 @@ export interface ActivityLogRequestBody {
   keywords: string
   dateFrom: string
   dateTo: string
-  filters: string[]
+  contactType: string[]
+  contactStatus: string[]
 }
 
 export interface SelectedFilterItem {
@@ -26,7 +28,8 @@ export interface SelectedFilterItem {
 export interface ActivityLogFiltersResponse extends ActivityLogFilters {
   errors: Errors
   selectedFilterItems: Record<string, SelectedFilterItem[]>
-  complianceOptions: Option[]
+  contactTypeOptions: Option[]
+  contactStatusOptions: Option[]
   baseUrl: string
   queryStr: string
   queryStrPrefix: string
