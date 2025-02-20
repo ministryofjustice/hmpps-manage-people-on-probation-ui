@@ -1,6 +1,6 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
-import { errorMessages } from '../../server/properties'
+import { errorMessages, contactFilterOptions } from '../../server/properties'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'
@@ -45,13 +45,19 @@ context('Activity log', () => {
     cy.get('[data-qa="date-from"]').within(() => cy.get('input').should('exist').should('have.value', ''))
     cy.get('[data-qa="date-to"]').within(() => cy.get('label').should('contain.text', 'Date to'))
     cy.get('[data-qa="date-to"]').within(() => cy.get('input').should('exist').should('have.value', ''))
-    cy.get('[data-qa="compliance"]').within(() =>
-      cy.get('legend').should('exist').should('contain.text', 'Compliance filters'),
+    cy.get('[data-qa="contact-type"]').within(() =>
+      cy.get('legend').should('exist').should('contain.text', 'Contact type'),
     )
-    const filters = ['Without an outcome', 'Complied', 'Not complied']
-    cy.get('[data-qa="compliance"] .govuk-checkboxes__item').each(($el, i) => {
+    cy.get('[data-qa="contact-type"] .govuk-checkboxes__item').each(($el, i) => {
       cy.wrap($el).find('input').should('not.be.checked')
-      cy.wrap($el).find('label').should('contain.text', filters[i])
+      cy.wrap($el).find('label').should('contain.text', contactFilterOptions.contactType[i].text)
+    })
+    cy.get('[data-qa="contact-status"]').within(() =>
+      cy.get('legend').should('exist').should('contain.text', 'Contact status'),
+    )
+    cy.get('[data-qa="contact-status"] .govuk-checkboxes__item').each(($el, i) => {
+      cy.wrap($el).find('input').should('not.be.checked')
+      cy.wrap($el).find('label').should('contain.text', contactFilterOptions.contactStatus[i].text)
     })
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
@@ -164,7 +170,7 @@ context('Activity log', () => {
     page.getSelectedFiltersBox().find('h3:nth-of-type(1)').should('contain.text', 'Search term')
     page.getSelectedFilterTags().should('have.length', 1)
     page.getSelectedFilterTag(1).should('contain.text', value)
-    page.getCardHeader('timeline1').should('contain.text', 'Phone call from Eula Schmeler')
+    page.getCardHeader('timeline1').should('contain.text', 'Video call')
     page.getKeywordsInput().should('have.value', value)
   })
   it('should remove the tag, clear the keyword field and reset the list if the keyword tag is clicked', () => {
@@ -192,7 +198,7 @@ context('Activity log', () => {
     page.getDateToInput().should('have.value', toDate)
     page.getSelectedFilterTags().should('have.length', 1)
     page.getSelectedFilterTag(1).should('contain.text', `${fromDate} - ${toDate}`)
-    page.getCardHeader('timeline1').should('contain.text', 'Phone call from Eula Schmeler')
+    page.getCardHeader('timeline1').should('contain.text', 'Video call')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '1')
