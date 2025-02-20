@@ -1,0 +1,13 @@
+<div class="app-note">
+    <p class="govuk-body govuk-!-margin-bottom-1">
+        {{ note.note }}{% if note.hasNoteBeenTruncated === true  %}... <a href="{{ href }}">View full note</a>{% endif %}
+    </p>
+    <p class="govuk-body-s secondary-text app-note__author">
+        Comment added by 
+        {% if note.createdBy %}
+            {{ note.createdBy }} on {{ note.createdByDate | dateWithYear }}
+        {% else %}
+            not entered
+        {% endif %}
+    </p>
+</div>

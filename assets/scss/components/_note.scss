@@ -1,0 +1,9 @@
+.app-note {
+    .app-note__author {
+        @include govuk-responsive-margin(2, "bottom");
+    }
+
+    &:not(:last-child) .app-note__author {
+        @include govuk-responsive-padding(2, "bottom");
+    }
+}
