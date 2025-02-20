@@ -2,12 +2,7 @@
 
 import { DateTime } from 'luxon'
 import { Route, ActivityLogFilters, ActivityLogFiltersResponse, SelectedFilterItem, Option } from '../@types'
-
-const contactFilters = ['contactType', 'contactStatus'] as const
-
-type FilterOptions = {
-  [K in (typeof contactFilters)[number]]: Option[]
-}
+import { contactFilterOptions, contactFilters } from '../properties'
 
 export const filterActivityLog: Route<void> = (req, res, next) => {
   if (req?.query?.submit) {
@@ -33,19 +28,6 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
   }
   if (contactStatus?.length && clearFilterKey === 'contactStatus') {
     contactStatus = contactStatus.filter(value => value !== clearFilterValue)
-  }
-
-  const contactFilterOptions: FilterOptions = {
-    contactType: [{ text: 'National Standard', value: 'national standard' }],
-    contactStatus: [
-      { text: 'Absence waiting for evidence', value: 'absence waiting for evidence' },
-      { text: 'Acceptable absence', value: 'acceptable absence' },
-      { text: 'Complied', value: 'complied' },
-      { text: 'Failed to comply', value: 'failed to comply' },
-      { text: 'Rescheduled', value: 'rescheduled' },
-      { text: 'No outcome', value: 'no outcome' },
-      { text: 'Warning letter', value: 'warning letter' },
-    ],
   }
 
   const filters: ActivityLogFilters = {

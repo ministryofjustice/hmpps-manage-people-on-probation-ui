@@ -1,6 +1,6 @@
 import logger from '../../../logger'
 import { Errors, Route } from '../../@types'
-import properties from '../../properties'
+import { errorMessages } from '../../properties'
 import utils from '../../utils'
 import { getDataValue } from '../../utils/utils'
 
@@ -26,8 +26,8 @@ const appointments: Route<void> = (req, res, next) => {
   const validateType = (): void => {
     if (req.url.includes('/type')) {
       if (!req.body?.appointments?.[crn]?.[id]?.type) {
-        logger.info(properties.errorMessages.appointments.type.log)
-        const text = properties.errorMessages.appointments.type.errors.isEmpty
+        logger.info(errorMessages.appointments.type.log)
+        const text = errorMessages.appointments.type.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-type`
         errors = utils.addError(errors, { text, anchor })
       }
@@ -41,8 +41,8 @@ const appointments: Route<void> = (req, res, next) => {
       const showReveal = ['Home visit', 'Planned office visit'].includes(type)
       const sentences = req.session.data.sentences[crn]
       if (!req.body?.appointments?.[crn]?.[id]?.sentence) {
-        logger.info(properties.errorMessages.appointments.sentence.log)
-        const text = properties.errorMessages.appointments.sentence.errors.isEmpty
+        logger.info(errorMessages.appointments.sentence.log)
+        const text = errorMessages.appointments.sentence.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-sentence`
         errors = utils.addError(errors, { text, anchor })
       } else {
@@ -52,8 +52,8 @@ const appointments: Route<void> = (req, res, next) => {
           sentence?.requirements?.length &&
           !req?.body?.appointments?.[crn]?.[id]?.['sentence-requirement']
         ) {
-          logger.info(properties.errorMessages.appointments['sentence-requirement'].log)
-          const text = properties.errorMessages.appointments['sentence-requirement'].errors.isEmpty
+          logger.info(errorMessages.appointments['sentence-requirement'].log)
+          const text = errorMessages.appointments['sentence-requirement'].errors.isEmpty
           const anchor = `appointments-${crn}-${id}-sentence-requirement`
           errors = utils.addError(errors, { text, anchor })
         }
@@ -62,8 +62,8 @@ const appointments: Route<void> = (req, res, next) => {
           sentence?.licenceConditions?.length &&
           !req?.body?.appointments?.[crn]?.[id]?.['sentence-licence-condition']
         ) {
-          logger.info(properties.errorMessages.appointments['sentence-licence-condition'].log)
-          const text = properties.errorMessages.appointments['sentence-licence-condition'].errors.isEmpty
+          logger.info(errorMessages.appointments['sentence-licence-condition'].log)
+          const text = errorMessages.appointments['sentence-licence-condition'].errors.isEmpty
           const anchor = `appointments-${crn}-${id}-sentence-licence-condition`
           errors = utils.addError(errors, { text, anchor })
         }
@@ -74,8 +74,8 @@ const appointments: Route<void> = (req, res, next) => {
   const validateLocation = (): void => {
     if (req.url.includes('/location')) {
       if (!req.body?.appointments?.[crn]?.[id]?.location) {
-        logger.info(properties.errorMessages.appointments.location.log)
-        const text = properties.errorMessages.appointments.location.errors.isEmpty
+        logger.info(errorMessages.appointments.location.log)
+        const text = errorMessages.appointments.location.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-location`
         errors = utils.addError(errors, { text, anchor })
       }
@@ -87,20 +87,20 @@ const appointments: Route<void> = (req, res, next) => {
       // eslint-disable-next-line no-underscore-dangle
       localParams.minDate = req.body._minDate
       if (!req.body?.appointments?.[crn]?.[id]?.date) {
-        logger.info(properties.errorMessages.appointments.date.log)
-        const text = properties.errorMessages.appointments.date.errors.isEmpty
+        logger.info(errorMessages.appointments.date.log)
+        const text = errorMessages.appointments.date.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-date`
         errors = utils.addError(errors, { text, anchor })
       }
       if (!req.body?.appointments?.[crn]?.[id]?.['start-time']) {
-        logger.info(properties.errorMessages.appointments['start-time'].log)
-        const text = properties.errorMessages.appointments['start-time'].errors.isEmpty
+        logger.info(errorMessages.appointments['start-time'].log)
+        const text = errorMessages.appointments['start-time'].errors.isEmpty
         const anchor = `appointments-${crn}-${id}-start-time`
         errors = utils.addError(errors, { text, anchor })
       }
       if (!req.body?.appointments?.[crn]?.[id]?.['end-time']) {
-        logger.info(properties.errorMessages.appointments['end-time'].log)
-        const text = properties.errorMessages.appointments['end-time'].errors.isEmpty
+        logger.info(errorMessages.appointments['end-time'].log)
+        const text = errorMessages.appointments['end-time'].errors.isEmpty
         const anchor = `appointments-${crn}-${id}-end-time`
         errors = utils.addError(errors, { text, anchor })
       }
@@ -123,31 +123,31 @@ const appointments: Route<void> = (req, res, next) => {
       isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
     }
     if (!repeatingValue) {
-      logger.info(properties.errorMessages.appointments.repeating.log)
-      const text = properties.errorMessages.appointments.repeating.errors.isEmpty
+      logger.info(errorMessages.appointments.repeating.log)
+      const text = errorMessages.appointments.repeating.errors.isEmpty
       const anchor = `appointments-${crn}-${id}-repeating`
       errors = utils.addError(errors, { text, anchor })
     }
     if (repeatingValue === 'Yes' && !req.body?.appointments?.[crn]?.[id]?.['repeating-frequency']) {
-      logger.info(properties.errorMessages.appointments['repeating-frequency'].log)
-      const text = properties.errorMessages.appointments['repeating-frequency'].errors.isEmpty
+      logger.info(errorMessages.appointments['repeating-frequency'].log)
+      const text = errorMessages.appointments['repeating-frequency'].errors.isEmpty
       const anchor = `appointments-${crn}-${id}-repeating-frequency`
       errors = utils.addError(errors, { text, anchor })
     }
     if (repeatingValue === 'Yes' && !req.body?.appointments?.[crn]?.[id]?.['repeating-count']) {
-      logger.info(properties.errorMessages.appointments['repeating-count'].log)
-      const text = properties.errorMessages.appointments['repeating-count'].errors.isEmpty
+      logger.info(errorMessages.appointments['repeating-count'].log)
+      const text = errorMessages.appointments['repeating-count'].errors.isEmpty
       const anchor = `appointments-${crn}-${id}-repeating-count`
       errors = utils.addError(errors, { text, anchor })
     }
     if (repeatingCountValue && !validRepeatingCount) {
-      logger.info(properties.errorMessages.appointments['repeating-count'].log)
-      const text = properties.errorMessages.appointments['repeating-count'].errors.isInvalid
+      logger.info(errorMessages.appointments['repeating-count'].log)
+      const text = errorMessages.appointments['repeating-count'].errors.isInvalid
       const anchor = `appointments-${crn}-${id}-repeating-count`
       errors = utils.addError(errors, { text, anchor })
     }
     if (isMoreThanAYear) {
-      const textFrequency = properties.errorMessages.appointments['repeating-frequency'].errors.isMoreThanAYear
+      const textFrequency = errorMessages.appointments['repeating-frequency'].errors.isMoreThanAYear
       const anchor = `appointments-${crn}-${id}-repeating-frequency`
       errors = utils.addError(errors, { text: textFrequency, anchor })
     }

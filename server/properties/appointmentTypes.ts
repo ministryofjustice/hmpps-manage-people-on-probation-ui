@@ -1,6 +1,6 @@
 import { AppointmentTypeOption } from '../@types'
 
-const appointmentTypes: AppointmentTypeOption[] = [
+export const appointmentTypes: AppointmentTypeOption[] = [
   {
     text: 'Home visit',
     value: 'HomeVisitToCaseNS',
@@ -18,5 +18,3 @@ const appointmentTypes: AppointmentTypeOption[] = [
     value: 'PlannedOfficeVisitNS',
   },
 ]
-
-export default appointmentTypes

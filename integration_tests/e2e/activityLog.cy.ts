@@ -1,6 +1,6 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
-import errorMessages from '../../server/properties/errorMessages'
+import { errorMessages } from '../../server/properties'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'

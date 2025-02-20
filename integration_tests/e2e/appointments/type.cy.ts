@@ -1,7 +1,7 @@
 import Page from '../../pages/page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import properties from '../../../server/properties'
+import { appointmentTypes } from '../../../server/properties'
 import 'cypress-plugin-tab'
 
 const crn = 'X778160'
@@ -24,8 +24,8 @@ describe('Arrange an appointment', () => {
         expect($backLink.text()).to.eq('Back')
       })
       typePage.getBackLink().should('have.attr', 'href', '/')
-      for (let i = 1; i < properties.appointmentTypes.length; i += 1) {
-        typePage.getRadioLabel('type', i).should('contain.text', properties.appointmentTypes[i - 1].text)
+      for (let i = 1; i < appointmentTypes.length; i += 1) {
+        typePage.getRadioLabel('type', i).should('contain.text', appointmentTypes[i - 1].text)
         typePage.getRadio('type', i).should('not.be.checked')
       }
       typePage.getSubmitBtn().should('contain.text', 'Continue')
