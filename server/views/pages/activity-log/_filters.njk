@@ -126,13 +126,13 @@
         items: filters.selectedFilterItems.contactType
    }), filterCategories) %}
 {% endif %}
-{% if filters.selectedFilterItems.compliance.length %}
+{% if filters.selectedFilterItems.contactStatus.length %}
   {% set filterCategories = (filterCategories.push(
     {
         heading: {
           text: 'Contact status'
         },
-        items: filters.selectedFilterItems.compliance
+        items: filters.selectedFilterItems.contactStatus
    }), filterCategories) %}
 {% endif %}
 
