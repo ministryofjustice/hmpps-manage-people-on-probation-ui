@@ -20,6 +20,7 @@ $govuk-page-width: $moj-page-width;
 @import './components/rosh-widget';
 @import './components/timeline';
 @import './components/flex';
+@import './components/note';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */

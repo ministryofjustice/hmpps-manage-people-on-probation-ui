@@ -21,29 +21,7 @@
   {% set hasNote = address.addressNote %}
   {% if address.addressNotes  %}
     {% for addressNote in address.addressNotes %}
-      {% set note %}
-        {% if addressNote.hasNoteBeenTruncated === true  %}
-          <p class="govuk-body line-break govuk-!-margin-bottom-1">{{ addressNote.note }}...<a href="/case/{{ crn }}/personal-details/addresses/{{ address.id }}/note/{{ addressNote.id }}">View full note</a>
-          </p>
-        {% else %}
-          <p class="govuk-body line-break govuk-!-margin-bottom-1">{{ addressNote.note }} </p>
-        {% endif %}
-
-        {% if addressNote.createdBy %}
-          {% if loop.last %}
-            <p class="govuk-body-s secondary-text">Comment added by {{ addressNote.createdBy }} on {{ addressNote.createdByDate | dateWithYear }}</p>
-          {% else %}
-            <p class="govuk-body-s secondary-text govuk-!-padding-bottom-2">Comment added by {{ addressNote.createdBy }} on {{ addressNote.createdByDate | dateWithYear }}</p>
-          {% endif %}
-        {% else %}
-          {% if loop.last %}
-            <p class="govuk-body-s secondary-text">Comment added by not entered</p>
-          {% else %}
-            <p class="govuk-body-s secondary-text govuk-!-padding-bottom-2">Comment added by not entered</p>
-          {% endif %}
-        {% endif %}
-      {% endset %}
-      {% set notes = notes.concat(note) %}
+      {% set notes = notes.concat(appNote(addressNote, '/case/' + crn + '/personal-details/addresses/' + address.id + '/note/' + addressNote.id)) %}
     {% endfor  %}
   {% elseif address.addressNote %}
     {% set note = address.addressNote.note %}
