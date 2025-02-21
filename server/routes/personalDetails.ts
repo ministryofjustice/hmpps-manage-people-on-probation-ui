@@ -8,7 +8,7 @@ import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient from '../data/tierApiClient'
 import type { Route } from '../@types'
 import { toIsoDateFromPicker, toPredictors, toRoshWidget } from '../utils/utils'
-import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import type { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import { validateWithSpec } from '../utils/validationUtils'
 import { personDetailsValidation } from '../properties'
 import renders from '../controllers/renders'
@@ -82,19 +82,50 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
       const editingMainAddress = req.path.includes('personal-details/edit-main-address')
       const errorMessages = validateWithSpec(req.body, personDetailsValidation(editingMainAddress))
       res.locals.errorMessages = errorMessages
+      const updateFn = editingMainAddress ? 'updatePersonalDetailsAddress' : 'updatePersonalDetailsContact'
 
       let request: PersonalDetailsUpdateRequest = {
         ...req.body,
       }
+
+      const {
+        noFixedAddress,
+        buildingName,
+        buildingNumber,
+        streetName,
+        district,
+        town,
+        county,
+        postcode,
+        phoneNumber: telephoneNumber,
+        mobileNumber,
+        emailAddress: email,
+        addressTypeCode: typeCode,
+        verified,
+        startDate: from,
+        endDate: to,
+        notes,
+      } = request
+
+      const hasNoFixedAddress = noFixedAddress === 'true'
+
       let action = 'SAVE_EDIT_PERSONAL_DETAILS'
       const renderPage = req.path.split('/').pop()
+
       if (editingMainAddress) {
         request = {
           ...request,
           endDate: toIsoDateFromPicker(req.body.endDate),
           startDate: toIsoDateFromPicker(req.body.startDate),
-          noFixedAddress: req?.body?.noFixedAddress === 'true',
-          verified: req?.body?.verified ? req.body.verified === 'true' : null,
+          noFixedAddress: hasNoFixedAddress,
+          buildingName: !hasNoFixedAddress ? buildingName : '',
+          buildingNumber: !hasNoFixedAddress ? buildingNumber : '',
+          streetName: !hasNoFixedAddress ? streetName : '',
+          district: !hasNoFixedAddress ? district : '',
+          town: !hasNoFixedAddress ? town : '',
+          county: !hasNoFixedAddress ? county : '',
+          postcode: !hasNoFixedAddress ? postcode : '',
+          verified: verified ? verified === 'true' : null,
         }
         action = 'SAVE_EDIT_MAIN_ADDRESS'
       }
@@ -128,40 +159,21 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
 
         const risksWidget = toRoshWidget(risks)
         const predictorScores = toPredictors(predictors)
-        const {
-          noFixedAddress,
-          buildingName,
-          buildingNumber,
-          streetName,
-          district,
-          town,
-          county,
-          postcode,
-          phoneNumber: telephoneNumber,
-          mobileNumber,
-          emailAddress: email,
-          addressTypeCode: typeCode,
-          verified,
-          startDate: from,
-          endDate: to,
-          notes,
-        } = request
 
         let personalDetailsData = { ...personalDetails }
-
         if (editingMainAddress) {
           personalDetailsData = {
             ...personalDetailsData,
             mainAddress: {
               ...personalDetailsData.mainAddress,
               noFixedAddress,
-              buildingName,
-              buildingNumber,
-              streetName,
-              district,
-              town,
-              county,
-              postcode,
+              buildingName: !hasNoFixedAddress ? buildingName : '',
+              buildingNumber: !hasNoFixedAddress ? buildingNumber : '',
+              streetName: !hasNoFixedAddress ? streetName : '',
+              district: !hasNoFixedAddress ? district : '',
+              town: !hasNoFixedAddress ? town : '',
+              county: !hasNoFixedAddress ? county : '',
+              postcode: !hasNoFixedAddress ? postcode : '',
               typeCode,
               verified,
               from,
@@ -189,10 +201,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
           backLink: `/case/${crn}/personal-details`,
         })
       } else {
-        await masClient.updatePersonalDetails(
-          crn,
-          Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')),
-        )
+        await masClient[updateFn](crn, Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')))
         res.redirect(`/case/${crn}/personal-details?update=success`)
       }
     },

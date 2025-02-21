@@ -46,11 +46,11 @@ export interface PersonalDetailsUpdateRequest extends Validateable {
   county?: string
   postcode?: string
   addressTypeCode?: string
+  verified?: string | boolean
+  noFixedAddress?: string | boolean
   startDate?: string
   endDate?: string
   notes?: string
-  verified?: string | boolean
-  noFixedAddress?: string | boolean
 }
 
 export interface PersonalContact {
