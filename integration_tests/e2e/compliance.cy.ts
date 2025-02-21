@@ -76,4 +76,12 @@ context('Compliance', () => {
       page.getRowData(card, row, 'Value').should('contain.text', value)
     })
   })
+  it('Compliance page is rendered with multiple NSIs in progress warning message', () => {
+    cy.visit('/case/X778160/compliance')
+    const page = Page.verifyOnPage(CompliancePage)
+    cy.get('.govuk-warning-text').should(
+      'contain.html',
+      'There are multiple breach NSIs in progress.<br>Check and correct any issues in NDelius.',
+    )
+  })
 })

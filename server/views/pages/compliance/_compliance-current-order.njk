@@ -38,11 +38,7 @@
 
     <div class="app-compliance-panel {{ complianceStatus.panelClass }}">
       <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
-      {% if failureToComplyCount >= 2 %}
-        {{ complianceStatus.text }} – <a href = "/case/{{ crn }}/handoff/delius">Start a breach</a>
-      {% else %}
         {{ complianceStatus.text }}
-      {% endif %}
       </p>
     </div>
 
@@ -151,18 +147,9 @@ No start date on current order
 
       {{ appSummaryCard({
         attributes: {'data-qa': 'breach' + loop.index + 'Card'},
-        classes: 'app-summary-card--compliance' + lastBreach + ' app-summary-card--large-title',
+        classes: 'app-summary-card--compliance ' + lastBreach + ' app-summary-card--large-title',
         titleText: "Breach details",
-        html: breachList,
-        actions: {
-          items: [
-            {
-              href: "",
-              text: "View in NDelius",
-              visuallyHiddenText: "name"
-            }
-          ]
-        }
+        html: breachList
       }) }}
     {% endif %}
 

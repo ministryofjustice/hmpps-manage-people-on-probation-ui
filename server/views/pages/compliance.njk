@@ -40,16 +40,12 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         {{ govukWarningText({
-          html: 'There are multiple breach NSIs in progress on NDelius.<br />Use NDelius to check and correct any problems.<div class="govuk-!-margin-top-1"><a href="/case/' + crn + '/handoff/delius">Go to NDelius</a></div>',
+          html: 'There are multiple breach NSIs in progress.<br>Check and correct any issues in NDelius.',
           iconFallbackText: 'Warning'
         }) }}
       </div>
     </div>
 {% endif %}
-
-<p class="govuk-!-margin-bottom-6">
-  <a href="/case/{{ crn }}/handoff/delius">Use NDelius to start a breach</a>
-</p>
 
 {% include './compliance/_compliance-current-order.njk' %}
 {% include './compliance/_compliance-previous-orders.njk' %}
