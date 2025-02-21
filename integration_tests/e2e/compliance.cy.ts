@@ -6,6 +6,7 @@ context('Compliance', () => {
     cy.visit('/case/X000001/compliance')
     const page = Page.verifyOnPage(CompliancePage)
     page.assertRiskTags()
+    cy.get('.app-compliance-panel').should('contain.text', 'Breach in progress')
     page.getCardHeader('sentence1').should('contain.text', 'ORA Community Order')
     page
       .getRowData('sentence1', 'mainOffenceDescription', 'Value')
@@ -15,6 +16,7 @@ context('Compliance', () => {
     page.getRowData('sentence1', 'breach', 'Value').should('contain.text', 'A breach is in progress')
 
     page.getCardHeader('breach1').should('contain.text', 'Breach details')
+    page.getCardHeader('breach1').find('.app-summary-card__actions').should('not.exist')
     page.getRowData('breach1', 'startDate', 'Value').should('contain.text', '2 March 2020')
     page.getRowData('breach1', 'status', 'Value').should('contain.text', 'An active breach status')
 
