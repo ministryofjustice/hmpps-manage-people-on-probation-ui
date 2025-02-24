@@ -1,5 +1,5 @@
 {% extends "../../partials/layout.njk" %}
-{% set title = 'Personal circumstances' %}
+{% set title = 'Personal details' %}
 {% set pageTitle = makePageTitle({ pageHeading: ["Personal circumstances", "Personal details"] }) %}
 
 {% block beforeContent %}
@@ -29,6 +29,15 @@
 <h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>
 
 {% for circumstance in circumstances.circumstances %}
+
+  {% set notes = '' %}
+  {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
+  {% if hasNotes  %}
+    {% for circumstanceNote in circumstance.circumstanceNotes %}
+      {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
+    {% endfor  %}
+  {% endif %}
+
   {% set circumstanceHtml %}
     {{ govukSummaryList({
       rows: [
@@ -50,7 +59,7 @@
         },
         {
           key: { text: "Notes" },
-          value: { text: circumstance.notes if circumstance.notes else 'No notes' }
+          value: { html: notes if hasNotes else 'No notes' }
         }
       ]
     }) }}

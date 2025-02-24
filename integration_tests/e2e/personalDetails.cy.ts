@@ -92,4 +92,17 @@ context('Personal Details', () => {
     const page = Page.verifyOnPage(PersonalDetailsPage)
     page.getRowData('contactDetails', 'mainAddressNotes', 'Value').should('contain.text', 'No notes')
   })
+
+  it('Personal Details page for a personal circumstance with a single note is rendered', () => {
+    cy.visit('/case/X000001/personal-details/circumstances/0/note/0')
+    const page = Page.verifyOnPage(PersonalDetailsPage)
+    page
+      .getRowData('contactDetails', 'circumstanceType', 'Value')
+      .should('contain.text', 'Committed/ Transferred to Crown')
+    page
+      .getRowData('contactDetails', 'circumstanceSubType', 'Value')
+      .should('contain.text', 'Life imprisonment (Adult)')
+    page.getRowData('contactDetails', 'circumstanceStartDate', 'Value').should('contain.text', '3 April 2021')
+    page.getRowData('contactDetails', 'circumstanceVerified', 'Value').should('contain.text', 'Yes')
+  })
 })
