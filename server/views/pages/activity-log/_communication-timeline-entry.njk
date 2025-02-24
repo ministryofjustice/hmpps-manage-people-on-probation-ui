@@ -1,5 +1,15 @@
+{% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed  %}
+
 {% set titleHtml %}
   <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="govuk-!-font-weight-bold">{% include './_communication-title.njk' %} at&nbsp;{{ entry.startDateTime | govukTime }}<span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+{% endset %}
+{% set actionsHtml %}
+  {% if shouldPromptToRecordAnOutcome %}
+    <a href="/case/{{ crn }}/handoff/delius" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Record an outcome</a>
+  {% else %}
+    {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
+  {% endif %}
 {% endset %}
 
 {% set html %}

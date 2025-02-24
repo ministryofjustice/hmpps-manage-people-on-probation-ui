@@ -1,5 +1,5 @@
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
-{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and entry.wasAbsent === false and hasAppointmentStartTimePassed and not entry.didTheyComply %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed  %}
 {% set appointment = entry %}
 
 {% set titleHtml %}
@@ -14,7 +14,7 @@
 
 {% set actionsHtml %}
   {% if shouldPromptToRecordAnOutcome %}
-    <a href="/case/{{ crn }}/handoff/delius" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Log an outcome</a>
+    <a href="/case/{{ crn }}/handoff/delius" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Record an outcome</a>
   {% else %}
     {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
   {% endif %}
