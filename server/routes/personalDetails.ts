@@ -107,8 +107,6 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
         notes,
       } = request
 
-      const hasNoFixedAddress = noFixedAddress === 'true'
-
       let action = 'SAVE_EDIT_PERSONAL_DETAILS'
       const renderPage = req.path.split('/').pop()
 
@@ -117,7 +115,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
           ...request,
           endDate: toIsoDateFromPicker(req.body.endDate),
           startDate: toIsoDateFromPicker(req.body.startDate),
-          noFixedAddress: hasNoFixedAddress,
+          noFixedAddress: req?.body?.noFixedAddress === 'true',
           buildingName,
           buildingNumber,
           streetName,
