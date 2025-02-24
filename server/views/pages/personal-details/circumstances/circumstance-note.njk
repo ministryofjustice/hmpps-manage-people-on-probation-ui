@@ -1,6 +1,6 @@
 {% extends "../../../partials/layout.njk" %}
-{% set title = 'Personal details' %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal details"] }) %}
+{% set title = 'Personal circumstances' %}
+{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal circumstances"] }) %}
 {% set circumstance = circumstanceOverview.circumstance %}
 
 {% block beforeContent %}
@@ -61,7 +61,7 @@
   {% endset %}
 
   {{ appSummaryCard({
-    attributes: {'data-qa': 'contactDetailsCard'},
+    attributes: {'data-qa': 'personalCircumstancesCard'},
     titleHtml: '<span class="govuk-!-font-weight-regular govuk-!-font-size-19">' + circumstance.type + '</span><br />' + circumstance.subType,
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: circumstanceHtml,

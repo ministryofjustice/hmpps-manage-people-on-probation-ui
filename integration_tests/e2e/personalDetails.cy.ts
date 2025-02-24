@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import PersonalDetailsPage from '../pages/personalDetails'
+import PersonalCircumstancesPage from '../pages/personalCircumstances'
 
 context('Personal Details', () => {
   it('Personal Details page is rendered', () => {
@@ -95,14 +96,14 @@ context('Personal Details', () => {
 
   it('Personal Details page for a personal circumstance with a single note is rendered', () => {
     cy.visit('/case/X000001/personal-details/circumstances/0/note/0')
-    const page = Page.verifyOnPage(PersonalDetailsPage)
+    const page = Page.verifyOnPage(PersonalCircumstancesPage)
     page
-      .getRowData('contactDetails', 'circumstanceType', 'Value')
+      .getRowData('personalCircumstances', 'circumstanceType', 'Value')
       .should('contain.text', 'Committed/ Transferred to Crown')
     page
-      .getRowData('contactDetails', 'circumstanceSubType', 'Value')
+      .getRowData('personalCircumstances', 'circumstanceSubType', 'Value')
       .should('contain.text', 'Life imprisonment (Adult)')
-    page.getRowData('contactDetails', 'circumstanceStartDate', 'Value').should('contain.text', '3 April 2021')
-    page.getRowData('contactDetails', 'circumstanceVerified', 'Value').should('contain.text', 'Yes')
+    page.getRowData('personalCircumstances', 'circumstanceStartDate', 'Value').should('contain.text', '3 April 2021')
+    page.getRowData('personalCircumstances', 'circumstanceVerified', 'Value').should('contain.text', 'Yes')
   })
 })
