@@ -107,12 +107,19 @@
         ]
       }) }}
    
-      {% if needs.assessedOn %}
-     <p class="govuk-!-margin-bottom-2"> <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysViewRiskAssessmentLink">
-    View the full risk assessment on OASys (opens in new tab)</a></p>
-    {% endif %}
-       <p><a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysCreateRiskAssessmentLink">Create a risk assessment on OASys (opens in new tab)</a>
+      <p>
+        <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysCreateRiskAssessmentLink">
+          Sign in to OASys to create a risk assessment (opens in new tab)
+        </a>
       </p>
+      {% if needs.assessedOn %}
+        <p class="govuk-!-margin-bottom-2">
+          <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysViewRiskAssessmentLink">
+            Sign in to OASys to the full risk assessment (opens in new tab)
+          </a>
+        </p>
+      {% endif %}
+       
     </div>
     <div class='govuk-!-margin-bottom-4'>
       {% if predictorScores.scores.RSR.score %}
