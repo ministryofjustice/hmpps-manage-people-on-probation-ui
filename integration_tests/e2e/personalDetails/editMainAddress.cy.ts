@@ -59,7 +59,6 @@ context('Edit main address', () => {
 
     page.getElement('#addressTypeCode option').each(($el, index) => {
       if (index) {
-        cy.task('log', index)
         const { code, description } = addressTypes[index - 1]
         cy.wrap($el).should('have.value', code).should('contain.text', description)
       }

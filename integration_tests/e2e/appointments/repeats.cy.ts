@@ -51,7 +51,7 @@ describe('Will the appointment repeat?', () => {
       loadPage()
       repeatingPage = new AppointmentRepeatingPage()
       repeatingPage.getSubmitBtn().click()
-      repeatingPage.getErrorSummaryLink(1).click()
+      repeatingPage.getErrorSummaryLink(0).click()
     })
     it('should focus the first radio button', () => {
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).should('be.focused')
@@ -102,11 +102,11 @@ describe('Will the appointment repeat?', () => {
       })
     })
     it('should focus the first frequency radio button when the first error summary link is clicked', () => {
-      repeatingPage.getErrorSummaryLink(1).click()
+      repeatingPage.getErrorSummaryLink(0).click()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency`).should('be.focused')
     })
     it('should focus the count field when the second error summary link is clicked', () => {
-      repeatingPage.getErrorSummaryLink(2).click()
+      repeatingPage.getErrorSummaryLink(1).click()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-count`).should('be.focused')
     })
   })

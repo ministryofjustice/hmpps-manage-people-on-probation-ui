@@ -44,7 +44,7 @@ const checkRequirementSentence = (type = 1) => {
         loadPage(type)
         sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-2`).click()
         sentencePage.getSubmitBtn().click()
-        sentencePage.getErrorSummaryLink(1).click()
+        sentencePage.getErrorSummaryLink(0).click()
         sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-requirement`).should('be.focused')
       })
 
@@ -103,7 +103,7 @@ const checkLicenceConditionSentence = (type = 1) => {
         loadPage(type)
         sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).click()
         sentencePage.getSubmitBtn().click()
-        sentencePage.getErrorSummaryLink(1).click()
+        sentencePage.getErrorSummaryLink(0).click()
         sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-licence-condition`).should('be.focused')
       })
       it('should link to the location page when licence condition is selected and continue is clicked', () => {
@@ -188,7 +188,7 @@ describe('Which sentence is this appointment for?', () => {
     })
     describe('The error summary link is clicked', () => {
       beforeEach(() => {
-        sentencePage.getErrorSummaryLink(1).click()
+        sentencePage.getErrorSummaryLink(0).click()
       })
       it('should focus the first radio button', () => {
         sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).should('be.focused')
