@@ -448,7 +448,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/personal-details/X000001/provisions",
+        "urlPattern": "/mas/personal-details/X801756/provisions",
         "method": "GET"
       },
       "response": {
@@ -492,7 +492,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/personal-details/X000001/circumstances",
+        "urlPattern": "/mas/personal-details/X801756/circumstances",
         "method": "GET"
       },
       "response": {
@@ -512,7 +512,26 @@
               "type": "Committed/ Transferred to Crown",
               "verified": true,
               "startDate": "2021-04-03",
-              "notes": "Some notes",
+              "circumstanceNotes": [
+                {
+                  "id": 0,
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ligula non eros porttitor tincidunt non vel ipsum. Quisque turpis erat, eleifend vitae tempus eget, posuere sit amet nunc. Maecenas vestibulum diam nibh, non porttitor magna suscipit sed. Aliquam mollis urna turpis, egestas congue elit vehicula nec. Nulla mattis tortor vel elit faucibus, vel vehicula nunc venenatis. Vivamus tortor dolor, convallis eu pulvinar id, venenatis at lorem. Duis dolor tortor, pretium ac interdum non, egestas vitae ipsum. Morbi vitae mi nec orci laoreet finibus. Vivamus ac bibendum diam. Donec eget vestibulum odio. Morbi rhoncus, turpis sed faucibus dapibus, justo enim feugiat velit, vel faucibus libero purus vel nulla. Maecenas eget purus arcu. Mauris consequat tempus pulvinar. Nulla volutpat vel arcu a tincidunt",
+                  "hasNoteBeenTruncated": true
+                },
+                {
+                  "id": 1,
+                  "createdBy": "Harry Kane",
+                  "createdByDate": "2024-10-29",
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 2,
+                  "createdByDate": "2022-01-07",
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
                 "forename": "Paul",

@@ -152,7 +152,8 @@ export interface CircumstancesDetail {
 export interface Circumstance {
   type: string
   subType: string
-  notes?: string
+  circumstanceNote?: Note
+  circumstanceNotes?: Note[]
   verified: boolean
   startDate: string
   lastUpdated: string
