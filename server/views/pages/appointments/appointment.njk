@@ -52,7 +52,7 @@
     <div class="govuk-grid-column-two-thirds">
       <div class="note-panel govuk-!-margin-bottom-6">
         {{ govukWarningText({
-          html: 'Outcome not recorded<br /><a href="/case/' + crn + '/handoff/delius">Record an outcome</a>',
+          html: 'Outcome not recorded<br /><a href="' + deliusDeepLinkUrl('ContactList', crn, contactId) + '" target="_blank" rel="external noopener noreferrer">Log an outcome</a>',
           iconFallbackText: 'Warning',
           classes: 'govuk-!-margin-bottom-0'
         }) }}
@@ -79,7 +79,7 @@
 <div class="govuk-grid-row">
   <div class="govuk-grid-column-two-thirds">
     <ul class="govuk-list govuk-!-margin-bottom-7">
-      <li><a href="/record-an-outcome/{{ crn }}/{{ appointment.id }}">Record an outcome</a></li>
+      <li><a href="/record-an-outcome/{{ crn }}/{{ appointment.id }}">Log an outcome</a></li>
       <li><a href="/arrange-appointment/{{ CRN }}/{{ appointment.id  }}/cancel">Cancel appointment</a></li>
     </ul>
   </div>
