@@ -44,6 +44,7 @@ context('Edit main address', () => {
     const page = new EditMainAddress()
     const addressTypes = getWiremockData<AddressType[]>(mockData, '/mas/personal-details/X000001', 'addressTypes')
     page.setPageTitle('Edit main address for Caroline')
+    cy.get('.moj-page-header-actions').should('not.exist')
     page
       .getElementData('noFixedAddressGroup')
       .find('.govuk-label--s')
@@ -125,6 +126,7 @@ context('Edit main address', () => {
         'contain.text',
         'An end date will change this to a previous address and you will need to add a new main address.',
       )
+    page.getElementData('verified').find('.govuk-radios__item').eq(0).click()
     page.getElementData('submitBtn').click()
     page.getElementData('updateBanner').should('contain.text', 'Contact details updated')
   })
