@@ -1,0 +1,72 @@
+{% extends "../../../partials/layout.njk" %}
+{% set title = 'Adjustments' %}
+{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal details"] }) %}
+
+
+{% block beforeContent %}
+{{ govukBreadcrumbs({
+  items: [
+    {
+      text: "My cases",
+      href: "/case"
+    },
+    {
+      text: adjustmentOverview.personSummary.name | fullName,
+      href: "/case/" + crn,
+      attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+    },
+    {
+      text: "Personal details",
+      href: "/case/" + adjustmentOverview.personSummary.crn + "/personal-details"
+    },
+    {
+      text: title
+    }
+  ]
+}) }}
+{% endblock %}
+
+{% block content %}
+  <h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>
+
+  <p>
+    <a href="{{ deliusDeepLinkUrl('EqualityMonitoring', crn) }}" target="_blank">Change adjustments on NDelius (opens in new tab)</a>
+  </p>
+
+  {% set adjustmentsHtml %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { text: "Adjustment" },
+          value: { html: '<span data-qa="adjustmentDescriptionValue">' + adjustmentOverview.provision.description + '</span>' }
+        },
+        {
+          key: { text: "Start date" },
+          value: { html: '<span data-qa="adjustmentStartDateValue">' + adjustmentOverview.provision.startDate | dateWithYear + '</span>' }
+        },
+        {
+          key: { text: "End date" },
+          value: { html: '<span data-qa="adjustmentEndDateValue">' + adjustmentOverview.provision.endDate | dateWithYear + '</span>' }
+        } if adjustmentOverview.provision.endDate,
+        {
+          key: { html: "Notes" },
+          value: { html: appNote(adjustmentOverview.provision.provisionNote, '/case/' + crn + '/personal-details/adjustments/' + adjustmentOverview.provision.id + '/note/' + adjustmentNote.id) }
+        }
+      ]
+    }) }}
+
+    <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
+        {{ lastUpdatedBy(adjustmentOverview.provision.lastUpdated, adjustmentOverview.provision.lastUpdatedBy)}}
+    </p>
+  {% endset %}
+
+  {{ appSummaryCard({
+    titleText: adjustmentOverview.provision.description,
+    attributes: {'data-qa': 'personalAdjustmentCard'},
+    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+    html: adjustmentsHtml,
+    actions: {}
+  }) }}
+
+
+{% endblock %}

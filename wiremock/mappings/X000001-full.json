@@ -474,8 +474,28 @@
           },
           "provisions": [
             {
+              "id": 0,
               "description": "Hand Rails",
-              "notes": "Some notes",
+              "provisionNotes": [
+                {
+                  "id": 0,
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ligula non eros porttitor tincidunt non vel ipsum. Quisque turpis erat, eleifend vitae tempus eget, posuere sit amet nunc. Maecenas vestibulum diam nibh, non porttitor magna suscipit sed. Aliquam mollis urna turpis, egestas congue elit vehicula nec. Nulla mattis tortor vel elit faucibus, vel vehicula nunc venenatis. Vivamus tortor dolor, convallis eu pulvinar id, venenatis at lorem. Duis dolor tortor, pretium ac interdum non, egestas vitae ipsum. Morbi vitae mi nec orci laoreet finibus. Vivamus ac bibendum diam. Donec eget vestibulum odio. Morbi rhoncus, turpis sed faucibus dapibus, justo enim feugiat velit, vel faucibus libero purus vel nulla. Maecenas eget purus arcu. Mauris consequat tempus pulvinar. Nulla volutpat vel arcu a tincidunt",
+                  "hasNoteBeenTruncated": true
+                },
+                {
+                  "id": 1,
+                  "createdBy": "Harry Kane",
+                  "createdByDate": "2024-10-29",
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 2,
+                  "createdByDate": "2022-01-07",
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "startDate": "2021-04-03",
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -484,8 +504,28 @@
               }
             },
             {
+              "id": 1,
               "description": "Special Furniture",
-              "notes": "Some notes",
+              "provisionNotes": [
+                {
+                  "id": 0,
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 1,
+                  "createdBy": "Harry Kane",
+                  "createdByDate": "2024-10-29",
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 2,
+                  "createdByDate": "2022-01-07",
+                  "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "startDate": "2021-04-03",
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -494,6 +534,42 @@
               }
             }
           ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/personal-details/X000001/provisions/0/note/0",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Eula",
+              "surname": "Schmeler"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "provision": {
+            "description": "Hand Rails",
+            "provisionNote": {
+              "id": 0,
+              "note": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Cras vel ligula non eros porttitor tincidunt non vel ipsum. Quisque turpis erat, eleifend vitae tempus eget, posuere sit amet nunc. Maecenas vestibulum diam nibh, non porttitor magna suscipit sed. Aliquam mollis urna turpis, egestas congue elit vehicula nec. Nulla mattis tortor vel elit faucibus, vel vehicula nunc venenatis. Vivamus tortor dolor, convallis eu pulvinar id, venenatis at lorem. Duis dolor tortor, pretium ac interdum non, egestas vitae ipsum. Morbi vitae mi nec orci laoreet finibus. Vivamus ac bibendum diam. Donec eget vestibulum odio. Morbi rhoncus, turpis sed faucibus dapibus, justo enim feugiat velit, vel faucibus libero purus vel nulla. Maecenas eget purus arcu. Mauris consequat tempus pulvinar. Nulla volutpat vel arcu a tincidunt"
+            },
+            "startDate": "2021-04-03",
+            "endDate": "2025-04-03",
+            "lastUpdated": "2023-03-20",
+            "lastUpdatedBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            }
+          }
         },
         "headers": {
           "Content-Type": "application/json"

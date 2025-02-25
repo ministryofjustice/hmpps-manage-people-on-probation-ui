@@ -34,6 +34,15 @@
 </p>
 
 {% for adjustment in adjustments.provisions %}
+
+  {% set notes = '' %}
+  {% set hasNotes = adjustment.provisionNotes.length > 0 %}
+  {% if hasNotes  %}
+    {% for adjustmentNote in adjustment.provisionNotes %}
+      {% set notes = notes.concat(appNote(adjustmentNote, '/case/' + crn + '/personal-details/adjustments/' + adjustment.id + '/note/' + adjustmentNote.id)) %}
+    {% endfor  %}
+  {% endif %}
+
   {% set adjustmentsHtml %}
     {{ govukSummaryList({
       rows: [
@@ -48,10 +57,11 @@
         {
           key: { text: "End date" },
           value: { text: adjustment.endDate | dateWithYear }
-        } if disability.endDate,
+        } if adjustment.endDate,
         {
           key: { text: "Notes" },
-          value: { text: adjustment.notes if adjustment.notes else 'No notes' }
+          value: { html: notes if hasNotes
+           else 'No notes' }
         }
       ]
     }) }}

@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import PersonalDetailsPage from '../pages/personalDetails'
 import PersonalCircumstancesPage from '../pages/personalCircumstances'
+import AdjustmentsPage from '../pages/adjustments'
 
 context('Personal Details', () => {
   it('Personal Details page is rendered', () => {
@@ -113,5 +114,13 @@ context('Personal Details', () => {
       .should('contain.text', 'Life imprisonment (Adult)')
     page.getRowData('personalCircumstances', 'circumstanceStartDate', 'Value').should('contain.text', '3 April 2021')
     page.getRowData('personalCircumstances', 'circumstanceVerified', 'Value').should('contain.text', 'Yes')
+  })
+
+  it('Personal Details page for a personal adjustment with a single note is rendered', () => {
+    cy.visit('/case/X000001/personal-details/adjustments/0/note/0')
+    const page = Page.verifyOnPage(AdjustmentsPage)
+    page.getRowData('personalAdjustment', 'adjustmentDescription', 'Value').should('contain.text', 'Hand Rails')
+    page.getRowData('personalAdjustment', 'adjustmentStartDate', 'Value').should('contain.text', '3 April 2021')
+    page.getRowData('personalAdjustment', 'adjustmentEndDate', 'Value').should('contain.text', '3 April 2025')
   })
 })

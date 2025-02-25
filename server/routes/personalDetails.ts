@@ -398,6 +398,28 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
     })
   })
 
+  get('/case/:crn/personal-details/adjustments/:adjustmentId/note/:noteId', async (req, res, _next) => {
+    const { crn, adjustmentId, noteId } = req.params
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+    const masClient = new MasApiClient(token)
+
+    await auditService.sendAuditMessage({
+      action: 'VIEW_MAS_VIEW_ALL_ADJUSTMENT_NOTE',
+      who: res.locals.user.username,
+      subjectId: crn,
+      subjectType: 'CRN',
+      correlationId: v4(),
+      service: 'hmpps-manage-people-on-probation-ui',
+    })
+
+    const adjustmentOverview = await masClient.getPersonAdjustmentNote(crn, adjustmentId, noteId)
+
+    res.render('pages/personal-details/adjustments/adjustment-note', {
+      adjustmentOverview,
+      crn,
+    })
+  })
+
   get('/case/:crn/personal-details/circumstances', async (req, res, _next) => {
     const { crn } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
