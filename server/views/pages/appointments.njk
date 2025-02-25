@@ -9,6 +9,7 @@
 {% set offenderId = upcomingAppointments.personSummary.offenderId  %}
 {% set headerGender = upcomingAppointments.personSummary.gender  %}
 {% set upcomingAppointments = sortAppointmentsDescending(upcomingAppointments.appointments) %}
+{% set contactId = pastAppointments.contactId %}
 {% set pastAppointments = sortAppointmentsDescending(pastAppointments.appointments, 10) %}
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
@@ -34,7 +35,7 @@
         ]
       }) }}
       {% else %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('ContactList', crn) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius</a>
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('ContactDetails', crn, contactId) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
     {% endset %}
 
@@ -88,7 +89,7 @@
           ]
         }) }}
       {% else %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('ContactList', crn) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius</a>
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('ContactDetails', crn, contactId) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
     {% endset %}
 
@@ -148,7 +149,7 @@
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
       </form>
       {% else %}
-        <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an appointment</a>
+        <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an appointment on NDelius</a>
       {% endif %}
     </div>
 {% endblock %}
@@ -156,11 +157,12 @@
 {% block pageContent %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="sentence2Card">
+        <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
           <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
           {% if upcomingAppointments.length == 0 %}
             <p>There are no upcoming appointments.</p>
           {% else %}
+          <p>All links to manage appointments open in new tabs on NDelius.</p>
             {{ govukTable({
               firstCellIsHeader: false,
               attributes: {
@@ -185,7 +187,7 @@
                   attributes: { "aria-sort": "none" }
                 },
                 {
-                  html: "Action<br/><span class='non-sortable__sortable-table-header-black'>(Links open in new tab)</span>",
+                  html: 'Action<span class="govuk-visually-hidden"> (links open in new tab)</span>',
                   classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
                   format: "numeric"
                 }
@@ -195,7 +197,7 @@
           {% endif %}
         </section>
 
-        <section class="govuk-!-margin-bottom-8">
+        <section class="govuk-!-margin-bottom-8" data-qa="pastAppointments">
           <h2 class="govuk-heading-m" id="section2">Past appointments</h2>
           {% if pastAppointments.length == 0 %}
             <p>There are no past appointments.</p>
@@ -224,7 +226,7 @@
                   attributes: { "aria-sort": "none" }
                 },
                 {
-                  html: "Action<br/><span class='non-sortable__sortable-table-header-black'>(Links open in new tab)</span>",
+                  html: "Action",
                   classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
                   format: "numeric"
                 }
@@ -233,7 +235,7 @@
             }) }}
           {% endif %}
         </section>
-        <section>
+        <section data-qa="appointmentHistory">
           <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
           <p><a href="./activity-log/national-standard-appointments" class="govuk-link">View all past appointments in the activity log</a>.</p>
         </section>

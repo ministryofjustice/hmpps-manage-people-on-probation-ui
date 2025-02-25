@@ -5,7 +5,8 @@ import AppointmentsPage from '../pages/appointments'
 context('Appointment', () => {
   it('Appointment page with outcome is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/4')
-    const page = Page.verifyOnPage(AppointmentPage)
+    const page = new AppointmentPage()
+    page.setPageTitle('Phone call with Steve Bruce')
     page.appointmentType().should('contain.text', 'Initial appointment')
     page.appointmentTitle().should('contain.text', 'Phone call with Steve Bruce')
     page.complianceTag().should('contain.text', 'Acceptable absence')
@@ -24,32 +25,58 @@ context('Appointment', () => {
     page.getRowData('outcomeDetails', 'sensitive', 'Value').should('contain.text', 'No')
     page.getRowData('outcomeDetails', 'notes', 'Value').should('contain.text', 'Some notes')
   })
-  it('Appointments page with upcoming and past appointments is rendered', () => {
-    cy.visit('/case/X000001/appointments')
-    const page = Page.verifyOnPage(AppointmentsPage)
-    const url = 'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001'
-
-    page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
-    page.assertRiskTags()
-    page.upcomingAppointmentDate(1).should('contain.text', '22 March 2045')
-    page.upcomingAppointmentTime(1).should('contain.text', '10:15am to 10:30am')
-    page.upcomingAppointmentType(1).should('contain.text', 'Video call')
-    page
-      .upcomingAppointmentAction(1)
+  it('Appointment page with no outcome recorded is rendered', () => {
+    cy.visit('/case/X000001/appointments/appointment/3')
+    const page = new AppointmentPage()
+    page.setPageTitle('Video call with Paulie Walnuts')
+    page.appointmentType().should('contain.text', 'Other contact')
+    page.appointmentTitle().should('contain.text', 'Video call with Paulie Walnuts')
+    cy.get('.note-panel').should('contain.text', 'Outcome not recorded')
+    cy.get('.note-panel')
       .find('a')
-      .should('contain.text', 'Manage on NDelius')
-      .should('have.attr', 'aria-label', 'Manage video call appointment on NDelius')
+      .should('contain.text', 'Log an outcome')
       .should('have.attr', 'target', '_blank')
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&crn=X000001',
       )
+  })
+  it('Appointments page with upcoming and past appointments is rendered', () => {
+    cy.visit('/case/X000001/appointments')
+    const page = Page.verifyOnPage(AppointmentsPage)
+    const url =
+      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&componentId=2500233993'
+
+    page.headerCrn().should('contain.text', 'X000001')
+    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.assertRiskTags()
+    cy.get('[data-qa="upcomingAppointments"] h2').should('contain.text', 'Upcoming appointments')
+    cy.get('[data-qa="upcomingAppointments"] p').should(
+      'contain.text',
+      'All links to manage appointments open in new tabs on NDelius.',
+    )
+    cy.get('[data-qa="upcomingAppointments"] th').eq(0).should('contain.text', 'Appointment type')
+    cy.get('[data-qa="upcomingAppointments"] th').eq(1).should('contain.text', 'Date')
+    cy.get('[data-qa="upcomingAppointments"] th').eq(2).should('contain.text', 'Time')
+    cy.get('[data-qa="upcomingAppointments"] th')
+      .eq(3)
+      .should('contain.html', 'Action<span class="govuk-visually-hidden"> (links open in new tab)</span>')
+    page.upcomingAppointmentType(1).should('contain.text', 'Video call')
+    page.upcomingAppointmentDate(1).should('contain.text', '22 March 2045')
+    page.upcomingAppointmentTime(1).should('contain.text', '10:15am to 10:30am')
+    page
+      .upcomingAppointmentAction(1)
+      .find('a')
+      .should('contain.text', 'Manage')
+      .should('have.attr', 'aria-label', 'Manage video call appointment on NDelius')
+      .should('have.attr', 'target', '_blank')
+      .should('have.attr', 'href', url)
     page.upcomingAppointmentDate(2).should('contain.text', '22 December 2044')
     page.upcomingAppointmentTime(2).should('contain.text', '9:15am')
     page.upcomingAppointmentType(2).should('contain.text', 'Phone call')
 
+    cy.get('[data-qa="pastAppointments"] h2').should('contain.text', 'Past appointments')
     page.pastAppointmentDate(1).should('contain.text', '22 March 2024')
     page.pastAppointmentTime(1).should('contain.text', '8:15am to 8:30am')
     page.pastAppointmentType(1).should('contain.text', 'Phone call')
@@ -63,5 +90,10 @@ context('Appointment', () => {
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 5, 1, url)
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url)
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url)
+
+    cy.get('[data-qa="appointmentHistory"] h2').should('contain.text', 'Appointment history')
+    cy.get('[data-qa="appointmentHistory"] a')
+      .should('contain.text', 'View all past appointments in the activity log')
+      .should('have.attr', 'href', './activity-log/national-standard-appointments')
   })
 })
