@@ -9,7 +9,7 @@
 
 {% set actionsHtml %}
   {% if shouldPromptToRecordAnOutcome %}
-    <a href="/case/{{ crn }}/handoff/delius" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Record an outcome</a>
+    <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, contactId) }}"target="_blank" rel="external noopener noreferrer" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
   {% else %}
     {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
   {% endif %}

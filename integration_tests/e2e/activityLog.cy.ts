@@ -329,8 +329,14 @@ context('Activity log', () => {
     page
       .getCardHeader('timeline6')
       .get('.app-summary-card__actions a')
-      .should('contain.text', 'Record an outcome')
-      .should('have.attr', 'href', '/case/X000001/handoff/delius')
+      .should('contain.text', 'Log an outcome')
+      .should('contain.html', '<span class="govuk-visually-hidden"> (opens in new tab)</span>')
+      .should('have.attr', 'target', '_blank')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&crn=X000001&componentId=2500233993',
+      )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')

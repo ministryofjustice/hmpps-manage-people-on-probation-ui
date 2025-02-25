@@ -232,11 +232,12 @@ export const deliusDateFormat = (datetime: string) => {
   return DateTime.fromISO(datetime).toFormat('dd/MM/yyyy')
 }
 
-export const deliusDeepLinkUrl = (component: string, crn: string) => {
+export const deliusDeepLinkUrl = (component: string, crn: string, contactId?: string) => {
   if (!component || !crn) {
     return ''
   }
-  return `${config.delius.link}/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=${crn}`
+
+  return `${config.delius.link}/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&crn=${crn}${contactId ? `&componentId=${contactId}` : ''}`
 }
 
 export const tierLink = (crn: string) => {

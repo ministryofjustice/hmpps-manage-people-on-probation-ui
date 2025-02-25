@@ -9,6 +9,7 @@
 {% set headerDob = personActivity.personSummary.dateOfBirth  %}
 {% set headerGender = personActivity.personSummary.gender  %}
 {% set personSummary = personActivity.personSummary %}
+{% set contactId = personActivity.contactId %}
 {% set entries = activityLog(personActivity.activities, category or 'all-previous-activity', requirement) %}
 {% set requirements = getDistinctRequirements(personActivity.activities) %}
 
