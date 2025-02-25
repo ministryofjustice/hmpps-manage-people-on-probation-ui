@@ -57,7 +57,7 @@ describe('Pick a location for this appointment', () => {
       })
     })
     it('should focus the first radio button when the summary link is clicked', () => {
-      locationPage.getErrorSummaryLink(1).click()
+      locationPage.getErrorSummaryLink(0).click()
       locationPage.getElement(`#appointments-${crn}-${uuid}-location`).should('be.focused')
     })
   })

@@ -13,15 +13,7 @@ export default class EditContactDetails extends Page {
     return cy.get(`[data-qa="${name}"]`)
   }
 
-  getElementInput = (name: string): PageElement => {
-    return cy.get(`[data-qa="${name}"] input`)
-  }
-
   getDateElementInput = (name: string): PageElement => {
     return cy.get(`[data-qa="${name}"] govuk-input moj-js-datepicker-input`)
-  }
-
-  getCheckboxField = (name: string): PageElement => {
-    return cy.get(`input[type="checkbox"]`)
   }
 }

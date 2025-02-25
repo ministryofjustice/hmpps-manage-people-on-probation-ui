@@ -19,9 +19,9 @@ const validate = {
 
 export default validate
 
-export const personDetailsValidation: ValidationSpec = {
+export const personDetailsValidation = (editingMainAddress: boolean): ValidationSpec => ({
   phoneNumber: {
-    optional: false,
+    optional: editingMainAddress,
     checks: [
       {
         validator: isNotEmpty,
@@ -39,7 +39,7 @@ export const personDetailsValidation: ValidationSpec = {
     ],
   },
   mobileNumber: {
-    optional: false,
+    optional: editingMainAddress,
     checks: [
       {
         validator: isNotEmpty,
@@ -57,7 +57,7 @@ export const personDetailsValidation: ValidationSpec = {
     ],
   },
   emailAddress: {
-    optional: false,
+    optional: editingMainAddress,
     checks: [
       {
         validator: isNotEmpty,
@@ -70,7 +70,7 @@ export const personDetailsValidation: ValidationSpec = {
       {
         validator: charsOrLess,
         length: 35,
-        msg: `Mobile number must be 35 characters or less.`,
+        msg: `Email address must be 35 characters or less.`,
       },
     ],
   },
@@ -135,7 +135,7 @@ export const personDetailsValidation: ValidationSpec = {
     ],
   },
   postcode: {
-    optional: false,
+    optional: true,
     checks: [
       {
         validator: isNotEmpty,
@@ -148,7 +148,7 @@ export const personDetailsValidation: ValidationSpec = {
     ],
   },
   addressTypeCode: {
-    optional: false,
+    optional: editingMainAddress === false,
     checks: [
       {
         validator: isNotEmpty,
@@ -157,7 +157,7 @@ export const personDetailsValidation: ValidationSpec = {
     ],
   },
   verified: {
-    optional: false,
+    optional: editingMainAddress === false,
     checks: [
       {
         validator: isNotEmpty,
@@ -166,7 +166,7 @@ export const personDetailsValidation: ValidationSpec = {
     ],
   },
   startDate: {
-    optional: false,
+    optional: editingMainAddress === false,
     checks: [
       {
         validator: isNotEmpty,
@@ -200,4 +200,4 @@ export const personDetailsValidation: ValidationSpec = {
       },
     ],
   },
-}
+})

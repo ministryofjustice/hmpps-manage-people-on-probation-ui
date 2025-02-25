@@ -109,6 +109,10 @@ export default abstract class Page {
     return cy.get(`[data-qa="${id}"] .govuk-radios__item:nth-child(${index}) input`)
   }
 
+  getCheckboxField = (name: string): PageElement => {
+    return cy.get(`input[type="checkbox"]`)
+  }
+
   getRadioLabel = (id: string, index: number): PageElement => {
     return cy.get(`[data-qa="${id}"] .govuk-radios__item:nth-child(${index}) label`)
   }
@@ -130,11 +134,15 @@ export default abstract class Page {
   }
 
   getErrorSummaryLink = (index: number): PageElement => {
-    return cy.get(`.govuk-error-summary__list li:nth-child(${index}) a`)
+    return cy.get('.govuk-error-summary__list li').eq(index).find('a')
   }
 
   getElement = (selector: string) => {
     return cy.get(selector)
+  }
+
+  getElementInput = (name: string): PageElement => {
+    return cy.get(`[data-qa="${name}"] input`)
   }
 
   checkErrorSummaryBox = (summaryErrors: string[]): void => {

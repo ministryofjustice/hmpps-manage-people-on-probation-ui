@@ -47,7 +47,7 @@ describe('Arrange an appointment', () => {
     })
     describe('The error summary link is clicked', () => {
       beforeEach(() => {
-        typePage.getErrorSummaryLink(1).click()
+        typePage.getErrorSummaryLink(0).click()
       })
       it('should focus the first radio button', () => {
         typePage.getRadio('type', 1).should('be.focused')

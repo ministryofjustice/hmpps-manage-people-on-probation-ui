@@ -115,30 +115,41 @@ describe('date which is not later than date', () => {
   })
 })
 
-const testRequest: PersonalDetailsUpdateRequest = {
-  phoneNumber: 'sakjdhaskdhjsakdkj',
-  mobileNumber: 'sakjdhaskdhjsakdkj',
-  emailAddress: 'test',
-  buildingName: 'x'.repeat(36),
-  postcode: 'INVALID',
-  startDate: 'ENDDATE',
-  endDate: DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString(),
-}
+describe('validates edit personal contact details request with spec', () => {
+  const testRequest: PersonalDetailsUpdateRequest = {
+    phoneNumber: 'sakjdhaskdhjsakdkj',
+    mobileNumber: 'sakjdhaskdhjsakdkj',
+    emailAddress: 'test',
+  }
+  const expectedResult: Record<string, string> = {
+    emailAddress: 'Enter an email address in the correct format.',
+    mobileNumber: 'Enter a mobile number in the correct format.',
+    phoneNumber: 'Enter a phone number in the correct format.',
+  }
+  it.each([['empty string', testRequest, personDetailsValidation(false), expectedResult]])(
+    '%s validateWithSpec(%s, %s)',
+    (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
+      expect(validateWithSpec(a, b)).toEqual(expected)
+    },
+  )
+})
 
-const expectedResult: Record<string, string> = {
-  addressTypeCode: 'Select an address type.',
-  buildingName: 'Building name must be 35 characters or less.',
-  emailAddress: 'Enter an email address in the correct format.',
-  endDate: 'End date can not be later than today.',
-  mobileNumber: 'Enter a mobile number in the correct format.',
-  phoneNumber: 'Enter a phone number in the correct format.',
-  postcode: 'Enter a full UK postcode.',
-  startDate: 'Enter or select a start date.',
-  verified: 'Select yes if the address is verified.',
-}
-
-describe('validates request with spec', () => {
-  it.each([['empty string', testRequest, personDetailsValidation, expectedResult]])(
+describe('validates edit main address request with spec', () => {
+  const testRequest: PersonalDetailsUpdateRequest = {
+    buildingName: 'x'.repeat(36),
+    postcode: 'INVALID',
+    startDate: 'ENDDATE',
+    endDate: DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString(),
+  }
+  const expectedResult: Record<string, string> = {
+    addressTypeCode: 'Select an address type.',
+    buildingName: 'Building name must be 35 characters or less.',
+    endDate: 'End date can not be later than today.',
+    postcode: 'Enter a full UK postcode.',
+    startDate: 'Enter or select a start date.',
+    verified: 'Select yes if the address is verified.',
+  }
+  it.each([['empty string', testRequest, personDetailsValidation(true), expectedResult]])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
       expect(validateWithSpec(a, b)).toEqual(expected)

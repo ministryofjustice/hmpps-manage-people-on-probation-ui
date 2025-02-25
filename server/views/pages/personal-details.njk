@@ -129,19 +129,59 @@
             rows: [
               {
                 key: { html: '<span data-qa="telephoneNumberLabel">Phone number</span>' },
-                value: { html: ('<span data-qa="telephoneNumberValue" class="app-!-font-family-tabular">' + personalDetails.telephoneNumber + '</span>') if personalDetails.telephoneNumber else '<span data-qa="telephoneNumberValue">No phone number</span>' }
+                value: { html: ('<span data-qa="telephoneNumberValue" class="app-!-font-family-tabular">' + personalDetails.telephoneNumber + '</span>') if personalDetails.telephoneNumber else '<span data-qa="telephoneNumberValue">No phone number</span>' },
+                actions: {
+                  items: [{
+                    href:"/case/" + crn + "/personal-details/edit-contact-details",
+                    text: "Change",
+                    visuallyHiddenText: "phone number",
+                    attributes: {
+                      'data-qa': 'telephoneNumberAction'
+                    }
+                  }] 
+                }
               },
                 {
                   key: { html: '<span data-qa="mobileNumberLabel">Mobile number</span>' },
-                  value: { html: ('<span data-qa="mobileNumberValue" class="app-!-font-family-tabular">' + personalDetails.mobileNumber + '</span>') if personalDetails.mobileNumber else '<span data-qa="mobileNumberValue">No mobile number</span>' }
+                  value: { html: ('<span data-qa="mobileNumberValue" class="app-!-font-family-tabular">' + personalDetails.mobileNumber + '</span>') if personalDetails.mobileNumber else '<span data-qa="mobileNumberValue">No mobile number</span>' },
+                  actions: {
+                  items: [{
+                    href:"/case/" + crn + "/personal-details/edit-contact-details",
+                    text: "Change",
+                    visuallyHiddenText: "mobile number",
+                    attributes: {
+                      'data-qa': 'mobileNumberAction'
+                    }
+                  }] 
+                }
                 },
               {
                 key: { html: '<span data-qa="emailAddressLabel">Email address</span>' },
-                value: { html: '<span data-qa="emailAddressValue">' + personalDetails.email + '</span>' if personalDetails.email else '<span data-qa="emailAddressValue">No email address</span>' }
+                value: { html: '<span data-qa="emailAddressValue">' + personalDetails.email + '</span>' if personalDetails.email else '<span data-qa="emailAddressValue">No email address</span>' },
+                actions: {
+                  items: [{
+                    href:"/case/" + crn + "/personal-details/edit-contact-details",
+                    text: "Change",
+                    visuallyHiddenText: "email address",
+                    attributes: {
+                      'data-qa': 'emailAddressAction'
+                    }
+                  }] 
+                }
               },
               {
                 key: { html: '<span data-qa="mainAddressLabel">' + 'Main address<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">' + mainAddress.lastUpdated | lastUpdatedDate + '</span></span>' },
-                value: { html: '<span data-qa="mainAddressValue">' + address + '</span>' }
+                value: { html: '<span data-qa="mainAddressValue">' + address + '</span>' },
+                actions: {
+                  items: [{
+                    href:"/case/" + crn + "/personal-details/edit-main-address",
+                    text: "Change",
+                    visuallyHiddenText: "main address",
+                    attributes: {
+                      'data-qa': 'mainAddressAction'
+                    }
+                  }] 
+                }
               },
               {
                 key: { html: '<span data-qa="otherAddressesLabel">Other addresses</span>' },
@@ -159,15 +199,7 @@
         attributes: {'data-qa': 'contactDetailsCard'},
         titleText: "Contact details",
         classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-        html: contactDetails,
-        actions: {
-        items: [
-          {
-            href: "/case/" + crn + "/personal-details/edit-contact-details",
-            text: "Change"
-          }
-        ]
-      }
+        html: contactDetails
     }) }}
 
     {% set personalDetailsHtml %}
