@@ -415,7 +415,7 @@
           } if personalDetails.sexualOrientation
         ]
       }) }}
-      <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0"><a href="/case/{{ crn }}/handoff/delius">View more in NDelius</a></p>
+      <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0"><a href="{{ deliusDeepLinkUrl('EqualityMonitoring', crn) }}" target="_blank" rel="noopener noreferrer" data-qa="equalityMonitoringDeliusLink">View more in NDelius (opens in new tab)</a></p>
     {% endset %}
 
     {{ appSummaryCard({

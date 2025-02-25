@@ -73,6 +73,14 @@ context('Personal Details', () => {
     page.getRowData('equalityMonitoring', 'sex', 'Value').should('contain.text', 'Female')
     page.getRowData('equalityMonitoring', 'genderIdentity', 'Value').should('contain.text', 'Non-Binary')
     page.getRowData('equalityMonitoring', 'sexualOrientation', 'Value').should('contain.text', 'Heterosexual')
+    cy.get('[data-qa="equalityMonitoringDeliusLink"]')
+      .should('contain.text', 'View more in NDelius (opens in new tab)')
+      .should('have.attr', 'target', '_blank')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=EqualityMonitoring&CRN=X000001',
+      )
   })
 
   it('Personal Details page for a main address with a single note is rendered', () => {
