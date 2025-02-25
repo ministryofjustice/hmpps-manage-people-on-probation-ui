@@ -132,7 +132,8 @@ export interface ProvisionOverview {
 
 export interface Provision {
   description: string
-  notes?: string
+  provisionNotes?: Note[]
+  provisionNote?: Note
   lastUpdated: string
   lastUpdatedBy: Name
 }
