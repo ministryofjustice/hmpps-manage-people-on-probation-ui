@@ -34,14 +34,3 @@ export interface ActivityLogFiltersResponse extends ActivityLogFilters {
   maxDate: string
   query?: ActivityLogFilters
 }
-
-export interface ActivityLogCacheItem extends ActivityLogFilters {
-  crn: string
-  personActivity: PersonActivity
-  tierCalculation: TierCalculation
-}
-
-export interface ActivityLogCache {
-  results?: ActivityLogCacheItem[]
-  filters?: ActivityLogFilters
-}
