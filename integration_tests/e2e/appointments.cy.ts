@@ -70,7 +70,7 @@ context('Appointment', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
     const url = (componentId: number) =>
-      `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&componentId=${componentId}`
+      `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&contactID=${componentId}`
 
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')

@@ -3,7 +3,6 @@
 {% set pageTitle = makePageTitle({ pageHeading: [appointment.type, "Appointments" if not isActivityLog else "Activity log"] }) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&') if queryParams.length > 0  else ''  %}
 {% set category = '/' + category + '/' + extraBreadcrumb if category else extraBreadcrumb  %}
-
 {% block beforeContent %}
 {{ govukBreadcrumbs({
   items: [
