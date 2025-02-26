@@ -49,8 +49,16 @@
           value: { html: '<span data-qa="circumstanceVerifiedValue">' + ('Yes' if circumstance.verified else 'No') + '</span>' }
         },
         {
+        key: { html: '<span data-qa="circumstanceNoteBaddedByLabel">Note added by</span>' },
+          value: { html: '<span data-qa="circumstanceNoteBaddedByValue">' + circumstance.circumstanceNote.createdBy + '</span>' }
+        } if circumstance.circumstanceNote.createdBy,
+        {
+          key: { html: '<span data-qa="circumstanceNoteDateAddedLabel">Date added</span>' },
+          value: { html: '<span data-qa="circumstanceNoteDateAddedValue">' + circumstance.circumstanceNote.createdByDate | dateWithYear + '</span>' }
+        } if circumstance.circumstanceNote.createdByDate,
+        {
           key: { text: "Note" },
-          value: { html: appNote(circumstance.circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id) if circumstance.circumstanceNote else 'No notes' }
+          value: { html:  '<p class="govuk-body line-break" data-qa="circumstanceNoteValue">' + circumstance.circumstanceNote.note + '</p>' if circumstance.circumstanceNote else 'No notes' }
         }
       ]
     }) }}

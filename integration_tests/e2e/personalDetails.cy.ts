@@ -114,6 +114,16 @@ context('Personal Details', () => {
       .should('contain.text', 'Life imprisonment (Adult)')
     page.getRowData('personalCircumstances', 'circumstanceStartDate', 'Value').should('contain.text', '3 April 2021')
     page.getRowData('personalCircumstances', 'circumstanceVerified', 'Value').should('contain.text', 'Yes')
+    page.getRowData('personalCircumstances', 'circumstanceNoteBaddedBy', 'Value').should('contain.text', 'Harry Kane')
+    page
+      .getRowData('personalCircumstances', 'circumstanceNoteDateAdded', 'Value')
+      .should('contain.text', '29 October 2024')
+    page
+      .getRowData('personalCircumstances', 'circumstanceNote', 'Value')
+      .should(
+        'contain.text',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n      Cras vel ligula non eros porttitor tincidunt non vel ipsum. Quisque turpis erat, eleifend vitae tempus eget, posuere sit amet nunc.\n      Maecenas vestibulum diam nibh, non porttitor magna suscipit sed. Aliquam mollis urna turpis, egestas congue elit vehicula nec.\n      Nulla mattis tortor vel elit faucibus, vel vehicula nunc venenatis. Vivamus tortor dolor, convallis eu pulvinar id, venenatis at lorem. Duis dolor tortor, pretium ac interdum non, egestas vitae ipsum. Morbi vitae mi nec orci laoreet finibus. Vivamus ac bibendum diam. Donec eget vestibulum odio. Morbi rhoncus, turpis sed faucibus dapibus, justo enim feugiat velit, vel faucibus libero purus vel nulla. Maecenas eget purus arcu. Mauris consequat tempus pulvinar. Nulla volutpat vel arcu a tincidunt',
+      )
   })
 
   it('Personal Details page for a personal adjustment with a single note is rendered', () => {
@@ -122,5 +132,13 @@ context('Personal Details', () => {
     page.getRowData('personalAdjustment', 'adjustmentDescription', 'Value').should('contain.text', 'Hand Rails')
     page.getRowData('personalAdjustment', 'adjustmentStartDate', 'Value').should('contain.text', '3 April 2021')
     page.getRowData('personalAdjustment', 'adjustmentEndDate', 'Value').should('contain.text', '3 April 2025')
+    page.getRowData('personalAdjustment', 'adjustmentNoteBaddedBy', 'Value').should('contain.text', 'Harry Kane')
+    page.getRowData('personalAdjustment', 'adjustmentNoteDateAdded', 'Value').should('contain.text', '29 October 2024')
+    page
+      .getRowData('personalAdjustment', 'adjustmentNote', 'Value')
+      .should(
+        'contain.text',
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n      Cras vel ligula non eros porttitor tincidunt non vel ipsum. Quisque turpis erat, eleifend vitae tempus eget, posuere sit amet nunc.\n      Maecenas vestibulum diam nibh, non porttitor magna suscipit sed. Aliquam mollis urna turpis, egestas congue elit vehicula nec.\n      Nulla mattis tortor vel elit faucibus, vel vehicula nunc venenatis. Vivamus tortor dolor, convallis eu pulvinar id, venenatis at lorem. Duis dolor tortor, pretium ac interdum non, egestas vitae ipsum. Morbi vitae mi nec orci laoreet finibus. Vivamus ac bibendum diam. Donec eget vestibulum odio. Morbi rhoncus, turpis sed faucibus dapibus, justo enim feugiat velit, vel faucibus libero purus vel nulla. Maecenas eget purus arcu. Mauris consequat tempus pulvinar. Nulla volutpat vel arcu a tincidunt',
+      )
   })
 })
