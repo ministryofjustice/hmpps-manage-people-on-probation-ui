@@ -49,8 +49,16 @@
           value: { html: '<span data-qa="adjustmentEndDateValue">' + adjustmentOverview.provision.endDate | dateWithYear + '</span>' }
         } if adjustmentOverview.provision.endDate,
         {
+        key: { html: '<span data-qa="adjustmentNoteBaddedByLabel">Note added by</span>' },
+          value: { html: '<span data-qa="adjustmentNoteBaddedByValue">' + adjustmentOverview.provision.provisionNote.createdBy + '</span>' }
+        } if adjustmentOverview.provision.provisionNote.createdBy,
+        {
+          key: { html: '<span data-qa="adjustmentNoteDateAddedLabel">Date added</span>' },
+          value: { html: '<span data-qa="adjustmentNoteDateAddedValue">' + adjustmentOverview.provision.provisionNote.createdByDate | dateWithYear + '</span>' }
+        } if adjustmentOverview.provision.provisionNote.createdByDate,
+        {
           key: { html: "Notes" },
-          value: { html: appNote(adjustmentOverview.provision.provisionNote, '/case/' + crn + '/personal-details/adjustments/' + adjustmentOverview.provision.id + '/note/' + adjustmentNote.id) }
+          value: { html: '<p class="govuk-body line-break" data-qa="adjustmentNoteValue">' + adjustmentOverview.provision.provisionNote.note + '</p>' }
         }
       ]
     }) }}
