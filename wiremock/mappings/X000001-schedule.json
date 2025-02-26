@@ -16,6 +16,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointments": [
             {
               "id": 1,
@@ -80,6 +81,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointments": [
             {
               "id": 3,
@@ -188,6 +190,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointment": {
             "id": 1,
             "type": "Phone call",
@@ -229,6 +232,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointment": {
             "id": 2,
             "type": "Video call",
@@ -271,6 +275,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointment": {
             "id": 3,
             "type": "Video call",
@@ -314,6 +319,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointment": {
             "id": 4,
             "type": "Phone call",
@@ -382,6 +388,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointment": {
             "id": 5,
             "type": "Phone call",
@@ -424,6 +431,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
+          "contactId": 2500233993,
           "appointment": {
             "id": 6,
             "type": "Other call",
