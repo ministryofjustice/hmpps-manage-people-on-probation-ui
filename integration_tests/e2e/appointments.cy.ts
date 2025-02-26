@@ -58,7 +58,7 @@ context('Appointment', () => {
     cy.get('.note-panel').should('contain.text', 'Outcome not recorded')
     cy.get('.note-panel')
       .find('a')
-      .should('contain.text', 'Log an outcome')
+      .should('contain.text', 'Log an outcome on NDelius (opens in new tab)')
       .should('have.attr', 'target', '_blank')
       .should(
         'have.attr',

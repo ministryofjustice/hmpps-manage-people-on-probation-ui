@@ -313,6 +313,10 @@ context('Activity log', () => {
   it('Activity log page is rendered in default view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('[data-qa="currentSectionNameSubText"]').should(
+      'contain.text',
+      'All links to log outcomes open in new tabs on NDelius.',
+    )
     page.getCardHeader('timeline1').should('contain.text', 'Video call')
     page.getRowData('timeline1', 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
     page.getCardHeader('timeline2').should('contain.text', 'Phone call from Eula Schmeler')

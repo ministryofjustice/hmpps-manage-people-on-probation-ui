@@ -67,7 +67,7 @@
     {% else %}
         <h2 class="govuk-heading-l {% if not currentSectionNameSubText %}govuk-!-margin-bottom-7{% else %}govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
         {% if currentSectionNameSubText %}
-         <p class="govuk-!-margin-bottom-7">{{ currentSectionNameSubText }}</p>
+         <p class="govuk-!-margin-bottom-7" data-qa="currentSectionNameSubText">{{ currentSectionNameSubText }}</p>
         {% endif %}
     {% endif %}
 {% endif %}
