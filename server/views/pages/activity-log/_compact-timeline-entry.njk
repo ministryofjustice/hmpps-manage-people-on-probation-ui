@@ -16,7 +16,7 @@
       <span class="govuk-visually-hidden"> on {{ thisDate }}
     </a>
      {% if shouldPromptToRecordAnOutcome %}
-        <br /><a href="{{ deliusDeepLinkUrl('UpdateContact', crn, contactId) }}" target="_blank" rel="external noopener noreferrer" class="govuk-!-font-weight-bold">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+        <br /><a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" class="govuk-!-font-weight-bold">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
      {% endif %}
   </p>
 {% endset %}
