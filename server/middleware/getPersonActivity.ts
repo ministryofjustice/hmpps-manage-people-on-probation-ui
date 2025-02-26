@@ -22,7 +22,7 @@ export const getPersonActivity = async (
 
   let personActivity: PersonActivity | null = null
   let tierCalculation: TierCalculation | null = null
-  if (req?.session?.cache?.activityLog?.results) {
+  if (req?.body?.submit && req?.session?.cache?.activityLog?.results) {
     const cache: ActivityLogCacheItem | undefined = req.session.cache.activityLog.results.find(
       cacheItem =>
         crn === cacheItem.crn &&
