@@ -69,8 +69,8 @@ context('Appointment', () => {
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
-    const url =
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&componentId=2500233993'
+    const url = (componentId: number) =>
+      `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&componentId=${componentId}`
 
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')
@@ -89,13 +89,15 @@ context('Appointment', () => {
     page.upcomingAppointmentType(1).should('contain.text', 'Video call')
     page.upcomingAppointmentDate(1).should('contain.text', '22 March 2045')
     page.upcomingAppointmentTime(1).should('contain.text', '10:15am to 10:30am')
+
     page
       .upcomingAppointmentAction(1)
       .find('a')
       .should('contain.text', 'Manage')
       .should('have.attr', 'aria-label', 'Manage video call appointment on NDelius')
       .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', url)
+      .should('have.attr', 'href', url(2))
+
     page.upcomingAppointmentDate(2).should('contain.text', '22 December 2044')
     page.upcomingAppointmentTime(2).should('contain.text', '9:15am')
     page.upcomingAppointmentType(2).should('contain.text', 'Phone call')
@@ -108,12 +110,12 @@ context('Appointment', () => {
     page.pastAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
     page.pastAppointmentType(2).should('contain.text', 'Phone call')
 
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 1, 1, url)
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url)
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url)
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 5, 1, url)
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url)
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url)
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 1, 1, url(2))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url(1))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url(4))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 5, 1, url(5))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
 
     page.getElement('[data-qa="appointmentHistory"]').find('h2').should('contain.text', 'Appointment history')
     page
