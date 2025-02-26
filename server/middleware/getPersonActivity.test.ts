@@ -136,7 +136,7 @@ describe('/middleware/getPersonActivity', () => {
     compliance: ['complied', 'not complied'],
   }
 
-  it('should request the filtered results from the api, if matching cache does not exist', async () => {
+  it('should request the filtered results from the api', async () => {
     req.query = { page: '0' }
     res.locals.filters = {
       ...filterVals,
@@ -153,22 +153,5 @@ describe('/middleware/getPersonActivity', () => {
 
     const [_tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
     expect(personActivity).toEqual(mockPersonActivityResponse)
-  })
-  it('should return the cached person activity data if matching cache exists', async () => {
-    req.session.cache = {
-      activityLog: {
-        ...(req?.session?.cache?.activityLog || {}),
-        results: [
-          {
-            crn,
-            personActivity: mockPersonActivityResponse,
-            tierCalculation: mockTierCalculationResponse,
-            ...filterVals,
-          },
-        ],
-      },
-    }
-    const [_tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
-    expect(personActivity).toEqual(req.session.cache.activityLog.results[0].personActivity)
   })
 })
