@@ -326,6 +326,7 @@ context('Activity log', () => {
     page.getCardHeader('timeline5').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline5').get('.app-summary-card__actions').should('contain.text', 'Complied')
     page.getCardHeader('timeline6').should('contain.text', 'Phone call at 8:15am')
+    // cy.pause()
     page
       .getCardHeader('timeline6')
       .get('.app-summary-card__actions a')
@@ -335,7 +336,7 @@ context('Activity log', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&crn=X000001&componentId=2500233993',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&crn=X000001&componentId=14',
       )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
