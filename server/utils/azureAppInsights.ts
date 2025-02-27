@@ -26,16 +26,18 @@ export function buildAppInsightsClient(applicationName = defaultName()): Telemet
   if (appInsightsConnectionString) {
     defaultClient.context.tags['ai.cloud.role'] = applicationName
     defaultClient.context.tags['ai.application.ver'] = version()
-    const filteredUrls = ['/ping', '/metrics', '/health', '/info']
-    defaultClient.addTelemetryProcessor((envelope, _context) => {
-      if (envelope.data.baseType === 'RequestData') {
-        const requestUrl: string = envelope.data.baseData.url
-        if (filteredUrls.some(filteredUrl => requestUrl.includes(filteredUrl))) {
-          return null
+
+    defaultClient.addTelemetryProcessor(envelope => {
+      const telemetryItem = envelope.data.baseData
+      if (telemetryItem?.url) {
+        const excludedRequestUrls = ['/ping', '/metrics', '/health', '/info']
+        if (excludedRequestUrls.some(url => telemetryItem.url.includes(url))) {
+          return false
         }
       }
       return true
     })
+
     return defaultClient
   }
   return null
