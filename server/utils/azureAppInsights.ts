@@ -1,4 +1,5 @@
-import { setup, defaultClient, TelemetryClient, DistributedTracingModes } from 'applicationinsights'
+import { setup, defaultClient, TelemetryClient, DistributedTracingModes, Contracts } from 'applicationinsights'
+import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 import applicationInfo from '../applicationInfo'
 
 const appInsightsConnectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
@@ -26,6 +27,16 @@ export function buildAppInsightsClient(applicationName = defaultName()): Telemet
   if (appInsightsConnectionString) {
     defaultClient.context.tags['ai.cloud.role'] = applicationName
     defaultClient.context.tags['ai.application.ver'] = version()
+    const filteredUrls = ['/ping', '/metrics', '/health', '/info']
+    defaultClient.addTelemetryProcessor((envelope, _context) => {
+      if (envelope.data.baseType === 'RequestData') {
+        const requestUrl: string = envelope.data.baseData.url
+        if (filteredUrls.some(filteredUrl => requestUrl.includes(filteredUrl))) {
+          return null
+        }
+      }
+      return true
+    })
     return defaultClient
   }
   return null
