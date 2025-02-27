@@ -1,4 +1,5 @@
-import { setup, defaultClient, TelemetryClient, DistributedTracingModes } from 'applicationinsights'
+import { setup, defaultClient, TelemetryClient, DistributedTracingModes, Contracts } from 'applicationinsights'
+import { EnvelopeTelemetry } from 'applicationinsights/out/Declarations/Contracts'
 import applicationInfo from '../applicationInfo'
 
 const appInsightsConnectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
