@@ -8,6 +8,19 @@
   </span>
 {% endset %}
 
+{% set actions = {} %}
+{% if addressType === 'address' %}
+{% 
+set actions = {
+        items: [
+          {
+            html: '<a href="/case/' + crn + '/personal-details/edit-main-address" data-qa="changeMainAddressLink">Change<span class="govuk-visually-hidden"> main address</span></a>'
+          }
+        ]
+    }
+%}
+{% endif %}
+
 {% set addressHtml %}
   {% set fullAddress %}
     {% if address.noFixedAddress %}
@@ -81,5 +94,6 @@
     titleHtml: addressTitle,
     headingLevel: 3,
     classes: 'govuk-!-margin-bottom-6',
-    html: addressHtml
+    html: addressHtml,
+    actions: actions
 }) }}

@@ -38,7 +38,7 @@
         {% include './_address.njk' %}
         {% else %}
         <p class="govuk-!-margin-bottom-2">There is no main address.</p>
-        <p><a href="/case/{{crn}}/personal-details/edit-contact-details">Add main address</a>.</p>
+        <p><a href="/case/{{crn}}/personal-details/edit-main-address">Add main address</a>.</p>
         {% endif %}
     </span>
     {% if addressOverview.otherAddresses.length > 0 %}
