@@ -13,6 +13,10 @@ context('Addresses', () => {
     page.assertTextElementAtIndex('p', 1, 'Edit all other addresses on NDelius (opens in new tab)')
 
     page.getTableHeader('mainAddress').should('contain.text', 'Main address – Since 14 Mar 2023')
+    cy.get('[data-qa="changeMainAddressLink"]')
+      .should('contain.text', 'Change')
+      .should('contain.html', '<span class="govuk-visually-hidden"> main address</span>')
+      .should('have.attr', 'href', '/case/X000001/personal-details/edit-main-address')
     page.getTableHeader('otherAddress1').should('contain.text', 'Postal address – Since 14 Mar 2023')
     page.getTableHeader('previousAddress1').should('contain.text', 'Previous address – 14 Mar 2022 to 17 Jan 2023')
 
