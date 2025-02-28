@@ -73,7 +73,7 @@ context('Addresses', () => {
       .eq(1)
       .find('a')
       .should('contain.text', 'Add main address')
-      .should('have.attr', 'href', '/case/X778160/personal-details/edit-contact-details')
+      .should('have.attr', 'href', '/case/X778160/personal-details/edit-main-address')
     cy.get('[data-qa="mainAddressSection"] section').should('not.exist')
   })
 })
