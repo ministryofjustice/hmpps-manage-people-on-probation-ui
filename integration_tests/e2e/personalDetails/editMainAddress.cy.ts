@@ -79,6 +79,29 @@ context('Edit main address', () => {
     page.getElementData('endDate').find('label').should('contain.text', 'End date (optional)')
     page.getElementData('endDate').find('.govuk-hint').should('contain.text', 'For example, 17/5/2024.')
 
+    page.getElementData('addressNotes').find('p').eq(0).should('contain.text', 'Previous notes')
+    page
+      .getElementData('addressNotes')
+      .find('.app-note')
+      .eq(0)
+      .should('contain.text', 'Main Address created automatically')
+    page
+      .getElementData('addressNotes')
+      .find('.app-note__author')
+      .eq(0)
+      .should('contain.text', 'Comment added by Tom Brady on 29 October 2024')
+    page.getElementData('addressNotes').find('.app-note').eq(1).should('contain.text', 'main address note 2')
+    page
+      .getElementData('addressNotes')
+      .find('.app-note__author')
+      .eq(1)
+      .should('contain.text', 'Comment added by not entered')
+    page.getElementData('addressNotes').find('.app-note').eq(2).should('contain.text', 'main address note 1')
+    page
+      .getElementData('addressNotes')
+      .find('.app-note__author')
+      .eq(2)
+      .should('contain.text', 'Comment added by not entered')
     page.getElementData('notes').find('label').should('contain.text', 'Notes (optional)')
     page.getElementData('notes').find('textarea').should('have.value', '')
 
@@ -95,6 +118,12 @@ context('Edit main address', () => {
       .getElementData('cancelBtn')
       .should('contain.text', 'Cancel')
       .should('have.attr', 'href', '/case/X000001/personal-details')
+  })
+  it('Should render the page with no previous address notes', () => {
+    cy.visit('/case/X778160/personal-details/edit-main-address')
+    const page = new EditMainAddress()
+    page.getElementData('addressNotes').find('p').eq(0).should('contain.text', 'Previous notes')
+    page.getElementData('addressNotes').find('p').eq(1).should('contain.text', 'No notes')
   })
   it('Submitting without selecting an address type should show errors', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
