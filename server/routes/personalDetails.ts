@@ -89,7 +89,6 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
       }
 
       const {
-        noFixedAddress,
         buildingName,
         buildingNumber,
         streetName,
