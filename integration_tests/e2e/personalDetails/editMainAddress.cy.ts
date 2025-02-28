@@ -175,6 +175,23 @@ context('Edit main address', () => {
         .should('have.value', field[2] || '')
     }
   })
+  it('Checking no fixed address, removing start address and submitting should persist the checkbox selection and not show address fields', () => {
+    cy.visit('/case/X000001/personal-details/edit-main-address')
+    const page = Page.verifyOnPage(EditMainAddress)
+    page.getCheckboxField('noFixedAddress').click()
+    page.getElementInput('startDate').clear()
+    page.getElementData('submitBtn').click()
+    page.getCheckboxField('noFixedAddress').should('not.be.checked')
+    page.getElementInput('buildingName').should('be.visible')
+  })
+  it('Unchecking no fixed address and removing start address should persist the checkbox selection and show address fields', () => {
+    cy.visit('/case/X000001/personal-details/edit-main-address')
+    const page = Page.verifyOnPage(EditMainAddress)
+    page.getElementInput('startDate').clear()
+    page.getElementData('submitBtn').click()
+    page.getCheckboxField('noFixedAddress').should('be.checked')
+    page.getElementInput('buildingName').should('not.be.visible')
+  })
   it('Submitting with no fixed address unchecked and no address details filled, should redirect to Personal details screen and update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
