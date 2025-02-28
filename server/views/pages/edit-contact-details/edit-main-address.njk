@@ -289,7 +289,18 @@
                     }
                 } if errorMessages.endDate
             }) }}
-
+            {% if personalDetails.mainAddress.addressNotes %}
+            <section class="govuk-!-margin-bottom-4" data-qa="addressNotes">
+            <p class="govuk-label--s govuk-!-margin-bottom-1">Previous notes</p>
+          {% if personalDetails.mainAddress.addressNotes.length %}                  
+            {% for addressNote in personalDetails.mainAddress.addressNotes %}
+ {{ appNote(addressNote, "/case/" + crn + "/personal-details/main-address/note/" + addressNote.id) }}
+            {% endfor %}
+            {% else %}
+            <p>No notes</p>
+            {% endif %}
+            </section>
+            {% endif %}
             {{ govukTextarea({
                 id: "notes",
                 name: "notes",
