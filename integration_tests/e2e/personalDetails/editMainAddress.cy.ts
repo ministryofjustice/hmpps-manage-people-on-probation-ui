@@ -127,7 +127,7 @@ context('Edit main address', () => {
       )
     page.getElementData('verified').find('.govuk-radios__item').eq(0).click()
     page.getElementData('submitBtn').click()
-    page.getElementData('updateBanner').should('contain.text', 'Contact details updated')
+    page.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
   it('Submitting with a dates later than today should show error messages', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
@@ -160,7 +160,7 @@ context('Edit main address', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
     page.getElementData('submitBtn').click()
-    page.getElementData('updateBanner').should('contain.text', 'Contact details updated')
+    page.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
   it('Unchecking no fixed address should display the address fields', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
@@ -183,13 +183,13 @@ context('Edit main address', () => {
       page.getElementData(field[0]).find('input').clear()
     }
     page.getElementData('submitBtn').click()
-    page.getElementData('updateBanner').should('contain.text', 'Contact details updated')
+    page.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
   it('Submitting with no fixed address unchecked and address details filled, should redirect to Personal details screen and update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
     page.getCheckboxField('noFixedAddress').click()
     page.getElementData('submitBtn').click()
-    page.getElementData('updateBanner').should('contain.text', 'Contact details updated')
+    page.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
 })
