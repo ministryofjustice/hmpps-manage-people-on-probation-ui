@@ -173,7 +173,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
               county,
               postcode,
               typeCode,
-              verified,
+              verified: request.verified,
               from,
               to,
               notes,
