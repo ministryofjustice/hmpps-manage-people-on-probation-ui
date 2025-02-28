@@ -156,6 +156,17 @@ context('Edit main address', () => {
     page.getErrorSummaryLink(0).should('contain.text', expectedError)
     page.getElementData('endDateError').should('be.visible').should('contain.text', expectedError)
   })
+  it('Submitting the form with address verified and no start date should persist the address verified selection', () => {
+    cy.visit('/case/X000001/personal-details/edit-main-address')
+    const page = Page.verifyOnPage(EditMainAddress)
+    page.getElementData('verified').find('.govuk-radios__item').eq(0).find('input').click()
+    page.getElementInput('startDate').clear()
+    page.getElementData('submitBtn').click()
+    page.getElementData('verified').find('.govuk-radios__item').eq(0).find('input').should('be.checked')
+    page.getElementData('verified').find('.govuk-radios__item').eq(1).find('input').click()
+    page.getElementData('submitBtn').click()
+    page.getElementData('verified').find('.govuk-radios__item').eq(1).find('input').should('be.checked')
+  })
   it('Submitting no fixed address successfully should redirect to Personal details screen with update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = Page.verifyOnPage(EditMainAddress)
