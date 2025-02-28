@@ -89,6 +89,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
       }
 
       const {
+        noFixedAddress,
         buildingName,
         buildingNumber,
         streetName,
@@ -113,7 +114,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
           ...request,
           endDate: toIsoDateFromPicker(req.body.endDate),
           startDate: toIsoDateFromPicker(req.body.startDate),
-          noFixedAddress: req?.body?.noFixedAddress === 'true',
+          noFixedAddress: noFixedAddress === 'true',
           buildingName,
           buildingNumber,
           streetName,
