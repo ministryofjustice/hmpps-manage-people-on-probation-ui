@@ -121,6 +121,6 @@ context('Edit contact details', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = Page.verifyOnPage(EditContactDetails)
     page.getElement('submitBtn').click()
-    page.getElement('updateBanner').should('contain.text', 'Contact details updated')
+    page.getElement('updateBanner').should('contain.text', 'Contact details saved')
   })
 })
