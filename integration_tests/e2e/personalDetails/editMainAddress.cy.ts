@@ -93,7 +93,7 @@ context('Edit main address', () => {
     page.getElementData('submitBtn').should('contain.text', 'Save changes')
     page
       .getElementData('cancelBtn')
-      .should('contain.text', 'Cancel')
+      .should('contain.text', 'Cancel and go back')
       .should('have.attr', 'href', '/case/X000001/personal-details')
   })
   it('Submitting without selecting an address type should show errors', () => {

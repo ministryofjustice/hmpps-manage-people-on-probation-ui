@@ -32,7 +32,7 @@ context('Edit contact details', () => {
     page.getElement('submitBtn').should('contain.text', 'Save changes')
     page
       .getElement('cancelBtn')
-      .should('contain.text', 'Cancel')
+      .should('contain.text', 'Cancel and go back')
       .should('have.attr', 'href', '/case/X000001/personal-details')
   })
 
