@@ -156,7 +156,7 @@
 {% block pageContent %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-full">
-        <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="sentence2Card">
+        <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
           <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
           {% if upcomingAppointments.length == 0 %}
             <p>There are no upcoming appointments.</p>
@@ -195,7 +195,7 @@
           {% endif %}
         </section>
 
-        <section class="govuk-!-margin-bottom-8">
+        <section class="govuk-!-margin-bottom-8" data-qa="pastAppointments">
           <h2 class="govuk-heading-m" id="section2">Past appointments</h2>
           {% if pastAppointments.length == 0 %}
             <p>There are no past appointments.</p>
@@ -233,9 +233,9 @@
             }) }}
           {% endif %}
         </section>
-        <section>
+        <section data-qa="appointmentHistory">
           <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
-          <p><a href="./activity-log/national-standard-appointments" class="govuk-link">View all past appointments in the activity log</a>.</p>
+          <p><a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
         </section>
       </div>
     </div>
