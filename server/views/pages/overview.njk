@@ -412,11 +412,15 @@
                     {{ sentence.order.description }}<br />
                     From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br />
                     {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
+                    {% else %}
+                    No order
                 {% endif %}
             {% endset %}
             {% set requirements %}
                 {% if sentence.rarDescription %}
                 {{ sentence.rarDescription }}
+                {% else %}
+                No requirements
                 {% endif %}
             {% endset %}
             {% set mainOffence %}
