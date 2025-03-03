@@ -95,9 +95,19 @@ export default class RestClient {
 
   private async requestWithBody<Response = unknown>(
     method: 'patch' | 'post' | 'put',
-    { path, query = {}, headers = {}, responseType = '', data = {}, raw = false, retry = false }: RequestWithBody,
+    {
+      path,
+      query = {},
+      headers = {},
+      responseType = '',
+      data = {},
+      raw = false,
+      retry = false,
+      handle404 = false,
+    }: RequestWithBody,
   ): Promise<Response> {
     logger.info(`${this.name} ${method.toUpperCase()}: ${path}`)
+
     try {
       const result = await superagent[method](`${this.apiUrl()}${path}`)
         .query(query)
@@ -118,6 +128,7 @@ export default class RestClient {
 
       return raw ? result : result.body
     } catch (error) {
+      if (handle404 && error.response?.status === 404) return null
       const sanitisedError = sanitiseError(error)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: '${method.toUpperCase()}'`)
       throw sanitisedError

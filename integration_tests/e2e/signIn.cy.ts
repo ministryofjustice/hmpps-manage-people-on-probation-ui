@@ -1,8 +1,13 @@
 import IndexPage from '../pages/index'
 import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
+import SearchPage from '../pages/search'
 
 context('Sign In', () => {
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
+
   it('User name visible in header', () => {
     cy.visit('/')
     const indexPage = Page.verifyOnPage(IndexPage)
@@ -20,5 +25,17 @@ context('Sign In', () => {
     const indexPage = Page.verifyOnPage(IndexPage)
     indexPage.signOut().click()
     Page.verifyOnPage(AuthSignInPage)
+  })
+
+  it('Redirects to /search when no cases available', () => {
+    cy.task('stubUserNoCaseload')
+    cy.visit('/')
+    Page.verifyOnPage(SearchPage)
+  })
+
+  it('Redirects to /search when caseload returns 404', () => {
+    cy.task('stubUserNoStaffRecord')
+    cy.visit('/')
+    Page.verifyOnPage(SearchPage)
   })
 })

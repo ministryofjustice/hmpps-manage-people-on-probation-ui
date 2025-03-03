@@ -1,5 +1,7 @@
 import { defineConfig } from 'cypress'
 
+import stubs from './wiremock/stubs'
+
 export default defineConfig({
   chromeWebSecurity: false,
   fixturesFolder: 'integration_tests/fixtures',
@@ -17,5 +19,10 @@ export default defineConfig({
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
+    setupNodeEvents: (on: (string, Record) => void): void => {
+      on('task', {
+        ...stubs,
+      })
+    },
   },
 })
