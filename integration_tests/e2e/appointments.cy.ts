@@ -2,6 +2,9 @@ import Page from '../pages/page'
 import AppointmentPage from '../pages/appointment'
 import AppointmentsPage from '../pages/appointments'
 
+const url = (contactId: number, component = 'ContactDetails') =>
+  `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
+
 context('Appointment', () => {
   it('Appointment page with outcome is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/4')
@@ -37,16 +40,13 @@ context('Appointment', () => {
     page.upcomingAppointmentDate(1).should('contain.text', '22 March 2045')
     page.upcomingAppointmentTime(1).should('contain.text', '10:15am to 10:30am')
     page.upcomingAppointmentType(1).should('contain.text', 'Video call')
+
     page
       .upcomingAppointmentAction(1)
       .find('a')
       .should('contain.text', 'Manage')
       .should('have.attr', 'target', '_blank')
-      .should(
-        'have.attr',
-        'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&componentId=2500233993',
-      )
+      .should('have.attr', 'href', url(2))
   })
   it('Appointment page with no outcome recorded is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/3')
@@ -59,17 +59,11 @@ context('Appointment', () => {
       .find('a')
       .should('contain.text', 'Log an outcome on NDelius (opens in new tab)')
       .should('have.attr', 'target', '_blank')
-      .should(
-        'have.attr',
-        'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001&contactID=3',
-      )
+      .should('have.attr', 'href', url(3, 'ContactList'))
   })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
-    const url = (componentId: number) =>
-      `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&CRN=X000001&contactID=${componentId}`
 
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')
