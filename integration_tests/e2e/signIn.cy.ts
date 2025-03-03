@@ -8,6 +8,10 @@ context('Sign In', () => {
     cy.task('resetMocks')
   })
 
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
+
   it('User name visible in header', () => {
     cy.visit('/')
     const indexPage = Page.verifyOnPage(IndexPage)
