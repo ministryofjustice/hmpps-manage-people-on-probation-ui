@@ -32,6 +32,8 @@ context('Appointment', () => {
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')
     page.assertRiskTags()
+
+    page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'Upcoming appointments')
     page.upcomingAppointmentDate(1).should('contain.text', '22 March 2045')
     page.upcomingAppointmentTime(1).should('contain.text', '10:15am to 10:30am')
     page.upcomingAppointmentType(1).should('contain.text', 'Video call')
@@ -50,6 +52,7 @@ context('Appointment', () => {
     page.upcomingAppointmentTime(2).should('contain.text', '9:15am')
     page.upcomingAppointmentType(2).should('contain.text', 'Phone call')
 
+    page.getElement('[data-qa="pastAppointments"]').find('h2').should('contain.text', 'Past appointments')
     page.pastAppointmentDate(1).should('contain.text', '22 March 2024')
     page.pastAppointmentTime(1).should('contain.text', '8:15am to 8:30am')
     page.pastAppointmentType(1).should('contain.text', 'Phone call')
@@ -63,5 +66,12 @@ context('Appointment', () => {
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 5, 1, url)
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url)
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url)
+
+    page.getElement('[data-qa="appointmentHistory"]').find('h2').should('contain.text', 'Appointment history')
+    page
+      .getElement('[data-qa="appointmentHistory"]')
+      .find('a')
+      .should('contain.text', 'View all past appointments in the activity log')
+      .should('have.attr', 'href', '/case/X000001/activity-log')
   })
 })
