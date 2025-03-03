@@ -2,7 +2,7 @@ import Page from '../pages/page'
 import AppointmentPage from '../pages/appointment'
 import AppointmentsPage from '../pages/appointments'
 
-const url = (contactId: number, component = 'ContactDetails') =>
+const url = (contactId: number, component = 'UpdateContact') =>
   `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
 
 context('Appointment', () => {
