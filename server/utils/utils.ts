@@ -236,7 +236,9 @@ export const deliusDeepLinkUrl = (component: string, crn: string, contactId?: st
   if (!component || !crn) {
     return ''
   }
-  return `${config.delius.link}/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=${crn}${contactId ? `&contactID=${contactId}` : ''}${componentId ? `&componentId=${componentId}` : ''}`
+  const contactIdParam = contactId ? `&contactID=${contactId}` : ''
+  const componentIdParam = componentId ? `&componentId=${componentId}` : ''
+  return `${config.delius.link}/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=${crn}${contactIdParam}${componentIdParam}`
 }
 
 export const tierLink = (crn: string) => {
