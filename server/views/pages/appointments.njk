@@ -9,7 +9,6 @@
 {% set offenderId = upcomingAppointments.personSummary.offenderId  %}
 {% set headerGender = upcomingAppointments.personSummary.gender  %}
 {% set upcomingAppointments = sortAppointmentsDescending(upcomingAppointments.appointments) %}
-{% set contactId = pastAppointments.contactId %}
 {% set pastAppointments = sortAppointmentsDescending(pastAppointments.appointments, 10) %}
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
