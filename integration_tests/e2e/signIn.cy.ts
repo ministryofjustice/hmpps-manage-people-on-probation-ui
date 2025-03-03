@@ -4,10 +4,6 @@ import Page from '../pages/page'
 import SearchPage from '../pages/search'
 
 context('Sign In', () => {
-  beforeEach(() => {
-    cy.task('resetMocks')
-  })
-
   afterEach(() => {
     cy.task('resetMocks')
   })
