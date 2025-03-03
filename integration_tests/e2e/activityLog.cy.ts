@@ -313,6 +313,10 @@ context('Activity log', () => {
   it('Activity log page is rendered in default view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('[data-qa="currentSectionNameSubText"]').should(
+      'contain.text',
+      'All links to log outcomes open in new tabs on NDelius.',
+    )
     page.getCardHeader('timeline1').should('contain.text', 'Video call')
     page.getRowData('timeline1', 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
     page.getCardHeader('timeline2').should('contain.text', 'Phone call from Eula Schmeler')
@@ -326,11 +330,18 @@ context('Activity log', () => {
     page.getCardHeader('timeline5').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline5').get('.app-summary-card__actions').should('contain.text', 'Complied')
     page.getCardHeader('timeline6').should('contain.text', 'Phone call at 8:15am')
+    // cy.pause()
     page
       .getCardHeader('timeline6')
       .get('.app-summary-card__actions a')
-      .should('contain.text', 'Record an outcome')
-      .should('have.attr', 'href', '/case/X000001/handoff/delius')
+      .should('contain.text', 'Log an outcome')
+      .should('contain.html', '<span class="govuk-visually-hidden"> (opens in new tab)</span>')
+      .should('have.attr', 'target', '_blank')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
+      )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')

@@ -34,7 +34,7 @@
         ]
       }) }}
       {% else %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('ContactList', crn) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius</a>
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
     {% endset %}
 
@@ -88,7 +88,7 @@
           ]
         }) }}
       {% else %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('ContactList', crn) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius</a>
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
     {% endset %}
 
@@ -148,7 +148,7 @@
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
       </form>
       {% else %}
-        <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an appointment</a>
+        <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an appointment on NDelius</a>
       {% endif %}
     </div>
 {% endblock %}
@@ -161,6 +161,7 @@
           {% if upcomingAppointments.length == 0 %}
             <p>There are no upcoming appointments.</p>
           {% else %}
+          <p>All links to manage appointments open in new tabs on NDelius.</p>
             {{ govukTable({
               firstCellIsHeader: false,
               attributes: {
@@ -185,7 +186,7 @@
                   attributes: { "aria-sort": "none" }
                 },
                 {
-                  html: "Action<br/><span class='non-sortable__sortable-table-header-black'>(Links open in new tab)</span>",
+                  html: 'Action<span class="govuk-visually-hidden"> (links open in new tab)</span>',
                   classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
                   format: "numeric"
                 }
@@ -224,7 +225,7 @@
                   attributes: { "aria-sort": "none" }
                 },
                 {
-                  html: "Action<br/><span class='non-sortable__sortable-table-header-black'>(Links open in new tab)</span>",
+                  html: "Action",
                   classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
                   format: "numeric"
                 }
