@@ -340,7 +340,7 @@ context('Activity log', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&crn=X000001&contactID=14',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
       )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')

@@ -54,8 +54,12 @@ context('Activity log details', () => {
     cy.get('.note-panel').find('.govuk-warning-text__text').should('contain.text', 'Outcome not recorded')
     cy.get('.note-panel')
       .find('a')
-      .should('contain.text', 'Record an outcome')
-      .should('have.attr', 'href', '/case/X000001/handoff/delius')
+      .should('contain.text', 'Log an outcome')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001&contactID=16',
+      )
     page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
     page
       .getCardElement('appointmentDetails', '.govuk-summary-list__key', 0)

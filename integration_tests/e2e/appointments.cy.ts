@@ -63,14 +63,14 @@ context('Appointment', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&crn=X000001',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001&contactID=3',
       )
   })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
     const url = (componentId: number) =>
-      `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&crn=X000001&contactID=${componentId}`
+      `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactDetails&CRN=X000001&contactID=${componentId}`
 
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')
