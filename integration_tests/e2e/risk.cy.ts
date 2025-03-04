@@ -61,12 +61,7 @@ context('Risk', () => {
       .should('have.attr', 'href', '/case/X000001/risk/removed-risk-flags')
     page
       .getElementData('oasysViewRiskAssessmentLink')
-      .should('contain.text', 'Sign in to OASys to the full risk assessment (opens in new tab)')
-      .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', 'https://oasys-dummy-url')
-    page
-      .getElementData('oasysCreateRiskAssessmentLink')
-      .should('contain.text', 'Sign in to OASys to create a risk assessment (opens in new tab)')
+      .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
   })
@@ -136,7 +131,7 @@ context('Risk', () => {
     cy.visit('/case/X801756/risk')
     const page = new RiskDetailPage()
     page.getElementData('oasysViewRiskAssessmentLink').should('not.exist')
-    page.getElementData('oasysCreateRiskAssessmentLink').should('exist')
+    page.getElementData('oasysCreateRiskAssessmentLink').should('not.exist')
   })
   it('Risk page is rendered with no OASys Layer 3 risk assessment', () => {
     cy.visit('/case/X778160/risk')
@@ -156,7 +151,7 @@ context('Risk', () => {
     page
       .getElementData('noOasysRiskBanner')
       .find('a')
-      .should('contain.text', 'View OASys')
+      .should('contain.text', 'Create a risk assessment on OASys (opens in new tab).')
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
   })
