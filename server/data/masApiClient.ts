@@ -25,6 +25,7 @@ import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails
 import { ActivityLogRequestBody, AppointmentRequestBody } from '../@types'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
 import { PreviousOrderDetail } from './model/previousOrderDetail'
+import { DeliusRoles } from './model/deliusRoles'
 
 export default class MasApiClient extends RestClient {
   constructor(token: string) {
@@ -257,5 +258,9 @@ export default class MasApiClient extends RestClient {
 
   async checkUserAccess(username: string, crns: Record<never, never>): Promise<UserAccess> {
     return this.post({ data: crns, path: `/user/${username}/access`, handle404: false })
+  }
+
+  async getDeliusRoles(username: string): Promise<DeliusRoles> {
+    return this.get({ path: `/user/${username}`, handle404: true })
   }
 }

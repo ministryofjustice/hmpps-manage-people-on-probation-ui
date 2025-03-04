@@ -21,6 +21,12 @@ export default function setUpAuth(): Router {
     return res.render('autherror')
   })
 
+  router.get('/no-perm-autherror', (req, res) => {
+    res.locals.backLink = req.query.backLink
+    res.status(403)
+    return res.render('no-perm-autherror')
+  })
+
   router.get('/sign-in', passport.authenticate('oauth2'))
 
   router.get('/sign-in/callback', (req, res, next) =>
