@@ -413,14 +413,14 @@
                     From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br />
                     {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
                     {% else %}
-                    No order
+                    No order details
                 {% endif %}
             {% endset %}
             {% set requirements %}
                 {% if sentence.rarDescription %}
                 {{ sentence.rarDescription }}
                 {% else %}
-                No requirements
+                No requirements details
                 {% endif %}
             {% endset %}
             {% set mainOffence %}
