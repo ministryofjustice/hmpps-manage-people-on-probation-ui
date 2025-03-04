@@ -139,7 +139,7 @@
                       'data-qa': 'telephoneNumberAction'
                     }
                   }] 
-                }
+                } if manageUsersAccess === true
               },
                 {
                   key: { html: '<span data-qa="mobileNumberLabel">Mobile number</span>' },
@@ -153,7 +153,7 @@
                       'data-qa': 'mobileNumberAction'
                     }
                   }] 
-                }
+                } if manageUsersAccess === true
                 },
               {
                 key: { html: '<span data-qa="emailAddressLabel">Email address</span>' },
@@ -167,7 +167,7 @@
                       'data-qa': 'emailAddressAction'
                     }
                   }] 
-                }
+                } if manageUsersAccess === true
               },
               {
                 key: { html: '<span data-qa="mainAddressLabel">' + 'Main address<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">' + mainAddress.lastUpdated | lastUpdatedDate + '</span></span>' },
@@ -181,7 +181,7 @@
                       'data-qa': 'mainAddressAction'
                     }
                   }] 
-                }
+                } if manageUsersAccess === true
               },
               {
                 key: { html: '<span data-qa="otherAddressesLabel">Other addresses</span>' },

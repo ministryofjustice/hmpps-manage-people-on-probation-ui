@@ -12,17 +12,19 @@ import type { PersonalDetailsUpdateRequest } from '../data/model/personalDetails
 import { validateWithSpec } from '../utils/validationUtils'
 import { personDetailsValidation } from '../properties'
 import renders from '../controllers/renders'
+import RoleService from '../services/roleService'
+import { DeliusRoleEnum } from '../data/model/deliusRoles'
 
 export default function personalDetailRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string | string[], handler: Route<void>) => router.post(path, asyncMiddleware(handler))
-
   get(
     [
       '/case/:crn/personal-details',
       '/case/:crn/personal-details/edit-contact-details',
       '/case/:crn/personal-details/edit-main-address',
     ],
+    // eslint-disable-next-line consistent-return
     async (req, res, _next) => {
       const { crn } = req.params
       const success = req.query.update
@@ -30,16 +32,24 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
+      const roleService = new RoleService(masClient)
+      const manageUsersAccess = await roleService.hasAccess(DeliusRoleEnum.MANAGE_USERS, res.locals.user.username)
 
       let action = 'VIEW_MAS_PERSONAL_DETAILS'
       let renderPath = 'pages/personal-details'
       const backLink = req.path.includes('personal-details/') ? `/case/${crn}/personal-details` : null
       const hidePageHeader = req.path.includes('personal-details/')
       if (req.path.includes('personal-details/edit-contact-details')) {
+        if (!manageUsersAccess) {
+          return res.redirect(`/no-perm-autherror?backLink=${backLink}`)
+        }
         action = 'VIEW_EDIT_PERSONAL_DETAILS'
         renderPath = 'pages/edit-contact-details/edit-contact-details'
       }
       if (req.path.includes('personal-details/edit-main-address')) {
+        if (!manageUsersAccess) {
+          return res.redirect(`/no-perm-autherror?backLink=${backLink}`)
+        }
         action = 'VIEW_EDIT_MAIN_ADDRESS'
         renderPath = 'pages/edit-contact-details/edit-main-address'
       }
@@ -72,6 +82,7 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
         success,
         backLink,
         hidePageHeader,
+        manageUsersAccess,
       })
     },
   )

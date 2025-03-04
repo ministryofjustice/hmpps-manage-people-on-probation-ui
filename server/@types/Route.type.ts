@@ -31,6 +31,7 @@ interface Locals {
   appointmentTypes?: AppointmentTypeOption[]
   lastAppointmentDate?: string
   version: string
+  backLink: string
 }
 
 export interface AppResponse extends Response {

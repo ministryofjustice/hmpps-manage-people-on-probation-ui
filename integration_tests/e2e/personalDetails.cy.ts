@@ -30,6 +30,11 @@ context('Personal Details', () => {
     page.getRowData('contactDetails', 'contacts', 'Value').should('contain.text', 'Steve Wilson – GP (secondary)')
     page.getRowData('contactDetails', 'mainAddressNotes', 'Value').should('contain.text', 'Main Address')
 
+    page.getElementData('telephoneNumberAction').should('exist')
+    page.getElementData('mobileNumberAction').should('exist')
+    page.getElementData('emailAddressAction').should('exist')
+    page.getElementData('mainAddressAction').should('exist')
+
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
     page.getRowData('personalDetails', 'dateOfBirth', 'Value').should('contain.text', '18 August 1979')
     page.getRowData('personalDetails', 'aliases', 'Value').should('contain.text', 'Jonny Smith')
