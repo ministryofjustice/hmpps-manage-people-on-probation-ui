@@ -123,7 +123,7 @@ export const toDate = (datetimeString: string): DateTime => {
   return DateTime.fromISO(datetimeString)
 }
 
-export const toISODate = (datetimeString: any) => {
+export const toIsoDate = (datetimeString: any) => {
   return DateTime.fromFormat(datetimeString, 'd/M/yyyy').toFormat('yyyy-MM-dd')
 }
 
@@ -755,3 +755,18 @@ export const roleDescription = (contact: Contact, addBreak?: boolean): string =>
 }
 
 export const toSentenceDescription = (value?: string): string => (!value ? 'Pre-Sentence' : value)
+
+export const toIsoDateString = (datetimestr: string): string => {
+  if (!datetimestr) {
+    return null
+  }
+  let date = DateTime.fromFormat(datetimestr, 'yyyy-MM-dd')
+  if (date.isValid) {
+    return datetimestr
+  }
+  date = DateTime.fromFormat(datetimestr, 'd/M/yyyy')
+  if (date.isValid) {
+    return date.toFormat('yyyy-MM-dd')
+  }
+  return ''
+}

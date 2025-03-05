@@ -1,0 +1,168 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/schedule/upcoming",
+        "method": "GET",
+        "queryParameters": {
+          "page": {
+            "matches": ".*"
+          },
+          "size": {
+            "matches": ".*"
+          },
+          "sortBy": {
+            "matches": ".*"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "size": 15,
+          "page": 0,
+          "totalResults": 54,
+          "totalPages": 6,
+          "name": {
+            "forename": "Eula",
+            "middleName": "",
+            "surname": "Schmeler"
+          },
+          "appointments": [
+            {
+              "caseName": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "id": 1,
+              "crn": "X778160",
+              "dob": "1975-09-25",
+              "tierScore": "B1",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 3,
+              "type": "Home visit",
+              "startDateTime": "2025-04-27T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-27T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Kari",
+                "middleName": "",
+                "surname": "Bradtke"
+              },
+              "id": 2,
+              "crn": "X801756",
+              "dob": "1986-07-19",
+              "tierScore": "B1",
+              "latestSentence": "CJA - Community Order",
+              "numberOfAdditionalSentences": 1,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2025-04-28T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-28T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "id": 3,
+              "crn": "X000001",
+              "dob": "2002-01-09",
+              "tierScore": "B1",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Planned office visit",
+              "startDateTime": "2025-04-29T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-29T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Wendell",
+                "middleName": "",
+                "surname": "Dooley"
+              },
+              "id": 4,
+              "crn": "X777916",
+              "dob": "2001-02-14",
+              "tierScore": "B1",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Home visit",
+              "startDateTime": "2025-04-30T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-30T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "id": 6,
+              "crn": "X778160",
+              "dob": "1975-09-25",
+              "tierScore": "B1",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 3,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2025-04-30T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-30T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Kari",
+                "middleName": "",
+                "surname": "Bradtke"
+              },
+              "id": 7,
+              "crn": "X801756",
+              "dob": "1986-07-19",
+              "tierScore": "B1",
+              "latestSentence": "CJA - Community Order",
+              "numberOfAdditionalSentences": 1,
+              "type": "Planned office visit",
+              "startDateTime": "2025-04-30T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-30T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "id": 8,
+              "crn": "X000001",
+              "dob": "2002-01-09",
+              "tierScore": "B1",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "3 Way Meeting (Non NS)",
+              "startDateTime": "2025-04-30T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-04-30T10:30:00.382936Z[Europe/London]"
+            },
+            {
+              "caseName": {
+                "forename": "Wendell",
+                "middleName": "",
+                "surname": "Dooley"
+              },
+              "id": 9,
+              "crn": "X777916",
+              "dob": "2001-02-14",
+              "tierScore": "B1",
+              "latestSentence": "Adult Custody < 12m",
+              "numberOfAdditionalSentences": 0,
+              "type": "Planned office visit",
+              "startDateTime": "2025-05-01T09:30:00.382936Z[Europe/London]",
+              "endDateTime": "2025-05-01T10:30:00.382936Z[Europe/London]"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
