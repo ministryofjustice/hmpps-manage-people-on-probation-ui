@@ -2,6 +2,7 @@ import { Router } from 'express'
 
 import type { Services } from '../services'
 
+import home from './home'
 import searchRoutes from './search'
 import caseRoutes from './case'
 import personalDetailRoutes from './personalDetails'
@@ -17,6 +18,7 @@ import arrangeAppointmentRoutes from './arrangeAppointment'
 
 export default function routes(services: Services): Router {
   const router = Router()
+  home(router)
   searchRoutes(router, services)
   caseRoutes(router, services)
   personalDetailRoutes(router, services)

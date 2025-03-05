@@ -33,6 +33,50 @@ $govuk-page-width: $moj-page-width;
   white-space: preserve-breaks;
 }
 
+.dps-header {
+  background-color: rgba(86, 148, 202, .2);
+  padding: 25px 0;
+}
+
+.dps-homepage-search {
+  background-color: #f3f2f1;
+  padding: 25px 0;
+}
+
+.govuk-accordion {
+
+  .govuk-accordion__controls {
+    display: none;
+    height: 25px;
+  }
+
+  .govuk-accordion__section {
+    border: 1px solid #b1b4b6 !important;
+    border-top: 1px solid #b1b4b6 !important;
+    border-bottom: 0 !important;
+    padding-top: 0;
+
+    .govuk-accordion__section-button {
+      display: flex;
+      border-top: 0 !important;
+      border-bottom: 0 !important;
+      padding-top: 15px !important;
+      padding-left: 15px !important;
+      padding-right: 15px !important;
+      padding-bottom: 5px !important;
+    
+      .govuk-accordion__section-heading-text {
+        flex-grow: 1;
+      }
+    }
+  }
+
+  .govuk-accordion__section-content {
+    padding-bottom: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
 .govuk-filter-background {
   background-color: #f3f2f1;
   padding: 32px 32px 5px 32px;

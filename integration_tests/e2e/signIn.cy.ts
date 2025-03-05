@@ -26,16 +26,4 @@ context('Sign In', () => {
     indexPage.signOut().click()
     Page.verifyOnPage(AuthSignInPage)
   })
-
-  it('Redirects to /search when no cases available', () => {
-    cy.task('stubUserNoCaseload')
-    cy.visit('/')
-    Page.verifyOnPage(SearchPage)
-  })
-
-  it('Redirects to /search when caseload returns 404', () => {
-    cy.task('stubUserNoStaffRecord')
-    cy.visit('/')
-    Page.verifyOnPage(SearchPage)
-  })
 })

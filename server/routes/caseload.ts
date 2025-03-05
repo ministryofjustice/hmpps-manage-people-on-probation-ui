@@ -17,22 +17,6 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: Route<void>) => router.post(path, asyncMiddleware(handler))
 
-  get('/', async (req, res, _next) => {
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-    const masClient = new MasApiClient(token)
-    const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-    req.session.page = pageNum as unknown as string
-    const sortBy: string = req.query.sortBy ? (req.query.sortBy as string) : 'nextContact.asc'
-    req.session.sortBy = sortBy
-    const caseload = await masClient.searchUserCaseload(res.locals.user.username, (pageNum - 1).toString(), sortBy, {})
-
-    if (caseload == null || caseload?.totalPages === 0) {
-      res.redirect('/search')
-    } else {
-      showCaseload(req, res, caseload, {})
-    }
-  })
-
   post('/case', async (req, res, _next) => {
     req.session.caseFilter = {
       nameOrCrn: req.body.nameOrCrn,
