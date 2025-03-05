@@ -7,10 +7,11 @@ import { HmppsAuthClient } from '../data'
 import { AppResponse } from '../@types'
 import config from '../config'
 
+config.apis.masApi.url = 'http://localhost:8100'
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/masApiClient')
+// jest.mock('../data/masApiClient')
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -42,8 +43,6 @@ const nextSpy = jest.fn()
 
 const crn = 'X000001'
 const number = '2'
-
-let fakeApi: nock.Scope
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 describe('/middleware/getSentences', () => {
@@ -77,16 +76,25 @@ describe('/middleware/getSentences', () => {
     */
 
   describe('500 response', () => {
+    let fakeApi: nock.Scope
+
     beforeEach(() => {
-      fakeApi = nock('http://localhost:8080/api', {
+      fakeApi = nock(config.apis.masApi.url, {
         reqheaders: { authorization: 'Bearer token-1' },
       })
     })
-    const spy = jest
-      .spyOn(MasApiClient.prototype, 'getSentences')
-      .mockImplementationOnce(() => Promise.reject(new Error()))
+
+    afterEach(() => {
+      nock.abortPendingRequests()
+      nock.cleanAll()
+    })
+
+    // const spy = jest
+    //   .spyOn(MasApiClient.prototype, 'getSentences')
+    //   .mockImplementationOnce(() => Promise.reject(new Error()))
     it('should...', async () => {
-      fakeApi.get(`/sentences/${crn}?number=${number}`).reply(500)
+      fakeApi.get('/sentences/X000001').query({ number: '2' }).reply(500, { message: 'Internal Server Error' })
+
       const req = httpMocks.createRequest({
         params: {
           crn,
