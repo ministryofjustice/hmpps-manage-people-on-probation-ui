@@ -10,10 +10,14 @@ import config from '../config'
 config.apis.masApi.url = 'http://localhost:8100'
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')
-jest.mock('../data/hmppsAuthClient')
+// jest.mock('../data/hmppsAuthClient')
 // jest.mock('../data/masApiClient')
 
+jest
+  .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
+  .mockImplementation(() => Promise.resolve(token.access_token))
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const sentencesMock = [
   {
@@ -78,12 +82,26 @@ describe('/middleware/getSentences', () => {
   describe('500 response', () => {
     let fakeApi: nock.Scope
 
+    // beforeEach(() => {
+    //   fakeApi = nock(config.apis.masApi.url, {
+    //     reqheaders: {
+    //       authorization: `Bearer ${token.access_token}`,
+    //     },
+    //   })
+    // })
     beforeEach(() => {
-      fakeApi = nock(config.apis.masApi.url, {
-        reqheaders: { authorization: 'Bearer token-1' },
-      })
+      nock.disableNetConnect()
+      nock.enableNetConnect('localhost')
+      nock('http://localhost:8100')
+        .get('/sentences/X000001', {
+          reqheaders: {
+            authorization: `Bearer ${token.access_token}`,
+          },
+        })
+        .query({ number: '2' })
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(500, { message: 'Internal Server Error' })
     })
-
     afterEach(() => {
       nock.abortPendingRequests()
       nock.cleanAll()
@@ -92,9 +110,8 @@ describe('/middleware/getSentences', () => {
     // const spy = jest
     //   .spyOn(MasApiClient.prototype, 'getSentences')
     //   .mockImplementationOnce(() => Promise.reject(new Error()))
-    it('should...', async () => {
-      fakeApi.get('/sentences/X000001').query({ number: '2' }).reply(500, { message: 'Internal Server Error' })
 
+    it('should...', async () => {
       const req = httpMocks.createRequest({
         params: {
           crn,
