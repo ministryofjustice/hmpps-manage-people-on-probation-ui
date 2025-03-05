@@ -23,7 +23,6 @@ export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<vo
     } catch (err) {
       console.log(err)
     }
-
     return next()
   }
 }
