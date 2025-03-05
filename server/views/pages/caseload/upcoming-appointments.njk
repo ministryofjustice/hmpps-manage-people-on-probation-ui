@@ -1,0 +1,82 @@
+{% extends "../../partials/layout.njk" %}
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l" data-qa="pageHeading">My upcoming appointments</h1>
+            {% set rows = [] %}
+            {% for appointment in userSchedule.appointments %}
+                {% set fullName %}
+                    {{ appointment.caseName.surname }}, {{ appointment.caseName.forename }}
+                {% endset %}
+                {% set otherSentencesLink = '' %}
+                {% if appointment.numberOfAdditionalSentences > 0 %}
+                {% set otherSentencesLink = '<br><a href="/case/' + appointment.crn + '/sentence">+ ' + appointment.numberOfAdditionalSentences + ' more</a>' %}
+                {% endif %}
+                {% set rows = (rows.push(
+                    [
+                        { html: '<a class="govuk-!-font-weight-bold" href="/case/' + appointment.crn + '">' + fullName + '</a>
+                                  <br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>', attributes: { 'data-sort-value': appointment.caseName.surname } },
+                        { html: appointment.dob | dateWithYear + "<br><span class='secondary-text'>Age " + appointment.birthdate.year | yearsSince + "</span>", attributes: { "data-sort-value": appointment.birthdate.year } },
+                        { text: appointment.tierScore, attributes: { "data-sort-value": appointment.tierScore } },
+                        { html: appointment.latestSentence + otherSentencesLink },
+                        { html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '">' + appointment.type + '</a>',
+                          attributes: { "data-sort-value": appointment.type  }
+                        },
+                        {
+                            html: appointment.startDateTime | dateWithYear + "</br><span class='secondary-text'>" + appointment.startDateTime | govukTime + " to " + appointment.endDateTime | govukTime + "</span>",
+                            format: "numeric",
+                            classes: "govuk-!-text-align-left",
+                            attributes: { "data-sort-value": appointment.startDateTime }
+                        }
+                    ]
+                ), rows) %}
+            {% endfor %}
+
+            {%- from "govuk/components/table/macro.njk" import govukTable -%}
+<div class="moj-scrollable-pane">
+            {{ govukTable({
+                attributes: {
+                    'data-module': 'moj-sortable-table'
+                },
+                head: [
+                    {
+                        text: "Name / CRN",
+                        attributes: { "aria-sort": "none" }
+                    },
+                    {
+                        text: "Date of birth / Age",
+                        attributes: { "aria-sort": "none" },
+                        classes: "nowrap"
+                    },
+                    {
+                        text: "Tier",
+                        attributes: { "aria-sort": "none" }
+                    },
+                    {
+                        text: "Main sentence",
+                        attributes: { "aria-sort": "none" }
+                    },
+                    {
+                        text: "Appointment",
+                        attributes: { "aria-sort": "none" }
+                    },
+                    {
+                        text: "Date and time",
+                        attributes: { "aria-sort": "none" }
+                    }
+                ],
+                rows: rows
+            }) }}
+            </div>
+            {% if userSchedule.totalPages > 1 %}
+<div class="govuk-!-margin-top-8">
+ {{ appPagination({
+  currentPage: query.page or 0 | int,
+  totalPages: userSchedule.totalPages,
+  url: '/upcoming-appointments?'
+  }) }}
+</div>
+{% endif %}
+        </div>
+    </div>
+{% endblock %}

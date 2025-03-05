@@ -2,6 +2,7 @@ import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
 import { PersonAppointment, Schedule } from './model/schedule'
+import { UserSchedule } from './model/userSchedule'
 import {
   CircumstanceOverview,
   DisabilityOverview,
@@ -242,6 +243,11 @@ export default class MasApiClient extends RestClient {
 
   async getUserLocations(username: string): Promise<UserLocations> {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
+  }
+
+  async getUserSchedule(username: string, page: string, sortBy: string, type = 'upcoming'): Promise<UserSchedule> {
+    const pageQuery = `?${new URLSearchParams({ size: '10', page, sortBy }).toString()}`
+    return this.get({ path: `/user/${username}/schedule/${type}${pageQuery}`, handle404: true })
   }
 
   async getTeamCaseload(teamCode: string, page: string): Promise<TeamCaseload> {

@@ -108,6 +108,27 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
     })
   }
 
+  get('/upcoming-appointments', async (req, res, _next) => {
+    const { crn } = req.params
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+    const masClient = new MasApiClient(token)
+    const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
+    req.session.page = pageNum as unknown as string
+    const sortBy: string = req.query.sortBy ? (req.query.sortBy as string) : 'nextContact.asc'
+    req.session.sortBy = sortBy
+    let userSchedule = await masClient.getUserSchedule(res.locals.user.username, (pageNum - 1).toString(), sortBy)
+    let { appointments } = userSchedule
+    appointments = appointments.map(appointment => {
+      const [year, month, day] = appointment.dob.split('-')
+      return { ...appointment, birthdate: { day, month, year } }
+    })
+    userSchedule = {
+      ...userSchedule,
+      appointments,
+    }
+    return res.render('pages/caseload/upcoming-appointments', { userSchedule })
+  })
+
   get('/teams', async (req, res, _next) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
