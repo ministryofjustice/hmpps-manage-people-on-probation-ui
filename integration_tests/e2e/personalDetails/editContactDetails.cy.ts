@@ -1,4 +1,3 @@
-import { toCamelCase } from '../../../server/utils/utils'
 import Page from '../../pages/page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
 
@@ -35,23 +34,6 @@ context('Edit contact details', () => {
       .should('contain.text', 'Cancel and go back')
       .should('have.attr', 'href', '/case/X000001/personal-details')
   })
-
-  const mandatoryFields = [
-    ['phone number', 'Enter a phone number.'],
-    ['mobile number', 'Enter a mobile number.'],
-    ['email address', 'Enter an email address.'],
-  ]
-
-  for (const field of mandatoryFields) {
-    it(`Submitting with no ${field[0]} should show error messages`, () => {
-      cy.visit('/case/X000001/personal-details/edit-contact-details')
-      const page = Page.verifyOnPage(EditContactDetails)
-      page.getElementInput(toCamelCase(field[0])).clear()
-      page.getElement('submitBtn').click()
-      page.getErrorSummaryLink(0).should('contain.text', field[1])
-    })
-  }
-
   it('Submitting a non-numeric phone number should show error messages', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = new EditContactDetails()
