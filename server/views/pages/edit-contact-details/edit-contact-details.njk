@@ -6,7 +6,7 @@
  {{ govukInput({
                 value: personalDetails.telephoneNumber if personalDetails.telephoneNumber,
                 label: {
-                    text: "Phone number",
+                    text: "Phone number (optional)",
                     classes: "govuk-label--s govuk-!-font-weight-bold"
                 },
                 hint: {
@@ -31,7 +31,7 @@
             {{ govukInput({
                 value: personalDetails.mobileNumber if personalDetails.mobileNumber,
                 label: {
-                    text: "Mobile number",
+                    text: "Mobile number (optional)",
                     classes: "govuk-label--s govuk-!-font-weight-bold"
                 },
                 hint: {
@@ -57,7 +57,7 @@
             {{ govukInput({
                 value: personalDetails.email if personalDetails.email,
                 label: {
-                    text: "Email address",
+                    text: "Email address (optional)",
                     classes: "govuk-label--s govuk-!-font-weight-bold"
                 },
                 hint: {

@@ -80,7 +80,7 @@
   {{ govukDetails({
     summaryText: "Notes (sensitive)" if entry.isSensitive else "Notes",
     html: notes,
-    open: loop.index < 4,
+    open: true,
     classes: 'govuk-!-margin-bottom-0'
   }) }}
 {% elseif not entry.notes %}

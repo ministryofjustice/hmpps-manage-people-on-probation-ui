@@ -58,7 +58,7 @@ context('Activity log details', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001&contactID=16',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=16',
       )
     page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
     page
