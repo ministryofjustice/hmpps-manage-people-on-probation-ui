@@ -3,6 +3,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l" data-qa="pageHeading">My upcoming appointments</h1>
+            {% if userSchedule.appointments.length > 0 %}
             {% set rows = [] %}
             {% for appointment in userSchedule.appointments %}
                 {% set fullName %}
@@ -17,7 +18,6 @@
                         { html: '<a class="govuk-!-font-weight-bold" href="/case/' + appointment.crn + '">' + fullName + '</a>
                                   <br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>', attributes: { 'data-sort-value': appointment.caseName.surname } },
                         { html: appointment.dob | dateWithYear + "<br><span class='secondary-text'>Age " + appointment.birthdate.year | yearsSince + "</span>", attributes: { "data-sort-value": appointment.birthdate.year } },
-                        { text: appointment.tierScore, attributes: { "data-sort-value": appointment.tierScore } },
                         { html: appointment.latestSentence + otherSentencesLink },
                         { html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '">' + appointment.type + '</a>',
                           attributes: { "data-sort-value": appointment.type  }
@@ -49,10 +49,6 @@
                         classes: "nowrap"
                     },
                     {
-                        text: "Tier",
-                        attributes: { "aria-sort": "none" }
-                    },
-                    {
                         text: "Main sentence",
                         attributes: { "aria-sort": "none" }
                     },
@@ -69,14 +65,17 @@
             }) }}
             </div>
             {% if userSchedule.totalPages > 1 %}
-<div class="govuk-!-margin-top-8">
+<div class="govuk-!-margin-top-2">
  {{ appPagination({
-  currentPage: query.page or 0 | int,
+  currentPage: page | int,
   totalPages: userSchedule.totalPages,
   url: '/upcoming-appointments?'
   }) }}
 </div>
 {% endif %}
         </div>
+        {% else %}
+<p>No upcoming appointments.</p>
+        {% endif %}
     </div>
 {% endblock %}

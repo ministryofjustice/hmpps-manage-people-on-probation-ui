@@ -1,6 +1,7 @@
 import { type Router, Request } from 'express'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
+import { Response, HTTPError } from 'superagent'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -12,6 +13,7 @@ import config from '../config'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { checkRecentlyViewedAccess } from '../utils/utils'
 import type { AppResponse, Route } from '../@types'
+import { UserSchedule } from '../data/model/userSchedule'
 
 export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -108,25 +110,44 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
     })
   }
 
-  get('/upcoming-appointments', async (req, res, _next) => {
-    const { crn } = req.params
+  const isErrorResponse = <TResponse>(response: HTTPError | TResponse): response is HTTPError => {
+    return (response as HTTPError)?.status !== undefined
+  }
+
+  const isUserScheduleResponse = (response: HTTPError | UserSchedule): response is UserSchedule => {
+    return (response as UserSchedule)?.appointments !== undefined
+  }
+
+  get('/upcoming-appointments', async (req, res, _next): Promise<void> => {
+    const { page = '0' } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-    req.session.page = pageNum as unknown as string
-    const sortBy: string = req.query.sortBy ? (req.query.sortBy as string) : 'nextContact.asc'
-    req.session.sortBy = sortBy
-    let userSchedule = await masClient.getUserSchedule(res.locals.user.username, (pageNum - 1).toString(), sortBy)
-    let { appointments } = userSchedule
-    appointments = appointments.map(appointment => {
-      const [year, month, day] = appointment.dob.split('-')
-      return { ...appointment, birthdate: { day, month, year } }
-    })
-    userSchedule = {
-      ...userSchedule,
-      appointments,
+    let response: UserSchedule | HTTPError
+    let userSchedule: UserSchedule = null
+    try {
+      response = await masClient.getUserSchedule(res.locals.user.username, page)
+      if (isErrorResponse<UserSchedule>(response)) {
+        res.locals.status = response.status
+        res.locals.message = JSON.parse(response.text).message
+        return res.status(response.status).render('pages/error')
+      }
+      if (isUserScheduleResponse(response)) {
+        let { appointments } = response
+        appointments = appointments.map(appointment => {
+          const [year, month, day] = appointment.dob.split('-')
+          return { ...appointment, birthdate: { day, month, year } }
+        })
+        userSchedule = {
+          ...response,
+          appointments,
+        }
+      }
+    } catch (err: any) {
+      const error = err as Error
+      res.locals.message = error.message
+      return res.status(err.status).render('pages/error')
     }
-    return res.render('pages/caseload/upcoming-appointments', { userSchedule })
+    return res.render('pages/caseload/upcoming-appointments', { userSchedule, page })
   })
 
   get('/teams', async (req, res, _next) => {

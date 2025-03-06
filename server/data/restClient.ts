@@ -1,7 +1,7 @@
 import { Readable } from 'stream'
 
 import Agent, { HttpsAgent } from 'agentkeepalive'
-import superagent from 'superagent'
+import superagent, { Response } from 'superagent'
 
 import logger from '../../logger'
 import type { UnsanitisedError } from '../sanitisedError'
@@ -51,7 +51,7 @@ export default class RestClient {
     return this.config.timeout
   }
 
-  async get<Response = unknown>({
+  async get<TResponse = unknown>({
     path,
     query = {},
     headers = {},
@@ -60,10 +60,10 @@ export default class RestClient {
     handle404 = false,
     handle500 = false,
     errorMessageFor500 = '',
-  }: Request): Promise<Response> {
+  }: Request): Promise<TResponse> {
     logger.info(`${this.name} GET: ${path}`)
     try {
-      const result = await superagent
+      const result: Response = await superagent
         .get(`${this.apiUrl()}${path}`)
         .query(query)
         .agent(this.agent)
@@ -77,16 +77,19 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
-      return raw ? result : result.body
-    } catch (error) {
-      if (handle500 && error.response?.status === 500) {
+      return raw ? (result as TResponse) : result.body
+    } catch (error: any) {
+      if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessageFor500 })
         error.response.errors = warnings
-        logger.info('Handling 500 ')
+        logger.info('Handling 500')
         return error.response
       }
-      if (handle404 && error.response?.status === 404) return null
+      if (handle404 && error?.response?.status === 404) {
+        logger.info('Handling 404')
+        return null
+      }
       const sanitisedError = sanitiseError(error)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
       throw sanitisedError
