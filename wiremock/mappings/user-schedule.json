@@ -10,9 +10,6 @@
           },
           "size": {
             "matches": ".*"
-          },
-          "sortBy": {
-            "matches": ".*"
           }
         }
       },

@@ -1,3 +1,4 @@
+import { Response, HTTPError } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
@@ -245,9 +246,9 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
 
-  async getUserSchedule(username: string, page: string, sortBy: string, type = 'upcoming'): Promise<UserSchedule> {
-    const pageQuery = `?${new URLSearchParams({ size: '10', page, sortBy }).toString()}`
-    return this.get({ path: `/user/${username}/schedule/${type}${pageQuery}`, handle404: true })
+  async getUserSchedule(username: string, page: string, type = 'upcoming'): Promise<UserSchedule | HTTPError> {
+    const pageQuery = `?${new URLSearchParams({ size: '10', page }).toString()}`
+    return this.get({ path: `/user/${username}/schedule/${type}${pageQuery}`, handle404: true, handle500: true })
   }
 
   async getTeamCaseload(teamCode: string, page: string): Promise<TeamCaseload> {
