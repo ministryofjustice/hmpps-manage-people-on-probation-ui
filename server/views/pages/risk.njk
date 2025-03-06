@@ -18,7 +18,7 @@
 {% set lowScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
   {% if risks.assessedOn %}
-      {% set lastUpdatedDate = 'Last updated (OASys):' + risks.assessedOn | dateWithYear %}
+      {% set lastUpdatedDate = 'Last updated (OASys): ' + risks.assessedOn | dateWithYear %}
   {% endif %}
 
 {% set highScoringNeeds %}
