@@ -34,12 +34,6 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 describe('caseload controllers', () => {
-  const req = httpMocks.createRequest({
-    query: {
-      page: '0',
-    },
-  })
-
   const res = httpMocks.createResponse({
     locals: {
       user: {
@@ -49,28 +43,51 @@ describe('caseload controllers', () => {
   })
   const renderSpy = jest.spyOn(res, 'render')
 
+  const getUserScheduleSpy = jest
+    .spyOn(MasApiClient.prototype, 'getUserSchedule')
+    .mockImplementation(() => Promise.resolve(mockResponse))
+
+  const expectedUserSchedule = {
+    ...mockResponse,
+    appointments: [
+      { ...mockResponse.appointments[0], birthdate: { day: '19', month: '07', year: '1986' } },
+      { ...mockResponse.appointments[1], birthdate: { day: '24', month: '08', year: '2001' } },
+    ],
+  }
+
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('upcomingAppointments', () => {
-    it('200 response', async () => {
-      const getUserScheduleSpy = jest
-        .spyOn(MasApiClient.prototype, 'getUserSchedule')
-        .mockImplementationOnce(() => Promise.resolve(mockResponse))
-
-      await renders.upcomingAppointments(hmppsAuthClient)(req, res)
-      const expectedUserSchedule = {
-        ...mockResponse,
-        appointments: [
-          { ...mockResponse.appointments[0], birthdate: { day: '19', month: '07', year: '1986' } },
-          { ...mockResponse.appointments[1], birthdate: { day: '24', month: '08', year: '2001' } },
-        ],
-      }
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page)
-      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/upcoming-appointments', {
+  describe('userScheduleController', () => {
+    it('renders the caseload appointments page with upcoming appointments', async () => {
+      const req = httpMocks.createRequest({
+        query: {
+          page: '0',
+        },
+        url: '/caseload/appointments/upcoming',
+      })
+      await renders.userScheduleController(hmppsAuthClient)(req, res)
+      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, 'upcoming')
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
+        type: 'upcoming',
+      })
+    })
+    it('renders the caseload appointments page with appointments with no outcome', async () => {
+      const req = httpMocks.createRequest({
+        query: {
+          page: '0',
+        },
+        url: '/caseload/appointments/no-outcome',
+      })
+      await renders.userScheduleController(hmppsAuthClient)(req, res)
+      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, 'no-outcome')
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        userSchedule: expectedUserSchedule,
+        page: req.query.page,
+        type: 'no-outcome',
       })
     })
   })
