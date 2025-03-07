@@ -106,12 +106,18 @@ context('Upcoming appointments', () => {
     page.getPaginationItem(4).find('a').should('contain.text', '5').should('not.have.attr', 'aria-current', 'page')
     page.getPaginationItem(5).find('a').should('contain.text', '6').should('have.attr', 'aria-current', 'page')
   })
+  it('Table sorts by name is ascending order when sort column button is clicked', () => {
+    cy.visit('/upcoming-appointments')
+    const page = Page.verifyOnPage(UpcomingAppointments)
+    page.getTableColumnHeading(0).find('button').click()
+    page.getTableCell(1, 1).find('a').should('contain.text', 'Berge, Alton')
+    page.getTableCell(8, 1).find('a').should('contain.text', 'Wolff, Caroline')
+  })
   it('Upcoming appointments page is rendered with no results', () => {
     cy.task('stubNoUpcomingAppointments')
     cy.visit('/upcoming-appointments')
     const page = Page.verifyOnPage(UpcomingAppointments)
   })
-
   it('Requesting upcoming appointments returns a 500 error', () => {
     cy.task('stubUpcomingAppointments500Response')
     cy.visit('/upcoming-appointments', { failOnStatusCode: false })
