@@ -109,7 +109,7 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
     })
   }
 
-  get('/upcoming-appointments', renders.upcomingAppointments(hmppsAuthClient))
+  get('/caseload/appointments/upcoming', renders.userScheduleController(hmppsAuthClient))
 
   get('/teams', async (req, res, _next) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

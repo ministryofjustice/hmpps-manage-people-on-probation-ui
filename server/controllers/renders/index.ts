@@ -1,7 +1,7 @@
 import { staffContacts } from './staffContacts'
-import { upcomingAppointments } from './caseload'
+import { userScheduleController } from './caseload'
 
 export default {
   staffContacts,
-  upcomingAppointments,
+  userScheduleController,
 }

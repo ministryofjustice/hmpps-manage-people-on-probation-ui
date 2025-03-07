@@ -1,8 +1,11 @@
 {% extends "../../partials/layout.njk" %}
+{% set title = 'My upcoming appointments' %}
+{% set pageTitle = makePageTitle({ pageHeading: title }) %}
+
 {% block content %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
-            <h1 class="govuk-heading-l" data-qa="pageHeading">My upcoming appointments</h1>
+            <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
             {% if userSchedule.appointments.length > 0 %}
             {% set rows = [] %}
             {% for appointment in userSchedule.appointments %}
@@ -69,7 +72,7 @@
  {{ appPagination({
   currentPage: page | int,
   totalPages: userSchedule.totalPages,
-  url: '/upcoming-appointments?'
+  url: '/caseload/appointments/upcoming?'
   }) }}
 </div>
 {% endif %}
