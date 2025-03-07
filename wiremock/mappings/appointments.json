@@ -1,0 +1,117 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/appointments",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "provider": "London",
+          "staff": {
+            "forename": "Paul",
+            "surname": "McPhee"
+          },
+          "appointments": [
+            {
+              "caseName": {
+                "surname": "Morrison",
+                "forename": "Stuart"
+              },
+              "crn": "X172592",
+              "description": "Planned telephone contact",
+              "location": "HMP Wakefield",
+              "date": "2025-04-06",
+              "startTime": "09:00:00",
+              "endTime": "09:30:00"
+            },
+            {
+              "caseName": {
+                "surname": "Emard",
+                "forename": "Garrett"
+              },
+              "crn": "X172591",
+              "description": "Home visit",
+              "location": "HMP Wakefield",
+              "date": "2025-04-06",
+              "startTime": "10:00:00",
+              "endTime": "10:30:00"
+            },
+            {
+              "caseName": {
+                "surname": "Weissnat",
+                "forename": "Briana"
+              },
+              "crn": "Y602391",
+              "description": "PI1:My Identity",
+              "location": "HMP Wakefield",
+              "date": "2025-04-06",
+              "startTime": "11:00:00",
+              "endTime": "11:30:00"
+            },
+            {
+              "caseName": {
+                "surname": "Huels",
+                "forename": "Sheridan"
+              },
+              "crn": "D115542",
+              "description": "PI1:My Identity",
+              "location": "HMP Wakefield",
+              "date": "2025-04-06",
+              "startTime": "12:00:00",
+              "endTime": "12:30:00"
+            },
+            {
+              "caseName": {
+                "surname": "Bradtke",
+                "forename": "Ethan"
+              },
+              "crn": "X148901",
+              "description": "Sentence Plan Review",
+              "location": "HMP Wakefield",
+              "date": "2025-04-06",
+              "startTime": "13:00:00",
+              "endTime": "13:30:00"
+            }
+          ],
+          "outcomes": [
+            {
+              "caseName": { "surname": "Morrison", "forename": "Stuart" },
+              "crn": "X172592",
+              "description": "Home visit",
+              "date": "2025-03-04"
+            },
+            {
+              "caseName": { "surname": "Emard", "forename": "Garrett" },
+              "crn": "X172591",
+              "description": "Planned office visit",
+              "date": "2025-03-03"
+            },
+            {
+              "caseName": { "surname": "Weissnat", "forename": "Briana" },
+              "crn": "Y602391",
+              "description": "Planned office visit",
+              "date": "2025-03-02"
+            },
+            {
+              "caseName": { "surname": "Huels", "forename": "Sheridan" },
+              "crn": "D115542",
+              "description": "Planned office visit",
+              "date": "2025-03-01"
+            },
+            {
+              "caseName": { "surname": "Bradtke", "forename": "Ethan" },
+              "crn": "X148901",
+              "description": "Sentence Plan Review",
+              "date": "2025-02-28"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
