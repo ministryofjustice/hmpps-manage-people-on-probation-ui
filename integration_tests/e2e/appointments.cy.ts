@@ -59,7 +59,7 @@ context('Appointment', () => {
       .find('a')
       .should('contain.text', 'Log an outcome on NDelius (opens in new tab)')
       .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', url(3, 'ContactList'))
+      .should('have.attr', 'href', url(3, 'UpdateContact'))
   })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
