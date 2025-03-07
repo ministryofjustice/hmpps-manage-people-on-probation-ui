@@ -128,6 +128,13 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
 
+  njkEnv.addFilter('concat', (arr, value) => {
+    if (!Array.isArray(arr)) {
+      throw new Error('First argument must be an array')
+    }
+    return arr.concat(value)
+  })
+
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
     return next()
