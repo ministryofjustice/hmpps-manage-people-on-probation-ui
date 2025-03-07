@@ -38,7 +38,7 @@ context('Upcoming appointments', () => {
       .find('a')
       .should('contain.text', 'Home visit')
       .should('have.attr', 'href', '/case/X778160/appointments/appointment/1')
-    page.getTableCell(1, 5).should('contain.text', '27 April 2025').should('contain.text', '9:30am to 10:30am')
+    page.getTableCell(1, 5).should('contain.text', '27 March 2025').should('contain.text', '9:30am to 10:30am')
     cy.get('.govuk-pagination').should('exist')
     page
       .getPaginationItem(1)
@@ -113,6 +113,12 @@ context('Upcoming appointments', () => {
     page.getTableCell(1, 1).find('a').should('contain.text', 'Berge, Alton')
     page.getTableCell(8, 1).find('a').should('contain.text', 'Wolff, Caroline')
   })
+  it('Requesting upcoming appointments returns a 500 error', () => {
+    cy.task('stubUpcomingAppointments500Response')
+    cy.visit('/upcoming-appointments', { failOnStatusCode: false })
+    cy.get('h1').should('contain.text', 'Internal Server Error')
+    cy.get('h2').should('contain.text', '500')
+  })
   it('Upcoming appointments page is rendered with no results', () => {
     cy.task('stubNoUpcomingAppointments')
     cy.visit('/upcoming-appointments')
@@ -120,11 +126,5 @@ context('Upcoming appointments', () => {
     cy.get('p').should('contain.text', 'No upcoming appointments.')
     cy.get('table').should('not.exist')
     cy.get('.govuk-pagination').should('not.exist')
-  })
-  it('Requesting upcoming appointments returns a 500 error', () => {
-    cy.task('stubUpcomingAppointments500Response')
-    cy.visit('/upcoming-appointments', { failOnStatusCode: false })
-    cy.get('h1').should('contain.text', 'Internal Server Error')
-    cy.get('h2').should('contain.text', '500')
   })
 })
