@@ -3,6 +3,8 @@
 {% set pageTitle = makePageTitle({ pageHeading: [appointment.type, "Appointments" if not isActivityLog else "Activity log"] }) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&') if queryParams.length > 0  else ''  %}
 {% set category = '/' + category + '/' + extraBreadcrumb if category else extraBreadcrumb  %}
+{% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
+{% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed  %}
 {% block beforeContent %}
 {{ govukBreadcrumbs({
   items: [
@@ -46,7 +48,7 @@
   </div>
 </div>
 
-{% if appointmentType === 'Previous' and not isOutcomeRecorded and not entry.rescheduled %}
+{% if shouldPromptToRecordAnOutcome %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       <div class="note-panel govuk-!-margin-bottom-6">
