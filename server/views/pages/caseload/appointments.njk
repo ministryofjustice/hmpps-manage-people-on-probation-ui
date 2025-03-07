@@ -16,7 +16,7 @@
                 {% if appointment.numberOfAdditionalSentences > 0 %}
                 {% set otherSentencesLink = '<br><a href="/case/' + appointment.crn + '/sentence">+ ' + appointment.numberOfAdditionalSentences + ' more</a>' %}
                 {% endif %}
-                {% set rows = [
+                {% set columns = [
                         { html: '<a class="govuk-!-font-weight-bold" href="/case/' + appointment.crn + '">' + fullName + '</a>
                                   <br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>', attributes: { 'data-sort-value': appointment.caseName.surname } },
                         { html: appointment.dob | dateWithYear + "<br><span class='secondary-text'>Age " + appointment.birthdate.year | yearsSince + "</span>", attributes: { "data-sort-value": appointment.birthdate.year } },
@@ -46,18 +46,16 @@
  { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
                          ]
                          %}
-                       
+{% endif %}
+{% set newRow = columns | concat(appointmentCol) | concat(dateCol) | concat(actionCol) %}
+                    {% set rows = (rows.push(
+                   newRow
+                ), rows) %}   
                      
             {% endfor %}
 
-            {%- from "govuk/components/table/macro.njk" import govukTable -%}
-<div class="moj-scrollable-pane">
-            {{ govukTable({
-                attributes: {
-                    'data-module': 'moj-sortable-table'
-                },
-                head: [
-                    {
+{% set mainColHeads = [
+ {
                         text: "Name / CRN",
                         attributes: { "aria-sort": "none" }
                     },
@@ -69,19 +67,41 @@
                     {
                         text: "Sentence",
                         attributes: { "aria-sort": "none" }
-                    },
-                    {
-                        text: "Appointment",
-                        attributes: { "aria-sort": "none" }
-                    } if type == 'upcoming',
-                    {
+                    }
+] %}
+
+{% set appointmentColHead = [] %}
+{% if type == 'upcoming' %}
+{% set appointmentColHead = [
+    {
+      text: "Appointment",
+      attributes: { "aria-sort": "none" }
+                    }
+] %}
+{% endif %}
+{% set dateColHead = [
+     {
                         text: "Date and time",
                         attributes: { "aria-sort": "none" }
-                    },
-                    {
+                    }
+] %}
+{% set actionColHead = [] %}
+{% if type == 'no-outcome' %}
+{% set actionColHead = [
+{
                         text: "Action"
-                    } if type == 'no-outcome'
-                ],
+                    }
+] %}
+{% endif %}
+
+{% set head = mainColHeads | concat(appointmentColHead) | concat(dateColHead) | concat(actionColHead) %}
+            {%- from "govuk/components/table/macro.njk" import govukTable -%}
+<div class="moj-scrollable-pane">
+            {{ govukTable({
+                attributes: {
+                    'data-module': 'moj-sortable-table'
+                },
+                head: head,
                 rows: rows
             }) }}
             </div>
