@@ -1,5 +1,4 @@
 import httpMocks from 'node-mocks-http'
-// import nock from 'nock'
 import renders from '.'
 import HmppsAuthClient from '../../data/hmppsAuthClient'
 import TokenStore from '../../data/tokenStore/redisTokenStore'
@@ -34,38 +33,34 @@ const mockResponse = {
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
-const getUserScheduleSpy = jest
-  .spyOn(MasApiClient.prototype, 'getUserSchedule')
-  .mockImplementation(() => Promise.resolve(mockResponse))
-
 describe('caseload controllers', () => {
+  const req = httpMocks.createRequest({
+    query: {
+      page: '0',
+    },
+  })
+
+  const res = httpMocks.createResponse({
+    locals: {
+      user: {
+        username: 'USER1',
+      },
+    },
+  })
+  const renderSpy = jest.spyOn(res, 'render')
+
   afterEach(() => {
     jest.clearAllMocks()
   })
 
   describe('upcomingAppointments', () => {
     it('200 response', async () => {
-      const req = httpMocks.createRequest({
-        query: {
-          page: '0',
-        },
-      })
-      //   nock('http://localhost:9091', {
-      //     reqheaders: { authorization: 'Bearer token-1' },
-      //   })
-      //     .get('/mas/user/USER1/schedule/upcoming?size=10&page=0')
-      //     .reply(200, mockResponse)
-      const res = httpMocks.createResponse({
-        locals: {
-          user: {
-            username: 'USER1',
-          },
-        },
-      })
-      const renderSpy = jest.spyOn(res, 'render')
-      const nextSpy = jest.fn()
-      await renders.upcomingAppointments(hmppsAuthClient)(req, res, nextSpy)
-      const expected = {
+      const getUserScheduleSpy = jest
+        .spyOn(MasApiClient.prototype, 'getUserSchedule')
+        .mockImplementationOnce(() => Promise.resolve(mockResponse))
+
+      await renders.upcomingAppointments(hmppsAuthClient)(req, res)
+      const expectedUserSchedule = {
         ...mockResponse,
         appointments: [
           { ...mockResponse.appointments[0], birthdate: { day: '19', month: '07', year: '1986' } },
@@ -74,10 +69,9 @@ describe('caseload controllers', () => {
       }
       expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page)
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/upcoming-appointments', {
-        userSchedule: expected,
+        userSchedule: expectedUserSchedule,
         page: req.query.page,
       })
-      //   expect(nock.isDone()).toBe(true)
     })
   })
 })

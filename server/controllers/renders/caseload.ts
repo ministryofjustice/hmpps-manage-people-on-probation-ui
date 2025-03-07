@@ -1,19 +1,9 @@
-import { HTTPError } from 'superagent'
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from 'express'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
-import { UserSchedule } from '../../data/model/userSchedule'
-
-const isErrorResponse = <TResponse>(response: HTTPError | TResponse): response is HTTPError => {
-  return (response as HTTPError)?.status !== undefined
-}
-
-const isUserScheduleResponse = (response: HTTPError | UserSchedule): response is UserSchedule => {
-  return (response as UserSchedule)?.appointments !== undefined
-}
 
 export const upcomingAppointments = (hmppsAuthClient: HmppsAuthClient) => {
-  return async (req: Request, res: Response, _next: NextFunction) => {
+  return async (req: Request, res: Response) => {
     const { page = '0' } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
