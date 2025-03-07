@@ -14,6 +14,7 @@ import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { checkRecentlyViewedAccess } from '../utils/utils'
 import type { AppResponse, Route } from '../@types'
 import { UserSchedule } from '../data/model/userSchedule'
+import renders from '../controllers/renders'
 
 export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -118,37 +119,7 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
     return (response as UserSchedule)?.appointments !== undefined
   }
 
-  get('/upcoming-appointments', async (req, res, _next): Promise<void> => {
-    const { page = '0' } = req.query as Record<string, string>
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-    const masClient = new MasApiClient(token)
-    let response: UserSchedule | HTTPError
-    let userSchedule: UserSchedule = null
-    try {
-      response = await masClient.getUserSchedule(res.locals.user.username, page)
-      if (isErrorResponse<UserSchedule>(response)) {
-        res.locals.status = response.status
-        res.locals.message = JSON.parse(response.text).message
-        return res.status(response.status).render('pages/error')
-      }
-      if (isUserScheduleResponse(response)) {
-        let { appointments } = response
-        appointments = appointments.map(appointment => {
-          const [year, month, day] = appointment.dob.split('-')
-          return { ...appointment, birthdate: { day, month, year } }
-        })
-        userSchedule = {
-          ...response,
-          appointments,
-        }
-      }
-    } catch (err: any) {
-      const error = err as Error
-      res.locals.message = error.message
-      return res.status(err.status).render('pages/error')
-    }
-    return res.render('pages/caseload/upcoming-appointments', { userSchedule, page })
-  })
+  get('/upcoming-appointments', renders.upcomingAppointments(hmppsAuthClient))
 
   get('/teams', async (req, res, _next) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
