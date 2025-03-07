@@ -1,7 +1,6 @@
 import { type Router, Request } from 'express'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { Response, HTTPError } from 'superagent'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import asyncMiddleware from '../middleware/asyncMiddleware'
@@ -13,7 +12,6 @@ import config from '../config'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { checkRecentlyViewedAccess } from '../utils/utils'
 import type { AppResponse, Route } from '../@types'
-import { UserSchedule } from '../data/model/userSchedule'
 import renders from '../controllers/renders'
 
 export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Services) {
@@ -109,14 +107,6 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
       currentNavSection,
       filter,
     })
-  }
-
-  const isErrorResponse = <TResponse>(response: HTTPError | TResponse): response is HTTPError => {
-    return (response as HTTPError)?.status !== undefined
-  }
-
-  const isUserScheduleResponse = (response: HTTPError | UserSchedule): response is UserSchedule => {
-    return (response as UserSchedule)?.appointments !== undefined
   }
 
   get('/upcoming-appointments', renders.upcomingAppointments(hmppsAuthClient))

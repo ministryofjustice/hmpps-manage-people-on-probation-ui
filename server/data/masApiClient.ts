@@ -1,4 +1,4 @@
-import { Response, HTTPError } from 'superagent'
+import { Response } from 'superagent'
 import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
