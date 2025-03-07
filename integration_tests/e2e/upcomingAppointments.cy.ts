@@ -115,7 +115,7 @@ context('Upcoming appointments', () => {
   it('Requesting upcoming appointments returns a 500 error', () => {
     cy.task('stubUpcomingAppointments500Response')
     cy.visit('/upcoming-appointments', { failOnStatusCode: false })
-    cy.get('h1').should('contain.text', '500 Error message')
+    cy.get('h1').should('contain.text', 'Internal Server Error')
     cy.get('h2').should('contain.text', '500')
   })
 })
