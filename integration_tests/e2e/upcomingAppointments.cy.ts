@@ -1,5 +1,5 @@
 import Page from '../pages/page'
-import UpcomingAppointments from '../pages/upcomingAppointments'
+import UpcomingAppointments from '../pages/userAppointments'
 
 context('Upcoming appointments', () => {
   afterEach(() => {
