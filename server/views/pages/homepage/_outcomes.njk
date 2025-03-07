@@ -1,0 +1,51 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set tableData = {
+  firstCellIsHeader: true,
+  head: [
+    {
+      text: "Person on probation"
+    },
+    {
+      classes: 'govuk-!-text-align-right',
+      text: "Appointment type"
+    },
+    {
+      classes: 'govuk-!-text-align-right',
+      text: "Date"
+    },
+    {
+      classes: 'govuk-!-text-align-right',
+      text: "Action"
+    }
+  ],
+  rows: []
+} %}
+
+
+{% for outcome in outcomes %}
+    {% set row = tableData.rows.push([
+        {
+            html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
+        },
+        {
+            classes: 'govuk-!-text-align-right',
+            html: '<a class="govuk-link" href="/">' + outcome.description + '</a>'
+        },
+        {
+            classes: 'govuk-!-text-align-right',
+            text: outcome.date | dateWithYear
+        },
+        {
+            classes: 'govuk-!-text-align-right',
+            html: '<a class="govuk-link" href="/">Log outcome</a>'
+        }
+    ]) %}
+{% endfor %}
+
+<div class="govuk-!-padding-3 govuk-!-padding-top-1">
+  {{ govukTable(tableData) }}
+  <p>
+      <a class="govuk-link govuk-link--no-visited-state" href="home/my-upcoming-appointments">Log more outcomes</a>
+  </p>
+</div>
