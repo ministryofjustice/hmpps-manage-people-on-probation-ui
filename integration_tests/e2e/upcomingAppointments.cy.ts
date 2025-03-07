@@ -117,6 +117,10 @@ context('Upcoming appointments', () => {
     cy.task('stubNoUpcomingAppointments')
     cy.visit('/upcoming-appointments')
     const page = Page.verifyOnPage(UpcomingAppointments)
+    cy.get('h1').should('contain.text', 'My upcoming appointments')
+    cy.get('p').should('contain.text', 'No upcoming appointments.')
+    cy.get('table').should('not.exist')
+    cy.get('.govuk-pagination').should('not.exist')
   })
   it('Requesting upcoming appointments returns a 500 error', () => {
     cy.task('stubUpcomingAppointments500Response')
