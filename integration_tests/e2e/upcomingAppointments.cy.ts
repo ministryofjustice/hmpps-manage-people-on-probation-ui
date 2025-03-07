@@ -116,7 +116,6 @@ context('Upcoming appointments', () => {
   it('Upcoming appointments page is rendered with no results', () => {
     cy.task('stubNoUpcomingAppointments')
     cy.visit('/upcoming-appointments')
-    const page = Page.verifyOnPage(UpcomingAppointments)
     cy.get('h1').should('contain.text', 'My upcoming appointments')
     cy.get('p').should('contain.text', 'No upcoming appointments.')
     cy.get('table').should('not.exist')
