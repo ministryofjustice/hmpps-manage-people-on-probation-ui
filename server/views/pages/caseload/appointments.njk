@@ -47,12 +47,12 @@
                         attributes: { "aria-sort": "none" }
                     },
                     {
-                        text: "Date of birth / Age",
+                        text: "DOB / Age",
                         attributes: { "aria-sort": "none" },
                         classes: "nowrap"
                     },
                     {
-                        text: "Main sentence",
+                        text: "Sentence",
                         attributes: { "aria-sort": "none" }
                     },
                     {
@@ -68,7 +68,7 @@
             }) }}
             </div>
             {% if userSchedule.totalPages > 1 %}
-<div class="govuk-!-margin-top-2">
+<div class="govuk-!-margin-top-2 flex flex--center">
  {{ appPagination({
   currentPage: page | int,
   totalPages: userSchedule.totalPages,

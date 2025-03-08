@@ -34,7 +34,7 @@ $govuk-page-width: $moj-page-width;
 }
 
 .dps-header {
-  background-color: rgba(86, 148, 202, .2);
+  background-color: rgba(86, 148, 202, 0.2);
   padding: 25px 0;
 }
 
@@ -44,7 +44,6 @@ $govuk-page-width: $moj-page-width;
 }
 
 .govuk-accordion {
-
   .govuk-accordion__controls {
     display: none;
     height: 25px;
@@ -64,7 +63,7 @@ $govuk-page-width: $moj-page-width;
       padding-left: 15px !important;
       padding-right: 15px !important;
       padding-bottom: 5px !important;
-    
+
       .govuk-accordion__section-heading-text {
         flex-grow: 1;
       }
@@ -200,4 +199,8 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .govuk-\!-width-one-fifth {
   width: 20% !important;
+}
+
+.flex--center {
+  justify-content: center;
 }
