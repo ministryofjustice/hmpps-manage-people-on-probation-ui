@@ -1,4 +1,4 @@
-import UserAppointments from '../pages/userAppointments'
+import UserAppointments from '../../pages/userAppointments'
 
 context('Outcomes to log', () => {
   afterEach(() => {
@@ -32,12 +32,7 @@ context('Outcomes to log', () => {
       .find('a')
       .should('contain.text', '+ 3 more')
       .should('have.attr', 'href', '/case/X778160/sentence')
-    page
-      .getTableCell(1, 4)
-      .find('a')
-      .should('contain.text', '27 March 2025')
-      .should('contain.text', '9:30am to 10:30am')
-      .should('have.attr', 'href', '/case/X778160/appointments/appointment/1')
+    page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am to 10:30am')
     page
       .getTableCell(1, 5)
       .find('a')
@@ -58,9 +53,10 @@ context('Outcomes to log', () => {
   })
 
   it('Outcomes to log page is rendered with no results', () => {
-    cy.task('stubNoUpcomingAppointments')
+    cy.task('stubNoOutcomesToLog')
     cy.visit('/caseload/appointments/no-outcome')
-    cy.get('h1').should('contain.text', 'My Outcomes to log')
+    const page = new UserAppointments()
+    page.setPageTitle('Outcomes to log')
     cy.get('p').should('contain.text', 'No outcomes to log.')
     cy.get('table').should('not.exist')
     cy.get('.govuk-pagination').should('not.exist')

@@ -57,4 +57,38 @@ const stubUpcomingAppointments500Response = (): SuperAgentRequest =>
     },
   })
 
-export default { stubNoUpcomingAppointments, stubUpcomingAppointments500Response }
+const stubNoOutcomesToLog = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/user/USER1/schedule/no-outcome',
+      method: 'GET',
+      queryParameters: {
+        page: {
+          matches: '.*',
+        },
+        size: {
+          matches: '.*',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        size: 15,
+        page: 0,
+        totalResults: 54,
+        totalPages: 6,
+        name: {
+          forename: 'Eula',
+          middleName: '',
+          surname: 'Schmeler',
+        },
+        appointments: [],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default { stubNoUpcomingAppointments, stubUpcomingAppointments500Response, stubNoOutcomesToLog }
