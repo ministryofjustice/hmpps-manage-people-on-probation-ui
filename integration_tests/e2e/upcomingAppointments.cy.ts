@@ -11,9 +11,9 @@ context('Upcoming appointments', () => {
 
     page.getTableColumnHeading(0).should('contain.text', 'Name / CRN')
     page.getTableColumnHeading(0).find('button').should('exist')
-    page.getTableColumnHeading(1).should('contain.text', 'Date of birth / Age')
+    page.getTableColumnHeading(1).should('contain.text', 'DOB / Age')
     page.getTableColumnHeading(1).find('button').should('exist')
-    page.getTableColumnHeading(2).should('contain.text', 'Main sentence')
+    page.getTableColumnHeading(2).should('contain.text', 'Sentence')
     page.getTableColumnHeading(2).find('button').should('exist')
     page.getTableColumnHeading(3).should('contain.text', 'Appointment')
     page.getTableColumnHeading(3).find('button').should('exist')
