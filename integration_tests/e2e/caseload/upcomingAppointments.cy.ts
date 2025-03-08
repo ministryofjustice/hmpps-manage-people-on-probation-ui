@@ -1,5 +1,5 @@
-import Page from '../pages/page'
-import UpcomingAppointments from '../pages/userAppointments'
+import Page from '../../pages/page'
+import UpcomingAppointments from '../../pages/userAppointments'
 
 context('Upcoming appointments', () => {
   afterEach(() => {
@@ -7,13 +7,13 @@ context('Upcoming appointments', () => {
   })
   it('Upcoming appointments page is rendered', () => {
     cy.visit('/caseload/appointments/upcoming')
-    const page = Page.verifyOnPage(UpcomingAppointments)
-
+    const page = new UpcomingAppointments()
+    page.setPageTitle('My upcoming appointments')
     page.getTableColumnHeading(0).should('contain.text', 'Name / CRN')
     page.getTableColumnHeading(0).find('button').should('exist')
-    page.getTableColumnHeading(1).should('contain.text', 'Date of birth / Age')
+    page.getTableColumnHeading(1).should('contain.text', 'DOB / Age')
     page.getTableColumnHeading(1).find('button').should('exist')
-    page.getTableColumnHeading(2).should('contain.text', 'Main sentence')
+    page.getTableColumnHeading(2).should('contain.text', 'Sentence')
     page.getTableColumnHeading(2).find('button').should('exist')
     page.getTableColumnHeading(3).should('contain.text', 'Appointment')
     page.getTableColumnHeading(3).find('button').should('exist')
