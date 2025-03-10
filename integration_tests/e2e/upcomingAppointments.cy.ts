@@ -1,5 +1,13 @@
 import Page from '../pages/page'
 import UpcomingAppointments from '../pages/upcomingAppointments'
+import { getWiremockData, Wiremock } from '../utils'
+import mockResponse from '../../wiremock/mappings/user-schedule.json'
+import { UserActivity } from '../../server/data/model/userSchedule'
+import { yearsSince } from '../../server/utils/utils'
+
+const mockData = mockResponse as Wiremock
+
+const mockAppointments = getWiremockData<UserActivity[]>(mockData, '/mas/user/USER1/schedule/upcoming', 'appointments')
 
 context('Upcoming appointments', () => {
   afterEach(() => {
@@ -26,7 +34,10 @@ context('Upcoming appointments', () => {
       .should('have.attr', 'href', '/case/X778160')
     page.getTableCell(1, 1).find('span').should('contain.text', 'X778160')
     page.getTableCell(1, 2).should('contain.text', '25 September 1975')
-    page.getTableCell(1, 2).find('span').should('contain.text', 'Age 50')
+    page
+      .getTableCell(1, 2)
+      .find('span')
+      .should('contain.text', `Age ${yearsSince(mockAppointments[0].dob)}`)
     page.getTableCell(1, 3).should('contain.text', 'Adult Custody < 12m')
     page
       .getTableCell(1, 3)
