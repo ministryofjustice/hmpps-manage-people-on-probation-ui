@@ -19,7 +19,7 @@
                 {% set columns = [
                         { html: '<a class="govuk-!-font-weight-bold" href="/case/' + appointment.crn + '">' + fullName + '</a>
                                   <br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>', attributes: { 'data-sort-value': appointment.caseName.surname } },
-                        { html: appointment.dob | dateWithYear + "<br><span class='secondary-text'>Age " + appointment.birthdate.year | yearsSince + "</span>", attributes: { "data-sort-value": appointment.birthdate.year } },
+                        { html: appointment.dob | dateWithYear + "<br><span class='secondary-text'>Age " + appointment.dob | yearsSince + "</span>", attributes: { "data-sort-value": appointment.birthdate.year } },
                         { html: appointment.latestSentence + otherSentencesLink }
                 ] %}
                 {% set appointmentCol = [] %}
