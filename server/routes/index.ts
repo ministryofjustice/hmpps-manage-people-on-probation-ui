@@ -18,7 +18,7 @@ import arrangeAppointmentRoutes from './arrangeAppointment'
 
 export default function routes(services: Services): Router {
   const router = Router()
-  home(router)
+  home(router, services)
   searchRoutes(router, services)
   caseRoutes(router, services)
   personalDetailRoutes(router, services)

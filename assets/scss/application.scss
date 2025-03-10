@@ -43,6 +43,13 @@ $govuk-page-width: $moj-page-width;
   padding: 25px 0;
 }
 
+.hmpps-services {
+  display: grid;
+  grid-template-columns: auto auto auto;
+  column-gap: 40px;
+  row-gap: 20px;
+}
+
 .govuk-accordion {
 
   .govuk-accordion__controls {
