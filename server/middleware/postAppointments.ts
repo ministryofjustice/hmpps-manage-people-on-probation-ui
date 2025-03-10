@@ -1,7 +1,7 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue } from '../utils/utils'
-import properties from '../properties'
+import { appointmentTypes } from '../properties'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppointmentRequestBody, Route } from '../@types'
@@ -42,7 +42,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       'sentence-licence-condition': sentenceLicenceCondition,
     } = getDataValue(data, ['appointments', crn, uuid])
 
-    const type = properties.appointmentTypes.find(t => t.text === appointmentType).value
+    const type = appointmentTypes.find(t => t.text === appointmentType).value
     const sentence = sentences.find(s => s.order.description === selectedSentence)
     const { eventId } = sentence
     const locationId = userLocations.find(location => location.description === selectedLocation).id

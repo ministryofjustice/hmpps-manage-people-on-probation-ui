@@ -3,7 +3,9 @@
 import { DateTime } from 'luxon'
 import { Route, ActivityLogFilters, ActivityLogFiltersResponse, SelectedFilterItem, Option } from '../@types'
 
-export const filterActivityLog: Route<void> = (req, res, next) => {
+import { filterOptions as complianceFilterOptions } from '../properties'
+
+export const filterActivityLog: Route<void> = (req, res, next): void => {
   if (req?.query?.submit) {
     let url = req.url.split('&page=')[0]
     url = url.replace('&submit=true', '')
@@ -21,11 +23,7 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
   if (compliance?.length && clearFilterKey === 'compliance') {
     compliance = compliance.filter(value => value !== clearFilterValue)
   }
-  const complianceFilterOptions: Option[] = [
-    { text: 'Without an outcome', value: 'no outcome' },
-    { text: 'Complied', value: 'complied' },
-    { text: 'Not complied', value: 'not complied' },
-  ]
+
   const filters: ActivityLogFilters = {
     keywords: keywords && clearFilterKey !== 'keywords' ? (keywords as string) : '',
     dateFrom:
@@ -39,21 +37,21 @@ export const filterActivityLog: Route<void> = (req, res, next) => {
 
   const getQueryString = (values: ActivityLogFilters | Record<string, string>): string => {
     const keys = [...Object.keys(filters)]
-    const queryStr: string = Object.entries(values)
+    const queryStr: string[] = Object.entries(values)
       .filter(([key, _value]) => keys.includes(key))
       .reduce((acc, [key, value]: [string, string | string[]], i) => {
         if (value) {
           if (Array.isArray(value)) {
             for (const val of value) {
-              acc = `${acc}${acc ? '&' : ''}${key}=${encodeURI(val)}`
+              acc = [...acc, `${key}=${encodeURI(val)}`]
             }
           } else {
-            acc = `${acc}${i > 0 ? '&' : ''}${key}=${encodeURI(value)}`
+            acc = [...acc, `${key}=${encodeURI(value)}`]
           }
         }
         return acc
-      }, '')
-    return queryStr
+      }, [])
+    return queryStr.join('&')
   }
 
   const queryStr = getQueryString(req.query as Record<string, string>)
