@@ -12,6 +12,7 @@ import config from '../config'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 import { checkRecentlyViewedAccess } from '../utils/utils'
 import type { AppResponse, Route } from '../@types'
+import renders from '../controllers/renders'
 
 export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -107,6 +108,8 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
       filter,
     })
   }
+
+  get('/caseload/appointments/upcoming', renders.userScheduleController(hmppsAuthClient))
 
   get('/teams', async (req, res, _next) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

@@ -2,27 +2,9 @@ import EditMainAddress from '../../pages/personalDetails/editMainAddress'
 import mockResponse from '../../../wiremock/mappings/X000001-personal-detail.json'
 import { AddressType, PersonAddress } from '../../../server/data/model/personalDetails'
 import Page from '../../pages/page'
-
-interface WiremockMapping {
-  request: {
-    urlPattern: string
-  }
-  response: {
-    status: number
-    jsonBody: any
-  }
-}
-
-interface Wiremock {
-  mappings: WiremockMapping[]
-}
+import { getWiremockData, Wiremock } from '../../utils'
 
 const mockData = mockResponse as Wiremock
-
-const getWiremockData = <TType>(mock: Wiremock, endpoint: string, prop: string): TType => {
-  const mapping: WiremockMapping = mock.mappings.find(m => m.request.urlPattern === endpoint)
-  return mapping.response.jsonBody[prop]
-}
 
 const mainAddress = getWiremockData<PersonAddress>(mockData, '/mas/personal-details/X000001', 'mainAddress')
 
