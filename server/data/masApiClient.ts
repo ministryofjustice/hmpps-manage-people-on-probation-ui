@@ -228,7 +228,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  postAppointments = async (crn: string, body: AppointmentRequestBody) => {
+  async postAppointments(crn: string, body: AppointmentRequestBody) {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,

@@ -10,8 +10,6 @@ import config from '../config'
 config.apis.masApi.url = 'http://localhost:8100'
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')
-// jest.mock('../data/hmppsAuthClient')
-// jest.mock('../data/masApiClient')
 
 jest
   .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
