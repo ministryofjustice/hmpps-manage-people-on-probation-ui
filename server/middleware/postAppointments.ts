@@ -46,14 +46,12 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const sentence = sentences.find(s => s.order.description === selectedSentence)
     const { eventId } = sentence
     const locationId = userLocations.find(location => location.description === selectedLocation).id
-    const matchedRequirementId = sentence?.requirements?.find(
-      requirement => requirement.description === sentenceRequirement,
-    )?.id
-    const requirementId = matchedRequirementId || 0
-    const matchedLicenceConditionId = sentence?.licenceConditions?.find(
-      licenceCondition => licenceCondition.mainDescription === sentenceLicenceCondition,
-    )?.id
-    const licenceConditionId = matchedLicenceConditionId || 0
+    const requirementId =
+      sentence?.requirements?.find(requirement => requirement.description === sentenceRequirement)?.id || 0
+    const licenceConditionId =
+      sentence?.licenceConditions?.find(
+        licenceCondition => licenceCondition.mainDescription === sentenceLicenceCondition,
+      )?.id || 0
 
     const body: AppointmentRequestBody = {
       user: {

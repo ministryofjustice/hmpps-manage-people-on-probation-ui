@@ -196,11 +196,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/activity/${crn}`, handle404: false })
   }
 
-  postPersonActivityLog = async (
-    crn: string,
-    body: ActivityLogRequestBody,
-    page: string,
-  ): Promise<PersonActivity | null> => {
+  async postPersonActivityLog(crn: string, body: ActivityLogRequestBody, page: string): Promise<PersonActivity | null> {
     const pageQuery = `?${new URLSearchParams({ size: '10', page }).toString()}`
     return this.post({
       data: body,

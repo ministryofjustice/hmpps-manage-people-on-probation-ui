@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { filterActivityLog } from './filterActivityLog'
-import { ActivityLogFiltersResponse, AppResponse, SelectedFilterItem } from '../@types'
+import { ActivityLogFiltersResponse, AppResponse } from '../@types'
 import { filterOptions } from '../properties'
 
 const now = new Date()
@@ -11,7 +11,7 @@ interface Args {
   keywords?: string
   dateFrom?: string
   dateTo?: string
-  compliance?: string[]
+  compliance?: string | string[]
   clearFilterKey?: string
   clearFilterValue?: string
   submit?: boolean
@@ -81,13 +81,45 @@ describe('/middleware/filterActivityLog()', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/activity-log?keywords=test`)
     })
   })
+  describe('Only one compliance filter is submitted', () => {
+    const req = getRequest({ keywords: '', dateFrom: '', dateTo: '', compliance: 'complied' })
+    beforeEach(() => {
+      filterActivityLog(req, res, nextSpy)
+    })
+    it('should assign the correct values to res.locals.filters', () => {
+      const query = req.query as Record<string, string | string[]>
+      const url = `/case/${crn}/activity-log?compliance=complied`
+      const expectedResponse: ActivityLogFiltersResponse = {
+        errors: req.session.errors,
+        selectedFilterItems: {
+          compliance: [
+            {
+              text: 'Complied',
+              href: `${url}&clearFilterKey=compliance&clearFilterValue=complied`,
+            },
+          ],
+        },
+        complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: value === 'complied' })),
+        baseUrl: `/case/${crn}/activity-log`,
+        queryStr: `compliance=complied`,
+        queryStrPrefix: '?',
+        queryStrSuffix: '&',
+        keywords: req.query.keywords as string,
+        compliance: [req.query.compliance] as string[],
+        dateFrom: req.query.dateFrom as string,
+        dateTo: req.query.dateTo as string,
+        maxDate,
+      }
+      expect(res.locals.filters).toEqual(expectedResponse)
+    })
+  })
 
   describe('All filters are completed', () => {
     const req = getRequest()
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
-    it('should...', () => {
+    it('should assign the correct values to res.locals.filters', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log?keywords=${query.keywords}&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery(query.compliance as string[])}`
       const expectedResponse: ActivityLogFiltersResponse = {

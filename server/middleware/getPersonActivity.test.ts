@@ -1,7 +1,14 @@
 import { Request } from 'express'
 import { getPersonActivity } from './getPersonActivity'
-import { AppResponse } from '../@types'
+import { ActivityLogRequestBody, AppResponse } from '../@types'
 import HmppsAuthClient from '../data/hmppsAuthClient'
+import MasApiClient from '../data/masApiClient'
+import TierApiClient from '../data/tierApiClient'
+import { toISODate } from '../utils/utils'
+
+jest.mock('../data/masApiClient')
+jest.mock('../data/hmppsAuthClient')
+jest.mock('../data/tokenStore/redisTokenStore')
 
 const crn = 'X756510'
 const mockPersonActivityResponse = {
@@ -84,31 +91,9 @@ const mockTierCalculationResponse = {
     calculationVersion: '',
   },
 }
-
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
-})
-jest.mock('../data/masApiClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      postPersonActivityLog: jest.fn().mockImplementation(() => Promise.resolve(mockPersonActivityResponse)),
-    }
-  })
-})
-
-jest.mock('../data/tierApiClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getCalculationDetails: jest.fn().mockImplementation(() => Promise.resolve(mockTierCalculationResponse)),
-    }
-  })
-})
-
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+jest.mock('../data/hmppsAuthClient')
+jest.mock('../data/masApiClient')
+jest.mock('../data/tierApiClient')
 
 describe('/middleware/getPersonActivity', () => {
   const req = {
@@ -135,8 +120,19 @@ describe('/middleware/getPersonActivity', () => {
     dateTo: '21/1/2025',
     compliance: ['complied', 'not complied'],
   }
+  let masSpy: jest.SpyInstance
+  let tierSpy: jest.SpyInstance
+  beforeEach(async () => {
+    masSpy = jest
+      .spyOn(MasApiClient.prototype, 'postPersonActivityLog')
+      .mockImplementation(() => Promise.resolve(mockPersonActivityResponse))
+    tierSpy = jest
+      .spyOn(TierApiClient.prototype, 'getCalculationDetails')
+      .mockImplementation(() => Promise.resolve(mockTierCalculationResponse))
+  })
 
   it('should request the filtered results from the api', async () => {
+    req.params = { crn }
     req.query = { page: '0' }
     res.locals.filters = {
       ...filterVals,
@@ -151,7 +147,19 @@ describe('/middleware/getPersonActivity', () => {
       maxDate: '21/1/2025',
     }
 
-    const [_tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
+    const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+
+    const expectedBody: ActivityLogRequestBody = {
+      keywords: filterVals.keywords,
+      dateFrom: toISODate(filterVals.dateFrom),
+      dateTo: toISODate(filterVals.dateTo),
+      filters: ['complied', 'notComplied'],
+    }
+
+    const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
+    expect(masSpy).toHaveBeenCalledWith(crn, expectedBody, '0')
+    expect(tierSpy).toHaveBeenCalledWith(crn)
     expect(personActivity).toEqual(mockPersonActivityResponse)
+    expect(tierCalculation).toEqual(mockTierCalculationResponse)
   })
 })

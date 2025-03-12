@@ -111,7 +111,6 @@ const nextSpy = jest.fn()
 
 describe('/middleware/postAppointments', () => {
   const {
-    type,
     date,
     'start-time': startTime,
     'end-time': endTime,

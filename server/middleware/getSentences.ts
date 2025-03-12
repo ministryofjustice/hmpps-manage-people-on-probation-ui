@@ -9,20 +9,16 @@ export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<vo
     const crn = req.params.crn as string
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    let allSentences: Sentences
-    try {
-      allSentences = await masClient.getSentences(crn, number)
-      req.session.data = {
-        ...(req?.session?.data || {}),
-        sentences: {
-          ...(req?.session?.data?.sentences || {}),
-          [crn]: allSentences.sentences,
-        },
-      }
-      res.locals.sentences = req.session.data.sentences[crn]
-    } catch (err) {
-      console.log(err)
+
+    const allSentences: Sentences = await masClient.getSentences(crn, number)
+    req.session.data = {
+      ...(req?.session?.data || {}),
+      sentences: {
+        ...(req?.session?.data?.sentences || {}),
+        [crn]: allSentences.sentences,
+      },
     }
+    res.locals.sentences = req.session.data.sentences[crn]
     return next()
   }
 }

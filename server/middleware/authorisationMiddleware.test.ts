@@ -17,14 +17,17 @@ function createToken(authorities: string[]) {
 }
 
 describe('authorisationMiddleware', () => {
-  let req: Request
+  const req = {
+    session: {},
+    originalUrl: 'some/url',
+  } as unknown as Request
   const next = jest.fn()
 
-  function createResWithToken({ authorities }: { authorities: string[] }): Response {
+  function createResWithToken({ authorities }: { authorities?: string[] }): Response {
     return {
       locals: {
         user: {
-          token: createToken(authorities),
+          token: authorities ? createToken(authorities) : '',
         },
       },
       redirect: jest.fn(),
@@ -69,5 +72,13 @@ describe('authorisationMiddleware', () => {
 
     expect(next).toHaveBeenCalled()
     expect(res.redirect).not.toHaveBeenCalled()
+  })
+
+  it('should redirect to the sign in page if no token is available', () => {
+    const res = createResWithToken({ authorities: null })
+    authorisationMiddleware(['ROLE_SOME_REQUIRED_ROLE'])(req, res, next)
+    expect(res.redirect).toHaveBeenCalledWith('/sign-in')
+    expect(req.session.returnTo).toEqual(req.originalUrl)
+    expect(next).not.toHaveBeenCalled()
   })
 })
