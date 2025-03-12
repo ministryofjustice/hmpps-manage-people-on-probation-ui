@@ -1,20 +1,8 @@
-import express from 'express'
-import passport, { deserializeUser, serializeUser } from 'passport'
-import setUpAuth from './setUpAuthentication'
+import express, { Request, Response, NextFunction } from 'express'
+import flash from 'connect-flash'
+import passport from 'passport'
+import setUpAuthentication from './setUpAuthentication'
 import auth from '../authentication/auth'
-
-jest.mock('passport', () => ({
-  initialize: jest.fn(),
-  serializeUser: jest.fn(),
-  deserializeUser: jest.fn(),
-  use: jest.fn(),
-  session: jest.fn(),
-  authenticate: jest.fn(),
-}))
-
-jest.mock('../authentication/auth', () => ({
-  init: jest.fn(),
-}))
 
 jest.mock('express', () => {
   const actualExpress = jest.requireActual('express')
@@ -32,14 +20,40 @@ jest.mock('express', () => {
   }
 })
 
-const useSpy = jest.spyOn(express.Router(), 'use')
+jest.mock('passport', () => ({
+  initialize: jest.fn(),
+  serializeUser: jest.fn(),
+  deserializeUser: jest.fn(),
+  use: jest.fn(),
+  session: jest.fn(),
+  authenticate: jest.fn(),
+}))
+
+jest.mock('../authentication/auth', () => ({
+  init: jest.fn(),
+}))
+
+jest.mock('connect-flash', () => jest.fn(() => (req: Request, res: Response, next: NextFunction) => next()))
+
 const authInitSpy = jest.spyOn(auth, 'init')
-describe('/middleware/setUpAuth', () => {
-  beforeEach(() => {
-    setUpAuth()
+describe('/middleware/setUpAuthentication', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
   })
-  it('should', () => {
+  let useSpy: jest.SpyInstance
+  const mockRouter = (express.Router as jest.Mock).mock.results[0].value
+  beforeEach(() => {
+    useSpy = jest.spyOn(mockRouter, 'use')
+    setUpAuthentication()
+  })
+  it('should initialise auth', () => {
     expect(authInitSpy).toHaveBeenCalled()
-    // expect(useSpy).toHaveBeenCalledWith(passport.initialize())
+  })
+  it('should initialise passport', () => {
+    expect(useSpy).toHaveBeenCalledWith(passport.session())
+    expect(useSpy).toHaveBeenCalledWith(passport.initialize())
+  })
+  it('should initialise flash', () => {
+    expect(flash).toHaveBeenCalled()
   })
 })
