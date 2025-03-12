@@ -90,11 +90,10 @@ describe('/middleware/populateCurrentUser()', () => {
   })
 
   describe('If error returned', () => {
-    let spy: jest.SpyInstance
     const mockError = new Error('Error fetching user')
     const loggerErrorSpy = jest.spyOn(logger, 'error')
     beforeEach(async () => {
-      spy = jest.spyOn(userService, 'getUser').mockImplementationOnce(() => Promise.reject(mockError))
+      jest.spyOn(userService, 'getUser').mockImplementationOnce(() => Promise.reject(mockError))
       await populateCurrentUser(userService)(req, res, nextSpy)
     })
     it('should log the error', () => {

@@ -33,39 +33,37 @@ describe('/middleware/evaluateFeatureFlags', () => {
   })
   const nextSpy = jest.fn()
 
-  describe('200 response', () => {
-    describe('Flags returned', () => {
-      const getFlagsSpy = jest
-        .spyOn(FlagService.prototype, 'getFlags')
-        .mockImplementationOnce(() => Promise.resolve(mockFlags))
-      beforeEach(async () => {
-        const flagService = new FlagService()
-        await evaluateFeatureFlags(flagService)(req, res, nextSpy)
-      })
-      it('should call FlagService.getFlags()', () => {
-        expect(getFlagsSpy).toHaveBeenCalled()
-      })
-      it('should assign the flags to res.locals.flags', () => {
-        expect(res.locals.flags).toEqual(mockFlags)
-      })
-      it('should call next()', () => {
-        expect(nextSpy).toHaveBeenCalled()
-      })
+  describe('Flags returned', () => {
+    const getFlagsSpy = jest
+      .spyOn(FlagService.prototype, 'getFlags')
+      .mockImplementationOnce(() => Promise.resolve(mockFlags))
+    beforeEach(async () => {
+      const flagService = new FlagService()
+      await evaluateFeatureFlags(flagService)(req, res, nextSpy)
     })
+    it('should call FlagService.getFlags()', () => {
+      expect(getFlagsSpy).toHaveBeenCalled()
+    })
+    it('should assign the flags to res.locals.flags', () => {
+      expect(res.locals.flags).toEqual(mockFlags)
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
+    })
+  })
 
-    describe('No flags returned', () => {
-      const loggerSpy = jest.spyOn(logger, 'info')
-      beforeEach(async () => {
-        jest.spyOn(FlagService.prototype, 'getFlags').mockImplementationOnce(() => Promise.resolve(null))
-        const flagService = new FlagService()
-        await evaluateFeatureFlags(flagService)(req, res, nextSpy)
-      })
-      it('should log info', () => {
-        expect(loggerSpy).toHaveBeenCalledWith('No flags available')
-      })
-      it('should call next()', () => {
-        expect(nextSpy).toHaveBeenCalled()
-      })
+  describe('No flags returned', () => {
+    const loggerSpy = jest.spyOn(logger, 'info')
+    beforeEach(async () => {
+      jest.spyOn(FlagService.prototype, 'getFlags').mockImplementationOnce(() => Promise.resolve(null))
+      const flagService = new FlagService()
+      await evaluateFeatureFlags(flagService)(req, res, nextSpy)
+    })
+    it('should log info', () => {
+      expect(loggerSpy).toHaveBeenCalledWith('No flags available')
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
     })
   })
 

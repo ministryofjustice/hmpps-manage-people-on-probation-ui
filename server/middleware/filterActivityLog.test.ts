@@ -87,7 +87,6 @@ describe('/middleware/filterActivityLog()', () => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should assign the correct values to res.locals.filters', () => {
-      const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log?compliance=complied`
       const expectedResponse: ActivityLogFiltersResponse = {
         errors: req.session.errors,
