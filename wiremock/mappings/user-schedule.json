@@ -39,7 +39,7 @@
               "numberOfAdditionalSentences": 3,
               "type": "Home visit",
               "startDateTime": "2025-03-27T09:30:00.382936Z[Europe/London]",
-              "endDateTime": "2025-03-27T10:30:00.382936Z[Europe/London]"
+              "endDateTime": ""
             },
             {
               "caseName": {

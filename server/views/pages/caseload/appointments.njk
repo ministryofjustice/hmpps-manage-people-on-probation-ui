@@ -33,7 +33,7 @@
                 {% endif %}
                        {% set dateCol = [
 {
-   html: appointment.startDateTime | dateWithYear + "</br><span class='secondary-text'>" + appointment.startDateTime | govukTime + " to " + appointment.endDateTime | govukTime + "</span>",
+   html: appointment.startDateTime | dateWithYear + "</br><span class='secondary-text'>" + appointment.startDateTime | govukTime + (" to " + appointment.endDateTime | govukTime if appointment.endDateTime) + "</span>",
                             format: "numeric",
                             classes: "govuk-!-text-align-left",
                             attributes: { "data-sort-value": appointment.startDateTime }

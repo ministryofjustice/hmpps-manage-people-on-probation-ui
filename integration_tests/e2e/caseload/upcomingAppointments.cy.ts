@@ -1,5 +1,13 @@
 import Page from '../../pages/page'
-import UpcomingAppointments from '../../pages/userAppointments'
+import UpcomingAppointments from '../../pages/upcomingAppointments'
+import { getWiremockData, Wiremock } from '../../utils'
+import mockResponse from '../../../wiremock/mappings/user-schedule.json'
+import { UserActivity } from '../../../server/data/model/userSchedule'
+import { yearsSince } from '../../../server/utils/utils'
+
+const mockData = mockResponse as Wiremock
+
+const mockAppointments = getWiremockData<UserActivity[]>(mockData, '/mas/user/USER1/schedule/upcoming', 'appointments')
 
 context('Upcoming appointments', () => {
   afterEach(() => {
@@ -7,8 +15,8 @@ context('Upcoming appointments', () => {
   })
   it('Upcoming appointments page is rendered', () => {
     cy.visit('/caseload/appointments/upcoming')
-    const page = new UpcomingAppointments()
-    page.setPageTitle('My upcoming appointments')
+    const page = Page.verifyOnPage(UpcomingAppointments)
+
     page.getTableColumnHeading(0).should('contain.text', 'Name / CRN')
     page.getTableColumnHeading(0).find('button').should('exist')
     page.getTableColumnHeading(1).should('contain.text', 'DOB / Age')
@@ -26,7 +34,10 @@ context('Upcoming appointments', () => {
       .should('have.attr', 'href', '/case/X778160')
     page.getTableCell(1, 1).find('span').should('contain.text', 'X778160')
     page.getTableCell(1, 2).should('contain.text', '25 September 1975')
-    page.getTableCell(1, 2).find('span').should('contain.text', 'Age 50')
+    page
+      .getTableCell(1, 2)
+      .find('span')
+      .should('contain.text', `Age ${yearsSince(mockAppointments[0].dob)}`)
     page.getTableCell(1, 3).should('contain.text', 'Adult Custody < 12m')
     page
       .getTableCell(1, 3)
@@ -38,7 +49,8 @@ context('Upcoming appointments', () => {
       .find('a')
       .should('contain.text', 'Home visit')
       .should('have.attr', 'href', '/case/X778160/appointments/appointment/1')
-    page.getTableCell(1, 5).should('contain.text', '27 March 2025').should('contain.text', '9:30am to 10:30am')
+    page.getTableCell(1, 5).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
+    page.getTableCell(2, 5).should('contain.text', '28 March 2025').should('contain.text', '9:30am to 10:30am')
     cy.get('.govuk-pagination').should('exist')
     page
       .getPaginationItem(1)
