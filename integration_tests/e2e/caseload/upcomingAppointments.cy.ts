@@ -42,8 +42,9 @@ context('Upcoming appointments', () => {
     page
       .getTableCell(1, 3)
       .find('a')
-      .should('contain.text', '+ 3 more')
+      .should('contain.text', '+ 2 more')
       .should('have.attr', 'href', '/case/X778160/sentence')
+    page.getTableCell(2, 3).find('a').should('not.exist')
     page
       .getTableCell(1, 4)
       .find('a')

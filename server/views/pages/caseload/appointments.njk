@@ -13,8 +13,8 @@
                     {{ appointment.caseName.surname }}, {{ appointment.caseName.forename }}
                 {% endset %}
                 {% set otherSentencesLink = '' %}
-                {% if appointment.numberOfAdditionalSentences > 0 %}
-                {% set otherSentencesLink = '<br><a href="/case/' + appointment.crn + '/sentence">+ ' + appointment.numberOfAdditionalSentences + ' more</a>' %}
+                {% if appointment.numberOfAdditionalSentences > 1 %}
+                {% set otherSentencesLink = '<br><a href="/case/' + appointment.crn + '/sentence">+ ' + (appointment.numberOfAdditionalSentences - 1) + ' more</a>' %}
                 {% endif %}
                 {% set columns = [
                         { html: '<a class="govuk-!-font-weight-bold" href="/case/' + appointment.crn + '">' + fullName + '</a>
