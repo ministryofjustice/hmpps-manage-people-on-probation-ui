@@ -12,6 +12,13 @@ const mockAppointments = getWiremockData<UserActivity[]>(
   'appointments',
 )
 
+const checkColumnHeading = (page: UserAppointments, index: number, label: string, name: string, action: string) => {
+  page.getTableColumnHeading(index).should('contain.text', label)
+  page.getTableColumnHeading(index).should('have.attr', 'data-sort-name', name)
+  page.getTableColumnHeading(index).should('have.attr', 'data-sort-action', action)
+  page.getTableColumnHeading(index).find('button').should('exist')
+}
+
 context('Outcomes to log', () => {
   afterEach(() => {
     cy.task('resetMocks')
@@ -20,22 +27,10 @@ context('Outcomes to log', () => {
     cy.visit('/caseload/appointments/no-outcome')
     const page = new UserAppointments()
     page.setPageTitle('Outcomes to log')
-    page.getTableColumnHeading(0).should('contain.text', 'Name / CRN')
-    page.getTableColumnHeading(0).should('have.attr', 'data-sort-name', 'name')
-    page.getTableColumnHeading(0).should('have.attr', 'data-sort-action', '/caseload/appointments/no-outcome')
-    page.getTableColumnHeading(0).find('button').should('exist')
-    page.getTableColumnHeading(1).should('contain.text', 'DOB / Age')
-    page.getTableColumnHeading(1).should('have.attr', 'data-sort-name', 'dob')
-    page.getTableColumnHeading(1).should('have.attr', 'data-sort-action', '/caseload/appointments/no-outcome')
-    page.getTableColumnHeading(1).find('button').should('exist')
-    page.getTableColumnHeading(2).should('contain.text', 'Sentence')
-    page.getTableColumnHeading(2).should('have.attr', 'data-sort-name', 'sentence')
-    page.getTableColumnHeading(2).should('have.attr', 'data-sort-action', '/caseload/appointments/no-outcome')
-    page.getTableColumnHeading(2).find('button').should('exist')
-    page.getTableColumnHeading(3).should('contain.text', 'Date and time')
-    page.getTableColumnHeading(3).should('have.attr', 'data-sort-name', 'date')
-    page.getTableColumnHeading(3).should('have.attr', 'data-sort-action', '/caseload/appointments/no-outcome')
-    page.getTableColumnHeading(3).find('button').should('exist')
+    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome')
+    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome')
+    checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/no-outcome')
+    checkColumnHeading(page, 3, 'Date and time', 'date', '/caseload/appointments/no-outcome')
     page.getTableColumnHeading(4).should('contain.text', 'Action')
     page.getTableColumnHeading(4).find('button').should('not.exist')
     page
