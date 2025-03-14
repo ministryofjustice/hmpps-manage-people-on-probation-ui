@@ -576,8 +576,7 @@
         {% set tier %}
             {% if tierCalculation.tierScore %}
                 <p>{{ tierCalculation.tierScore }}</p>
-                <p><a href="{{ tierLink(crn) }}" target="_blank">View all tier information</a></br>
-                <span class="govuk-!-font-size-16">Link opens in a new window</span></p>
+                <p><a href="{{ tierLink(crn) }}" target="_blank" rel="external noopener noreferrer">View all tier information (opens in new tab)</a></p>
             {% else %}
                 No tier information available
             {% endif %}
