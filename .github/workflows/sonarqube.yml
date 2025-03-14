@@ -12,7 +12,7 @@ jobs:
       - name: download the test artifacts
         uses: actions/download-artifact@v4
         with:
-          name: npm_unit_test_artifacts
+          name: npm_coverage_artifacts
           path: |
             test_results/
       - name: SonarCloud Scan
