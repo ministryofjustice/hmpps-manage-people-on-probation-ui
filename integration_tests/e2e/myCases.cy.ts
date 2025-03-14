@@ -1,8 +1,8 @@
 import Page from '../pages/page'
 import YourCasesPage from '../pages/myCases'
 
-context('My cases', () => {
-  it('My cases page is rendered ', () => {
+context('Cases', () => {
+  it('Cases page is rendered ', () => {
     cy.visit('/case')
     const page = Page.verifyOnPage(YourCasesPage)
     page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', 'X778160')

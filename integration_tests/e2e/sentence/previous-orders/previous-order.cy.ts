@@ -11,7 +11,7 @@ context('Sentence', () => {
 
     page.assertTextElementAtIndex('.govuk-caption-l', 0, 'Previous orders')
     page.assertAnchorElementAtIndex(breadCrumbElement, 0, '/case')
-    page.assertTextAtElementAtIndex(breadCrumbElement, 0, 'My cases')
+    page.assertTextAtElementAtIndex(breadCrumbElement, 0, 'Cases')
 
     page.assertAnchorElementAtIndex(breadCrumbElement, 1, '/case/X000001')
     page.assertTextAtElementAtIndex(breadCrumbElement, 1, 'Caroline Wolff')
