@@ -46,7 +46,7 @@ jobs:
   node_integration_tests:
     name: node integration tests
     uses: ./.github/workflows/node_integration_tests.yml # WORKFLOW_VERSION
-    needs: [node_build]
+    needs: [node_unit_tests]
     secrets: inherit
   sonarcloud:
     name: SonarCloud
