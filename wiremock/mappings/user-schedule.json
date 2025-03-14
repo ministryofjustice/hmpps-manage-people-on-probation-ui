@@ -10,6 +10,9 @@
           },
           "size": {
             "matches": ".*"
+          },
+          "sortBy": {
+            "matches": ".*"
           }
         }
       },
@@ -162,6 +165,9 @@
             "matches": ".*"
           },
           "size": {
+            "matches": ".*"
+          },
+          "sortBy": {
             "matches": ".*"
           }
         }

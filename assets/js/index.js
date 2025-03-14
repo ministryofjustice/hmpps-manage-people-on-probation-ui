@@ -7,6 +7,10 @@ import './predictors'
 govukFrontend.initAll()
 mojFrontend.initAll()
 
+const sortableTable = new MOJFrontend.BackendSortableTable({
+  table: 'table[data-module="moj-backend-sortable-table"]',
+})
+
 /* eslint-disable no-restricted-globals */
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-repeating-frequency]')
@@ -73,6 +77,7 @@ const setNoFixedAddressConditional = () => {
     fixedAddressCheckbox.addEventListener('click', showOrHide)
   }
 }
+
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()

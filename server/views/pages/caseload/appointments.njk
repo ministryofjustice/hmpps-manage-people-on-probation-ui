@@ -57,16 +57,16 @@
 {% set mainColHeads = [
  {
                         text: "Name / CRN",
-                        attributes: { "aria-sort": "none" }
+                        attributes: { "aria-sort": sortBy.name, "data-sort-name": "name", "data-sort-action": sortUrl }
                     },
                     {
                         text: "DOB / Age",
-                        attributes: { "aria-sort": "none" },
+                        attributes: { "aria-sort": sortBy.dob, "data-sort-name": "dob", "data-sort-action": sortUrl  },
                         classes: "nowrap"
                     },
                     {
                         text: "Sentence",
-                        attributes: { "aria-sort": "none" }
+                        attributes: { "aria-sort": sortBy.sentence, "data-sort-name": "sentence", "data-sort-action": sortUrl  }
                     }
 ] %}
 
@@ -75,14 +75,14 @@
 {% set appointmentColHead = [
     {
       text: "Appointment",
-      attributes: { "aria-sort": "none" }
+      attributes: { "aria-sort": sortBy.appointment, "data-sort-name": "appointment", "data-sort-action": sortUrl  }
                     }
 ] %}
 {% endif %}
 {% set dateColHead = [
      {
                         text: "Date and time",
-                        attributes: { "aria-sort": "none" }
+                        attributes: { "aria-sort": sortBy.date, "data-sort-name": "date", "data-sort-action": sortUrl  }
                     }
 ] %}
 {% set actionColHead = [] %}
@@ -99,7 +99,7 @@
 <div class="moj-scrollable-pane">
             {{ govukTable({
                 attributes: {
-                    'data-module': 'moj-sortable-table'
+                    'data-module': 'moj-backend-sortable-table'
                 },
                 head: head,
                 rows: rows
@@ -110,7 +110,7 @@
  {{ appPagination({
   currentPage: page | int,
   totalPages: userSchedule.totalPages,
-  url: '/caseload/appointments/' + type + '?'
+    url: paginationUrl 
   }) }}
 </div>
 {% endif %}

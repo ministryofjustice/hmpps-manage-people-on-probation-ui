@@ -61,33 +61,103 @@ describe('caseload controllers', () => {
 
   describe('userScheduleController', () => {
     it('renders the caseload appointments page with upcoming appointments', async () => {
+      const sortBy = {
+        name: 'none',
+        dob: 'none',
+        sentence: 'none',
+        appointment: 'none',
+        date: 'none',
+      }
       const req = httpMocks.createRequest({
         query: {
           page: '0',
         },
-        url: '/caseload/appointments/upcoming',
+        url: '/caseload/appointments/upcoming?page=0',
       })
+
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, 'upcoming')
+      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, '', 'upcoming')
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
         type: 'upcoming',
+        sortBy,
+        paginationUrl: '/caseload/appointments/upcoming?',
+        sortUrl: '/caseload/appointments/upcoming?page=0',
+      })
+    })
+    it('renders the upcoming appointment page with page and sortBy search parameters set in url', async () => {
+      const sortBy = {
+        name: 'ascending',
+        dob: 'none',
+        sentence: 'none',
+        appointment: 'none',
+        date: 'none',
+      }
+      const req = httpMocks.createRequest({
+        query: {
+          page: '2',
+          sortBy: 'name.asc',
+        },
+        url: '/caseload/appointments/upcoming?page=0&sortBy=name.asc',
+      })
+      await renders.userScheduleController(hmppsAuthClient)(req, res)
+      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, 'name.asc', 'upcoming')
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        userSchedule: expectedUserSchedule,
+        page: req.query.page,
+        type: 'upcoming',
+        sortBy,
+        paginationUrl: '/caseload/appointments/upcoming?sortBy=name.asc&',
+        sortUrl: '/caseload/appointments/upcoming?page=2',
       })
     })
     it('renders the caseload appointments page with appointments with no outcome', async () => {
+      const sortBy = {
+        name: 'none',
+        dob: 'none',
+        sentence: 'none',
+        date: 'none',
+      }
       const req = httpMocks.createRequest({
         query: {
           page: '0',
         },
-        url: '/caseload/appointments/no-outcome',
+        url: '/caseload/appointments/no-outcome?page=0',
       })
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, 'no-outcome')
+      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, '', 'no-outcome')
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
         type: 'no-outcome',
+        sortBy,
+        paginationUrl: '/caseload/appointments/no-outcome?',
+        sortUrl: '/caseload/appointments/no-outcome?page=0',
+      })
+    })
+    it('renders the outcomes to log page with the sortBy search param included in the url', async () => {
+      const sortBy = {
+        name: 'none',
+        dob: 'none',
+        sentence: 'descending',
+        date: 'none',
+      }
+      const req = httpMocks.createRequest({
+        query: {
+          sortBy: 'sentence.desc',
+        },
+        url: '/caseload/appointments/no-outcome?sortBy=sentence.desc',
+      })
+      await renders.userScheduleController(hmppsAuthClient)(req, res)
+      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, '0', 'sentence.desc', 'no-outcome')
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
+        userSchedule: expectedUserSchedule,
+        page: '0',
+        type: 'no-outcome',
+        sortBy,
+        paginationUrl: '/caseload/appointments/no-outcome?sortBy=sentence.desc&',
+        sortUrl: '/caseload/appointments/no-outcome',
       })
     })
   })
