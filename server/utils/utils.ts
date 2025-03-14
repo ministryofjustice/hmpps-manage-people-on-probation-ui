@@ -770,3 +770,39 @@ export const toIsoDateString = (datetimestr: string): string => {
   }
   return ''
 }
+
+export const concat = (arr: string[], value: string) => {
+  if (!Array.isArray(arr)) {
+    throw new Error('First argument must be an array')
+  }
+  return arr.concat(value)
+}
+
+export const getSearchParamsString = ({
+  req,
+  ignore = [],
+  prefix = '?',
+  showPrefixIfNoQuery = false,
+  suffix = '',
+}: {
+  req: Request
+  ignore?: string[]
+  prefix?: string
+  showPrefixIfNoQuery?: boolean
+  suffix?: string
+}): string => {
+  const query = req.query as Record<string, string>
+  if (!Object.keys(query).length) {
+    return showPrefixIfNoQuery ? `${prefix}` : ''
+  }
+  const params = Object.entries(query).filter(([key, value]) => !ignore.includes(key) && value)
+  if (!params.length) {
+    return showPrefixIfNoQuery ? `${prefix}` : ''
+  }
+  const searchParams = params
+    .reduce((acc, [key, value]) => {
+      return [...acc, `${key}=${value}`]
+    }, [])
+    .join('&')
+  return `${prefix}${searchParams}${suffix}`
+}

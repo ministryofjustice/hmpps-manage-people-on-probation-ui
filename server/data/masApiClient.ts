@@ -3,7 +3,6 @@ import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
 import { PersonAppointment, Schedule } from './model/schedule'
-import { UserSchedule } from './model/userSchedule'
 import {
   CircumstanceOverview,
   DisabilityOverview,
@@ -22,12 +21,22 @@ import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
 import { TeamCaseload, UserCaseload, UserLocations, UserTeam } from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
-import { CaseAccess, UserAccess } from './model/caseAccess'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { ActivityLogRequestBody, AppointmentRequestBody } from '../@types'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
 import { PreviousOrderDetail } from './model/previousOrderDetail'
+import { CaseAccess, UserAccess } from './model/caseAccess'
 import { DeliusRoles } from './model/deliusRoles'
+import { UserSchedule } from './model/userSchedule'
+
+interface GetUserScheduleProps {
+  username: string
+  page: string
+  sortBy: string
+  ascending: string
+  size: string
+  type: string
+}
 
 export default class MasApiClient extends RestClient {
   constructor(token: string) {
@@ -246,9 +255,23 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
 
-  async getUserSchedule(username: string, page: string, type = 'upcoming'): Promise<UserSchedule> {
-    const pageQuery = `?${new URLSearchParams({ size: '10', page }).toString()}`
-    return this.get({ path: `/user/${username}/schedule/${type}${pageQuery}`, handle404: false, handle500: false })
+  async getUserSchedule({
+    username,
+    page,
+    sortBy,
+    ascending,
+    size,
+    type = 'upcoming',
+  }: GetUserScheduleProps): Promise<UserSchedule> {
+    const searchParams = Object.fromEntries(
+      Object.entries({ size, page, sortBy, ascending }).filter(([_k, v]) => v),
+    ) as Record<string, string>
+    const pageQuery = `${new URLSearchParams(searchParams).toString()}`
+    return this.get({
+      path: `/user/${username}/schedule/${type}${pageQuery ? '?' : ''}${pageQuery}`,
+      handle404: false,
+      handle500: false,
+    })
   }
 
   async getTeamCaseload(teamCode: string, page: string): Promise<TeamCaseload> {

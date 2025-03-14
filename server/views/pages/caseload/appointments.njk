@@ -1,5 +1,5 @@
 {% extends "../../partials/layout.njk" %}
-{% set title = 'My upcoming appointments' %}
+{% set title = 'My upcoming appointments' if type == 'upcoming' else 'Outcomes to log' %}
 {% set pageTitle = makePageTitle({ pageHeading: title }) %}
 
 {% block content %}
@@ -13,57 +13,95 @@
                     {{ appointment.caseName.surname }}, {{ appointment.caseName.forename }}
                 {% endset %}
                 {% set otherSentencesLink = '' %}
-                {% if appointment.numberOfAdditionalSentences > 0 %}
-                {% set otherSentencesLink = '<br><a href="/case/' + appointment.crn + '/sentence">+ ' + appointment.numberOfAdditionalSentences + ' more</a>' %}
+                {% if appointment.numberOfAdditionalSentences > 1 %}
+                {% set otherSentencesLink = '<br><a href="/case/' + appointment.crn + '/sentence">+ ' + (appointment.numberOfAdditionalSentences - 1) + ' more</a>' %}
                 {% endif %}
-                {% set rows = (rows.push(
-                    [
+                {% set columns = [
                         { html: '<a class="govuk-!-font-weight-bold" href="/case/' + appointment.crn + '">' + fullName + '</a>
                                   <br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>', attributes: { 'data-sort-value': appointment.caseName.surname } },
                         { html: appointment.dob | dateWithYear + "<br><span class='secondary-text'>Age " + appointment.dob | yearsSince + "</span>", attributes: { "data-sort-value": appointment.birthdate.year } },
-                        { html: appointment.latestSentence + otherSentencesLink },
-                        { html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '">' + appointment.type + '</a>',
+                        { html: appointment.latestSentence + otherSentencesLink }
+                ] %}
+                {% set appointmentCol = [] %}
+                {% if type == 'upcoming' %}
+                {% set appointmentCol = [
+{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '">' + appointment.type + '</a>',
                           attributes: { "data-sort-value": appointment.type  }
-                        },
-                        {
-                            html: appointment.startDateTime | dateWithYear + "</br><span class='secondary-text'>" + appointment.startDateTime | govukTime + " to " + appointment.endDateTime | govukTime + "</span>",
+                        }
+                ]
+                %}
+                {% endif %}
+                       {% set dateCol = [
+{
+   html: appointment.startDateTime | dateWithYear + "</br><span class='secondary-text'>" + appointment.startDateTime | govukTime + (" to " + appointment.endDateTime | govukTime if appointment.endDateTime) + "</span>",
                             format: "numeric",
                             classes: "govuk-!-text-align-left",
                             attributes: { "data-sort-value": appointment.startDateTime }
                         }
-                    ]
-                ), rows) %}
+                       ] %}
+                        
+                        {% set actionCol = [] %}
+                         {% if type == 'no-outcome' %}
+                         {% set actionCol = [
+ { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
+                         ]
+                         %}
+{% endif %}
+{% set newRow = columns | concat(appointmentCol) | concat(dateCol) | concat(actionCol) %}
+                    {% set rows = (rows.push(
+                   newRow
+                ), rows) %}   
+                     
             {% endfor %}
 
-            {%- from "govuk/components/table/macro.njk" import govukTable -%}
-<div class="moj-scrollable-pane">
-            {{ govukTable({
-                attributes: {
-                    'data-module': 'moj-sortable-table'
-                },
-                head: [
-                    {
+{% set mainColHeads = [
+ {
                         text: "Name / CRN",
-                        attributes: { "aria-sort": "none" }
+                        attributes: { "aria-sort": sortBy.name, "data-sort-name": "name", "data-sort-action": sortUrl }
                     },
                     {
                         text: "DOB / Age",
-                        attributes: { "aria-sort": "none" },
+                        attributes: { "aria-sort": sortBy.dob, "data-sort-name": "dob", "data-sort-action": sortUrl  },
                         classes: "nowrap"
                     },
                     {
                         text: "Sentence",
-                        attributes: { "aria-sort": "none" }
-                    },
-                    {
-                        text: "Appointment",
-                        attributes: { "aria-sort": "none" }
-                    },
-                    {
-                        text: "Date and time",
-                        attributes: { "aria-sort": "none" }
+                        attributes: { "aria-sort": sortBy.sentence, "data-sort-name": "sentence", "data-sort-action": sortUrl  }
                     }
-                ],
+] %}
+
+{% set appointmentColHead = [] %}
+{% if type == 'upcoming' %}
+{% set appointmentColHead = [
+    {
+      text: "Appointment",
+      attributes: { "aria-sort": sortBy.appointment, "data-sort-name": "appointment", "data-sort-action": sortUrl  }
+                    }
+] %}
+{% endif %}
+{% set dateColHead = [
+     {
+                        text: "Date and time",
+                        attributes: { "aria-sort": sortBy.date, "data-sort-name": "date", "data-sort-action": sortUrl  }
+                    }
+] %}
+{% set actionColHead = [] %}
+{% if type == 'no-outcome' %}
+{% set actionColHead = [
+{
+                        text: "Action"
+                    }
+] %}
+{% endif %}
+
+{% set head = mainColHeads | concat(appointmentColHead) | concat(dateColHead) | concat(actionColHead) %}
+            {%- from "govuk/components/table/macro.njk" import govukTable -%}
+<div class="moj-scrollable-pane">
+            {{ govukTable({
+                attributes: {
+                    'data-module': 'moj-backend-sortable-table'
+                },
+                head: head,
                 rows: rows
             }) }}
             </div>
@@ -72,13 +110,13 @@
  {{ appPagination({
   currentPage: page | int,
   totalPages: userSchedule.totalPages,
-  url: '/caseload/appointments/upcoming?'
+    url: paginationUrl 
   }) }}
 </div>
 {% endif %}
         </div>
         {% else %}
-<p>No upcoming appointments.</p>
+<p>{% if type === 'upcoming' %}No upcoming appointments.{% else %}No outcomes to log.{% endif %}</p>
         {% endif %}
     </div>
 {% endblock %}

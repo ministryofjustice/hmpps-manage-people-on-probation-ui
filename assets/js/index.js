@@ -73,6 +73,7 @@ const setNoFixedAddressConditional = () => {
     fixedAddressCheckbox.addEventListener('click', showOrHide)
   }
 }
+
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()

@@ -1,10 +1,6 @@
 import Page, { PageElement } from './page'
 
-export default class UpcomingAppointments extends Page {
-  constructor() {
-    super('My upcoming appointments')
-  }
-
+export default class UserAppointments extends Page {
   getTableColumnHeading = (index: number): PageElement => cy.get('table thead th').eq(index)
 
   getTableCell = (rowIndex: number, columnIndex: number): PageElement =>
