@@ -1,11 +1,6 @@
 name: Sonarqube
 on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_call:
 jobs:
   sonarcloud:
     name: SonarCloud
