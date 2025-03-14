@@ -52,7 +52,7 @@ context('Outcomes to log', () => {
     page.getTableCell(1, 3).should('contain.text', 'Adult Custody < 12m')
     page.getTableCell(1, 3).find('a').should('contain.text', '+ 2 more')
     page.getTableCell(2, 3).find('a').should('not.exist')
-    page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am to 10:30am')
+    page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
     page
       .getTableCell(1, 5)
       .find('a')

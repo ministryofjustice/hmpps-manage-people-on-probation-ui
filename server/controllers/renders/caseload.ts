@@ -4,22 +4,23 @@ import MasApiClient from '../../data/masApiClient'
 import type { UserActivity } from '../../data/model/userSchedule'
 import { getSearchParamsString } from '../../utils/utils'
 
-let cols = ['name', 'dob', 'sentence', 'appointment', 'date']
+const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
 const directions = {
   asc: 'ascending',
   desc: 'descending',
 }
 
-type ColName = (typeof cols)[number]
+type ColName = (typeof colNames)[number]
 type SortDir = 'asc' | 'desc'
 
 export const userScheduleController = (hmppsAuthClient: HmppsAuthClient) => {
   return async (req: Request, res: Response) => {
     const { query, url } = req
     const type = url.split('/').pop().split('?')[0]
-    const { page = '0', sortBy: sortByQuery = '' } = query as Record<string, string>
+    const { page = '', sortBy: sortByQuery = '' } = query as Record<string, string>
     const [name, dir] = sortByQuery.split('.') as [ColName, SortDir]
+    let cols = colNames
     if (type === 'no-outcome') {
       cols = cols.filter(col => col !== 'appointment')
     }
@@ -29,7 +30,14 @@ export const userScheduleController = (hmppsAuthClient: HmppsAuthClient) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const ascending = dir ? (dir === 'asc').toString() : ''
-    let userSchedule = await masClient.getUserSchedule(res.locals.user.username, page, name, ascending, type)
+    let userSchedule = await masClient.getUserSchedule({
+      username: res.locals.user.username,
+      type,
+      page,
+      sortBy: name,
+      ascending,
+      size: '',
+    })
     const appointments: UserActivity[] = userSchedule.appointments.map((appointment: UserActivity) => {
       const [year, month, day] = appointment.dob.split('-')
       return { ...appointment, birthdate: { day, month, year } }

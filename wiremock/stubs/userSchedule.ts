@@ -1,94 +1,50 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { WiremockMapping } from '../../integration_tests/utils'
 
-const stubNoUpcomingAppointments = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
+const getStub = (type: 'upcoming' | 'no-outcome', status: 200 | 500): WiremockMapping => {
+  const mapping: WiremockMapping = {
     request: {
-      urlPathPattern: '/mas/user/USER1/schedule/upcoming',
+      urlPathPattern: `/mas/user/USER1/schedule/${type}`,
       method: 'GET',
-      queryParameters: {
-        page: {
-          matches: '.*',
-        },
-        size: {
-          matches: '.*',
-        },
-      },
     },
     response: {
-      status: 200,
-      jsonBody: {
-        size: 15,
-        page: 0,
-        totalResults: 54,
-        totalPages: 6,
-        name: {
-          forename: 'Eula',
-          middleName: '',
-          surname: 'Schmeler',
-        },
-        appointments: [],
-      },
+      status,
+
       headers: {
         'Content-Type': 'application/json',
       },
     },
-  })
+  }
+  if (status === 200) {
+    mapping.response.jsonBody = {
+      size: 15,
+      page: 0,
+      totalResults: 54,
+      totalPages: 6,
+      name: {
+        forename: 'Eula',
+        middleName: '',
+        surname: 'Schmeler',
+      },
+      appointments: [],
+    }
+  }
+  return mapping
+}
 
-const stubUpcomingAppointments500Response = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/mas/user/USER1/schedule/upcoming',
-      method: 'GET',
-      queryParameters: {
-        page: {
-          matches: '.*',
-        },
-        size: {
-          matches: '.*',
-        },
-      },
-    },
-    response: {
-      status: 500,
-      jsonBody: { message: '500 Error message' },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
+const stubNoUpcomingAppointments = (): SuperAgentRequest => {
+  const stub = getStub('upcoming', 200)
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 
-const stubNoOutcomesToLog = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/mas/user/USER1/schedule/no-outcome',
-      method: 'GET',
-      queryParameters: {
-        page: {
-          matches: '.*',
-        },
-        size: {
-          matches: '.*',
-        },
-      },
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        size: 15,
-        page: 0,
-        totalResults: 54,
-        totalPages: 6,
-        name: {
-          forename: 'Eula',
-          middleName: '',
-          surname: 'Schmeler',
-        },
-        appointments: [],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
+const stubUpcomingAppointments500Response = (): SuperAgentRequest => {
+  const stub = getStub('upcoming', 500)
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+
+const stubNoOutcomesToLog = (): SuperAgentRequest => {
+  const stub = getStub('no-outcome', 200)
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 
 export default { stubNoUpcomingAppointments, stubUpcomingAppointments500Response, stubNoOutcomesToLog }

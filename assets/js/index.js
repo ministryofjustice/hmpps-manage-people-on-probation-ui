@@ -7,11 +7,6 @@ import './predictors'
 govukFrontend.initAll()
 mojFrontend.initAll()
 
-// eslint-disable-next-line no-new
-new MOJFrontend.BackendSortableTable({
-  table: 'table[data-module="moj-backend-sortable-table"]',
-})
-
 /* eslint-disable no-restricted-globals */
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-repeating-frequency]')

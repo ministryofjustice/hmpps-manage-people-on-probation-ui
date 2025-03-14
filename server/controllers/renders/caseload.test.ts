@@ -70,20 +70,27 @@ describe('caseload controllers', () => {
       }
       const req = httpMocks.createRequest({
         query: {
-          page: '0',
+          page: '',
         },
-        url: '/caseload/appointments/upcoming?page=0',
+        url: '/caseload/appointments/upcoming',
       })
 
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, '', '', 'upcoming')
+      expect(getUserScheduleSpy).toHaveBeenCalledWith({
+        username: res.locals.user.username,
+        page: req.query.page,
+        size: '',
+        sortBy: '',
+        ascending: '',
+        type: 'upcoming',
+      })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
         type: 'upcoming',
         sortBy,
         paginationUrl: '/caseload/appointments/upcoming?',
-        sortUrl: '/caseload/appointments/upcoming?page=0',
+        sortUrl: '/caseload/appointments/upcoming',
       })
     })
     it('renders the upcoming appointment page with page and sort name ascending search parameters set in url', async () => {
@@ -102,13 +109,14 @@ describe('caseload controllers', () => {
         url: '/caseload/appointments/upcoming?page=0&sortBy=name.asc',
       })
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(
-        res.locals.user.username,
-        req.query.page,
-        'name',
-        'true',
-        'upcoming',
-      )
+      expect(getUserScheduleSpy).toHaveBeenCalledWith({
+        username: res.locals.user.username,
+        page: req.query.page,
+        size: '',
+        sortBy: 'name',
+        ascending: 'true',
+        type: 'upcoming',
+      })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
@@ -134,13 +142,14 @@ describe('caseload controllers', () => {
         url: '/caseload/appointments/upcoming?page=0&sortBy=appointment.asc',
       })
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(
-        res.locals.user.username,
-        req.query.page,
-        'appointment',
-        'false',
-        'upcoming',
-      )
+      expect(getUserScheduleSpy).toHaveBeenCalledWith({
+        username: res.locals.user.username,
+        page: req.query.page,
+        size: '',
+        sortBy: 'appointment',
+        ascending: 'false',
+        type: 'upcoming',
+      })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
@@ -164,7 +173,14 @@ describe('caseload controllers', () => {
         url: '/caseload/appointments/no-outcome?page=0',
       })
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, req.query.page, '', '', 'no-outcome')
+      expect(getUserScheduleSpy).toHaveBeenCalledWith({
+        username: res.locals.user.username,
+        page: req.query.page,
+        size: '',
+        sortBy: '',
+        ascending: '',
+        type: 'no-outcome',
+      })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
         page: req.query.page,
@@ -188,10 +204,17 @@ describe('caseload controllers', () => {
         url: '/caseload/appointments/no-outcome?sortBy=sentence.desc',
       })
       await renders.userScheduleController(hmppsAuthClient)(req, res)
-      expect(getUserScheduleSpy).toHaveBeenCalledWith(res.locals.user.username, '0', 'sentence', 'false', 'no-outcome')
+      expect(getUserScheduleSpy).toHaveBeenCalledWith({
+        username: res.locals.user.username,
+        page: '',
+        size: '',
+        sortBy: 'sentence',
+        ascending: 'false',
+        type: 'no-outcome',
+      })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
-        page: '0',
+        page: '',
         type: 'no-outcome',
         sortBy,
         paginationUrl: '/caseload/appointments/no-outcome?sortBy=sentence.desc&',

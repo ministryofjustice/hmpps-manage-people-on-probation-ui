@@ -144,3 +144,8 @@ MOJFrontend.BackendSortableTable.prototype.getCellValue = function (cell) {
   }
   return val
 }
+
+// eslint-disable-next-line no-new
+new MOJFrontend.BackendSortableTable({
+  table: 'table[data-module="moj-backend-sortable-table"]',
+})
