@@ -44,6 +44,17 @@
     "collectCoverageFrom": [
       "server/**/*.{ts,js,jsx,mjs}"
     ],
+    "coveragePathIgnorePatterns": [
+      ".*.test.ts",
+      "node_modules",
+      "integration_tests",
+      "wiremock",
+      "server/@types",
+      ".*jest.config.js",
+      "server/app.ts",
+      "server/index.ts",
+      ".*.cy.ts"
+    ],
     "coverageDirectory": "test_results/jest/",
     "testMatch": [
       "<rootDir>/(server|job)/**/?(*.)(cy|test).{ts,js,jsx,mjs}"
