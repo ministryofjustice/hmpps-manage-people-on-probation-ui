@@ -1,6 +1,6 @@
 import { AppointmentTypeOption } from '../@types'
 
-const appointmentTypes: AppointmentTypeOption[] = [
+export const appointmentTypes: AppointmentTypeOption[] = [
   {
     text: 'Home visit',
     value: 'HomeVisitToCaseNS',

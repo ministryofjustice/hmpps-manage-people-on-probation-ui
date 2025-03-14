@@ -54,7 +54,7 @@ export default class MasApiClient extends RestClient {
 
   async getSentences(crn: string, number = ''): Promise<Sentences | null> {
     const queryParameters = number ? `?number=${number}` : ''
-    return this.get({ path: `/sentences/${crn}${queryParameters}`, handle404: false })
+    return this.get({ path: `/sentences/${crn}${queryParameters}`, handle500: true, handle404: false })
   }
 
   async getProbationHistory(crn: string): Promise<SentenceDetails | null> {
@@ -196,11 +196,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/activity/${crn}`, handle404: false })
   }
 
-  postPersonActivityLog = async (
-    crn: string,
-    body: ActivityLogRequestBody,
-    page: string,
-  ): Promise<PersonActivity | null> => {
+  async postPersonActivityLog(crn: string, body: ActivityLogRequestBody, page: string): Promise<PersonActivity | null> {
     const pageQuery = `?${new URLSearchParams({ size: '10', page }).toString()}`
     return this.post({
       data: body,
@@ -228,7 +224,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  postAppointments = async (crn: string, body: AppointmentRequestBody) => {
+  async postAppointments(crn: string, body: AppointmentRequestBody) {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,
