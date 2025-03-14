@@ -123,7 +123,7 @@ export const toDate = (datetimeString: string): DateTime => {
   return DateTime.fromISO(datetimeString)
 }
 
-export const toISODate = (datetimeString: any) => {
+export const toIsoDate = (datetimeString: any) => {
   return DateTime.fromFormat(datetimeString, 'd/M/yyyy').toFormat('yyyy-MM-dd')
 }
 
@@ -759,4 +759,19 @@ export const toSentenceDescription = (value?: string): string => (!value ? 'Pre-
 export const shortTime = (isoTime: string) => {
   const time = DateTime.fromSQL(isoTime)
   return (time.minute.valueOf() > 0 ? time.toFormat('h:mma') : time.toFormat('ha')).toLocaleLowerCase()
+}
+
+export const toIsoDateString = (datetimestr: string): string => {
+  if (!datetimestr) {
+    return null
+  }
+  let date = DateTime.fromFormat(datetimestr, 'yyyy-MM-dd')
+  if (date.isValid) {
+    return datetimestr
+  }
+  date = DateTime.fromFormat(datetimestr, 'd/M/yyyy')
+  if (date.isValid) {
+    return date.toFormat('yyyy-MM-dd')
+  }
+  return ''
 }
