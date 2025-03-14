@@ -28,7 +28,8 @@ export const userScheduleController = (hmppsAuthClient: HmppsAuthClient) => {
     }, {})
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    let userSchedule = await masClient.getUserSchedule(res.locals.user.username, page, sortByQuery, type)
+    const ascending = dir ? (dir === 'asc').toString() : ''
+    let userSchedule = await masClient.getUserSchedule(res.locals.user.username, page, name, ascending, type)
     const appointments: UserActivity[] = userSchedule.appointments.map((appointment: UserActivity) => {
       const [year, month, day] = appointment.dob.split('-')
       return { ...appointment, birthdate: { day, month, year } }
