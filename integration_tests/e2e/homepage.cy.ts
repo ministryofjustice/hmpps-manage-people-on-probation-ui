@@ -1,5 +1,6 @@
 import IndexPage from '../pages/index'
 import Page from '../pages/page'
+import SearchPage from '../pages/search'
 
 context('Sign In', () => {
   afterEach(() => {
@@ -44,5 +45,15 @@ context('Sign In', () => {
 
     page.getOtherServices().should('exist')
     page.getOtherServices().should('contain.text', 'Other services')
+  })
+
+  it('Submits search input to /search', () => {
+    cy.visit('/')
+    const page = Page.verifyOnPage(IndexPage)
+
+    page.getSearchSubmit().should('exist')
+    page.getSearchSubmit().click()
+
+    Page.verifyOnPage(SearchPage)
   })
 })

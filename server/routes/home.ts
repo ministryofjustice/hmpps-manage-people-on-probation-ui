@@ -5,7 +5,7 @@ import type { Services } from '../services'
 import MasApiClient from '../data/masApiClient'
 import config from '../config'
 
-export default function homeRoutes(router: Router, { hmppsAuthClient, searchService }: Services) {
+export default function homeRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   get('/', async (_req, res, _next) => {
@@ -21,6 +21,4 @@ export default function homeRoutes(router: Router, { hmppsAuthClient, searchServ
       interventions_link: config.interventions.link,
     })
   })
-
-  router.post('/', searchService.post)
 }
