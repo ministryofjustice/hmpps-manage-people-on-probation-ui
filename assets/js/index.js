@@ -7,7 +7,8 @@ import './predictors'
 govukFrontend.initAll()
 mojFrontend.initAll()
 
-const sortableTable = new MOJFrontend.BackendSortableTable({
+// eslint-disable-next-line no-new
+new MOJFrontend.BackendSortableTable({
   table: 'table[data-module="moj-backend-sortable-table"]',
 })
 
