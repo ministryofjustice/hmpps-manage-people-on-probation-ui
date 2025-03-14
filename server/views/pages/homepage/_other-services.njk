@@ -1,80 +1,60 @@
+{% set links = [
+  {
+    heading: 'Consider a recall',
+    href: 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/',
+    description: 'View information and assess whether to recommend a recall.'
+  },
+  {
+    heading: 'Approved Premises (CAS1)',
+    href: '#',
+    description: 'Create, manage and view Approved Premises placements and assessments.'
+  },
+  {
+    heading: 'Transitional Accommodation (CAS3)',
+    href: 'https://transitional-accommodation-dev.hmpps.service.justice.gov.uk/referrals',
+    description: 'Apply for temporary accommodation for someone who will leave prison at risk of homelessness.'
+  },
+  {
+    heading: 'Create and vary a licence',
+    href: 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk',
+    description: 'Produce standard determinate licences and post sentence supervision orders.'
+  },
+  {
+    heading: 'Effective Proposal Framework (EPF2)',
+    href: '#',
+    description: 'Plan for the pre-release of offenders, ensuring offenders are reintegrated into the community successfully.'
+  },
+  {
+    heading: 'NDelius',
+    href: delius_link,
+    description: 'Case management system within probation. '
+  },
+  {
+    heading: 'OASys',
+    href: oasys_link,
+    description: 'Assessment system for sentence management and creating plans. '
+  },
+  {
+    heading: 'Refer and monitor an intervention',
+    href: interventions_link,
+    description: 'Find, refer and monitor interventions.'
+  }
+] %}
+
 <section data-qa="homepage-services-section">
-            <h1 class="govuk-heading-m">Other services</h1>
+  <h1 class="govuk-heading-m">Other services</h1>
 
-            <div class="hmpps-services">
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Accredited Programmes</a></p>
-                    </div>
-                        <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Search for an Accredited Programme, make referrals and view their progress.</p>
-                    </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Approved Premises (CAS1)</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Create, manage and view Approved Premises placements and assessments.</p>
-                </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Community Accommodation Services - Tier 2 (CAS2)</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Apply for temporary accommodation for someone who will leave prison under Home Detention Curfew.</p>
-                </div>
-
-
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Consider a recall</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Gather evidence and decide whether to recommend a recall.</p>
-                </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Create and vary a licence</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Produce standard determinate licences and post sentence supervision orders</p>
-                </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">NDelius</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Case management system for people on probation.</p>
-                </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">OASys</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Assessment system for sentence management and creating plans.</p>
-                </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Refer and monitor an intervention</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Find, refer and monitor interventions.&nbsp;</p>
-                </div>
-
-                <div class="hmpps-service-item">
-                    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-                    <div class="hmpps-service-item__header">
-                        <p><a href="#" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">Transitional Accommodation (CAS3)</a></p>
-                    </div>
-                    <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">Apply for temporary accommodation for someone who will leave prison at risk of homelessness.</p>
-                </div>
-
-            </div>
-        </section>
+  <div class="hmpps-services">
+    {% for link in links %}
+    <div class="hmpps-service-item">
+      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
+      <div class="hmpps-service-item__header">
+        <p>
+          <a href="{{ link.href }}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state">{{ link.heading }}</a>
+        </p>
+      </div>
+      <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">{{ link.description }}</p>
+    </div>
+    {% endfor %}
+  </div>
+</section>

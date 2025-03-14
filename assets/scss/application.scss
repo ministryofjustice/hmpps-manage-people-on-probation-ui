@@ -45,7 +45,7 @@ $govuk-page-width: $moj-page-width;
 
 .hmpps-services {
   display: grid;
-  grid-template-columns: auto auto auto;
+  grid-template-columns: repeat(3, 1fr);
   column-gap: 40px;
   row-gap: 20px;
 }
