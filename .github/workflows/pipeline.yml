@@ -48,6 +48,11 @@ jobs:
     uses: ./.github/workflows/node_integration_tests.yml # WORKFLOW_VERSION
     needs: [node_build]
     secrets: inherit
+  sonarcloud:
+    name: SonarCloud
+    uses: ./.github/workflows/sonarqube.yml
+    needs: [node_unit_tests, node_integration_tests]
+    secrets: inherit
   helm_lint:
     strategy:
       matrix:
