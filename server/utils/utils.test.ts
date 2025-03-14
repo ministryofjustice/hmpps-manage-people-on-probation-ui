@@ -38,7 +38,7 @@ import {
   groupByLevel,
   toSentenceCase,
   getSearchParamsString,
-  toISODate,
+  toIsoDate,
 } from './utils'
 import { Need, RiskResponse, RiskScore, RiskToSelf } from '../data/arnsApiClient'
 import { Name } from '../data/model/common'
@@ -652,8 +652,10 @@ describe('getSearchParamsString()', () => {
     })
     const searchParamString = getSearchParamsString({ req, prefix: '' })
     expect(searchParamString).toEqual('page=2&sortBy=name.asc')
+  })
+})
 describe('toISODate', () => {
   it('should format the value into ISO date format', () => {
-    expect(toISODate('21/10/2024')).toEqual('2024-10-21')
+    expect(toIsoDate('21/10/2024')).toEqual('2024-10-21')
   })
 })

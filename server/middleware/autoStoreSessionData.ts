@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import config from '../config'
-import { getDataValue, setDataValue, toISODate } from '../utils/utils'
+import { getDataValue, setDataValue, toIsoDate } from '../utils/utils'
 
 export const autoStoreSessionData = (req: Request, res: Response, next: NextFunction): void => {
   const newSessionData = req?.session?.data || {}
@@ -13,7 +13,7 @@ export const autoStoreSessionData = (req: Request, res: Response, next: NextFunc
       Object.keys(body).forEach(valueKey => {
         let newValue = body[valueKey]
         if (config.dateFields.includes(valueKey) && body[valueKey].includes('/')) {
-          newValue = toISODate(body[valueKey])
+          newValue = toIsoDate(body[valueKey])
         }
         const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
         setDataValue(newSessionData, setPath, newValue)
