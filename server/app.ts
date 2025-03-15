@@ -4,7 +4,6 @@ import createError from 'http-errors'
 
 import * as Sentry from '@sentry/node'
 // @ts-expect-error Import untyped middleware for cypress coverage
-// eslint-disable-next-line import/no-extraneous-dependencies
 import cypressCoverage from '@cypress/code-coverage/middleware/express'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
