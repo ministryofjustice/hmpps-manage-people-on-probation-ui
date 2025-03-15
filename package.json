@@ -11,7 +11,7 @@
     "start:dev": "concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,ESBuild,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"node esbuild/esbuild.config.js --build --watch\" \"node esbuild/esbuild.config.js --dev-server\"",
     "start-feature": "concurrently -k -p \"[{name}]\" -n \"WireMock,Node\" -c \"magenta.bold,green.bold\" \"npm run wiremock\" \"npm run start-node-feature\"",
     "start-feature:dev": "export $(cat feature.env) && concurrently -k -p \"[{name}]\" -n \"WireMock,Views,TypeScript,ESBuild,Node,Sass\" -c \"yellow.bold,cyan.bold\" \"npm run wiremock\"  \"node esbuild/esbuild.config.js --build --watch\" \"nyc --silent node esbuild/esbuild.config.js --feature-dev-server\"",
-    "start-node-feature": "export $(cat feature.env) && nyc --silent node $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
+    "start-node-feature": "export $(cat feature.env) && npx nyc instrument --compact=false server instrumented && nyc --silent node $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
     "watch-node-feature": "export $(cat feature.env) && nodemon --watch dist/ $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
     "wiremock": "npx wiremock --port 9091 --root-dir wiremock --local-response-templating",
     "lint": "eslint . --cache --max-warnings 0",
