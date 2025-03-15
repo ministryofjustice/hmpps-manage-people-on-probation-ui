@@ -73,6 +73,12 @@ jobs:
       with:
         name: npm_coverage_artifacts
         path: test_results/
+    - name: upload the integration test artifacts
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: npm_integration_test_coverage_artifacts
+        path: coverage/
     - name: fail the action if the tests failed
       if: ${{ steps.integration-tests.outcome == 'failure' }}
       uses: actions/github-script@v7

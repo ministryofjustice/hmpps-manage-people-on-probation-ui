@@ -3,6 +3,9 @@ import express from 'express'
 import createError from 'http-errors'
 
 import * as Sentry from '@sentry/node'
+// @ts-expect-error Import untyped middleware for cypress coverage
+// eslint-disable-next-line import/no-extraneous-dependencies
+import cypressCoverage from '@cypress/code-coverage/middleware/express'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
@@ -27,6 +30,10 @@ import baseController from './baseController'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
+
+  if (process.env.NODE_ENV === 'development') {
+    cypressCoverage(app)
+  }
 
   app.set('json spaces', 2)
   app.set('trust proxy', true)
