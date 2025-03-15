@@ -54,7 +54,7 @@ jobs:
       id: integration-tests
       shell: bash
       run: |
-        nohup npm run start-feature &
+        nohup npm run start-feature:dev &
         sleep 5
         npm run int-test
       # continue-on-error: true
