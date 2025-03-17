@@ -60,6 +60,7 @@ import {
   yearsSince,
   roleDescription,
   toSentenceDescription,
+  concat,
   shortTime,
 } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
@@ -128,6 +129,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('roleDescription', roleDescription)
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
+  njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('shortTime', shortTime)
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {

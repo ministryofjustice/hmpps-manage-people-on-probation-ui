@@ -15,7 +15,7 @@ import validate from '../middleware/validation/index'
 import { setDataValue, getDataValue } from '../utils/utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { postAppointments } from '../middleware/postAppointments'
-import properties from '../properties'
+import { appointmentTypes } from '../properties'
 import { getTimeOptions } from '../middleware/getTimeOptions'
 import type { AppResponse, Route } from '../@types'
 
@@ -32,7 +32,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
   })
   router.all('/case/:crn/arrange-appointment/:id/type', (_req, res: AppResponse, next) => {
-    res.locals.appointmentTypes = properties.appointmentTypes
+    res.locals.appointmentTypes = appointmentTypes
     return next()
   })
   get('/case/:crn/arrange-appointment/:id/type', async (req, res, _next) => {

@@ -3,7 +3,7 @@ import superagent, { Response } from 'superagent'
 import homepage from './homepage'
 import caseload from './caseload'
 import userRoles from './userRoles'
-import upcomingAppointments from './upcomingAppointments'
+import userSchedule from './userSchedule'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -11,5 +11,5 @@ export default {
   ...homepage,
   ...caseload,
   ...userRoles,
-  ...upcomingAppointments,
+  ...userSchedule,
 }

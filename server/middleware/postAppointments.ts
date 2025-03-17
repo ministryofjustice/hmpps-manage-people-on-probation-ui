@@ -1,12 +1,12 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue } from '../utils/utils'
-import properties from '../properties'
+import { appointmentTypes } from '../properties'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppointmentRequestBody, Route } from '../@types'
 
-const dateTime = (date: string, time: string): Date => {
+export const dateTime = (date: string, time: string): Date => {
   const isPm = time.includes('pm')
   const [hour, minute] = time
     .split('am')
@@ -42,18 +42,16 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       'sentence-licence-condition': sentenceLicenceCondition,
     } = getDataValue(data, ['appointments', crn, uuid])
 
-    const type = properties.appointmentTypes.find(t => t.text === appointmentType).value
+    const type = appointmentTypes.find(t => t.text === appointmentType).value
     const sentence = sentences.find(s => s.order.description === selectedSentence)
     const { eventId } = sentence
     const locationId = userLocations.find(location => location.description === selectedLocation).id
-    const requirementId = sentenceRequirement
-      ? sentence.requirements.find(requirement => requirement.description === sentenceRequirement).id
-      : 0
-    const licenceConditionId = sentenceLicenceCondition
-      ? sentence.licenceConditions.find(
-          licenceCondition => licenceCondition.mainDescription === sentenceLicenceCondition,
-        ).id
-      : 0
+    const requirementId =
+      sentence?.requirements?.find(requirement => requirement.description === sentenceRequirement)?.id || 0
+    const licenceConditionId =
+      sentence?.licenceConditions?.find(
+        licenceCondition => licenceCondition.mainDescription === sentenceLicenceCondition,
+      )?.id || 0
 
     const body: AppointmentRequestBody = {
       user: {

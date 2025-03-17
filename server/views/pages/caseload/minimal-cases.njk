@@ -1,8 +1,8 @@
 {% extends "./caseload.njk" %}
 {% set hasCases = caseload.caseload | length > 0 %}
 {% set hasStaff = caseload !== null %}
-{% set title = 'My cases' %}
-{% set pageTitle = makePageTitle({ pageHeading: "My cases" }) %}
+{% set title = 'Cases' %}
+{% set pageTitle = makePageTitle({ pageHeading: "Cases" }) %}
 
 {% block pageContent %}
     {% if currentNavSection == 'teamCases' and caseload.team %}
@@ -39,7 +39,7 @@
             <div class="govuk-filter-background govuk-!-margin-bottom-3">
               <div class="moj-filter__selected-heading">
                 <div class="moj-filter__heading-title">
-                  <h2 class="govuk-heading-m">Filter my cases</h2>
+                  <h2 class="govuk-heading-m">Filter cases</h2>
                 </div>
               </div>
 

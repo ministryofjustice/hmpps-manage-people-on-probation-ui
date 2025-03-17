@@ -1,5 +1,5 @@
+import httpMocks from 'node-mocks-http'
 import { DateTime } from 'luxon'
-
 import {
   activityLog,
   activityLogDate,
@@ -37,6 +37,8 @@ import {
   makePageTitle,
   groupByLevel,
   toSentenceCase,
+  getSearchParamsString,
+  toIsoDate,
 } from './utils'
 import { Need, RiskResponse, RiskScore, RiskToSelf } from '../data/arnsApiClient'
 import { Name } from '../data/model/common'
@@ -609,5 +611,51 @@ describe('toSentenceCase()', () => {
   })
   it('should return the correctly formatted string if argument is a camel cased value', () => {
     expect(toSentenceCase('Camel Cased Value')).toEqual('Camel cased value')
+  })
+})
+
+describe('getSearchParamsString()', () => {
+  it('should return an empty string if no query string', () => {
+    const req = httpMocks.createRequest({
+      query: {
+        page: '2',
+      },
+    })
+    const searchParamString = getSearchParamsString({ req, ignore: ['page'] })
+    expect(searchParamString).toEqual('')
+  })
+  it('should return only the prefix if no query string but showPrefix = true', () => {
+    const req = httpMocks.createRequest({
+      query: {
+        page: '2',
+      },
+    })
+    const searchParamString = getSearchParamsString({ req, ignore: ['page'], showPrefixIfNoQuery: true })
+    expect(searchParamString).toEqual('?')
+  })
+  it('should return the full search param string and the suffix', () => {
+    const req = httpMocks.createRequest({
+      query: {
+        page: '2',
+        sortBy: 'name.asc',
+      },
+    })
+    const searchParamString = getSearchParamsString({ req, suffix: '&' })
+    expect(searchParamString).toEqual('?page=2&sortBy=name.asc&')
+  })
+  it('should not add the prefix', () => {
+    const req = httpMocks.createRequest({
+      query: {
+        page: '2',
+        sortBy: 'name.asc',
+      },
+    })
+    const searchParamString = getSearchParamsString({ req, prefix: '' })
+    expect(searchParamString).toEqual('page=2&sortBy=name.asc')
+  })
+})
+describe('toISODate', () => {
+  it('should format the value into ISO date format', () => {
+    expect(toIsoDate('21/10/2024')).toEqual('2024-10-21')
   })
 })

@@ -71,7 +71,8 @@ MOJFrontend.BackendSortableTable.prototype.createStatusBox = function () {
 
 MOJFrontend.BackendSortableTable.prototype.onSortButtonClick = function (e) {
   const sortDirection = $(e.currentTarget).parent().attr('aria-sort')
-  const action = $(e.currentTarget).parent().attr('action')
+  const action = $(e.currentTarget).parent().data('sort-action')
+
   let backendSortDirection
   if (sortDirection === 'none' || sortDirection === 'descending') {
     backendSortDirection = 'asc'
@@ -79,10 +80,10 @@ MOJFrontend.BackendSortableTable.prototype.onSortButtonClick = function (e) {
     backendSortDirection = 'desc'
   }
 
-  const columnName = $(e.currentTarget).parent().attr('col-name')
+  const columnName = $(e.currentTarget).parent().data('sort-name')
   const sortBy = `${columnName}.${backendSortDirection}`
-
-  window.location = `/${action}?sortBy=${sortBy}`
+  const suffix = action.includes('?') ? '&' : '?'
+  window.location = `${action}${suffix}sortBy=${sortBy}`
 }
 
 MOJFrontend.BackendSortableTable.prototype.sort = function (rows, columnNumber, sortDirection) {
@@ -143,3 +144,8 @@ MOJFrontend.BackendSortableTable.prototype.getCellValue = function (cell) {
   }
   return val
 }
+
+// eslint-disable-next-line no-new
+new MOJFrontend.BackendSortableTable({
+  table: 'table[data-module="moj-backend-sortable-table"]',
+})

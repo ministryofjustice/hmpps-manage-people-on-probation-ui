@@ -46,7 +46,7 @@ interface ErrorMessages {
   }
 }
 
-const errorMessages: ErrorMessages = {
+export const errorMessages: ErrorMessages = {
   appointments: {
     type: {
       log: 'Appointment type not selected',
@@ -142,5 +142,3 @@ const errorMessages: ErrorMessages = {
     },
   },
 }
-
-export default errorMessages

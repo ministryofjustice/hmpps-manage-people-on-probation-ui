@@ -3,7 +3,6 @@ import config from '../config'
 import RestClient from './restClient'
 import { Overview } from './model/overview'
 import { PersonAppointment, Schedule } from './model/schedule'
-import { UserSchedule } from './model/userSchedule'
 import {
   CircumstanceOverview,
   DisabilityOverview,
@@ -22,12 +21,22 @@ import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
 import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserTeam } from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
-import { CaseAccess, UserAccess } from './model/caseAccess'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { ActivityLogRequestBody, AppointmentRequestBody } from '../@types'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
 import { PreviousOrderDetail } from './model/previousOrderDetail'
+import { CaseAccess, UserAccess } from './model/caseAccess'
 import { DeliusRoles } from './model/deliusRoles'
+import { UserSchedule } from './model/userSchedule'
+
+interface GetUserScheduleProps {
+  username: string
+  page: string
+  sortBy: string
+  ascending: string
+  size: string
+  type: string
+}
 
 export default class MasApiClient extends RestClient {
   constructor(token: string) {
@@ -45,7 +54,7 @@ export default class MasApiClient extends RestClient {
 
   async getSentences(crn: string, number = ''): Promise<Sentences | null> {
     const queryParameters = number ? `?number=${number}` : ''
-    return this.get({ path: `/sentences/${crn}${queryParameters}`, handle404: false })
+    return this.get({ path: `/sentences/${crn}${queryParameters}`, handle500: true, handle404: false })
   }
 
   async getProbationHistory(crn: string): Promise<SentenceDetails | null> {
@@ -187,11 +196,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/activity/${crn}`, handle404: false })
   }
 
-  postPersonActivityLog = async (
-    crn: string,
-    body: ActivityLogRequestBody,
-    page: string,
-  ): Promise<PersonActivity | null> => {
+  async postPersonActivityLog(crn: string, body: ActivityLogRequestBody, page: string): Promise<PersonActivity | null> {
     const pageQuery = `?${new URLSearchParams({ size: '10', page }).toString()}`
     return this.post({
       data: body,
@@ -219,7 +224,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  postAppointments = async (crn: string, body: AppointmentRequestBody) => {
+  async postAppointments(crn: string, body: AppointmentRequestBody) {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,
@@ -250,9 +255,23 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
 
-  async getUserSchedule(username: string, page: string, type = 'upcoming'): Promise<UserSchedule> {
-    const pageQuery = `?${new URLSearchParams({ size: '10', page }).toString()}`
-    return this.get({ path: `/user/${username}/schedule/${type}${pageQuery}`, handle404: false, handle500: false })
+  async getUserSchedule({
+    username,
+    page,
+    sortBy,
+    ascending,
+    size,
+    type = 'upcoming',
+  }: GetUserScheduleProps): Promise<UserSchedule> {
+    const searchParams = Object.fromEntries(
+      Object.entries({ size, page, sortBy, ascending }).filter(([_k, v]) => v),
+    ) as Record<string, string>
+    const pageQuery = `${new URLSearchParams(searchParams).toString()}`
+    return this.get({
+      path: `/user/${username}/schedule/${type}${pageQuery ? '?' : ''}${pageQuery}`,
+      handle404: false,
+      handle500: false,
+    })
   }
 
   async getTeamCaseload(teamCode: string, page: string): Promise<TeamCaseload> {

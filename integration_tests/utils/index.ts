@@ -1,11 +1,16 @@
-interface WiremockMapping {
+export interface WiremockMapping {
   request: {
     urlPattern?: string
     urlPathPattern?: string
+    method?: string
+    queryParameters?: {
+      [key: string]: { matches: string }
+    }
   }
   response: {
     status: number
-    jsonBody: any
+    headers: Record<string, string>
+    jsonBody?: any
   }
 }
 

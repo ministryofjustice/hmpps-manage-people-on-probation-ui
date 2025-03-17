@@ -11,6 +11,7 @@ import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
 import type { Services } from '../../services'
 import type { ApplicationInfo } from '../../applicationInfo'
+import setUpAuthentication from '../../middleware/setUpAuthentication'
 
 const testAppInfo: ApplicationInfo = {
   applicationName: 'test',
@@ -51,7 +52,8 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use(routes(services))
-  app.use((req, res, next) => next(new NotFound()))
+  app.use(setUpAuthentication())
+  app.use((_req, _res, next) => next(new NotFound()))
   app.use(errorHandler(production))
 
   return app
