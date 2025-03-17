@@ -61,6 +61,7 @@ import {
   roleDescription,
   toSentenceDescription,
   concat,
+  shortTime,
 } from './utils'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
@@ -129,6 +130,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
+  njkEnv.addFilter('shortTime', shortTime)
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))

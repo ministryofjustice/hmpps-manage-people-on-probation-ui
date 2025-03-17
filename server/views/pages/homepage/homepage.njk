@@ -14,13 +14,43 @@
   </div>
   <div class="dps-homepage-search">
     <div class="govuk-width-container">
-      {{ caseSearch({
-                id: "search",
-                results: searchResults,
-                label: {
-                    html: '<h1 class="govuk-label-wrapper"><label class="govuk-label moj-search__label govuk-label--m" for="search">Find a person on probation</label></h1>'
-                }
-            }) }}
+      <div class="moj-search">
+        <form id="search-form" class="probation-search__form" method="POST" action="/search">
+          <input type="hidden" name="_csrf" value="{{csrfToken}}">
+          <div class="probation-search__input-container">
+            <div class="govuk-form-group">
+              <label class="govuk-label" for="search">
+                <h1 class="govuk-label-wrapper">
+                  <label class="govuk-label moj-search__label govuk-label--m" for="search">Find a person on probation</label>
+                </h1>
+              </label>
+              <div id="search-hint" class="govuk-hint moj-search__hint">
+                You can search by name, date of birth or any other identifier (for example <abbr title="Case Reference Number">CRN</abbr> or <abbr title="Police National Computer Identifier">PNC id</abbr>).
+              </div>
+              <input class="govuk-input" id="search" name="probation-search-input" type="search" aria-describedby="search-hint">
+            </div>
+            <button type="submit" class="govuk-button moj-search__button" data-module="govuk-button" data-govuk-button-init="" data-qa="search-submit">
+              Search
+            </button>
+            <p id="search-suggestions" class="probation-search__suggestions govuk-!-margin-top-1">
+              <script nonce="">
+                document
+                  .getElementById("search-suggestions")
+                  .addEventListener("click", e => {
+                    if (e.target.dataset.suggestedQuery) {
+                      document
+                        .getElementById("search")
+                        .value = e.target.dataset.suggestedQuery;
+                      document
+                        .getElementById("search-form")
+                        .submit();
+                    }
+                  });
+              </script>
+            </p>
+          </div>
+        </form>
+      </div>
       <p>
         <a class="govuk-link govuk-link--no-visited-state" href="/case">View your cases</a>
       </p>
@@ -28,264 +58,27 @@
   </div>
 {% endblock %}
 
-{% set appointments %}
-<div class="govuk-!-padding-3 govuk-!-padding-top-1">
-  <table class="govuk-table govuk-table govuk-!-margin-bottom-3">
-
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-
-        <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-action--bottom" aria-sort="none">Person on probation</th>
-
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric govuk-!-width-one-fifth govuk-action--bottom " aria-sort="none">Appointment type</th>
-
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric govuk-!-width-one-fifth govuk-action--bottom " aria-sort="none">Location</th>
-
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric govuk-!-width-one-fifth">Time</th>
-
-      </tr>
-    </thead>
-
-    <tbody class="govuk-table__body">
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/X172592?journey=appointments&amp;action=create">
-            Morrison, Stuart
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">X172592</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X172592/MFM/appointment-detail">Planned telephone contact</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">HMP Wakefield</td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">9am to 9:30am</td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/X172591?journey=appointments&amp;action=create">
-            Emard, Garrett
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">X172591</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X172591/SJW/appointment-detail">Home visit</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">HMP Wakefield</td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">10am to 10:30am</td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/Y602391?journey=appointments&amp;action=create">
-            Weissnat, Briana
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">Y602391</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/Y602391/R72/appointment-detail">PI1:My Identity</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">HMP Wakefield</td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">11am to 11:30am</td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/D115542?journey=appointments&amp;action=create">
-            Huels, Sheridan
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">D115542</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/D115542/GCL/appointment-detail">PI1:My Identity</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">HMP Wakefield</td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">12pm to 12:30pm</td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/X148901?journey=appointments&amp;action=create">
-            Bradtke, Ethan
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">X148901</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X148901/0GS/appointment-detail">Sentence Plan Review</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">HMP Wakefield</td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">1pm to 1:30pm</td>
-
-      </tr>
-
-    </tbody>
-  </table>
-
-  <p>
-    <a class="govuk-link govuk-link--no-visited-state" href="/caseload/appointments/upcoming">View all upcoming appointments</a>
-  </p>
-</div>
+{% set appointmentsTable %}
+{% include './_appointments.njk' %}
 {% endset %}
 
-{% set outcomes %}
-<div class="govuk-!-padding-3 govuk-!-padding-top-1">
-  <table class="govuk-table govuk-table govuk-!-margin-bottom-3">
-
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-
-        <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-action--bottom" aria-sort="none">Person on probation</th>
-
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric govuk-!-width-one-fifth govuk-action--bottom " aria-sort="none">Appointment type</th>
-
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric govuk-!-width-one-fifth govuk-action--bottom " aria-sort="none">Date</th>
-
-        <th scope="col" class="govuk-table__header govuk-table__header--numeric govuk-!-width-one-fifth">Action</th>
-
-      </tr>
-    </thead>
-
-    <tbody class="govuk-table__body">
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/X172592?journey=appointments&amp;action=create">
-            Morrison, Stuart
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">X172592</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X172592/3EO/appointment-detail">Home visit</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">4 March 2025</td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X172592/3EO/appointment-detail">Log outcome</a>
-        </td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/X172591?journey=appointments&amp;action=create">
-            Emard, Garrett
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">X172591</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X172591/I9D/appointment-detail">Planned office visit</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">3 March 2025</td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X172591/I9D/appointment-detail">Log outcome</a>
-        </td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/Y602391?journey=appointments&amp;action=create">
-            Weissnat, Briana
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">Y602391</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/Y602391/5TV/appointment-detail">Planned office visit</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">2 March 2025</td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/Y602391/5TV/appointment-detail">Log outcome</a>
-        </td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/D115542?journey=appointments&amp;action=create">
-            Huels, Sheridan
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">D115542</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/D115542/BZH/appointment-detail">Planned office visit</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">1 March 2025</td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/D115542/BZH/appointment-detail">Log outcome</a>
-        </td>
-
-      </tr>
-
-      <tr class="govuk-table__row">
-
-        <td class="govuk-table__cell">
-          <a class="govuk-!-font-weight-regular" href="./case-listings/case/X148901?journey=appointments&amp;action=create">
-            Bradtke, Ethan
-        </a><br>
-          <span class="govuk-!-font-weight-bold secondary-text">X148901</span></td>
-
-        <td class="govuk-table__cell govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X148901/UIK/appointment-detail">Sentence Plan Review</a>
-        </td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">28 February 2025</td>
-
-        <td class="govuk-table__cell govuk-table__cell--numeric govuk-!-text-align-right">
-          <a class="govuk-link" href="/case-listings/case/X148901/UIK/appointment-detail">Log outcome</a>
-        </td>
-
-      </tr>
-
-    </tbody>
-  </table>
-
-  <p>
-    <a class="govuk-link govuk-link--no-visited-state" href="/caseload/appointments/no-outcome">Log more outcomes</a>
-  </p>
-</div>
+{% set outcomesTable %}
+{% include './_outcomes.njk' %}
 {% endset %}
 
 {% block content %}
   {{ govukAccordion({
     id: "accordion-default",
+    attributes: {
+     'data-qa': 'homepage-appointments'
+    },
     items: [
       {
         heading: {
-            text: "Today's appointments (5)"
+            text: "Today's appointments (" + appointments.length + ")"
         },
         content: {
-            html: appointments
+            html: appointmentsTable
         }
       }
     ]
@@ -293,15 +86,22 @@
 
   {{ govukAccordion({
     id: "accordion-default",
+    attributes: {
+     'data-qa': 'homepage-outcomes'
+    },
     items: [
       {
         heading: {
-            text: "Outcomes to log (0)"
+            text: "Outcomes to log (" + outcomes.length + ")"
         },
         content: {
-            html: outcomes
+            html: outcomesTable
         }
       }
     ]
   }) }}
+
+  <hr class="govuk-section-break--l">
+
+  {% include './_other-services.njk' %}
 {% endblock %}

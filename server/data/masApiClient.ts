@@ -19,7 +19,7 @@ import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
 import { PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
-import { TeamCaseload, UserCaseload, UserLocations, UserTeam } from './model/caseload'
+import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserTeam } from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { ActivityLogRequestBody, AppointmentRequestBody } from '../@types'
@@ -241,6 +241,10 @@ export default class MasApiClient extends RestClient {
   ): Promise<UserCaseload> {
     const pageQuery = `?${new URLSearchParams({ size: '10', page, sortBy }).toString()}`
     return this.post({ data: body, path: `/caseload/user/${username}/search${pageQuery}`, handle404: true })
+  }
+
+  async getUserAppointments(username: string): Promise<UserAppontment> {
+    return this.get({ path: `/user/${username}/appointments` })
   }
 
   async getUserTeams(username: string): Promise<UserTeam> {
