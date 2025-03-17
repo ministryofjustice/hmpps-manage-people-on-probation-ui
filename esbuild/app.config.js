@@ -9,11 +9,13 @@ const buildApp = buildConfig =>
   esbuild.build({
     entryPoints: glob.sync(buildConfig.app.entryPoints),
     outdir: buildConfig.app.outDir,
-    bundle: true,
+    bundle: buildConfig.isProduction,
     sourcemap: buildConfig.sourcemap,
     platform: 'node',
     format: 'cjs',
-    external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
+    external: buildConfig.isProduction
+      ? [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})]
+      : [],
     plugins: [
       typecheckPlugin(),
       copy({
@@ -25,6 +27,7 @@ const buildApp = buildConfig =>
 
 module.exports = buildConfig => {
   console.log('\u{1b}[1m\u{2728}  Building app...\u{1b}[0m')
+  console.log(`Building with isProduction set to ${buildConfig.isProduction} `)
 
   return buildApp(buildConfig)
 }
