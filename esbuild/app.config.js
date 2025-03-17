@@ -10,7 +10,7 @@ const buildApp = buildConfig =>
     entryPoints: glob.sync(buildConfig.app.entryPoints),
     outdir: buildConfig.app.outDir,
     bundle: buildConfig.isProduction,
-    sourcemap: buildConfig.sourcemap,
+    sourcemap: !buildConfig.isProduction,
     platform: 'node',
     format: 'cjs',
     external: buildConfig.isProduction
