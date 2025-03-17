@@ -757,7 +757,7 @@ export const roleDescription = (contact: Contact, addBreak?: boolean): string =>
 export const toSentenceDescription = (value?: string): string => (!value ? 'Pre-Sentence' : value)
 
 export const shortTime = (isoTime: string) => {
-  const time = DateTime.fromSQL(isoTime)
+  const time = DateTime.fromISO(isoTime)
   return (time.minute.valueOf() > 0 ? time.toFormat('h:mma') : time.toFormat('ha')).toLocaleLowerCase()
 }
 

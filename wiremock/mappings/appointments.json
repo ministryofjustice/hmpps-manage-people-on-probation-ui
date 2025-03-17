@@ -22,9 +22,8 @@
               "crn": "X172592",
               "description": "Planned telephone contact",
               "location": "HMP Wakefield",
-              "date": "2025-04-06",
-              "startTime": "09:00:00",
-              "endTime": "09:30:00"
+              "startDateTime": "2025-03-17T09:00:00Z",
+              "endDateTime": "2025-03-17T09:30:00Z"
             },
             {
               "caseName": {
@@ -33,10 +32,7 @@
               },
               "crn": "X172591",
               "description": "Home visit",
-              "location": "HMP Wakefield",
-              "date": "2025-04-06",
-              "startTime": "10:00:00",
-              "endTime": "10:30:00"
+              "startDateTime": "2025-03-17T10:00:00Z"
             },
             {
               "caseName": {
@@ -46,9 +42,8 @@
               "crn": "Y602391",
               "description": "PI1:My Identity",
               "location": "HMP Wakefield",
-              "date": "2025-04-06",
-              "startTime": "11:00:00",
-              "endTime": "11:30:00"
+              "startDateTime": "2025-03-17T11:00:00Z",
+              "endDateTime": "2025-03-17T11:30:00Z"
             },
             {
               "caseName": {
@@ -57,10 +52,7 @@
               },
               "crn": "D115542",
               "description": "PI1:My Identity",
-              "location": "HMP Wakefield",
-              "date": "2025-04-06",
-              "startTime": "12:00:00",
-              "endTime": "12:30:00"
+              "startDateTime": "2025-03-17T12:00:00Z"
             },
             {
               "caseName": {
@@ -70,9 +62,8 @@
               "crn": "X148901",
               "description": "Sentence Plan Review",
               "location": "HMP Wakefield",
-              "date": "2025-04-06",
-              "startTime": "13:00:00",
-              "endTime": "13:30:00"
+              "startDateTime": "2025-03-17T13:00:00Z",
+              "endDateTime": "2025-03-17T13:30:00Z"
             }
           ],
           "outcomes": [

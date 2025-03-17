@@ -34,11 +34,11 @@
         },
         {
             classes: 'govuk-!-text-align-right',
-            text: appointment.location
+            text: appointment.location if appointment.location else 'Not Provided'
         },
         {
             classes: 'govuk-!-text-align-right',
-            text: appointment.startTime | shortTime + ' to ' + appointment.endTime | shortTime
+            text: appointment.startDateTime | shortTime + (' to ' + appointment.endDateTime | shortTime if appointment.endDateTime else '')
         }
     ]) %}
 {% endfor %}
