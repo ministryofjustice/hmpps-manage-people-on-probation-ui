@@ -20,7 +20,7 @@
                 "forename": "Stuart"
               },
               "crn": "X172592",
-              "description": "Planned telephone contact",
+              "type": "Planned telephone contact",
               "location": "HMP Wakefield",
               "startDateTime": "2025-03-17T09:00:00Z",
               "endDateTime": "2025-03-17T09:30:00Z"
@@ -31,7 +31,7 @@
                 "forename": "Garrett"
               },
               "crn": "X172591",
-              "description": "Home visit",
+              "type": "Home visit",
               "startDateTime": "2025-03-17T10:00:00Z"
             },
             {
@@ -40,7 +40,7 @@
                 "forename": "Briana"
               },
               "crn": "Y602391",
-              "description": "PI1:My Identity",
+              "type": "PI1:My Identity",
               "location": "HMP Wakefield",
               "startDateTime": "2025-03-17T11:00:00Z",
               "endDateTime": "2025-03-17T11:30:00Z"
@@ -51,7 +51,7 @@
                 "forename": "Sheridan"
               },
               "crn": "D115542",
-              "description": "PI1:My Identity",
+              "type": "PI1:My Identity",
               "startDateTime": "2025-03-17T12:00:00Z"
             },
             {
@@ -60,7 +60,7 @@
                 "forename": "Ethan"
               },
               "crn": "X148901",
-              "description": "Sentence Plan Review",
+              "type": "Sentence Plan Review",
               "location": "HMP Wakefield",
               "startDateTime": "2025-03-17T13:00:00Z",
               "endDateTime": "2025-03-17T13:30:00Z"
@@ -70,32 +70,32 @@
             {
               "caseName": { "surname": "Morrison", "forename": "Stuart" },
               "crn": "X172592",
-              "description": "Home visit",
-              "date": "2025-03-04"
+              "type": "Home visit",
+              "startDateTime": "2025-03-04T11:30:00Z"
             },
             {
               "caseName": { "surname": "Emard", "forename": "Garrett" },
               "crn": "X172591",
-              "description": "Planned office visit",
-              "date": "2025-03-03"
+              "type": "Planned office visit",
+              "startDateTime": "2025-03-03T11:30:00Z"
             },
             {
               "caseName": { "surname": "Weissnat", "forename": "Briana" },
               "crn": "Y602391",
-              "description": "Planned office visit",
-              "date": "2025-03-02"
+              "type": "Planned office visit",
+              "startDateTime": "2025-03-02T11:30:00Z"
             },
             {
               "caseName": { "surname": "Huels", "forename": "Sheridan" },
               "crn": "D115542",
-              "description": "Planned office visit",
-              "date": "2025-03-01"
+              "type": "Planned office visit",
+              "startDateTime": "2025-03-01T11:30:00Z"
             },
             {
               "caseName": { "surname": "Bradtke", "forename": "Ethan" },
               "crn": "X148901",
-              "description": "Sentence Plan Review",
-              "date": "2025-02-28"
+              "type": "Sentence Plan Review",
+              "startDateTime": "2025-02-28T11:30:00Z"
             }
           ]
         },
