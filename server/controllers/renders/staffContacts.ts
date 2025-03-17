@@ -5,7 +5,7 @@ import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
 
 export const staffContacts = (hmppsAuthClient: HmppsAuthClient) => {
-  return async (req: Request, res: Response, next: NextFunction) => {
+  return async (req: Request, res: Response) => {
     const { crn } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
 
