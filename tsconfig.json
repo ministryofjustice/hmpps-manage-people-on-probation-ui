@@ -34,7 +34,11 @@
     "playwright.config.ts",
     "playwright-report",
     "test-results",
-    "eslint.config.mjs"
+    "eslint.config.mjs",
+    "coverage",
+    "**/*.cy.ts",
+    "test_results",
+    "codecov_reports"
   ],
   "include": ["**/*.js", "**/*.ts"]
 }
