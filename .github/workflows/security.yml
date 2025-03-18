@@ -74,6 +74,7 @@ jobs:
         uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
         if: steps.json.outputs.high != '0' || steps.json.outputs.medium != '0'
         with:
+          method: chat.postMessage
           payload: |
             {
               "channel": "probation-integration-notifications",
@@ -123,6 +124,7 @@ jobs:
         uses: slackapi/slack-github-action@485a9d42d3a73031f12ec201c457e2162c45d02d # v2.0.0
         if: failure()
         with:
+          method: chat.postMessage
           payload: |
             {
               "channel": "probation-integration-notifications",
