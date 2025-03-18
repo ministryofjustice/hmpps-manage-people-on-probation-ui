@@ -53,8 +53,12 @@ context('Outcomes to log', () => {
       .find('span')
       .should('contain.text', `Age ${yearsSince(mockAppointments[0].dob)}`)
     page.getTableCell(1, 3).should('contain.text', 'Adult Custody < 12m')
-    page.getTableCell(1, 3).find('a').should('contain.text', '+ 2 more')
-    page.getTableCell(2, 3).find('a').should('not.exist')
+    page
+      .getTableCell(1, 3)
+      .find('a')
+      .should('contain.text', '+ 3 more')
+      .should('have.attr', 'href', '/case/X778160/sentence')
+    page.getTableCell(2, 3).find('a').should('contain.text', '+ 1 more')
     page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
     page
       .getTableCell(1, 5)
