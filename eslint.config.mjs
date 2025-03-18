@@ -4,7 +4,7 @@ import tsParser from '@typescript-eslint/parser'
 
 export default [
   ...hmppsConfig({
-    extraIgnorePaths: ['playwright-report/**', '.zap/**'],
+    extraIgnorePaths: ['playwright-report/**', '.zap/**', 'instrumented/**'],
     extraPathsAllowingDevDependencies: ['e2e_tests/**', 'playwright.config.ts'],
     extraFrontendGlobals: { $: 'readonly', MOJFrontend: 'readonly' },
   }),

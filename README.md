@@ -150,6 +150,9 @@ To run the Cypress integration tests locally:
 # Start the UI in test mode
 npm run start-feature:dev
 
+# Start the UI in test with integration test coverage instrumentation
+npm run start-feature
+
 # Run the tests in headless mode:
 npm run int-test
 
