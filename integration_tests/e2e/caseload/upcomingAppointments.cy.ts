@@ -9,8 +9,16 @@ const mockData = mockResponse as Wiremock
 
 const mockAppointments = getWiremockData<UserActivity[]>(mockData, '/mas/user/USER1/schedule/upcoming', 'appointments')
 
-const checkColumnHeading = (page: UserAppointments, index: number, label: string, name: string, action: string) => {
+const checkColumnHeading = (
+  page: UserAppointments,
+  index: number,
+  label: string,
+  name: string,
+  action: string,
+  sort = 'none',
+) => {
   page.getTableColumnHeading(index).should('contain.text', label)
+  page.getTableColumnHeading(index).should('have.attr', 'aria-sort', sort)
   page.getTableColumnHeading(index).should('have.attr', 'data-sort-name', name)
   page.getTableColumnHeading(index).should('have.attr', 'data-sort-action', action)
   page.getTableColumnHeading(index).find('button').should('exist')
@@ -28,7 +36,7 @@ context('Upcoming appointments', () => {
     checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/upcoming')
     checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/upcoming')
     checkColumnHeading(page, 3, 'Appointment', 'appointment', '/caseload/appointments/upcoming')
-    checkColumnHeading(page, 4, 'Date and time', 'date', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 4, 'Date and time', 'date', '/caseload/appointments/upcoming', 'ascending')
 
     page
       .getTableCell(1, 1)
@@ -87,6 +95,27 @@ context('Upcoming appointments', () => {
       .find('a')
       .should('contain.text', 'Next')
       .should('have.attr', 'href', '/caseload/appointments/upcoming?page=1')
+  })
+  it('upcoming appointments page is rendered ordered by appointment ascending', () => {
+    cy.visit('/caseload/appointments/upcoming')
+    const page = new UserAppointments()
+    page.getTableColumnHeading(3).find('button').click()
+    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 3, 'Appointment', 'appointment', '/caseload/appointments/upcoming', 'ascending')
+    checkColumnHeading(page, 4, 'Date and time', 'date', '/caseload/appointments/upcoming')
+  })
+  it('upcoming appointments page is rendered ordered by name descending', () => {
+    cy.visit('/caseload/appointments/upcoming')
+    const page = new UserAppointments()
+    page.getTableColumnHeading(0).find('button').click()
+    page.getTableColumnHeading(0).find('button').click()
+    checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/upcoming', 'descending')
+    checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 3, 'Appointment', 'appointment', '/caseload/appointments/upcoming')
+    checkColumnHeading(page, 4, 'Date and time', 'date', '/caseload/appointments/upcoming')
   })
   it('Upcoming appointments page 3 is rendered', () => {
     cy.visit('/caseload/appointments/upcoming?page=2')

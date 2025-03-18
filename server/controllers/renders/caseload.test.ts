@@ -66,7 +66,7 @@ describe('caseload controllers', () => {
         dob: 'none',
         sentence: 'none',
         appointment: 'none',
-        date: 'none',
+        date: 'ascending',
       }
       const req = httpMocks.createRequest({
         query: {
@@ -164,7 +164,7 @@ describe('caseload controllers', () => {
         name: 'none',
         dob: 'none',
         sentence: 'none',
-        date: 'none',
+        date: 'ascending',
       }
       const req = httpMocks.createRequest({
         query: {
