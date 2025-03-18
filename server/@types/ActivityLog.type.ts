@@ -1,5 +1,3 @@
-import { PersonActivity } from '../data/model/activityLog'
-import { TierCalculation } from '../data/tierApiClient'
 import type { Errors, Option } from './index'
 
 export interface ActivityLogFilters {

@@ -26,7 +26,7 @@ const buildAssets = buildConfig =>
     minify: buildConfig.isProduction,
     sourcemap: buildConfig.sourcemap,
     platform: 'browser',
-    target: 'es2018',
+    target: 'es2023',
     external: ['/assets/*'],
     bundle: true,
     plugins: [

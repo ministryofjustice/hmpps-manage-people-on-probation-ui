@@ -12,7 +12,7 @@ import validate from '../middleware/validation/index'
 import { filterActivityLog } from '../middleware'
 import type { AppResponse, Route } from '../@types'
 import { getPersonActivity } from '../middleware/getPersonActivity'
-import { toPredictors, toRoshWidget, toTimeline } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils/utils'
 import ArnsApiClient from '../data/arnsApiClient'
 
 export default function activityLogRoutes(router: Router, { hmppsAuthClient }: Services) {

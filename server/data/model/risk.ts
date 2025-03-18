@@ -27,26 +27,6 @@ export interface ScoreTwoYears {
   twoYears: number
 }
 
-export interface RsrPredictorDto {
-  rsrPercentageScore?: number
-  rsrScoreLevel?: ScoreLevelEnum
-  ospcPercentageScore?: number
-  ospcScoreLevel?: ScoreLevelEnum
-  ospiPercentageScore?: number
-  ospiScoreLevel?: ScoreLevelEnum
-  ospiiPercentageScore?: number
-  ospdcPercentageScore?: number
-  ospiiScoreLevel?: ScoreLevelEnum
-  ospdcScoreLevel?: ScoreLevelEnum
-  calculatedDate?: string
-  completedDate?: string
-  signedDate?: string
-  staticOrDynamic?: StaticOrDynamicEnum
-  source: SourceEnum
-  status: StatusEnum
-  algorithmVersion?: string
-}
-
 export interface RoshRiskWidgetDto {
   overallRisk?: string
   assessedOn?: string
@@ -121,38 +101,10 @@ export interface RsrScoreDto {
 }
 
 export type RiskEnum = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH' | 'NOT_APPLICABLE'
-export const RiskEnum = {
-  LOW: 'LOW' as RiskEnum,
-  MEDIUM: 'MEDIUM' as RiskEnum,
-  HIGH: 'HIGH' as RiskEnum,
-  VERYHIGH: 'VERY_HIGH' as RiskEnum,
-  NOTAPPLICABLE: 'NOT_APPLICABLE' as RiskEnum,
-}
-
 export type ScoreLevelEnum = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH' | 'NOT_APPLICABLE'
-export const RsrScoreLevelEnum = {
-  LOW: 'LOW' as ScoreLevelEnum,
-  MEDIUM: 'MEDIUM' as ScoreLevelEnum,
-  HIGH: 'HIGH' as ScoreLevelEnum,
-  VERYHIGH: 'VERY_HIGH' as ScoreLevelEnum,
-  NOTAPPLICABLE: 'NOT_APPLICABLE' as ScoreLevelEnum,
-}
-
 export type StaticOrDynamicEnum = 'STATIC' | 'DYNAMIC'
-export const StaticOrDynamicEnum = {
-  STATIC: 'STATIC' as StaticOrDynamicEnum,
-  DYNAMIC: 'DYNAMIC' as StaticOrDynamicEnum,
-}
-
 export type SourceEnum = 'OASYS'
-export const SourceEnum = {
-  OASYS: 'OASYS' as SourceEnum,
-}
 export type StatusEnum = 'COMPLETE' | 'LOCKED_INCOMPLETE'
-export const StatusEnum = {
-  COMPLETE: 'COMPLETE' as StatusEnum,
-  LOCKEDINCOMPLETE: 'LOCKED_INCOMPLETE' as StatusEnum,
-}
 
 export interface PersonRiskFlags {
   personSummary: PersonSummary
