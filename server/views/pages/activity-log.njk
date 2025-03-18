@@ -10,7 +10,7 @@
 {% set headerDob = personActivity.personSummary.dateOfBirth  %}
 {% set headerGender = personActivity.personSummary.gender  %}
 {% set personSummary = personActivity.personSummary %}
-{% set entries = activityLog(personActivity.activities, category or 'all-previous-activity', requirement) %}
+{% set entries = personActivity.activities %}
 {% set requirements = getDistinctRequirements(personActivity.activities) %}
 
 {% block beforeContent %}
@@ -81,7 +81,6 @@
  {% include "./activity-log/_switch-views.njk" %}
  <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
  </div>
-    {% set entries = activityLog(entries, category or 'all-previous-activity') %}
     {% if entries.length > 0 %}
       {% if compactView %}
         {% include "./activity-log/_compact-view.njk" %}
