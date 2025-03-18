@@ -7,7 +7,6 @@
       text: "Person on probation"
     },
     {
-      classes: 'govuk-!-text-align-right',
       text: "Appointment type"
     },
     {
@@ -29,8 +28,7 @@
             html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
         },
         {
-            classes: 'govuk-!-text-align-right',
-            html: '<a class="govuk-link" href="/">' + outcome.type + '</a>'
+            html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '">' + outcome.type + '</a>'
         },
         {
             classes: 'govuk-!-text-align-right',
@@ -38,7 +36,7 @@
         },
         {
             classes: 'govuk-!-text-align-right',
-            html: '<a class="govuk-link" href="/">Log outcome</a>'
+            html: '<a class="govuk-link" href="/appointments/appointment/' + outcome.id + '">Log outcome</a>'
         }
     ]) %}
 {% endfor %}
