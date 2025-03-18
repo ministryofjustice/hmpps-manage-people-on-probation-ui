@@ -25,7 +25,8 @@ export const userScheduleController = (hmppsAuthClient: HmppsAuthClient) => {
       cols = cols.filter(col => col !== 'appointment')
     }
     const sortBy = cols.reduce((acc, colName) => {
-      return { ...acc, [colName]: name === colName ? directions?.[dir] || 'none' : 'none' }
+      const defaultSort = !dir && colName === 'date' ? 'ascending' : 'none'
+      return { ...acc, [colName]: name === colName ? directions?.[dir] || defaultSort : defaultSort }
     }, {})
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)

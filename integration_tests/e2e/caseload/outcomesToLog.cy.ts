@@ -12,8 +12,16 @@ const mockAppointments = getWiremockData<UserActivity[]>(
   'appointments',
 )
 
-const checkColumnHeading = (page: UserAppointments, index: number, label: string, name: string, action: string) => {
+const checkColumnHeading = (
+  page: UserAppointments,
+  index: number,
+  label: string,
+  name: string,
+  action: string,
+  sort = 'none',
+) => {
   page.getTableColumnHeading(index).should('contain.text', label)
+  page.getTableColumnHeading(index).should('have.attr', 'aria-sort', sort)
   page.getTableColumnHeading(index).should('have.attr', 'data-sort-name', name)
   page.getTableColumnHeading(index).should('have.attr', 'data-sort-action', action)
   page.getTableColumnHeading(index).find('button').should('exist')
@@ -30,7 +38,7 @@ context('Outcomes to log', () => {
     checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome')
     checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome')
     checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/no-outcome')
-    checkColumnHeading(page, 3, 'Date and time', 'date', '/caseload/appointments/no-outcome')
+    checkColumnHeading(page, 3, 'Date and time', 'date', '/caseload/appointments/no-outcome', 'ascending')
     page.getTableColumnHeading(4).should('contain.text', 'Action')
     page.getTableColumnHeading(4).find('button').should('not.exist')
     page
