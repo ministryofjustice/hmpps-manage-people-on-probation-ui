@@ -1,0 +1,197 @@
+import httpMocks from 'node-mocks-http'
+import { auditService } from '@ministryofjustice/hmpps-audit-client'
+import { v4 as uuidv4 } from 'uuid'
+import renders from '.'
+import HmppsAuthClient from '../../data/hmppsAuthClient'
+import MasApiClient from '../../data/masApiClient'
+import TokenStore from '../../data/tokenStore/redisTokenStore'
+import { AppResponse } from '../../@types'
+import TierApiClient from '../../data/tierApiClient'
+import ArnsApiClient from '../../data/arnsApiClient'
+import { toRoshWidget, toPredictors } from '../../utils/utils'
+import { PersonAppointment, Schedule } from '../../data/model/schedule'
+import { mockTierCalculation, mockRisks, mockPredictors } from './activityLog.test'
+
+const token = { access_token: 'token-1', expires_in: 300 }
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const crn = 'X000001'
+const id = '1234'
+
+jest.mock('../../data/masApiClient')
+jest.mock('../../data/tokenStore/redisTokenStore')
+jest.mock('@ministryofjustice/hmpps-audit-client')
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
+}))
+jest.mock('../../data/hmppsAuthClient', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
+    }
+  })
+})
+jest.mock('../../data/arnsApiClient')
+jest.mock('../../utils/utils', () => ({
+  toRoshWidget: jest.fn(),
+  toPredictors: jest.fn(),
+}))
+
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+tokenStore.getToken.mockResolvedValue(token.access_token)
+
+const mockPersonSchedule = {
+  personSummary: {
+    name: {
+      forename: 'Eula',
+      surname: 'Schmeler',
+    },
+    crn: 'X000001',
+    dateOfBirth: '1979-08-18',
+  },
+  appointments: [
+    {
+      id: 1,
+      type: 'Phone call',
+      startDateTime: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      rarToolKit: 'Choices and Changes',
+      isSensitive: false,
+      hasOutcome: false,
+      isEmailOrTextFromPop: true,
+      wasAbsent: true,
+      notes: 'Some notes',
+      officerName: {
+        forename: 'Terry',
+        surname: 'Jones',
+      },
+      lastUpdated: '2023-03-20',
+      lastUpdatedBy: {
+        forename: 'Paul',
+        surname: 'Smith',
+      },
+    },
+  ],
+} as unknown as Schedule
+
+const req = httpMocks.createRequest({
+  params: {
+    crn,
+    id,
+  },
+  query: { page: '', view: 'default', category: 'mock-category' },
+})
+
+const res = {
+  locals: {
+    user: {
+      username: 'user-1',
+    },
+    filters: {
+      dateFrom: '',
+      dateTo: '',
+      keywords: '',
+    },
+  },
+  redirect: jest.fn().mockReturnThis(),
+  render: jest.fn().mockReturnThis(),
+} as unknown as AppResponse
+
+const renderSpy = jest.spyOn(res, 'render')
+
+const getPersonScheduleSpy = jest
+  .spyOn(MasApiClient.prototype, 'getPersonSchedule')
+  .mockImplementation(() => Promise.resolve(mockPersonSchedule))
+
+const getCalculationDetailsSpy = jest
+  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
+  .mockImplementation(() => Promise.resolve(mockTierCalculation))
+
+const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
+const getPredictorsSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
+  .mockImplementation(() => Promise.resolve(mockPredictors))
+
+const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
+
+describe('controllers/appointments', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+  describe('get appointments', () => {
+    beforeEach(async () => {
+      await renders.appointments(hmppsAuthClient)(req, res)
+    })
+    it('should send an audit message', () => {
+      expect(auditSpy).toHaveBeenCalledWith({
+        action: 'VIEW_MAS_APPOINTMENTS',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: uuidv4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+    })
+    it('should request previous and upcoming appointments from the api', () => {
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+    })
+    it('should request risks from the api', () => {
+      expect(getRisksSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request tier calculation details from the api', () => {
+      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request predictors from the api', () => {
+      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should render the appointments page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
+        upcomingAppointments: mockPersonSchedule,
+        pastAppointments: mockPersonSchedule,
+        crn,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+      })
+    })
+  })
+
+  describe('post appointments', () => {
+    const redirectSpy = jest.spyOn(res, 'redirect')
+    beforeEach(() => {
+      renders.appointmentsPost(req, res)
+    })
+    it('should redirect to the arrange appointment type page', () => {
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/type`)
+    })
+  })
+
+  describe('appointment details', () => {
+    beforeEach(async () => {
+      await renders.appointmentDetails(hmppsAuthClient)(req, res)
+    })
+    it('should send an audit message', () => {
+      expect(auditSpy).toHaveBeenCalledWith({
+        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: uuidv4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+    })
+  })
+  /*
+  describe('get record an outcome', () => {
+    beforeEach(async () => {
+      await renders.recordAnOutcome(hmppsAuthClient)(req, res)
+    })
+  })
+
+
+  describe('post record an outcome', () => {
+    beforeEach(async () => {
+      await renders.recordAnOutcomePost(hmppsAuthClient)(req, res)
+    })
+  })
+    */
+})
