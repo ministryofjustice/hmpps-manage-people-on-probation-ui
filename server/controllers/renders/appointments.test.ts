@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 as uuidv4 } from 'uuid'
+import logger from '../../../logger'
 import renders from '.'
 import HmppsAuthClient from '../../data/hmppsAuthClient'
 import MasApiClient from '../../data/masApiClient'
@@ -16,6 +17,8 @@ const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const id = '1234'
+const contactId = '1234'
+const actionType = 'mockType'
 
 jest.mock('../../data/masApiClient')
 jest.mock('../../data/tokenStore/redisTokenStore')
@@ -72,10 +75,42 @@ const mockPersonSchedule = {
   ],
 } as unknown as Schedule
 
+const mockPersonAppointment = {
+  personSummary: {
+    name: {
+      forename: 'Eula',
+      surname: 'Schmeler',
+    },
+    crn: 'X000001',
+    dateOfBirth: '1979-08-18',
+  },
+  appointment: {
+    id: 1,
+    type: 'Phone call',
+    startDateTime: '2024-12-22T09:15:00.382936Z[Europe/London]',
+    rarToolKit: 'Choices and Changes',
+    isSensitive: false,
+    hasOutcome: false,
+    wasAbsent: true,
+    notes: 'Some notes',
+    officerName: {
+      forename: 'Terry',
+      surname: 'Jones',
+    },
+    lastUpdated: '2023-03-20',
+    lastUpdatedBy: {
+      forename: 'Paul',
+      surname: 'Smith',
+    },
+  },
+} as unknown as PersonAppointment
+
 const req = httpMocks.createRequest({
   params: {
     crn,
     id,
+    contactId,
+    actionType,
   },
   query: { page: '', view: 'default', category: 'mock-category' },
 })
@@ -101,6 +136,10 @@ const getPersonScheduleSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonSchedule')
   .mockImplementation(() => Promise.resolve(mockPersonSchedule))
 
+const getPersonAppointmentSpy = jest
+  .spyOn(MasApiClient.prototype, 'getPersonAppointment')
+  .mockImplementation(() => Promise.resolve(mockPersonAppointment))
+
 const getCalculationDetailsSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
@@ -111,6 +150,7 @@ const getPredictorsSpy = jest
   .mockImplementation(() => Promise.resolve(mockPredictors))
 
 const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
+const loggerSpy = jest.spyOn(logger, 'info')
 
 describe('controllers/appointments', () => {
   afterEach(() => {
@@ -179,19 +219,98 @@ describe('controllers/appointments', () => {
         service: 'hmpps-manage-people-on-probation-ui',
       })
     })
+    it('should request the person appointment from the api', () => {
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId)
+    })
+    it('should render the appointment detail page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+      })
+    })
   })
-  /*
+
   describe('get record an outcome', () => {
     beforeEach(async () => {
       await renders.recordAnOutcome(hmppsAuthClient)(req, res)
     })
-  })
-
-
-  describe('post record an outcome', () => {
-    beforeEach(async () => {
-      await renders.recordAnOutcomePost(hmppsAuthClient)(req, res)
+    it('should send an audit message', () => {
+      expect(auditSpy).toHaveBeenCalledWith({
+        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: uuidv4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+    })
+    it('should request previous appointments from the api', () => {
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+    })
+    it('should render the record an outcome page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
+        schedule: mockPersonSchedule,
+        crn,
+        actionType,
+      })
     })
   })
-    */
+
+  describe('post record an outcome', () => {
+    describe('If appointment id is null in request body', () => {
+      beforeEach(async () => {
+        const mockReq = httpMocks.createRequest({
+          params: {
+            crn,
+            id,
+            contactId,
+            actionType,
+          },
+          query: { page: '', view: 'default', category: 'mock-category' },
+          body: {
+            'appointment-id': null,
+          },
+        })
+        await renders.recordAnOutcomePost(hmppsAuthClient)(mockReq, res)
+      })
+      it('should log appointment has not been selected', () => {
+        expect(loggerSpy).toHaveBeenCalledWith('Appointment not selected')
+      })
+      it('should request previous appointments from the api', () => {
+        expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+      })
+      it('should render the record an outcome page', () => {
+        expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
+          errorMessages: {
+            appointment: { text: 'Please select an appointment' },
+          },
+          schedule: mockPersonSchedule,
+          crn,
+          actionType,
+        })
+      })
+    })
+    describe('If appointment id in request body', () => {
+      const appointmentId = '1234'
+      beforeEach(async () => {
+        const mockReq = httpMocks.createRequest({
+          params: {
+            crn,
+            id,
+            contactId,
+            actionType,
+          },
+          query: { page: '', view: 'default', category: 'mock-category' },
+          body: {
+            'appointment-id': appointmentId,
+          },
+        })
+        await renders.recordAnOutcomePost(hmppsAuthClient)(mockReq, res)
+      })
+      it('should redirect to the appointment details page', () => {
+        const redirectSpy = jest.spyOn(res, 'redirect')
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${appointmentId}`)
+      })
+    })
+  })
 })
