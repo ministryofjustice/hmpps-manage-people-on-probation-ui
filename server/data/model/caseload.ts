@@ -42,11 +42,6 @@ export interface Location {
 }
 
 export interface UserAppontment {
-  provider: string
-  staff: {
-    forename: string
-    surname: string
-  }
   appointments: {
     caseName: {
       surname: string

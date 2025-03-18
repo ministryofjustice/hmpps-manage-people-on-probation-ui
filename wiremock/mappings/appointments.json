@@ -8,13 +8,9 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "provider": "London",
-          "staff": {
-            "forename": "Paul",
-            "surname": "McPhee"
-          },
           "appointments": [
             {
+              "id": 0,
               "caseName": {
                 "surname": "Morrison",
                 "forename": "Stuart"
@@ -26,6 +22,7 @@
               "endDateTime": "2025-03-17T09:30:00Z"
             },
             {
+              "id": 1,
               "caseName": {
                 "surname": "Emard",
                 "forename": "Garrett"
@@ -35,6 +32,7 @@
               "startDateTime": "2025-03-17T10:00:00Z"
             },
             {
+              "id": 2,
               "caseName": {
                 "surname": "Weissnat",
                 "forename": "Briana"
@@ -46,6 +44,7 @@
               "endDateTime": "2025-03-17T11:30:00Z"
             },
             {
+              "id": 3,
               "caseName": {
                 "surname": "Huels",
                 "forename": "Sheridan"
@@ -55,6 +54,7 @@
               "startDateTime": "2025-03-17T12:00:00Z"
             },
             {
+              "id": 4,
               "caseName": {
                 "surname": "Bradtke",
                 "forename": "Ethan"
@@ -68,30 +68,35 @@
           ],
           "outcomes": [
             {
+              "id": 0,
               "caseName": { "surname": "Morrison", "forename": "Stuart" },
               "crn": "X172592",
               "type": "Home visit",
               "startDateTime": "2025-03-04T11:30:00Z"
             },
             {
+              "id": 1,
               "caseName": { "surname": "Emard", "forename": "Garrett" },
               "crn": "X172591",
               "type": "Planned office visit",
               "startDateTime": "2025-03-03T11:30:00Z"
             },
             {
+              "id": 2,
               "caseName": { "surname": "Weissnat", "forename": "Briana" },
               "crn": "Y602391",
               "type": "Planned office visit",
               "startDateTime": "2025-03-02T11:30:00Z"
             },
             {
+              "id": 3,
               "caseName": { "surname": "Huels", "forename": "Sheridan" },
               "crn": "D115542",
               "type": "Planned office visit",
               "startDateTime": "2025-03-01T11:30:00Z"
             },
             {
+              "id": 4,
               "caseName": { "surname": "Bradtke", "forename": "Ethan" },
               "crn": "X148901",
               "type": "Sentence Plan Review",
