@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient from '../data/tierApiClient'
 import type { Route } from '../@types'
-import { toPredictors, toRoshWidget, toTimeline } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils/utils'
 
 export default function caseRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
