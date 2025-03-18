@@ -25,5 +25,11 @@ generic-service:
     ENVIRONMENT_NAME: DEV
     ENVIRONMENT: dev
 
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - unilink_staff
+      - moj_cloud_platform
+      
 generic-prometheus-alerts:
   alertSeverity: probation-integration-notifications
