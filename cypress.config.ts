@@ -1,5 +1,5 @@
 import { defineConfig } from 'cypress'
-
+import coverageTask from '@cypress/code-coverage/task'
 import stubs from './wiremock/stubs'
 
 export default defineConfig({
@@ -15,14 +15,25 @@ export default defineConfig({
   numTestsKeptInMemory: 20,
   experimentalMemoryManagement: true,
   e2e: {
+    setupNodeEvents(on, config) {
+      coverageTask(on, config)
+      on('task', {
+        ...stubs,
+      })
+      return config
+    },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',
     specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
-    setupNodeEvents: (on: (string, Record) => void): void => {
-      on('task', {
-        ...stubs,
-      })
+    experimentalRunAllSpecs: true,
+    env: {
+      codeCoverage: {
+        url: 'http://localhost:3007/__coverage__',
+      },
+    },
+    retries: {
+      runMode: 1,
     },
   },
 })

@@ -11,14 +11,14 @@
     "start:dev": "concurrently -k -p \"[{name}]\" -n \"Views,TypeScript,ESBuild,Node,Sass\" -c \"yellow.bold,cyan.bold,green.bold,blue.bold\" \"node esbuild/esbuild.config.js --build --watch\" \"node esbuild/esbuild.config.js --dev-server\"",
     "start-feature": "concurrently -k -p \"[{name}]\" -n \"WireMock,Node\" -c \"magenta.bold,green.bold\" \"npm run wiremock\" \"npm run start-node-feature\"",
     "start-feature:dev": "export $(cat feature.env) && concurrently -k -p \"[{name}]\" -n \"WireMock,Views,TypeScript,ESBuild,Node,Sass\" -c \"yellow.bold,cyan.bold\" \"npm run wiremock\"  \"node esbuild/esbuild.config.js --build --watch\" \"node esbuild/esbuild.config.js --feature-dev-server\"",
-    "start-node-feature": "export $(cat feature.env) && node $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
+    "start-node-feature": "npx nyc instrument dist --nycrc-path ./.nycrc && node $NODE_DEBUG_OPTION --env-file=feature.env dist/server.js | bunyan -o short",
     "watch-node-feature": "export $(cat feature.env) && nodemon --watch dist/ $NODE_DEBUG_OPTION dist/server.js | bunyan -o short",
     "wiremock": "npx wiremock --port 9091 --root-dir wiremock --local-response-templating",
     "lint": "eslint . --cache --max-warnings 0",
     "lint:fix": "eslint . --fix",
     "typecheck": "tsc && tsc -p integration_tests",
-    "test": "jest",
-    "test:ci": "jest --runInBand",
+    "test": "jest --coverage",
+    "test:ci": "jest --coverage --runInBand",
     "security_audit": "npx audit-ci --config audit-ci.json",
     "int-test": "cypress run --config video=false",
     "int-test-ui": "cypress open --e2e --browser chrome",
@@ -26,11 +26,20 @@
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist && sentry-cli sourcemaps upload --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist",
     "e2e-test": "NODE_OPTIONS='--import tsx' npx playwright test",
     "e2e-test:headed": "NODE_OPTIONS='--import tsx' npx playwright test --headed",
-    "e2e-test:debug": "NODE_OPTIONS='--import tsx' npx playwright test --debug"
+    "e2e-test:debug": "NODE_OPTIONS='--import tsx' npx playwright test --debug",
+    "coverage-report": "cpy cypress_coverage/coverage-final.json coverage --rename=int-{{basename}} --flat && cpy test_results/jest/coverage-final.json coverage --rename=unit-{{basename}} --flat && npx nyc report --reporter lcov -t coverage --report-dir coverage --exclude-after-remap false"
   },
   "engines": {
     "node": "^20",
     "npm": "^10"
+  },
+  "nyc": {
+    "report-dir": "cypress_coverage",
+    "reporter": [
+      "text",
+      "json"
+    ],
+    "lines": 0
   },
   "jest": {
     "transform": {
@@ -43,6 +52,22 @@
     },
     "collectCoverageFrom": [
       "server/**/*.{ts,js,jsx,mjs}"
+    ],
+    "coveragePathIgnorePatterns": [
+      ".*.test.ts",
+      "node_modules",
+      "integration_tests",
+      "wiremock",
+      "server/@types",
+      ".*jest.config.js",
+      "server/app.ts",
+      "server/index.ts",
+      ".*.cy.ts"
+    ],
+    "coverageDirectory": "test_results/jest/",
+    "coverageReporters": [
+      "json",
+      "lcov"
     ],
     "testMatch": [
       "<rootDir>/(server|job)/**/?(*.)(cy|test).{ts,js,jsx,mjs}"
@@ -98,8 +123,9 @@
     "@ministryofjustice/frontend": "^3.7.0",
     "@ministryofjustice/hmpps-audit-client": "^1.1.1",
     "@ministryofjustice/probation-search-frontend": "^2.3.0",
-    "@sentry/cli": "^2.42.2",
+    "@sentry/cli": "^2.42.3",
     "@sentry/node": "^9.5.0",
+    "@types/cypress__code-coverage": "^3.10.2",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.5",
     "body-parser": "^1.20.3",
@@ -119,6 +145,7 @@
     "helmet": "^8.0.0",
     "http-errors": "^2.0.0",
     "jwt-decode": "^4.0.0",
+    "lcov-result-merger": "^5.0.1",
     "lodash": "^4.17.21",
     "luxon": "^3.5.0",
     "luxon-business-days": "^3.0.1",
@@ -138,10 +165,12 @@
     "node-mocks-http": "^1.16.2"
   },
   "devDependencies": {
+    "@cypress/code-coverage": "^3.13.12",
     "@faker-js/faker": "^9.6.0",
+    "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/eslint-config-hmpps": "^0.0.1-beta.2",
-    "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.65.0",
+    "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.66.0",
     "@playwright/test": "^1.51.0",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
@@ -149,6 +178,7 @@
     "@types/connect-flash": "0.0.40",
     "@types/cookie-session": "^2.0.49",
     "@types/csurf": "^1.11.5",
+    "@types/cypress__code-coverage": "^3.10.2",
     "@types/express-session": "^1.18.1",
     "@types/http-errors": "^2.0.4",
     "@types/jest": "^29.5.14",
@@ -169,7 +199,8 @@
     "audit-ci": "^7.1.0",
     "concurrently": "^9.1.2",
     "cookie-session": "^2.1.0",
-    "cypress": "^14.1.0",
+    "cpy-cli": "^5.0.0",
+    "cypress": "^14.2.0",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-plugin-tab": "^1.0.5",
     "esbuild": "^0.25.1",
@@ -185,6 +216,7 @@
     "mocha-junit-reporter": "^2.2.1",
     "nock": "^14.0.1",
     "nodemon": "^3.1.9",
+    "nyc": "^17.1.0",
     "prettier": "^3.5.3",
     "prettier-plugin-jinja-template": "^2.0.0",
     "sass": "^1.85.1",

@@ -10,12 +10,22 @@ const buildApp = require('./app.config')
 const nwDir = path.dirname(process.execPath)
 
 const cwd = process.cwd()
+
+/**
+ * Configuration for build steps
+ * @type {BuildConfig}
+ */
 const buildConfig = {
   isProduction: process.env.NODE_ENV === 'production',
   sourcemap: process.env.NODE_ENV === 'development' ? 'inline' : false,
   app: {
     outDir: path.join(cwd, 'dist'),
-    entryPoints: path.join(cwd, 'server.ts'),
+    entryPoints:
+      process.env.NODE_ENV === 'production'
+        ? path.join(cwd, 'server.ts')
+        : glob
+            .sync([path.join(cwd, '*.ts'), path.join(cwd, 'server/**/*.ts')])
+            .filter(file => !file.endsWith('.test.ts')),
     copy: [
       {
         from: path.join(cwd, 'server/views/**/*'),
@@ -23,7 +33,6 @@ const buildConfig = {
       },
     ],
   },
-
   assets: {
     outDir: path.join(cwd, 'dist/assets'),
     entryPoints: glob.sync([path.join(cwd, 'assets/js/index.js'), path.join(cwd, 'assets/scss/application.scss')]),
