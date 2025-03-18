@@ -26,11 +26,11 @@
 {% for appointment in appointments %}
     {% set row = tableData.rows.push([
         {
-            html: '<a class="govuk-!-font-weight-regular" href="./case-listings/case/X172592?journey=appointments&amp;action=create">' + appointment.caseName.surname + ', ' + appointment.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
+            html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.caseName.surname + ', ' + appointment.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
         },
         {
             classes: 'govuk-!-text-align-right',
-            html: '<a class="govuk-link" href="/case-listings/case/X172592/MFM/appointment-detail">' + appointment.type + '</a>'
+            html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '">' + appointment.type + '</a>'
         },
         {
             classes: 'govuk-!-text-align-right',

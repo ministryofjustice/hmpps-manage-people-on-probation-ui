@@ -30,7 +30,7 @@
         },
         {
             classes: 'govuk-!-text-align-right',
-            html: '<a class="govuk-link" href="/">' + outcome.type + '</a>'
+            html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '">' + outcome.type + '</a>'
         },
         {
             classes: 'govuk-!-text-align-right',
@@ -38,7 +38,7 @@
         },
         {
             classes: 'govuk-!-text-align-right',
-            html: '<a class="govuk-link" href="/">Log outcome</a>'
+            html: '<a class="govuk-link" href="/appointments/appointment/' + outcome.id + '">Log outcome</a>'
         }
     ]) %}
 {% endfor %}
