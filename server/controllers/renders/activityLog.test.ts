@@ -15,8 +15,9 @@ import { toRoshWidget, toPredictors } from '../../utils/utils'
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
+const id = '1234'
 
-const mockTierCalculation = {
+export const mockTierCalculation = {
   tierScore: 'B2',
   calculationId: 'ee1f151f-7417-47f8-9366-2ced6356db37',
   calculationDate: '2023-12-07T12:05:11.524616',
@@ -77,8 +78,8 @@ const mockActivities = {
   ],
 } as unknown as PersonActivity
 
-const mockRisks = {} as unknown as RiskSummary
-const mockPredictors = [] as unknown as RiskScoresDto[]
+export const mockRisks = {} as unknown as RiskSummary
+export const mockPredictors = [] as unknown as RiskScoresDto[]
 
 jest.mock('../../data/masApiClient')
 jest.mock('../../data/tokenStore/redisTokenStore')
@@ -101,7 +102,6 @@ jest.mock('uuid', () => ({
 }))
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
-const arnsClient = new ArnsApiClient(null) as jest.Mocked<ArnsApiClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const getPersonActivitySpy = jest
@@ -120,6 +120,7 @@ const getPredictorsSpy = jest
 const req = httpMocks.createRequest({
   params: {
     crn,
+    id,
   },
   query: { page: '', view: 'default', requirement: '' },
 })

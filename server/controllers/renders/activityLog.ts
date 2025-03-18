@@ -3,14 +3,13 @@ import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { ActivityLogRequestBody, AppResponse } from '../../@types'
 import { HmppsAuthClient } from '../../data'
-import { getPersonActivity } from '../../middleware'
 import ArnsApiClient from '../../data/arnsApiClient'
 import { toRoshWidget, toPredictors, toCamelCase, toIsoDate } from '../../utils/utils'
 import MasApiClient from '../../data/masApiClient'
 import { PersonActivity } from '../../data/model/activityLog'
 import TierApiClient, { TierCalculation } from '../../data/tierApiClient'
 
-const getQueryString = (params: Record<string, string>): string[] => {
+export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
   const usedParams = ['view', 'requirement', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page']
   for (const usedParam of usedParams) {
@@ -60,8 +59,6 @@ export const activityLog = (hmppsAuthClient: HmppsAuthClient) => {
       tierClient.getCalculationDetails(crn),
     ])
 
-    // const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
-
     const queryParams = getQueryString(req.query as Record<string, string>)
     const arnsClient = new ArnsApiClient(token)
     const currentPage = parseInt(page as string, 10)
@@ -86,7 +83,7 @@ export const activityLog = (hmppsAuthClient: HmppsAuthClient) => {
 
     const predictorScores = toPredictors(predictors)
 
-    res.render('pages/activity-log', {
+    return res.render('pages/activity-log', {
       personActivity,
       crn,
       query,
