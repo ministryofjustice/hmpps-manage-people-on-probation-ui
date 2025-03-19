@@ -21,7 +21,7 @@ context('Sign In', () => {
     const page = Page.verifyOnPage(IndexPage)
 
     page.getOutcomesToLog().should('exist')
-    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (5)')
+    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (21)')
     page.getAppointmentRows().should('have.length', 5)
   })
 

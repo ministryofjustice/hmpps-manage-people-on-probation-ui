@@ -14,6 +14,8 @@ const stubEmptyHomepage = (): SuperAgentRequest =>
           forename: 'Paul',
           surname: 'McPhee',
         },
+        totalAppointments: 0,
+        totalOutcomes: 0,
         appointments: [],
         outcomes: [],
       },

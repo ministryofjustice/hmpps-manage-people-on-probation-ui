@@ -11,9 +11,13 @@ export default function homeRoutes(router: Router, { hmppsAuthClient }: Services
   get('/', async (_req, res, _next) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    const { appointments, outcomes } = await masClient.getUserAppointments(res.locals.user.username)
+    const { appointments, outcomes, totalAppointments, totalOutcomes } = await masClient.getUserAppointments(
+      res.locals.user.username,
+    )
 
     res.render('pages/homepage/homepage', {
+      totalAppointments,
+      totalOutcomes,
       appointments,
       outcomes,
       delius_link: config.delius.link,
