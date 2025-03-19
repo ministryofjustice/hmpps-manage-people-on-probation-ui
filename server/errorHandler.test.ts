@@ -51,12 +51,13 @@ const checkLocalsVars = (error: HTTPError, production = false): void => {
   it('should set res.locals correctly', () => {
     const { message, stack } = error
     const status = error?.status || 500
+    const devError = `<pre>${error.stack}</pre>`
     expect(res.locals.title).toEqual(statusErrors[status as StatusErrorCode].title)
     expect(res.locals.message).toContain(`${statusErrors[status as StatusErrorCode].message}`)
     if (!production) {
-      expect(res.locals.message).toContain(`<p>Error: ${status} ${message}</p>`)
+      expect(res.locals.message).toContain(devError)
     } else {
-      expect(res.locals.message).not.toContain(`<p>Error: ${status} ${message}</p>`)
+      expect(res.locals.message).not.toContain(devError)
     }
     expect(res.locals.status).toEqual(status)
     expect(res.locals.stack).toEqual(production ? null : stack)
@@ -73,7 +74,7 @@ describe('GET 404', () => {
       .expect(response => {
         expect(response.text).toContain(title)
         expect(response.text).toContain(message)
-        expect(response.text).toContain('Error: 404 Not Found')
+        expect(response.text).toContain('NotFoundError: Not Found')
       })
   })
 
@@ -85,7 +86,7 @@ describe('GET 404', () => {
       .expect(response => {
         expect(response.text).toContain(title)
         expect(response.text).toContain(message)
-        expect(response.text).not.toContain('Error: 404 Not Found')
+        expect(response.text).not.toContain('NotFoundError: Not Found')
       })
   })
 })
