@@ -23,6 +23,11 @@ export default function homeRoutes(router: Router, { hmppsAuthClient }: Services
       delius_link: config.delius.link,
       oasys_link: config.oaSys.link,
       interventions_link: config.interventions.link,
+      recall_link: config.recall.link,
+      cas1_link: config.cas1.link,
+      cas3_link: config.cas3.link,
+      caval_link: config.caval.link,
+      epf2_link: config.epf2.link,
     })
   })
 }

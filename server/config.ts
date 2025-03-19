@@ -85,6 +85,25 @@ export default {
   interventions: {
     link: get('INTERVENTIONS_LINK', 'https://interventions-dummy-url', requiredInProduction),
   },
+  recall: {
+    link: get('RECALL_LINK', 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/', requiredInProduction),
+  },
+  cas1: {
+    link: get('CAS1_LINK', 'https://approved-premises.hmpps.service.justice.gov.uk/', requiredInProduction),
+  },
+  cas3: {
+    link: get(
+      'CAS3_LINK',
+      'https://transitional-accommodation-dev.hmpps.service.justice.gov.uk/referrals',
+      requiredInProduction,
+    ),
+  },
+  caval: {
+    link: get('CAVAL_LINK', 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk', requiredInProduction),
+  },
+  epf2: {
+    link: get('EPF2_LINK', 'https://epf.linkspace.uk', requiredInProduction),
+  },
   flipt: {
     url: get('FLIPT_URL', 'http://localhost:8100', requiredInProduction),
     token: get('FLIPT_TOKEN', 'FLIPT_TOKEN', requiredInProduction),
