@@ -42,6 +42,8 @@ export interface Location {
 }
 
 export interface UserAppontment {
+  totalAppointments: number
+  totalOutcomes: number
   appointments: {
     caseName: {
       surname: string
