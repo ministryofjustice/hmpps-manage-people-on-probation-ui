@@ -89,6 +89,7 @@ generic-service:
     groups:
       - digital_staff_and_mojo
       - unilink_staff
+      - moj_cloud_platform
 
   serviceAccountName: manage-people-on-probation-ui
 
