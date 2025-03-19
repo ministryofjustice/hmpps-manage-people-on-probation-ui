@@ -10,7 +10,9 @@ import logger from '../logger'
 
 let app: Express
 
-const req = httpMocks.createRequest()
+const req = httpMocks.createRequest({
+  originalUrl: 'some/url',
+})
 
 const res = {
   locals: {
@@ -26,6 +28,7 @@ const res = {
 const statusSpy = jest.spyOn(res, 'status')
 const renderSpy = jest.spyOn(res, 'render')
 const nextSpy = jest.fn()
+const loggerErrorSpy = jest.spyOn(logger, 'error')
 
 beforeEach(() => {
   app = appWithAllRoutes({})
@@ -49,7 +52,7 @@ const mockError = (status = 500): HTTPError => {
 
 const checkLocalsVars = (error: HTTPError, production = false): void => {
   it('should set res.locals correctly', () => {
-    const { message, stack } = error
+    const { stack } = error
     const status = error?.status || 500
     const devError = `<pre>${error.stack}</pre>`
     expect(res.locals.title).toEqual(statusErrors[status as StatusErrorCode].title)
@@ -100,6 +103,12 @@ describe('500 Error', () => {
     const production = false
     beforeEach(() => {
       createErrorHandler(production)(error, req, res, nextSpy)
+    })
+    it('should log an error', () => {
+      expect(loggerErrorSpy).toHaveBeenCalledWith(
+        `Error handling request for '${req.originalUrl}', user '${res.locals.user?.username}'`,
+        error,
+      )
     })
     checkLocalsVars(error, production)
     it('should set the response status', () => {
