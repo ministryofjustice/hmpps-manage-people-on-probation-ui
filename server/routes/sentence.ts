@@ -170,7 +170,10 @@ export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Serv
     })
   })
 
-  get('/case/:crn/sentence/probation-history/staff-contacts', renders.staffContacts(hmppsAuthClient))
+  get(
+    '/case/:crn/sentence/probation-history/staff-contacts',
+    renders.personalDetailsController.staffContacts(hmppsAuthClient),
+  )
 
   get('/case/:crn/sentence/licence-condition/:licenceConditionId/note/:noteId', async (req, res, _next) => {
     const { crn, licenceConditionId, noteId } = req.params

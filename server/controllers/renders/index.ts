@@ -1,7 +1,7 @@
-import { staffContacts } from './staffContacts'
 import { userScheduleController } from './caseload'
 import { activityLog } from './activityLog'
 import { activityDetails } from './activityDetails'
+import { personalDetailsController } from './personalDetails'
 import {
   appointments,
   appointmentDetails,
@@ -11,7 +11,6 @@ import {
 } from './appointments'
 
 export default {
-  staffContacts,
   userScheduleController,
   activityLog,
   activityDetails,
@@ -20,4 +19,5 @@ export default {
   appointmentDetails,
   recordAnOutcome,
   recordAnOutcomePost,
+  personalDetailsController,
 }
