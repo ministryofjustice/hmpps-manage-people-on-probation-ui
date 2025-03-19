@@ -12,8 +12,16 @@ const mockAppointments = getWiremockData<UserActivity[]>(
   'appointments',
 )
 
-const checkColumnHeading = (page: UserAppointments, index: number, label: string, name: string, action: string) => {
+const checkColumnHeading = (
+  page: UserAppointments,
+  index: number,
+  label: string,
+  name: string,
+  action: string,
+  sort = 'none',
+) => {
   page.getTableColumnHeading(index).should('contain.text', label)
+  page.getTableColumnHeading(index).should('have.attr', 'aria-sort', sort)
   page.getTableColumnHeading(index).should('have.attr', 'data-sort-name', name)
   page.getTableColumnHeading(index).should('have.attr', 'data-sort-action', action)
   page.getTableColumnHeading(index).find('button').should('exist')
@@ -30,7 +38,7 @@ context('Outcomes to log', () => {
     checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome')
     checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome')
     checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/no-outcome')
-    checkColumnHeading(page, 3, 'Date and time', 'date', '/caseload/appointments/no-outcome')
+    checkColumnHeading(page, 3, 'Date and time', 'date', '/caseload/appointments/no-outcome', 'ascending')
     page.getTableColumnHeading(4).should('contain.text', 'Action')
     page.getTableColumnHeading(4).find('button').should('not.exist')
     page
@@ -45,8 +53,12 @@ context('Outcomes to log', () => {
       .find('span')
       .should('contain.text', `Age ${yearsSince(mockAppointments[0].dob)}`)
     page.getTableCell(1, 3).should('contain.text', 'Adult Custody < 12m')
-    page.getTableCell(1, 3).find('a').should('contain.text', '+ 2 more')
-    page.getTableCell(2, 3).find('a').should('not.exist')
+    page
+      .getTableCell(1, 3)
+      .find('a')
+      .should('contain.text', '+ 3 more')
+      .should('have.attr', 'href', '/case/X778160/sentence')
+    page.getTableCell(2, 3).find('a').should('contain.text', '+ 1 more')
     page.getTableCell(1, 4).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
     page
       .getTableCell(1, 5)

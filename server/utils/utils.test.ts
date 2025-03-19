@@ -1,7 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { DateTime } from 'luxon'
 import {
-  activityLog,
   activityLogDate,
   checkRecentlyViewedAccess,
   compactActivityLogDate,
@@ -352,15 +351,6 @@ describe('Activity log date', () => {
     ['gets day', '2024-05-25T09:08:34.123', 'Saturday 25 May 2024'],
   ])('%s activityLogDate(%s, %s)', (_: string, a: string, expected: string) => {
     expect(activityLogDate(a)).toEqual(expected)
-  })
-})
-
-describe('filters activity log', () => {
-  it.each([
-    ['Filters absent awaiting evidence', appointments, 'waiting-for-evidence', appointments[4]],
-    ['Filters no outcome', appointments, 'national-standard-appointments-without-outcome', appointments[3]],
-  ])('%s activityLog(%s, %s)', (_: string, a: Activity[], b: string, appointment: Activity) => {
-    expect(activityLog(a, b)[0]).toEqual(appointment)
   })
 })
 

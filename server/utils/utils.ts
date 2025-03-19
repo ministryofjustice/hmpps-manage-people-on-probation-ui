@@ -45,7 +45,7 @@ export const initialiseName = (fullName?: string): string | null => {
   if (!fullName) return null
 
   const array = fullName.split(' ')
-  return `${array[0][0]}. ${array.reverse()[0]}`
+  return `${array[0][0]}. ${array.toReversed()[0]}`
 }
 
 export const dateWithYear = (datetimeString: string): string | null => {
@@ -333,61 +333,6 @@ export const getRisksWithScore = (risk: Partial<Record<RiskScore, string[]>>, sc
   return risks
 }
 
-export const filterEntriesByCategory = (category: string) => {
-  return function filterActivity(activity: Activity) {
-    const { isAppointment } = activity
-    const isPastAppointment = isAppointment && isInThePast(activity.startDateTime)
-    const { isNationalStandard } = activity
-    const isRescheduled = activity.rescheduled && isNationalStandard
-    const hasOutcome = activity.didTheyComply !== undefined || isRescheduled
-    const { wasAbsent } = activity
-    const acceptableAbsence = wasAbsent && activity.acceptableAbsence === true
-    const unacceptableAbsence = wasAbsent && activity.acceptableAbsence === false
-    const waitingForEvidence = activity.absentWaitingEvidence === true
-    const complied = activity.didTheyComply === true
-    const attendedDidNotComply = activity.didTheyComply === false
-
-    switch (category) {
-      case 'all-appointments':
-        return isAppointment
-      case 'other-communication':
-        return !isAppointment
-      case 'previous-appointments':
-        return isPastAppointment
-      case 'national-standard-appointments':
-        return isPastAppointment && isNationalStandard
-      case 'national-standard-appointments-without-outcome':
-        return isPastAppointment && isNationalStandard && !hasOutcome
-      case 'complied-appointments':
-        return isPastAppointment && complied && isNationalStandard
-      case 'acceptable-absence-appointments':
-        return isPastAppointment && acceptableAbsence && isNationalStandard
-      case 'unacceptable-absence-appointments':
-        return isPastAppointment && unacceptableAbsence && isNationalStandard
-      case 'waiting-for-evidence':
-        return isPastAppointment && waitingForEvidence && isNationalStandard
-      case 'attended-but-did-not-comply-appointments':
-        return isPastAppointment && attendedDidNotComply && isNationalStandard
-      case 'all-failure-to-comply-appointments':
-        return isPastAppointment && (attendedDidNotComply || unacceptableAbsence) && isNationalStandard
-      case 'upcoming-appointments':
-        return isAppointment && !isPastAppointment
-      case 'warning-letters':
-        return activity.action != null
-      case 'all-previous-activity':
-        return isPastAppointment || !isAppointment
-      case 'all-rescheduled':
-        return isRescheduled
-      case 'rescheduled-by-staff':
-        return isRescheduled && activity.rescheduledStaff === true
-      case 'rescheduled-by-person-on-probation':
-        return isRescheduled && activity.rescheduledPop === true
-      default:
-        return true
-    }
-  }
-}
-
 export const activityLogDate = (datetimeString: string) => {
   if (!datetimeString || isBlank(datetimeString)) return null
   const date = DateTime.fromISO(datetimeString)
@@ -416,16 +361,6 @@ export const compactActivityLogDate = (datetimeString: string) => {
 
 export const removeEmpty = (array: never[]) => {
   return array.filter((value: NonNullable<unknown>) => Object.keys(value).length !== 0)
-}
-
-export const activityLog = (contacts: Activity[], category: string, requirement?: string) => {
-  let ret = contacts
-    .filter(filterEntriesByCategory(category))
-    .sort((a, b) => (a.startDateTime < b.startDateTime ? 1 : -1))
-  if (requirement) {
-    ret = ret.filter(entry => entry.rarCategory && toSlug(entry.rarCategory) === toSlug(requirement))
-  }
-  return ret
 }
 
 export const timeFromTo = (from: string, to: string) => {
@@ -642,13 +577,6 @@ export const toTimeline = (riskScores: RiskScoresDto[]): TimelineItem[] => {
   })
 }
 
-export const getLatest = (predictors: RiskScoresDto[]): RiskScoresDto => {
-  if (predictors.length > 0) {
-    return [...predictors].sort((a, b) => +toDate(b.completedDate) - +toDate(a.completedDate))[0]
-  }
-  return null
-}
-
 export const riskLevelLabel = (level: string) => {
   switch (level) {
     case 'VERY_HIGH':
@@ -759,21 +687,6 @@ export const toSentenceDescription = (value?: string): string => (!value ? 'Pre-
 export const shortTime = (isoTime: string) => {
   const time = DateTime.fromISO(isoTime)
   return (time.minute.valueOf() > 0 ? time.toFormat('h:mma') : time.toFormat('ha')).toLocaleLowerCase()
-}
-
-export const toIsoDateString = (datetimestr: string): string => {
-  if (!datetimestr) {
-    return null
-  }
-  let date = DateTime.fromFormat(datetimestr, 'yyyy-MM-dd')
-  if (date.isValid) {
-    return datetimestr
-  }
-  date = DateTime.fromFormat(datetimestr, 'd/M/yyyy')
-  if (date.isValid) {
-    return date.toFormat('yyyy-MM-dd')
-  }
-  return ''
 }
 
 export const concat = (arr: string[], value: string) => {

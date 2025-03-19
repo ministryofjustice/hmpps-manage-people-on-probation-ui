@@ -3,7 +3,6 @@ import path from 'path'
 import nunjucks from 'nunjucks'
 import express, { Request, NextFunction } from 'express'
 import {
-  activityLog,
   activityLogDate,
   addressToList,
   compactActivityLogDate,
@@ -142,7 +141,6 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('getComplianceStatus', getComplianceStatus)
   njkEnv.addGlobal('timeFromTo', timeFromTo)
   njkEnv.addGlobal('getRisksWithScore', getRisksWithScore)
-  njkEnv.addGlobal('activityLog', activityLog)
   njkEnv.addGlobal('getRisksToThemselves', getRisksToThemselves)
   njkEnv.addGlobal('getCurrentRisksToThemselves', getCurrentRisksToThemselves)
   njkEnv.addGlobal('getPreviousRisksToThemselves', getPreviousRisksToThemselves)

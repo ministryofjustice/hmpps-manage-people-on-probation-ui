@@ -26,7 +26,11 @@ export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Serv
     if (number) {
       query.number = number as string
     }
-    const queryParam = Object.entries(query).reduce((acc, [k, v], i) => `${acc}${i === 0 ? `?` : '&'}${k}=${v}`, '')
+    const setQuery = (acc: string, key: string, value: any, index: number): string => {
+      const separator = index === 0 ? `?` : '&'
+      return `${acc}${separator}${key}=${value}`
+    }
+    const queryParam = Object.entries(query).reduce((acc, [k, v], i) => setQuery(acc, k, v, i), '')
 
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
 
