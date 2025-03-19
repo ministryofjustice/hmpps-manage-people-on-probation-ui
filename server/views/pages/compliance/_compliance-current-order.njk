@@ -157,15 +157,11 @@ No start date on current order
       {% if failureToComplyCount == 0 %}
         None
       {% elseif attendedButDidNotComplyCount == 0 %}
-        <a href="/case/{{ crn }}/activity-log/all-failure-to-comply-appointments{{ queryParams }}">
           {% if unacceptableAbsenceCount == 1 %}1 unacceptable absence{% else %}{{ unacceptableAbsenceCount }} unacceptable absences{% endif %}
-        </a>
       {% elseif unacceptableAbsenceCount == 0 %}
-        <a href="/case/{{ crn }}/activity-log/all-failure-to-comply-appointments{{ queryParams }}">
           {% if attendedButDidNotComplyCount == 1 %}1 failure{% else %}{{ attendedButDidNotComplyCount }} failures{% endif %} to comply because of behaviour
-        </a>
       {% else %}
-        <p><a href="/case/{{ crn }}/activity-log/all-failure-to-comply-appointments{{ queryParams }}">{{ failureToComplyCount }} failures to comply</a>:</p>
+        <p>{{ failureToComplyCount }} failures to comply:</p>
         <ul class="govuk-list govuk-!-margin-top-2">
           <li>{{ unacceptableAbsenceCount }} unacceptable absence</li>
           <li>{{ attendedButDidNotComplyCount }} failure to comply because of behaviour</li>
@@ -176,7 +172,7 @@ No start date on current order
     {% set acceptableAbsencesHtml %}
 
       {% if absentCount > 0 %}
-        <a href="/case/{{ crn }}/activity-log/acceptable-absence-appointments{{ queryParams }}">{{ absentCount }} acceptable absences</a>
+        {{ absentCount }} acceptable absences
       {% else %}
         None
       {% endif %}
@@ -184,9 +180,9 @@ No start date on current order
 
     {% set waitingForEvidenceHtml %}
       {% if waitingForEvidenceCount > 0 %}
-        <a href="/case/{{ crn }}/activity-log/waiting-for-evidence{{ queryParams }}">{{ waitingForEvidenceCount }} absence waiting for evidence</a>
+        {{ waitingForEvidenceCount }} absence waiting for evidence
       {% elseif waitingForEvidenceCount > 0 %}
-        <a href="/case/{{ crn }}/activity-log/waiting-for-evidence{{ queryParams }}">{{ waitingForEvidenceCount }} absences waiting for evidence</a>
+        {{ waitingForEvidenceCount }} absences waiting for evidence
       {% else %}
         None
       {% endif %}
@@ -196,15 +192,11 @@ No start date on current order
       {% if rescheduledCount == 0 %}
         None
       {% elseif rescheduledByStaffCount == 0 %}
-        <a href="/case/{{ crn }}/activity-log/all-rescheduled{{ queryParams }}">
           {{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}
-        </a>
       {% elseif rescheduledByPersonOnProbationCount == 0 %}
-        <a href="/case/{{ crn }}/activity-log/all-rescheduled{{ queryParams }}">
           {{ rescheduledByStaffCount }} requested by staff
-        </a>
       {% else %}
-        <p><a href="/case/{{ crn }}/activity-log/all-rescheduled{{ queryParams }}">{{ rescheduledCount }} rescheduled</a>:</p>
+        <p>{{ rescheduledCount }} rescheduled:</p>
         <ul class="govuk-list govuk-!-margin-top-2">
           <li>{{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}</li>
           <li>{{ rescheduledByStaffCount }} requested  by staff</li>
@@ -215,9 +207,9 @@ No start date on current order
     {% set warningLettersHtml %}
 
       {% if lettersCount === 1 %}
-        <a href="/case/{{ crn }}/activity-log/warning-letters{{ queryParams }}">First warning letter sent</a>
+        First warning letter sent
       {% elif lettersCount > 1 %}
-        <a href="/case/{{ crn }}/activity-log/warning-letters{{ queryParams }}">{{ lettersCount }} letters sent</a>
+        {{ lettersCount }} letters sent
       {% else %}
         None
       {% endif %}
@@ -232,7 +224,7 @@ No start date on current order
                   text: 'Appointments'
                 },
                 value: {
-                  html: '<span data-qa="appointmentsValue"><a href="/case/' + crn + '/activity-log/national-standard-appointments' + queryParams + '">' + nationalStandardAppointmentsCount + ' national standard appointments</a></span>'
+                  html: '<span data-qa="appointmentsValue">' + nationalStandardAppointmentsCount + ' national standard appointments </span>'
                 }
               },
               {
@@ -240,7 +232,7 @@ No start date on current order
                   text: 'Without an outcome'
                 },
                 value: {
-                  html: '<span data-qa="withoutOutcomeValue"><a href="/case/' + crn + '/activity-log/national-standard-appointments-without-outcome' + queryParams + '">' + outcomeNotRecordedCount + ' without a recorded outcome</a></span>'
+                  html: '<span data-qa="withoutOutcomeValue">' + outcomeNotRecordedCount + ' without a recorded outcome</span>'
                 }
               } if outcomeNotRecordedCount > 0,
               {
@@ -256,7 +248,7 @@ No start date on current order
                   text: 'Complied'
                 },
                 value: {
-                  html: '<span data-qa="compliedValue"><a href="/case/' + crn + '/activity-log/complied-appointments' + queryParams +'">' + compliedAppointmentsCount + ' complied</a></span>'
+                  html: '<span data-qa="compliedValue">' + compliedAppointmentsCount + ' complied</span>'
                 }
               },
               {
