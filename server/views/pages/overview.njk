@@ -182,6 +182,9 @@
                 {% if overview.personalDetails.mobileNumber  %}
                     {{ overview.personalDetails.mobileNumber }}<br />
                 {% endif %}
+                {% if not overview.personalDetails.mobileNumber|length and not overview.personalDetails.mobileNumber|length  %}
+                    No contact number
+                {% endif %}
             {% endset %}
         {% endset %}
         {% set circumstances %}
