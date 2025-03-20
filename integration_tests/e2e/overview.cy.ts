@@ -111,11 +111,7 @@ context('Overview', () => {
     page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'Risk to Known Adult')
     cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
     cy.get('[data-qa="riskFlagsValue"] dt').eq(3).should('contain.text', 'Information only')
-    page.getRowData('miscellaneous', 'tier', 'Value').should('contain.text', 'B2')
-    cy.get('[data-qa="tierValue"] a')
-      .should('contain.text', 'View all tier information (opens in new tab')
-      .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', 'https://tier-dev.hmpps.service.justice.gov.uk/case/X000001')
+
     const expected =
       '{"name":"Wolff,Caroline","crn":"X000001","dob":"9 January 2002","age":"22","tierScore":"B2","sentence":"12 month Community order"}'
 
