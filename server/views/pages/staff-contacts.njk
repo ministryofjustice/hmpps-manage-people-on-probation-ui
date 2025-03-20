@@ -6,7 +6,6 @@
 {% set pageTitle = makePageTitle({ pageHeading: ["Staff contacts", "Personal details"] }) %}
 {% endif %}
 {% set headerPersonName = professionalContact.name.forename + ' ' + professionalContact.name.surname %}
-{% set handOffDelius = "/case/" + crn + "/handoff/delius" %}
 
 {% block beforeContent %}
 {% set breadcrumbItems = [

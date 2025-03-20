@@ -11,8 +11,7 @@
       actions: {
         items: [
           {
-            href: '/case/' + crn + '/handoff/delius',
-            text: "Change"
+            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
           }
         ]
       }

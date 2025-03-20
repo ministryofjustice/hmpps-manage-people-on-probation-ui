@@ -398,28 +398,6 @@ export default function personalDetailRoutes(router: Router, { hmppsAuthClient }
     res.send(response.body)
   })
 
-  get('/case/:crn/handoff/:system', async (req, res, _next) => {
-    const { crn } = req.params
-    const { system } = req.params
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-    const masClient = new MasApiClient(token)
-
-    await auditService.sendAuditMessage({
-      action: `VIEW_MAS_HANDOFF_${system.toUpperCase()}`,
-      who: res.locals.user.username,
-      subjectId: crn,
-      subjectType: 'CRN',
-      correlationId: v4(),
-      service: 'hmpps-manage-people-on-probation-ui',
-    })
-
-    const personSummary = await masClient.getPersonSummary(crn)
-    res.render(`pages/handoff/${system}`, {
-      personSummary,
-      crn,
-    })
-  })
-
   get('/case/:crn/personal-details/disabilities', async (req, res, _next) => {
     const { crn } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

@@ -18,9 +18,6 @@
      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
   {% endif %}
 
-  {% if entry.isSensitive === true %}
-    {{ govukTag({ text: "Sensitive", classes: "govuk-tag--grey" }) }}
-  {% endif %}
 {% endset %}
 
 {% set html %}

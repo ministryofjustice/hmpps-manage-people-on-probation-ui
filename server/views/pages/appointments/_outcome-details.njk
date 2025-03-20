@@ -27,9 +27,7 @@
       actions: {
         items: [
           {
-            href: "/case/" + crn + "/handoff/delius",
-            text: "Change",
-            visuallyHiddenText: "complied"
+            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change complied for ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
           }
         ]
       }
@@ -40,9 +38,7 @@
       actions: {
         items: [
           {
-            href: "/case/" + crn + "/handoff/delius",
-            text: "Change",
-            visuallyHiddenText: "reason for not complying"
+            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change reason for not complying for ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
           }
         ]
       }
@@ -53,9 +49,7 @@
       actions: {
         items: [
           {
-            href: "/case/" + crn + "/handoff/delius",
-            text: "Change",
-            visuallyHiddenText: "reason for absence"
+            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change reason for absence for ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
           }
         ]
       }
@@ -66,9 +60,7 @@
       actions: {
         items: [
           {
-            href:"/case/" + crn + "/handoff/delius",
-            text: "Change",
-            visuallyHiddenText: "enforcement action"
+            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change enforcement action for ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
           }
         ]
       }
@@ -87,9 +79,7 @@
       actions: {
         items: [
           {
-            href: "/case/" + crn + "/handoff/delius",
-            text: "Change",
-            visuallyHiddenText: "uploaded documents"
+            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change uploaded documents for ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
           }
         ]
       }
