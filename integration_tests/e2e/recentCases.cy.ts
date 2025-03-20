@@ -36,10 +36,10 @@ context('Recent Cases', () => {
 
     cy.get('thead')
       .eq(0)
-      .within(() => cy.get('th').eq(0).should('contain.html', 'Name<br>CRN'))
+      .within(() => cy.get('th').eq(0).should('contain.text', 'Name / CRN'))
     cy.get('thead')
       .eq(0)
-      .within(() => cy.get('th').eq(1).should('contain.html', 'Date of birth<br>Age'))
+      .within(() => cy.get('th').eq(1).should('contain.text', 'DOB / Age'))
     cy.get('thead')
       .eq(0)
       .within(() => cy.get('th').eq(2).should('contain.text', 'Tier'))

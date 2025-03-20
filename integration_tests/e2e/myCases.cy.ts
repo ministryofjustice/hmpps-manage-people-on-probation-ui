@@ -5,6 +5,14 @@ context('Cases', () => {
   it('Cases page is rendered ', () => {
     cy.visit('/case')
     const page = Page.verifyOnPage(YourCasesPage)
+    page.getColumnHeader('myCases', 0).should('contain.text', 'Name / CRN').should('have.attr', 'aria-sort', 'none')
+    page.getColumnHeader('myCases', 1).should('contain.text', 'DOB / Age').should('have.attr', 'aria-sort', 'none')
+    page.getColumnHeader('myCases', 2).should('contain.text', 'Sentence').should('have.attr', 'aria-sort', 'none')
+    page.getColumnHeader('myCases', 3).should('contain.text', 'Last contact').should('have.attr', 'aria-sort', 'none')
+    page
+      .getColumnHeader('myCases', 4)
+      .should('contain.text', 'Next contact')
+      .should('have.attr', 'aria-sort', 'ascending')
     page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', 'X778160')
     page.getRowData('myCases', 'dob', 'Value1').should('contain.text', '25 Sep 1975')
 

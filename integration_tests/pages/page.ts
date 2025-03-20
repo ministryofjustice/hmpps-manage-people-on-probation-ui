@@ -44,6 +44,10 @@ export default abstract class Page {
     return cy.get(`[data-qa=${cardName}Card]`).within(() => cy.get(`[data-qa=${rowName}${type}]`).eq(index))
   }
 
+  getColumnHeader = (cardName: string, index = 0): PageElement => {
+    return cy.get(`[data-qa=${cardName}Card]`).find(`.govuk-table__header`).eq(index)
+  }
+
   getElementData = (name: string): PageElement => {
     return cy.get(`[data-qa=${name}]`)
   }
