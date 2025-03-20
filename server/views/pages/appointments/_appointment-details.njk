@@ -11,7 +11,11 @@
       actions: {
         items: [
           {
-            html:'<a class="govuk-link govuk-link--no-visited-state" target="_blank" href="'+ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) +'"aria-label="Change ' + appointment.type | lower + 'appointment on NDelius">Change<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'
+            classes: "govuk-link--no-visited-state",
+            attributes: { "target": "_blank", "aria-label":"Change '" + appointment.type | lower + " appointment on NDelius" },
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text:'Change',
+            visuallyHiddenText: '(opens in new tab)'
           }
         ]
       }
