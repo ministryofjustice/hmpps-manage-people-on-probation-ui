@@ -32,7 +32,7 @@ context('Interventions', () => {
     page.getRowData('interventions', 'referralReferenceNumber1', 'Value').should('contain.text', 'AC2495AC')
   })
 
-  it('Upcoming appointments page is rendered with no results', () => {
+  it('Interventions page is rendered with no results', () => {
     cy.task('stubNoInterventions')
     cy.visit('/case/X000001/interventions')
     cy.get('h2').should('contain.text', 'Interventions')
