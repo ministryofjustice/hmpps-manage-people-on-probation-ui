@@ -21,7 +21,7 @@ generic-service:
     DELIUS_LINK: "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io"
     OASYS_LINK: "https://pp-int.oasys.service.justice.gov.uk"
     RECALL_LINK: "https://consider-a-recall-preprod.hmpps.service.justice.gov.uk/"
-    CAS1_LINK: "https://approved-premises.hmpps.service.justice.gov.uk/"
+    CAS1_LINK: "https://approved-premises-preprod.hmpps.service.justice.gov.uk/"
     CAS3_LINK: "https://transitional-accommodation-preprod.hmpps.service.justice.gov.uk/referrals"
     CAVAL_LINK: "https://create-and-vary-a-licence-preprod.hmpps.service.justice.gov.uk"
     EPF2_LINK: "https://epf.linkspace.uk"
