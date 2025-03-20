@@ -113,7 +113,7 @@ context('Risk', () => {
     cy.get('[data-qa="riskFlagGuidanceLink"]')
       .should('contain.text', '(opens in new tab)')
       .find('a')
-      .should('contain.text', 'View guidance on risk flags in the NDelius SharePoint')
+      .should('contain.text', 'View guidance on risk flags in the NDelius SharePoint (opens in new tab)')
       .should('have.attr', 'target', '_blank')
       .should(
         'have.attr',
