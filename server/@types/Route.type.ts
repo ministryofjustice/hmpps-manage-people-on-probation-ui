@@ -17,6 +17,7 @@ interface Locals {
   appointment?: Appointment
   case?: PersonalDetails
   message?: string
+  title?: string
   status?: number
   stack?: boolean | number | string
   flags?: FeatureFlags
