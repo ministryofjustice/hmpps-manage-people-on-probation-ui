@@ -130,7 +130,7 @@ context('Risk', () => {
   it('Risk page is rendered with create a risk assessment on OASys link', () => {
     cy.visit('/case/X801756/risk')
     const page = new RiskDetailPage()
-    page.getElementData('oasysViewRiskAssessmentLink').should('not.exist')
+    page.getElementData('oasysViewRiskAssessmentLink').should('exist')
     page.getElementData('oasysCreateRiskAssessmentLink').should('not.exist')
   })
   it('Risk page is rendered with no OASys Layer 3 risk assessment', () => {

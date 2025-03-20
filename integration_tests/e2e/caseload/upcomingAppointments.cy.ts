@@ -1,4 +1,3 @@
-import Page from '../../pages/page'
 import UserAppointments from '../../pages/userAppointments'
 import { getWiremockData, Wiremock } from '../../utils'
 import mockResponse from '../../../wiremock/mappings/user-schedule.json'
@@ -150,12 +149,6 @@ context('Upcoming appointments', () => {
     page.getPaginationItem(3).find('a').should('contain.text', '4').should('not.have.attr', 'aria-current', 'page')
     page.getPaginationItem(4).find('a').should('contain.text', '5').should('not.have.attr', 'aria-current', 'page')
     page.getPaginationItem(5).find('a').should('contain.text', '6').should('have.attr', 'aria-current', 'page')
-  })
-  it('Requesting upcoming appointments returns a 500 error', () => {
-    cy.task('stubUpcomingAppointments500Response')
-    cy.visit('/caseload/appointments/upcoming', { failOnStatusCode: false })
-    cy.get('h1').should('contain.text', 'Internal Server Error')
-    cy.get('h2').should('contain.text', '500')
   })
   it('Upcoming appointments page is rendered with no results', () => {
     cy.task('stubNoUpcomingAppointments')

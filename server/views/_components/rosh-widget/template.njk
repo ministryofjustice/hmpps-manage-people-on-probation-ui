@@ -41,7 +41,7 @@
     {% endif %}
 {% endmacro %}
 
-{% if roshSummary.overallRisk == 'NOT_FOUND' %}
+{% if not roshSummary.overallRisk or roshSummary.overallRisk == 'NOT_FOUND' %}
     <div class="rosh-widget rosh-widget--unknown">
         <h3 class="govuk-heading-m"><strong>Unknown</strong> RoSH</h3>
         <p class="govuk-body-m">Risk of serious harm<br><span class="govuk-body-s govuk-hint">A RoSH summary has not been completed for this individual. Check OASys for this person's current assessment status.</span></p>
