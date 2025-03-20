@@ -353,7 +353,7 @@
       {% set mappaValue =  '<span class="govuk-!-font-weight-bold">' + mappaCat + mappaLevel + '</span>' %}
       {% endif %}
       {% set overallRosh %}
-      {% if hasRiskAssessment %}
+      {% if hasRiskAssessment and risks.summary.overallRiskLevel %}
       <table><tr>
       <td class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ risks.summary.overallRiskLevel + ' risk of serious harm' | replace('_',' ') | upper }}</td>
       </table>
