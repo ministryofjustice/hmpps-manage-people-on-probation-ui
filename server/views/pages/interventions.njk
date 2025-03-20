@@ -1,5 +1,5 @@
 {% extends "../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: "Interventions" }) %}
+    
 {% set currentNavSection = 'interventions' %}
 {% set currentSectionName = 'Interventions' %}
 {% set headerPersonName = personSummary.name.forename + ' ' + personSummary.name.surname %}
@@ -26,6 +26,9 @@
 {% endblock %}
 
 {% block pageContent %}
+{% if interventions.length === 0 %}
+<p>There may be interventions in place but we cannot yet display them. <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" rel="external noopener noreferrer">Search the contact log on NDelius (opens in new tab)</a>.</p>
+{% else %}
     <h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-8 govuk-!-margin-bottom-5">CRS referrals</h2>
 
     {% set rows = [] %}
@@ -123,4 +126,5 @@
      ],
      rows: rows
    }) }}
+{% endif %}
 {% endblock %}

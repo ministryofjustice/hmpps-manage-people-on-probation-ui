@@ -2,6 +2,9 @@ import Page from '../pages/page'
 import InterventionsPage from '../pages/interventions'
 
 context('Interventions', () => {
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('Interventions page is rendered', () => {
     cy.visit('/case/X000001/interventions')
     const page = Page.verifyOnPage(InterventionsPage)
@@ -27,5 +30,21 @@ context('Interventions', () => {
       .getRowData('interventions', 'referralInterventionTitle1', 'Value')
       .should('contain.text', 'Accommodation Services - North East')
     page.getRowData('interventions', 'referralReferenceNumber1', 'Value').should('contain.text', 'AC2495AC')
+  })
+
+  it('Upcoming appointments page is rendered with no results', () => {
+    cy.task('stubNoInterventions')
+    cy.visit('/case/X000001/interventions')
+    cy.get('h2').should('contain.text', 'Interventions')
+    cy.get('p').should('contain.text', 'There may be interventions in place but we cannot yet display them.')
+    cy.get('p')
+      .find('a')
+      .should('contain.text', 'Search the contact log on NDelius (opens in new tab)')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001',
+      )
+      .should('have.attr', 'target', '_blank')
   })
 })
