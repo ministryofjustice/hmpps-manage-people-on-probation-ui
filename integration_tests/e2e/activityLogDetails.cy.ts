@@ -30,7 +30,11 @@ context('Activity log details', () => {
     page
       .getCardElement('outcomeDetails', '.govuk-summary-list__actions', 0)
       .find('a')
-      .should('have.attr', 'href', '/case/X000001/handoff/delius')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=15',
+      )
     page.getCardElement('outcomeDetails', '.govuk-summary-list__key', 1).should('contain.text', 'Outcome')
     page
       .getCardElement('outcomeDetails', '.govuk-summary-list__value', 1)
