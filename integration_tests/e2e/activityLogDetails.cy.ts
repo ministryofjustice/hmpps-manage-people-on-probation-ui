@@ -78,7 +78,7 @@ context('Activity log details', () => {
       .getCardElement('appointmentDetails', '.govuk-summary-list__value', 2)
       .should('contain.text', '10:15am to 10:30am')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 3).should('contain.text', 'RAR activity')
-    page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 3).should('contain.text', 'Not known')
+    page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 3).should('contain.text', 'Not provided')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 4).should('contain.text', 'Appointment notes')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 4).should('contain.text', 'Some notes')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 5).should('contain.text', 'Sensitive')

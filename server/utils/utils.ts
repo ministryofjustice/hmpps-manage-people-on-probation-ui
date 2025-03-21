@@ -318,7 +318,7 @@ export const getAppointmentsToAction = (appointments: Activity[], type: string):
 }
 
 export const toYesNo = (value: boolean) => {
-  if (value == null) return 'Not known'
+  if (value == null) return 'Not provided'
   if (!value) {
     return 'No'
   }
