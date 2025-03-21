@@ -39,7 +39,9 @@
   {% set hasNotes = adjustment.provisionNotes.length > 0 %}
   {% if hasNotes  %}
     {% for adjustmentNote in adjustment.provisionNotes %}
+    {% if adjustmentNote.note %}
       {% set notes = notes.concat(appNote(adjustmentNote, '/case/' + crn + '/personal-details/adjustments/' + adjustment.id + '/note/' + adjustmentNote.id)) %}
+    {% endif %}
     {% endfor  %}
   {% endif %}
 

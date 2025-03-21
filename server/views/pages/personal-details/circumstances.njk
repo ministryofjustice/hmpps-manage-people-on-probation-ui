@@ -34,7 +34,9 @@
   {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
   {% if hasNotes  %}
     {% for circumstanceNote in circumstance.circumstanceNotes %}
+    {% if circumstanceNote.note %}
       {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
+    {% endif %}
     {% endfor  %}
   {% endif %}
 
@@ -42,29 +44,29 @@
     {{ govukSummaryList({
       rows: [
         {
-          key: { text: "Type" },
-          value: { html: circumstance.type }
+          key: { html: '<span data-qa="typeLabel">Type</span>' },
+          value: { html: '<span data-qa="typeValue">' + circumstance.type + '</span>' }
         },
         {
-          key: { text: "Sub-type" },
-          value: { text: circumstance.subType  }
+          key: { html: '<span data-qa="subTypeLabel">Sub-type</span>' },
+          value: { html: '<span data-qa="subTypeValue">' + circumstance.subType + '</span>' }
         },
         {
-          key: { text: "Start date" },
-          value: { text: circumstance.startDate | dateWithYear }
+          key: { html: '<span data-qa="startDateLabel">Start date</span>' },
+          value: { html: '<span data-qa="startDateValue">' + circumstance.startDate | dateWithYear + '</span>' }
         },
         {
-          key: { text: "Verified?" },
-          value: { text: 'Yes' if circumstance.verified else 'No' }
+          key: { html: '<span data-qa="verifiedLabel">Verified?</span>' },
+          value: { html: '<span data-qa="verifiedValue"> ' + 'Yes' if circumstance.verified else 'No' + '</span>' }
         },
         {
-          key: { text: "Notes" },
-          value: { html: notes if hasNotes else 'No notes' }
+          key: { html: '<span data-qa="notesLabel">Notes</span>' },
+          value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
         }
       ]
     }) }}
 
-    <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
+    <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s" data-qa="lastUpdatedBy">
       {{ lastUpdatedBy(circumstance.lastUpdated, circumstance.lastUpdatedBy)}}
     </p>
   {% endset %}
@@ -73,6 +75,7 @@
     titleHtml: '<span class="govuk-!-font-weight-regular govuk-!-font-size-19">' + circumstance.type + '</span><br />' + circumstance.subType,
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: circumstanceHtml,
+    attributes: {'data-qa': 'personalCircumstancesCard'},
     actions: {}
   }) }}
 {% endfor %}
