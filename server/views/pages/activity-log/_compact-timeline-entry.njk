@@ -1,6 +1,6 @@
 {% set hasOutcomeBeenConfirmed = entry.didTheyComply === true or entry.rescheduled === true %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
-{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and entry.wasAbsent === false and hasAppointmentStartTimePassed %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed  %}
 
 {% set titleHtml %}
   <p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
@@ -9,8 +9,10 @@
         {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
         {{ entry.type }} at&nbsp;{{ entry.startDateTime | govukTime }}
       {% elseif entry.isCommunication %}
+        {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
         {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
       {% else %}
+        {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
         {{ entry.type }}
       {% endif %}
       <span class="govuk-visually-hidden"> on {{ thisDate }}

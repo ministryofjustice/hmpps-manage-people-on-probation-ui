@@ -182,6 +182,9 @@
                 {% if overview.personalDetails.mobileNumber  %}
                     {{ overview.personalDetails.mobileNumber }}<br />
                 {% endif %}
+                {% if not overview.personalDetails.mobileNumber|length and not overview.personalDetails.mobileNumber|length  %}
+                    No contact number
+                {% endif %}
             {% endset %}
         {% endset %}
         {% set circumstances %}
@@ -571,30 +574,6 @@
       attributes: {'data-qa': 'activityAndComplianceCard'},
       classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
       html: activityAndCompliance
-    }) }}
-    {% set miscellaneous %}
-        {% set tier %}
-            {% if tierCalculation.tierScore %}
-                <p>{{ tierCalculation.tierScore }}</p>
-                <p><a href="{{ tierLink(crn) }}" target="_blank" rel="external noopener noreferrer">View all tier information (opens in new tab)</a></p>
-            {% else %}
-                No tier information available
-            {% endif %}
-        {% endset %}
-        {{ govukSummaryList({
-            rows: [
-              {
-                  key: { html: '<span data-qa="tierLabel">Tier<br><span class="govuk-!-font-size-16 govuk-!-font-weight-regular">' + tierCalculation.calculationDate | lastUpdatedDate + '</span></span>' },
-                  value: { html: '<span data-qa="tierValue">' + tier + '</span>' }
-              }
-            ]
-        }) }}
-    {% endset %}
-    {{ appSummaryCard({
-      titleText: 'Miscellaneous',
-      attributes: {'data-qa': 'miscellaneousCard'},
-      classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-      html: miscellaneous
     }) }}
 
     <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">

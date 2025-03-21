@@ -57,7 +57,7 @@
 {% else %}
     <div class="rosh-widget {{ getOverallRiskLevelClass(roshSummary.overallRisk) }}">
         <h3 class="govuk-heading-m" data-qa="overallRiskValue"><strong>{{ getRiskLevelText(roshSummary.overallRisk) }}</strong> RoSH</h3>
-        <p class="govuk-body-m">Risk of serious harm<br><span class="govuk-body-s govuk-hint">Last updated (OASys): {{ roshSummary.assessedOn | dateWithYearShortMonth | default("Not known") }}</span></p>
+        <p class="govuk-body-m">Risk of serious harm<br><span class="govuk-body-s govuk-hint">Last updated (OASys): {{ roshSummary.assessedOn | dateWithYearShortMonth | default("Not provided") }}</span></p>
         <div class="moj-scrollable-pane">
         <table class="govuk-table rosh-widget__table">
             <caption class="govuk-visually-hidden">Risk of serious harm in Community</caption>

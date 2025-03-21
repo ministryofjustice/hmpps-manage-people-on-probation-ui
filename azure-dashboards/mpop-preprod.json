@@ -1,0 +1,988 @@
+{
+  "properties": {
+    "lenses": [
+      {
+        "order": 0,
+        "parts": [
+          {
+            "position": {
+              "x": 0,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "59fa906b-4f35-4c8c-be77-c0761601bab8",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "requests\n| where startofday(timestamp) > startofday(ago(1d))\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| where name in (\"GET /sign-in\")\n| summarize count() by user_Id, bin(timestamp, 1d)\n| order by timestamp desc , count_ desc \n| extend rn=row_number()\n| project rn, user_Id, timestamp, count_\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "user_Id": "102px"
+                  },
+                  "Query": "requests\n| where startofday(timestamp) == startofday(ago(0d))\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| where name in (\"GET /sign-in\")\n| where isnotempty(user_Id)\n| summarize count() by user_Id, bin(timestamp, 1d)\n| order by timestamp desc, count_ desc \n| extend row_number=row_number()\n| project row_number, user_Id, count_\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Unique logins by user today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 0,
+              "colSpan": 6,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "8389362a-cd75-448e-a104-2315f619d12f",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "// average pageView duration by name\nlet timeGrain=5m;\nlet dataset=pageViews\n// additional filters can be applied here\n| where timestamp > startofday(now())\n| where client_Type == \"Browser\" \n| where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\n// calculate average pageView duration for all pageViews\nlet partitionByName=dataset\n| partition hint.strategy=native by name (\n    summarize pageVisits=count() by name\n );\npartitionByName | sort by pageVisits desc  \n| take 30\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "name": "341px"
+                  },
+                  "Query": "let dataset=pageViews\n    // additional filters can be applied here\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet partitionByName=dataset\n    | partition hint.strategy=native by name (\n        summarize pageVisits=count() by name\n        );\npartitionByName\n| sort by pageVisits desc  \n| take 30\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Top 30 page visist today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 5,
+              "colSpan": 6,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/Microsoft.Insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "15c4f28c-1d6b-4978-b33b-3fa6de1f08fd",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let usg_events = dynamic([\"*\"]);\nlet grain = iff(true, 1h, 1h);\nlet mainTable = union pageViews\n    | where timestamp > startofday(ago(1d))\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| make-series Users = dcountif(user_Id, 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))) default = 0 on timestamp from datetime(\"2025-03-19T00:00:00.000Z\") to datetime(\"2025-03-19T20:00:00.000Z\") step grain\n| render columnchart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Users",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "let now=now();\nlet startOfDay=startofday(ago(0d));\nlet usg_events = dynamic([\"*\"]);\nlet grain = 15m;\nlet mainTable = union pageViews\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| make-series Users = dcountif(user_Id, 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))) default = 0 on timestamp from startOfDay to now step grain\n| render columnchart \n\n"
+                }
+              },
+              "partHeader": {
+                "title": "User acces today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 5,
+              "colSpan": 6,
+              "rowSpan": 5
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "2f10e17e-3757-43be-b915-e0107e01ea73",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let usg_events = dynamic([\"*\"]);\nlet mainTable = union pageViews\n    | where timestamp > startofday(ago(0d))\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet queryTable = mainTable;\nlet splitTable =  () {\n    queryTable\n    | extend dimension = column_ifexists('name', '')\n    | extend dimension = iif(isempty(dimension), \"<undefined>\", dimension)\n};\nlet cohortedTable = splitTable\n    | where 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))\n    | extend byDimension = bin(timestamp, 1h)\n    | summarize metricHll = hll(user_Id) by byDimension, dimension;\nlet topSegments = cohortedTable\n    | summarize mergedMetricHll = hll_merge(metricHll) by dimension\n    | project dimension, dcount_user_Id = dcount_hll(mergedMetricHll)\n    | top 5 by dcount_user_Id desc nulls last\n    | summarize makelist(dimension);\ncohortedTable\n| extend dimension = iff(dimension in (topSegments), dimension, \"Other\")\n| project byDimension, dimension, metricHll\n| summarize metric = hll_merge(metricHll) by dimension, byDimension\n| project byDimension, dimension, metric = dcount_hll(metric)\n| render columnchart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "byDimension",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "metric",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "dimension",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "let usg_events = dynamic([\"*\"]);\nlet mainTable = union pageViews\n    | where timestamp > startofday(ago(0d))\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet queryTable = mainTable;\nlet splitTable =  () {\n    queryTable\n    | extend dimension = column_ifexists('name', '')\n    | extend dimension = iif(isempty(dimension), \"<undefined>\", dimension)\n};\nlet cohortedTable = splitTable\n    | where 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))\n    | extend byDimension = bin(timestamp, 15m)\n    | summarize metricHll = hll(user_Id) by byDimension, dimension;\nlet topSegments = cohortedTable\n    | summarize mergedMetricHll = hll_merge(metricHll) by dimension\n    | project dimension, dcount_user_Id = dcount_hll(mergedMetricHll)\n    | top 5 by dcount_user_Id desc nulls last\n    | summarize makelist(dimension);\ncohortedTable\n| extend dimension = iff(dimension in (topSegments), dimension, \"Other\")\n| project byDimension, dimension, metricHll\n| summarize metric = hll_merge(metricHll) by dimension, byDimension\n| project byDimension, dimension, metric = dcount_hll(metric)\n| render columnchart \n\n"
+                }
+              },
+              "partHeader": {
+                "title": "User access by page",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 10,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "991cbd3f-87d8-4fd9-8140-6375965928a3",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "// average pageView duration by name\nlet timeGrain=5m;\nlet dataset=pageViews\n// additional filters can be applied here\n| where timestamp > startofday(now())\n| where client_Type == \"Browser\" \n| where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\n// calculate average pageView duration for all pageViews\ndataset\n| summarize avg(duration) by bin(timestamp, timeGrain)\n| extend pageView='Overall'\n// render result in a chart\n| render timechart\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "Line",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_duration",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "pageView",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "// average pageView duration by name\nlet timeGrain=5m;\nlet dataset=pageViews\n    // additional filters can be applied here\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\n// calculate average pageView duration for all pageViews\ndataset\n| summarize avg(duration/1000) by bin(timestamp, timeGrain)\n| extend pageView='Overall'\n// render result in a chart\n| render timechart\n\n",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "avg_",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [
+                      {
+                        "name": "pageView",
+                        "type": "string"
+                      }
+                    ],
+                    "aggregation": "Sum"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "average page loading duration in seconds",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 10,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "35fd7f23-a871-467b-9158-c77da116f02e",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n| order by duration desc \n| take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project operation_Name,  durationInSeconds, timestamp, performanceBucket\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "operation_Name": "206px"
+                  }
+                }
+              },
+              "partHeader": {
+                "title": "Top 100 slowest page loads today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 14,
+              "colSpan": 6,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "14457e1a-3cb1-46ea-8616-5e34064ea34c",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n| order by duration asc\n| take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project operation_Name,  durationInSeconds, timestamp, performanceBucket\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {},
+              "partHeader": {
+                "title": "Top 100 fastest page loads today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 6,
+              "y": 14,
+              "colSpan": 2,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "value": {
+                    "SubscriptionId": "a5ddf257-3b21-4ba9-a28c-ab30f751b383",
+                    "ResourceGroup": "nomisapi-preprod-rg",
+                    "Name": "nomisapi-preprod",
+                    "LinkedApplicationType": 0,
+                    "ResourceId": "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/Microsoft.Insights/components/nomisapi-preprod",
+                    "ResourceType": "microsoft.insights/components",
+                    "IsAzureFirst": false
+                  }
+                },
+                {
+                  "name": "ResourceIds",
+                  "value": [
+                    "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/Microsoft.Insights/components/nomisapi-preprod"
+                  ],
+                  "isOptional": true
+                },
+                {
+                  "name": "Type",
+                  "value": "workbook",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeContext",
+                  "isOptional": true
+                },
+                {
+                  "name": "ConfigurationId",
+                  "value": "community-Workbooks/Usage/User Retention Analysis",
+                  "isOptional": true
+                },
+                {
+                  "name": "ViewerMode",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "GalleryResourceType",
+                  "value": "microsoft.insights/components",
+                  "isOptional": true
+                },
+                {
+                  "name": "NotebookParams",
+                  "value": "{\"TimeRange\":\"7d\",\"WhoUsed\":\"pageViews,customEvents\",\"UserEvents\":[\"value::all\"],\"ReturnWhoUsed\":\"pageViews,customEvents\",\"ReturnUserEvents\":[\"value::all\"],\"ExtendColumn\":\"| project cohort, cohort_Num, total, a = column_ifexists('0', 0), b = column_ifexists('1', 0), c = column_ifexists('2', 0), d = column_ifexists('3', 0), e = column_ifexists('4', 0), f = column_ifexists('5', 0), g = column_ifexists('6', 0), h = column_ifexists('7', 0)\",\"TotalCalc\":\"| summarize ['<1d'] = sum(a), ['1d'] = sum(b), ['2d'] = sum(c), ['3d'] = sum(d), ['4d'] = sum(e), ['5d'] = sum(f), ['6d'] = sum(g), ['7d'] = sum(h)\",\"GridCellsCalc\":\"| summarize cohort_Num=avg(cohort_Num), total =tolong(avg(total)), a = sum(a), b = sum(b), c = sum(c), d = sum(d), e = sum(e), f = sum(f), g = sum(g), h = sum(h) by cohort | project cohort, total, ['<1d'] = a, ['1d'] = iff(cohort_Num < 7, b, long(null)), ['2d']= iff(cohort_Num < 6, c, long(null)), ['3d'] = iff(cohort_Num < 5, d, long(null)), ['4d'] = iff(cohort_Num < 4, e, long(null)), ['5d'] = iff(cohort_Num < 3,f, long(null)), ['6d'] = iff(cohort_Num < 2, g, long(null)), ['7d'] = iff(cohort_Num < 1, h, long(null))\",\"TotalRateCalc\":\"| project ['<1d'] = toreal(['<1d'])*100/column_ifexists('0',0) , ['1d'] = toreal(['1d'])*100/column_ifexists('1',0), ['2d'] = toreal(['2d'])*100/column_ifexists('2',0), ['3d'] = toreal(['3d'])*100/column_ifexists('3',0), ['4d'] = toreal(['4d'])*100/column_ifexists('4',0), ['5d'] = toreal(['5d'])*100/column_ifexists('5',0), ['6d'] = toreal(['6d'])*100/column_ifexists('6',0), ['7d'] = toreal(['7d'])*100/column_ifexists('7',0)\",\"CellRateCalc\":\"| project cohort, total, ['<1d'] = toreal(['<1d'])*100/total , ['1d'] = iff(isnull(['1d']), real(null), toreal(['1d'])*100/total), ['2d'] = iff(isnull(['2d']), real(null), toreal(['2d'])*100/total), ['3d'] = iff(isnull(['3d']), real(null), toreal(['3d'])*100/total), ['4d'] = iff(isnull(['4d']), real(null), toreal(['4d'])*100/total), ['5d'] = iff(isnull(['5d']), real(null), toreal(['5d'])*100/total), ['6d'] = iff(isnull(['6d']), real(null), toreal(['6d'])*100/total), ['7d'] = iff(isnull(['1d']), real(null), toreal(['7d'])*100/total)\",\"overallText\":\"(Days Over Last Week)\",\"EnableFilter1\":\"1\",\"ishiddenFilter\":\"0\",\"usageStandardDimension\":\"['application_Version','Application version','Standard Properties', 'user_AuthenticatedId','Authenticated user Id','Standard Properties', 'client_Browser','Browser version','Standard Properties', 'client_City','City','Standard Properties', 'cloud_RoleInstance','Cloud role instance','Standard Properties', 'cloud_RoleName','Cloud role name','Standard Properties', 'client_CountryOrRegion','Country or region','Standard Properties', 'client_Model','Device model','Standard Properties', 'client_Type','Device type','Standard Properties', 'name','Name','Standard Properties', 'client_OS','Operating system','Standard Properties', 'operation_Name','Operation name','Standard Properties', 'performanceBucket','Performance','Standard Properties', 'operation_SyntheticSource','Source of synthetic traffic','Standard Properties', 'client_StateOrProvince','State or province','Standard Properties', 'url','Url','Standard Properties', 'Host','Url host','Standard Properties', 'Path','Url path','Standard Properties']\",\"getCustomDimensions\":\"['customDimensions[\\\"1\\\"]','1','Custom Properties', 'customDimensions[\\\"10\\\"]','10','Custom Properties', 'customDimensions[\\\"2\\\"]','2','Custom Properties', 'customDimensions[\\\"3\\\"]','3','Custom Properties', 'customDimensions[\\\"4\\\"]','4','Custom Properties', 'customDimensions[\\\"5\\\"]','5','Custom Properties', 'customDimensions[\\\"6\\\"]','6','Custom Properties', 'customDimensions[\\\"7\\\"]','7','Custom Properties', 'customDimensions[\\\"8\\\"]','8','Custom Properties', 'customDimensions[\\\"9\\\"]','9','Custom Properties', 'customDimensions[\\\"A0022EA\\\"]','A0022EA','Custom Properties', 'customDimensions[\\\"A0023EA\\\"]','A0023EA','Custom Properties', 'customDimensions[\\\"A0027EA\\\"]','A0027EA','Custom Properties', 'customDimensions[\\\"A0056EA\\\"]','A0056EA','Custom Properties', 'customDimensions[\\\"A0532EA\\\"]','A0532EA','Custom Properties', 'customDimensions[\\\"A0947DZ\\\"]','A0947DZ','Custom Properties', 'customDimensions[\\\"A1183DZ\\\"]','A1183DZ','Custom Properties', 'customDimensions[\\\"A1315DZ\\\"]','A1315DZ','Custom Properties', 'customDimensions[\\\"A3840DZ\\\"]','A3840DZ','Custom Properties', 'customDimensions[\\\"A4570EA\\\"]','A4570EA','Custom Properties', 'customDimensions[\\\"A5201DY\\\"]','A5201DY','Custom Properties', 'customDimensions[\\\"A6764DZ\\\"]','A6764DZ','Custom Properties', 'customDimensions[\\\"A7442DZ\\\"]','A7442DZ','Custom Properties', 'customDimensions[\\\"A7780DY\\\"]','A7780DY','Custom Properties', 'customDimensions[\\\"A7844DY\\\"]','A7844DY','Custom Properties', 'customDimensions[\\\"A7862DY\\\"]','A7862DY','Custom Properties', 'customDimensions[\\\"A7937DY\\\"]','A7937DY','Custom Properties', 'customDimensions[\\\"A8111DY\\\"]','A8111DY','Custom Properties', 'customDimensions[\\\"A8154DY\\\"]','A8154DY','Custom Properties', 'customDimensions[\\\"A8174DY\\\"]','A8174DY','Custom Properties', 'customDimensions[\\\"A8202DY\\\"]','A8202DY','Custom Properties', 'customDimensions[\\\"A8205DY\\\"]','A8205DY','Custom Properties', 'customDimensions[\\\"A8290DY\\\"]','A8290DY','Custom Properties', 'customDimensions[\\\"A8576DY\\\"]','A8576DY','Custom Properties', 'customDimensions[\\\"A8596DY\\\"]','A8596DY','Custom Properties', 'customDimensions[\\\"A8610DY\\\"]','A8610DY','Custom Properties', 'customDimensions[\\\"A8731DY\\\"]','A8731DY','Custom Properties', 'customDimensions[\\\"A8830DZ\\\"]','A8830DZ','Custom Properties', 'customDimensions[\\\"A9527DZ\\\"]','A9527DZ','Custom Properties', 'customDimensions[\\\"A9740DY\\\"]','A9740DY','Custom Properties', 'customDimensions[\\\"A9809DZ\\\"]','A9809DZ','Custom Properties', 'customDimensions[\\\"A9873DZ\\\"]','A9873DZ','Custom Properties', 'customDimensions[\\\"ACR\\\"]','ACR','Custom Properties', 'customDimensions[\\\"_MS.ResourceAttributeId\\\"]','_MS.ResourceAttributeId','Custom Properties', 'customDimensions[\\\"action\\\"]','action','Custom Properties', 'customDimensions[\\\"actionType\\\"]','actionType','Custom Properties', 'customDimensions[\\\"actionedBy\\\"]','actionedBy','Custom Properties', 'customDimensions[\\\"active-prisoners\\\"]','active-prisoners','Custom Properties', 'customDimensions[\\\"activeCaseLoad\\\"]','activeCaseLoad','Custom Properties', 'customDimensions[\\\"activeCaseLoadId\\\"]','activeCaseLoadId','Custom Properties', 'customDimensions[\\\"activeFrom\\\"]','activeFrom','Custom Properties', 'customDimensions[\\\"activeKeyWorkerAllocations\\\"]','activeKeyWorkerAllocations','Custom Properties', 'customDimensions[\\\"activeOnly\\\"]','activeOnly','Custom Properties', 'customDimensions[\\\"activeTo\\\"]','activeTo','Custom Properties', 'customDimensions[\\\"activityCategory\\\"]','activityCategory','Custom Properties', 'customDimensions[\\\"activityDescription\\\"]','activityDescription','Custom Properties', 'customDimensions[\\\"activityId\\\"]','activityId','Custom Properties', 'customDimensions[\\\"activityName\\\"]','activityName','Custom Properties', 'customDimensions[\\\"activityScheduleId\\\"]','activityScheduleId','Custom Properties', 'customDimensions[\\\"activitySummary\\\"]','activitySummary','Custom Properties', 'customDimensions[\\\"actorUserId\\\"]','actorUserId','Custom Properties', 'customDimensions[\\\"actorUserName\\\"]','actorUserName','Custom Properties', 'customDimensions[\\\"additionalConditions\\\"]','additionalConditions','Custom Properties', 'customDimensions[\\\"additionalInformation\\\"]','additionalInformation','Custom Properties', 'customDimensions[\\\"additionalInformation.AssessmentDate\\\"]','additionalInformation.AssessmentDate','Custom Properties', 'customDimensions[\\\"additionalInformation.activityScheduleId\\\"]','additionalInformation.activityScheduleId','Custom Properties', 'customDimensions[\\\"additionalInformation.addressId\\\"]','additionalInformation.addressId','Custom Properties', 'customDimensions[\\\"additionalInformation.addressStatus\\\"]','additionalInformation.addressStatus','Custom Properties', 'customDimensions[\\\"additionalInformation.agencyLocationId\\\"]','additionalInformation.agencyLocationId','Custom Properties', 'customDimensions[\\\"additionalInformation.alertCode\\\"]','additionalInformation.alertCode','Custom Properties', 'customDimensions[\\\"additionalInformation.alertUuid\\\"]','additionalInformation.alertUuid','Custom Properties', 'customDimensions[\\\"additionalInformation.alertsAdded\\\"]','additionalInformation.alertsAdded','Custom Properties', 'customDimensions[\\\"additionalInformation.alertsRemoved\\\"]','additionalInformation.alertsRemoved','Custom Properties', 'customDimensions[\\\"additionalInformation.allocationId\\\"]','additionalInformation.allocationId','Custom Properties', 'customDimensions[\\\"additionalInformation.applicationId\\\"]','additionalInformation.applicationId','Custom Properties', 'customDimensions[\\\"additionalInformation.appointmentId\\\"]','additionalInformation.appointmentId','Custom Properties', 'customDimensions[\\\"additionalInformation.appointmentInstanceId\\\"]','additionalInformation.appointmentInstanceId','Custom Properties', 'customDimensions[\\\"additionalInformation.approvedVisitor\\\"]','additionalInformation.approvedVisitor','Custom Properties', 'customDimensions[\\\"additionalInformation.assignedTo\\\"]','additionalInformation.assignedTo','Custom Properties', 'customDimensions[\\\"additionalInformation.attendanceId\\\"]','additionalInformation.attendanceId','Custom Properties', 'customDimensions[\\\"additionalInformation.authorisedById\\\"]','additionalInformation.authorisedById','Custom Properties', 'customDimensions[\\\"additionalInformation.bedAssignmentSeq\\\"]','additionalInformation.bedAssignmentSeq','Custom Properties', 'customDimensions[\\\"additionalInformation.bookedBy\\\"]','additionalInformation.bookedBy','Custom Properties', 'customDimensions[\\\"additionalInformation.bookingId\\\"]','additionalInformation.bookingId','Custom Properties', 'customDimensions[\\\"additionalInformation.bookingNumber\\\"]','additionalInformation.bookingNumber','Custom Properties', 'customDimensions[\\\"additionalInformation.calculationId\\\"]','additionalInformation.calculationId','Custom Properties', 'customDimensions[\\\"additionalInformation.caseNoteId\\\"]','additionalInformation.caseNoteId','Custom Properties', 'customDimensions[\\\"additionalInformation.caseNoteType\\\"]','additionalInformation.caseNoteType','Custom Properties', 'customDimensions[\\\"additionalInformation.categoriesChanged\\\"]','additionalInformation.categoriesChanged','Custom Properties', 'customDimensions[\\\"additionalInformation.chargeNumber\\\"]','additionalInformation.chargeNumber','Custom Properties', 'customDimensions[\\\"additionalInformation.contactAddressId\\\"]','additionalInformation.contactAddressId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactAddressPhoneId\\\"]','additionalInformation.contactAddressPhoneId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactEmailId\\\"]','additionalInformation.contactEmailId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactId\\\"]','additionalInformation.contactId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactIdentityId\\\"]','additionalInformation.contactIdentityId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactOutcome\\\"]','additionalInformation.contactOutcome','Custom Properties', 'customDimensions[\\\"additionalInformation.contactPersonId\\\"]','additionalInformation.contactPersonId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactPhoneId\\\"]','additionalInformation.contactPhoneId','Custom Properties', 'customDimensions[\\\"additionalInformation.convictedStatus\\\"]','additionalInformation.convictedStatus','Custom Properties', 'customDimensions[\\\"usage_colkeys\\\"]','usage_colkeys','Custom Properties']\",\"formattedCustomDimensions\":\"['customDimensions[\\\"1\\\"]','1','Custom Properties', 'customDimensions[\\\"10\\\"]','10','Custom Properties', 'customDimensions[\\\"2\\\"]','2','Custom Properties', 'customDimensions[\\\"3\\\"]','3','Custom Properties', 'customDimensions[\\\"4\\\"]','4','Custom Properties', 'customDimensions[\\\"5\\\"]','5','Custom Properties', 'customDimensions[\\\"6\\\"]','6','Custom Properties', 'customDimensions[\\\"7\\\"]','7','Custom Properties', 'customDimensions[\\\"8\\\"]','8','Custom Properties', 'customDimensions[\\\"9\\\"]','9','Custom Properties', 'customDimensions[\\\"A0022EA\\\"]','A0022EA','Custom Properties', 'customDimensions[\\\"A0023EA\\\"]','A0023EA','Custom Properties', 'customDimensions[\\\"A0027EA\\\"]','A0027EA','Custom Properties', 'customDimensions[\\\"A0056EA\\\"]','A0056EA','Custom Properties', 'customDimensions[\\\"A0532EA\\\"]','A0532EA','Custom Properties', 'customDimensions[\\\"A0947DZ\\\"]','A0947DZ','Custom Properties', 'customDimensions[\\\"A1183DZ\\\"]','A1183DZ','Custom Properties', 'customDimensions[\\\"A1315DZ\\\"]','A1315DZ','Custom Properties', 'customDimensions[\\\"A3840DZ\\\"]','A3840DZ','Custom Properties', 'customDimensions[\\\"A4570EA\\\"]','A4570EA','Custom Properties', 'customDimensions[\\\"A5201DY\\\"]','A5201DY','Custom Properties', 'customDimensions[\\\"A6764DZ\\\"]','A6764DZ','Custom Properties', 'customDimensions[\\\"A7442DZ\\\"]','A7442DZ','Custom Properties', 'customDimensions[\\\"A7780DY\\\"]','A7780DY','Custom Properties', 'customDimensions[\\\"A7844DY\\\"]','A7844DY','Custom Properties', 'customDimensions[\\\"A7862DY\\\"]','A7862DY','Custom Properties', 'customDimensions[\\\"A7937DY\\\"]','A7937DY','Custom Properties', 'customDimensions[\\\"A8111DY\\\"]','A8111DY','Custom Properties', 'customDimensions[\\\"A8154DY\\\"]','A8154DY','Custom Properties', 'customDimensions[\\\"A8174DY\\\"]','A8174DY','Custom Properties', 'customDimensions[\\\"A8202DY\\\"]','A8202DY','Custom Properties', 'customDimensions[\\\"A8205DY\\\"]','A8205DY','Custom Properties', 'customDimensions[\\\"A8290DY\\\"]','A8290DY','Custom Properties', 'customDimensions[\\\"A8576DY\\\"]','A8576DY','Custom Properties', 'customDimensions[\\\"A8596DY\\\"]','A8596DY','Custom Properties', 'customDimensions[\\\"A8610DY\\\"]','A8610DY','Custom Properties', 'customDimensions[\\\"A8731DY\\\"]','A8731DY','Custom Properties', 'customDimensions[\\\"A8830DZ\\\"]','A8830DZ','Custom Properties', 'customDimensions[\\\"A9527DZ\\\"]','A9527DZ','Custom Properties', 'customDimensions[\\\"A9740DY\\\"]','A9740DY','Custom Properties', 'customDimensions[\\\"A9809DZ\\\"]','A9809DZ','Custom Properties', 'customDimensions[\\\"A9873DZ\\\"]','A9873DZ','Custom Properties', 'customDimensions[\\\"ACR\\\"]','ACR','Custom Properties', 'customDimensions[\\\"_MS.ResourceAttributeId\\\"]','_MS.ResourceAttributeId','Custom Properties', 'customDimensions[\\\"action\\\"]','action','Custom Properties', 'customDimensions[\\\"actionType\\\"]','actionType','Custom Properties', 'customDimensions[\\\"actionedBy\\\"]','actionedBy','Custom Properties', 'customDimensions[\\\"active-prisoners\\\"]','active-prisoners','Custom Properties', 'customDimensions[\\\"activeCaseLoad\\\"]','activeCaseLoad','Custom Properties', 'customDimensions[\\\"activeCaseLoadId\\\"]','activeCaseLoadId','Custom Properties', 'customDimensions[\\\"activeFrom\\\"]','activeFrom','Custom Properties', 'customDimensions[\\\"activeKeyWorkerAllocations\\\"]','activeKeyWorkerAllocations','Custom Properties', 'customDimensions[\\\"activeOnly\\\"]','activeOnly','Custom Properties', 'customDimensions[\\\"activeTo\\\"]','activeTo','Custom Properties', 'customDimensions[\\\"activityCategory\\\"]','activityCategory','Custom Properties', 'customDimensions[\\\"activityDescription\\\"]','activityDescription','Custom Properties', 'customDimensions[\\\"activityId\\\"]','activityId','Custom Properties', 'customDimensions[\\\"activityName\\\"]','activityName','Custom Properties', 'customDimensions[\\\"activityScheduleId\\\"]','activityScheduleId','Custom Properties', 'customDimensions[\\\"activitySummary\\\"]','activitySummary','Custom Properties', 'customDimensions[\\\"actorUserId\\\"]','actorUserId','Custom Properties', 'customDimensions[\\\"actorUserName\\\"]','actorUserName','Custom Properties', 'customDimensions[\\\"additionalConditions\\\"]','additionalConditions','Custom Properties', 'customDimensions[\\\"additionalInformation\\\"]','additionalInformation','Custom Properties', 'customDimensions[\\\"additionalInformation.AssessmentDate\\\"]','additionalInformation.AssessmentDate','Custom Properties', 'customDimensions[\\\"additionalInformation.activityScheduleId\\\"]','additionalInformation.activityScheduleId','Custom Properties', 'customDimensions[\\\"additionalInformation.addressId\\\"]','additionalInformation.addressId','Custom Properties', 'customDimensions[\\\"additionalInformation.addressStatus\\\"]','additionalInformation.addressStatus','Custom Properties', 'customDimensions[\\\"additionalInformation.agencyLocationId\\\"]','additionalInformation.agencyLocationId','Custom Properties', 'customDimensions[\\\"additionalInformation.alertCode\\\"]','additionalInformation.alertCode','Custom Properties', 'customDimensions[\\\"additionalInformation.alertUuid\\\"]','additionalInformation.alertUuid','Custom Properties', 'customDimensions[\\\"additionalInformation.alertsAdded\\\"]','additionalInformation.alertsAdded','Custom Properties', 'customDimensions[\\\"additionalInformation.alertsRemoved\\\"]','additionalInformation.alertsRemoved','Custom Properties', 'customDimensions[\\\"additionalInformation.allocationId\\\"]','additionalInformation.allocationId','Custom Properties', 'customDimensions[\\\"additionalInformation.applicationId\\\"]','additionalInformation.applicationId','Custom Properties', 'customDimensions[\\\"additionalInformation.appointmentId\\\"]','additionalInformation.appointmentId','Custom Properties', 'customDimensions[\\\"additionalInformation.appointmentInstanceId\\\"]','additionalInformation.appointmentInstanceId','Custom Properties', 'customDimensions[\\\"additionalInformation.approvedVisitor\\\"]','additionalInformation.approvedVisitor','Custom Properties', 'customDimensions[\\\"additionalInformation.assignedTo\\\"]','additionalInformation.assignedTo','Custom Properties', 'customDimensions[\\\"additionalInformation.attendanceId\\\"]','additionalInformation.attendanceId','Custom Properties', 'customDimensions[\\\"additionalInformation.authorisedById\\\"]','additionalInformation.authorisedById','Custom Properties', 'customDimensions[\\\"additionalInformation.bedAssignmentSeq\\\"]','additionalInformation.bedAssignmentSeq','Custom Properties', 'customDimensions[\\\"additionalInformation.bookedBy\\\"]','additionalInformation.bookedBy','Custom Properties', 'customDimensions[\\\"additionalInformation.bookingId\\\"]','additionalInformation.bookingId','Custom Properties', 'customDimensions[\\\"additionalInformation.bookingNumber\\\"]','additionalInformation.bookingNumber','Custom Properties', 'customDimensions[\\\"additionalInformation.calculationId\\\"]','additionalInformation.calculationId','Custom Properties', 'customDimensions[\\\"additionalInformation.caseNoteId\\\"]','additionalInformation.caseNoteId','Custom Properties', 'customDimensions[\\\"additionalInformation.caseNoteType\\\"]','additionalInformation.caseNoteType','Custom Properties', 'customDimensions[\\\"additionalInformation.categoriesChanged\\\"]','additionalInformation.categoriesChanged','Custom Properties', 'customDimensions[\\\"additionalInformation.chargeNumber\\\"]','additionalInformation.chargeNumber','Custom Properties', 'customDimensions[\\\"additionalInformation.contactAddressId\\\"]','additionalInformation.contactAddressId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactAddressPhoneId\\\"]','additionalInformation.contactAddressPhoneId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactEmailId\\\"]','additionalInformation.contactEmailId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactId\\\"]','additionalInformation.contactId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactIdentityId\\\"]','additionalInformation.contactIdentityId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactOutcome\\\"]','additionalInformation.contactOutcome','Custom Properties', 'customDimensions[\\\"additionalInformation.contactPersonId\\\"]','additionalInformation.contactPersonId','Custom Properties', 'customDimensions[\\\"additionalInformation.contactPhoneId\\\"]','additionalInformation.contactPhoneId','Custom Properties', 'customDimensions[\\\"additionalInformation.convictedStatus\\\"]','additionalInformation.convictedStatus','Custom Properties', 'customDimensions[\\\"usage_colkeys\\\"]','usage_colkeys','Custom Properties']\",\"commonFilterDimensions\":\"['user_AccountId', 'Account Id',  'Standard Properties', 'operation_Id', 'Operation Id', 'Standard Properties', 'session_Id', 'Session Id',  'Standard Properties', 'user_Id', 'User Id', 'Standard Properties']\",\"FilterDimension1\":\"cloud_RoleName\",\"FilterOperator1\":\"==\",\"FilterValues1text\":\"hmpps-manage-people-on-probation-ui\",\"FilterDimension1s\":\"cloud_RoleName\",\"isFilter1Completed\":\"1\",\"FilterValues1\":\"\\\"hmpps-manage-people-on-probation-ui\\\"\",\"filter1Query\":\"cloud_RoleName == \\\"hmpps-manage-people-on-probation-ui\\\"\",\"FilterDimension2\":null,\"FilterOperator2\":\"==\",\"FilterValues2text\":\"\",\"isFilter2Completed\":\"2\",\"FilterValues2\":\"\\\"\\\"\",\"filter2Query\":\"true\",\"FilterDimension3\":null,\"FilterOperator3\":\"==\",\"FilterValues3text\":\"\",\"isFilter3Completed\":\"2\",\"FilterValues3\":\"\\\"\\\"\",\"filter3Query\":\"true\",\"filters\":\"| where cloud_RoleName == \\\"hmpps-manage-people-on-probation-ui\\\" \",\"ChartType\":\"linechart\",\"DataType\":\"Percentage\",\"MetadataType\":\"7dr\",\"PivotColumn\":\"| evaluate pivot(_bucket, sum(retention))\",\"ColumnsList\":\"| project Cohort = cohort, Users = total, ['<1d'], ['1d'], ['2d'], ['3d'], ['4d'], ['5d'], ['6d'], ['7d']\",\"timeUnit\":\"day\"}",
+                  "isOptional": true
+                },
+                {
+                  "name": "Location",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "1.0",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/AppInsightsExtension/PartType/NotebookPinnedPart",
+              "viewState": {
+                "content": {
+                  "configurationId": "community-Workbooks/Usage/User Retention Analysis"
+                }
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 8,
+              "y": 14,
+              "colSpan": 2,
+              "rowSpan": 2
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "ComponentId",
+                  "value": {
+                    "SubscriptionId": "a5ddf257-3b21-4ba9-a28c-ab30f751b383",
+                    "ResourceGroup": "nomisapi-preprod-rg",
+                    "Name": "nomisapi-preprod",
+                    "LinkedApplicationType": 0,
+                    "ResourceId": "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/Microsoft.Insights/components/nomisapi-preprod",
+                    "ResourceType": "microsoft.insights/components",
+                    "IsAzureFirst": false
+                  }
+                },
+                {
+                  "name": "ResourceIds",
+                  "value": [
+                    "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/Microsoft.Insights/components/nomisapi-preprod"
+                  ],
+                  "isOptional": true
+                },
+                {
+                  "name": "Type",
+                  "value": "workbook",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeContext",
+                  "isOptional": true
+                },
+                {
+                  "name": "ConfigurationId",
+                  "value": "community-Workbooks/Usage/Usage by hours of the day",
+                  "isOptional": true
+                },
+                {
+                  "name": "ViewerMode",
+                  "value": false,
+                  "isOptional": true
+                },
+                {
+                  "name": "GalleryResourceType",
+                  "value": "microsoft.insights/components",
+                  "isOptional": true
+                },
+                {
+                  "name": "NotebookParams",
+                  "value": "{\"Activities\":[\"Manage people on probation\"],\"TimeRange\":{\"durationMs\":1209600000},\"Metric\":\"Metric = dcount(user_Id)\",\"ExcludeWeekends\":\"Yes\"}",
+                  "isOptional": true
+                },
+                {
+                  "name": "Location",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "1.0",
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/AppInsightsExtension/PartType/NotebookPinnedPart",
+              "viewState": {
+                "content": {
+                  "configurationId": "community-Workbooks/Usage/Usage by hours of the day"
+                }
+              },
+              "partHeader": {
+                "title": "Usage through the day by root url",
+                "subtitle": ""
+              }
+            }
+          }
+        ]
+      }
+    ],
+    "metadata": {
+      "model": {
+        "timeRange": {
+          "value": {
+            "relative": {
+              "duration": 24,
+              "timeUnit": 1
+            }
+          },
+          "type": "MsPortalFx.Composition.Configuration.ValueTypes.TimeRange"
+        },
+        "filterLocale": {
+          "value": "en-us"
+        },
+        "filters": {
+          "value": {
+            "MsPortalFx_TimeRange": {
+              "model": {
+                "format": "utc",
+                "granularity": "auto",
+                "relative": "24h"
+              },
+              "displayCache": {
+                "name": "UTC Time",
+                "value": "Past 24 hours"
+              },
+              "filteredPartIds": [
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8187",
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8189",
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d818b",
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d818d",
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d818f",
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8191",
+                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8197"
+              ]
+            }
+          }
+        }
+      }
+    }
+  },
+  "name": "mpop - preprod",
+  "type": "Microsoft.Portal/dashboards",
+  "location": "INSERT LOCATION",
+  "tags": {
+    "hidden-title": "mpop - preprod"
+  },
+  "apiVersion": "2022-12-01-preview"
+}

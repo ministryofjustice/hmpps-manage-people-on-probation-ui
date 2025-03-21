@@ -171,11 +171,11 @@
              },
              head: [
                {
-                 html: "Name</br>CRN",
+                 html: "Name / CRN",
                  attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'action': 'case'}
                },
                {
-                 html: "Date of birth</br>Age",
+                 html: "DOB / Age",
                  attributes: {'aria-sort': setSortOrder('dob', caseload.sortedBy) , 'col-name': 'dob', 'data-qa': 'dob', 'action': 'case' },
                  classes: "nowrap"
                },
@@ -241,7 +241,7 @@
             {% if hasStaff === false %}
                 <p>You do not have an NDelius staff record. Please contact the NDelius team</p>
             {% else %}
-                <p>You have not been allocated to any cases</p>
+                <p>You have not been allocated any cases.</p>
             {% endif %}
         {% endif %}
         <p><a href="/search">Find a person on probation</a></br>

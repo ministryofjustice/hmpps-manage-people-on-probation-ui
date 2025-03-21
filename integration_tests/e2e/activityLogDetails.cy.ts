@@ -30,7 +30,11 @@ context('Activity log details', () => {
     page
       .getCardElement('outcomeDetails', '.govuk-summary-list__actions', 0)
       .find('a')
-      .should('have.attr', 'href', '/case/X000001/handoff/delius')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=15',
+      )
     page.getCardElement('outcomeDetails', '.govuk-summary-list__key', 1).should('contain.text', 'Outcome')
     page
       .getCardElement('outcomeDetails', '.govuk-summary-list__value', 1)
@@ -74,7 +78,7 @@ context('Activity log details', () => {
       .getCardElement('appointmentDetails', '.govuk-summary-list__value', 2)
       .should('contain.text', '10:15am to 10:30am')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 3).should('contain.text', 'RAR activity')
-    page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 3).should('contain.text', 'Not known')
+    page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 3).should('contain.text', 'Not provided')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 4).should('contain.text', 'Appointment notes')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 4).should('contain.text', 'Some notes')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 5).should('contain.text', 'Sensitive')

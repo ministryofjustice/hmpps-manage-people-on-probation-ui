@@ -30,9 +30,9 @@
     {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-one-quarter">
-          {% set items = [] %}
-          {% set eventNumber = sentenceDetails.sentence.offenceDetails.eventNumber %}
-          {% if sentenceDetails.sentenceSummaryList.length %}
+      {% set items = [] %}
+      {% set eventNumber = sentenceDetails.sentence.offenceDetails.eventNumber %}
+      {% if sentenceDetails.sentenceSummaryList.length > 0 %}
           {% for sentence in sentenceDetails.sentenceSummaryList %}
             {% set isActive = sentence.eventNumber === eventNumber %}
             {% set items = items.concat(
@@ -44,7 +44,7 @@
                 )
             %}
           {% endfor %}
-          {% else %}
+      {% else %}
            {% set items = items.concat(
                     {
                         "text": 'No active sentence',
@@ -53,15 +53,15 @@
                     }
                 )
             %}
-{% endif %}
-          {% set items = items.concat({"text": "Probation history", href: "/case/" + crn + "/sentence/probation-history"}) %}
+      {% endif %}
+      {% set items = items.concat({"text": "Probation history", href: "/case/" + crn + "/sentence/probation-history"}) %}
 
-          {{ mojSideNavigation({
-              label: 'Side navigation',
-              items: items,
-              classes: 'govuk-!-padding-top-0'
-            }) }}
-      </div>
+      {{ mojSideNavigation({
+          label: 'Side navigation',
+          items: items,
+          classes: 'govuk-!-padding-top-0'
+        }) }}
+  </div>
       <div class="govuk-grid-column-three-quarters">
           {% set sentence = sentenceDetails.sentence %}
           {% if sentence %}
