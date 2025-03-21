@@ -74,7 +74,8 @@
               "caseName": { "surname": "Morrison", "forename": "Stuart" },
               "crn": "X000001",
               "type": "Home visit",
-              "startDateTime": "2025-03-04T11:30:00Z"
+              "startDateTime": "2025-03-04T11:30:00Z",
+              "endDateTime": "2025-03-04T12:00:00Z"
             },
             {
               "id": 1,
@@ -88,7 +89,8 @@
               "caseName": { "surname": "Weissnat", "forename": "Briana" },
               "crn": "X000001",
               "type": "Planned office visit",
-              "startDateTime": "2025-03-02T11:30:00Z"
+              "startDateTime": "2025-03-02T11:30:00Z",
+              "endDateTime": "2025-03-02T12:00:00Z"
             },
             {
               "id": 3,
@@ -102,7 +104,8 @@
               "caseName": { "surname": "Bradtke", "forename": "Ethan" },
               "crn": "X000001",
               "type": "Sentence Plan Review",
-              "startDateTime": "2025-02-28T11:30:00Z"
+              "startDateTime": "2025-02-28T11:30:00Z",
+              "endDateTime": "2025-02-28T12:00:00Z"
             }
           ]
         },

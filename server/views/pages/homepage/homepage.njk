@@ -75,7 +75,7 @@
     items: [
       {
         heading: {
-            text: "Today's appointments (" + totalAppointments + ")"
+            html: 'My upcoming appointments<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a'
         },
         content: {
             html: appointmentsTable
@@ -92,7 +92,7 @@
     items: [
       {
         heading: {
-            text: "Outcomes to log (" + totalOutcomes + ")"
+            html: 'Outcomes to log (' + totalOutcomes + ')<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>'
         },
         content: {
             html: outcomesTable
