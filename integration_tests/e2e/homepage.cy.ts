@@ -12,7 +12,7 @@ context('Sign In', () => {
     const page = Page.verifyOnPage(IndexPage)
 
     page.getAppointments().should('exist')
-    page.getAppointments().should('contain.text', "Today's appointments (5)")
+    page.getAppointments().should('contain.text', 'My upcoming appointments')
     page.getAppointmentRows().should('have.length', 5)
   })
 
@@ -32,7 +32,7 @@ context('Sign In', () => {
     const page = Page.verifyOnPage(IndexPage)
 
     page.getAppointments().should('exist')
-    page.getAppointments().should('contain.text', "Today's appointments (0)")
+    page.getAppointments().should('contain.text', 'My upcoming appointments')
     page.getAppointmentRows().should('not.exist')
     page.getOutcomesToLog().should('exist')
     page.getOutcomesToLog().should('contain.text', 'Outcomes to log (0)')

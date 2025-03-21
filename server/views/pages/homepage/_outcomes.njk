@@ -2,16 +2,17 @@
 
 {% set tableData = {
   firstCellIsHeader: true,
+  classes: 'govuk-!-margin-bottom-0',
   head: [
     {
       text: "Person on probation"
     },
     {
-      text: "Appointment type"
+      text: "Outcome type"
     },
     {
       classes: 'govuk-!-text-align-right',
-      text: "Date"
+      text: "Date and time"
     },
     {
       classes: 'govuk-!-text-align-right',
@@ -21,29 +22,29 @@
   rows: []
 } %}
 
+{% if outcomes.length > 0 %}
+  {% for outcome in outcomes %}
+      {% set row = tableData.rows.push([
+          {
+              html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
+          },
+          {
+              html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '">' + outcome.type + '</a>'
+          },
+          {
+              classes: 'govuk-!-text-align-right',
+              html: outcome.startDateTime | dateWithYear + '<br /><span class="secondary-text">' + outcome.startDateTime | shortTime + (' to ' + outcome.endDateTime | shortTime if outcome.endDateTime else '') + '</span>'
+          },
+          {
+              classes: 'govuk-!-text-align-right',
+              html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', outcome.crn, outcome.id) + '" target="_blank" rel="external noopener noreferrer">Log outcome</a>'
+          }
+      ]) %}
+  {% endfor %}
+  <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+    {{ govukTable(tableData) }}
+  </div>
+{% else %}
 
-{% for outcome in outcomes %}
-    {% set row = tableData.rows.push([
-        {
-            html: '<a class="govuk-!-font-weight-regular" href="/case/' + outcome.crn + '">' + outcome.caseName.surname + ', ' + outcome.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + outcome.crn + '</span>'
-        },
-        {
-            html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '">' + outcome.type + '</a>'
-        },
-        {
-            classes: 'govuk-!-text-align-right',
-            text: outcome.startDateTime | dateWithYear
-        },
-        {
-            classes: 'govuk-!-text-align-right',
-            html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', outcome.crn, outcome.id) + '" target="_blank" rel="external noopener noreferrer">Log outcome</a>'
-        }
-    ]) %}
-{% endfor %}
-
-<div class="govuk-!-padding-3 govuk-!-padding-top-1">
-  {{ govukTable(tableData) }}
-  <p>
-      <a class="govuk-link govuk-link--no-visited-state" href="/caseload/appointments/no-outcome">Log more outcomes</a>
-  </p>
-</div>
+  <p class="govuk-body govuk-!-padding-3">There are no upcoming appointments.</p>
+{% endif %}
