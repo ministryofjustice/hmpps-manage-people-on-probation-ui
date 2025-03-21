@@ -94,15 +94,15 @@
         rows: [
           {
             key: { html: '<span data-qa="highScoringNeedsLabel">High-scoring areas from the assessment</span>' },
-            value: { html: '<span data-qa="highScoringNeedsValue">' + highScoringNeeds + '</span>' }
+            value: { html: '<span data-qa="highScoringNeedsValue">' + highScoringNeeds + '</span>' if needs else '<span data-qa="highScoringNeedsValue">Not provided</span>' }
           },
           {
             key: { html: '<span data-qa="lowScoringNeedsLabel">Low-scoring areas from the assessment</span>' },
-            value: { html: '<span data-qa="lowScoringNeedsValue">' + lowScoringNeeds + '</span>'}
+            value: { html: '<span data-qa="lowScoringNeedsValue">' + lowScoringNeeds + '</span>' if needs else '<span data-qa="lowScoringNeedsValue">Not provided</span>' }
           },
           {
             key: { html: '<span data-qa="noScoreNeedsLabel">Areas without a need score</span>' },
-            value: { html: '<span data-qa="noScoreNeedsValue">' + noScoreNeeds + '</span>'}
+            value: { html: '<span data-qa="noScoreNeedsValue">' + noScoreNeeds + '</span>' if needs else '<span data-qa="noScoreNeedsValue">Not provided</span>' }
           }
         ]
       }) }}
@@ -125,7 +125,7 @@
         </div>
         <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.RSR.score }}%</div>
       {% endif %}
-      {% if predictorScores.scores.OGRS %}
+      {% if predictorScores.scores.OGRS.level %}
         <h2 class="govuk-heading-m score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OGRS score">
           OGRS (offender group reconviction scale)
         </h2>
@@ -175,7 +175,7 @@
         <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPC.score }}%</div>
       {% endif %}
 
-      {% if predictorScores.scores.OVP %}
+      {% if predictorScores.scores.OVP.level %}
         <h2 class="govuk-heading-m score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OVP score">
           OVP (OASys violent predictor score)
         </h2>
@@ -199,7 +199,7 @@
         </div>
       {% endif %}
 
-      {% if predictorScores.scores.OGP %}
+      {% if predictorScores.scores.OGP.level %}
         <h2 class="govuk-heading-m score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OGP score">
           OGP (OASys general predictor score)
         </h2>
@@ -221,8 +221,8 @@
               </div>
           </div>
         </div>
-      </div>
       {% endif %}
+      </div>
       {% else %}
         {% set html %}
           <h2 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h2>
