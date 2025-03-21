@@ -158,10 +158,10 @@
       <div class="govuk-grid-column-full">
         <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
           <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
+          <p>All links to manage appointments open in new tabs on NDelius.</p>
           {% if upcomingAppointments.length == 0 %}
             <p>There are no upcoming appointments.</p>
           {% else %}
-          <p>All links to manage appointments open in new tabs on NDelius.</p>
             {{ govukTable({
               firstCellIsHeader: false,
               attributes: {
