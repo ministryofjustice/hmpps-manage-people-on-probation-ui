@@ -5,6 +5,7 @@ import caseload from './caseload'
 import userRoles from './userRoles'
 import userSchedule from './userSchedule'
 import interventions from './interventions'
+import personalDetails from './personalDetails'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -14,4 +15,5 @@ export default {
   ...userRoles,
   ...userSchedule,
   ...interventions,
+  ...personalDetails,
 }

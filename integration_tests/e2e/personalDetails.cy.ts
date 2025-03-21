@@ -4,6 +4,9 @@ import PersonalCircumstancesPage from '../pages/personalCircumstances'
 import AdjustmentsPage from '../pages/adjustments'
 
 context('Personal Details', () => {
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('Personal Details page is rendered', () => {
     cy.visit('/case/X000001/personal-details')
     const page = Page.verifyOnPage(PersonalDetailsPage)
@@ -106,6 +109,83 @@ context('Personal Details', () => {
     cy.visit('/case/X778160/personal-details')
     const page = Page.verifyOnPage(PersonalDetailsPage)
     page.getRowData('contactDetails', 'mainAddressNotes', 'Value').should('contain.text', 'No notes')
+  })
+
+  it('Personal circumstances page is rendered', () => {
+    cy.visit('/case/X000001/personal-details/circumstances')
+    const page = Page.verifyOnPage(PersonalCircumstancesPage)
+    page
+      .getCardHeader('personalCircumstances')
+      .should('contain.text', 'Committed/ Transferred to Crown')
+      .should('contain.text', 'Life imprisonment (Adult)')
+
+    page.getRowData('personalCircumstances', 'type', 'Label').should('contain.text', 'Type')
+    page.getRowData('personalCircumstances', 'type', 'Value').should('contain.text', 'Committed/ Transferred to Crown')
+    page.getRowData('personalCircumstances', 'subType', 'Label').should('contain.text', 'Sub-type')
+    page.getRowData('personalCircumstances', 'subType', 'Value').should('contain.text', 'Life imprisonment (Adult)')
+    page.getRowData('personalCircumstances', 'startDate', 'Label').should('contain.text', 'Start date')
+    page.getRowData('personalCircumstances', 'startDate', 'Value').should('contain.text', '3 April 2021')
+    page.getRowData('personalCircumstances', 'verified', 'Label').should('contain.text', 'Verified?')
+    page.getRowData('personalCircumstances', 'verified', 'Value').should('contain.text', 'Yes')
+    page.getRowData('personalCircumstances', 'notes', 'Label').should('contain.text', 'Notes')
+    page.getRowData('personalCircumstances', 'notes', 'Value').find('.app-note').should('have.length', 3)
+    page
+      .getRowData('personalCircumstances', 'notes', 'Value')
+      .find('.app-note')
+      .eq(0)
+      .find('p')
+      .eq(0)
+      .should('contain.text', 'Lorem ipsum dolor sit amet,')
+    page
+      .getRowData('personalCircumstances', 'notes', 'Value')
+      .find('.app-note')
+      .eq(0)
+      .find('p')
+      .eq(1)
+      .should('contain.text', 'Comment added by not entered')
+    page
+      .getRowData('personalCircumstances', 'notes', 'Value')
+      .find('.app-note')
+      .eq(1)
+      .find('p')
+      .eq(0)
+      .should('contain.text', 'Lorem ipsum dolor sit amet,')
+    page
+      .getRowData('personalCircumstances', 'notes', 'Value')
+      .find('.app-note')
+      .eq(1)
+      .find('p')
+      .eq(1)
+      .should('contain.text', 'Comment added by Harry Kane on 29 October 2024')
+    cy.get('[data-qa="lastUpdatedBy"]').should('contain.text', 'Last updated by Paul Smith on 20 Mar 2023')
+  })
+
+  it('Personal circumstances page is rendered with no notes', () => {
+    cy.task('stubNoCircumstanceNotes')
+    cy.visit('/case/X000001/personal-details/circumstances')
+    const page = Page.verifyOnPage(PersonalCircumstancesPage)
+    page.getRowData('personalCircumstances', 'notes', 'Value').should('contain.text', 'No notes')
+  })
+
+  it('Personal circumstances page is rendered with a note which is null', () => {
+    cy.task('stubNullCircumstanceNote')
+    cy.visit('/case/X000001/personal-details/circumstances')
+    const page = Page.verifyOnPage(PersonalCircumstancesPage)
+    page.getRowData('personalCircumstances', 'notes', 'Value').find('.app-note').should('have.length', 1)
+    page
+      .getRowData('personalCircumstances', 'notes', 'Value')
+      .find('.app-note')
+      .eq(0)
+      .find('p')
+      .eq(0)
+      .should('contain.text', 'Lorem ipsum dolor')
+    page
+      .getRowData('personalCircumstances', 'notes', 'Value')
+      .find('.app-note')
+      .eq(0)
+      .find('p')
+      .eq(1)
+      .should('contain.text', 'Comment added by Harry Kane on 29 October 2024')
   })
 
   it('Personal Details page for a personal circumstance with a single note is rendered', () => {
