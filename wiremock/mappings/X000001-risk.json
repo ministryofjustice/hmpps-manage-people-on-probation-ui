@@ -41,7 +41,7 @@
             "completedDate": "2024-12-09T08:13:33",
             "assessmentStatus": "string",
             "groupReconvictionScore": {
-              "oneYear": 5,
+              "oneYear": 3,
               "twoYears": 6,
               "scoreLevel": "LOW"
             },
@@ -49,9 +49,9 @@
               "ovpStaticWeightedScore": 0,
               "ovpDynamicWeightedScore": 0,
               "ovpTotalWeightedScore": 0,
-              "oneYear": 0,
-              "twoYears": 0,
-              "ovpRisk": "LOW"
+              "oneYear": 4,
+              "twoYears": 10.2,
+              "ovpRisk": "MEDIUM"
             },
             "generalPredictorScore": {
               "ogpStaticWeightedScore": 0,
