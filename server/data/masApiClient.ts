@@ -192,6 +192,14 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/schedule/${crn}/appointment/${appointmentId}`, handle404: false })
   }
 
+  async getPersonAppointmentNote(
+    crn: string,
+    appointmentId: string,
+    noteId: string,
+  ): Promise<PersonAppointment | null> {
+    return this.get({ path: `/schedule/${crn}/appointment/${appointmentId}/note/${noteId}`, handle404: false })
+  }
+
   async getPersonActivityLog(crn: string): Promise<PersonActivity> {
     return this.get({ path: `/activity/${crn}`, handle404: false })
   }

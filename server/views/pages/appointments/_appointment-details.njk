@@ -1,3 +1,14 @@
+{% set notes = '' %}
+{% set hasNote = appointment.appointmentNote and not appointment.hasOutcome  %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 and not appointment.hasOutcome %}
+{% if hasNotes  %}
+  {% for appointmentNote in appointment.appointmentNotes %}
+    {% if appointmentNote.note %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+    {% endif %}
+  {% endfor  %}
+{% endif %}
+
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
   rows: [
@@ -54,8 +65,12 @@
     } if not appointment.hasOutcome,
     {
       key: { html: '<span data-qa="notesLabel">Appointment notes</span>' },
-      value: { html: '<span data-qa="notesValue">' + (appointment.notes | nl2br | safe) + '</span>'  if appointment.notes else '<span data-qa="notesValue">None</span>' }
-    } if not appointment.hasOutcome,
+      value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
+    } if hasNotes,
+    {
+      key: { html: '<span data-qa="notesLabel">Note</span>' },
+      value: { html: '<span class="govuk-body line-break">' + appointment.appointmentNote.note + '</span>' if appointment.appointmentNote.note else 'No note' }
+    } if hasNote,
     {
       key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>'  },
       value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo + '</span>' }

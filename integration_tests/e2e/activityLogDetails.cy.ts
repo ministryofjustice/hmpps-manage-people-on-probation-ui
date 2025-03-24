@@ -85,4 +85,15 @@ context('Activity log details', () => {
     page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 5).should('contain.text', 'No')
     page.getCardHeader('outcomeDetails').should('not.exist')
   })
+  it('should render a complied appointment with a single selected note', () => {
+    cy.visit('/case/X000001/activity-log/activity/15/note/0')
+    const page = new ActivityLogDetailsPage()
+    const cardBody = '[class=app-summary-card__body]'
+    page.assertPageElementAtIndexWithin(cardBody, 1, 'dt', 4, 'Note added by')
+    page.assertPageElementAtIndexWithin(cardBody, 1, 'dd', 5, 'Tom Brady')
+    page.assertPageElementAtIndexWithin(cardBody, 1, 'dt', 5, 'Date added')
+    page.assertPageElementAtIndexWithin(cardBody, 1, 'dd', 6, '29 October 2024')
+    page.assertPageElementAtIndexWithin(cardBody, 1, 'dt', 6, 'Note')
+    page.assertPageElementAtIndexWithin(cardBody, 1, 'dd', 7, 'Appointment Notes')
+  })
 })

@@ -172,6 +172,33 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
     })
   })
 
+  get('/case/:crn/activity-log/activity/:id/note/:noteId', async (req, res, _next) => {
+    const { crn, id, noteId } = req.params
+    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+    const masClient = new MasApiClient(token)
+    const personAppointment = await masClient.getPersonAppointmentNote(crn, id, noteId)
+    const isActivityLog = true
+    const queryParams = getQueryString(req.query)
+    const { category } = req.query
+
+    await auditService.sendAuditMessage({
+      action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
+      who: res.locals.user.username,
+      subjectId: crn,
+      subjectType: 'CRN',
+      correlationId: v4(),
+      service: 'hmpps-manage-people-on-probation-ui',
+    })
+
+    res.render('pages/appointments/appointment', {
+      category,
+      queryParams,
+      personAppointment,
+      crn,
+      isActivityLog,
+    })
+  })
+
   function getQueryString(params: Query): string[] {
     const queryParams: string[] = []
     const usedParams = ['view', 'requirement', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page']

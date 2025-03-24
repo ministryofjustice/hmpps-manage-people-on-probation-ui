@@ -820,7 +820,12 @@
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+              }
+            ],
             "isAppointment": false,
             "isCommunication": true,
             "isPhoneCallFromPop": true,
@@ -867,7 +872,12 @@
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
             "officerName": {
               "forename": "William",
               "surname": "Philips"
@@ -915,7 +925,12 @@
             "complied": false,
             "isAppointment": true,
             "isNationalStandard": true,
-            "notes": "Stuart did not attend this appointment. I phoned him several times on his mobile and left a voicemail. I also called the Timpson shop where he works and was told that he is off sick today and this is the first time that’s he’s been ill while working here.\n\nWill keep trying his mobile throughout the day. If I haven’t had any contact from Stuart by later this afternoon, I’ll visit him at home.",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Stuart did not attend this appointment. I phoned him several times on his mobile and left a voicemail. I also called the Timpson shop where he works and was told that he is off sick today and this is the first time that’s he’s been ill while working here.\n\nWill keep trying his mobile throughout the day. If I haven’t had any contact from Stuart by later this afternoon, I’ll visit him at home."
+              }
+            ],
             "lastUpdated": "2023-03-20",
             "officerName": {
               "forename": "Paulie",
@@ -958,7 +973,12 @@
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
             "isAppointment": true,
             "acceptableAbsence": true,
             "acceptableAbsenceReason": "Trains were on strike and lost phone",
@@ -1008,7 +1028,76 @@
             "isAppointment": true,
             "didTheyComply": true,
             "isNationalStandard": true,
-            "notes": "Turned up and was very apologetic",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "createdBy": "Tom Brady",
+                "createdByDate": "2024-10-29",
+                "note": "Appointment Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Main Address(s) unless otherwise authorised by your supervising officer. Main Address created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Main Address(s) unless otherwise authorised by your supervising officer.Main Address created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
+                "hasNoteBeenTruncated": true
+              },
+              {
+                "id": 1,
+                "note": "Turned up and was very apologetic",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 2,
+                "note": "another appointment note 1",
+                "hasNoteBeenTruncated": true
+              }
+            ],
+            "lastUpdated": "2023-03-20",
+            "officerName": {
+              "forename": "Terry",
+              "surname": "Jones"
+            },
+            "lastUpdatedBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/schedule/X000001/appointment/15/note/0",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Eula",
+              "surname": "Schmeler"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "appointment": {
+            "id": 15,
+            "type": "Office appointment",
+            "description": "User-generated free text content",
+            "startDateTime": "2024-03-22T10:15:00.382936Z[Europe/London]",
+            "endDateTime": "2024-03-22T10:30:00.382936Z[Europe/London]",
+            "rarToolKit": "Choices and Changes",
+            "isSensitive": false,
+            "hasOutcome": true,
+            "outcome": "User-generated free text content",
+            "isAppointment": true,
+            "didTheyComply": true,
+            "isNationalStandard": true,
+            "appointmentNote": {
+              "id": 0,
+              "createdBy": "Tom Brady",
+              "createdByDate": "2024-10-29",
+              "note": "Appointment Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Main Address(s) unless otherwise authorised by your supervising officer. Main Address created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Main Address(s) unless otherwise authorised by your supervising officer.Main Address created automatically from the Create and Vary a licence system of\nAllow person(s) as desi"
+            },
             "lastUpdated": "2023-03-20",
             "officerName": {
               "forename": "Terry",
@@ -1055,7 +1144,12 @@
             "didTheyComply": false,
             "isAppointment": true,
             "isNationalStandard": true,
-            "notes": "Some notes",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
             "lastUpdated": "2023-03-20",
             "officerName": {
               "forename": "Terry",
@@ -1102,7 +1196,12 @@
             "isAppointment": true,
             "isNationalStandard": true,
             "absentWaitingEvidence": true,
-            "notes": "Some notes",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
             "lastUpdated": "2023-03-20",
             "officerName": {
               "forename": "Terry",
@@ -1173,7 +1272,12 @@
                 "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
               }
             ],
-            "notes": "Some notes",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
             "lastUpdated": "2023-03-20",
             "officerName": {
               "forename": "Terry",
