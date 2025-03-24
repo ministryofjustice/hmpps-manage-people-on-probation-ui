@@ -64,7 +64,20 @@ context('Risk', () => {
       .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
+
+    page.getElementData('ogrs-1yr').should('have.text', '3%')
+    page.getElementData('ogrs-2yr').should('have.text', '6%')
+    page.getElementData('ogrs-level').should('have.text', 'Low')
+
+    page.getElementData('ovp-1yr').should('have.text', '4%')
+    page.getElementData('ovp-2yr').should('have.text', '10.2%')
+    page.getElementData('ovp-level').should('have.text', 'Medium')
+
+    page.getElementData('ogp-1yr').should('have.text', '5%')
+    page.getElementData('ogp-2yr').should('have.text', '28.8%')
+    page.getElementData('ogp-level').should('have.text', 'High')
   })
+
   it('Removed risk page is rendered', () => {
     cy.visit('/case/X000001/risk/removed-risk-flags')
     const page = Page.verifyOnPage(RemovedRiskPage)
