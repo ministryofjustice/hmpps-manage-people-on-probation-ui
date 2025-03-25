@@ -5,7 +5,7 @@
 {% if removed %}
 {% set pageTitle = makePageTitle({ pageHeading: [title, "Removed risk flags", "Risk"] }) %}
 {% else %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Risk flags"] }) %}
+{% set pageTitle = makePageTitle({ pageHeading: [title, "Risk flags", "Risk"] }) %}
 {% endif %}
 {% block beforeContent %}
 {{ govukBreadcrumbs({

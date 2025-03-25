@@ -1,6 +1,6 @@
 {% extends "../../partials/edit-contact-details.njk" %}
 {% set title = 'Edit main address for ' + personalDetails.name.forename %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Edit main address", "Personal details"] }) %}
+{% set pageTitle = makePageTitle({ pageHeading: ["Edit contact details", "Contact"] }) %}
 {% set addressTypeSelectItems = [] %}
 {% set addressTypeSelectItems = [{text: "Select address type", value: null }] %}
   {% for addressType in personalDetails.addressTypes|sort(attribute='description') %}
