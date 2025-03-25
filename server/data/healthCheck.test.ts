@@ -79,5 +79,10 @@ describe('Service healthcheck', () => {
 
       await expect(healthcheck()).rejects.toThrow('Response timeout of 100ms exceeded')
     })
+
+    it('Should fail if ping does not error and does not return 200', async () => {
+      fakeServiceApi.get('/ping').reply(204, 'pong')
+      await expect(healthcheck()).rejects.toThrow('204')
+    })
   })
 })
