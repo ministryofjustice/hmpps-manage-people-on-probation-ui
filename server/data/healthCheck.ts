@@ -32,11 +32,11 @@ export function serviceCheckFactory(
         .end((error, result) => {
           if (error) {
             logger.error(error.stack, `Error calling ${name}`)
-            reject(error)
+            reject(new Error(error))
           } else if (result.status === 200) {
             resolve('UP')
           } else {
-            reject(result.status)
+            reject(new Error(result.status.toString()))
           }
         })
     })
