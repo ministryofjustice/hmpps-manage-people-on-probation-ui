@@ -39,7 +39,7 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
-              "notes": "Some notes",
+              "appointmentNotes": [],
               "officerName": {
                 "forename": "William",
                 "surname": "Philips"
@@ -60,7 +60,19 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                },
+                {
+                  "id": 1,
+                  "note": "Email sent to Stuart",
+                  "createdBy": "Tom Brady",
+                  "createdByDate": "2024-10-29",
+                  "hasNoteBeenTruncated": true
+                }
+              ],
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
@@ -86,7 +98,7 @@
               "isAppointment": true,
               "isNationalStandard": true,
               "absentWaitingEvidence": true,
-              "notes": "Some notes",
+              "appointmentNotes": [],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Terry",
@@ -133,7 +145,12 @@
                   "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
                 }
               ],
-              "notes": "Some notes",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Some notes"
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Terry",
@@ -155,7 +172,12 @@
               "isAppointment": true,
               "didTheyComply": true,
               "isNationalStandard": true,
-              "notes": "Turned up and was very apologetic",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Turned up and was very apologetic"
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Terry",
@@ -175,7 +197,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
-              "notes": "Some notes",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Some notes"
+                }
+              ],
               "isAppointment": true,
               "acceptableAbsence": true,
               "acceptableAbsenceReason": "Trains were on strike and lost phone",
@@ -203,7 +230,12 @@
               "didTheyComply": false,
               "isAppointment": true,
               "isNationalStandard": true,
-              "notes": "Some notes",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Some notes"
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Terry",
@@ -250,7 +282,12 @@
                   "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
                 }
               ],
-              "notes": "Some notes",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Some notes"
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Terry",
@@ -297,7 +334,12 @@
                   "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
                 }
               ],
-              "notes": "Some notes",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Some notes"
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Terry",
@@ -321,7 +363,12 @@
               "complied": false,
               "isAppointment": true,
               "isNationalStandard": true,
-              "notes": "Stuart did not attend this appointment. I phoned him several times on his mobile and left a voicemail. I also called the Timpson shop where he works and was told that he is off sick today and this is the first time that’s he’s been ill while working here.\n\nWill keep trying his mobile throughout the day. If I haven’t had any contact from Stuart by later this afternoon, I’ll visit him at home.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Stuart did not attend this appointment. I phoned him several times on his mobile and left a voicemail. I also called the Timpson shop where he works and was told that he is off sick today and this is the first time that’s he’s been ill while working here.\n\nWill keep trying his mobile throughout the day. If I haven’t had any contact from Stuart by later this afternoon, I’ll visit him at home."
+                }
+              ],
               "lastUpdated": "2023-03-20",
               "officerName": {
                 "forename": "Paulie",
@@ -407,7 +454,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
@@ -464,7 +516,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
@@ -521,7 +578,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
@@ -578,7 +640,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": false,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
@@ -604,7 +671,12 @@
               "didTheyComply": true,
               "wasAbsent": false,
               "complied": true,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
@@ -632,7 +704,12 @@
               "wasAbsent": true,
               "acceptableAbsence": false,
               "nonComplianceReason": "Unacceptable absence",
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
@@ -689,7 +766,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": false,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
@@ -715,7 +797,12 @@
               "didTheyComply": true,
               "wasAbsent": false,
               "complied": true,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
@@ -772,7 +859,12 @@
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": false,
-              "notes": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting.",
+              "appointmentNotes": [
+                {
+                  "id": 0,
+                  "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+                }
+              ],
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
@@ -824,8 +916,67 @@
               {
                 "id": 0,
                 "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+              },
+              {
+                "id": 1,
+                "createdBy": "Tom Brady",
+                "createdByDate": "2024-10-29",
+                "note": "Email sent to Stuart",
+                "hasNoteBeenTruncated": true
               }
             ],
+            "isAppointment": false,
+            "isCommunication": true,
+            "isPhoneCallFromPop": true,
+            "officerName": {
+              "forename": "Terry",
+              "surname": "Jones"
+            },
+            "lastUpdated": "2023-03-20",
+            "lastUpdatedBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/schedule/X000001/appointment/11/note/1",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Eula",
+              "surname": "Schmeler"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "appointment": {
+            "id": 11,
+            "type": "Phone call",
+            "description": "",
+            "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
+            "endDateTime": "2044-12-22T09:30:00.382936Z[Europe/London]",
+            "rarToolKit": "Choices and Changes",
+            "rarCategory": "Stepping Stones",
+            "isSensitive": false,
+            "hasOutcome": false,
+            "wasAbsent": true,
+            "appointmentNote": {
+              "id": 1,
+              "createdBy": "Tom Brady",
+              "createdByDate": "2024-10-29",
+              "note": "Email sent to Stuart"
+            },
             "isAppointment": false,
             "isCommunication": true,
             "isPhoneCallFromPop": true,
@@ -872,12 +1023,7 @@
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "appointmentNotes": [
-              {
-                "id": 0,
-                "note": "Some notes"
-              }
-            ],
+            "appointmentNotes": [],
             "officerName": {
               "forename": "William",
               "surname": "Philips"
@@ -1196,12 +1342,7 @@
             "isAppointment": true,
             "isNationalStandard": true,
             "absentWaitingEvidence": true,
-            "appointmentNotes": [
-              {
-                "id": 0,
-                "note": "Some notes"
-              }
-            ],
+            "appointmentNotes": [],
             "lastUpdated": "2023-03-20",
             "officerName": {
               "forename": "Terry",

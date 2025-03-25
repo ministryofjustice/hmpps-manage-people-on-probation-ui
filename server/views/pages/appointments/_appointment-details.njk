@@ -64,9 +64,17 @@
       value: { html: '<span data-qa="rarActivityValue">' + appointment.countsTowardsRAR | toYesNo + '</span>' }
     } if not appointment.hasOutcome,
     {
+      key: { html: '<span data-qa="noteAddedByLabel">Note added by</span>' },
+      value: { html: '<span data-qa="noteAddedByValue">' + appointment.appointmentNote.createdBy + '</span>' }
+    } if appointment.appointmentNote.createdBy,
+    {
+      key: { html: '<span data-qa="dateAddedLabel">Date added</span>' },
+      value: { html: '<span data-qa="dateAddedValue">' + appointment.appointmentNote.createdByDate | dateWithYear + '</span>' }
+    } if appointment.appointmentNote.createdByDate,
+    {
       key: { html: '<span data-qa="notesLabel">Appointment notes</span>' },
       value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
-    } if hasNotes,
+    } if not hasNote,
     {
       key: { html: '<span data-qa="notesLabel">Note</span>' },
       value: { html: '<span class="govuk-body line-break">' + appointment.appointmentNote.note + '</span>' if appointment.appointmentNote.note else 'No note' }
