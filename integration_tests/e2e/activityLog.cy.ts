@@ -53,6 +53,11 @@ context('Activity log', () => {
       cy.wrap($el).find('input').should('not.be.checked')
       cy.wrap($el).find('label').should('contain.text', filters[i])
     })
+
+    const cardBody = '[class=app-summary-card__body]'
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 0, 'Enforcement')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 0, 'Warning letter sent')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'p', 0, 'No notes')
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
     cy.visit('/case/X000001/activity-log')

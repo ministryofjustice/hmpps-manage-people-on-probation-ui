@@ -66,7 +66,7 @@
     {
       key: { html: '<span data-qa="notesLabel">Appointment notes</span>' },
       value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
-    } if hasNotes,
+    } if not hasNote,
     {
       key: { html: '<span data-qa="notesLabel">Note</span>' },
       value: { html: '<span class="govuk-body line-break">' + appointment.appointmentNote.note + '</span>' if appointment.appointmentNote.note else 'No note' }

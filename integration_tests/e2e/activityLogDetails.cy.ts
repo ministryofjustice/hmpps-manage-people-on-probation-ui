@@ -96,4 +96,11 @@ context('Activity log details', () => {
     page.assertPageElementAtIndexWithin(cardBody, 1, 'dt', 6, 'Note')
     page.assertPageElementAtIndexWithin(cardBody, 1, 'dd', 7, 'Appointment Notes')
   })
+  it('should render an appointment and a note has not been recorded', () => {
+    cy.visit('/case/X000001/activity-log/activity/12')
+    const page = new ActivityLogDetailsPage()
+    const cardBody = '[class=app-summary-card__body]'
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 4, 'Appointment notes')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 4, 'No notes')
+  })
 })
