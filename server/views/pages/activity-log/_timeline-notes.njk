@@ -73,7 +73,7 @@
   {% if showNotesDetails > 0  %}
     {% for appointmentNote in entry.appointmentNotes %}
       {% if appointmentNote.note %}
-        {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+        {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + entry.id + '/note/' + appointmentNote.id)) %}
       {% endif %}
     {% endfor  %}
   {% endif %}

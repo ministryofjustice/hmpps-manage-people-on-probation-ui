@@ -49,6 +49,16 @@ context('Activity log details', () => {
       .should('contain.text', 'Turned up and was very apologetic')
 
     cy.get('[data-qa="appointmentLastUpdated"]').should('contain.text', 'Last updated by Paul Smith on 20 Mar 2023')
+
+    const cardBody = '[class=app-summary-card__body]'
+    page.assertAnchorElementAtIndexWithin(
+      cardBody,
+      1,
+      0,
+      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=15',
+    )
+    page.assertAnchorElementAtIndexWithin(cardBody, 1, 1, '/case/X000001/activity-log/activity/15/note/0')
+    page.assertAnchorElementAtIndexWithin(cardBody, 1, 2, '/case/X000001/activity-log/activity/15/note/2')
   })
   it('should render an appointment without an outcome', () => {
     cy.visit('/case/X000001/activity-log/activity/16')
@@ -102,5 +112,16 @@ context('Activity log details', () => {
     const cardBody = '[class=app-summary-card__body]'
     page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 4, 'Appointment notes')
     page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 4, 'No notes')
+  })
+  it('should render an appointment and note that has been truncated', () => {
+    cy.visit('/case/X000001/activity-log/activity/11/note/1')
+    const page = new ActivityLogDetailsPage()
+    const cardBody = '[class=app-summary-card__body]'
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 5, 'Note added by')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 5, 'Tom Brady')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 6, 'Date added')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 6, '29 October 2024')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 7, 'Note')
+    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 7, 'Email sent to Stuart')
   })
 })
