@@ -332,7 +332,12 @@
             "hasOutcome": true,
             "wasAbsent": true,
             "acceptableAbsence": true,
-            "notes": "Some notes",
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
             "officerName": {
               "forename": "Steve",
               "surname": "Bruce"
