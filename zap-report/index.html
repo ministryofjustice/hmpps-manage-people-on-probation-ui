@@ -17,9 +17,9 @@
 		<p>
 			<span>Generated with</span> <a href="https://zaproxy.org"><img
 				src="index/zap32x32.png" alt="The ZAP logo" class="zap-logo">ZAP</a>
-			<span>on Tue 25 Mar 2025, at 09:44:49</span>
+			<span>on Wed 26 Mar 2025, at 09:44:04</span>
 		</p>
-		<p>ZAP Version: 2.16.0</p>
+		<p>ZAP Version: 2.16.1</p>
 		<p>
 			ZAP by <a href="https://checkmarx.com/">Checkmarx</a>
 		</p>
@@ -38,7 +38,38 @@
 							<li><a
 								href="#report-parameters">Report parameters</a></li>
 						</ol></li>
-					
+					<data-th-block>
+					<li><a
+						href="#summaries">Summaries</a>
+						<ol>
+							<li><a
+								href="#risk-confidence-counts">Alert counts by risk and confidence</a></li>
+							<li><a
+								href="#site-risk-counts">Alert counts by site and risk</a></li>
+							<li><a
+								href="#alert-type-counts">Alert counts by alert type</a></li>
+						</ol></li>
+					<li><a
+						href="#alerts">Alerts</a>
+						<ol>
+							
+							 
+							
+							
+							<li><a
+								href="#alerts--risk-2-confidence-3"><span>Risk</span>=<span
+									class="risk-level">Medium</span>, <span>Confidence</span>=<span
+									class="confidence-level">High</span> <span>(1)</span></a></li>
+							  
+							 
+						</ol></li>
+					<li><a
+						href="#appendix">Appendix</a>
+						<ol>
+							<li><a
+								href="#alert-types">Alert types</a></li>
+						</ol></li>
+					</data-th-block>
 				</ol>
 			</nav>
 		</section>
@@ -106,9 +137,225 @@
 
 		
 		<section>
-			<p>
-				<strong>No alerts were found within the report parameters.</strong>
-			</p>
+			
+		</section>
+		
+		<section id="summaries" class="summaries">
+			<h2>Summaries</h2>
+
+			<section
+				id="risk-confidence-counts">
+				<h3>Alert counts by risk and confidence</h3>
+				<table class="risk-confidence-counts-table">
+					<caption>
+						<p>This table shows the number of alerts for each level of risk and confidence included in the report.</p>
+						<p>(The percentages in brackets represent the count as a percentage of the total number of alerts included in the report, rounded to one decimal place.)</p>
+					</caption>
+					<colgroup>
+						<col>
+						<col>
+					</colgroup>
+					<colgroup>
+						<col
+							style="width: 35.0%">
+						<col style="width: 35.0%">
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" rowspan="2"></td>
+							<th scope="colgroup"
+								colspan="2">Confidence</th>
+						</tr>
+						<tr>
+							<th scope="col">High</th>
+							<th scope="col">Total</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="rowgroup"
+								rowspan="4">Risk</th>
+							<th scope="row">High</th>
+							<td><span>0</span><br> <span
+								class="additional-info-percentages">(0.0%)</span></td>
+							<td><span>0</span><br> <span class="additional-info-percentages">(0.0%)</span></td>
+						</tr>
+						<tr>
+							
+							<th scope="row">Medium</th>
+							<td><span>1</span><br> <span
+								class="additional-info-percentages">(100.0%)</span></td>
+							<td><span>1</span><br> <span class="additional-info-percentages">(100.0%)</span></td>
+						</tr>
+						<tr>
+							
+							<th scope="row">Low</th>
+							<td><span>0</span><br> <span
+								class="additional-info-percentages">(0.0%)</span></td>
+							<td><span>0</span><br> <span class="additional-info-percentages">(0.0%)</span></td>
+						</tr>
+						<tr>
+							<th scope="row">Total</th>
+							<td><span>1</span><br> <span
+								class="additional-info-percentages">(100.0%)</span></td>
+							<td><span>1</span><br> <span
+								class="additional-info-percentages">(100%)</span></td>
+						</tr>
+					</tbody>
+				</table>
+			</section>
+
+			<section
+				id="site-risk-counts">
+				<h3>Alert counts by site and risk</h3>
+				<table class="site-risk-counts-table">
+					<caption>
+						<p>This table shows, for each site for which one or more alerts were raised, the number of alerts raised at each risk level.</p>
+						<p>Alerts with a confidence level of &quot;False Positive&quot; have been excluded from these counts.</p>
+						<p>(The numbers in brackets are the number of alerts raised for the site at or above that risk level.)</p>
+					</caption>
+					<colgroup>
+						<col>
+						<col>
+					</colgroup>
+					<colgroup>
+						<col
+							style="width: 21.666666666666668%"><col
+							style="width: 21.666666666666668%"><col
+							style="width: 21.666666666666668%">
+					</colgroup>
+					<thead>
+						<tr>
+							<td colspan="2" rowspan="2"></td>
+							<th scope="colgroup" colspan="3">Risk</th>
+						</tr>
+						<tr>
+							<th scope="col">
+								<span>High</span><br>  <span
+									class="additional-info-percentages">(= High)</span>  
+							</th>
+							<th scope="col">
+								<span>Medium</span><br>   <span
+									class="additional-info-percentages">(&gt;= Medium)</span> 
+							</th>
+							<th scope="col">
+								<span>Low</span><br>   <span
+									class="additional-info-percentages">(&gt;= Low)</span> 
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						
+					</tbody>
+				</table>
+			</section>
+
+			<section
+				id="alert-type-counts">
+				<h3>Alert counts by alert type</h3>
+				<table class="alert-type-counts-table">
+					<caption>
+						<p>This table shows the number of alerts of each alert type, together with the alert type&#39;s risk level.</p>
+						<p>(The percentages in brackets represent each count as a percentage, rounded to one decimal place, of the total number of alerts included in this report.)</p>
+					</caption>
+					<thead>
+						<tr>
+							<th scope="col">Alert type</th>
+							<th scope="col">Risk</th>
+							<th scope="col">Count</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr>
+							<th scope="row"><a
+								href="#alert-type-0">CSP: Failure to Define Directive with No Fallback</a></th>
+							<td class="risk-level">Medium</td>
+							<td><span>1</span><br> <span
+								class="additional-info-percentages">(100.0%)</span></td>
+						</tr>
+					</tbody>
+					<tfoot>
+						<tr>
+							<th scope="row">Total</th>
+							<td></td>
+							<td>1</td>
+						</tr>
+					</tfoot>
+				</table>
+			</section>
+		</section>
+
+		<section id="alerts" class="alerts">
+			<h2>Alerts</h2>
+			<ol>
+				
+				 
+				 
+				<li id="alerts--risk-2-confidence-3">
+					<h3>
+						<span>Risk</span>=<span
+							class="risk-level">Medium</span>, <span>Confidence</span>=<span
+							class="confidence-level">High</span> <span>(1)</span>
+					</h3>
+					<ol>
+						
+					</ol>
+				</li>
+				  
+				 
+			</ol>
+		</section>
+
+		<section id="appendix" class="appendix">
+			<h2>Appendix</h2>
+
+			<section id="alert-types" class="alert-types">
+				<h3>Alert types</h3>
+				<p class="alert-types-intro">This section contains additional information on the types of alerts in the report.</p>
+				<ol>
+					<li
+						id="alert-type-0">
+						<h4>CSP: Failure to Define Directive with No Fallback</h4>
+						<table class="alert-types-table">
+							<tr>
+								<th scope="row">Source</th>
+								<td>
+									
+									   <span>raised by a passive scanner</span> <span>(<a
+										href="https://www.zaproxy.org/docs/alerts/10055/">CSP</a>)
+									</span>   
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">CWE ID</th>
+								<td><a
+									href="https://cwe.mitre.org/data/definitions/693.html">693</a></td>
+							</tr>
+							<tr>
+								<th scope="row">WASC ID</th>
+								<td>15</td>
+							</tr>
+							<tr>
+								<th scope="row">Reference</th>
+								<td>
+									<ol>
+										<li><a
+											href="https://www.w3.org/TR/CSP/">https://www.w3.org/TR/CSP/</a></li>
+										<li><a
+											href="https://caniuse.com/#search=content+security+policy">https://caniuse.com/#search=content+security+policy</a></li>
+										<li><a
+											href="https://content-security-policy.com/">https://content-security-policy.com/</a></li>
+										<li><a
+											href="https://github.com/HtmlUnit/htmlunit-csp">https://github.com/HtmlUnit/htmlunit-csp</a></li>
+										<li><a
+											href="https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources">https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources</a></li>
+									</ol>
+								</td>
+							</tr>
+						</table>
+					</li>
+				</ol>
+			</section>
 		</section>
 		 
 	</main>

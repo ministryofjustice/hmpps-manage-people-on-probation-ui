@@ -1,7 +1,7 @@
 {
 	"@programName": "ZAP",
-	"@version": "2.16.0",
-	"@generated": "Tue, 25 Mar 2025 09:44:50",
+	"@version": "2.16.1",
+	"@generated": "Wed, 26 Mar 2025 09:44:04",
 	"site":[ 
 		{
 			"@name": "https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk",
@@ -9,6 +9,34 @@
 			"@port": "443",
 			"@ssl": "true",
 			"alerts": [ 
+				{
+					"pluginid": "10055",
+					"alertRef": "10055-13",
+					"alert": "CSP: Failure to Define Directive with No Fallback",
+					"name": "CSP: Failure to Define Directive with No Fallback",
+					"riskcode": "2",
+					"confidence": "3",
+					"riskdesc": "Medium (High)",
+					"desc": "<p>The Content Security Policy fails to define one of the directives that has no fallback. Missing/excluding them is the same as allowing anything.</p>",
+					"instances":[ 
+						{
+							"id": "480",
+							"uri": "https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk",
+							"method": "GET",
+							"param": "Content-Security-Policy",
+							"attack": "",
+							"evidence": "default-src 'self'; script-src 'self' www.googletagmanager.com www.google-analytics.com; frame-src 'self' www.googletagmanager.com; frame-ancestors 'self'",
+							"otherinfo": "The directive(s): form-action is/are among the directives that do not fallback to default-src."
+						}
+					],
+					"count": "1",
+					"solution": "<p>Ensure that your web server, application server, load balancer, etc. is properly configured to set the Content-Security-Policy header.</p>",
+					"otherinfo": "<p>The directive(s): form-action is/are among the directives that do not fallback to default-src.</p>",
+					"reference": "<p>https://www.w3.org/TR/CSP/</p><p>https://caniuse.com/#search=content+security+policy</p><p>https://content-security-policy.com/</p><p>https://github.com/HtmlUnit/htmlunit-csp</p><p>https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources</p>",
+					"cweid": "693",
+					"wascid": "15",
+					"sourceid": "404"
+				}
 			]
 		}
 	],
