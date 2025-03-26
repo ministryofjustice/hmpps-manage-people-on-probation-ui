@@ -2,7 +2,7 @@
 import { Location } from '../data/model/caseload'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { Sentence } from '../data/model/sentenceDetails'
-import { Errors, Appointment, ActivityLogFilters } from './index'
+import { Errors, Appointment } from './index'
 
 export interface Data {
   appointments?: {
