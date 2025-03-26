@@ -68,13 +68,15 @@
 <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
 {% endif %}
 
-{% set showNotesDetails = entry.notes %}
-{% set notes %}
-  {% if entry.notes %}
-    <p class="govuk-!-margin-bottom-0">{{ entry.notes | nl2br | safe }}</p>
-    <p class="govuk-body-s secondary-text govuk-!-padding-top-2">Comment added by {{ entry.lastUpdatedBy.forename }} {{ entry.lastUpdatedBy.surname }} on {{ entry.lastUpdated | dateWithYear }}</p>
+{% set showNotesDetails = entry.appointmentNotes.length > 0 %}
+{% set notes = '' %}
+  {% if showNotesDetails > 0  %}
+    {% for appointmentNote in entry.appointmentNotes %}
+      {% if appointmentNote.note %}
+        {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + entry.id + '/note/' + appointmentNote.id)) %}
+      {% endif %}
+    {% endfor  %}
   {% endif %}
-{% endset %}
 
 {% if showNotesDetails %}
   {{ govukDetails({
@@ -83,7 +85,7 @@
     open: true,
     classes: 'govuk-!-margin-bottom-0'
   }) }}
-{% elseif not entry.notes %}
+{% elseif not entry.appointmentNotes.length > 0 %}
   {% if entry.isSensitive %}
     <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold govuk-colour--red">Sensitive (No notes)</p>
   {% else %}
