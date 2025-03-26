@@ -141,10 +141,14 @@ describe('/middleware/getPersonActivity', () => {
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
-      queryStr: '',
-      queryStrPrefix: '',
-      queryStrSuffix: '',
       maxDate: '21/1/2025',
+    }
+
+    req.session.activityLogFilters = {
+      keywords: filterVals.keywords,
+      dateFrom: filterVals.dateFrom,
+      dateTo: filterVals.dateTo,
+      compliance: ['complied', 'not complied'],
     }
 
     const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>

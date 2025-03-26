@@ -1,14 +1,14 @@
   <ul class="toggle-menu govuk-!-margin-bottom-6">
   <li class="toggle-menu__list-item">
     {% if compactView %}
-      <a href="{{filters.baseUrl}}{{filters.queryStrPrefix}}{{filters.queryStr}}{{filters.queryStrSuffix}}requirement={{ requirement }}&page={{page}}">Default view</a>
+      <a href="{{filters.baseUrl}}?page={{page}}">Default view</a>
     {% else %}
       <span>Default view</span>
     {% endif %}
     </li>
  <li class="toggle-menu__list-item">
  {% if defaultView %}
-      <a href="{{filters.baseUrl}}{{filters.queryStrPrefix}}{{filters.queryStr}}{{filters.queryStrSuffix}}view=compact&requirement={{ requirement }}&page={{page}}">Compact view</a>
+      <a href="{{filters.baseUrl}}?view=compact&page={{page}}">Compact view</a>
     {% else %}
       <span>Compact view</span>
     {% endif %}
