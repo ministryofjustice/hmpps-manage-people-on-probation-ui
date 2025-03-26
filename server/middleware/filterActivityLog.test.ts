@@ -131,7 +131,6 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
-
       const expectedResponse: ActivityLogFiltersResponse = {
         errors: req.session.errors,
         selectedFilterItems: {
@@ -172,12 +171,7 @@ describe('/middleware/filterActivityLog()', () => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should refresh the page', () => {
-      const query = req.query as Record<string, string | string[]>
-
       expect(req.session.activityLogFilters.compliance).toEqual(['no outcome', 'not complied'])
-      // expect(redirectSpy).toHaveBeenCalledWith(
-      //   `/case/${crn}/activity-log?keywords=test&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery((query.compliance as string[]).filter((_item, i) => i !== 1))}`,
-      // )
     })
   })
 
