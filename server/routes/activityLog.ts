@@ -9,12 +9,11 @@ import controllers from '../controllers'
 export default function activityLogRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all(
-    '/case/:crn/activity-log',
+  router.get('/case/:crn/activity-log', [
     validate.activityLog,
     filterActivityLog,
     controllers.activityLog.getActivityLog(hmppsAuthClient),
-  )
+  ])
 
   get('/case/:crn/activity-log/activity/:id', controllers.activityLog.getActivityDetails(hmppsAuthClient))
 }
