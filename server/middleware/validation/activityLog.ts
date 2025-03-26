@@ -6,12 +6,9 @@ import utils from '../../utils'
 import { toCamelCase } from '../../utils/utils'
 
 const activityLog: Route<void> = (req, res, next): void => {
-  const { dateFrom: dateFromQuery, dateTo: dateToQuery } = req.query
-  const dateFrom = dateFromQuery as string
-  const dateTo = dateToQuery as string
-  const { url, query } = req
-  const { submit } = query
-
+  const { dateFrom, dateTo } = req.body
+  const { url, body } = req
+  const { submit } = body
   const isValid: { [key: string]: boolean } = {
     dateFrom: true,
     dateTo: true,
@@ -23,7 +20,7 @@ const activityLog: Route<void> = (req, res, next): void => {
   }
 
   const isValidDateFormat = (nameProp: string, dateVal: string): void => {
-    const regex = /^(?:[1-9])?\d\/(?:[1-9])?\d\/\d{4}$/
+    const regex = /^[1-9]?\d\/[1-9]?\d\/\d{4}$/
     if (dateVal && !regex.test(dateVal)) {
       const text = errorMessages['activity-log'][nameProp].errors.isInvalid
       const name = toCamelCase(nameProp)
@@ -34,7 +31,7 @@ const activityLog: Route<void> = (req, res, next): void => {
 
   const isRealDate = (nameProp: string, dateVal: string): void => {
     const name = toCamelCase(nameProp)
-    if (isValid[name] && req?.query?.[name]) {
+    if (isValid[name] && req?.body?.[name]) {
       const dateToIso = getIsoDate(dateVal)
       if (!dateToIso.isValid) {
         const text = errorMessages['activity-log'][nameProp].errors.isNotReal
@@ -46,7 +43,7 @@ const activityLog: Route<void> = (req, res, next): void => {
 
   const isDateInFuture = (nameProp: string, dateVal: string): void => {
     const name = toCamelCase(nameProp)
-    if (isValid[name] && req?.query?.[name]) {
+    if (isValid[name] && req?.body?.[name]) {
       const dateFromIso = getIsoDate(dateVal)
       const today = DateTime.now()
       if (dateFromIso > today) {
@@ -57,7 +54,7 @@ const activityLog: Route<void> = (req, res, next): void => {
     }
   }
 
-  const dateIsValid = (dateName: string): boolean => req?.query?.[dateName] && isValid[dateName]
+  const dateIsValid = (dateName: string): boolean => req?.body?.[dateName] && isValid[dateName]
 
   const validateDateRanges = (): void => {
     isValidDateFormat('date-from', dateFrom)

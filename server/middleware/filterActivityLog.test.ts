@@ -25,7 +25,7 @@ const defaultRequest: Args = {
   compliance: ['no outcome', 'complied', 'not complied'],
   clearFilterKey: '',
   clearFilterValue: '',
-  submit: false,
+  submit: true,
   errors: false,
 }
 
@@ -41,6 +41,10 @@ const getRequest = (args?: Args) => {
       }
     : null
   const req = httpMocks.createRequest({
+    body: {
+      ...defaultRequest,
+      ...(args || {}),
+    },
     query,
     params: {
       crn,
@@ -77,32 +81,38 @@ describe('/middleware/filterActivityLog()', () => {
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
-    it('should refresh the page removing the submit query param from the url', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/activity-log?keywords=test`)
+    it('should load the page setting the session activityLogFilters to undefined', () => {
+      expect(req.session.activityLogFilters).toEqual({
+        clearFilterKey: '',
+        clearFilterValue: '',
+        compliance: ['no outcome', 'complied', 'not complied'],
+        dateFrom: '21/03/2025',
+        dateTo: '22/03/2025',
+        errors: false,
+        keywords: 'test',
+        submit: true,
+      })
     })
   })
   describe('Only one compliance filter is submitted', () => {
-    const req = getRequest({ keywords: '', dateFrom: '', dateTo: '', compliance: 'complied' })
+    const req = getRequest({ submit: true, keywords: '', dateFrom: '', dateTo: '', compliance: 'complied' })
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should assign the correct values to res.locals.filters', () => {
-      const url = `/case/${crn}/activity-log?compliance=complied`
+      const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
         errors: req.session.errors,
         selectedFilterItems: {
           compliance: [
             {
               text: 'Complied',
-              href: `${url}&clearFilterKey=compliance&clearFilterValue=complied`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=complied`,
             },
           ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: value === 'complied' })),
         baseUrl: `/case/${crn}/activity-log`,
-        queryStr: `compliance=complied`,
-        queryStrPrefix: '?',
-        queryStrSuffix: '&',
         keywords: req.query.keywords as string,
         compliance: [req.query.compliance] as string[],
         dateFrom: req.query.dateFrom as string,
@@ -120,34 +130,32 @@ describe('/middleware/filterActivityLog()', () => {
     })
     it('should assign the correct values to res.locals.filters', () => {
       const query = req.query as Record<string, string | string[]>
-      const url = `/case/${crn}/activity-log?keywords=${query.keywords}&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery(query.compliance as string[])}`
+      const url = `/case/${crn}/activity-log`
+
       const expectedResponse: ActivityLogFiltersResponse = {
         errors: req.session.errors,
         selectedFilterItems: {
           keywords: [
             {
               text: req.query.keywords as string,
-              href: `${url}&clearFilterKey=keywords&clearFilterValue=${query.keywords}`,
+              href: `${url}?clearFilterKey=keywords`,
             },
           ],
           compliance: [
             ...(query.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
-              href: `${url}&clearFilterKey=compliance&clearFilterValue=${item.replace(' ', '%20')}`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=${item.replace(' ', '%20')}`,
             })),
           ],
           dateRange: [
             {
               text: `${req.query.dateFrom} - ${req.query.dateTo}`,
-              href: `/case/X000001/activity-log?keywords=${query.keywords}&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery(query.compliance as string[])}&clearFilterKey=dateRange&clearFilterValue=${query.dateFrom}`,
+              href: `/case/X000001/activity-log?clearFilterKey=dateRange`,
             },
           ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
-        queryStr: `keywords=${query.keywords}&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery(query.compliance as string[])}`,
-        queryStrPrefix: '?',
-        queryStrSuffix: '&',
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
         dateFrom: req.query.dateFrom as string,
@@ -165,9 +173,11 @@ describe('/middleware/filterActivityLog()', () => {
     })
     it('should refresh the page', () => {
       const query = req.query as Record<string, string | string[]>
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/activity-log?keywords=test&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery((query.compliance as string[]).filter((_item, i) => i !== 1))}`,
-      )
+
+      expect(req.session.activityLogFilters.compliance).toEqual(['no outcome', 'not complied'])
+      // expect(redirectSpy).toHaveBeenCalledWith(
+      //   `/case/${crn}/activity-log?keywords=test&dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery((query.compliance as string[]).filter((_item, i) => i !== 1))}`,
+      // )
     })
   })
 
@@ -178,9 +188,7 @@ describe('/middleware/filterActivityLog()', () => {
     })
     it('should refresh the page with the correct url and query parameters', () => {
       const query = req.query as Record<string, string | string[]>
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/activity-log?dateFrom=${query.dateFrom}&dateTo=${query.dateTo}&compliance=${getComplianceQuery(query.compliance as string[])}`,
-      )
+      expect(req.session.activityLogFilters.keywords).toEqual('')
     })
   })
 
@@ -191,9 +199,8 @@ describe('/middleware/filterActivityLog()', () => {
     })
     it('should refresh the page with the correct url and query parameters', () => {
       const query = req.query as Record<string, string | string[]>
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/activity-log?keywords=${query.keywords}&compliance=${getComplianceQuery(query.compliance as string[])}`,
-      )
+      expect(req.session.activityLogFilters.dateTo).toEqual('')
+      expect(req.session.activityLogFilters.dateFrom).toEqual('')
     })
   })
 
@@ -204,28 +211,25 @@ describe('/middleware/filterActivityLog()', () => {
     })
     it('set res.locals.filters with the correct values', () => {
       const query = req.query as Record<string, string | string[]>
-      const url = `/case/${crn}/activity-log?keywords=${query.keywords}&dateFrom=${query.dateFrom}&compliance=${getComplianceQuery(query.compliance as string[])}`
+      const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
         errors: req.session.errors,
         selectedFilterItems: {
           keywords: [
             {
               text: req.query.keywords as string,
-              href: `${url}&clearFilterKey=keywords&clearFilterValue=${query.keywords}`,
+              href: `${url}?clearFilterKey=keywords`,
             },
           ],
           compliance: [
             ...(query.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
-              href: `${url}&clearFilterKey=compliance&clearFilterValue=${item.replace(' ', '%20')}`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=${item.replace(' ', '%20')}`,
             })),
           ],
         },
         complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
-        queryStr: `keywords=${query.keywords}&dateFrom=${query.dateFrom}&compliance=${getComplianceQuery(query.compliance as string[])}`,
-        queryStrPrefix: '?',
-        queryStrSuffix: '&',
         keywords: req.query.keywords as string,
         compliance: req.query.compliance as string[],
         dateFrom: '',

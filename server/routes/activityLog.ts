@@ -18,12 +18,12 @@ import ArnsApiClient from '../data/arnsApiClient'
 export default function activityLogRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.get(
+  router.all(
     '/case/:crn/activity-log',
     validate.activityLog,
     filterActivityLog,
     async (req, res: AppResponse, _next) => {
-      const { query, params } = req
+      const { query, body, params } = req
       const { crn } = params
       const { page = '0', view = '' } = query
 
@@ -38,7 +38,7 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
 
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
 
-      const queryParams = getQueryString(req.query)
+      const queryParams = getQueryString(body)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const currentPage = parseInt(page as string, 10)
@@ -62,11 +62,12 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
       const risksWidget = toRoshWidget(risks)
 
       const predictorScores = toPredictors(predictors)
+      const baseUrl = req.url.split('?')[0]
 
       res.render('pages/activity-log', {
         personActivity,
         crn,
-        query,
+        query: req.session.activityLogFilters,
         queryParams,
         page,
         view,
@@ -74,62 +75,12 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
         risksWidget,
         predictorScores,
         url: req.url,
+        baseUrl,
         resultsStart,
         resultsEnd,
       })
     },
   )
-
-  get('/case/:crn/activity-log/:category', async (req, res, _next) => {
-    const { crn, category } = req.params
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-
-    await auditService.sendAuditMessage({
-      action: 'VIEW_MAS_ACTIVITY_LOG_CATEGORY',
-      who: res.locals.user.username,
-      subjectId: crn,
-      subjectType: 'CRN',
-      correlationId: v4(),
-      service: 'hmpps-manage-people-on-probation-ui',
-    })
-
-    const arnsClient = new ArnsApiClient(token)
-    const masClient = new MasApiClient(token)
-    const tierClient = new TierApiClient(token)
-
-    const [personActivity, tierCalculation, risks, predictors] = await Promise.all([
-      masClient.getPersonActivityLog(crn),
-      tierClient.getCalculationDetails(crn),
-      arnsClient.getRisks(crn),
-      arnsClient.getPredictorsAll(crn),
-    ])
-
-    if (req.query.view === 'compact') {
-      res.locals.compactView = true
-    } else {
-      res.locals.defaultView = true
-    }
-
-    if (req.query.requirement) {
-      res.locals.requirement = req.query.requirement as string
-    }
-
-    const queryParams = getQueryString(req.query)
-
-    const risksWidget = toRoshWidget(risks)
-
-    const predictorScores = toPredictors(predictors)
-    res.render('pages/activity-log', {
-      category,
-      personActivity,
-      queryParams,
-      crn,
-      tierCalculation,
-      errors: req?.session?.errors,
-      risksWidget,
-      predictorScores,
-    })
-  })
 
   get('/case/:crn/activity-log/activity/:id', async (req, res, _next) => {
     const { crn, id } = req.params
@@ -205,9 +156,9 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
     for (const usedParam of usedParams) {
       if (params[usedParam]) {
         if (!Array.isArray(params[usedParam])) {
-          queryParams.push(`${usedParam}=${params[usedParam]}`)
+          queryParams.push(`${usedParam}=${params[usedParam] as string}`)
         } else {
-          params[usedParam].forEach(param => queryParams.push(`${usedParam}=${param}`))
+          params[usedParam].forEach(param => queryParams.push(`${usedParam}=${param as string}`))
         }
       }
     }

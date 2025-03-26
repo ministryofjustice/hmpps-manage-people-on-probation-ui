@@ -4,7 +4,7 @@ export interface ActivityLogFilters {
   keywords: string
   dateFrom: string
   dateTo: string
-  compliance: string[]
+  compliance: Array<string>
   clearFilterKey?: string
   clearFilterValue?: string
 }
@@ -26,9 +26,6 @@ export interface ActivityLogFiltersResponse extends ActivityLogFilters {
   selectedFilterItems: Record<string, SelectedFilterItem[]>
   complianceOptions: Option[]
   baseUrl: string
-  queryStr: string
-  queryStrPrefix: string
-  queryStrSuffix: string
   maxDate: string
   query?: ActivityLogFilters
 }
