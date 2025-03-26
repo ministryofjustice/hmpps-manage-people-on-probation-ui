@@ -1,14 +1,33 @@
 import httpMocks from 'node-mocks-http'
+import { auditService } from '@ministryofjustice/hmpps-audit-client'
+import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
+import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { UserSchedule } from '../data/model/userSchedule'
 import { mockAppResponse } from './mocks'
+import { CaseSearchFilter, UserCaseload } from '../data/model/caseload'
+import caseloadController from './caseload'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
+}))
+jest.mock('../data/hmppsAuthClient', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
+    }
+  })
+})
+
+const crn = 'X000001'
+const mockPagination = { from: '1', items: [], next: '2', prev: '1', to: '0', total: '0' } as Pagination
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/hmppsAuthClient', () => {
@@ -18,6 +37,12 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+
+jest.mock('@ministryofjustice/probation-search-frontend/utils/pagination', () => ({
+  __esModule: true,
+  default: jest.fn(),
+}))
+;(getPaginationLinks as jest.Mock).mockReturnValue(mockPagination)
 
 const mockResponse = {
   name: {
@@ -34,10 +59,27 @@ const mockResponse = {
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
-describe('caseloadController', () => {
-  const res = mockAppResponse()
-  const renderSpy = jest.spyOn(res, 'render')
+const nextSpy = jest.fn()
+const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
+const res = mockAppResponse()
+const renderSpy = jest.spyOn(res, 'render')
+const mockCaseload = {} as UserCaseload
+const mockFilters = {} as CaseSearchFilter
 
+const checkAuditMessage = (action: string): void => {
+  it('should send an audit message', () => {
+    expect(auditSpy).toHaveBeenCalledWith({
+      action,
+      who: res.locals.user.username,
+      subjectId: res.locals.user.username,
+      subjectType: 'USER',
+      correlationId: uuidv4(),
+      service: 'hmpps-manage-people-on-probation-ui',
+    })
+  })
+}
+
+describe('caseloadController', () => {
   const getUserScheduleSpy = jest
     .spyOn(MasApiClient.prototype, 'getUserSchedule')
     .mockImplementation(() => Promise.resolve(mockResponse))
@@ -53,6 +95,80 @@ describe('caseloadController', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
+
+  describe('showCaseload', () => {
+    const req = httpMocks.createRequest({
+      session: {
+        page: '1',
+      },
+    })
+    const mockArgs = {
+      caseload: mockCaseload,
+      filter: mockFilters,
+    }
+    beforeEach(async () => {
+      await controllers.caseload.showCaseload()(req, res, nextSpy, mockArgs)
+    })
+    checkAuditMessage('VIEW_MAS_CASELOAD')
+    it('should render minimal cases', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
+        pagination: mockPagination,
+        caseload: mockCaseload,
+        currentNavSection: 'yourCases',
+        filter: mockFilters,
+      })
+    })
+  })
+
+  describe('postCase', () => {
+    const req = httpMocks.createRequest({
+      session: {
+        page: '2',
+        sortBy: 'name',
+      },
+      body: {
+        nameOrCrn: crn,
+        sentenceCode: '1234',
+        nextContactCode: '5678',
+      },
+    })
+
+    const expectedCaseFilter = {
+      nameOrCrn: req.body.nameOrCrn,
+      sentenceCode: req.body.sentenceCode,
+      nextContactCode: req.body.nextContactCode,
+    }
+    const mockUserCaseload = {} as UserCaseload
+    const searchUserCaseloadSpy = jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementation(() => Promise.resolve(mockUserCaseload))
+
+    it('should set session.caseFilter', async () => {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
+      expect(req.session.caseFilter).toEqual(expectedCaseFilter)
+    })
+    it('should request the caseload from the api', async () => {
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
+      expect(searchUserCaseloadSpy).toHaveBeenCalledWith(
+        res.locals.user.username,
+        '0',
+        req.session.sortBy,
+        expectedCaseFilter,
+      )
+    })
+    it('should call caseloadController.showCaseload', async () => {
+      const showCaseloadMock = jest.fn()
+      caseloadController.showCaseload = jest.fn().mockReturnValue(showCaseloadMock)
+      await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
+      expect(caseloadController.showCaseload).toHaveBeenCalledWith(hmppsAuthClient)
+      expect(showCaseloadMock).toHaveBeenCalledWith(req, res, nextSpy, {
+        caseload: mockUserCaseload,
+        filter: expectedCaseFilter,
+      })
+    })
+  })
+
+  // describe('getCase', () => {})
 
   describe('userSchedule', () => {
     it('renders the caseload appointments page with upcoming appointments', async () => {

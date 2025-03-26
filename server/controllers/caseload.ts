@@ -40,7 +40,7 @@ interface Args {
 }
 
 const caseloadController: Controller<typeof routes, Args> = {
-  showCaseload: _hmppsAuthClient => {
+  showCaseload: () => {
     return async (req, res, _next, args) => {
       const { caseload, filter } = args
       const currentNavSection = 'yourCases'
