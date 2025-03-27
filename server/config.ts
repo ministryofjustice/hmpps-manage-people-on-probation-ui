@@ -146,10 +146,10 @@ export default {
       url: get('MAS_API_URL', 'http://localhost:8100', requiredInProduction),
       pageSize: 10,
       timeout: {
-        response: Number(get('MAS_API_TIMEOUT_RESPONSE', 5000)),
-        deadline: Number(get('MAS_API_TIMEOUT_DEADLINE', 5000)),
+        response: Number(get('MAS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('MAS_API_TIMEOUT_DEADLINE', 10000)),
       },
-      agent: new AgentConfig(Number(get('MAS_API_TIMEOUT_RESPONSE', 5000))),
+      agent: new AgentConfig(Number(get('MAS_API_TIMEOUT_RESPONSE', 10000))),
     },
     arnsApi: {
       url: get('ARNS_API_URL', 'http://localhost:8100', requiredInProduction),
