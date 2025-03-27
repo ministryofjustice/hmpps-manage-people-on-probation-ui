@@ -33,7 +33,7 @@ context('Sentence', () => {
     page.assertPageElementAtIndexWithin('section', 1, 'dt', 0, 'Offence')
     page.assertPageElementAtIndexWithin('section', 1, 'dt', 1, 'Category')
     page.assertPageElementAtIndexWithin('section', 1, 'dt', 2, 'Offence date')
-    page.assertPageElementAtIndexWithin('section', 1, 'dd', 0, 'Endangering railway passengers - 00600 (1 count)')
+    page.assertPageElementAtIndexWithin('section', 1, 'dd', 0, 'Endangering railway passengers - 00600')
     page.assertPageElementAtIndexWithin('section', 1, 'dd', 1, 'Endangering railway passengers')
     page.assertPageElementAtIndexWithin('section', 1, 'dd', 2, '22 March 2024')
 
@@ -43,13 +43,7 @@ context('Sentence', () => {
     page.assertPageElementAtIndexWithin('section', 2, 'dt', 0, 'Offence')
     page.assertPageElementAtIndexWithin('section', 2, 'dt', 1, 'Category')
     page.assertPageElementAtIndexWithin('section', 2, 'dt', 2, 'Offence date')
-    page.assertPageElementAtIndexWithin(
-      'section',
-      2,
-      'dd',
-      0,
-      'Contravene court remedy order (S.42) - 08505 (3 counts)',
-    )
+    page.assertPageElementAtIndexWithin('section', 2, 'dd', 0, 'Contravene court remedy order (S.42) - 08505')
     page.assertPageElementAtIndexWithin('section', 2, 'dd', 1, 'Health and Safety at Work etc Act 1974')
     page.assertPageElementAtIndexWithin('section', 2, 'dd', 2, '21 February 2024')
   })
