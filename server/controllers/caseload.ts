@@ -291,7 +291,7 @@ const caseloadController: Controller<typeof routes, Args> = {
       }
     }
   },
-  getRecentCases: _hmppsAuthClient => {
+  getRecentCases: () => {
     return async (req, res) => {
       const currentNavSection = 'recentCases'
       req.session.backLink = '/recent-cases'
