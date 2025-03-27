@@ -7,19 +7,21 @@
 {% endset %}
 
 {% set offenceHtml %}
-  {% set countText %}
-    {% if offence.count == 1 %}
-      (1&nbsp;count)
-    {% else %}
-      ({{ offence.count }}&nbsp;counts)
-    {% endif %}
-  {% endset %}
+  {% if offence.count %}
+    {% set countText %}
+      {% if offence.count == 1 %}
+        (1&nbsp;count)
+      {% else %}
+        ({{ offence.count }}&nbsp;counts)
+      {% endif %}
+    {% endset %}
+  {% endif %}
 
   {{ govukSummaryList({
     rows: [
       {
         key: { text: "Offence" },
-        value: { html: offence.description + ' ' + countText }
+        value: { html: offence.description + ' ' + countText | nl2br if countText else offence.description }
       },
       {
         key: { text: "Category" },
