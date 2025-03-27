@@ -9,6 +9,7 @@ import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors } from '../utils/utils'
 import { mockActivity, mockTierCalculation, mockActivities, mockAppResponse, mockRisks, mockPredictors } from './mocks'
+import { checkAuditMessage } from './testutils'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -82,16 +83,7 @@ describe('/controllers/activityLogController', () => {
       await controllers.activityLog.getActivityLog(hmppsAuthClient)(req, res)
       expect(res.locals.defaultView).toEqual(true)
     })
-    it('should send an audit message', () => {
-      expect(auditSpy).toHaveBeenCalledWith({
-        action: 'VIEW_MAS_ACTIVITY_LOG',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: uuidv4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-    })
+    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG', uuidv4(), crn, 'CRN')
     it('should request the person activity from the api', () => {
       const expectedBody = {
         keywords: '',
@@ -146,16 +138,7 @@ describe('/controllers/activityLogController', () => {
       expect(getRisksSpy).toHaveBeenCalledWith(crn)
       expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
     })
-    it('should send an audit message', () => {
-      expect(auditSpy).toHaveBeenCalledWith({
-        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: uuidv4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-    })
+    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
     it('should render the appointment page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
         category: req.query.category,
