@@ -1,6 +1,5 @@
 import httpMocks from 'node-mocks-http'
 import { Response } from 'superagent'
-import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 as uuidv4 } from 'uuid'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import RoleService from '../services/roleService'
@@ -21,6 +20,7 @@ import {
 } from '../data/model/personalDetails'
 import { AddressOverview, AddressOverviewSummary, PersonSummary } from '../data/model/common'
 import controllers from '.'
+import { checkAuditMessage } from './testutils'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -88,7 +88,6 @@ const getContactsSpy = jest
   .spyOn(MasApiClient.prototype, 'getContacts')
   .mockImplementation(() => Promise.resolve(mockContacts))
 
-const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
@@ -112,19 +111,6 @@ const checkApiRequests = (): void => {
   })
   it('should request predictors from the api', () => {
     expect(predictorsSpy).toHaveBeenCalledWith(crn)
-  })
-}
-
-const checkAuditMessage = (action: string): void => {
-  it('should send an audit message', () => {
-    expect(auditSpy).toHaveBeenCalledWith({
-      action,
-      who: res.locals.user.username,
-      subjectId: crn,
-      subjectType: 'CRN',
-      correlationId: uuidv4(),
-      service: 'hmpps-manage-people-on-probation-ui',
-    })
   })
 }
 
@@ -157,7 +143,7 @@ describe('/controllers/personalDetails', () => {
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(true))
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
-        checkAuditMessage('VIEW_EDIT_PERSONAL_DETAILS')
+        checkAuditMessage(res, 'VIEW_EDIT_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
         it('should render the main address page', () => {
           expect(renderSpy).toHaveBeenCalledWith('pages/edit-contact-details/edit-contact-details', {
             personalDetails: mockPersonalDetails,
@@ -197,7 +183,7 @@ describe('/controllers/personalDetails', () => {
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(true))
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
-        checkAuditMessage('VIEW_EDIT_MAIN_ADDRESS')
+        checkAuditMessage(res, 'VIEW_EDIT_MAIN_ADDRESS', uuidv4(), crn, 'CRN')
         it('should render the main address page', () => {
           expect(renderSpy).toHaveBeenCalledWith('pages/edit-contact-details/edit-main-address', {
             personalDetails: mockPersonalDetails,
@@ -265,7 +251,7 @@ describe('/controllers/personalDetails', () => {
           }))
           await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, res)
         })
-        checkAuditMessage('SAVE_EDIT_MAIN_ADDRESS')
+        checkAuditMessage(res, 'SAVE_EDIT_MAIN_ADDRESS', uuidv4(), crn, 'CRN')
         it('should request the page data from the api', () => {
           expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
           expect(risksSpy).toHaveBeenCalledWith(crn)
@@ -320,7 +306,7 @@ describe('/controllers/personalDetails', () => {
           jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({}))
           await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, res)
         })
-        checkAuditMessage('SAVE_EDIT_MAIN_ADDRESS')
+        checkAuditMessage(res, 'SAVE_EDIT_MAIN_ADDRESS', uuidv4(), crn, 'CRN')
         it('should update the main address', () => {
           expect(updatePersonalDetailsAddressSpy).toHaveBeenCalledWith(crn, {
             addressTypeCode: '',
@@ -367,7 +353,7 @@ describe('/controllers/personalDetails', () => {
           }))
           await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, res)
         })
-        checkAuditMessage('SAVE_EDIT_PERSONAL_DETAILS')
+        checkAuditMessage(res, 'SAVE_EDIT_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
         it('should request the page data from the api', () => {
           expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
           expect(risksSpy).toHaveBeenCalledWith(crn)
@@ -410,7 +396,7 @@ describe('/controllers/personalDetails', () => {
           jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({}))
           await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, res)
         })
-        checkAuditMessage('SAVE_EDIT_PERSONAL_DETAILS')
+        checkAuditMessage(res, 'SAVE_EDIT_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
         it('should update the personal details', () => {
           const { emailAddress } = contactDetailsBody
           expect(updatePersonalDetailsContactSpy).toHaveBeenCalledWith(crn, {
@@ -429,7 +415,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getStaffContacts(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_SENTENCE_PROFESSIONAL_CONTACTS')
+    checkAuditMessage(res, 'VIEW_MAS_SENTENCE_PROFESSIONAL_CONTACTS', uuidv4(), crn, 'CRN')
     it('should request the contacts from the api', () => {
       expect(getContactsSpy).toHaveBeenCalledWith(crn)
     })
@@ -451,7 +437,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getPersonalContact(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_PERSONAL_CONTACT')
+    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_CONTACT', uuidv4(), crn, 'CRN')
     it('should request personal contact from the api', () => {
       expect(personalContactSpy).toHaveBeenCalledWith(crn, id)
     })
@@ -474,7 +460,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getPersonalContactNote(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_PERSONAL_CONTACT_NOTE')
+    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_CONTACT_NOTE', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(personalContactNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
     })
@@ -497,7 +483,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getMainAddressNote(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_PERSONAL_CONTACT_NOTE')
+    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_CONTACT_NOTE', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(mainAddressNoteSpy).toHaveBeenCalledWith(crn, noteId)
     })
@@ -520,7 +506,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getAddresses(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_VIEW_ALL_ADDRESSES')
+    checkAuditMessage(res, 'VIEW_MAS_VIEW_ALL_ADDRESSES', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(personalAddressesSpy).toHaveBeenCalledWith(crn)
     })
@@ -539,7 +525,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getAddressesNote(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_VIEW_ALL_ADDRESSES_NOTE')
+    checkAuditMessage(res, 'VIEW_MAS_VIEW_ALL_ADDRESSES_NOTE', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(addressesNoteSpy).toHaveBeenCalledWith(crn, addressId, noteId)
     })
@@ -564,7 +550,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getDocumentsDownload(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_DOWNLOAD_DOCUMENT')
+    checkAuditMessage(res, 'VIEW_MAS_DOWNLOAD_DOCUMENT', uuidv4(), crn, 'CRN')
     it('should request the download from the api', () => {
       expect(downloadDocumentSpy).toHaveBeenCalledWith(crn, documentId)
     })
@@ -583,7 +569,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getHandoff(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_HANDOFF_MOCKSYSTEM')
+    checkAuditMessage(res, 'VIEW_MAS_HANDOFF_MOCKSYSTEM', uuidv4(), crn, 'CRN')
     it('should request person summary from the api', () => {
       expect(getPersonSummarySpy).toHaveBeenCalledWith(crn)
     })
@@ -602,7 +588,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getDisabilities(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_DISABILITIES')
+    checkAuditMessage(res, 'VIEW_MAS_DISABILITIES', uuidv4(), crn, 'CRN')
     it('should request person disabilities from the api', () => {
       expect(getPersonDisabilitiesSpy).toHaveBeenCalledWith(crn)
     })
@@ -621,7 +607,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getDisabilitiesNote(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_DISABILITY_NOTE')
+    checkAuditMessage(res, 'VIEW_MAS_DISABILITY_NOTE', uuidv4(), crn, 'CRN')
     it('should request person disability note from the api', () => {
       expect(getPersonDisabilityNoteSpy).toHaveBeenCalledWith(crn, disabilityId, noteId)
     })
@@ -640,7 +626,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getAdjustments(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_ADJUSTMENTS')
+    checkAuditMessage(res, 'VIEW_MAS_ADJUSTMENTS', uuidv4(), crn, 'CRN')
     it('should request person adjustments from the api', () => {
       expect(getPersonAdjustmentsSpy).toHaveBeenCalledWith(crn)
     })
@@ -659,7 +645,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getAdjustmentsNote(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_VIEW_ALL_ADJUSTMENT_NOTE')
+    checkAuditMessage(res, 'VIEW_MAS_VIEW_ALL_ADJUSTMENT_NOTE', uuidv4(), crn, 'CRN')
     it('should request the adjustment note from the api', () => {
       expect(getPersonAdjustmentNoteSpy).toHaveBeenCalledWith(crn, adjustmentId, noteId)
     })
@@ -678,7 +664,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getCircumstances(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_CIRCUMSTANCES')
+    checkAuditMessage(res, 'VIEW_MAS_CIRCUMSTANCES', uuidv4(), crn, 'CRN')
     it('should request the circumstances from the api', () => {
       expect(getPersonCircumstancesSpy).toHaveBeenCalledWith(crn)
     })
@@ -697,7 +683,7 @@ describe('/controllers/personalDetails', () => {
     beforeEach(async () => {
       await controllers.personalDetails.getCircumstancesNote(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage('VIEW_MAS_VIEW_ALL_CIRCUMSTANCE_NOTE')
+    checkAuditMessage(res, 'VIEW_MAS_VIEW_ALL_CIRCUMSTANCE_NOTE', uuidv4(), crn, 'CRN')
     it('should request the circumstances from the api', () => {
       expect(getPersonCircumstanceNoteSpy).toHaveBeenCalledWith(crn, circumstanceId, noteId)
     })

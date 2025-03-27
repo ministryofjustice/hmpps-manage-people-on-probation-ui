@@ -13,6 +13,7 @@ import { CaseSearchFilter, TeamCaseload, UserCaseload, UserTeam } from '../data/
 import caseloadController from './caseload'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import * as utils from '../utils/utils'
+import { checkAuditMessage } from './testutils'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -69,19 +70,6 @@ const renderSpy = jest.spyOn(res, 'render')
 const mockCaseload = {} as UserCaseload
 const mockFilters = {} as CaseSearchFilter
 
-const checkAuditMessage = (action: string, subjectId = res.locals.user.username, subjectType = 'USER'): void => {
-  it('should send an audit message', () => {
-    expect(auditSpy).toHaveBeenCalledWith({
-      action,
-      who: res.locals.user.username,
-      subjectId,
-      subjectType,
-      correlationId: uuidv4(),
-      service: 'hmpps-manage-people-on-probation-ui',
-    })
-  })
-}
-
 describe('caseloadController', () => {
   const getUserScheduleSpy = jest
     .spyOn(MasApiClient.prototype, 'getUserSchedule')
@@ -117,7 +105,7 @@ describe('caseloadController', () => {
     beforeEach(async () => {
       await controllers.caseload.showCaseload()(req, res, nextSpy, mockArgs)
     })
-    checkAuditMessage('VIEW_MAS_CASELOAD')
+    checkAuditMessage(res, 'VIEW_MAS_CASELOAD', uuidv4())
     it('should render minimal cases', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/minimal-cases', {
         pagination: mockPagination,
@@ -512,7 +500,7 @@ describe('caseloadController', () => {
             ;[spy, userTeams] = setMockTeamResponse(2)
             await controllers.caseload.getTeams(hmppsAuthClient)(req, res)
           })
-          checkAuditMessage('VIEW_MAS_TEAMS')
+          checkAuditMessage(res, 'VIEW_MAS_TEAMS', uuidv4())
           it('should render the select a team page', () => {
             expect(renderSpy).toHaveBeenCalledWith('pages/caseload/select-team', { userTeams })
           })
@@ -542,7 +530,7 @@ describe('caseloadController', () => {
         ;[getUserTeamsSpy, userTeams] = setMockTeamResponse()
         await controllers.caseload.getChangeTeam(hmppsAuthClient)(req, res)
       })
-      checkAuditMessage('VIEW_MAS_TEAMS')
+      checkAuditMessage(res, 'VIEW_MAS_TEAMS', uuidv4())
       it('should request the user teams from the api', async () => {
         await controllers.caseload.getTeams(hmppsAuthClient)(req, res)
         expect(getUserTeamsSpy).toHaveBeenCalledWith(res.locals.user.username)
@@ -618,7 +606,7 @@ describe('caseloadController', () => {
           beforeEach(async () => {
             await controllers.caseload.getTeamCase(hmppsAuthClient)(req, res)
           })
-          checkAuditMessage('VIEW_MAS_CASELOAD_TEAM', team, 'TEAM')
+          checkAuditMessage(res, 'VIEW_MAS_CASELOAD_TEAM', uuidv4(), team, 'TEAM')
           it('should request the team caseload from the api', async () => {
             expect(getTeamCaseloadSpy).toHaveBeenCalledWith(req.session.mas.team, '0')
           })
@@ -648,7 +636,7 @@ describe('caseloadController', () => {
           beforeEach(async () => {
             await controllers.caseload.getTeamCase(hmppsAuthClient)(req, res)
           })
-          checkAuditMessage('VIEW_MAS_CASELOAD_TEAM', team, 'TEAM')
+          checkAuditMessage(res, 'VIEW_MAS_CASELOAD_TEAM', uuidv4(), team, 'TEAM')
           it('should not request the team caseload from the api', () => {
             expect(getTeamCaseloadSpy).not.toHaveBeenCalled()
           })
@@ -726,7 +714,8 @@ describe('caseloadController', () => {
     it('should set the backLink session value', () => {
       expect(req.session.backLink).toEqual('/recent-cases')
     })
-    checkAuditMessage('VIEW_MAS_RECENT_CASES')
+    checkAuditMessage(res, 'VIEW_MAS_RECENT_CASES', uuidv4())
+
     it('should render the recent cases page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/recent-cases', { currentNavSection: 'recentCases' })
     })

@@ -1,5 +1,4 @@
 import httpMocks from 'node-mocks-http'
-import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 as uuidv4 } from 'uuid'
 import logger from '../../logger'
 import controllers from '.'
@@ -17,6 +16,7 @@ import {
   mockPersonSchedule,
   mockPersonAppointment,
 } from './mocks'
+import { checkAuditMessage } from './testutils'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -84,7 +84,6 @@ const getPredictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
 
-const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
 const loggerSpy = jest.spyOn(logger, 'info')
 
 describe('controllers/appointments', () => {
@@ -95,16 +94,7 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
     })
-    it('should send an audit message', () => {
-      expect(auditSpy).toHaveBeenCalledWith({
-        action: 'VIEW_MAS_APPOINTMENTS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: uuidv4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-    })
+    checkAuditMessage(res, 'VIEW_MAS_APPOINTMENTS', uuidv4(), crn, 'CRN')
     it('should request previous and upcoming appointments from the api', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming')
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
@@ -144,16 +134,7 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getAppointmentDetails(hmppsAuthClient)(req, res)
     })
-    it('should send an audit message', () => {
-      expect(auditSpy).toHaveBeenCalledWith({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: uuidv4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-    })
+    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
     it('should request the person appointment from the api', () => {
       expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId)
     })
@@ -169,16 +150,7 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
-    it('should send an audit message', () => {
-      expect(auditSpy).toHaveBeenCalledWith({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: uuidv4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-    })
+    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
     it('should request previous appointments from the api', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
     })
