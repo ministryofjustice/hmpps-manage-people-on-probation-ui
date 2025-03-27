@@ -31,4 +31,4 @@ generic-service:
     ENVIRONMENT: prod
 
 generic-prometheus-alerts:
-  alertSeverity: probation-integration-notifications
+  alertSeverity: manage-people-on-probation-alerts

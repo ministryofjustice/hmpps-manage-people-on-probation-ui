@@ -11,17 +11,18 @@ export const getPersonActivity = async (
   res: AppResponse,
   hmppsAuthClient: HmppsAuthClient,
 ): Promise<[TierCalculation, PersonActivity]> => {
-  const { filters } = res.locals
   const { params, query } = req
-  const { keywords, dateFrom, dateTo, compliance } = filters
+  const compliance: string[] = req.session?.activityLogFilters?.compliance
+  const { keywords, dateFrom, dateTo } = req.session?.activityLogFilters ?? {
+    keywords: '',
+    dateFrom: '',
+    dateTo: '',
+  }
   const { crn } = params
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
   const masClient = new MasApiClient(token)
   const tierClient = new TierApiClient(token)
-
-  let personActivity: PersonActivity | null = null
-  let tierCalculation: TierCalculation | null = null
 
   const body: ActivityLogRequestBody = {
     keywords,
@@ -29,7 +30,7 @@ export const getPersonActivity = async (
     dateTo: dateTo ? toIsoDate(dateTo) : '',
     filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
   }
-  ;[personActivity, tierCalculation] = await Promise.all([
+  const [personActivity, tierCalculation] = await Promise.all([
     masClient.postPersonActivityLog(crn, body, page as string),
     tierClient.getCalculationDetails(crn),
   ])

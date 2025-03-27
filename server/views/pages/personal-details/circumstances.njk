@@ -1,6 +1,6 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = 'Personal circumstances' %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Personal circumstances", "Personal circumstances"] }) %}
+{% set pageTitle = makePageTitle({ pageHeading: ["Personal circumstances", "Personal details"] }) %}
 
 {% block beforeContent %}
 {{ govukBreadcrumbs({
@@ -27,6 +27,10 @@
 
 {% block content %}
 <h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>
+
+{% if circumstances.circumstances.length > 0 %}
+  <h2 class="govuk-heading-m" data-qa="currentCircumstancesTitle">Current circumstances</h2>
+{% endif %}
 
 {% for circumstance in circumstances.circumstances %}
 
@@ -56,6 +60,10 @@
           value: { html: '<span data-qa="startDateValue">' + circumstance.startDate | dateWithYear + '</span>' }
         },
         {
+          key: { html: '<span data-qa="endDateLabel">End date</span>' },
+          value: { html: '<span data-qa="endDateValue">' + circumstance.endDate | dateWithYear + '</span>' if circumstance.endDate else '<span data-qa="endDateValue">No end date selected</span>' }
+        },
+        {
           key: { html: '<span data-qa="verifiedLabel">Verified?</span>' },
           value: { html: '<span data-qa="verifiedValue"> ' + 'Yes' if circumstance.verified else 'No' + '</span>' }
         },
@@ -75,7 +83,67 @@
     titleHtml: '<span class="govuk-!-font-weight-regular govuk-!-font-size-19">' + circumstance.type + '</span><br />' + circumstance.subType,
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: circumstanceHtml,
-    attributes: {'data-qa': 'personalCircumstancesCard'},
+    attributes: {'data-qa': 'personalCircumstances'+ loop.index +'Card'},
+    actions: {}
+  }) }}
+{% endfor %}
+
+{% if circumstances.previousCircumstances.length > 0 %}
+  <h2 class="govuk-heading-m" data-qa="previousCircumstancesTitle">Previous circumstances</h2>
+{% endif %}
+
+{% for circumstance in circumstances.previousCircumstances %}
+
+  {% set notes = '' %}
+  {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
+  {% if hasNotes  %}
+    {% for circumstanceNote in circumstance.circumstanceNotes %}
+      {% if circumstanceNote.note %}
+        {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
+      {% endif %}
+    {% endfor  %}
+  {% endif %}
+
+  {% set circumstanceHtml %}
+    {{ govukSummaryList({
+      rows: [
+        {
+          key: { html: '<span data-qa="typeLabel">Type</span>' },
+          value: { html: '<span data-qa="typeValue">' + circumstance.type + '</span>' }
+        },
+        {
+          key: { html: '<span data-qa="subTypeLabel">Sub-type</span>' },
+          value: { html: '<span data-qa="subTypeValue">' + circumstance.subType + '</span>' }
+        },
+        {
+          key: { html: '<span data-qa="startDateLabel">Start date</span>' },
+          value: { html: '<span data-qa="startDateValue">' + circumstance.startDate | dateWithYear + '</span>' }
+        },
+        {
+          key: { html: '<span data-qa="endDateLabel">End date</span>' },
+          value: { html: '<span data-qa="endDateValue">' + circumstance.endDate | dateWithYear + '</span>' }
+        },
+        {
+          key: { html: '<span data-qa="verifiedLabel">Verified?</span>' },
+          value: { html: '<span data-qa="verifiedValue"> ' + 'Yes' if circumstance.verified else 'No' + '</span>' }
+        },
+        {
+          key: { html: '<span data-qa="notesLabel">Notes</span>' },
+          value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
+        }
+      ]
+    }) }}
+
+    <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s" data-qa="lastUpdatedBy">
+      {{ lastUpdatedBy(circumstance.lastUpdated, circumstance.lastUpdatedBy)}}
+    </p>
+  {% endset %}
+
+  {{ appSummaryCard({
+    titleHtml: '<span class="govuk-!-font-weight-regular govuk-!-font-size-19">' + circumstance.type + '</span><br />' + circumstance.subType,
+    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+    html: circumstanceHtml,
+    attributes: {'data-qa': 'previousCircumstances'+ loop.index +'Card'},
     actions: {}
   }) }}
 {% endfor %}

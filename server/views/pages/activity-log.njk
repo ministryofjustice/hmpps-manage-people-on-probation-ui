@@ -36,36 +36,6 @@
 {% endif %}
 {% endblock %}
 
-{% switch category %}
-  {% case 'national-standard-appointments' %}
-    {% set title = 'National Standard appointments' %}
-    {% set emptyText = 'There are no National Standard appointments' %}
-  {% case 'national-standard-appointments-without-outcome' %}
-    {% set title = 'National Standard appointments without an outcome' %}
-    {% set emptyText = 'There are no National Standard appointments needing an outcome' %}
-  {% case 'complied-appointments' %}
-    {% set title = 'Complied appointments' %}
-    {% set emptyText = 'There are no complied appointments' %}
-  {% case 'acceptable-absence-appointments' %}
-    {% set title = 'Acceptable abscences' %}
-    {% set emptyText = 'There have been no acceptable absences' %}
-  {% case 'waiting-for-evidence' %}
-    {% set title = 'Absences waiting for evidence' %}
-    {% set emptyText = 'There are no absences waiting for evidence' %}
-  {% case 'all-failure-to-comply-appointments' %}
-    {% set title = 'Failures to comply within 12 months' %}
-    <!-- If breach was proven within last 12 months: 'Failures to comply since breach' %} -->
-    {% set emptyText = 'There have been no failures to comply in the last 12 months' %}
-  {% case 'warning-letters' %}
-    {% set title = 'Warning letters' %}
-    {% set emptyText = 'There have been no warning letters' %}
-  {% case 'all-rescheduled' %}
-    {% set title = 'Rescheduled appointments' %}
-    {% set emptyText = 'There are no rescheduled appointments' %}
-  {% default %}
-    {% set title = 'Activity log' %}
-    {% set emptyText = 'There has been no activity' %}
-{% endswitch %}
 {% block pageContent %}
 
 <div class="govuk-grid-row govuk-!-margin-top-4">
@@ -94,9 +64,9 @@
 {% if personActivity.totalPages > 1 %}
 <div class="govuk-!-margin-top-8">
  {{ appPagination({
-  currentPage: query.page | int,
+  currentPage: page | int,
   totalPages: personActivity.totalPages,
-  url: filters.baseUrl + filters.queryStrPrefix + filters.queryStr + filters.queryStrSuffix + 'view=' + view + '&'
+  url: filters.baseUrl + '?view=' + view + '&'
   }) }}
 </div>
 {% endif %}

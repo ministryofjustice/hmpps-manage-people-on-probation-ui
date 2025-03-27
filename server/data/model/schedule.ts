@@ -1,5 +1,6 @@
 import { Name, PersonSummary } from './common'
 import { Document, Address } from './personalDetails'
+import { Note } from './note'
 
 export interface Schedule {
   personSummary: PersonSummary
@@ -12,7 +13,8 @@ export interface Activity {
   startDateTime?: string
   endDateTime?: string
   rarToolKit?: string
-  notes?: string
+  appointmentNotes?: Note[]
+  appointmentNote?: Note
   isSensitive?: boolean
   hasOutcome?: boolean
   wasAbsent?: boolean
