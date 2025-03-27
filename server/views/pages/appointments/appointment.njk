@@ -2,7 +2,6 @@
 {% set appointment = personAppointment.appointment %}
 {% set pageTitle = makePageTitle({ pageHeading: [appointment.type, "Appointments" if not isActivityLog else "Activity log"] }) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&') if queryParams.length > 0  else ''  %}
-{% set category = '/' + category + '/' + extraBreadcrumb if category else extraBreadcrumb  %}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed  %}
 {% block beforeContent %}
@@ -19,7 +18,7 @@
     },
     {
       text: "Appointments" if not isActivityLog else "Activity log",
-      href: "/case/" + crn + "/appointments" if not isActivityLog else "/case/" + crn + "/activity-log" + category
+      href: "/case/" + crn + "/appointments" if not isActivityLog else "/case/" + crn + "/activity-log" + extraBreadcrumb
     },
     {
       text: appointment.type

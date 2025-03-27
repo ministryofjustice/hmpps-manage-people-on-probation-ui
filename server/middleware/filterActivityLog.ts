@@ -6,7 +6,8 @@ import { ActivityLogFilters, Option, Route, SelectedFilterItem } from '../@types
 import { filterOptions as complianceFilterOptions } from '../properties'
 
 export const filterActivityLog: Route<void> = (req, res, next): void => {
-  if (req?.query?.clear) {
+  if (req?.query?.clear || (Object.keys(req.query).length === 0 && req.method === 'GET')) {
+    // Only clear session when there is no query params in a GET request or it has been explicitly requested
     req.session.activityLogFilters = undefined
   }
   const { crn } = req.params

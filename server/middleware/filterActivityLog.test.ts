@@ -8,6 +8,7 @@ const maxDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() 
 const crn = 'X000001'
 
 interface Args {
+  page?: string
   keywords?: string
   dateFrom?: string
   dateTo?: string
@@ -19,6 +20,7 @@ interface Args {
 }
 
 const defaultRequest: Args = {
+  page: undefined,
   keywords: 'test',
   dateFrom: '21/03/2025',
   dateTo: '22/03/2025',
@@ -57,9 +59,6 @@ const getRequest = (args?: Args) => {
   return req
 }
 
-const getComplianceQuery = (compliance: string[]) =>
-  compliance.map(item => `${item.replace(' ', '%20')}`).join('&compliance=')
-
 describe('/middleware/filterActivityLog()', () => {
   const res = {
     locals: {
@@ -74,6 +73,25 @@ describe('/middleware/filterActivityLog()', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+  })
+
+  describe('submit is in request query params', () => {
+    const req = getRequest({ submit: true })
+    beforeEach(() => {
+      filterActivityLog(req, res, nextSpy)
+    })
+    it('should load the page setting the session activityLogFilters to undefined', () => {
+      expect(req.session.activityLogFilters).toEqual({
+        clearFilterKey: '',
+        clearFilterValue: '',
+        compliance: ['no outcome', 'complied', 'not complied'],
+        dateFrom: '21/03/2025',
+        dateTo: '22/03/2025',
+        errors: false,
+        keywords: 'test',
+        submit: true,
+      })
+    })
   })
 
   describe('submit is in request query params', () => {
@@ -125,10 +143,16 @@ describe('/middleware/filterActivityLog()', () => {
 
   describe('All filters are completed', () => {
     const req = getRequest()
+    req.session.activityLogFilters = {
+      compliance: ['not complied'],
+      dateFrom: '20/03/2025',
+      dateTo: '23/03/2025',
+      keywords: 'testing',
+    }
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
-    it('should assign the correct values to res.locals.filters', () => {
+    it('should clear session and assign the correct values to res.locals.filters', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
@@ -228,6 +252,54 @@ describe('/middleware/filterActivityLog()', () => {
         compliance: req.query.compliance as string[],
         dateFrom: '',
         dateTo: '',
+        maxDate,
+      }
+      expect(res.locals.filters).toEqual(expectedResponse)
+    })
+  })
+
+  describe('Should not clear session when page already selected in query string', () => {
+    const req = getRequest({ page: '0', submit: false })
+    req.url = `/case/${crn}/activity-log?page=0`
+    req.session.activityLogFilters = {
+      compliance: ['not complied'],
+      dateFrom: '20/03/2025',
+      dateTo: '23/03/2025',
+      keywords: 'testing',
+    }
+    beforeEach(() => {
+      filterActivityLog(req, res, nextSpy)
+    })
+    it('should assign the correct values to res.locals.filters', () => {
+      const url = `/case/${crn}/activity-log`
+      const expectedResponse: ActivityLogFiltersResponse = {
+        errors: req.session.errors,
+        selectedFilterItems: {
+          compliance: [
+            {
+              text: 'Not complied',
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=not%20complied`,
+            },
+          ],
+          dateRange: [
+            {
+              text: '20/03/2025 - 23/03/2025',
+              href: `${url}?clearFilterKey=dateRange`,
+            },
+          ],
+          keywords: [
+            {
+              text: 'testing',
+              href: `${url}?clearFilterKey=keywords`,
+            },
+          ],
+        },
+        complianceOptions: filterOptions.map(({ text, value }) => ({ text, value, checked: value === 'not complied' })),
+        baseUrl: `/case/${crn}/activity-log`,
+        keywords: 'testing',
+        compliance: ['not complied'],
+        dateFrom: '20/03/2025',
+        dateTo: '23/03/2025',
         maxDate,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
