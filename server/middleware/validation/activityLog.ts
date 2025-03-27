@@ -7,8 +7,8 @@ import { toCamelCase } from '../../utils/utils'
 
 const activityLog: Route<void> = (req, res, next): void => {
   const { dateFrom, dateTo } = req.body
-  const { url, body } = req
-  const { submit } = body
+  const { url } = req
+  const { error } = req.query
   const isValid: { [key: string]: boolean } = {
     dateFrom: true,
     dateTo: true,
@@ -89,15 +89,18 @@ const activityLog: Route<void> = (req, res, next): void => {
   }
 
   let errors: Errors = null
-  if (submit) {
+  if (!error) {
+    delete req.session.errors
+  }
+
+  if (req.method === 'POST') {
     if (req?.session?.errors) {
       delete req.session.errors
     }
-
     validateDateRanges()
     if (errors) {
       req.session.errors = errors
-      return res.redirect(url.replace('&submit=true', ''))
+      return res.redirect(`${url}?error=true`)
     }
   }
   return next()
