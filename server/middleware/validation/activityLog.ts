@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import logger from '../../../logger'
-import { Errors, Route } from '../../@types'
+import { ActivityLogFilters, Errors, Route } from '../../@types'
 import { errorMessages } from '../../properties'
 import utils from '../../utils'
 import { toCamelCase } from '../../utils/utils'
@@ -8,7 +8,6 @@ import { toCamelCase } from '../../utils/utils'
 const activityLog: Route<void> = (req, res, next): void => {
   const { dateFrom, dateTo } = req.body
   const { url } = req
-  const { error } = req.query
   const isValid: { [key: string]: boolean } = {
     dateFrom: true,
     dateTo: true,
@@ -89,10 +88,9 @@ const activityLog: Route<void> = (req, res, next): void => {
   }
 
   let errors: Errors = null
-  if (!error) {
+  if (Object.keys(req.query).length === 0 && req.method === 'GET') {
     delete req.session.errors
   }
-
   if (req.method === 'POST') {
     if (req?.session?.errors) {
       delete req.session.errors
@@ -100,6 +98,9 @@ const activityLog: Route<void> = (req, res, next): void => {
     validateDateRanges()
     if (errors) {
       req.session.errors = errors
+      const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
+      req.session.activityLogFilters = req.body as ActivityLogFilters
+      req.session.activityLogFilters.compliance = complianceFilters
       return res.redirect(`${url}?error=true`)
     }
   }
