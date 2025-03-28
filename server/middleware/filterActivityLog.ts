@@ -18,13 +18,13 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const { clearFilterKey, clearFilterValue } = req.query
   const errors = req?.session?.errors
 
-  if (req.body?.submit) {
+  if (req.body?.submit && !req?.query?.error) {
     const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
     req.session.activityLogFilters = req.body as ActivityLogFilters
     req.session.activityLogFilters.compliance = complianceFilters
   }
 
-  if (req.session?.activityLogFilters) {
+  if (req.session?.activityLogFilters && !req?.query?.error) {
     keywords = req.session?.activityLogFilters.keywords
     dateFrom = req.session?.activityLogFilters.dateFrom
     dateTo = req.session?.activityLogFilters.dateTo
