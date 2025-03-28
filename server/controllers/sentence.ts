@@ -200,7 +200,7 @@ const sentenceController: Controller<typeof routes> = {
         subjectId: crn,
         subjectType: 'CRN',
         correlationId: v4(),
-        service: 'hmpps-manage-a-supervision-ui',
+        service: 'hmpps-manage-people-on-probation-ui',
       })
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)

@@ -61,6 +61,9 @@ const req = httpMocks.createRequest({
 })
 
 describe('interventionsController', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('getInterventions', () => {
     beforeEach(async () => {
       await controllers.interventions.getInterventions(hmppsAuthClient)(req, res)
