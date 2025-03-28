@@ -53,6 +53,9 @@ const getPersonComplianceSpy = jest
   .mockImplementation(() => Promise.resolve(mockPersonCompliance))
 
 describe('complianceController', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   const req = httpMocks.createRequest({
     params: {
       crn,
