@@ -184,11 +184,9 @@ const caseloadController: Controller<typeof routes, Args> = {
           case 1: {
             req.session.mas.team = userTeams.teams[0].code
             return res.redirect(`/team/case`)
-            break
           }
           case 0: {
             return res.redirect(`/team/case`)
-            break
           }
           default: {
             await auditService.sendAuditMessage({
