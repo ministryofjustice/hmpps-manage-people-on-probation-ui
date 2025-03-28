@@ -1,10 +1,8 @@
 import { Router } from 'express'
 import type { Services } from '../services'
+import controllers from '../controllers'
 
 export default function searchRoutes(router: Router, { searchService }: Services) {
   router.post('/search', searchService.post)
-  router.get('/search', searchService.get, (req, res) => {
-    req.session.backLink = '/search'
-    res.render('pages/search')
-  })
+  router.get('/search', searchService.get, controllers.search.getSearch())
 }

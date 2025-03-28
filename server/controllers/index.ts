@@ -9,6 +9,8 @@ import interventionsController from './interventions'
 import riskController from './risk'
 import sentenceController from './sentence'
 import arrangeAppointmentController from './arrangeAppointment'
+import accessibilityController from './accessibility'
+import searchController from './search'
 
 export default {
   caseload: caseloadController,
@@ -22,4 +24,6 @@ export default {
   risk: riskController,
   sentence: sentenceController,
   arrangeAppointments: arrangeAppointmentController,
+  accessibility: accessibilityController,
+  search: searchController,
 }
