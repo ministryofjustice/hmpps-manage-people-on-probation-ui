@@ -24,7 +24,7 @@ generic-service:
     CAS1_LINK: "https://approved-premises-preprod.hmpps.service.justice.gov.uk/"
     CAS3_LINK: "https://transitional-accommodation-preprod.hmpps.service.justice.gov.uk/referrals"
     CAVAL_LINK: "https://create-and-vary-a-licence-preprod.hmpps.service.justice.gov.uk"
-    EPF2_LINK: "https://epf.linkspace.uk"
+    EPF2_LINK: "/"
     TIER_LINK: "https://tier-preprod.hmpps.service.justice.gov.uk/case"
     SENTENCE_PLAN_LINK: "https://sentence-plan-preprod.hmpps.service.justice.gov.uk/about-pop"
     ENVIRONMENT_NAME: PRE-PRODUCTION

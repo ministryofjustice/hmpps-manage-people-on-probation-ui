@@ -24,7 +24,7 @@ generic-service:
     CAS1_LINK: "https://approved-premises-dev.hmpps.service.justice.gov.uk/"
     CAS3_LINK: "https://transitional-accommodation-dev.hmpps.service.justice.gov.uk/referrals"
     CAVAL_LINK: "https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk"
-    EPF2_LINK: "https://epf.linkspace.uk"
+    EPF2_LINK: "/"
     TIER_LINK: "https://tier-dev.hmpps.service.justice.gov.uk/case"
     SENTENCE_PLAN_LINK: "https://sentence-plan-dev.hmpps.service.justice.gov.uk/about-pop"
     ENVIRONMENT_NAME: DEV
