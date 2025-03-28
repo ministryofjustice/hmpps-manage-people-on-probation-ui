@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
-import type { ActivityLogRequestBody, AppResponse, Controller } from '../@types'
+import type { ActivityLogRequestBody, Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors, toCamelCase, toIsoDate } from '../utils/utils'
 import MasApiClient from '../data/masApiClient'
