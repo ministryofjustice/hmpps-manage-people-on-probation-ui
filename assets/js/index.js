@@ -77,3 +77,14 @@ const setNoFixedAddressConditional = () => {
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
+
+const search = document.getElementById('homepage-search-suggestions')
+
+if (search) {
+  search.addEventListener('click', e => {
+    if (e.target.dataset.suggestedQuery) {
+      document.getElementById('search').value = e.target.dataset.suggestedQuery
+      document.getElementById('homepage-search-form').submit()
+    }
+  })
+}
