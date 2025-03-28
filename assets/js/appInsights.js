@@ -20,7 +20,13 @@ document.initialiseTelemetry = (applicationInsightsConnectionString, application
     }
     const uri = element.getAttribute('title')
     if (uri && uri.includes('Select case record')) {
-      return 'searchPersonNameLink'
+      return 'Search Persons Name Link'
+    }
+    if (element.className === 'moj-filter__tag') {
+      return 'Clear Filter Tag'
+    }
+    if (element.className.includes('moj-datepicker')) {
+      return 'Date selected'
     }
     return ''
   }
