@@ -27,6 +27,17 @@ const checkColumnHeading = (
   page.getTableColumnHeading(index).find('button').should('exist')
 }
 
+const checkColumnSorting = (page: UserAppointments, index: number) => {
+  const firstSort = index < 3 ? 'ascending' : 'descending'
+  const secondSort = index < 3 ? 'descending' : 'ascending'
+  page.getTableColumnHeading(index).find('button').click()
+  page.getTableColumnHeading(index).should('have.attr', 'aria-sort', firstSort)
+  page.getTableCell(1, 1).find('a').should('contain.text', 'Berge, Alton').should('have.attr', 'href', '/case/X778160')
+  page.getTableColumnHeading(index).find('button').click()
+  page.getTableColumnHeading(index).should('have.attr', 'aria-sort', secondSort)
+  page.getTableCell(1, 1).find('a').should('contain.text', 'Berge, Alton').should('have.attr', 'href', '/case/X778160')
+}
+
 context('Outcomes to log', () => {
   afterEach(() => {
     cy.task('resetMocks')
@@ -78,6 +89,14 @@ context('Outcomes to log', () => {
       .should('have.attr', 'href', '/caseload/appointments/no-outcome?page=0')
       .should('have.attr', 'aria-current', 'page')
   })
+  const sortableColumns = ['Name / CRN', 'DOB / Age', 'Sentence', 'Date and time']
+  for (let i = 0; i < sortableColumns.length; i += 1) {
+    it(`should request the sorted results from the api and re-render the page when ${sortableColumns[i - 1]} sort button is clicked`, () => {
+      cy.visit('/caseload/appointments/no-outcome')
+      const page = new UserAppointments()
+      checkColumnSorting(page, i)
+    })
+  }
 
   it('Outcomes to log page is rendered with no results', () => {
     cy.task('stubNoOutcomesToLog')

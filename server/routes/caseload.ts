@@ -84,6 +84,7 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
   })
 
   const showCaseload = async (req: Request, res: AppResponse, caseload: UserCaseload, filter: CaseSearchFilter) => {
+    let newCaseload = caseload
     const currentNavSection = 'yourCases'
     await auditService.sendAuditMessage({
       action: 'VIEW_MAS_CASELOAD',
@@ -100,10 +101,15 @@ export default function caseloadRoutes(router: Router, { hmppsAuthClient }: Serv
       page => addParameters(req, { page: page.toString() }),
       caseload?.pageSize || config.apis.masApi.pageSize,
     )
-
+    if (req?.query?.sortBy) {
+      newCaseload = {
+        ...caseload,
+        sortedBy: req.query.sortBy as string,
+      }
+    }
     res.render('pages/caseload/minimal-cases', {
       pagination,
-      caseload,
+      caseload: newCaseload,
       currentNavSection,
       filter,
     })
