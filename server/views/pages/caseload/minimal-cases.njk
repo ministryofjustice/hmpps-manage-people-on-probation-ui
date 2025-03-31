@@ -170,27 +170,27 @@
                'data-qa': 'myCasesCard'
              },
              head: [
-               {
-                 html: "Name / CRN",
-                 attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'action': 'case'}
-               },
-               {
-                 html: "DOB / Age",
-                 attributes: {'aria-sort': setSortOrder('dob', caseload.sortedBy) , 'col-name': 'dob', 'data-qa': 'dob', 'action': 'case' },
-                 classes: "nowrap"
-               },
-               {
-                 text: "Sentence",
-                 attributes: {'aria-sort': setSortOrder('sentence', caseload.sortedBy) , 'col-name': 'sentence', 'action': 'case'}
-               },
-               {
-                 text: "Last contact",
-                 attributes: {'aria-sort': setSortOrder('lastContact', caseload.sortedBy) , 'col-name': 'lastContact', 'action': 'case' }
-               },
-               {
-                 text: "Next contact",
-                 attributes: {'aria-sort': setSortOrder('nextContact', caseload.sortedBy) , 'col-name': 'nextContact', 'action': 'case' }
-               }
+                 {
+                     html: "Name / CRN",
+                     attributes: {'aria-sort': setSortOrder('nameOrCrn', caseload.sortedBy) , 'col-name': 'nameOrCrn', 'data-sort-name': 'nameOrCrn', 'data-sort-action': 'case'}
+                 },
+                 {
+                     html: "DOB / Age",
+                     attributes: {'aria-sort': setSortOrder('dob', caseload.sortedBy) , 'col-name': 'dob', 'data-qa': 'dob', 'data-sort-name': 'dob',  'data-sort-action': 'case' },
+                     classes: "nowrap"
+                 },
+                 {
+                     text: "Sentence",
+                     attributes: {'aria-sort': setSortOrder('sentence', caseload.sortedBy) , 'col-name': 'sentence', 'data-sort-name': 'sentence', 'data-sort-action': 'case'}
+                 },
+                 {
+                     text: "Last contact",
+                     attributes: {'aria-sort': setSortOrder('lastContact', caseload.sortedBy) , 'col-name': 'lastContact', 'data-sort-name': 'lastContact', 'data-sort-action': 'case' }
+                 },
+                 {
+                     text: "Next contact",
+                     attributes: {'aria-sort': setSortOrder('nextContact', caseload.sortedBy) , 'col-name': 'nextContact',  'data-sort-name': 'nextContact', 'data-sort-action': 'case' }
+                 }
              ],
              rows: rows
            }) }}
