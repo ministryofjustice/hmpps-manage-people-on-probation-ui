@@ -7,6 +7,7 @@ export interface UserCaseload {
   pageSize: number
   provider: string
   staff: Name
+  sortedBy: string
   caseload: Caseload[]
 }
 export interface TeamCaseload {
