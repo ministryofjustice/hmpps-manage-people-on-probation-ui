@@ -30,6 +30,8 @@ generic-service:
       # handle header already sent while sending to client, needs further investigation for potential fix
       SecRule REQUEST_URI "@rx ^\/case\/\w{7}" "id:103,phase:1,pass,t:none,nolog,ctl:ruleRemoveById=959100"
       SecRule REQUEST_URI "/recent-cases" "id:104,phase:1,pass,t:none,nolog,ctl:ruleRemoveById=959100"
+      
+      SecRule REQUEST_URI "@streq /id:105,phase:1,pass,t:none,nolog,ctl:ruleRemoveById=949110"
 
       # Send ModSecurity audit logs to the stdout (only for rejected requests)
       SecAuditLog /dev/stdout
