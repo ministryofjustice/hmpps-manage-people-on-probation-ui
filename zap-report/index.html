@@ -17,7 +17,7 @@
 		<p>
 			<span>Generated with</span> <a href="https://zaproxy.org"><img
 				src="index/zap32x32.png" alt="The ZAP logo" class="zap-logo">ZAP</a>
-			<span>on Mon 31 Mar 2025, at 09:44:40</span>
+			<span>on Tue 1 Apr 2025, at 08:43:16</span>
 		</p>
 		<p>ZAP Version: 2.16.1</p>
 		<p>
@@ -59,7 +59,7 @@
 							<li><a
 								href="#alerts--risk-2-confidence-3"><span>Risk</span>=<span
 									class="risk-level">Medium</span>, <span>Confidence</span>=<span
-									class="confidence-level">High</span> <span>(1)</span></a></li>
+									class="confidence-level">High</span> <span>(2)</span></a></li>
 							  
 							 
 						</ol></li>
@@ -183,9 +183,9 @@
 						<tr>
 							
 							<th scope="row">Medium</th>
-							<td><span>1</span><br> <span
+							<td><span>2</span><br> <span
 								class="additional-info-percentages">(100.0%)</span></td>
-							<td><span>1</span><br> <span class="additional-info-percentages">(100.0%)</span></td>
+							<td><span>2</span><br> <span class="additional-info-percentages">(100.0%)</span></td>
 						</tr>
 						<tr>
 							
@@ -196,9 +196,9 @@
 						</tr>
 						<tr>
 							<th scope="row">Total</th>
-							<td><span>1</span><br> <span
+							<td><span>2</span><br> <span
 								class="additional-info-percentages">(100.0%)</span></td>
-							<td><span>1</span><br> <span
+							<td><span>2</span><br> <span
 								class="additional-info-percentages">(100%)</span></td>
 						</tr>
 					</tbody>
@@ -245,7 +245,19 @@
 						</tr>
 					</thead>
 					<tbody>
-						
+						<tr>
+							<th scope="rowgroup"
+								rowspan="1">Site</th>
+							<th scope="row">https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk</th>
+							
+							<td><span>0</span><br> <span
+								class="additional-info-percentages">(0)</span></td>
+							<td><span>1</span><br> <span
+								class="additional-info-percentages">(1)</span></td>
+							<td><span>0</span><br> <span
+								class="additional-info-percentages">(1)</span></td>
+							
+						</tr>
 					</tbody>
 				</table>
 			</section>
@@ -271,14 +283,21 @@
 								href="#alert-type-0">CSP: Failure to Define Directive with No Fallback</a></th>
 							<td class="risk-level">Medium</td>
 							<td><span>1</span><br> <span
-								class="additional-info-percentages">(100.0%)</span></td>
+								class="additional-info-percentages">(50.0%)</span></td>
+						</tr>
+						<tr>
+							<th scope="row"><a
+								href="#alert-type-1">Content Security Policy (CSP) Header Not Set</a></th>
+							<td class="risk-level">Medium</td>
+							<td><span>16</span><br> <span
+								class="additional-info-percentages">(800.0%)</span></td>
 						</tr>
 					</tbody>
 					<tfoot>
 						<tr>
 							<th scope="row">Total</th>
 							<td></td>
-							<td>1</td>
+							<td>2</td>
 						</tr>
 					</tfoot>
 				</table>
@@ -295,9 +314,121 @@
 					<h3>
 						<span>Risk</span>=<span
 							class="risk-level">Medium</span>, <span>Confidence</span>=<span
-							class="confidence-level">High</span> <span>(1)</span>
+							class="confidence-level">High</span> <span>(2)</span>
 					</h3>
 					<ol>
+						
+						<li class="alerts--site-li">
+							<h4>
+								<span class="site">https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk</span> <span>(1)</span>
+							</h4>
+							<ol>
+								
+								<li>
+									<h5>
+										<a
+											href="#alert-type-1">Content Security Policy (CSP) Header Not Set</a> <span>(1)</span>
+									</h5>
+									<ol>
+										<li><details>
+												<summary>
+													<span class="request-method-n-url">GET https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk/</span>
+												</summary>
+												
+<table class="alerts-table">
+	<tr>
+		<th scope="row">Alert tags</th>
+		<td>
+			<ul class="alert-tags-list">
+				<li>
+					<span><a href="https://cwe.mitre.org/data/definitions/693.html">CWE-693</a></span> 
+				</li>
+				<li>
+					<span><a href="https://owasp.org/Top10/A05_2021-Security_Misconfiguration/">OWASP_2021_A05</a></span> 
+				</li>
+				<li>
+					<span><a href="https://owasp.org/www-project-top-ten/2017/A6_2017-Security_Misconfiguration.html">OWASP_2017_A06</a></span> 
+				</li>
+			</ul>
+		</td>
+	</tr>
+	<tr>
+		<th scope="row">Alert description</th>
+		<td> 
+<p>Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.</p>
+ </td>
+	</tr>
+	
+	<tr>
+		<th scope="row">Request</th>
+		<td><details open="open">
+				<summary>Request line and header section (351 bytes)</summary>
+				
+				<pre><code>GET https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk/ HTTP/1.1
+host: manage-people-on-probation-dev.hmpps.service.justice.gov.uk
+user-agent: 
+pragma: no-cache
+cache-control: no-cache
+Cookie: hmpps-manage-people-on-probation-ui.session=s%3AAln4GKEu--zjMnlneHgBYl5c2-0QH1Gu.Ojm%2FF0gDWk%2BhIMdhb1azj8pH7%2F8IioeTfHUox%2Fizf40
+
+</code></pre>
+				
+				
+			</details> <details class="request-body" open="open">
+				<summary>Request body (0 bytes)</summary>
+				
+				<pre><code></code></pre>
+				
+				
+			</details></td>
+	</tr>
+	<tr>
+		<th scope="row">Response</th>
+		<td><details open="open">
+				<summary>Status line and header section (202 bytes)</summary>
+				
+				<pre><code>HTTP/1.1 406 Not Acceptable
+Date: Tue, 01 Apr 2025 08:41:56 GMT
+Content-Type: text/html
+Content-Length: 156
+Connection: keep-alive
+Strict-Transport-Security: max-age=31536000; includeSubDomains
+
+</code></pre>
+				
+				
+			</details> <details class="response-body" open="open">
+				<summary>Response body (156 bytes)</summary>
+				
+				<pre><code>&lt;html&gt;
+&lt;head&gt;&lt;title&gt;406 Not Acceptable&lt;/title&gt;&lt;/head&gt;
+&lt;body&gt;
+&lt;center&gt;&lt;h1&gt;406 Not Acceptable&lt;/h1&gt;&lt;/center&gt;
+&lt;hr&gt;&lt;center&gt;nginx&lt;/center&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+				
+				
+			</details></td>
+	</tr>
+	
+	
+	
+	<tr>
+		<th scope="row">Solution</th>
+		<td> 
+<p>Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.</p>
+ </td>
+	</tr>
+</table>
+
+											</details></li>
+									</ol>
+								</li>
+								
+							</ol>
+						</li>
 						
 					</ol>
 				</li>
@@ -349,6 +480,51 @@
 											href="https://github.com/HtmlUnit/htmlunit-csp">https://github.com/HtmlUnit/htmlunit-csp</a></li>
 										<li><a
 											href="https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources">https://developers.google.com/web/fundamentals/security/csp#policy_applies_to_a_wide_variety_of_resources</a></li>
+									</ol>
+								</td>
+							</tr>
+						</table>
+					</li>
+					<li
+						id="alert-type-1">
+						<h4>Content Security Policy (CSP) Header Not Set</h4>
+						<table class="alert-types-table">
+							<tr>
+								<th scope="row">Source</th>
+								<td>
+									
+									   <span>raised by a passive scanner</span> <span>(<a
+										href="https://www.zaproxy.org/docs/alerts/10038/">Content Security Policy (CSP) Header Not Set</a>)
+									</span>   
+								</td>
+							</tr>
+							<tr>
+								<th scope="row">CWE ID</th>
+								<td><a
+									href="https://cwe.mitre.org/data/definitions/693.html">693</a></td>
+							</tr>
+							<tr>
+								<th scope="row">WASC ID</th>
+								<td>15</td>
+							</tr>
+							<tr>
+								<th scope="row">Reference</th>
+								<td>
+									<ol>
+										<li><a
+											href="https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy">https://developer.mozilla.org/en-US/docs/Web/Security/CSP/Introducing_Content_Security_Policy</a></li>
+										<li><a
+											href="https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html">https://cheatsheetseries.owasp.org/cheatsheets/Content_Security_Policy_Cheat_Sheet.html</a></li>
+										<li><a
+											href="https://www.w3.org/TR/CSP/">https://www.w3.org/TR/CSP/</a></li>
+										<li><a
+											href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a></li>
+										<li><a
+											href="https://web.dev/articles/csp">https://web.dev/articles/csp</a></li>
+										<li><a
+											href="https://caniuse.com/#feat=contentsecuritypolicy">https://caniuse.com/#feat=contentsecuritypolicy</a></li>
+										<li><a
+											href="https://content-security-policy.com/">https://content-security-policy.com/</a></li>
 									</ol>
 								</td>
 							</tr>
