@@ -1,13 +1,13 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
-import type { ActivityLogRequestBody, Controller } from '../@types'
+import type { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors, toCamelCase, toIsoDate } from '../utils/utils'
 import MasApiClient from '../data/masApiClient'
-import { PersonActivity } from '../data/model/activityLog'
-import TierApiClient, { TierCalculation } from '../data/tierApiClient'
+import TierApiClient from '../data/tierApiClient'
+import { getPersonActivity } from '../middleware'
 
-const routes = ['getActivityLog', 'getActivityDetails'] as const
+const routes = ['getActivityLog', 'getActivityDetails', 'getActivityNote'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -27,7 +27,7 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 const activityLogController: Controller<typeof routes> = {
   getActivityLog: hmppsAuthClient => {
     return async (req, res) => {
-      const { query, params } = req
+      const { query, body, params } = req
       const { crn } = params
       const { page = '0', view = '' } = query
       if (req.query.view === 'compact') {
@@ -38,24 +38,9 @@ const activityLogController: Controller<typeof routes> = {
       if (req.query.requirement) {
         res.locals.requirement = req.query.requirement as string
       }
-      const { filters } = res.locals
-      const { keywords, dateFrom, dateTo, compliance } = filters
+      const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
+      const queryParams = getQueryString(body)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
-      let personActivity: PersonActivity | null = null
-      let tierCalculation: TierCalculation | null = null
-      const body: ActivityLogRequestBody = {
-        keywords,
-        dateFrom: dateFrom ? toIsoDate(dateFrom) : '',
-        dateTo: dateTo ? toIsoDate(dateTo) : '',
-        filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
-      }
-      ;[personActivity, tierCalculation] = await Promise.all([
-        masClient.postPersonActivityLog(crn, body, page as string),
-        tierClient.getCalculationDetails(crn),
-      ])
-      const queryParams = getQueryString(req.query as Record<string, string>)
       const arnsClient = new ArnsApiClient(token)
       const currentPage = parseInt(page as string, 10)
       const resultsStart = currentPage > 0 ? 10 * currentPage + 1 : 1
@@ -74,10 +59,11 @@ const activityLogController: Controller<typeof routes> = {
       })
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-      return res.render('pages/activity-log', {
+      const baseUrl = req.url.split('?')[0]
+      res.render('pages/activity-log', {
         personActivity,
         crn,
-        query,
+        query: req.session.activityLogFilters,
         queryParams,
         page,
         view,
@@ -85,6 +71,7 @@ const activityLogController: Controller<typeof routes> = {
         risksWidget,
         predictorScores,
         url: req.url,
+        baseUrl,
         resultsStart,
         resultsEnd,
       })
@@ -116,7 +103,7 @@ const activityLogController: Controller<typeof routes> = {
       })
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-      return res.render('pages/appointments/appointment', {
+      res.render('pages/appointments/appointment', {
         category,
         queryParams,
         personAppointment,
@@ -125,6 +112,32 @@ const activityLogController: Controller<typeof routes> = {
         tierCalculation,
         risksWidget,
         predictorScores,
+      })
+    }
+  },
+  getActivityNote: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, noteId } = req.params
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personAppointment = await masClient.getPersonAppointmentNote(crn, id, noteId)
+      const isActivityLog = true
+      const queryParams = getQueryString(req.query as Record<string, string>)
+      const { category } = req.query
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      res.render('pages/appointments/appointment', {
+        category,
+        queryParams,
+        personAppointment,
+        crn,
+        isActivityLog,
       })
     }
   },

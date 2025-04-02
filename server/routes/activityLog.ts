@@ -16,4 +16,6 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
   ])
 
   get('/case/:crn/activity-log/activity/:id', controllers.activityLog.getActivityDetails(hmppsAuthClient))
+
+  get('/case/:crn/activity-log/activity/:id/note/:noteId', controllers.activityLog.getActivityNote(hmppsAuthClient))
 }

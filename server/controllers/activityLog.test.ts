@@ -1,5 +1,4 @@
 import httpMocks from 'node-mocks-http'
-import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -8,13 +7,22 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors } from '../utils/utils'
-import { mockActivity, mockTierCalculation, mockActivities, mockAppResponse, mockRisks, mockPredictors } from './mocks'
+import {
+  mockActivity,
+  mockTierCalculation,
+  mockActivities,
+  mockActivityNote,
+  mockAppResponse,
+  mockRisks,
+  mockPredictors,
+} from './mocks'
 import { checkAuditMessage } from './testutils'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const id = '1234'
+const noteId = '5678'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -57,8 +65,12 @@ const req = httpMocks.createRequest({
   params: {
     crn,
     id,
+    noteId,
   },
   query: { page: '', view: 'default', requirement: '' },
+  session: {
+    activityLogFilters: { page: '', view: 'default', requirement: '' },
+  },
 })
 const res = mockAppResponse({
   filters: {
@@ -69,7 +81,6 @@ const res = mockAppResponse({
 })
 
 const renderSpy = jest.spyOn(res, 'render')
-const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
 
 describe('/controllers/activityLogController', () => {
   afterEach(() => {
@@ -103,9 +114,10 @@ describe('/controllers/activityLogController', () => {
     it('should render the activity log page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
         personActivity: mockActivities,
+        baseUrl: '',
         crn,
         query: req.query,
-        queryParams: ['view=default'],
+        queryParams: [],
         page: req.query.page,
         view: req.query.view,
         tierCalculation: mockTierCalculation,
@@ -149,6 +161,27 @@ describe('/controllers/activityLogController', () => {
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+      })
+    })
+  })
+  describe('getActivityNote', () => {
+    const getPersonAppointmentNoteSpy = jest
+      .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
+      .mockImplementation(() => Promise.resolve(mockActivityNote))
+    beforeEach(async () => {
+      await controllers.activityLog.getActivityNote(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
+    it('should request the person activity note from the api', () => {
+      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
+    })
+    it('should render the appointment page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
+        category: req.query.category,
+        queryParams: ['view=default'],
+        personAppointment: mockActivityNote,
+        crn,
+        isActivityLog: true,
       })
     })
   })
