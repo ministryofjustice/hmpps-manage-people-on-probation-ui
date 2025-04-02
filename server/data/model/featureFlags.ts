@@ -4,6 +4,7 @@ export class FeatureFlags {
   enableNavOverview?: boolean = undefined
   enableNavAppointments?: boolean = undefined
   enableNavPersonalDetails?: boolean = undefined
+  enableNavDocuments?: boolean = undefined
   enableNavRisk?: boolean = undefined
   enableNavSentence?: boolean = undefined
   enableNavActivityLog?: boolean = undefined

@@ -29,6 +29,15 @@
             href="/case/{{ crn }}/personal-details">Personal details</a>
         </li>
         {% endif %}
+        {% if flags.enableNavDocuments === true %}
+          <li class="moj-sub-navigation__item" data-qa="personalDetailsTab">
+            <a class="moj-sub-navigation__link govuk-link--no-visited-state"
+                    {% if currentNavSection == 'documents' %}
+                      aria-current="page"
+                    {% endif %}
+               href="/case/{{ crn }}/documents">Documents</a>
+          </li>
+        {% endif %}
         {% if flags.enableNavRisk === true %}
         <li class="moj-sub-navigation__item" data-qa="riskTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"

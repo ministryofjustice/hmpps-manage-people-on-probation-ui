@@ -46,6 +46,17 @@
               "rollouts": []
             },
             {
+              "key": "enableNavDocuments",
+              "name": "enableNavDocuments",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2025-01-13T15:25:42.822726Z",
+              "updatedAt": "2025-01-13T15:25:46.092253Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
               "key": "enableNavRisk",
               "name": "enableNavRisk",
               "description": "",
