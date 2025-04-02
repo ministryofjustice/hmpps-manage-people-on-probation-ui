@@ -7,9 +7,7 @@ import {
   addressToList,
   compactActivityLogDate,
   dateForSort,
-  dateWithDayAndWithoutYear,
   dateWithNoDay,
-  dateWithYear,
   dateWithYearShortMonth,
   dateWithYearShortMonthAndTime,
   dayOfWeek,
@@ -32,7 +30,6 @@ import {
   govukTime,
   groupByLevel,
   hasValue,
-  initialiseName,
   interventionsLink,
   isDefined,
   isInThePast,
@@ -56,12 +53,13 @@ import {
   toIsoDateFromPicker,
   toSlug,
   toYesNo,
-  yearsSince,
   roleDescription,
   toSentenceDescription,
   concat,
   shortTime,
 } from './utils'
+
+import { initialiseName, yearsSince, dateWithYear, dateWithDayAndWithoutYear } from '.'
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../@types'

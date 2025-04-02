@@ -1,5 +1,5 @@
 import { jwtDecode } from 'jwt-decode'
-import { convertToTitleCase } from '../utils/utils'
+import { convertToTitleCase } from '../utils'
 import type { User } from '../data/manageUsersApiClient'
 import ManageUsersApiClient from '../data/manageUsersApiClient'
 

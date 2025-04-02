@@ -1,7 +1,7 @@
 import logger from '../../../logger'
 import { Errors, Route } from '../../@types'
 import { errorMessages } from '../../properties'
-import utils from '../../utils'
+import { addError } from '../../utils'
 import { getDataValue } from '../../utils/utils'
 
 interface LocalParams {
@@ -29,7 +29,7 @@ const appointments: Route<void> = (req, res, next) => {
         logger.info(errorMessages.appointments.type.log)
         const text = errorMessages.appointments.type.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-type`
-        errors = utils.addError(errors, { text, anchor })
+        errors = addError(errors, { text, anchor })
       }
     }
   }
@@ -44,7 +44,7 @@ const appointments: Route<void> = (req, res, next) => {
         logger.info(errorMessages.appointments.sentence.log)
         const text = errorMessages.appointments.sentence.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-sentence`
-        errors = utils.addError(errors, { text, anchor })
+        errors = addError(errors, { text, anchor })
       } else {
         const sentence = sentences.find((s: any) => s.order.description === req.body.appointments[crn][id].sentence)
         if (
@@ -55,7 +55,7 @@ const appointments: Route<void> = (req, res, next) => {
           logger.info(errorMessages.appointments['sentence-requirement'].log)
           const text = errorMessages.appointments['sentence-requirement'].errors.isEmpty
           const anchor = `appointments-${crn}-${id}-sentence-requirement`
-          errors = utils.addError(errors, { text, anchor })
+          errors = addError(errors, { text, anchor })
         }
         if (
           showReveal &&
@@ -65,7 +65,7 @@ const appointments: Route<void> = (req, res, next) => {
           logger.info(errorMessages.appointments['sentence-licence-condition'].log)
           const text = errorMessages.appointments['sentence-licence-condition'].errors.isEmpty
           const anchor = `appointments-${crn}-${id}-sentence-licence-condition`
-          errors = utils.addError(errors, { text, anchor })
+          errors = addError(errors, { text, anchor })
         }
       }
     }
@@ -77,7 +77,7 @@ const appointments: Route<void> = (req, res, next) => {
         logger.info(errorMessages.appointments.location.log)
         const text = errorMessages.appointments.location.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-location`
-        errors = utils.addError(errors, { text, anchor })
+        errors = addError(errors, { text, anchor })
       }
     }
   }
@@ -90,19 +90,19 @@ const appointments: Route<void> = (req, res, next) => {
         logger.info(errorMessages.appointments.date.log)
         const text = errorMessages.appointments.date.errors.isEmpty
         const anchor = `appointments-${crn}-${id}-date`
-        errors = utils.addError(errors, { text, anchor })
+        errors = addError(errors, { text, anchor })
       }
       if (!req.body?.appointments?.[crn]?.[id]?.['start-time']) {
         logger.info(errorMessages.appointments['start-time'].log)
         const text = errorMessages.appointments['start-time'].errors.isEmpty
         const anchor = `appointments-${crn}-${id}-start-time`
-        errors = utils.addError(errors, { text, anchor })
+        errors = addError(errors, { text, anchor })
       }
       if (!req.body?.appointments?.[crn]?.[id]?.['end-time']) {
         logger.info(errorMessages.appointments['end-time'].log)
         const text = errorMessages.appointments['end-time'].errors.isEmpty
         const anchor = `appointments-${crn}-${id}-end-time`
-        errors = utils.addError(errors, { text, anchor })
+        errors = addError(errors, { text, anchor })
       }
     }
   }
@@ -126,30 +126,30 @@ const appointments: Route<void> = (req, res, next) => {
       logger.info(errorMessages.appointments.repeating.log)
       const text = errorMessages.appointments.repeating.errors.isEmpty
       const anchor = `appointments-${crn}-${id}-repeating`
-      errors = utils.addError(errors, { text, anchor })
+      errors = addError(errors, { text, anchor })
     }
     if (repeatingValue === 'Yes' && !req.body?.appointments?.[crn]?.[id]?.['repeating-frequency']) {
       logger.info(errorMessages.appointments['repeating-frequency'].log)
       const text = errorMessages.appointments['repeating-frequency'].errors.isEmpty
       const anchor = `appointments-${crn}-${id}-repeating-frequency`
-      errors = utils.addError(errors, { text, anchor })
+      errors = addError(errors, { text, anchor })
     }
     if (repeatingValue === 'Yes' && !req.body?.appointments?.[crn]?.[id]?.['repeating-count']) {
       logger.info(errorMessages.appointments['repeating-count'].log)
       const text = errorMessages.appointments['repeating-count'].errors.isEmpty
       const anchor = `appointments-${crn}-${id}-repeating-count`
-      errors = utils.addError(errors, { text, anchor })
+      errors = addError(errors, { text, anchor })
     }
     if (repeatingCountValue && !validRepeatingCount) {
       logger.info(errorMessages.appointments['repeating-count'].log)
       const text = errorMessages.appointments['repeating-count'].errors.isInvalid
       const anchor = `appointments-${crn}-${id}-repeating-count`
-      errors = utils.addError(errors, { text, anchor })
+      errors = addError(errors, { text, anchor })
     }
     if (isMoreThanAYear) {
       const textFrequency = errorMessages.appointments['repeating-frequency'].errors.isMoreThanAYear
       const anchor = `appointments-${crn}-${id}-repeating-frequency`
-      errors = utils.addError(errors, { text: textFrequency, anchor })
+      errors = addError(errors, { text: textFrequency, anchor })
     }
   }
 
