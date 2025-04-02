@@ -43,6 +43,7 @@ const caseloadController: Controller<typeof routes, Args> = {
   showCaseload: () => {
     return async (req, res, _next, args) => {
       const { caseload, filter } = args
+      let newCaseload = caseload
       const currentNavSection = 'yourCases'
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_CASELOAD',
@@ -59,9 +60,15 @@ const caseloadController: Controller<typeof routes, Args> = {
         page => addParameters(req, { page: page.toString() }),
         caseload?.pageSize || config.apis.masApi.pageSize,
       )
+      if (req?.query?.sortBy) {
+        newCaseload = {
+          ...caseload,
+          sortedBy: req.query.sortBy as string,
+        }
+      }
       res.render('pages/caseload/minimal-cases', {
         pagination,
-        caseload,
+        caseload: newCaseload,
         currentNavSection,
         filter,
       })
@@ -109,7 +116,6 @@ const caseloadController: Controller<typeof routes, Args> = {
       } else {
         req.session.sortBy = req.query.sortBy ? (req.query.sortBy as string) : 'nextContact.asc'
       }
-
       if (req.session?.page) {
         if (req.query.page && req.query.page !== req.session.page) {
           req.session.page = req.query.page as string
@@ -252,7 +258,6 @@ const caseloadController: Controller<typeof routes, Args> = {
           teamCount > 0
             ? await masClient.getTeamCaseload(teamCode, (pageNum - 1).toString())
             : { totalPages: 0, totalElements: 0, pageSize: 0 }
-
         const pagination: Pagination = getPaginationLinks(
           req.query.page ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize) : 1,
           caseload?.totalPages || 0,
