@@ -125,7 +125,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params
       const { change } = req.query
       const today = new Date()
-      const minDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
+      const minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
       return res.render(`pages/arrange-appointment/date-time`, { crn, id, minDate, change })
     }
   },
