@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
 
-const routes = ['getActivityLog', 'getActivityDetails', 'getActivityNote'] as const
+const routes = ['getOrPostActivityLog', 'getActivityLog', 'getActivityDetails', 'getActivityNote'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -25,6 +25,58 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 }
 
 const activityLogController: Controller<typeof routes> = {
+  getOrPostActivityLog: hmppsAuthClient => {
+    return async (req, res) => {
+      const { query, body, params } = req
+      const { crn } = params
+      const { page = '0', view = '' } = query
+      if (req.query.view === 'compact') {
+        res.locals.compactView = true
+      } else {
+        res.locals.defaultView = true
+      }
+      if (req.query.requirement) {
+        res.locals.requirement = req.query.requirement as string
+      }
+      const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
+      const queryParams = getQueryString(body)
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const arnsClient = new ArnsApiClient(token)
+      const currentPage = parseInt(page as string, 10)
+      const resultsStart = currentPage > 0 ? 10 * currentPage + 1 : 1
+      let resultsEnd = currentPage > 0 ? (currentPage + 1) * 10 : 10
+      if (personActivity.totalResults >= resultsStart && personActivity.totalResults <= resultsEnd) {
+        resultsEnd = personActivity.totalResults
+      }
+      const [risks, predictors] = await Promise.all([arnsClient.getRisks(crn), arnsClient.getPredictorsAll(crn)])
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_ACTIVITY_LOG',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      const risksWidget = toRoshWidget(risks)
+      const predictorScores = toPredictors(predictors)
+      const baseUrl = req.url.split('?')[0]
+      res.render('pages/activity-log', {
+        personActivity,
+        crn,
+        query: req.session.activityLogFilters,
+        queryParams,
+        page,
+        view,
+        tierCalculation,
+        risksWidget,
+        predictorScores,
+        url: req.url,
+        baseUrl,
+        resultsStart,
+        resultsEnd,
+      })
+    }
+  },
   getActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { query, body, params } = req
