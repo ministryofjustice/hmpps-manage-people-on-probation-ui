@@ -4,7 +4,7 @@ import { ActivityLogRequestBody, AppResponse } from '../@types'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toIsoDate } from '../utils/utils'
+import { toIsoDateFromPicker } from '../utils'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -155,8 +155,8 @@ describe('/middleware/getPersonActivity', () => {
 
     const expectedBody: ActivityLogRequestBody = {
       keywords: filterVals.keywords,
-      dateFrom: toIsoDate(filterVals.dateFrom),
-      dateTo: toIsoDate(filterVals.dateTo),
+      dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
+      dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
     }
 

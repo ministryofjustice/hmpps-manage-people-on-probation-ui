@@ -7,7 +7,6 @@ import setKeypath from 'lodash/set'
 import { Request } from 'express'
 import { Need, RiskScore, RiskSummary, RiskToSelf } from '../data/arnsApiClient'
 import { ErrorSummary, Name } from '../data/model/common'
-import { Address } from '../data/model/personalDetails'
 import config from '../config'
 import { Activity } from '../data/model/schedule'
 import { CaseSearchFilter, SelectElement } from '../data/model/caseload'
@@ -15,7 +14,7 @@ import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import { RiskFlag, RiskScoresDto, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import type { AppResponse } from '../@types'
 import { Contact } from '../data/model/professionalContact'
-import { isBlank, convertToTitleCase } from '.'
+import { isBlank, govukTime, toDate, dateWithYearShortMonthAndTime } from '.'
 
 interface Item {
   checked?: string
@@ -23,191 +22,6 @@ interface Item {
   value: string
   text?: string
   idPrefix?: string
-}
-
-export const dateWithNoDay = (datetimeString: string): string | null => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.fromISO(datetimeString).toFormat('MMMM yyyy')
-}
-export const dateForSort = (datetimeString: string): number | null => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.fromISO(datetimeString).toMillis()
-}
-
-export const timeForSort = (datetimeString: string): number | null => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return Number(DateTime.fromISO(datetimeString).toFormat('HHmm'))
-}
-
-export const fullName = (name: Name): string => {
-  if (name === undefined || name === null) return ''
-  return `${name.forename} ${name.surname}`
-}
-
-export const monthsOrDaysElapsed = (datetimeString: string): string => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  const months = DateTime.now().diff(DateTime.fromISO(datetimeString), ['months', 'days']).months.toString()
-  const days = DateTime.now().diff(DateTime.fromISO(datetimeString), ['days', 'hours']).days.toString()
-  if (months === '0') {
-    return `${days} days`
-  }
-  return `${months} months`
-}
-
-export const toIsoDateFromPicker = (datetimeString: string): string => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  const converted = DateTime.fromFormat(datetimeString, 'd/M/yyyy').toFormat('yyyy-MM-dd')
-  if (converted === 'Invalid DateTime') {
-    return datetimeString
-  }
-  return converted
-}
-
-export const fromIsoDateToPicker = (datetimeString: string): string => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  if (!DateTime.fromFormat(datetimeString, 'yyyy-MM-dd').isValid) {
-    return datetimeString
-  }
-  const converted = DateTime.fromISO(datetimeString).toFormat('d/M/yyyy')
-  if (converted === 'Invalid DateTime') {
-    return datetimeString
-  }
-  return converted
-}
-
-export const dateWithYearShortMonth = (datetimeString: string): string => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.fromISO(datetimeString).toFormat('d MMM yyyy')
-}
-
-export const toDate = (datetimeString: string): DateTime => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.fromISO(datetimeString)
-}
-
-export const toIsoDate = (datetimeString: any) => {
-  return DateTime.fromFormat(datetimeString, 'd/M/yyyy').toFormat('yyyy-MM-dd')
-}
-
-export const dateWithYearShortMonthAndTime = (datetimeString: string): string => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  const date = DateTime.fromISO(datetimeString).toFormat('d MMM yyyy')
-  return `${date} at ${govukTime(datetimeString)}`
-}
-
-export const govukTime = (datetimeString: string): string => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  const datetime = DateTime.fromISO(datetimeString)
-  const hourMinuteFormat = datetime.minute === 0 ? 'ha' : 'h:mma'
-  return datetime.toFormat(hourMinuteFormat).toLowerCase()
-}
-
-export const getCurrentRisksToThemselves = (riskToSelf: RiskToSelf) => {
-  return getRisksToThemselves(riskToSelf, 'current')
-}
-
-export const getPreviousRisksToThemselves = (riskToSelf: RiskToSelf) => {
-  const currentRisks = getCurrentRisksToThemselves(riskToSelf)
-  const previousRisks = getRisksToThemselves(riskToSelf, 'previous')
-  return previousRisks.filter(risk => !currentRisks.includes(risk))
-}
-
-export const getRisksToThemselves = (riskToSelf: RiskToSelf, type: string) => {
-  const risksToThemselves: string[] = []
-  if (riskToSelf === undefined) return risksToThemselves
-  const typesOfRisk = [
-    { key: 'suicide', text: 'suicide' },
-    { key: 'selfHarm', text: 'self harm' },
-    { key: 'custody', text: 'coping in custody' },
-    { key: 'hostelSetting', text: 'coping in a hostel setting' },
-    { key: 'vulnerability', text: 'a vulnerability' },
-  ]
-
-  typesOfRisk.forEach(risk => {
-    if (riskToSelf?.[risk.key]?.[type]) {
-      if (riskToSelf[risk.key][type] === 'YES') {
-        risksToThemselves.push(risk.text)
-      }
-    }
-  })
-  return risksToThemselves
-}
-
-export const getTagClass = (score: RiskScore) => {
-  switch (score) {
-    case 'LOW':
-      return 'govuk-tag--green'
-    case 'MEDIUM':
-      return 'govuk-tag--yellow'
-    case 'HIGH':
-      return 'govuk-tag--red'
-    case 'VERY_HIGH':
-      return 'govuk-tag--red'
-    default:
-      return 'govuk-tag--blue'
-  }
-}
-
-export const addressToList = (address: Address, hidePostcode: boolean = false): string[] => {
-  const addressArray: string[] = []
-  let buildingNumber = ''
-  if (address?.officeName) {
-    addressArray.push(address?.officeName)
-  }
-  if (address?.buildingName) {
-    addressArray.push(address?.buildingName)
-  }
-  if (address?.buildingNumber) {
-    buildingNumber = `${address?.buildingNumber} `
-  }
-  if (address?.streetName) {
-    addressArray.push(`${buildingNumber}${address?.streetName}`)
-  }
-  if (address?.district) {
-    addressArray.push(address?.district)
-  }
-  if (address?.town) {
-    addressArray.push(address?.town)
-  }
-  if (address?.ldu) {
-    addressArray.push(address?.ldu)
-  }
-  if (address?.county) {
-    addressArray.push(address?.county)
-  }
-  if (address?.postcode && hidePostcode === false) {
-    addressArray.push(address?.postcode)
-  }
-
-  return addressArray
-}
-
-export const lastUpdatedDate = (datetime: string) => {
-  return datetime ? `Last updated ${dateWithYearShortMonth(datetime)}` : ''
-}
-
-export const lastUpdatedBy = (datetime: string, name: Name) => {
-  return datetime ? `Last updated by ${fullName(name)} on ${dateWithYearShortMonth(datetime)}` : ''
-}
-
-export const deliusDateFormat = (datetime: string) => {
-  return DateTime.fromISO(datetime).toFormat('dd/MM/yyyy')
-}
-
-export const deliusDeepLinkUrl = (component: string, crn: string, contactId?: string, componentId?: string) => {
-  if (!component || !crn) {
-    return ''
-  }
-  const contactIdParam = contactId ? `&contactID=${contactId}` : ''
-  const componentIdParam = componentId ? `&componentId=${componentId}` : ''
-  return `${config.delius.link}/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=${crn}${contactIdParam}${componentIdParam}`
-}
-
-export const tierLink = (crn: string) => {
-  if (!crn) {
-    return ''
-  }
-  return `${config.tier.link}/${crn}`
 }
 
 export const interventionsLink = (referralId: string) => {

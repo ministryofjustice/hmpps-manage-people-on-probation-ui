@@ -3,8 +3,9 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { ActivityLogRequestBody, AppResponse } from '../@types'
 import { PersonActivity } from '../data/model/activityLog'
-import { toIsoDate, toCamelCase } from '../utils/utils'
+import { toCamelCase } from '../utils/utils'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
+import { toIsoDateFromPicker } from '../utils'
 
 export const getPersonActivity = async (
   req: Request,
@@ -22,8 +23,8 @@ export const getPersonActivity = async (
 
   const body: ActivityLogRequestBody = {
     keywords,
-    dateFrom: dateFrom ? toIsoDate(dateFrom) : '',
-    dateTo: dateTo ? toIsoDate(dateTo) : '',
+    dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
+    dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
     filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
   }
   const [personActivity, tierCalculation] = await Promise.all([

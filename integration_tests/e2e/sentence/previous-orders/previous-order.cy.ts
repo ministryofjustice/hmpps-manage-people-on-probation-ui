@@ -1,6 +1,6 @@
 import Page from '../../../pages'
 import PreviousOrderPage from '../../../pages/sentence/previous-orders/previous-order'
-import { monthsOrDaysElapsed } from '../../../../server/utils/utils'
+import { monthsOrDaysElapsed } from '../../../../server/utils'
 
 context('Sentence', () => {
   it('Previous order page is rendered', () => {

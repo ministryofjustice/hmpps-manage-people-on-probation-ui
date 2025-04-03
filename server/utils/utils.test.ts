@@ -1,39 +1,30 @@
 import httpMocks from 'node-mocks-http'
 import { DateTime } from 'luxon'
-import { isBlank } from '.'
+import { govukTime } from './govukTime'
 import {
   activityLogDate,
   checkRecentlyViewedAccess,
   compactActivityLogDate,
-  dateForSort,
-  dateWithYearShortMonth,
   dayOfWeek,
-  deliusDeepLinkUrl,
   deliusHomepageUrl,
   getAppointmentsToAction,
   getComplianceStatus,
-  getRisksToThemselves,
   getRisksWithScore,
-  getTagClass,
-  govukTime,
   isInThePast,
   isToday,
-  monthsOrDaysElapsed,
   oaSysUrl,
   pastAppointments,
   removeEmpty,
   scheduledAppointments,
   sortAppointmentsDescending,
-  tierLink,
-  timeForSort,
   timeFromTo,
   toYesNo,
   makePageTitle,
   groupByLevel,
   toSentenceCase,
   getSearchParamsString,
-  toIsoDate,
 } from './utils'
+import { getRisksToThemselves } from '.'
 import { Need, RiskResponse, RiskScore, RiskToSelf } from '../data/arnsApiClient'
 import { Activity } from '../data/model/schedule'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
@@ -72,17 +63,6 @@ const appointments = [
   },
 ]
 
-describe('months or days elapsed since', () => {
-  it.each([
-    [null, null, null],
-    ['Empty string', '', null],
-    ['Months elapsed ', DateTime.now().minus({ months: 309 }), '309 months'],
-    ['Days elapsed ', DateTime.now().minus({ days: 5 }), '5 days'],
-  ])('%s monthsOrDaysElapsed(%s, %s)', (_: string, a: string, expected: string) => {
-    expect(monthsOrDaysElapsed(a)).toEqual(expected)
-  })
-})
-
 describe('govuk Time', () => {
   it.each([
     [null, null, null],
@@ -90,16 +70,6 @@ describe('govuk Time', () => {
     ['Date String ', '2024-05-25T09:08:34.123', '9:08am'],
   ])('%s govukTime(%s, %s)', (_: string, a: string, expected: string) => {
     expect(govukTime(a)).toEqual(expected)
-  })
-})
-
-describe('date with year short month', () => {
-  it.each([
-    [null, null, null],
-    ['Empty string', '', null],
-    ['Date String ', '2024-08-25T09:08:34.123', '25 Aug 2024'],
-  ])('%s dateWithYearShortMonth(%s, %s)', (_: string, a: string, expected: string) => {
-    expect(dateWithYearShortMonth(a)).toEqual(expected)
   })
 })
 
@@ -154,36 +124,6 @@ describe('get risks to themselves', () => {
     ['Valid Risk to Self with type', riskOfSelfHarm2, 'current', ['suicide', 'self harm', 'coping in custody']],
   ])('%s getRisksToThemselves %s %s %s', (_: string, a: RiskToSelf, b: string, expected: string[]) => {
     expect(getRisksToThemselves(a, b)).toEqual(expected)
-  })
-})
-
-describe('get tag class', () => {
-  const HIGH: RiskScore = 'HIGH'
-  const LOW: RiskScore = 'LOW'
-  const MEDIUM: RiskScore = 'MEDIUM'
-  const VERY_HIGH: RiskScore = 'VERY_HIGH'
-  it.each([
-    [null, null, 'govuk-tag--blue'],
-    ['Low', LOW, 'govuk-tag--green'],
-    ['Medium', MEDIUM, 'govuk-tag--yellow'],
-    ['High', HIGH, 'govuk-tag--red'],
-    ['Very High', VERY_HIGH, 'govuk-tag--red'],
-  ])('%s getTagClass(%s, %s)', (_: string, a: RiskScore, expected: string) => {
-    expect(getTagClass(a)).toEqual(expected)
-  })
-})
-
-describe('get delius deep link', () => {
-  it.each([
-    ['null', null, null, ''],
-    [
-      'present',
-      'ContactList',
-      '1234',
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234',
-    ],
-  ])('%s deliusDeepLinkUrl(%s, %s)', (_: string, a: string, b: string, expected: string) => {
-    expect(deliusDeepLinkUrl(a, b)).toEqual(expected)
   })
 })
 
@@ -334,15 +274,6 @@ describe('get past Appointments', () => {
   })
 })
 
-describe('tier link', () => {
-  it.each([
-    ['Returns empty', null, ''],
-    ['Returns link', 'X000001', 'https://tier-dummy-url/X000001'],
-  ])('%s tierLink(%s, %s)', (_: string, a: string, expected: string) => {
-    expect(tierLink(a)).toEqual(expected)
-  })
-})
-
 describe('Sort appointments descending', () => {
   it.each([
     ['sorts and limits correctly', appointments, 3, 3],
@@ -351,25 +282,6 @@ describe('Sort appointments descending', () => {
     const result = sortAppointmentsDescending(a, limit)
     expect(result[0]).toEqual(appointments[0])
     expect(result.length).toEqual(expectedSize)
-  })
-})
-
-describe('convert date to sortable number', () => {
-  it.each([
-    ['converts correctly', DateTime.fromSQL('2020-09-10', { zone: 'utc' }).toString(), 1599696000000],
-    ['returns null', undefined, null],
-  ])('%s dateForSort(%s)', (_: string, a: string, expected: number) => {
-    expect(dateForSort(a)).toEqual(expected)
-  })
-})
-
-describe('convert time to sortable number', () => {
-  it.each([
-    ['converts correctly', DateTime.fromSQL('2017-05-15 09:24:15').toString(), 924],
-    ['converts correctly', DateTime.fromSQL('2017-05-15 19:24:15').toString(), 1924],
-    ['returns null', undefined, null],
-  ])('%s timeForSort(%s)', (_: string, a: string, expected: number) => {
-    expect(timeForSort(a)).toEqual(expected)
   })
 })
 
@@ -568,10 +480,5 @@ describe('getSearchParamsString()', () => {
     })
     const searchParamString = getSearchParamsString({ req, prefix: '' })
     expect(searchParamString).toEqual('page=2&sortBy=name.asc')
-  })
-})
-describe('toISODate', () => {
-  it('should format the value into ISO date format', () => {
-    expect(toIsoDate('21/10/2024')).toEqual('2024-10-21')
   })
 })
