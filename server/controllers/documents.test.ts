@@ -10,6 +10,7 @@ import { toPredictors, toRoshWidget } from '../utils/utils'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse, mockTierCalculation, mockRisks, mockPredictors, mockDocumemts } from './mocks'
+import { AppResponse } from '../@types'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/interventionsApiClient')
@@ -79,6 +80,20 @@ describe('documentsController', () => {
         crn,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+      })
+    })
+  })
+
+  describe('getDocuments not enabled should return error', () => {
+    beforeEach(async () => {
+      res.locals.flags = {
+        enableNavDocuments: false,
+      }
+      await controllers.document.getDocuments(hmppsAuthClient)(req, res)
+    })
+    it('should render the documents page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/error', {
+        message: 'Page not found',
       })
     })
   })
