@@ -1,6 +1,6 @@
 import { deliusDateFormat } from './deliusDateFormat'
 
-describe('deliusDateFormat', () => {
+describe('utils/deliusDateFormat', () => {
   it.each([
     ['an empty string if date is undefined', undefined, ''],
     ['an empty string if date is null', null, ''],

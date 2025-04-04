@@ -1,7 +1,7 @@
 import { RiskResponse, RiskToSelf } from '../data/arnsApiClient'
 import { getRisksToThemselves } from './getRisksToThemselves'
 
-describe('getRisksToThemselves', () => {
+describe('utils/getRisksToThemselves', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })

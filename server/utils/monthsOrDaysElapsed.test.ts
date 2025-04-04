@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { monthsOrDaysElapsed } from './monthsOrDaysElapsed'
 
-describe('months or days elapsed since', () => {
+describe('utils/monthsOrDaysElapsed', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

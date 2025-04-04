@@ -55,7 +55,7 @@ const mockRiskToSelf = {
   },
 } as RiskToSelf
 
-describe('getPreviousRisksToThemselves', () => {
+describe('utils/getPreviousRisksToThemselves', () => {
   let getCurrentRisksSpy: jest.SpyInstance
   let getPreviousRisksSpy: jest.SpyInstance
   let result: any

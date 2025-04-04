@@ -1,6 +1,6 @@
 import { yearsSince } from '.'
 
-describe('yearsSince', () => {
+describe('utils/yearsSince', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

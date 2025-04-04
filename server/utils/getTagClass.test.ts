@@ -1,7 +1,7 @@
 import { RiskScore } from '../data/arnsApiClient'
 import { getTagClass } from './getTagClass'
 
-describe('get tag class', () => {
+describe('utils/getTagClass', () => {
   const HIGH: RiskScore = 'HIGH'
   const LOW: RiskScore = 'LOW'
   const MEDIUM: RiskScore = 'MEDIUM'

@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { toDate } from './toDate'
 
-describe('toDate', () => {
+describe('utils/toDate', () => {
   it.each([
     ['null', undefined, null],
     ['null', null, null],

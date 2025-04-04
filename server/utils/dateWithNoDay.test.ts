@@ -1,6 +1,6 @@
 import { dateWithNoDay } from '.'
 
-describe('dateWithNoDay', () => {
+describe('utils/dateWithNoDay', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

@@ -1,6 +1,6 @@
 import { dateWithYearShortMonth } from './dateWithYearShortMonth'
 
-describe('date with year short month', () => {
+describe('utils/dateWithYearShortMonth', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

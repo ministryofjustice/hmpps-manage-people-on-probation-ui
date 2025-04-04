@@ -1,6 +1,6 @@
 import { initialiseName } from '.'
 
-describe('initialiseName', () => {
+describe('utils/initialiseName', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

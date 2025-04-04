@@ -9,7 +9,7 @@ const mockName: Name = {
 
 const dateStr = '2025-02-25T09:08:34.123'
 
-describe('lastUpdatedBy', () => {
+describe('utils/lastUpdatedBy', () => {
   it.each([
     ['the last updated by date', dateStr, `Last updated by Joe Bloggs on 25 Feb 2025`],
     ['an empty string', null, ''],

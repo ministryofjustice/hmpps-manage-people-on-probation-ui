@@ -12,8 +12,7 @@ import {
   date,
 } from './imports'
 import AppointmentPreviewPage from '../../pages/appointments/preview.page'
-import { dayOfWeek } from '../../../server/utils/utils'
-import { dateWithYear } from '../../../server/utils'
+import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 

@@ -1,6 +1,6 @@
 import { fromIsoDateToPicker } from './fromIsoDateToPicker'
 
-describe('fromIsoDateToPicker', () => {
+describe('utils/fromIsoDateToPicker', () => {
   it.each([
     ['null', undefined, null],
     ['null', null, null],

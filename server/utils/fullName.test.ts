@@ -1,11 +1,7 @@
 import { fullName } from './fullName'
 import { Name } from '../data/model/common'
 
-describe('fullName', () => {
-  it(`should return the full name`, () => {})
-})
-
-describe('fullName', () => {
+describe('utils/fullName', () => {
   it.each([
     ['empty string', undefined, ''],
     ['empty string', null, ''],

@@ -1,6 +1,6 @@
 import { dateWithDayAndWithoutYear } from '.'
 
-describe('dateWithDayAndWithoutYear', () => {
+describe('utils/dateWithDayAndWithoutYear', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

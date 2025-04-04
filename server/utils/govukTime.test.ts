@@ -1,6 +1,6 @@
 import { govukTime } from './govukTime'
 
-describe('govukTime', () => {
+describe('utils/govukTime', () => {
   it.each([
     [null, null, null],
     ['Empty string', '', null],

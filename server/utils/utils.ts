@@ -1,20 +1,18 @@
 /* eslint-disable no-param-reassign */
 
 import { DateTime } from 'luxon'
-import slugify from 'slugify'
 import getKeypath from 'lodash/get'
 import setKeypath from 'lodash/set'
 import { Request } from 'express'
 import { Need, RiskScore, RiskSummary, RiskToSelf } from '../data/arnsApiClient'
 import { ErrorSummary, Name } from '../data/model/common'
 import config from '../config'
-import { Activity } from '../data/model/schedule'
 import { CaseSearchFilter, SelectElement } from '../data/model/caseload'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import { RiskFlag, RiskScoresDto, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import type { AppResponse } from '../@types'
 import { Contact } from '../data/model/professionalContact'
-import { isBlank, govukTime, toDate, dateWithYearShortMonthAndTime } from '.'
+import { toDate, dateWithYearShortMonthAndTime } from '.'
 
 interface Item {
   checked?: string
@@ -22,168 +20,6 @@ interface Item {
   value: string
   text?: string
   idPrefix?: string
-}
-
-export const interventionsLink = (referralId: string) => {
-  if (!referralId) {
-    return ''
-  }
-  return `${config.interventions.link}/probation-practitioner/referrals/${referralId}/progress`
-}
-
-export const oaSysUrl = () => {
-  return `${config.oaSys.link}`
-}
-
-export const deliusHomepageUrl = () => {
-  return `${config.delius.link}`
-}
-
-export const sentencePlanLink = () => {
-  return `${config.sentencePlan.link}`
-}
-
-export const isInThePast = (datetimeString: string) => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.now() > DateTime.fromISO(datetimeString)
-}
-
-export const isToday = (datetimeString: string) => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.fromISO(datetimeString).hasSame(DateTime.now(), 'day')
-}
-
-export const dayOfWeek = (datetimeString: string) => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  return DateTime.fromISO(datetimeString).toFormat('cccc')
-}
-
-export const sortAppointmentsDescending = (appointments: Activity[], limit?: number): Activity[] => {
-  return [...appointments]
-    .sort((a, b) => (a.startDateTime < b.startDateTime ? 1 : -1))
-    .filter((_, index) => (limit && index < limit) || !limit)
-}
-
-export const scheduledAppointments = (appointments: Activity[]): Activity[] => {
-  return (
-    // Show future appointments and any appointments that are today
-    appointments
-      .filter(entry => !isInThePast(entry.startDateTime))
-      .sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
-  )
-}
-
-export const pastAppointments = (appointments: Activity[]): Activity[] => {
-  return (
-    // Show future appointments and any appointments that are today
-    appointments
-      .filter(entry => isInThePast(entry.startDateTime))
-      .sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
-  )
-}
-
-export const getAppointmentsToAction = (appointments: Activity[], type: string): Activity[] => {
-  if (type === 'evidence') {
-    return pastAppointments(appointments).filter(entry => entry.absentWaitingEvidence === true)
-  }
-  return pastAppointments(appointments).filter(
-    entry =>
-      entry.hasOutcome === false &&
-      (entry.absentWaitingEvidence === false || entry.absentWaitingEvidence === undefined),
-  )
-}
-
-export const toYesNo = (value: boolean) => {
-  if (value == null) return 'Not provided'
-  if (!value) {
-    return 'No'
-  }
-  return 'Yes'
-}
-
-export const getRisksWithScore = (risk: Partial<Record<RiskScore, string[]>>, score: RiskScore): string[] => {
-  const risks: string[] = []
-  if (risk[score]) {
-    return risk[score]
-  }
-  return risks
-}
-
-export const activityLogDate = (datetimeString: string) => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  const date = DateTime.fromISO(datetimeString)
-  if (date.hasSame(DateTime.local(), 'day')) {
-    return 'Today'
-  }
-  if (date.hasSame(DateTime.local().minus({ days: 1 }), 'day')) {
-    return 'Yesterday'
-  }
-  return date.toFormat('cccc d MMMM yyyy')
-}
-
-export const compactActivityLogDate = (datetimeString: string) => {
-  if (!datetimeString || isBlank(datetimeString)) return null
-  const date = DateTime.fromISO(datetimeString)
-  if (date.hasSame(DateTime.local(), 'day')) {
-    return 'Today'
-  }
-
-  if (date.hasSame(DateTime.local().minus({ days: 1 }), 'day')) {
-    return 'Yesterday'
-  }
-
-  return date.toFormat('ccc d MMM yyyy')
-}
-
-export const removeEmpty = (array: never[]) => {
-  return array.filter((value: NonNullable<unknown>) => Object.keys(value).length !== 0)
-}
-
-export const timeFromTo = (from: string, to: string) => {
-  const timeFrom = govukTime(from)
-  const timeTo = govukTime(to)
-  if (timeTo === null) {
-    return timeFrom
-  }
-  return `${timeFrom} to ${timeTo}`
-}
-
-export const getComplianceStatus = (failureToComplyCount: number, breachStarted: boolean) => {
-  const status: { text: string; panelClass: string } = {
-    text: '',
-    panelClass: '',
-  }
-
-  if (breachStarted) {
-    status.text = 'Breach in progress'
-    status.panelClass = 'app-compliance-panel--red'
-  } else {
-    switch (failureToComplyCount) {
-      case 0:
-        status.text = 'No failures to comply within 12 months'
-        status.panelClass = 'app-compliance-panel--green'
-        break
-      case 1:
-        status.text = '1 failure to comply within 12 months'
-        status.panelClass = ''
-        break
-      default:
-        status.text = `${failureToComplyCount} failures to comply within 12 months. No breach in progress yet.`
-        status.panelClass = 'app-compliance-panel--red'
-        break
-    }
-  }
-
-  return status
-}
-
-export const getDistinctRequirements = (appointments: Activity[]): string[] => {
-  const rqmts = appointments.flatMap(entry => (entry.rarCategory ? [entry.rarCategory] : []))
-  return rqmts.filter((n, i) => rqmts.indexOf(n) === i)
-}
-
-export const toSlug = (string: string) => {
-  return slugify(string, { lower: true })
 }
 
 export const setSortOrder = (columnName: string, sortBy: string) => {

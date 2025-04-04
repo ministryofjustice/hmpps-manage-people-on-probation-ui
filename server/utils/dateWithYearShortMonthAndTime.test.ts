@@ -1,7 +1,7 @@
 import { dateWithYearShortMonthAndTime } from './dateWithYearShortMonthAndTime'
 import { govukTime } from './govukTime'
 
-describe('dateWithYearShortMonthAndTime', () => {
+describe('utils/dateWithYearShortMonthAndTime', () => {
   const dateStr = '2025-02-25T09:08:34.123'
   it.each([
     ['null', undefined, null],

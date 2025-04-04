@@ -30,7 +30,7 @@ const getExpected = (withoutKey: string): string[] => {
   }, [])
 }
 
-describe('addressToList', () => {
+describe('utils/addressToList', () => {
   for (const withoutKey of Object.keys(mockAddress)) {
     it(`should return an address array without ${withoutKey}`, () => {
       expect(addressToList(getMockAddress(withoutKey))).toEqual(getExpected(withoutKey))

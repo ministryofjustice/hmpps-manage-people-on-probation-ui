@@ -1,6 +1,6 @@
 import { deliusDeepLinkUrl } from './deliusDeepLinkUrl'
 
-describe('get delius deep link', () => {
+describe('utils/deliusDeepLinkUrl', () => {
   it.each([
     ['null', null, null, ''],
     [

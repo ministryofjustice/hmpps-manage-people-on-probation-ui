@@ -1,6 +1,6 @@
 import { properCase, properCaseName, convertToTitleCase } from '.'
 
-describe('properCase', () => {
+describe('utils/properCase', () => {
   it('should return an empty string, if argument is an empty string', () => {
     expect(properCase('')).toEqual('')
   })
@@ -12,7 +12,7 @@ describe('properCase', () => {
   })
 })
 
-describe('properCaseName', () => {
+describe('utils/properCaseName', () => {
   it('should return a blank string if name is blank', () => {
     expect('').toEqual('')
   })
@@ -24,7 +24,7 @@ describe('properCaseName', () => {
   })
 })
 
-describe('convertToTitleCase', () => {
+describe('utils/convertToTitleCase', () => {
   it.each([
     [null, null, ''],
     ['empty string', '', ''],

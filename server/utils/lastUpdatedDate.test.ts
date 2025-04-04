@@ -1,6 +1,6 @@
 import { lastUpdatedDate } from './lastUpdatedDate'
 
-describe('lastUpdatedDate', () => {
+describe('utils/lastUpdatedDate', () => {
   const dateStr = '2025-02-25T09:08:34.123'
   it.each([
     ['the last updated date', dateStr, 'Last updated 25 Feb 2025'],

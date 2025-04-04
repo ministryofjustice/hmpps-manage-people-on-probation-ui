@@ -1,7 +1,7 @@
 import { interventionsLink } from './interventionsLink'
 import config from '../config'
 
-describe('interventionsLink', () => {
+describe('utils/interventionsLink', () => {
   const referralId = '1234'
   it.each([
     ['an empty string if referral id is null', null, ''],

@@ -1,6 +1,6 @@
 import { dateWithYear } from '.'
 
-describe('dateWithYear', () => {
+describe('utils/dateWithYear', () => {
   it.each([
     [null, null, ''],
     ['Empty string', '', ''],

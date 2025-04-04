@@ -1,6 +1,6 @@
 import { tierLink } from './tierLink'
 
-describe('tierLink', () => {
+describe('utils/tierLink', () => {
   it.each([
     ['Returns empty', null, ''],
     ['Returns link', 'X000001', 'https://tier-dummy-url/X000001'],
