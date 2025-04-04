@@ -112,6 +112,8 @@ context('Overview', () => {
     cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
     cy.get('[data-qa="riskFlagsValue"] dt').eq(3).should('contain.text', 'Information only')
 
+    page.getElementData('overallRiskValue').should('contain.text', 'VERY HIGH RISK OF SERIOUS HARM')
+
     const expected =
       '{"name":"Wolff,Caroline","crn":"X000001","dob":"9 January 2002","age":"22","tierScore":"B2","sentence":"12 month Community order"}'
 

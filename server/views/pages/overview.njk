@@ -355,10 +355,11 @@
       {% endif %}
       {% set mappaValue =  '<span class="govuk-!-font-weight-bold">' + mappaCat + mappaLevel + '</span>' %}
       {% endif %}
+      {% set roshText = risks.summary.overallRiskLevel | replace("_"," ") %}
       {% set overallRosh %}
       {% if hasRiskAssessment and risks.summary.overallRiskLevel %}
       <table><tr>
-      <td class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ risks.summary.overallRiskLevel + ' risk of serious harm' | replace('_',' ') | upper }}</td>
+      <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
       </table>
       {% else %}
       {{'There is no RoSH summary.'}}
