@@ -38,8 +38,9 @@ import {
   toSentenceCase,
   getSearchParamsString,
   toIsoDate,
+  toRoshWidget,
 } from './utils'
-import { Need, RiskResponse, RiskScore, RiskToSelf } from '../data/arnsApiClient'
+import { Need, RiskResponse, RiskScore, RiskSummary, RiskToSelf } from '../data/arnsApiClient'
 import { Name } from '../data/model/common'
 import { Activity } from '../data/model/schedule'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
@@ -647,5 +648,121 @@ describe('getSearchParamsString()', () => {
 describe('toISODate', () => {
   it('should format the value into ISO date format', () => {
     expect(toIsoDate('21/10/2024')).toEqual('2024-10-21')
+  })
+})
+describe('toRoshWidget', () => {
+  const riskSummary: RiskSummary = {
+    summary: {
+      riskInCommunity: { LOW: ['Children'], HIGH: ['Public'] },
+      riskInCustody: {
+        LOW: ['Children'],
+        HIGH: ['Public', 'Known Adult', 'Staff', 'Prisoners'],
+      },
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const riskSummaryNoCustody: RiskSummary = {
+    summary: {
+      riskInCommunity: { LOW: ['Children'], HIGH: ['Public'] },
+      riskInCustody: {},
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const undefinedCustody: RiskSummary = {
+    summary: {
+      riskInCommunity: { LOW: ['Children'], HIGH: ['Public'] },
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const undefinedBoth: RiskSummary = {
+    summary: {
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const emptyBoth: RiskSummary = {
+    summary: {
+      overallRiskLevel: 'HIGH',
+      riskInCommunity: {},
+      riskInCustody: {},
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const noSummary: RiskSummary = {}
+
+  it('should combined the community and custody scores into one object', () => {
+    expect(toRoshWidget(riskSummary)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [
+        { riskTo: 'Children', community: 'LOW', custody: 'LOW' },
+        { riskTo: 'Public', community: 'HIGH', custody: 'HIGH' },
+        { riskTo: 'Known Adult', community: 'N/A', custody: 'HIGH' },
+        { riskTo: 'Staff', community: 'N/A', custody: 'HIGH' },
+        { riskTo: 'Prisoners', community: 'N/A', custody: 'HIGH' },
+      ],
+    })
+  })
+
+  it('should combined the community and custody scores into one object when no custody', () => {
+    expect(toRoshWidget(riskSummaryNoCustody)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [
+        { riskTo: 'Children', community: 'LOW', custody: 'N/A' },
+        { riskTo: 'Public', community: 'HIGH', custody: 'N/A' },
+      ],
+    })
+  })
+
+  it('should combined the community and custody scores into one object when no undefined custody', () => {
+    expect(toRoshWidget(undefinedCustody)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [
+        { riskTo: 'Children', community: 'LOW', custody: 'N/A' },
+        { riskTo: 'Public', community: 'HIGH', custody: 'N/A' },
+      ],
+    })
+  })
+
+  it('should show an empty array when there is an undefined custody and undefined community', () => {
+    expect(toRoshWidget(undefinedBoth)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [],
+    })
+  })
+
+  it('should show an empty array when there is an empty custody and empty community', () => {
+    expect(toRoshWidget(emptyBoth)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [],
+    })
+  })
+
+  it('should show an empty array when there is an empty custody and empty community', () => {
+    expect(toRoshWidget(emptyBoth)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [],
+    })
+  })
+
+  it('should show an empty array when there is no summary', () => {
+    expect(toRoshWidget(noSummary)).toEqual({
+      assessedOn: undefined,
+      overallRisk: 'UNAVAILABLE',
+      risks: undefined,
+    })
   })
 })

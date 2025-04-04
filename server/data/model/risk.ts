@@ -30,8 +30,7 @@ export interface ScoreTwoYears {
 export interface RoshRiskWidgetDto {
   overallRisk?: string
   assessedOn?: string
-  riskInCommunity: { [key: string]: string }
-  riskInCustody: { [key: string]: string }
+  risks: { riskTo: string; community: string | string[]; custody: string | string[] }[]
 }
 
 export interface RiskScoresDto {

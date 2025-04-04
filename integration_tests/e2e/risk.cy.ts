@@ -32,6 +32,24 @@ context('Risk', () => {
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=RegisterSummary&CRN=X000001',
       )
 
+    page.getElementData('riskToLabelValue1').should('contain.text', 'Children')
+    page.getElementData('riskToLabelValue2').should('contain.text', 'Staff')
+    page.getElementData('riskToLabelValue3').should('contain.text', 'Known adult')
+    page.getElementData('riskToLabelValue4').should('contain.text', 'Public')
+    page.getElementData('riskToLabelValue5').should('contain.text', 'Prisoners')
+
+    page.getElementData('riskToCommunityValue1').should('contain.text', 'Low')
+    page.getElementData('riskToCommunityValue2').should('contain.text', 'Very high')
+    page.getElementData('riskToCommunityValue3').should('contain.text', 'Medium')
+    page.getElementData('riskToCommunityValue4').should('contain.text', 'High')
+    page.getElementData('riskToCommunityValue5').should('contain.text', 'N/A')
+
+    page.getElementData('riskToCustodyValue1').should('contain.text', 'Low')
+    page.getElementData('riskToCustodyValue2').should('contain.text', 'Low')
+    page.getElementData('riskToCustodyValue3').should('contain.text', 'Low')
+    page.getElementData('riskToCustodyValue4').should('contain.text', 'Very high')
+    page.getElementData('riskToCustodyValue5').should('contain.text', 'Low')
+
     for (let i = 0; i < mockRiskFlags.length; i += 1) {
       const index = i + 1
       const { level, description, notes, createdDate, nextReviewDate } = mockRiskFlags[i]

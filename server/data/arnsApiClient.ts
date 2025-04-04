@@ -71,8 +71,8 @@ export interface RiskSummary {
     riskImminence?: string | null
     riskIncreaseFactors?: string | null
     riskMitigationFactors?: string | null
-    riskInCommunity: Partial<Record<RiskScore, string[]>>
-    riskInCustody: Partial<Record<RiskScore, string[]>>
+    riskInCommunity?: Partial<Record<RiskScore, string[]>>
+    riskInCustody?: Partial<Record<RiskScore, string[]>>
     overallRiskLevel: RiskScore
   }
   assessedOn?: string | null
