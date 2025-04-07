@@ -117,7 +117,7 @@
   {% if hasNotes  %}
     {% for riskNote in flag.riskNotes %}
       {% if riskNote.note %}
-        {% set notes = notes.concat(appNote(riskNote, '/case/' + crn + '/risk/flag/' + flag.id + '/note/' + riskNote.id)) %}
+        {% set notes = notes.concat(appNote(riskNote, '/case/' + crn + '/risk/flag/' + flag.id + '/before-removal-note/' + riskNote.id)) %}
       {% endif %}
     {% endfor  %}
   {% endif %}

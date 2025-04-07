@@ -242,6 +242,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/risk-flags/${crn}/${id}/risk-removal-note/${noteId}`, handle404: false })
   }
 
+  async getPersonRiskBeforeRemovalFlagSingleNote(crn: string, id: string, noteId: string): Promise<PersonRiskFlag> {
+    return this.get({ path: `/risk-flags/${crn}/${id}/before-removal-note/${noteId}`, handle404: false })
+  }
+
   async getPersonCompliance(crn: string): Promise<PersonCompliance> {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
