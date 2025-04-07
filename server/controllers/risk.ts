@@ -13,7 +13,6 @@ const routes = [
   'getRiskFlag',
   'getRiskFlagSingleNote',
   'getRiskRemovalFlagSingleNote',
-  'getRiskBeforeRemovalFlagSingleNote',
   'getRemovedRiskFlags',
 ] as const
 
@@ -117,26 +116,6 @@ const riskController: Controller<typeof routes> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const personRiskFlag = await masClient.getPersonRiskRemovalFlagSingleNote(crn, id, noteId)
-      return res.render('pages/risk/flag', {
-        personRiskFlag,
-        crn,
-      })
-    }
-  },
-  getRiskBeforeRemovalFlagSingleNote: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id, noteId } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_RISK_DETAIL_BEFORE_REMOVAL_SINGLE_NOTE',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const personRiskFlag = await masClient.getPersonRiskBeforeRemovalFlagSingleNote(crn, id, noteId)
       return res.render('pages/risk/flag', {
         personRiskFlag,
         crn,

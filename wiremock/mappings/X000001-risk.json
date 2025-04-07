@@ -679,68 +679,6 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/risk-flags/X000001/4/before-removal-note/1",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "jsonBody": {
-          "personSummary": {
-            "name": {
-              "forename": "Caroline",
-              "middleName": "Linda",
-              "surname": "Wolff"
-            },
-            "crn": "X000001",
-            "dateOfBirth": "1979-08-18"
-          },
-          "riskFlag": {
-            "id": 4,
-            "description": "Restraining Order",
-            "riskNote": {
-              "id": 1,
-              "note": "Note 1"
-            },
-            "nextReviewDate": "2025-08-12",
-            "mostRecentReviewDate": "2023-12-12",
-            "createdDate": "2022-12-12",
-            "createdBy": {
-              "forename": "Paul",
-              "surname": "Smith"
-            },
-            "removed": true,
-            "removalHistory": [
-              {
-                "riskRemovalNotes": [
-                  {
-                    "id": 0,
-                    "createdBy": "Bruce Banner",
-                    "createdByDate": "2024-10-30",
-                    "note": "Some removal notes",
-                    "hasNoteBeenTruncated": true
-                  },
-                  {
-                    "id": 1,
-                    "note": "Removal Notes 2",
-                    "hasNoteBeenTruncated": false
-                  }
-                ],
-                "removalDate": "2022-11-18",
-                "removedBy": {
-                  "forename": "Paul",
-                  "surname": "Smith"
-                }
-              }
-            ]
-          }
-        },
-        "headers": {
-          "Content-Type": "application/json"
-        }
-      }
-    },
-    {
-      "request": {
         "urlPattern": "/mas/risk-flags/X000001/5",
         "method": "GET"
       },

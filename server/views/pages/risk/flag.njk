@@ -112,12 +112,12 @@
 {% endset %}
 
 {% set aboutThisFlagSummaryList %}
-  {% set hasNotes = flag.riskNotes.length > 0 %}
+  {% set hasNotes = personRiskFlag.riskFlag.riskNotes.length > 0 %}
   {% set notes = '' %}
   {% if hasNotes  %}
-    {% for riskNote in flag.riskNotes %}
+    {% for riskNote in personRiskFlag.riskFlag.riskNotes %}
       {% if riskNote.note %}
-        {% set notes = notes.concat(appNote(riskNote, '/case/' + crn + '/risk/flag/' + flag.id + '/before-removal-note/' + riskNote.id)) %}
+        {% set notes = notes.concat(appNote(riskNote, '/case/' + crn + '/risk/flag/' + flag.id + '/note/' + riskNote.id)) %}
       {% endif %}
     {% endfor  %}
   {% endif %}
@@ -130,7 +130,7 @@
         value: {
           html: '<span data-qa="riskFlagNotesValue">' + (notes if hasNotes else 'No notes') + '</span>'
         }
-      } if not flag.riskNote.note,
+      } if not personRiskFlag.riskFlag.riskNote.note,
       {
         key: { text: 'Note added by'},
         value: { text: flag.riskNote.createdBy }
