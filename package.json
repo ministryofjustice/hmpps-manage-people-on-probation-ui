@@ -120,7 +120,7 @@
     "@flipt-io/flipt-client": "^0.14.0",
     "@microsoft/applicationinsights-clickanalytics-js": "^3.3.6",
     "@microsoft/applicationinsights-web": "^3.3.6",
-    "@ministryofjustice/frontend": "^3.7.0",
+    "@ministryofjustice/frontend": "^5.1.0",
     "@ministryofjustice/hmpps-audit-client": "^1.1.1",
     "@ministryofjustice/probation-search-frontend": "^2.3.0",
     "@sentry/cli": "^2.43.0",
