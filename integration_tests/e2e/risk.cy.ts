@@ -98,6 +98,8 @@ context('Risk', () => {
       .getRowData('riskFlag', 'mostRecentReviewDate', 'Value')
       .should('contain.text', '12 December 2023 by Paul Smith')
     page.getRowData('riskFlag', 'createdDate', 'Value').should('contain.text', '12 December 2023 by Paul Smith')
+    page.assertAnchorElementAtIndex('[data-qa=riskFlagRemovedCard]', 0, '/case/X000001/risk/flag/4/risk-removal-note/0')
+    page.assertAnchorElementAtIndex('[data-qa=riskFlagCard]', 0, '/case/X000001/risk/flag/4/note/1')
   })
   it('Risk Detail page is rendered', () => {
     cy.visit('/case/X000001/risk/flag/2')
@@ -202,5 +204,12 @@ context('Risk', () => {
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Risk Notes 4')
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 1, '12 December 2023 by Paul Smith')
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 2, '12 December 2022 by Paul Smith')
+  })
+  it('Risk flag page is rendered with a truncated note', () => {
+    cy.visit('/case/X000001/risk/flag/3')
+    const page = new RiskDetailPage()
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 0, 'Notes')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Risk Notes')
+    page.assertAnchorElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 1, '/case/X000001/risk/flag/3/note/0')
   })
 })
