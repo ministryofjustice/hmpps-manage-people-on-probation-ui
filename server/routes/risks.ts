@@ -11,5 +11,12 @@ export default function risksRoutes(router: Router, { hmppsAuthClient }: Service
 
   get('/case/:crn/risk/flag/:id', controllers.risk.getRiskFlag(hmppsAuthClient))
 
+  get('/case/:crn/risk/flag/:id/note/:noteId', controllers.risk.getRiskFlagSingleNote(hmppsAuthClient))
+
+  get(
+    '/case/:crn/risk/flag/:id/risk-removal-note/:noteId',
+    controllers.risk.getRiskRemovalFlagSingleNote(hmppsAuthClient),
+  )
+
   get('/case/:crn/risk/removed-risk-flags', controllers.risk.getRemovedRiskFlags(hmppsAuthClient))
 }

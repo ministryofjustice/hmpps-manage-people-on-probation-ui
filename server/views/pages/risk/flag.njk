@@ -46,6 +46,15 @@
 {% for removal in flag.removalHistory %}
 
 {% set removedFlagSummaryList %}
+  {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
+  {% set removalNotes = '' %}
+  {% if hasRemovalNotes  %}
+    {% for removalNote in removal.riskRemovalNotes %}
+      {% if removalNote.note %}
+        {% set removalNotes = removalNotes.concat(appNote(removalNote, '/case/' + crn + '/risk/flag/' + flag.id + '/risk-removal-note/' + removalNote.id)) %}
+      {% endif %}
+    {% endfor  %}
+  {% endif %}
   {{ govukSummaryList({
     rows: [
       {
@@ -61,9 +70,21 @@
           text: "Why it was removed"
         },
         value: {
-          html: '<span data-qa="removalNotesValue">' + removal.notes + '</span>' if removal.notes else '<span data-qa="removalNotesValue">No notes given</span>'
+          html: '<span data-qa="removalNotesValue">' + (removalNotes if hasRemovalNotes else '	No notes given') + '</span>'
         }
-      } if removed
+      } if removed and not removal.riskRemovalNote,
+      {
+        key: { text: 'Note added by'},
+        value: { text: removal.riskRemovalNote.createdBy }
+      } if removal.riskRemovalNote.createdBy,
+      {
+        key: { text: 'Date added'},
+        value: { text:  removal.riskRemovalNote.createdByDate | dateWithYear  }
+      } if removal.riskRemovalNote.createdByDate,
+      {
+        key: { html: '<span data-qa="riskFlagNotesLabel">Note</span>' },
+        value: { html:  '<p class="govuk-body line-break">' +  '<span data-qa="riskFlagNotesLabel">' + removal.riskRemovalNote.note + '</span>' + '<\p>'  }
+      } if removal.riskRemovalNote.note
     ]
   }) }}
 {% endset %}
@@ -91,6 +112,15 @@
 {% endset %}
 
 {% set aboutThisFlagSummaryList %}
+  {% set hasNotes = flag.riskNotes.length > 0 %}
+  {% set notes = '' %}
+  {% if hasNotes  %}
+    {% for riskNote in flag.riskNotes %}
+      {% if riskNote.note %}
+        {% set notes = notes.concat(appNote(riskNote, '/case/' + crn + '/risk/flag/' + flag.id + '/note/' + riskNote.id)) %}
+      {% endif %}
+    {% endfor  %}
+  {% endif %}
   {{ govukSummaryList({
     rows: [
       {
@@ -98,9 +128,21 @@
           html: '<span data-qa="riskFlagNotesLabel">Notes</span>'
         },
         value: {
-          html: '<span data-qa="riskFlagNotesValue">' + personRiskFlag.riskFlag.notes + '</span>' if personRiskFlag.riskFlag.notes else '<span data-qa="riskFlagNotesValue">No notes</span>'
+          html: '<span data-qa="riskFlagNotesValue">' + (notes if hasNotes else 'No notes') + '</span>'
         }
-      },
+      } if not flag.riskNote.note,
+      {
+        key: { text: 'Note added by'},
+        value: { text: flag.riskNote.createdBy }
+      } if flag.riskNote.createdBy,
+      {
+        key: { text: 'Date added'},
+        value: { text:  flag.riskNote.createdByDate | dateWithYear  }
+      } if flag.riskNote.createdByDate,
+      {
+        key: { html: '<span data-qa="riskFlagNotesLabel">Note</span>' },
+        value: { html:  '<p class="govuk-body line-break">' +  '<span data-qa="riskFlagNotesLabel">' + flag.riskNote.note + '</span>' + '<\p>'  }
+      } if flag.riskNote.note,
       {
         key: {
            html: '<span data-qa="nextReviewDateLabel">Next review</span>'

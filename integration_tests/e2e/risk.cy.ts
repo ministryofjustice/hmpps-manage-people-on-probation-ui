@@ -34,7 +34,7 @@ context('Risk', () => {
 
     for (let i = 0; i < mockRiskFlags.length; i += 1) {
       const index = i + 1
-      const { level, description, notes, createdDate, nextReviewDate } = mockRiskFlags[i]
+      const { level, description, riskNotes, createdDate, nextReviewDate } = mockRiskFlags[i]
       page.getRowData('riskFlags', `risk${index}Level`, 'Value').should('contain.text', toSentenceCase(level))
       const classes = level !== 'INFORMATION_ONLY' ? ` rosh--${level.toLowerCase()}` : ''
       page
@@ -46,7 +46,6 @@ context('Risk', () => {
         .getElementData(`risk${index}DescriptionValue`)
         .find('a')
         .should('have.attr', 'href', `/case/X000001/risk/flag/${index}`)
-      page.getRowData('riskFlags', `risk${index}Notes`, 'Value').should('contain.text', notes)
       page.getRowData('riskFlags', `risk${index}DateAdded`, 'Value').should('contain.text', dateWithYear(createdDate))
       page
         .getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value')
@@ -55,6 +54,9 @@ context('Risk', () => {
         page.getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value').should('contain.text', 'Overdue')
       }
     }
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 2, 'No notes')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 7, 'Risk Notes 1')
+
     page
       .getElementData('viewRemovedRiskFlagsLink')
       .should('contain.text', 'View removed risk flags (3)')
@@ -91,7 +93,7 @@ context('Risk', () => {
     page.getRowData('riskFlagRemoved', 'removalDate', 'Value').should('contain.text', '18 November 2022 by Paul Smith')
     page.getRowData('riskFlagRemoved', 'removalNotes', 'Value').should('contain.text', 'Some removal notes')
     page.getCardHeader('riskFlag').should('contain.text', 'Before it was removed')
-    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Some notes')
+    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Risk Notes 4')
     page
       .getRowData('riskFlag', 'mostRecentReviewDate', 'Value')
       .should('contain.text', '12 December 2023 by Paul Smith')
@@ -114,7 +116,7 @@ context('Risk', () => {
       )
       .should('have.attr', 'target', '_blank')
     page.getRowData('riskFlag', 'riskFlagNotes', 'Label').should('contain.text', 'Notes')
-    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Some notes')
+    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Risk Notes 1')
     page.getRowData('riskFlag', 'nextReviewDate', 'Label').should('contain.text', 'Next review')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').should('contain.text', '18 August 2025')
     page.getRowData('riskFlag', 'mostRecentReviewDate', 'Label').should('contain.text', 'Most recent review')

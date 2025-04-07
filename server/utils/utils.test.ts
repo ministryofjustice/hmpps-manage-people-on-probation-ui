@@ -45,6 +45,7 @@ import { Activity } from '../data/model/schedule'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import config from '../config'
 import { RiskFlag } from '../data/model/risk'
+import { Note } from '../data/model/note'
 
 const appointments = [
   {
@@ -534,7 +535,7 @@ describe('groupByLevel()', () => {
         id: 1,
         level: 'HIGH',
         description: 'Restraining Order',
-        notes: 'Some notes',
+        riskNotes: [{ id: 0, note: 'Some notes' }],
         createdDate: '2022-12-18',
         nextReviewDate: '2024-12-15',
         createdBy: { forename: 'Paul', surname: 'Smith' },
@@ -545,7 +546,7 @@ describe('groupByLevel()', () => {
         id: 2,
         description: 'Domestic Abuse Perpetrator',
         level: 'MEDIUM',
-        notes: 'Some notes',
+        riskNotes: [{ id: 1, note: 'Some notes' }],
         nextReviewDate: '2025-08-18',
         mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
@@ -557,7 +558,7 @@ describe('groupByLevel()', () => {
         id: 3,
         description: 'Risk to Known Adult',
         level: 'LOW',
-        notes: 'Some notes',
+        riskNotes: [{ id: 2, note: 'Some notes' }],
         nextReviewDate: '2025-08-18',
         mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
@@ -569,7 +570,7 @@ describe('groupByLevel()', () => {
         id: 4,
         description: 'Domestic Abuse Perpetrator',
         level: 'INFORMATION_ONLY',
-        notes: 'Some notes',
+        riskNotes: [{ id: 3, note: 'Some notes' }],
         nextReviewDate: '2025-08-18',
         mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
