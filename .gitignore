@@ -137,3 +137,5 @@ integration_tests/screenshots/
 /blob-report/
 /playwright/.cache/
 .DS_Store
+
+cypress

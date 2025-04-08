@@ -47,9 +47,20 @@
       {% for flag in personRisk.removedRiskFlags %}
           {% if flag.removalHistory.length > 0 %}
               {% set removal = flag.removalHistory[0] %}
+              {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
+              {% set removalNotes = '' %}
+              {% if hasRemovalNotes  %}
+                {% for removalNote in removal.riskRemovalNotes %}
+                  {% if removalNote.note %}
+                    {% set removalNotes = removalNotes.concat(appNote(removalNote, '/case/' + crn + '/risk/flag/' + flag.id + '/risk-removal-note/' + removalNote.id)) %}
+                  {% endif %}
+                {% endfor  %}
+              {% else %}
+                {% set removalNotes = 'No notes' %}
+              {% endif %}
               <tr class="govuk-table__row">
                 <td class="govuk-table__cell" data-qa="removedRisk{{loop.index}}Value"><a href="/case/{{ crn }}/risk/flag/{{ flag.id }}">{{ flag.description }}</a></td>
-                <td class="govuk-table__cell">{{ removal.notes or 'No notes given' }}</td>
+                <td class="govuk-table__cell">{{ removalNotes | safe }}</td>
                 <td class="govuk-table__cell">{{ removal.removalDate | dateWithYear }}</td>
               </tr>
           {% endif %}
