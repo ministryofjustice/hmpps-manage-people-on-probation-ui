@@ -1,4 +1,5 @@
 import { Name, PersonSummary } from './common'
+import { Note } from './note'
 
 export interface TimelineItem {
   date: string
@@ -128,7 +129,8 @@ export interface RiskFlag {
   id: number
   description: string
   level: 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY'
-  notes?: string
+  riskNotes?: Note[]
+  riskNote?: Note
   nextReviewDate?: string
   mostRecentReviewDate?: string
   createdDate: string

@@ -137,8 +137,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eula",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
@@ -160,7 +161,6 @@
               "id": 1,
               "level": "HIGH",
               "description": "Restraining Order",
-              "notes": "Some notes",
               "createdDate": "2022-12-18",
               "nextReviewDate": "2024-12-15",
               "createdBy": {
@@ -173,7 +173,20 @@
               "id": 2,
               "description": "Domestic Abuse Perpetrator",
               "level": "MEDIUM",
-              "notes": "Some notes",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Patrick Bateman",
+                  "createdByDate": "2024-10-30",
+                  "note": "Risk Notes 1",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 1,
+                  "note": "Note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
@@ -187,7 +200,20 @@
               "id": 3,
               "description": "Risk to Known Adult",
               "level": "LOW",
-              "notes": "Some notes",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Tom Brady",
+                  "createdByDate": "2024-10-30",
+                  "note": "Risk Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer. Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer.Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
+                  "hasNoteBeenTruncated": true
+                },
+                {
+                  "id": 1,
+                  "note": "Note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
@@ -201,7 +227,20 @@
               "id": 4,
               "description": "Domestic Abuse Perpetrator",
               "level": "INFORMATION_ONLY",
-              "notes": "Some notes",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "John Wick",
+                  "createdByDate": "2024-10-30",
+                  "note": "Risk Notes 4",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 1,
+                  "note": "Note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
@@ -216,7 +255,15 @@
             {
               "id": 4,
               "description": "Restraining Order",
-              "notes": "Some notes",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Harry Hole",
+                  "createdByDate": "2025-01-01",
+                  "note": "Removed risk note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
@@ -227,7 +274,15 @@
               "removed": true,
               "removalHistory": [
                 {
-                  "notes": "Some removal notes",
+                  "riskRemovalNotes": [
+                    {
+                      "id": 0,
+                      "createdBy": "Dave Holland",
+                      "createdByDate": "2025-01-02",
+                      "note": "Removal history note 1",
+                      "hasNoteBeenTruncated": false
+                    }
+                  ],
                   "removalDate": "2022-11-18",
                   "removedBy": {
                     "forename": "Paul",
@@ -239,7 +294,15 @@
             {
               "id": 5,
               "description": "Domestic Abuse Perpetrator",
-              "notes": "Some notes",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Charlie Brown",
+                  "createdByDate": "2025-01-02",
+                  "note": "Removed risk note 2",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
@@ -250,7 +313,6 @@
               "removed": true,
               "removalHistory": [
                 {
-                  "notes": "Some removal notes",
                   "removalDate": "2022-11-18",
                   "removedBy": {
                     "forename": "Paul",
@@ -262,7 +324,15 @@
             {
               "id": 6,
               "description": "Risk to Known Adult",
-              "notes": "Some notes",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Mickey Haller",
+                  "createdByDate": "2025-01-03",
+                  "note": "Removed risk note 3",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
               "nextReviewDate": "2025-08-18",
               "mostRecentReviewDate": "2023-12-18",
               "createdDate": "2022-12-18",
@@ -273,7 +343,15 @@
               "removed": true,
               "removalHistory": [
                 {
-                  "notes": "Some removal notes",
+                  "riskRemovalNotes": [
+                    {
+                      "id": 0,
+                      "createdBy": "Peter Jones",
+                      "createdByDate": "2025-01-10",
+                      "note": "Removal history note 2",
+                      "hasNoteBeenTruncated": false
+                    }
+                  ],
                   "removalDate": "2022-11-18",
                   "removedBy": {
                     "forename": "Paul",
@@ -299,8 +377,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eulaaaa",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
@@ -333,8 +412,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eula",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
@@ -342,7 +422,20 @@
           "riskFlag": {
             "id": 2,
             "description": "Domestic Abuse Perpetrator",
-            "notes": "Some notes",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "Patrick Bateman",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes 1",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": false
+              }
+            ],
             "nextReviewDate": "2025-08-18",
             "mostRecentReviewDate": "2023-12-18",
             "createdDate": "2022-12-18",
@@ -368,8 +461,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eula",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
@@ -377,7 +471,61 @@
           "riskFlag": {
             "id": 3,
             "description": "Risk to Known Adult",
-            "notes": "Some notes",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "Tom Brady",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer. Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer.Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
+                "hasNoteBeenTruncated": true
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": false
+              }
+            ],
+            "nextReviewDate": "2025-08-18",
+            "mostRecentReviewDate": "2023-12-18",
+            "createdDate": "2022-12-18",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": false
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X000001/3/note/0",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 3,
+            "description": "Risk to Known Adult",
+            "riskNote": {
+              "id": 0,
+              "createdBy": "Tom Brady",
+              "createdByDate": "2024-10-30",
+              "note": "Risk Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer. Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer.Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as desi"
+            },
             "nextReviewDate": "2025-08-18",
             "mostRecentReviewDate": "2023-12-18",
             "createdDate": "2022-12-18",
@@ -403,8 +551,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eulaaaa",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
@@ -412,7 +561,20 @@
           "riskFlag": {
             "id": 4,
             "description": "Restraining Order",
-            "notes": "Some notes",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "John Wick",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes 4",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": true
+              }
+            ],
             "nextReviewDate": "2025-08-12",
             "mostRecentReviewDate": "2023-12-12",
             "createdDate": "2022-12-12",
@@ -423,7 +585,84 @@
             "removed": true,
             "removalHistory": [
               {
-                "notes": "Some removal notes",
+                "riskRemovalNotes": [
+                  {
+                    "id": 0,
+                    "createdBy": "Bruce Banner",
+                    "createdByDate": "2024-10-30",
+                    "note": "Some removal notes",
+                    "hasNoteBeenTruncated": true
+                  },
+                  {
+                    "id": 1,
+                    "note": "Removal Notes 2",
+                    "hasNoteBeenTruncated": false
+                  }
+                ],
+                "removalDate": "2022-11-18",
+                "removedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                }
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X000001/4/risk-removal-note/0",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 4,
+            "description": "Restraining Order",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "John Wick",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes 4",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": false
+              }
+            ],
+            "nextReviewDate": "2025-08-12",
+            "mostRecentReviewDate": "2023-12-12",
+            "createdDate": "2022-12-12",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": true,
+            "removalHistory": [
+              {
+                "riskRemovalNote": {
+                  "id": 0,
+                  "createdBy": "Bruce Banner",
+                  "createdByDate": "2024-10-30",
+                  "note": "Some removal notes"
+                },
                 "removalDate": "2022-11-18",
                 "removedBy": {
                   "forename": "Paul",
@@ -448,8 +687,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eula",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
@@ -493,8 +733,9 @@
         "jsonBody": {
           "personSummary": {
             "name": {
-              "forename": "Eula",
-              "surname": "Schmeler"
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
             },
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"

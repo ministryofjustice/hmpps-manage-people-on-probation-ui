@@ -23,11 +23,20 @@
       <tbody class="govuk-table__body">
         {% for flag in personRisk.riskFlags %}
         {% if not flag.rosh %}
+          {% set showNotesDetails = flag.riskNotes.length > 0 %}
+          {% set note = '' %}
+          {% if showNotesDetails > 0  %}
+            {% for riskNote in flag.riskNotes %}
+              {% if loop.first %}
+                {% set note = riskNote.note %}
+              {% endif %}
+            {% endfor  %}
+          {% endif %}
           {% set level = flag.level | toSentenceCase %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}LevelValue"><span class="govuk-!-font-weight-bold{% if flag.level != 'INFORMATION_ONLY' %} rosh--{{ flag.level | lower }}{% endif %}">{{ level }}</span></td>
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}DescriptionValue"><a href="/case/{{ crn }}/risk/flag/{{ flag.id }}">{{ flag.description }}</a></td>
-              <td class="govuk-table__cell" data-qa="risk{{loop.index}}NotesValue"><p class='truncate-notes'>{{ flag.notes or 'No notes' }}</p></td>
+              <td class="govuk-table__cell" data-qa="risk{{loop.index}}NotesValue"><p class='truncate-notes'>{{ note or 'No notes' }}</p></td>
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}DateAddedValue">{{ flag.createdDate | dateWithYear }}</td>
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}NextReviewDateValue">{{ flag.nextReviewDate | dateWithYear }}
                 {% if(isInThePast(flag.nextReviewDate)) %}
