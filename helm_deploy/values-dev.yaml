@@ -6,7 +6,8 @@ generic-service:
 
   ingress:
     host: manage-people-on-probation-dev.hmpps.service.justice.gov.uk
-
+    className: modsec-non-prod
+    
   env:
     INGRESS_URL: "https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk"
     HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"

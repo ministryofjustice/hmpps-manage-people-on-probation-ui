@@ -38,13 +38,15 @@ import {
   toSentenceCase,
   getSearchParamsString,
   toIsoDate,
+  toRoshWidget,
 } from './utils'
-import { Need, RiskResponse, RiskScore, RiskToSelf } from '../data/arnsApiClient'
+import { Need, RiskResponse, RiskScore, RiskSummary, RiskToSelf } from '../data/arnsApiClient'
 import { Name } from '../data/model/common'
 import { Activity } from '../data/model/schedule'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import config from '../config'
 import { RiskFlag } from '../data/model/risk'
+import { Note } from '../data/model/note'
 
 const appointments = [
   {
@@ -534,7 +536,7 @@ describe('groupByLevel()', () => {
         id: 1,
         level: 'HIGH',
         description: 'Restraining Order',
-        notes: 'Some notes',
+        riskNotes: [{ id: 0, note: 'Some notes' }],
         createdDate: '2022-12-18',
         nextReviewDate: '2024-12-15',
         createdBy: { forename: 'Paul', surname: 'Smith' },
@@ -545,7 +547,7 @@ describe('groupByLevel()', () => {
         id: 2,
         description: 'Domestic Abuse Perpetrator',
         level: 'MEDIUM',
-        notes: 'Some notes',
+        riskNotes: [{ id: 1, note: 'Some notes' }],
         nextReviewDate: '2025-08-18',
         mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
@@ -557,7 +559,7 @@ describe('groupByLevel()', () => {
         id: 3,
         description: 'Risk to Known Adult',
         level: 'LOW',
-        notes: 'Some notes',
+        riskNotes: [{ id: 2, note: 'Some notes' }],
         nextReviewDate: '2025-08-18',
         mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
@@ -569,7 +571,7 @@ describe('groupByLevel()', () => {
         id: 4,
         description: 'Domestic Abuse Perpetrator',
         level: 'INFORMATION_ONLY',
-        notes: 'Some notes',
+        riskNotes: [{ id: 3, note: 'Some notes' }],
         nextReviewDate: '2025-08-18',
         mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
@@ -647,5 +649,121 @@ describe('getSearchParamsString()', () => {
 describe('toISODate', () => {
   it('should format the value into ISO date format', () => {
     expect(toIsoDate('21/10/2024')).toEqual('2024-10-21')
+  })
+})
+describe('toRoshWidget', () => {
+  const riskSummary: RiskSummary = {
+    summary: {
+      riskInCommunity: { LOW: ['Children'], HIGH: ['Public'] },
+      riskInCustody: {
+        LOW: ['Children'],
+        HIGH: ['Public', 'Known Adult', 'Staff', 'Prisoners'],
+      },
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const riskSummaryNoCustody: RiskSummary = {
+    summary: {
+      riskInCommunity: { LOW: ['Children'], HIGH: ['Public'] },
+      riskInCustody: {},
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const undefinedCustody: RiskSummary = {
+    summary: {
+      riskInCommunity: { LOW: ['Children'], HIGH: ['Public'] },
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const undefinedBoth: RiskSummary = {
+    summary: {
+      overallRiskLevel: 'HIGH',
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const emptyBoth: RiskSummary = {
+    summary: {
+      overallRiskLevel: 'HIGH',
+      riskInCommunity: {},
+      riskInCustody: {},
+    },
+    assessedOn: '2024-05-09T10:22:03',
+  }
+
+  const noSummary: RiskSummary = {}
+
+  it('should combined the community and custody scores into one object', () => {
+    expect(toRoshWidget(riskSummary)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [
+        { riskTo: 'Children', community: 'LOW', custody: 'LOW' },
+        { riskTo: 'Public', community: 'HIGH', custody: 'HIGH' },
+        { riskTo: 'Known Adult', community: 'N/A', custody: 'HIGH' },
+        { riskTo: 'Staff', community: 'N/A', custody: 'HIGH' },
+        { riskTo: 'Prisoners', community: 'N/A', custody: 'HIGH' },
+      ],
+    })
+  })
+
+  it('should combined the community and custody scores into one object when no custody', () => {
+    expect(toRoshWidget(riskSummaryNoCustody)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [
+        { riskTo: 'Children', community: 'LOW', custody: 'N/A' },
+        { riskTo: 'Public', community: 'HIGH', custody: 'N/A' },
+      ],
+    })
+  })
+
+  it('should combined the community and custody scores into one object when no undefined custody', () => {
+    expect(toRoshWidget(undefinedCustody)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [
+        { riskTo: 'Children', community: 'LOW', custody: 'N/A' },
+        { riskTo: 'Public', community: 'HIGH', custody: 'N/A' },
+      ],
+    })
+  })
+
+  it('should show an empty array when there is an undefined custody and undefined community', () => {
+    expect(toRoshWidget(undefinedBoth)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [],
+    })
+  })
+
+  it('should show an empty array when there is an empty custody and empty community', () => {
+    expect(toRoshWidget(emptyBoth)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [],
+    })
+  })
+
+  it('should show an empty array when there is an empty custody and empty community', () => {
+    expect(toRoshWidget(emptyBoth)).toEqual({
+      assessedOn: '2024-05-09T10:22:03',
+      overallRisk: 'HIGH',
+      risks: [],
+    })
+  })
+
+  it('should show an empty array when there is no summary', () => {
+    expect(toRoshWidget(noSummary)).toEqual({
+      assessedOn: undefined,
+      overallRisk: 'UNAVAILABLE',
+      risks: undefined,
+    })
   })
 })

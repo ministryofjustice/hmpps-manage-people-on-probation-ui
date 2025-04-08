@@ -634,20 +634,32 @@ function toMap(partial: Partial<Record<RiskScore, string[]>>): { [key: string]: 
 
 export const toRoshWidget = (roshSummary: RiskSummary): RoshRiskWidgetDto => {
   if (!roshSummary) {
-    return { overallRisk: 'NOT_FOUND', assessedOn: undefined, riskInCommunity: undefined, riskInCustody: undefined }
+    return {
+      overallRisk: 'NOT_FOUND',
+      assessedOn: undefined,
+      risks: undefined,
+    }
   }
 
   if (!roshSummary.summary) {
-    return { overallRisk: 'UNAVAILABLE', assessedOn: undefined, riskInCommunity: undefined, riskInCustody: undefined }
+    return { overallRisk: 'UNAVAILABLE', assessedOn: undefined, risks: undefined }
   }
 
-  const riskInCommunity = toMap(roshSummary.summary.riskInCommunity)
-  const riskInCustody = toMap(roshSummary.summary.riskInCustody)
+  const riskInCommunity = roshSummary.summary?.riskInCommunity ? toMap(roshSummary.summary.riskInCommunity) : {}
+  const riskInCustody = roshSummary.summary?.riskInCustody ? toMap(roshSummary.summary.riskInCustody) : {}
+
+  const risks = Array.from(new Set([...Object.keys(riskInCommunity), ...Object.keys(riskInCustody)])).map(key => {
+    return {
+      riskTo: key,
+      community: riskInCommunity[key] || 'N/A',
+      custody: riskInCustody[key] || 'N/A',
+    }
+  })
+
   return {
     overallRisk: roshSummary.summary.overallRiskLevel,
     assessedOn: roshSummary.assessedOn,
-    riskInCommunity,
-    riskInCustody,
+    risks,
   }
 }
 

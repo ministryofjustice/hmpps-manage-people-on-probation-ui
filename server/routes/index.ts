@@ -15,6 +15,7 @@ import caseloadRoutes from './caseload'
 import accessibilityRoutes from './accessibilityRoutes'
 import interventionsRoutes from './interventions'
 import arrangeAppointmentRoutes from './arrangeAppointment'
+import documentsRoutes from './documents'
 
 export default function routes(services: Services): Router {
   const router = Router()
@@ -31,5 +32,6 @@ export default function routes(services: Services): Router {
   accessibilityRoutes(router)
   interventionsRoutes(router, services)
   arrangeAppointmentRoutes(router, services)
+  documentsRoutes(router, services)
   return router
 }

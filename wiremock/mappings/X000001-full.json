@@ -194,9 +194,10 @@
               "VERY_HIGH": ["Staff"]
             },
             "riskInCustody": {
-              "LOW": ["Children", "Public", "Known Adult", "Staff", "Prisoners"]
+              "LOW": ["Children", "Public", "Known Adult", "Staff", "Prisoners"],
+              "VERY_HIGH": ["Public"]
             },
-            "overallRiskLevel": "HIGH"
+            "overallRiskLevel": "VERY_HIGH"
           },
           "assessedOn": "2024-01-24T08:07:15"
         },

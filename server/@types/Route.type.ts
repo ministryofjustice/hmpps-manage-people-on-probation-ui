@@ -39,4 +39,4 @@ export interface AppResponse extends Response {
   locals: Locals
 }
 
-export type Route<T> = (req: Request, res: AppResponse, next?: NextFunction) => T
+export type Route<T, TArgs = any> = (req: Request, res: AppResponse, next?: NextFunction, args?: TArgs) => T

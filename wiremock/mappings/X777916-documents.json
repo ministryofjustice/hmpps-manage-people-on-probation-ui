@@ -1,0 +1,38 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/documents/X777916",
+        "method": "GET",
+        "queryParameters": {
+          "size": {
+            "equalTo": "15"
+          },
+          "page": {
+            "equalTo": "0"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "totalPages": 0,
+          "totalElements": 0,
+          "sortedBy": "lastUpdatedAt.desc",
+          "documents": []
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

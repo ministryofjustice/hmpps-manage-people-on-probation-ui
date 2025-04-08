@@ -1,4 +1,5 @@
 import { Name, PersonSummary } from './common'
+import { Note } from './note'
 
 export interface TimelineItem {
   date: string
@@ -30,8 +31,7 @@ export interface ScoreTwoYears {
 export interface RoshRiskWidgetDto {
   overallRisk?: string
   assessedOn?: string
-  riskInCommunity: { [key: string]: string }
-  riskInCustody: { [key: string]: string }
+  risks: { riskTo: string; community: string | string[]; custody: string | string[] }[]
 }
 
 export interface RiskScoresDto {
@@ -129,7 +129,8 @@ export interface RiskFlag {
   id: number
   description: string
   level: 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY'
-  notes?: string
+  riskNotes?: Note[]
+  riskNote?: Note
   nextReviewDate?: string
   mostRecentReviewDate?: string
   createdDate: string

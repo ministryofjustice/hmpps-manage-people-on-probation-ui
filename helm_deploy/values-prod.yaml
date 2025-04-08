@@ -18,7 +18,7 @@ generic-service:
     INTERVENTIONS_API_URL: "https://hmpps-interventions-service.apps.live-1.cloud-platform.service.justice.gov.uk"
     FLIPT_URL: "https://feature-flags.hmpps.service.justice.gov.uk"
     INTERVENTIONS_LINK: "https://hmpps-interventions-ui.apps.live-1.cloud-platform.service.justice.gov.uk"
-    DELIUS_LINK: "https://ndelius.probation.service.justice.gov.uk/"
+    DELIUS_LINK: "https://ndelius.probation.service.justice.gov.uk"
     OASYS_LINK: "https://int.oasys.service.justice.gov.uk"
     RECALL_LINK: "https://consider-a-recall.hmpps.service.justice.gov.uk/"
     CAS1_LINK: "https://approved-premises.hmpps.service.justice.gov.uk/"

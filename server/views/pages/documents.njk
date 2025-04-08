@@ -1,0 +1,119 @@
+{% extends "../partials/case.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
+{% set pageTitle = makePageTitle({ pageHeading: "Documents" }) %}
+{% set currentNavSection = 'documents' %}
+{% set currentSectionName = 'Documents' %}
+{% set headerPersonName = documents.personSummary.name.forename + ' ' + documents.personSummary.name.surname %}
+{% set headerCRN = documents.personSummary.crn %}
+{% set headerDob = documents.personSummary.dateOfBirth  %}
+{% set offenderId = documents.personSummary.offenderId  %}
+{% set headerGender = documents.personSummary.gender  %}
+
+{% block beforeContent %}
+    {{ govukBreadcrumbs({
+      items: [
+        {
+          text: "Cases",
+          href: "/case"
+        },
+        {
+          text: headerPersonName,
+          href: "/case/" + crn,
+          attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+        },
+        {
+          text: "Documents"
+        }
+      ]
+    }) }}
+{% endblock %}
+{% block pageContent %}
+
+{% if pagination.total > 0 %}
+  {% if pagination.items | length > 1 %}
+    <p data-qa="pagination">Showing <b>{{ pagination.from }}</b> to <b>{{ pagination.to }}</b> of <b>{{ pagination.total }}</b> documents.</p>
+  {% endif %}
+
+  {% set rows = [] %}
+  {% for document in documents.documents %}
+
+    {% set rows = (rows.push(
+      [
+        {
+          html: '<span class="govuk-tag govuk-tag--orange">'+document.status+'</strong>' if document.status === 'Sensitive' else document.status,
+          attributes: { 'data-qa': 'statusValue' + loop.index }
+        },
+        {
+          text: document.level,
+          attributes: { 'data-qa': 'levelValue' + loop.index }
+        },
+        {
+          html: '<a data-ai-id="documentDownload" href="personal-details/documents/' + document.alfrescoId +'/download" download="' + document.name +'">' + document.name +'</a>',
+          attributes: { 'data-qa': 'nameValue' + loop.index }
+        },
+        {
+          text: document.type,
+          attributes: { 'data-qa': 'typeValue' + loop.index }
+        },
+        {
+          text: document.createdAt| dateWithYear,
+          attributes: { 'data-qa': 'dateCreatedValue' + loop.index },
+          classes: "nowrap"
+        },
+        {
+          text: document.lastUpdatedAt| dateWithYear,
+          attributes: { 'data-qa': 'dateModifiedValue' + loop.index },
+          classes: "nowrap"
+        }
+      ]
+    ), rows) %}
+  {% endfor %}
+
+  {%- from "govuk/components/table/macro.njk" import govukTable -%}
+
+  {{ govukTable({
+    attributes: {
+      'data-module': 'moj-backend-sortable-table',
+      'data-qa': 'documentsCard'
+    },
+    head: [
+      {
+        html: "Status",
+        attributes: {'aria-sort': setSortOrder('status', documents.sortedBy) , 'col-name': 'status', 'data-qa': 'statusHeader', 'data-sort-name': 'status', 'data-sort-action': 'documents' }
+      },
+      {
+        html: "Level",
+        attributes: {'aria-sort': setSortOrder('level', documents.sortedBy) , 'col-name': 'level', 'data-qa': 'levelHeader', 'data-sort-name': 'level', 'data-sort-action': 'documents' }
+      },
+      {
+        html: "Name",
+        attributes: {'aria-sort': setSortOrder('name', documents.sortedBy) , 'col-name': 'name', 'data-qa': 'nameHeader', 'data-sort-name': 'name', 'data-sort-action': 'documents' }
+      },
+      {
+        html: "Type",
+        attributes: {'aria-sort': setSortOrder('type', documents.sortedBy) , 'col-name': 'type', 'data-qa': 'typeHeader', 'data-sort-name': 'type', 'data-sort-action': 'documents' }
+      },
+      {
+        text: "Date created",
+        attributes: {'aria-sort': setSortOrder('createdAt', documents.sortedBy) , 'col-name': 'createdAt', 'data-qa': 'createdAtHeader', 'data-sort-name': 'createdAt', 'data-sort-action': 'documents'},
+        classes: "nowrap"
+      },
+      {
+        text: "Date modified",
+        attributes: {'aria-sort': setSortOrder('lastUpdatedAt', documents.sortedBy) , 'col-name': 'lastUpdatedAt', 'data-qa': 'lastUpdatedAtHeader', 'data-sort-name': 'lastUpdatedAt', 'data-sort-action': 'documents' },
+        classes: "nowrap"
+      }
+    ],
+    rows: rows
+  }) }}
+
+  {% if pagination.items | length > 1 %}
+    {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
+  {% endif %}
+
+{% else %}
+  <p data-qa="noData">There are no documents to display.</p>
+{% endif %}
+
+{% endblock %}

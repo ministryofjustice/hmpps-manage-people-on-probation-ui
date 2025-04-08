@@ -28,6 +28,7 @@ import { PreviousOrderDetail } from './model/previousOrderDetail'
 import { CaseAccess, UserAccess } from './model/caseAccess'
 import { DeliusRoles } from './model/deliusRoles'
 import { UserSchedule } from './model/userSchedule'
+import { PersonDocuments } from './model/documents'
 
 interface GetUserScheduleProps {
   username: string
@@ -224,8 +225,21 @@ export default class MasApiClient extends RestClient {
     })
   }
 
+  async getDocuments(crn: string, page: string, sortBy: string): Promise<PersonDocuments> {
+    const pageQuery = `?${new URLSearchParams({ size: '15', page, sortBy }).toString()}`
+    return this.get({ path: `/documents/${crn}${pageQuery}`, handle404: true })
+  }
+
   async getPersonRiskFlag(crn: string, id: string): Promise<PersonRiskFlag> {
     return this.get({ path: `/risk-flags/${crn}/${id}`, handle404: false })
+  }
+
+  async getPersonRiskFlagSingleNote(crn: string, id: string, noteId: string): Promise<PersonRiskFlag> {
+    return this.get({ path: `/risk-flags/${crn}/${id}/note/${noteId}`, handle404: false })
+  }
+
+  async getPersonRiskRemovalFlagSingleNote(crn: string, id: string, noteId: string): Promise<PersonRiskFlag> {
+    return this.get({ path: `/risk-flags/${crn}/${id}/risk-removal-note/${noteId}`, handle404: false })
   }
 
   async getPersonCompliance(crn: string): Promise<PersonCompliance> {

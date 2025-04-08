@@ -32,9 +32,27 @@ context('Risk', () => {
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=RegisterSummary&CRN=X000001',
       )
 
+    page.getElementData('riskToLabelValue1').should('contain.text', 'Children')
+    page.getElementData('riskToLabelValue2').should('contain.text', 'Staff')
+    page.getElementData('riskToLabelValue3').should('contain.text', 'Known adult')
+    page.getElementData('riskToLabelValue4').should('contain.text', 'Public')
+    page.getElementData('riskToLabelValue5').should('contain.text', 'Prisoners')
+
+    page.getElementData('riskToCommunityValue1').should('contain.text', 'Low')
+    page.getElementData('riskToCommunityValue2').should('contain.text', 'Very high')
+    page.getElementData('riskToCommunityValue3').should('contain.text', 'Medium')
+    page.getElementData('riskToCommunityValue4').should('contain.text', 'High')
+    page.getElementData('riskToCommunityValue5').should('contain.text', 'N/A')
+
+    page.getElementData('riskToCustodyValue1').should('contain.text', 'Low')
+    page.getElementData('riskToCustodyValue2').should('contain.text', 'Low')
+    page.getElementData('riskToCustodyValue3').should('contain.text', 'Low')
+    page.getElementData('riskToCustodyValue4').should('contain.text', 'Very high')
+    page.getElementData('riskToCustodyValue5').should('contain.text', 'Low')
+
     for (let i = 0; i < mockRiskFlags.length; i += 1) {
       const index = i + 1
-      const { level, description, notes, createdDate, nextReviewDate } = mockRiskFlags[i]
+      const { level, description, riskNotes, createdDate, nextReviewDate } = mockRiskFlags[i]
       page.getRowData('riskFlags', `risk${index}Level`, 'Value').should('contain.text', toSentenceCase(level))
       const classes = level !== 'INFORMATION_ONLY' ? ` rosh--${level.toLowerCase()}` : ''
       page
@@ -46,7 +64,6 @@ context('Risk', () => {
         .getElementData(`risk${index}DescriptionValue`)
         .find('a')
         .should('have.attr', 'href', `/case/X000001/risk/flag/${index}`)
-      page.getRowData('riskFlags', `risk${index}Notes`, 'Value').should('contain.text', notes)
       page.getRowData('riskFlags', `risk${index}DateAdded`, 'Value').should('contain.text', dateWithYear(createdDate))
       page
         .getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value')
@@ -55,6 +72,9 @@ context('Risk', () => {
         page.getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value').should('contain.text', 'Overdue')
       }
     }
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 2, 'No notes')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 7, 'Risk Notes 1')
+
     page
       .getElementData('viewRemovedRiskFlagsLink')
       .should('contain.text', 'View removed risk flags (3)')
@@ -91,11 +111,13 @@ context('Risk', () => {
     page.getRowData('riskFlagRemoved', 'removalDate', 'Value').should('contain.text', '18 November 2022 by Paul Smith')
     page.getRowData('riskFlagRemoved', 'removalNotes', 'Value').should('contain.text', 'Some removal notes')
     page.getCardHeader('riskFlag').should('contain.text', 'Before it was removed')
-    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Some notes')
+    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Risk Notes 4')
     page
       .getRowData('riskFlag', 'mostRecentReviewDate', 'Value')
       .should('contain.text', '12 December 2023 by Paul Smith')
     page.getRowData('riskFlag', 'createdDate', 'Value').should('contain.text', '12 December 2023 by Paul Smith')
+    page.assertAnchorElementAtIndex('[data-qa=riskFlagRemovedCard]', 0, '/case/X000001/risk/flag/4/risk-removal-note/0')
+    page.assertAnchorElementAtIndex('[data-qa=riskFlagCard]', 0, '/case/X000001/risk/flag/4/note/1')
   })
   it('Risk Detail page is rendered', () => {
     cy.visit('/case/X000001/risk/flag/2')
@@ -114,7 +136,7 @@ context('Risk', () => {
       )
       .should('have.attr', 'target', '_blank')
     page.getRowData('riskFlag', 'riskFlagNotes', 'Label').should('contain.text', 'Notes')
-    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Some notes')
+    page.getRowData('riskFlag', 'riskFlagNotes', 'Value').should('contain.text', 'Risk Notes 1')
     page.getRowData('riskFlag', 'nextReviewDate', 'Label').should('contain.text', 'Next review')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').should('contain.text', '18 August 2025')
     page.getRowData('riskFlag', 'mostRecentReviewDate', 'Label').should('contain.text', 'Most recent review')
@@ -167,5 +189,45 @@ context('Risk', () => {
       .should('contain.text', 'Create a risk assessment on OASys (opens in new tab).')
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://oasys-dummy-url')
+  })
+  it('Risk flag page is rendered with a single note', () => {
+    cy.visit('/case/X000001/risk/flag/3/note/0')
+    const page = new RiskDetailPage()
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 0, 'Note added by')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 1, 'Date added')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 2, 'Note')
+
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Tom Brady')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 1, '30 October 2024')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 2, 'Risk Notes')
+  })
+  it('Risk flag page is rendered with a single removal note', () => {
+    cy.visit('case/X000001/risk/flag/4/risk-removal-note/0')
+    const page = new RiskDetailPage()
+
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dt', 0, 'Date removed')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dt', 1, 'Note added by')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dt', 2, 'Date added')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dt', 3, 'Note')
+
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dd', 0, '18 November 2022 by Paul Smith')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dd', 1, 'Bruce Banner')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dd', 2, '30 October 2024')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagRemovedCard]', 0, 'dd', 3, 'Some removal notes')
+
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 0, 'Notes')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 1, 'Most recent review')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 2, 'Date added')
+
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Risk Notes 4')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 1, '12 December 2023 by Paul Smith')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 2, '12 December 2022 by Paul Smith')
+  })
+  it('Risk flag page is rendered with a truncated note', () => {
+    cy.visit('/case/X000001/risk/flag/3')
+    const page = new RiskDetailPage()
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 0, 'Notes')
+    page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Risk Notes')
+    page.assertAnchorElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 1, '/case/X000001/risk/flag/3/note/0')
   })
 })
