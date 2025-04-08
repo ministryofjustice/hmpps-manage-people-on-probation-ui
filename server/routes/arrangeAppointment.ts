@@ -12,7 +12,7 @@ import {
 } from '../middleware/index'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
-import { setDataValue, getDataValue } from '../utils/utils'
+import { setDataValue, getDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { postAppointments } from '../middleware/postAppointments'
 import { appointmentTypes } from '../properties'

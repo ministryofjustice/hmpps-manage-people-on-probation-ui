@@ -2,7 +2,7 @@ import type { Request, Response } from 'express'
 import { HmppsAuthClient } from '../../data'
 import MasApiClient from '../../data/masApiClient'
 import type { UserActivity } from '../../data/model/userSchedule'
-import { getSearchParamsString } from '../../utils/utils'
+import { getSearchParamsString } from '../../utils'
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 

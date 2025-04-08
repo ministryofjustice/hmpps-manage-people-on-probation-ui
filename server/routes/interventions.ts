@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import InterventionsApiClient from '../data/interventionsApiClient'
 import type { Route } from '../@types'
-import { toPredictors, toRoshWidget } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils'
 import ArnsApiClient from '../data/arnsApiClient'
 
 export default function interventionsRoutes(router: Router, { hmppsAuthClient }: Services) {

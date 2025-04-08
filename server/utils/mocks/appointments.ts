@@ -9,9 +9,6 @@ export const appointments = [
     startDateTime: DateTime.now().plus({ days: 3 }).toString(),
   },
   {
-    startDateTime: DateTime.now().plus({ days: 2 }).toString(),
-  },
-  {
     startDateTime: DateTime.now().minus({ days: 1 }).toString(),
     isNationalStandard: true,
     isAppointment: true,
@@ -32,5 +29,8 @@ export const appointments = [
     startDateTime: DateTime.now().minus({ days: 4 }).toString(),
     hasOutcome: true,
     rarCategory: 'Choices and Changes',
+  },
+  {
+    startDateTime: DateTime.now().plus({ days: 2 }).toString(),
   },
 ] as unknown as Activity[]

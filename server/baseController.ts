@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import config from './config'
 import { defaultName } from './utils/azureAppInsights'
-import { makePageTitle } from './utils/utils'
+import { makePageTitle } from './utils'
 
 const baseController = () => {
   return (req: Request, res: Response, next: NextFunction): void => {

@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import type { Route } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils'
 import renders from '../controllers/renders'
 
 interface QueryParams {

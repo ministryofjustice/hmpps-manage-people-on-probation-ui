@@ -3,9 +3,8 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { ActivityLogRequestBody, AppResponse } from '../@types'
 import { PersonActivity } from '../data/model/activityLog'
-import { toCamelCase } from '../utils/utils'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
-import { toIsoDateFromPicker } from '../utils'
+import { toIsoDateFromPicker, toCamelCase } from '../utils'
 
 export const getPersonActivity = async (
   req: Request,

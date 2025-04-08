@@ -6,6 +6,6 @@ export const scheduledAppointments = (appointments: Activity[]): Activity[] => {
     // Show future appointments and any appointments that are today
     appointments
       .filter(entry => !isInThePast(entry.startDateTime))
-      .sort((a, b) => (a.startDateTime > b.startDateTime ? 1 : -1))
+      .sort((a, b) => new Date(a.startDateTime).getTime() - new Date(b.startDateTime).getTime())
   )
 }

@@ -3,12 +3,18 @@ import { Activity } from '../data/model/schedule'
 import { appointments } from './mocks'
 
 describe('utils/sortAppointmentsDescending', () => {
-  it.each([
-    ['sorts and limits correctly', appointments, 3, 3],
-    ['sorts and does not limit', appointments, undefined, 7],
-  ])('%s sortAppointmentsDescending(%s, %s)', (_: string, a: Activity[], limit: number, expectedSize: number) => {
-    const result = sortAppointmentsDescending(a, limit)
-    expect(result[0]).toEqual(appointments[0])
-    expect(result.length).toEqual(expectedSize)
+  it('should sort and limit the appointments correctly if limit is set to 3', () => {
+    const result: Activity[] = sortAppointmentsDescending(appointments, 3)
+    const expectedOrder = [0, 1, 6]
+    const expected = expectedOrder.map(index => appointments[index])
+    expect(result).toStrictEqual(expected)
+    expect(result).toHaveLength(3)
+  })
+  it('should return all the sorted appointments if no limit is set', () => {
+    const result: Activity[] = sortAppointmentsDescending(appointments, undefined)
+    const expectedOrder = [0, 1, 6, 2, 3, 4, 5]
+    const expected = expectedOrder.map(index => appointments[index])
+    expect(result).toStrictEqual(expected)
+    expect(result).toHaveLength(appointments.length)
   })
 })

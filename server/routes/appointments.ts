@@ -8,7 +8,7 @@ import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
 import TierApiClient from '../data/tierApiClient'
 import type { Route } from '../@types'
-import { toPredictors, toRoshWidget } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils'
 import ArnsApiClient from '../data/arnsApiClient'
 
 export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Services) {

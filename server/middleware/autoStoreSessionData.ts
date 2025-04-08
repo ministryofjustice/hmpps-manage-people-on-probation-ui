@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import config from '../config'
-import { getDataValue, setDataValue } from '../utils/utils'
-import { toIsoDateFromPicker } from '../utils'
+import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 
 export const autoStoreSessionData = (req: Request, res: Response, next: NextFunction): void => {
   const newSessionData = req?.session?.data || {}

@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import type { Route } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils'
 
 export default function complianceRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))

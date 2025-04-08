@@ -3,7 +3,9 @@ import { appointments } from './mocks'
 import { pastAppointments } from './pastAppointments'
 
 describe('utils/pastAppointments', () => {
-  it.each([['Filters correctly', appointments]])('%s pastAppointments(%s, %s)', (_: string, a: Activity[]) => {
-    expect(pastAppointments(a)[0]).toEqual(appointments[6])
+  const expectedOrder = [2, 3, 4, 5]
+  const expected = expectedOrder.map(index => appointments[index])
+  it('should return the appointments in the past in date order', () => {
+    expect(pastAppointments(appointments)).toEqual(expected)
   })
 })

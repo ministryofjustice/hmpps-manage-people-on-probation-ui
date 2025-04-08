@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { TimelineItem } from '../data/model/risk'
-import { toRoshWidget, toTimeline } from '../utils/utils'
+import { toRoshWidget, toTimeline } from '../utils'
 import type { Route } from '../@types'
 import config from '../config'
 

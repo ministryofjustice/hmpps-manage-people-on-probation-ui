@@ -2,8 +2,7 @@ import { DateTime } from 'luxon'
 import logger from '../../../logger'
 import { ActivityLogFilters, Errors, Route } from '../../@types'
 import { errorMessages } from '../../properties'
-import { addError } from '../../utils'
-import { toCamelCase } from '../../utils/utils'
+import { toCamelCase, addError } from '../../utils'
 
 const activityLog: Route<void> = (req, res, next): void => {
   const { dateFrom, dateTo } = req.body

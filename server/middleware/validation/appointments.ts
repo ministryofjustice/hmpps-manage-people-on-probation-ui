@@ -1,8 +1,7 @@
 import logger from '../../../logger'
 import { Errors, Route } from '../../@types'
 import { errorMessages } from '../../properties'
-import { addError } from '../../utils'
-import { getDataValue } from '../../utils/utils'
+import { addError, getDataValue } from '../../utils'
 
 interface LocalParams {
   crn: string

@@ -2,22 +2,6 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express, { Request, NextFunction } from 'express'
-import {
-  decorateFormAttributes,
-  defaultFormInputValues,
-  defaultFormSelectValues,
-  groupByLevel,
-  hasValue,
-  isDefined,
-  isNotNull,
-  riskLevelLabel,
-  toErrorList,
-  toSentenceCase,
-  roleDescription,
-  toSentenceDescription,
-  concat,
-  shortTime,
-} from './utils'
 
 import {
   initialiseName,
@@ -64,6 +48,20 @@ import {
   timeFromTo,
   toSlug,
   toYesNo,
+  defaultFormInputValues,
+  defaultFormSelectValues,
+  isDefined,
+  isNotNull,
+  decorateFormAttributes,
+  groupByLevel,
+  hasValue,
+  riskLevelLabel,
+  toErrorList,
+  toSentenceCase,
+  roleDescription,
+  toSentenceDescription,
+  concat,
+  shortTime,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'

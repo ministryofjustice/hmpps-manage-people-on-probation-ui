@@ -10,7 +10,7 @@ import logger from '../../logger'
 import { CaseSearchFilter, ErrorMessages, UserCaseload } from '../data/model/caseload'
 import config from '../config'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
-import { checkRecentlyViewedAccess } from '../utils/utils'
+import { checkRecentlyViewedAccess } from '../utils'
 import type { AppResponse, Route } from '../@types'
 import renders from '../controllers/renders'
 

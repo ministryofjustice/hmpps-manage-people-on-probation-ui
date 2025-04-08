@@ -51,6 +51,7 @@ describe('utils/getRisksToThemselves', () => {
 
   it.each([
     [null, null, null, []],
+    ['Returns empty array', undefined, 'current', []],
     ['Valid Risk to Self no type', riskOfSelfHarm1, null, []],
     ['Valid Risk to Self with type', riskOfSelfHarm2, 'current', ['suicide', 'self harm', 'coping in custody']],
   ])('%s getRisksToThemselves %s %s %s', (_: string, a: RiskToSelf, b: string, expected: string[]) => {

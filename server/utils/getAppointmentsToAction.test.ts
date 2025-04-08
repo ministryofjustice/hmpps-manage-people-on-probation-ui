@@ -4,8 +4,8 @@ import { appointments } from './mocks'
 
 describe('appointments to action', () => {
   it.each([
-    ['Filters absent awating evidence', appointments, 'evidence', appointments[4]],
-    ['Filters no outcome', appointments, 'outcome', appointments[5]],
+    ['Filters absent awating evidence', appointments, 'evidence', appointments[3]],
+    ['Filters no outcome', appointments, 'outcome', appointments[4]],
   ])('%s getAppointmentsToAction(%s, %s)', (_: string, a: Activity[], b: string, appointment: Activity) => {
     expect(getAppointmentsToAction(a, b)[0]).toEqual(appointment)
   })
