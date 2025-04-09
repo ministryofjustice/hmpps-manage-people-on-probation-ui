@@ -33,7 +33,7 @@ describe('groupByLevel()', () => {
     expect(groupByLevel('STANDARD', mockNeeds)).toEqual(mockNeeds.filter(need => need?.severity === 'STANDARD'))
   })
   it('should return filtered risk flags', () => {
-    const mockRiskFlags: RiskFlag[] = [
+    const mockRiskFlags = [
       {
         id: 1,
         level: 'HIGH',
@@ -81,7 +81,7 @@ describe('groupByLevel()', () => {
         removed: false,
         removalHistory: [],
       },
-    ]
+    ] as unknown as RiskFlag[]
     expect(groupByLevel('MEDIUM', mockRiskFlags)).toEqual(mockRiskFlags.filter(riskFlag => riskFlag.level === 'MEDIUM'))
   })
 })

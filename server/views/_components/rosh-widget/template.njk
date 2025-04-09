@@ -69,11 +69,11 @@
             </tr>
             </thead>
             <tbody class="govuk-table__body">
-            {% for key, value in roshSummary.riskInCustody | dictsort %}
+            {% for risk in roshSummary.risks  %}
                 <tr class="govuk-table__row">
-                    <th class="govuk-table__header">{{ key | capitalize }}</th>
-                    <td class="govuk-table__cell {{ getRiskLevelClass(roshSummary.riskInCommunity[key], roshSummary.overallRisk) }}">{{ getRiskLevelText(roshSummary.riskInCommunity[key]) or "N/A" }}</td>
-                    <td class="govuk-table__cell {{ getRiskLevelClass(value, roshSummary.overallRisk) }}">{{ getRiskLevelText(value) or "N/A" }}</td>
+                    <th data-qa='riskToLabelValue{{ loop.index }}' class="govuk-table__header">{{ risk.riskTo | capitalize }}</th>
+                    <td data-qa='riskToCommunityValue{{ loop.index }}' class="govuk-table__cell {{ getRiskLevelClass(risk.community, roshSummary.overallRisk) }}">{{ getRiskLevelText(risk.community) or "N/A" }}</td>
+                    <td data-qa='riskToCustodyValue{{ loop.index }}' class="govuk-table__cell {{ getRiskLevelClass(risk.custody, roshSummary.overallRisk) }}">{{ getRiskLevelText(risk.custody) or "N/A" }}</td>
                 </tr>
             {% endfor %}
             </tbody>

@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { HmppsAuthClient } from '../data'
 import { Route } from '.'
 
