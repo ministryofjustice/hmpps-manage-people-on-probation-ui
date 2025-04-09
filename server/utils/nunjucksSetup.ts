@@ -68,9 +68,8 @@ import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../@types'
 
-const production = process.env.NODE_ENV === 'production'
-
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
+  const production = process.env.NODE_ENV === 'production'
   app.set('view engine', 'njk')
 
   app.locals.asset_path = '/assets/'
