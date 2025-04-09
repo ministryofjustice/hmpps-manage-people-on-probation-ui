@@ -1,7 +1,7 @@
 {
 	"@programName": "ZAP",
 	"@version": "2.16.1",
-	"@generated": "Tue, 8 Apr 2025 09:44:08",
+	"@generated": "Wed, 9 Apr 2025 09:45:01",
 	"site":[ 
 		{
 			"@name": "https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk",
@@ -20,7 +20,7 @@
 					"desc": "<p>The Content Security Policy fails to define one of the directives that has no fallback. Missing/excluding them is the same as allowing anything.</p>",
 					"instances":[ 
 						{
-							"id": "485",
+							"id": "476",
 							"uri": "https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk",
 							"method": "GET",
 							"param": "Content-Security-Policy",
