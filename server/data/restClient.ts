@@ -1,5 +1,3 @@
-import { Readable } from 'stream'
-
 import Agent, { HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
 

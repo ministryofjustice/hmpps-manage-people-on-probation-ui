@@ -10,52 +10,39 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     // Only clear session when there is no query params in a GET request or it has been explicitly requested
     req.session.activityLogFilters = undefined
   }
-  const { crn } = req.params
-  let keywords = ''
-  let dateFrom = ''
-  let dateTo = ''
-
   const { clearFilterKey, clearFilterValue } = req.query
+  const { crn } = req.params
+  const { keywords, dateFrom, dateTo, compliance } = setSession()
   const errors = req?.session?.errors
 
-  if (req.body?.submit && !req?.query?.error) {
-    const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
-    req.session.activityLogFilters = req.body as ActivityLogFilters
-    req.session.activityLogFilters.compliance = complianceFilters
+  function setSession() {
+    clearSession()
+    if (req.body?.submit && !req?.query?.error) {
+      const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
+      req.session.activityLogFilters = req.body as ActivityLogFilters
+      req.session.activityLogFilters.compliance = complianceFilters
+    }
+    return {
+      keywords: req.session?.activityLogFilters?.keywords || '',
+      dateFrom: req.session?.activityLogFilters?.dateFrom || '',
+      dateTo: req.session?.activityLogFilters?.dateTo || '',
+      compliance: req.session?.activityLogFilters?.compliance || [],
+    }
+  }
+  function clearSession() {
+    if (clearFilterKey === 'compliance') {
+      req.session.activityLogFilters.compliance = req.session.activityLogFilters.compliance.filter(
+        value => value !== clearFilterValue,
+      )
+    } else if (clearFilterKey === 'dateRange') {
+      req.session.activityLogFilters.dateFrom = ''
+      req.session.activityLogFilters.dateTo = ''
+    } else if (clearFilterKey === 'keywords') {
+      req.session.activityLogFilters.keywords = ''
+    }
   }
 
-  if (req.session?.activityLogFilters && !req?.query?.error) {
-    keywords = req.session?.activityLogFilters.keywords
-    dateFrom = req.session?.activityLogFilters.dateFrom
-    dateTo = req.session?.activityLogFilters.dateTo
-  }
-
-  let compliance: string[] = req.session?.activityLogFilters?.compliance || []
   const baseUrl = `/case/${crn}/activity-log`
-
-  if (clearFilterKey === 'compliance') {
-    compliance = compliance.filter(value => value !== clearFilterValue)
-    req.session.activityLogFilters.compliance = compliance
-  }
-
-  if (clearFilterKey === 'keywords') {
-    keywords = ''
-  }
-
-  if (clearFilterKey === 'dateRange') {
-    dateFrom = ''
-  }
-
-  if (clearFilterKey === 'dateRange') {
-    dateTo = ''
-  }
-
-  if (clearFilterKey && req?.session?.activityLogFilters) {
-    req.session.activityLogFilters.keywords = keywords
-    req.session.activityLogFilters.dateFrom = dateFrom
-    req.session.activityLogFilters.dateTo = dateTo
-  }
-
   const filters: ActivityLogFilters = {
     keywords,
     dateFrom: dateFrom && dateTo && !errors?.errorMessages?.dateFrom && clearFilterKey !== 'dateRange' ? dateFrom : '',
