@@ -7,7 +7,7 @@ import { filterOptions as complianceFilterOptions } from '../properties'
 
 export const filterActivityLog: Route<void> = (req, res, next): void => {
   if (req?.query?.clear || (Object.keys(req.query).length === 0 && req.method === 'GET')) {
-    // Only clear session when there is no query params in a GET request or it has been explicitly requested
+    // Only clear session when there is no query params in a GET request, or it has been explicitly requested
     req.session.activityLogFilters = undefined
   }
   const { clearFilterKey, clearFilterValue } = req.query
@@ -16,11 +16,13 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const errors = req?.session?.errors
 
   function setSession() {
-    clearSession()
     if (req.body?.submit && !req?.query?.error) {
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
       req.session.activityLogFilters = req.body as ActivityLogFilters
       req.session.activityLogFilters.compliance = complianceFilters
+    }
+    if (req.session.activityLogFilters) {
+      checkClearFilterKeys()
     }
     return {
       keywords: req.session?.activityLogFilters?.keywords || '',
@@ -29,7 +31,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       compliance: req.session?.activityLogFilters?.compliance || [],
     }
   }
-  function clearSession() {
+  function checkClearFilterKeys() {
     if (clearFilterKey === 'compliance') {
       req.session.activityLogFilters.compliance = req.session.activityLogFilters.compliance.filter(
         value => value !== clearFilterValue,
