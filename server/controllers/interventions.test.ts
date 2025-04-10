@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import InterventionsApiClient from '../data/interventionsApiClient'
 import { checkAuditMessage } from './testutils'
-import { toPredictors, toRoshWidget } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import {

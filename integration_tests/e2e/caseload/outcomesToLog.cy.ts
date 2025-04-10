@@ -2,7 +2,7 @@ import UserAppointments from '../../pages/userAppointments'
 import { getWiremockData, Wiremock } from '../../utils'
 import { UserActivity } from '../../../server/data/model/userSchedule'
 import mockResponse from '../../../wiremock/mappings/user-schedule.json'
-import { yearsSince } from '../../../server/utils/utils'
+import { yearsSince } from '../../../server/utils'
 
 const mockData = mockResponse as Wiremock
 

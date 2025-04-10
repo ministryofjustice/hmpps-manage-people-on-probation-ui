@@ -2,8 +2,7 @@ import { DateTime } from 'luxon'
 import logger from '../../../logger'
 import { ActivityLogFilters, Errors, Route } from '../../@types'
 import { errorMessages } from '../../properties'
-import utils from '../../utils'
-import { toCamelCase } from '../../utils/utils'
+import { toCamelCase, addError } from '../../utils'
 
 const activityLog: Route<void> = (req, res, next): void => {
   const { dateFrom, dateTo } = req.body
@@ -23,7 +22,7 @@ const activityLog: Route<void> = (req, res, next): void => {
     if (dateVal && !regex.test(dateVal)) {
       const text = errorMessages['activity-log'][nameProp].errors.isInvalid
       const name = toCamelCase(nameProp)
-      errors = utils.addError(errors, { text, anchor: name })
+      errors = addError(errors, { text, anchor: name })
       isValid[name] = false
     }
   }
@@ -34,7 +33,7 @@ const activityLog: Route<void> = (req, res, next): void => {
       const dateToIso = getIsoDate(dateVal)
       if (!dateToIso.isValid) {
         const text = errorMessages['activity-log'][nameProp].errors.isNotReal
-        errors = utils.addError(errors, { text, anchor: name })
+        errors = addError(errors, { text, anchor: name })
         isValid[name] = false
       }
     }
@@ -47,7 +46,7 @@ const activityLog: Route<void> = (req, res, next): void => {
       const today = DateTime.now()
       if (dateFromIso > today) {
         const text = errorMessages['activity-log'][nameProp].errors.isInFuture
-        errors = utils.addError(errors, { text, anchor: name })
+        errors = addError(errors, { text, anchor: name })
         isValid[name] = false
       }
     }
@@ -67,13 +66,13 @@ const activityLog: Route<void> = (req, res, next): void => {
     if (!dateFrom && dateIsValid('dateTo')) {
       logger.info(errorMessages['activity-log']['date-from'].log)
       const text = errorMessages['activity-log']['date-from'].errors.isEmpty
-      errors = utils.addError(errors, { text, anchor: 'dateFrom' })
+      errors = addError(errors, { text, anchor: 'dateFrom' })
       isValid.dateFrom = false
     }
     if (!dateTo && dateIsValid('dateFrom')) {
       logger.info(errorMessages['activity-log']['date-to'].log)
       const text = errorMessages['activity-log']['date-to'].errors.isEmpty
-      errors = utils.addError(errors, { text, anchor: 'dateTo' })
+      errors = addError(errors, { text, anchor: 'dateTo' })
       isValid.dateTo = false
     }
     if (dateIsValid('dateFrom') && dateIsValid('dateTo')) {
@@ -81,7 +80,7 @@ const activityLog: Route<void> = (req, res, next): void => {
       const dateToIso = getIsoDate(dateTo)
       if (dateFromIso > dateToIso) {
         const text = errorMessages['activity-log']['date-from'].errors.isAfterTo
-        errors = utils.addError(errors, { text, anchor: 'dateFrom' })
+        errors = addError(errors, { text, anchor: 'dateFrom' })
         isValid.dateFrom = false
       }
     }

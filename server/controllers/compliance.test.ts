@@ -9,7 +9,7 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks } from './mocks'
 import { checkAuditMessage } from './testutils'
 import { PersonCompliance } from '../data/model/compliance'
-import { toPredictors, toRoshWidget } from '../utils/utils'
+import { toPredictors, toRoshWidget } from '../utils'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')

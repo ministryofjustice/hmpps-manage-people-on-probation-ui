@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import InterventionsApiClient from '../data/interventionsApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors } from '../utils/utils'
+import { toRoshWidget, toPredictors } from '../utils'
 
 const routes = ['getInterventions'] as const
 

@@ -6,7 +6,7 @@ import config from '../config'
 import ArnsApiClient from '../data/arnsApiClient'
 import { TimelineItem } from '../data/model/risk'
 import TierApiClient from '../data/tierApiClient'
-import { toTimeline, toRoshWidget } from '../utils/utils'
+import { toTimeline, toRoshWidget } from '../utils'
 
 const routes = [
   'getRisk',

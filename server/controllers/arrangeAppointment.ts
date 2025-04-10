@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import { appointmentTypes } from '../properties'
-import { getDataValue, setDataValue } from '../utils/utils'
+import { getDataValue, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 
 const routes = [

@@ -5,7 +5,7 @@ import { AppResponse, Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors } from '../utils/utils'
+import { toRoshWidget, toPredictors } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
 

@@ -7,7 +7,7 @@ import RiskDetailPage from '../pages/riskDetail'
 // @ts-ignore
 import mockRiskData from '../../wiremock/mappings/X000001-risk.json'
 import { RiskFlag } from '../../server/data/model/risk'
-import { dateWithYear, toSentenceCase } from '../../server/utils/utils'
+import { dateWithYear, toSentenceCase } from '../../server/utils'
 
 const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',

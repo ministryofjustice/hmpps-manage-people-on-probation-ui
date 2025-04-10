@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { getDataValue } from '../utils/utils'
+import { getDataValue } from '../utils'
 import { Route } from '../@types'
 
 export const redirectWizard = (requiredValues: string[]): Route<Promise<void>> => {

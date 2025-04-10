@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors } from '../utils/utils'
+import { toRoshWidget, toPredictors } from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -39,7 +39,7 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/arnsApiClient')
-jest.mock('../utils/utils', () => ({
+jest.mock('../utils', () => ({
   toRoshWidget: jest.fn(),
   toPredictors: jest.fn(),
 }))

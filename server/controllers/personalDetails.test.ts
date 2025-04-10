@@ -8,7 +8,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient, { Needs } from '../data/arnsApiClient'
 import { mockTierCalculation, mockRisks, mockPredictors, mockContacts, mockAppResponse } from './mocks'
-import { toRoshWidget, toPredictors } from '../utils/utils'
+import { toRoshWidget, toPredictors } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
 import {
   CircumstanceOverview,
@@ -43,7 +43,7 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
-jest.mock('../utils/utils', () => ({
+jest.mock('../utils', () => ({
   toRoshWidget: jest.fn(),
   toPredictors: jest.fn(),
   toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),

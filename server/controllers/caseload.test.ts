@@ -12,7 +12,7 @@ import { mockAppResponse } from './mocks'
 import { CaseSearchFilter, TeamCaseload, UserCaseload, UserTeam } from '../data/model/caseload'
 import caseloadController from './caseload'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
-import * as utils from '../utils/utils'
+import * as utils from '../utils'
 import { checkAuditMessage } from './testutils'
 
 jest.mock('../data/masApiClient')
@@ -28,6 +28,13 @@ jest.mock('../data/hmppsAuthClient', () => {
       getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
     }
   })
+})
+
+jest.mock('../utils', () => {
+  return {
+    ...jest.requireActual('../utils'),
+    checkRecentlyViewedAccess: jest.fn(),
+  }
 })
 
 const crn = 'X000001'

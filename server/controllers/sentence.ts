@@ -4,7 +4,7 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors } from '../utils/utils'
+import { toRoshWidget, toPredictors } from '../utils'
 
 const routes = [
   'getSentence',

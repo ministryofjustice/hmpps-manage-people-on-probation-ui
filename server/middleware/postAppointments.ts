@@ -1,6 +1,6 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue } from '../utils/utils'
+import { getDataValue } from '../utils'
 import { appointmentTypes } from '../properties'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
