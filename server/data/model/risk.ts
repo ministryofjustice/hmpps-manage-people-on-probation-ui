@@ -104,7 +104,6 @@ export type RiskEnum = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH' | 'NOT_APPLICABLE
 export type ScoreLevelEnum = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH' | 'NOT_APPLICABLE'
 export type StaticOrDynamicEnum = 'STATIC' | 'DYNAMIC'
 export type SourceEnum = 'OASYS'
-export type StatusEnum = 'COMPLETE' | 'LOCKED_INCOMPLETE'
 
 export interface PersonRiskFlags {
   personSummary: PersonSummary
