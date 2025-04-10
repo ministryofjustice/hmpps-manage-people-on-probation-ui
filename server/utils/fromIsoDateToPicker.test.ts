@@ -15,7 +15,7 @@ describe('utils/fromIsoDateToPicker', () => {
   it('should return a formatted date', () => {
     expect(fromIsoDateToPicker('2025-02-01')).toEqual('1/2/2025')
   })
-  it('should', () => {
+  it('should return invalid datetime error', () => {
     const fakeDateTime = {
       toFormat: jest.fn().mockReturnValue('Invalid DateTime'),
       isValid: true,
