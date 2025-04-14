@@ -16,6 +16,7 @@ interface Request {
   raw?: boolean
   handle404?: boolean
   handle500?: boolean
+  handle401?: boolean
   errorMessageFor500?: string
 }
 
@@ -57,6 +58,7 @@ export default class RestClient {
     raw = false,
     handle404 = false,
     handle500 = false,
+    handle401 = false,
     errorMessageFor500 = '',
   }: Request): Promise<TResponse> {
     logger.info(`${this.name} GET: ${path}`)
@@ -87,6 +89,13 @@ export default class RestClient {
       if (handle404 && error?.response?.status === 404) {
         logger.info('Handling 404')
         return null
+      }
+      if (handle401 && error?.response?.status === 401) {
+        logger.info('Handling 401s the same as 500s')
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({ text: errorMessageFor500 })
+        error.response.errors = warnings
+        return error.response
       }
       const sanitisedError = sanitiseError(error)
       logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
