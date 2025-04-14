@@ -14,6 +14,7 @@ export default class ArnsApiClient extends RestClient {
       path: `/risks/crn/${crn}`,
       handle404: true,
       handle500: true,
+      handle401: true,
       errorMessageFor500:
         'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
     })
@@ -24,6 +25,7 @@ export default class ArnsApiClient extends RestClient {
       path: `/needs/crn/${crn}`,
       handle404: true,
       handle500: true,
+      handle401: true,
       errorMessageFor500:
         'OASys is experiencing technical difficulties. It has not been possible to provide the Criminogenic needs information held in OASys',
     })
@@ -34,6 +36,7 @@ export default class ArnsApiClient extends RestClient {
       path: `/risks/crn/${crn}/predictors/all`,
       handle404: true,
       handle500: true,
+      handle401: true,
       errorMessageFor500:
         'OASys is experiencing technical difficulties. It has not been possible to provide the predictor score information held in OASys',
     })
