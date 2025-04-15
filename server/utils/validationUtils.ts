@@ -45,6 +45,15 @@ export const isValidDateFormat = (args: any[]): boolean => {
   const regex = /^[1-9]?\d\/[1-9]?\d\/\d{4}$/
   return regex.test(args[0])
 }
+export const isStringNumber = (args: any[]): boolean => {
+  return !Number.isNaN(parseInt(args[0], 10))
+}
+export const isNotLaterThanAYear = (args: any[]) => {
+  const currentDate = args?.[1] || DateTime.now()
+  const date = DateTime.fromFormat(currentDate, 'd/M/yyyy')
+  const oneYearFromDate = date.plus({ years: 1 })
+  return date < oneYearFromDate
+}
 export const isNotLaterThanToday = (args: any[]) => {
   if (!args[0]) {
     return true

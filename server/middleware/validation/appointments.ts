@@ -1,7 +1,8 @@
 import logger from '../../../logger'
 import { Errors, Route } from '../../@types'
-import { errorMessages } from '../../properties'
 import { addError, getDataValue } from '../../utils'
+import { appointmentsValidation, errorMessages } from '../../properties'
+import { validateWithSpec } from '../../utils/validationUtils'
 
 interface LocalParams {
   crn: string
@@ -24,12 +25,7 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateType = (): void => {
     if (req.url.includes('/type')) {
-      if (!req.body?.appointments?.[crn]?.[id]?.type) {
-        logger.info(errorMessages.appointments.type.log)
-        const text = errorMessages.appointments.type.errors.isEmpty
-        const anchor = `appointments-${crn}-${id}-type`
-        errors = addError(errors, { text, anchor })
-      }
+      errors = validateWithSpec(req.body, appointmentsValidation({ crn, id, page: 'type' }))
     }
   }
 
@@ -39,6 +35,20 @@ const appointments: Route<void> = (req, res, next) => {
       const type = getDataValue(data, ['appointments', crn, id, 'type'])
       const showReveal = ['Home visit', 'Planned office visit'].includes(type)
       const sentences = req.session.data.sentences[crn]
+      const sentence = sentences.find((s: any) => s.order.description === req.body.appointments[crn][id].sentence)
+      const validateSentenceRequirement = showReveal && sentence?.requirements?.length > 0
+      const validateSentenceLicenceCondition = showReveal && sentence?.licenceConditions?.length > 0
+      errors = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'sentence',
+          validateSentenceRequirement,
+          validateSentenceLicenceCondition,
+        }),
+      )
+      /*
       if (!req.body?.appointments?.[crn]?.[id]?.sentence) {
         logger.info(errorMessages.appointments.sentence.log)
         const text = errorMessages.appointments.sentence.errors.isEmpty
@@ -67,17 +77,20 @@ const appointments: Route<void> = (req, res, next) => {
           errors = addError(errors, { text, anchor })
         }
       }
+        */
     }
   }
 
   const validateLocation = (): void => {
     if (req.url.includes('/location')) {
-      if (!req.body?.appointments?.[crn]?.[id]?.location) {
-        logger.info(errorMessages.appointments.location.log)
-        const text = errorMessages.appointments.location.errors.isEmpty
-        const anchor = `appointments-${crn}-${id}-location`
-        errors = addError(errors, { text, anchor })
-      }
+      errors = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'location',
+        }),
+      )
     }
   }
 
@@ -85,6 +98,15 @@ const appointments: Route<void> = (req, res, next) => {
     if (req.url.includes('/date-time')) {
       // eslint-disable-next-line no-underscore-dangle
       localParams.minDate = req.body._minDate
+      errors = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'datetime',
+        }),
+      )
+      /*
       if (!req.body?.appointments?.[crn]?.[id]?.date) {
         logger.info(errorMessages.appointments.date.log)
         const text = errorMessages.appointments.date.errors.isEmpty
@@ -103,24 +125,52 @@ const appointments: Route<void> = (req, res, next) => {
         const anchor = `appointments-${crn}-${id}-end-time`
         errors = addError(errors, { text, anchor })
       }
+        */
     }
   }
 
   const validateRepeating = () => {
-    const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
-    const { data } = req.session
-    const repeatingCountValue = getDataValue(data, ['appointments', crn, id, 'repeating-count'])
-    const validRepeatingCount = !Number.isNaN(parseInt(repeatingCountValue, 10))
-    const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
-    const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeating-dates'])
-    const oneYearFromDate = new Date(appointmentDate)
-    oneYearFromDate.setFullYear(oneYearFromDate.getFullYear() + 1)
-    let finalAppointmentDate = null
-    let isMoreThanAYear = false
-    if (appointmentRepeatingDates) {
-      finalAppointmentDate = appointmentRepeatingDates[appointmentRepeatingDates.length - 1]
-      isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
+    if (req.url.includes('/repeating')) {
+      const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
+      const { data } = req.session
+      const repeatingCountValue = getDataValue(data, ['appointments', crn, id, 'repeating-count'])
+      const validRepeatingCount = !Number.isNaN(parseInt(repeatingCountValue, 10))
+      const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
+      const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeating-dates'])
+      const oneYearFromDate = new Date(appointmentDate)
+      oneYearFromDate.setFullYear(oneYearFromDate.getFullYear() + 1)
+      let finalAppointmentDate = null
+      let isMoreThanAYear = false
+      if (appointmentRepeatingDates) {
+        finalAppointmentDate = appointmentRepeatingDates[appointmentRepeatingDates.length - 1]
+        isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
+      }
+      errors = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'repeating',
+        }),
+      )
     }
+
+    // const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
+    // const { data } = req.session
+    // const repeatingCountValue = getDataValue(data, ['appointments', crn, id, 'repeating-count'])
+    // const validRepeatingCount = !Number.isNaN(parseInt(repeatingCountValue, 10))
+    // const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
+    // const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeating-dates'])
+    // const oneYearFromDate = new Date(appointmentDate)
+    // oneYearFromDate.setFullYear(oneYearFromDate.getFullYear() + 1)
+    // let finalAppointmentDate = null
+    // let isMoreThanAYear = false
+    // if (appointmentRepeatingDates) {
+    //   finalAppointmentDate = appointmentRepeatingDates[appointmentRepeatingDates.length - 1]
+    //   isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
+    // }
+
+    /*
     if (!repeatingValue) {
       logger.info(errorMessages.appointments.repeating.log)
       const text = errorMessages.appointments.repeating.errors.isEmpty
@@ -150,9 +200,9 @@ const appointments: Route<void> = (req, res, next) => {
       const anchor = `appointments-${crn}-${id}-repeating-frequency`
       errors = addError(errors, { text: textFrequency, anchor })
     }
+      */
   }
-
-  let errors: Errors = null
+  let errors: Record<string, string> = {}
   validateType()
   validateSentence()
   validateLocation()
@@ -160,8 +210,8 @@ const appointments: Route<void> = (req, res, next) => {
   if (req.url.includes('/repeating')) {
     validateRepeating()
   }
-  if (errors) {
-    res.locals.errors = errors
+  if (Object.keys(errors)) {
+    res.locals.errorMessages = errors
     return res.render(render, { errors, ...localParams })
   }
   return next()
