@@ -35,9 +35,12 @@
     },
     value: query.dateFrom,
     maxDate: filters.maxDate,
-     errorMessage: {
-      text: filters.errors.errorMessages.dateFrom.text
-     } if filters.errors.errorMessages.dateFrom.text
+    errorMessage: {
+      text: errorMessages.dateFrom,
+      attributes: {
+        'data-qa': 'dateFromError'
+      }
+    } if errorMessages.dateFrom
 }) }}
 {{ mojDatePicker({
   id: "dateTo",
@@ -55,8 +58,11 @@
   value: query.dateTo,
   maxDate: filters.maxDate,
   errorMessage: {
-    text: filters.errors.errorMessages.dateTo.text
-  } if filters.errors.errorMessages.dateTo.text
+      text: errorMessages.dateTo,
+      attributes: {
+        'data-qa': 'dateToError'
+      }
+    } if errorMessages.dateTo
 }) }}
   {{ govukCheckboxes({
     idPrefix: 'compliance',

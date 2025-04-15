@@ -122,22 +122,22 @@ export const errorMessages: ErrorMessages = {
     'date-from': {
       log: 'Activity log date from no entered',
       errors: {
-        isEmpty: 'Enter or select a from date',
+        isEmpty: 'Enter or select a date from',
         isInvalid: 'Enter a date in the correct format, for example 17/5/2024',
         isNotReal: 'Enter a real date',
         isIncomplete: 'Enter a full date, for example 17/5/2024',
-        isInFuture: 'The from date must be today or in the past',
-        isAfterTo: 'The from date must be on or before the to date',
+        isInFuture: 'The date from must be today or in the past',
       },
     },
     'date-to': {
       log: 'Activity log date from no entered',
       errors: {
-        isEmpty: 'Enter or select a to date',
+        isEmpty: 'Enter or select a date to',
         isInvalid: 'Enter a date in the correct format, for example 17/5/2024',
         isNotReal: 'Enter a real date',
         isIncomplete: 'Enter a full date, for example 17/5/2024',
-        isInFuture: 'The to date must be today or in the past',
+        isInFuture: 'The date to must be today or in the past',
+        isBeforeFrom: 'The date to must be on or after the date from',
       },
     },
   },

@@ -21,6 +21,11 @@ export interface ValidationSpec {
   [index: string]: ErrorChecks
 }
 
+const getIsoDate = (date: string): DateTime => {
+  const [day, month, year] = date.split('/')
+  return DateTime.fromISO(DateTime.local(parseInt(year, 10), parseInt(month, 10), parseInt(day, 10)).toISODate())
+}
+
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const isNotEmpty = (args: any[]) => {
   return !!args[0] && args[0] !== undefined
@@ -36,7 +41,10 @@ export const charsOrLess = (args: any[]) => {
 export const isValidDate = (args: any[]) => {
   return !!args[0] && DateTime.fromFormat(args[0], 'd/M/yyyy').isValid
 }
-
+export const isValidDateFormat = (args: any[]): boolean => {
+  const regex = /^[1-9]?\d\/[1-9]?\d\/\d{4}$/
+  return regex.test(args[0])
+}
 export const isNotLaterThanToday = (args: any[]) => {
   if (!args[0]) {
     return true

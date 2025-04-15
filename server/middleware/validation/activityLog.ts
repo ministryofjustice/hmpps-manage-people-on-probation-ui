@@ -1,9 +1,42 @@
-import { DateTime } from 'luxon'
-import logger from '../../../logger'
-import { ActivityLogFilters, Errors, Route } from '../../@types'
-import { errorMessages } from '../../properties'
-import { toCamelCase, addError } from '../../utils'
+import { Request } from 'express'
+import { ActivityLogFilters, Route } from '../../@types'
+import { activityLogValidation } from '../../properties'
+import { validateWithSpec } from '../../utils/validationUtils'
 
+const getErrorMessages = (req: Request) => {
+  const dateToIsEmpty =
+    !req?.body?.dateTo || req?.body?.dateTo === undefined || (req?.body?.dateTo && req.body.dateTo.trim() === '')
+  const dateFromIsEmpty =
+    !req?.body?.dateFrom ||
+    req?.body?.dateFrom === undefined ||
+    (req?.body?.dateFrom && req.body.dateFrom.trim() === '')
+  return validateWithSpec(req.body, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
+}
+
+const activityLog: Route<void> = (req, res, next): void => {
+  let errorMessages: Record<string, string> = {}
+  const { url } = req
+  if (Object.keys(req.query).length === 0 && req.method === 'GET') {
+    delete req.session.errorMessages
+  }
+  if (req.method === 'POST') {
+    if (req?.session?.errorMessages) {
+      delete req.session.errorMessages
+    }
+    errorMessages = getErrorMessages(req)
+
+    if (Object.keys(errorMessages).length) {
+      req.session.errorMessages = errorMessages
+      const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
+      req.session.activityLogFilters = req.body as ActivityLogFilters
+      req.session.activityLogFilters.compliance = complianceFilters
+      return res.redirect(`${url}?error=true`)
+    }
+  }
+  return next()
+}
+
+/*
 const activityLog: Route<void> = (req, res, next): void => {
   const { dateFrom, dateTo } = req.body
   const { url } = req
@@ -105,5 +138,6 @@ const activityLog: Route<void> = (req, res, next): void => {
   }
   return next()
 }
+*/
 
 export default activityLog

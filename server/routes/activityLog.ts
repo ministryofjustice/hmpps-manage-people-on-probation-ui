@@ -1,10 +1,10 @@
 import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { type Services } from '../services'
-import validate from '../middleware/validation/index'
-import type { Route } from '../@types'
 import { filterActivityLog } from '../middleware'
+import type { Route } from '../@types'
 import controllers from '../controllers'
+import validate from '../middleware/validation/index'
 
 export default function activityLogRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))

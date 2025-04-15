@@ -137,7 +137,7 @@ describe('/middleware/getPersonActivity', () => {
     res.locals.filters = {
       ...filterVals,
       complianceOptions: [],
-      errors: null,
+      errorMessages: null,
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },

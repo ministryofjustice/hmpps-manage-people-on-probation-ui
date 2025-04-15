@@ -38,8 +38,7 @@ const getRequest = (args?: Args) => {
   }
   const sessionErrors = query.errors
     ? {
-        errorList: [{ text: 'Enter or select a to date', href: '#dateTo' }],
-        errorMessages: { dateTo: { text: 'Enter or select a to date' } },
+        dateTo: 'Enter or select a to date',
       }
     : null
   const req = httpMocks.createRequest({
@@ -120,7 +119,7 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
+        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           compliance: [
             {
@@ -156,7 +155,7 @@ describe('/middleware/filterActivityLog()', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
+        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           keywords: [
             {
@@ -231,7 +230,7 @@ describe('/middleware/filterActivityLog()', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
+        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           keywords: [
             {
@@ -273,7 +272,7 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
+        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           compliance: [
             {
