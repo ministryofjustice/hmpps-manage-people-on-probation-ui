@@ -22,7 +22,6 @@ export interface SelectedFilterItem {
 }
 
 export interface ActivityLogFiltersResponse extends ActivityLogFilters {
-  errorMessages: Record<string, string>
   selectedFilterItems: Record<string, SelectedFilterItem[]>
   complianceOptions: Option[]
   baseUrl: string

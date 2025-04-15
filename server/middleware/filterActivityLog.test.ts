@@ -119,7 +119,6 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           compliance: [
             {
@@ -155,7 +154,6 @@ describe('/middleware/filterActivityLog()', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           keywords: [
             {
@@ -204,7 +202,6 @@ describe('/middleware/filterActivityLog()', () => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should refresh the page with the correct url and query parameters', () => {
-      const query = req.query as Record<string, string | string[]>
       expect(req.session.activityLogFilters.keywords).toEqual('')
     })
   })
@@ -230,7 +227,6 @@ describe('/middleware/filterActivityLog()', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           keywords: [
             {
@@ -272,7 +268,6 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errorMessages: req.session.errorMessages,
         selectedFilterItems: {
           compliance: [
             {

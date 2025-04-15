@@ -94,7 +94,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const maxDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
 
   res.locals.filters = {
-    errorMessages,
     selectedFilterItems,
     complianceOptions,
     baseUrl,
