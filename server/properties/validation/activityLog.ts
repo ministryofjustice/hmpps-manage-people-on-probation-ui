@@ -7,7 +7,7 @@ import {
   isValidDateFormat,
 } from '../../utils/validationUtils'
 
-export const activityLogValidation = (dateToIsEmpty: boolean, dateFromIsEmpty: boolean): ValidationSpec => ({
+export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = true): ValidationSpec => ({
   dateFrom: {
     optional: dateToIsEmpty,
     checks: [

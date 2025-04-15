@@ -36,14 +36,6 @@ interface ErrorMessages {
       }
     }
   }
-  'activity-log': {
-    [key in ActivityLogInput]: {
-      log: string
-      errors: {
-        [rule in Rule]?: string
-      }
-    }
-  }
 }
 
 export const errorMessages: ErrorMessages = {
@@ -115,29 +107,6 @@ export const errorMessages: ErrorMessages = {
         isEmpty: 'Enter the number of times the appointment will repeat',
         isInvalid: 'Enter a number',
         isMoreThanAYear: 'The appointment can only repeat up to a year',
-      },
-    },
-  },
-  'activity-log': {
-    'date-from': {
-      log: 'Activity log date from no entered',
-      errors: {
-        isEmpty: 'Enter or select a date from',
-        isInvalid: 'Enter a date in the correct format, for example 17/5/2024',
-        isNotReal: 'Enter a real date',
-        isIncomplete: 'Enter a full date, for example 17/5/2024',
-        isInFuture: 'The date from must be today or in the past',
-      },
-    },
-    'date-to': {
-      log: 'Activity log date from no entered',
-      errors: {
-        isEmpty: 'Enter or select a date to',
-        isInvalid: 'Enter a date in the correct format, for example 17/5/2024',
-        isNotReal: 'Enter a real date',
-        isIncomplete: 'Enter a full date, for example 17/5/2024',
-        isInFuture: 'The date to must be today or in the past',
-        isBeforeFrom: 'The date to must be on or after the date from',
       },
     },
   },
