@@ -1,4 +1,3 @@
-import logger from '../../../logger'
 import { Errors, Route } from '../../@types'
 import { getDataValue } from '../../utils'
 import { appointmentsValidation } from '../../properties'
@@ -117,7 +116,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateDateTime()
   validateRepeating()
   if (Object.keys(errorMessages).length) {
-    console.log(errorMessages)
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
   }
