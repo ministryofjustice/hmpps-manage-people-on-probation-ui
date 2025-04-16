@@ -1,18 +1,33 @@
 import { DateTime } from 'luxon'
+import logger from '../../logger'
 import {
   charsOrLess,
+  getNestedValue,
+  hasNestedKeys,
   isEmail,
   isNotEmpty,
   isNotLaterThan,
   isNotLaterThanToday,
   isNumeric,
+  isStringNumber,
   isUkPostcode,
   isValidDate,
+  isValidDateFormat,
+  Validateable,
   validateWithSpec,
   ValidationSpec,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { personDetailsValidation } from '../properties'
+import {
+  activityLogValidation,
+  appointmentsValidation,
+  type AppointmentsValidationArgs,
+  personDetailsValidation,
+} from '../properties'
+
+const loggerSpy = jest.spyOn(logger, 'info')
+const crn = 'X000001'
+const id = 'bfb940b1-77ab-45a6-8f3c-aa481c403555'
 
 describe('is email address', () => {
   it.each([
@@ -155,4 +170,239 @@ describe('validates edit main address request with spec', () => {
       expect(validateWithSpec(a, b)).toEqual(expected)
     },
   )
+})
+
+describe('validates appointment repeat request with spec when no repeating option is selected', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    appointments: {
+      [crn]: {
+        [id]: {
+          repeating: undefined,
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`appointments-${crn}-${id}-repeating`]: 'Select if the appointment will repeat',
+  }
+  const args: AppointmentsValidationArgs = {
+    crn,
+    id,
+    page: 'repeating',
+    repeatingValue: undefined,
+  }
+  const spec = appointmentsValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Appointment repeat not selected')
+  })
+})
+describe(`validates appointment repeat request with spec when no repeating option is 'Yes'`, () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    appointments: {
+      [crn]: {
+        [id]: {
+          repeating: 'Yes',
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`appointments-${crn}-${id}-repeating-frequency`]: 'Select the frequency the appointment will repeat',
+    [`appointments-${crn}-${id}-repeating-count`]: 'Enter the number of times the appointment will repeat',
+  }
+  const args: AppointmentsValidationArgs = {
+    crn,
+    id,
+    page: 'repeating',
+    repeatingValue: 'Yes',
+  }
+  const spec = appointmentsValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe(`validates appointment repeat request with spec when no repeating option is 'Yes'`, () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    appointments: {
+      [crn]: {
+        [id]: {
+          repeating: 'Yes',
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`appointments-${crn}-${id}-repeating-frequency`]: 'Select the frequency the appointment will repeat',
+    [`appointments-${crn}-${id}-repeating-count`]: 'Enter the number of times the appointment will repeat',
+  }
+  const args: AppointmentsValidationArgs = {
+    crn,
+    id,
+    page: 'repeating',
+    repeatingValue: 'Yes',
+  }
+  const spec = appointmentsValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe('validates appointment date time request with spec', () => {
+  const testRequest = {
+    appointments: {
+      [crn]: {
+        [id]: {
+          date: '21/11/2',
+          'start-time': '9:00am',
+          'end-time': '9:30am',
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`appointments-${crn}-${id}-date`]: 'Enter a date in the correct format, for example 17/5/2024',
+  }
+  const args = {
+    crn,
+    id,
+    page: 'datetime',
+  }
+  const spec = appointmentsValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    expect(loggerSpy).toHaveBeenCalledWith('Appointment date not entered in correct format')
+  })
+})
+
+describe('validates activity log filter request with spec', () => {
+  const testRequest = {
+    dateFrom: '10/4/2025',
+    dateTo: '6/4/2025',
+  }
+  const expectedResult: Record<string, string> = {
+    dateTo: 'The date to must be on or after the date from',
+  }
+  const spec = activityLogValidation(false, false)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe('isValidDateFormat()', () => {
+  it('should return true if a correct date format', () => {
+    expect(isValidDateFormat(['9/4/2025'])).toEqual(true)
+  })
+  it('should return true if a correct date format', () => {
+    expect(isValidDateFormat(['19/10/2025'])).toEqual(true)
+  })
+  it('should return false if date is not correct format', () => {
+    expect(isValidDateFormat(['09/04/2025'])).toEqual(false)
+  })
+  it('should return false if date is not correct format', () => {
+    expect(isValidDateFormat(['19/04/2025'])).toEqual(false)
+  })
+  it('should return false if date is not correct format', () => {
+    expect(isValidDateFormat(['19/04/25'])).toEqual(false)
+  })
+  it('should return false if date is not correct format', () => {
+    expect(isValidDateFormat(['9/4/25'])).toEqual(false)
+  })
+})
+describe('isStringNumber()', () => {
+  it('should return true if string value is a number', () => {
+    expect(isStringNumber(['12'])).toEqual(true)
+    expect(isStringNumber(['0'])).toEqual(true)
+    expect(isStringNumber(['0'])).toEqual(true)
+  })
+  it('should return false if string value is not a number', () => {
+    expect(isStringNumber(['a'])).toEqual(false)
+    expect(isStringNumber(['&'])).toEqual(false)
+  })
+})
+
+describe('getNestedValue()', () => {
+  it('should return the nested value', () => {
+    const path = ['appointments', crn, id, 'type']
+    const mockData = {
+      appointments: {
+        [crn]: {
+          [id]: {
+            type: 'Home visit',
+          },
+        },
+      },
+    }
+    expect(getNestedValue(mockData, path)).toEqual('Home visit')
+  })
+  it('should return undefined', () => {
+    const path = ['appointments', crn, id, 'type']
+    const mockData = {
+      appointments: {
+        [crn]: {
+          [id]: {
+            sentence: '',
+          },
+        },
+      },
+    }
+    expect(getNestedValue(mockData, path)).toBeUndefined()
+  })
+  it('should return undefined', () => {
+    const path = ['appointments', crn, id, 'type']
+    const mockData = {
+      appointments: {
+        [crn]: {
+          [id]: {
+            sentence: null,
+          },
+        },
+      },
+    } as any
+    expect(getNestedValue(mockData, path)).toBeUndefined()
+  })
+})
+
+describe('hasNestedKeys()', () => {
+  it('should return true if all keys are in object', () => {
+    const path = ['appointments', crn, id, 'type']
+    const mockData = {
+      appointments: {
+        [crn]: {
+          [id]: {
+            type: 'Home visit',
+          },
+        },
+      },
+    }
+    expect(hasNestedKeys(mockData, path)).toEqual(true)
+  })
+  it('should return false if not all keys are in object', () => {
+    const path = ['appointments', crn, id, 'sentence']
+    const mockData = {
+      appointments: {
+        [crn]: {
+          [id]: {
+            type: 'Home visit',
+          },
+        },
+      },
+    }
+    expect(hasNestedKeys(mockData, path)).toEqual(false)
+  })
 })

@@ -1,24 +1,16 @@
-import {
-  isNotEmpty,
-  isNotLaterThan,
-  isNotLaterThanToday,
-  isValidDate,
-  ValidationSpec,
-  isValidDateFormat,
-  isStringNumber,
-  isNotLaterThanAYear,
-} from '../../utils/validationUtils'
+import { isNotEmpty, isValidDate, ValidationSpec, isValidDateFormat, isStringNumber } from '../../utils/validationUtils'
 
-interface Args {
+export interface AppointmentsValidationArgs {
   crn: string
   id: string
   page: string
   validateSentenceRequirement?: boolean
   validateSentenceLicenceCondition?: boolean
+  repeatingValue?: 'Yes' | 'No' | undefined
 }
 
-export const appointmentsValidation = (args: Args): ValidationSpec => {
-  const { crn, id, page, validateSentenceRequirement, validateSentenceLicenceCondition } = args
+export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
+  const { crn, id, page, validateSentenceRequirement, validateSentenceLicenceCondition, repeatingValue } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -26,6 +18,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select an appointment type',
+          log: 'Appointment type not selected',
         },
       ],
     },
@@ -35,6 +28,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select a sentence',
+          log: 'Sentence not selected',
         },
       ],
     },
@@ -44,6 +38,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select a requirement',
+          log: 'Sentence requirement not selected',
         },
       ],
     },
@@ -53,6 +48,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select a licence condition',
+          log: 'Sentence licence condition not selected',
         },
       ],
     },
@@ -62,6 +58,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select an appointment location',
+          log: 'Location not selected',
         },
       ],
     },
@@ -72,6 +69,16 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
           validator: isNotEmpty,
           msg: 'Select an appointment date',
         },
+        {
+          validator: isValidDateFormat,
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
+          log: 'Appointment date not entered in correct format',
+        },
+        {
+          validator: isValidDate,
+          msg: 'Enter a real date',
+          log: 'Appointment date is not valid',
+        },
       ],
     },
     [`[appointments][${crn}][${id}][start-time]`]: {
@@ -80,6 +87,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select an appointment start time',
+          log: 'Appointment start time not selected or entered',
         },
       ],
     },
@@ -89,6 +97,7 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select an appointment end time',
+          log: 'Appointment end time not selected or entered',
         },
       ],
     },
@@ -98,32 +107,32 @@ export const appointmentsValidation = (args: Args): ValidationSpec => {
         {
           validator: isNotEmpty,
           msg: 'Select if the appointment will repeat',
+          log: 'Appointment repeat not selected',
         },
       ],
     },
     [`[appointments][${crn}][${id}][repeating-frequency]`]: {
-      optional: page !== 'repeating',
+      optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
       checks: [
         {
           validator: isNotEmpty,
           msg: 'Select the frequency the appointment will repeat',
+          log: 'Appointment repeat frequency not selected',
         },
       ],
     },
     [`[appointments][${crn}][${id}][repeating-count]`]: {
-      optional: page !== 'repeating',
+      optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
       checks: [
         {
           validator: isNotEmpty,
           msg: 'Enter the number of times the appointment will repeat',
+          log: 'Appointment repeat count not entered',
         },
         {
           validator: isStringNumber,
           msg: 'Enter a number',
-        },
-        {
-          validator: isNotLaterThanAYear,
-          msg: 'The appointment can only repeat up to a year',
+          log: 'Appointment repeat count not entered in correct format',
         },
       ],
     },

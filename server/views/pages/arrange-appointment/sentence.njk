@@ -4,10 +4,16 @@
 
 {% block heading %}{% endblock %}
 {% block form %}
-  {% if errors %}
-{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors.errorList }) }}
-{% endif %}
+{% if errorMessages %}
+    {% set errorList = errorMessages | toErrorList %}
+        {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+        {% endif %}
+    {% endif %}
 {% set allSentences = [] %}
 {% set sentenceReveal = '' %}
 {% for sentence in sentences %}

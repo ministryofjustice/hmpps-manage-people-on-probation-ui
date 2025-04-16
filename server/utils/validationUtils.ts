@@ -1,5 +1,6 @@
 import { postcodeValidator } from 'postcode-validator'
 import { DateTime } from 'luxon'
+import logger from '../../logger'
 
 export interface Validateable {
   [index: string]: string | boolean
@@ -10,6 +11,8 @@ export interface ErrorCheck {
   msg: string
   length?: number
   crossField?: string
+  isActive?: boolean
+  log?: string
 }
 
 export interface ErrorChecks {
@@ -19,11 +22,6 @@ export interface ErrorChecks {
 
 export interface ValidationSpec {
   [index: string]: ErrorChecks
-}
-
-const getIsoDate = (date: string): DateTime => {
-  const [day, month, year] = date.split('/')
-  return DateTime.fromISO(DateTime.local(parseInt(year, 10), parseInt(month, 10), parseInt(day, 10)).toISODate())
 }
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
@@ -48,12 +46,6 @@ export const isValidDateFormat = (args: any[]): boolean => {
 export const isStringNumber = (args: any[]): boolean => {
   return !Number.isNaN(parseInt(args[0], 10))
 }
-export const isNotLaterThanAYear = (args: any[]) => {
-  const currentDate = args?.[1] || DateTime.now()
-  const date = DateTime.fromFormat(currentDate, 'd/M/yyyy')
-  const oneYearFromDate = date.plus({ years: 1 })
-  return date < oneYearFromDate
-}
 export const isNotLaterThanToday = (args: any[]) => {
   if (!args[0]) {
     return true
@@ -76,17 +68,28 @@ export const isNotLaterThan = (args: any[]) => {
 
 export function validateWithSpec<R extends Validateable>(request: R, validationSpec: ValidationSpec) {
   const errors: Record<string, string> = {}
-  Object.entries(validationSpec).forEach(entry => {
-    const fieldName = entry[0]
-    const checks = entry[1]
+  Object.entries(validationSpec).forEach(([fieldName, checks]) => {
+    const formattedFieldName = fieldName.split('][').join('-').replace('[', '').replace(']', '')
     if (!request[fieldName] && checks.optional === true) {
       return
     }
-    if (Object.prototype.hasOwnProperty.call(request, fieldName)) {
+    let hasProperty = false
+    if (isObjectFieldName(fieldName)) {
+      const keys = fieldName.slice(1, -1).split('][')
+      hasProperty = hasNestedKeys(request, keys)
+    } else {
+      hasProperty = Object.keys(request).includes(fieldName)
+    }
+    if (hasProperty) {
       const error = executeValidator(checks.checks, fieldName, request)
-      if (error) errors[fieldName] = error
-    } else if (checks.optional === false) {
-      errors[fieldName] = checks.checks[0].msg
+      if (error) {
+        errors[formattedFieldName] = error
+      }
+    } else if (checks?.optional === false) {
+      errors[formattedFieldName] = checks.checks[0].msg
+      if (checks?.checks?.[0]?.log) {
+        logger.info(checks.checks[0].log)
+      }
     }
   })
   return errors
@@ -94,8 +97,12 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
 
 function executeValidator(checks: ErrorCheck[], fieldName: string, request: Validateable) {
   for (const check of checks) {
+    const { log = '' } = check
     const args: any[] = setArgs(fieldName, check, request)
     if (!check.validator(args)) {
+      if (log) {
+        logger.info(check.log)
+      }
       return check.msg
     }
   }
@@ -103,9 +110,35 @@ function executeValidator(checks: ErrorCheck[], fieldName: string, request: Vali
 }
 
 function setArgs(fieldName: string, check: ErrorCheck, request: Validateable) {
-  let args: any[] = check?.length ? [check.length, request[fieldName]] : [request[fieldName]]
+  let value = request[fieldName]
+  if (isObjectFieldName(fieldName)) {
+    const path = fieldName.slice(1, -1).split('][')
+    value = getNestedValue(request, path)
+  }
+  let args: any[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
-    args = [request[check.crossField], request[fieldName]]
+    args = [request[check.crossField], value]
   }
   return args
+}
+
+const isObjectFieldName = (fieldName: string): boolean => fieldName.includes('[') && fieldName.includes(']')
+
+export const getNestedValue = (obj: any, keys: string[]): any => {
+  let current = obj
+  for (const key of keys) {
+    current = current?.[key]
+  }
+  return current
+}
+
+export const hasNestedKeys = (obj: any, keys: string[]): boolean => {
+  return (
+    keys.reduce((acc, key) => {
+      if (acc && typeof acc === 'object' && key in acc) {
+        return acc[key]
+      }
+      return undefined
+    }, obj) !== undefined
+  )
 }
