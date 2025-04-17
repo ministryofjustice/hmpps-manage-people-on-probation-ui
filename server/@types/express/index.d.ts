@@ -19,6 +19,7 @@ declare module 'express-session' {
     activityLogFilters?: ActivityLogFilters
     data?: Data
     errors?: Errors
+    errorMessages?: Record<string, string>
     cache?: {
       activityLog: ActivityLogCache
     }

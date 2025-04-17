@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
-import { errorMessages } from '../../server/properties'
+import { activityLogValidation } from '../../server/properties'
+import { getErrorMessage } from '../utils'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'
@@ -72,7 +73,9 @@ context('Activity log', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-from'].errors.isEmpty)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
     page.getErrorSummaryLink(0).click()
     page.getDateFromInput().should('be.focused')
   })
@@ -87,7 +90,7 @@ context('Activity log', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-to'].errors.isEmpty)
+    page.getErrorSummaryLink(0).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
     page.getErrorSummaryLink(0).click()
     page.getDateToInput().should('be.focused')
   })
@@ -98,8 +101,11 @@ context('Activity log', () => {
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-from'].errors.isInvalid)
+    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDateFormat'))
+    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
   })
   it('should show the correct validation if an invalid date to is entered', () => {
     cy.visit('/case/X000001/activity-log')
@@ -108,8 +114,13 @@ context('Activity log', () => {
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-to'].errors.isInvalid)
+    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
+    page
+      .getErrorSummaryLink(1)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDateFormat'))
   })
   it('should show the correct validation if date from doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
@@ -118,8 +129,11 @@ context('Activity log', () => {
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-from'].errors.isNotReal)
+    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
+    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
   })
   it('should show the correct validation if date to doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
@@ -128,10 +142,15 @@ context('Activity log', () => {
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-to'].errors.isNotReal)
+    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
+    page
+      .getErrorSummaryLink(1)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
   })
-  it('should show the correct validation if date from is after date to', () => {
+  it('should show the correct validation if date to is before date from', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateFromInput().type('12/1/2025')
@@ -140,7 +159,9 @@ context('Activity log', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-from'].errors.isAfterTo)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThan'))
   })
 
   it('should show the correct validation if date from is in the future', () => {
@@ -149,8 +170,11 @@ context('Activity log', () => {
     page.getDateFromInput().type(`${day}/${month}/${year + 1}`)
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-from'].errors.isInFuture)
+    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotLaterThanToday'))
+    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
   })
   it('should show the correct validation if date to is in the future', () => {
     cy.visit('/case/X000001/activity-log')
@@ -158,8 +182,13 @@ context('Activity log', () => {
     page.getDateToInput().type(`${day}/${month}/${year + 1}`)
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
-    page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', errorMessages['activity-log']['date-to'].errors.isInFuture)
+    page.getAllErrorSummaryLinks().should('have.length', 2)
+    page
+      .getErrorSummaryLink(0)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
+    page
+      .getErrorSummaryLink(1)
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThanToday'))
   })
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {
     cy.visit('/case/X000001/activity-log')

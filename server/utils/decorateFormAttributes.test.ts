@@ -102,12 +102,8 @@ describe('utils/decorateFormAttributes', () => {
   })
   it('should decorate a date input value from the value stored in the session', () => {
     const res = mockAppResponse({
-      errors: {
-        errorMessages: {
-          [`appointments-${crn}-${id}-date`]: {
-            text: 'An error message',
-          },
-        },
+      errorMessages: {
+        [`appointments-${crn}-${id}-date`]: 'An error message',
       },
     })
 
@@ -140,7 +136,7 @@ describe('utils/decorateFormAttributes', () => {
     }
     const expected = {
       ...obj,
-      value: '09/04/2025',
+      value: '9/4/2025',
       errorMessage: { text: 'An error message' },
     }
     const result = decorateFormAttributes(req, res)(obj, sections)

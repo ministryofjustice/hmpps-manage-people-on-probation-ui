@@ -17,8 +17,10 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
   const { data } = req.session as any
   let storedValue = getDataValue(data, sections)
   if (storedValue && config.dateFields.includes(sections[sections.length - 1]) && storedValue.includes('-')) {
-    const [year, month, day] = storedValue.split('-')
-    storedValue = [day.padStart(2, '0'), month.padStart(2, '0'), year].join('/')
+    const [year, month, day] = storedValue
+      .split('-')
+      .map((value: string) => (value.charAt(0) === '0' ? value.substring(1) : value))
+    storedValue = [day, month, year].join('/')
   }
   if (newObj.items !== undefined) {
     newObj.items = newObj.items.map((item: Item) => {
@@ -47,8 +49,8 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
       newObj.id = id
     }
     newObj.name = sections.map((s: string) => `[${s}]`).join('')
-    if (res?.locals?.errors?.errorMessages?.[id]?.text) {
-      newObj.errorMessage = { text: res.locals.errors.errorMessages[id].text }
+    if (res?.locals?.errorMessages?.[id]) {
+      newObj.errorMessage = { text: res.locals.errorMessages[id] }
     }
   }
   return newObj

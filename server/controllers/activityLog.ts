@@ -74,6 +74,7 @@ const activityLogController: Controller<typeof routes> = {
         baseUrl,
         resultsStart,
         resultsEnd,
+        errorMessages: req.session.errorMessages,
       })
     }
   },
@@ -126,6 +127,7 @@ const activityLogController: Controller<typeof routes> = {
         baseUrl,
         resultsStart,
         resultsEnd,
+        errorMessages: req.session.errorMessages,
       })
     }
   },

@@ -38,8 +38,7 @@ const getRequest = (args?: Args) => {
   }
   const sessionErrors = query.errors
     ? {
-        errorList: [{ text: 'Enter or select a to date', href: '#dateTo' }],
-        errorMessages: { dateTo: { text: 'Enter or select a to date' } },
+        dateTo: 'Enter or select a to date',
       }
     : null
   const req = httpMocks.createRequest({
@@ -120,7 +119,6 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
         selectedFilterItems: {
           compliance: [
             {
@@ -156,7 +154,6 @@ describe('/middleware/filterActivityLog()', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
         selectedFilterItems: {
           keywords: [
             {
@@ -205,7 +202,6 @@ describe('/middleware/filterActivityLog()', () => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should refresh the page with the correct url and query parameters', () => {
-      const query = req.query as Record<string, string | string[]>
       expect(req.session.activityLogFilters.keywords).toEqual('')
     })
   })
@@ -231,7 +227,6 @@ describe('/middleware/filterActivityLog()', () => {
       const query = req.query as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
         selectedFilterItems: {
           keywords: [
             {
@@ -273,7 +268,6 @@ describe('/middleware/filterActivityLog()', () => {
     it('should assign the correct values to res.locals.filters', () => {
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
-        errors: req.session.errors,
         selectedFilterItems: {
           compliance: [
             {

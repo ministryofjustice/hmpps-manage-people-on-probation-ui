@@ -13,7 +13,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const { clearFilterKey, clearFilterValue } = req.query
   const { crn } = req.params
   const { keywords, dateFrom, dateTo, compliance } = setSession()
-  const errors = req?.session?.errors
+  const errorMessages = req?.session?.errorMessages
 
   function setSession() {
     if (req.body?.submit && !req?.query?.error) {
@@ -47,8 +47,8 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const baseUrl = `/case/${crn}/activity-log`
   const filters: ActivityLogFilters = {
     keywords,
-    dateFrom: dateFrom && dateTo && !errors?.errorMessages?.dateFrom && clearFilterKey !== 'dateRange' ? dateFrom : '',
-    dateTo: dateTo && dateFrom && !errors?.errorMessages?.dateTo && clearFilterKey !== 'dateRange' ? dateTo : '',
+    dateFrom: dateFrom && dateTo && !errorMessages?.dateFrom && clearFilterKey !== 'dateRange' ? dateFrom : '',
+    dateTo: dateTo && dateFrom && !errorMessages?.dateTo && clearFilterKey !== 'dateRange' ? dateTo : '',
     compliance,
   }
 
@@ -94,7 +94,6 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const maxDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
 
   res.locals.filters = {
-    errors,
     selectedFilterItems,
     complianceOptions,
     baseUrl,
