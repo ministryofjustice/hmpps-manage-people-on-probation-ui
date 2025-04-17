@@ -9,6 +9,12 @@ export interface PersonDocuments {
   documents: Document[]
 }
 
+export interface SearchDocumentsRequest {
+  name?: string
+  dateFrom?: string
+  dateTo?: string
+}
+
 export interface Document {
   alfrescoId: string
   name: string

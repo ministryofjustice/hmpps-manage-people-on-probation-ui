@@ -1,0 +1,121 @@
+{%- from "moj/components/filter/macro.njk" import mojFilter -%}
+{%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
+
+{%- set filterHtml %}
+
+  {{ govukInput({
+    id: 'fileName',
+    name: 'fileName',
+    label: {
+      text: 'File name',
+      classes: "govuk-label--s govuk-!-font-weight-bold"
+    },
+    formGroup: {
+      classes: "govuk-!-margin-bottom-3",
+      attributes: {
+        'data-qa': 'fileName'
+      }
+    },
+    value: filter.fileName
+  }) }}
+{{ mojDatePicker({
+  id: "dateFrom",
+  name: "dateFrom",
+  label: {
+      text: "Date created from",
+      classes: "govuk-label--s govuk-!-font-weight-bold"
+  },
+  formGroup: {
+      classes: "govuk-!-margin-bottom-3",
+      attributes: {
+        'data-qa': 'dateFrom'
+      }
+    },
+    value: filter.dateFrom,
+    maxDate: filter.maxDate,
+    errorMessage: {
+        text: errorMessages.dateFrom,
+        attributes: {
+            'data-qa': 'dateFromError'
+        }
+    } if errorMessages.dateFrom
+}) }}
+{{ mojDatePicker({
+  id: "dateTo",
+  name: "dateTo",
+  label: {
+      text: "Date created to",
+      classes: "govuk-label--s govuk-!-font-weight-bold"
+  },
+  formGroup: {
+    classes: "govuk-!-margin-bottom-3",
+    attributes: {
+        'data-qa': 'dateTo'
+      }
+  },
+  value: filter.dateTo,
+  maxDate: filter.maxDate,
+  errorMessage: {
+    text: errorMessages.dateTo,
+    attributes: {
+        'data-qa': 'dateToError'
+    }
+  } if errorMessages.dateTo
+}) }}
+
+{% endset -%}
+
+{% set filterCategories = [] %}
+{% if filter.selectedFilterItems.fileName.length %}
+   {% set filterCategories = (filterCategories.push(
+    {
+        heading: {
+          text: 'Search term'
+        },
+        items: filter.selectedFilterItems.fileName
+   }), filterCategories) %}
+{% endif %}
+{% if filter.selectedFilterItems.dateRange.length %}
+   {% set filterCategories = (filterCategories.push(
+    {
+        heading: {
+          text: 'Date range'
+        },
+        items: filter.selectedFilterItems.dateRange
+   }), filterCategories) %}
+{% endif %}
+
+
+<form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+{{ mojFilter({
+  heading: {
+    html: 'Filter documents',
+    classes: 'govuk-heading-s'
+  },
+  submit: {
+    value: "submit",
+    attributes: {
+        "data-qa": "submit-button"
+    }
+  },
+  selectedFilters: {
+    heading: {
+      html: '<span class="govuk-heading-m">Selected filters</span>'
+    },
+    clearLink: {
+      text: 'Clear filters',
+      href: '/case/' + crn + '/documents?clear=all',
+      attributes: {
+        "data-qa": "clearAll"
+      }
+    },
+    categories: filterCategories
+  } if filter.selectedFilterItems.fileName.length or filter.selectedFilterItems.dateRange.length,
+  optionsHtml: filterHtml
+}) }}
+<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+<input type="hidden" name="submit" value="true">
+<input type="hidden" name="view" value="{{view}}">
+<input type="hidden" name="page" value="{{page}}">
+</form>
+

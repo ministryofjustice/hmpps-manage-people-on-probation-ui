@@ -62,3 +62,10 @@
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
 }
+
+.document-link {
+  word-break:     break-word !important;
+  -webkit-hyphens: auto;
+  -moz-hyphens:    auto;
+  hyphens:         auto;
+}

@@ -17,12 +17,19 @@ declare module 'express-session' {
     sortBy: string
     caseFilter: CaseFilter
     activityLogFilters?: ActivityLogFilters
+    documentFilters?: DocumentFilters
     data?: Data
     errors?: Errors
     errorMessages?: Record<string, string>
     cache?: {
       activityLog: ActivityLogCache
     }
+  }
+
+  interface DocumentFilters {
+    fileName?: string
+    dateFrom?: string
+    dateTo?: string
   }
 
   interface CaseFilter {

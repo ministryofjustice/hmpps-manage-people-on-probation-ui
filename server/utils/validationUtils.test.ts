@@ -5,6 +5,7 @@ import {
   getNestedValue,
   hasNestedKeys,
   isEmail,
+  isNotEarlierThan,
   isNotEmpty,
   isNotLaterThan,
   isNotLaterThanToday,
@@ -22,6 +23,7 @@ import {
   activityLogValidation,
   appointmentsValidation,
   type AppointmentsValidationArgs,
+  documentSearchValidation,
   personDetailsValidation,
 } from '../properties'
 
@@ -127,6 +129,19 @@ describe('date which is not later than date', () => {
     ['populated valid', ['02/02/2024', '01/02/2024'], false],
   ])('%s isNotLaterThan(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(isNotLaterThan(a)).toEqual(expected)
+  })
+})
+
+describe('date which is not later than date', () => {
+  it.each([
+    ['empty string', ['', ''], true],
+    ['null', [null], true],
+    ['undefined', [undefined], true],
+    ['populated invalid date', ['XXDFDS', '02/02/2024'], true],
+    ['populated valid', ['01/02/2024', '02/02/2024'], false],
+    ['populated valid', ['02/02/2024', '01/02/2024'], true],
+  ])('%s isNotEarlierThan(%s, %s)', (_: string, a: [], expected: boolean) => {
+    expect(isNotEarlierThan(a)).toEqual(expected)
   })
 })
 
@@ -299,6 +314,19 @@ describe('validates activity log filter request with spec', () => {
     dateTo: 'The date to must be on or after the date from',
   }
   const spec = activityLogValidation(false, false)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe('validates documents filter request with spec', () => {
+  const testRequest = {
+    dateFrom: '10/4/2025',
+  }
+  const expectedResult: Record<string, string> = {
+    dateTo: 'Enter or select a to date',
+  }
+  const spec = documentSearchValidation()
   it('should return the correct validation errors', () => {
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
   })

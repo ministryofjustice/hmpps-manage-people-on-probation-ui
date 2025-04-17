@@ -17,6 +17,8 @@ export interface ErrorCheck {
 
 export interface ErrorChecks {
   optional: boolean
+  mandatoryWhenFieldSet?: string
+  mandatoryMsg?: string
   checks: ErrorCheck[]
 }
 
@@ -54,6 +56,18 @@ export const isNotLaterThanToday = (args: any[]) => {
   return date.isValid && date <= DateTime.now()
 }
 
+export const isNotEarlierThan = (args: any[]) => {
+  if (!args[0]) {
+    return true
+  }
+  const notEarlierThanDate = DateTime.fromFormat(args[0], 'd/M/yyyy')
+  const date = DateTime.fromFormat(args[1], 'd/M/yyyy')
+  if (!notEarlierThanDate.isValid || !date.isValid) {
+    return true
+  }
+  return notEarlierThanDate >= date
+}
+
 export const isNotLaterThan = (args: any[]) => {
   if (!args[0]) {
     return true
@@ -70,6 +84,10 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
   const errors: Record<string, string> = {}
   Object.entries(validationSpec).forEach(([fieldName, checks]) => {
     const formattedFieldName = fieldName.split('][').join('-').replace('[', '').replace(']', '')
+    if (checks.mandatoryWhenFieldSet && !request[fieldName] && request[checks.mandatoryWhenFieldSet]) {
+      errors[fieldName] = checks.mandatoryMsg
+      return
+    }
     if (!request[fieldName] && checks.optional === true) {
       return
     }
@@ -117,7 +135,7 @@ function setArgs(fieldName: string, check: ErrorCheck, request: Validateable) {
   }
   let args: any[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
-    args = [request[check.crossField], value]
+    args = [request[check.crossField], request[fieldName]]
   }
   return args
 }
