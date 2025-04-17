@@ -18,7 +18,7 @@ import controllers from '../controllers'
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all('/case/:crn/arrange-appointment/:id/*', (req, res: AppResponse, next) => {
+  router.all('/case/:crn/arrange-appointment/:id/:page', (req, res: AppResponse, next) => {
     res.locals.change = req.query.change as string
     return next()
   })
@@ -28,9 +28,9 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   get('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getType())
 
-  router.all('/case/:crn/arrange-appointment/:id/*', getAppointment)
+  router.all('/case/:crn/arrange-appointment/:id/:page', getAppointment)
 
-  router.post('/case/:crn/arrange-appointment/:id/*', autoStoreSessionData)
+  router.post('/case/:crn/arrange-appointment/:id/:page', autoStoreSessionData)
 
   router.post(
     '/case/:crn/arrange-appointment/:id/type',
