@@ -101,7 +101,7 @@ const documentController: Controller<typeof routes> = {
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
       const request: SearchDocumentsRequest = {
-        name: req.session?.documentFilters?.fileName || null,
+        name: req.session?.documentFilters?.fileName ?? null,
         dateFrom: !errors.dateFrom ? toIsoDateTimeFromPicker(req.session?.documentFilters?.dateFrom) : null,
         dateTo: !errors.dateTo ? toIsoDateTimeFromPicker(req.session?.documentFilters?.dateTo) : null,
       }
