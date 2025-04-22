@@ -1,6 +1,6 @@
 import { PersonDocuments } from '../../data/model/documents'
 
-export const mockDocumemts = {
+export const mockDocuments = {
   personSummary: {
     name: {
       forename: 'Caroline',

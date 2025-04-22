@@ -2,8 +2,8 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas/documents/X000001",
-        "method": "GET",
+        "urlPathPattern": "/mas/documents/X000001/search",
+        "method": "POST",
         "queryParameters": {
           "size": {
             "equalTo": "15"
@@ -35,7 +35,8 @@
               "lastUpdatedAt": "2023-04-06T11:06:25.672587+01:00",
               "level": "Level 1",
               "author": "Author 1",
-              "type": "Type 1"
+              "type": "Type 1",
+              "workInProgress": true
             },
             {
               "alfrescoId": "c2650260-9568-476e-a293-0b168027a5f1",
@@ -45,7 +46,8 @@
               "level": "Level 2",
               "author": "Author 2",
               "status": "Sensitive",
-              "type": "Type 2"
+              "type": "Type 2",
+              "status": "Sensitive"
             },
             {
               "alfrescoId": "b82e444b-c77c-4d44-bf99-4ce4dc426ff4",
