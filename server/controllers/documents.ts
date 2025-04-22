@@ -21,7 +21,7 @@ const documentController: Controller<typeof routes> = {
         res.status(404)
         return res.render('pages/error', { message: 'Page not found' })
       }
-      const errors = validateWithSpec(req.body, documentSearchValidation())
+      const errors = validateWithSpec(req?.body || {}, documentSearchValidation())
       res.locals.errorMessages = errors
       if (
         req?.session?.documentFilters &&
@@ -31,7 +31,7 @@ const documentController: Controller<typeof routes> = {
       }
 
       if (req.method === 'POST') {
-        req.session.documentFilters = req.body
+        req.session.documentFilters = req?.body || {}
       }
 
       if (req.query.clear === 'dates' && req.session.documentFilters) {

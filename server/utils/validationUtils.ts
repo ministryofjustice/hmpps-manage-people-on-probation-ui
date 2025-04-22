@@ -84,11 +84,11 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
   const errors: Record<string, string> = {}
   Object.entries(validationSpec).forEach(([fieldName, checks]) => {
     const formattedFieldName = fieldName.split('][').join('-').replace('[', '').replace(']', '')
-    if (checks.mandatoryWhenFieldSet && !request[fieldName] && request[checks.mandatoryWhenFieldSet]) {
+    if (checks.mandatoryWhenFieldSet && !request?.[fieldName] && request?.[checks.mandatoryWhenFieldSet]) {
       errors[fieldName] = checks.mandatoryMsg
       return
     }
-    if (!request[fieldName] && checks.optional === true) {
+    if (!request?.[fieldName] && checks.optional === true) {
       return
     }
     let hasProperty = false

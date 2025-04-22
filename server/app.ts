@@ -53,7 +53,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
-  app.use(['/case/:crn', '/case/:crn/*'], limitedAccess(services))
+  app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
 
   app.use(routes(services))
 
