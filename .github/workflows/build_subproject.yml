@@ -1,0 +1,59 @@
+name: Build Subproject
+
+on:
+  workflow_call:
+    inputs:
+      push:
+        type: boolean
+        default: false
+      force-deploy:
+        type: boolean
+        default: false
+  workflow_dispatch:
+    inputs:
+      push:
+        description: Push images
+        type: boolean
+        default: false
+      force-deploy:
+        description: Force re-tagging and deployment of images
+        type: boolean
+        default: false
+
+env:
+  push: ${{ !(github.event_name == 'push' && github.ref_name != 'main') && inputs.push }}
+
+jobs:
+  build-docker:
+    name: Docker build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        project:
+          - feature-flags
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version
+        id: version
+        run: |
+          version=$(date '+%Y-%m-%d').${{ github.run_number }}.$(echo ${{ github.sha }} | cut -c1-7)
+          echo "version=$version" | tee -a "$GITHUB_OUTPUT"
+
+      - name: Build Docker images
+        uses: ./.github/actions/docker-build
+        id: build
+        with:
+          project: ${{ matrix.project }}
+          push: ${{ env.push }}
+          version: ${{ steps.version.outputs.version }}
+          force-deploy: ${{ inputs.force-deploy }}
+
+      - name: Output changes
+        run: echo '${{ steps.build.outputs.changes }}' > ${{ matrix.project }}-changes.json
+
+      - name: Store changes
+        uses: actions/upload-artifact@v4
+        with:
+          name: changes-${{ matrix.project }}
+          path: ${{ matrix.project }}-changes.json
