@@ -53,9 +53,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpCsrf())
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
-  const caseCrnWithWildcardRegex = /^\/case\/([^/]+)\/(.*)$/
-
-  app.use(['/case/:crn', caseCrnWithWildcardRegex], limitedAccess(services))
+  app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
 
   app.use(routes(services))
 
