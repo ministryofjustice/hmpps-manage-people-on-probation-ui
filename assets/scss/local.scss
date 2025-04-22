@@ -29,6 +29,8 @@
   }
 }
 
+
+
 .reset-button {
   appearance: none;
   font-size: inherit;
@@ -61,6 +63,10 @@
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
+}
+
+.moj-filter__tag {
+  word-break: break-word !important;
 }
 
 .document-link {
