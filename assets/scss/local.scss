@@ -12,7 +12,7 @@
 }
 
 .border-bottom:after {
-  content: "";
+  content: '';
   display: block;
   border-bottom: 1px solid #b1b4b6;
 }
@@ -48,8 +48,8 @@
   text-align: left;
 }
 
-.notes-wrapper{
-  max-width:100%
+.notes-wrapper {
+  max-width: 100%;
 }
 .notes {
   white-space: nowrap;
@@ -61,7 +61,9 @@
 .truncate-notes {
   overflow: hidden;
   display: -webkit-box;
+  line-clamp: 3;
   -webkit-line-clamp: 3;
+  box-orient: vertical;
   -webkit-box-orient: vertical;
 }
 
@@ -70,8 +72,8 @@
 }
 
 .document-link {
-  word-break:     break-word !important;
+  word-break: break-word !important;
   -webkit-hyphens: auto;
-  -moz-hyphens:    auto;
-  hyphens:         auto;
+  -moz-hyphens: auto;
+  hyphens: auto;
 }
