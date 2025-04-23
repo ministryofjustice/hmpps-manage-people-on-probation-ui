@@ -14,7 +14,7 @@ on:
         type: choice
         required: true
         options:
-          - test
+          - dev
           - preprod
           - prod
       version:
@@ -29,7 +29,7 @@ on:
         type: string
         required: true
       environment:
-        description: The environment name to deploy to (test/preprod/prod)
+        description: The environment name to deploy to (dev/preprod/prod)
         type: string
         required: true
       version:
