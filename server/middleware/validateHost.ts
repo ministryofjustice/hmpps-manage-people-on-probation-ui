@@ -7,7 +7,7 @@ type AllowedHosts = {
 
 const allowedHosts: AllowedHosts = {
   production: ['manage-people-on-probation.hmpps.service.justice.gov.uk'],
-  development: ['localhost:30077', 'localhost:3000', 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk'],
+  development: ['localhost:3007', 'localhost:3000', 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk'],
 }
 
 export default function validateHost(): Route<void> {
