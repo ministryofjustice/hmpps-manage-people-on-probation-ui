@@ -15,7 +15,7 @@ generic-service:
     MAS_API_URL: "http://manage-supervision-and-delius.hmpps-probation-integration-services-prod.svc.cluster.local"
     ARNS_API_URL: "https://assess-risks-and-needs.hmpps.service.justice.gov.uk"
     TIER_API_URL: "https://hmpps-tier.hmpps.service.justice.gov.uk"
-    INTERVENTIONS_API_URL: "https://hmpps-interventions-service.apps.live-1.cloud-platform.service.justice.gov.uk"
+    INTERVENTIONS_API_URL: "https://refer-monitor-intervention.service.justice.gov.uk"
     FLIPT_URL: "https://feature-flags.hmpps.service.justice.gov.uk"
     INTERVENTIONS_LINK: "https://hmpps-interventions-ui.apps.live-1.cloud-platform.service.justice.gov.uk"
     DELIUS_LINK: "https://ndelius.probation.service.justice.gov.uk"
