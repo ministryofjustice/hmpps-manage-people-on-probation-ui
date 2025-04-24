@@ -17,8 +17,8 @@ const res = {
 
 const nextSpy = jest.fn() as NextFunction
 
-const checkValidHost = (env: Host, validHost = true, hostIndex = 0) => {
-  const host = !validHost ? 'blocked.com' : allowedHosts[env][hostIndex]
+const checkValidHost = (env: Host, validHost: boolean, reqHost?: string) => {
+  const host = !validHost ? 'blocked.com' : reqHost
   it(`should ${!validHost ? 'block requests for an invalid host' : 'call next() for a valid host'} in ${env}`, () => {
     process.env.NODE_ENV = env
     const req = getRequest(host)
@@ -40,16 +40,16 @@ describe('middleware/validateHost', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
+  checkValidHost('development', false)
   let index = 0
   for (const host of allowedHosts.development) {
-    checkValidHost('development', false, index)
-    index += 1
-  }
-  index = 0
-  for (const host of allowedHosts.development) {
-    checkValidHost('development', true, index)
+    checkValidHost('development', true, host)
     index += 1
   }
   checkValidHost('production', false)
-  checkValidHost('production')
+  index = 0
+  for (const host of allowedHosts.production) {
+    checkValidHost('production', true, host)
+    index += 1
+  }
 })
