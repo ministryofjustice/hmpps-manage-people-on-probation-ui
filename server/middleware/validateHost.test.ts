@@ -1,6 +1,6 @@
 import { NextFunction, Request } from 'express'
 
-import validateHost, { allowedHosts, Host } from './validateHost'
+import validateHost, { allowedHosts, type Host } from './validateHost'
 import { AppResponse } from '../@types'
 
 const getRequest = (host: string): Request => {
