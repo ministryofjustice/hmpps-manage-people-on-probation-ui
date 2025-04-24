@@ -1,11 +1,11 @@
 import { AppResponse, Route } from '../@types'
 
-type Host = 'development' | 'production'
+export type Host = 'development' | 'production'
 type AllowedHosts = {
   [K in Host]: string[]
 }
 
-const allowedHosts: AllowedHosts = {
+export const allowedHosts: AllowedHosts = {
   production: ['manage-people-on-probation.hmpps.service.justice.gov.uk'],
   development: ['localhost:3007', 'localhost:3000', 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk'],
 }
