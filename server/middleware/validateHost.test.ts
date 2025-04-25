@@ -1,6 +1,6 @@
 import { NextFunction, Request } from 'express'
 
-import validateHost, { allowedHosts, type Host } from './validateHost'
+import validateHost, { allowedHosts } from './validateHost'
 import { AppResponse } from '../@types'
 
 const getRequest = (host: string): Request => {
@@ -17,16 +17,15 @@ const res = {
 
 const nextSpy = jest.fn() as NextFunction
 
-const checkValidHost = (env: Host, validHost: boolean, reqHost?: string) => {
+const checkValidHost = (validHost: boolean, reqHost?: string) => {
   const host = !validHost ? 'blocked.com' : reqHost
-  it(`should ${!validHost ? 'block requests for an invalid host' : 'call next() for a valid host'} in ${env}`, () => {
-    process.env.NODE_ENV = env
+  it(`should ${!validHost ? 'block requests for an invalid host' : 'call next() for a valid host'}`, () => {
     const req = getRequest(host)
     validateHost()(req, res, nextSpy)
     if (!validHost) {
       expect(req.get).toHaveBeenCalledWith('host')
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith(`Env: ${env}, Host: ${host}, Invalid host`)
+      expect(res.send).toHaveBeenCalledWith('Invalid host')
       expect(nextSpy).not.toHaveBeenCalled()
     } else {
       expect(res.status).not.toHaveBeenCalled()
@@ -40,16 +39,10 @@ describe('middleware/validateHost', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  checkValidHost('development', false)
+  checkValidHost(false)
   let index = 0
-  for (const host of allowedHosts.development) {
-    checkValidHost('development', true, host)
-    index += 1
-  }
-  checkValidHost('production', false)
-  index = 0
-  for (const host of allowedHosts.production) {
-    checkValidHost('production', true, host)
+  for (const host of allowedHosts) {
+    checkValidHost(true, host)
     index += 1
   }
 })
