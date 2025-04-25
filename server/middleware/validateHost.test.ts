@@ -26,7 +26,7 @@ const checkValidHost = (env: Host, validHost: boolean, reqHost?: string) => {
     if (!validHost) {
       expect(req.get).toHaveBeenCalledWith('host')
       expect(res.status).toHaveBeenCalledWith(400)
-      expect(res.send).toHaveBeenCalledWith('Invalid host')
+      expect(res.send).toHaveBeenCalledWith(`Env: ${env}, Host: ${host}, Invalid host`)
       expect(nextSpy).not.toHaveBeenCalled()
     } else {
       expect(res.status).not.toHaveBeenCalled()
