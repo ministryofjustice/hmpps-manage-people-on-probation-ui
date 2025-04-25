@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
 
+const autoprefixer = require('autoprefixer')
+const postcss = require('postcss')
+const postcssPresetEnv = require('postcss-preset-env')
 const { copy } = require('esbuild-plugin-copy')
 const { sassPlugin } = require('esbuild-sass-plugin')
 const { clean } = require('esbuild-plugin-clean')
@@ -36,6 +39,12 @@ const buildAssets = buildConfig =>
       sassPlugin({
         quietDeps: true,
         loadPaths: [process.cwd(), path.join(process.cwd(), 'node_modules')],
+        async transform(source, resolveDir) {
+          const { css } = await postcss([autoprefixer, postcssPresetEnv({ stage: 0 })]).process(source, {
+            from: undefined,
+          })
+          return css
+        },
       }),
     ],
   })
