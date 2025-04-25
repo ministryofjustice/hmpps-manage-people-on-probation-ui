@@ -20,7 +20,7 @@ export default function validateHost(): Route<void> {
     const host = req.get('host')
     const env = process.env.NODE_ENV as Host
     if (!allowedHosts[env].includes(host)) {
-      return res.status(400).send('Invalid host')
+      return res.status(400).send(`Env: ${env}, Host: ${host}, Invalid host`)
     }
     return next()
   }
