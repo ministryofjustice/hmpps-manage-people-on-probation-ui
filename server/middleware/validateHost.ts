@@ -6,6 +6,7 @@ export const allowedHosts = [
   'sign-in-dev.hmpps.service.justice.gov.uk',
   'sign-in.hmpps.service.justice.gov.uk',
   'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
+  'manage-people-on-probation-preprod.hmpps.service.justice.gov.uk',
   'manage-people-on-probation.hmpps.service.justice.gov.uk',
 ]
 
