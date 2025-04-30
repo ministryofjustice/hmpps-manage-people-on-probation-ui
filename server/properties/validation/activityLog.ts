@@ -4,7 +4,6 @@ import {
   isNotLaterThanToday,
   isValidDate,
   ValidationSpec,
-  isValidDateFormat,
 } from '../../utils/validationUtils'
 
 export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = true): ValidationSpec => ({
@@ -16,12 +15,8 @@ export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = tr
         msg: 'Enter or select a date from',
       },
       {
-        validator: isValidDateFormat,
-        msg: 'Enter a date in the correct format, for example 17/5/2024',
-      },
-      {
         validator: isValidDate,
-        msg: 'Enter a real date',
+        msg: 'Enter a date in the correct format, for example 17/5/2024',
       },
       {
         validator: isNotLaterThanToday,
@@ -37,12 +32,8 @@ export const activityLogValidation = (dateToIsEmpty = true, dateFromIsEmpty = tr
         msg: 'Enter or select a date to',
       },
       {
-        validator: isValidDateFormat,
-        msg: 'Enter a date in the correct format, for example 17/5/2024',
-      },
-      {
         validator: isValidDate,
-        msg: 'Enter a real date',
+        msg: 'Enter a date in the correct format, for example 17/5/2024',
       },
       {
         validator: isNotLaterThanToday,
