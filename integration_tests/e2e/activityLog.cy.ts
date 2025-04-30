@@ -25,6 +25,10 @@ const filtersAreFilled = (page: ActivityLogPage) => {
   page.getComplianceFilter(3).should('be.checked')
 }
 
+const checkCompactViewPersists = () => {
+  cy.get('.toggle-menu__list-item:nth-of-type(2) span').should('contain.text', 'Compact view')
+}
+
 context('Activity log', () => {
   const today = new Date()
   const day = today.getDate()
@@ -559,5 +563,16 @@ context('Activity log', () => {
     page.getActivity('1').find('h2 a').click()
     cy.get('.govuk-breadcrumbs__list .govuk-breadcrumbs__list-item:nth-of-type(3) a').click()
     filtersAreFilled(page)
+  })
+  it('should persist the selected compact view', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
+    page.getDateToInput().type('11/1/2025')
+    page.getApplyFiltersButton().click()
+    checkCompactViewPersists()
+    page.getDateFromInput().type('5/1/2025')
+    page.getApplyFiltersButton().click()
+    checkCompactViewPersists()
   })
 })

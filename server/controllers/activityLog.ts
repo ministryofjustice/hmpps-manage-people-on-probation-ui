@@ -30,7 +30,7 @@ const activityLogController: Controller<typeof routes> = {
       const { query, body, params } = req
       const { crn } = params
       const { page = '0', view = '' } = query
-      if (req.query.view === 'compact') {
+      if (req?.query?.view || req?.body?.view === 'compact') {
         res.locals.compactView = true
       } else {
         res.locals.defaultView = true
@@ -38,6 +38,7 @@ const activityLogController: Controller<typeof routes> = {
       if (req.query.requirement) {
         res.locals.requirement = req.query.requirement as string
       }
+      const currentView = view || body?.view
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -66,7 +67,7 @@ const activityLogController: Controller<typeof routes> = {
         query: req.session.activityLogFilters,
         queryParams,
         page,
-        view,
+        view: currentView,
         tierCalculation,
         risksWidget,
         predictorScores,
