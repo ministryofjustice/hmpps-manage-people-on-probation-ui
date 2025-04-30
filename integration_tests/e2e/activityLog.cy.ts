@@ -97,14 +97,14 @@ context('Activity log', () => {
   it('should show the correct validation if an invalid date from is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    page.getDateFromInput().type('01/04/2025')
+    page.getDateFromInput().type('0104/2025')
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
     page
       .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDateFormat'))
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
     page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
   })
   it('should show the correct validation if an invalid date to is entered', () => {
@@ -120,7 +120,7 @@ context('Activity log', () => {
       .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
     page
       .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDateFormat'))
+      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
   })
   it('should show the correct validation if date from doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
