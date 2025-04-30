@@ -26,7 +26,9 @@ const activityLog: Route<void> = (req, res, next): void => {
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
       req.session.activityLogFilters = req.body as ActivityLogFilters
       req.session.activityLogFilters.compliance = complianceFilters
-      return res.redirect(`${url}?error=true`)
+      const view = req?.query?.view || req?.body?.view
+      const query = `error=true${view ? `&view=${view}` : ''}`
+      return res.redirect(`${url}?${query}`)
     }
   }
   return next()
