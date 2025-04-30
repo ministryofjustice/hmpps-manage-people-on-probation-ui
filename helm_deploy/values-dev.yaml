@@ -31,5 +31,12 @@ generic-service:
     ENVIRONMENT_NAME: DEV
     ENVIRONMENT: dev
 
+  allowlist:
+    groups:
+      - digital_staff_and_mojo
+      - unilink_staff
+      - moj_cloud_platform
+      - accessibility-testing-1
+        
 generic-prometheus-alerts:
   alertSeverity: manage-people-on-probation-alerts
