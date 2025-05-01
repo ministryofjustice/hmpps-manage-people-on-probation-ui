@@ -574,5 +574,7 @@ context('Activity log', () => {
     page.getDateFromInput().type('5/1/2025')
     page.getApplyFiltersButton().click()
     checkCompactViewPersists()
+    page.getSelectedFilterTag(1).click()
+    checkCompactViewPersists()
   })
 })

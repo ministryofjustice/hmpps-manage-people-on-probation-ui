@@ -11,6 +11,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     req.session.activityLogFilters = undefined
   }
   const { clearFilterKey, clearFilterValue } = req.query
+  const view = req?.query?.view || req?.body?.view
   const { crn } = req.params
   const { keywords, dateFrom, dateTo, compliance } = setSession()
   const errorMessages = req?.session?.errorMessages
@@ -54,9 +55,9 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
 
   const filterHref = (key: string, value: string): string => {
     if (key === 'compliance') {
-      return `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}`
+      return `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}${view ? `&view=${view}` : ''}`
     }
-    return `${baseUrl}?clearFilterKey=${key}`
+    return `${baseUrl}?clearFilterKey=${key}${view ? `&view=${view}` : ''}`
   }
 
   const selectedFilterItems: Record<string, SelectedFilterItem[]> = Object.entries(filters)
