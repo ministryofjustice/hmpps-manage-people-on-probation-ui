@@ -2,6 +2,7 @@
 {%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
 
 {% set queryString = '?' + queryParams.join('&') if queryParams.length > 0  else ''  %}
+{% set clearLink = '?clear=true&view=' + view if view else '?clear=true' %}
 
 {%- set filterOptionsHtml %}
 
@@ -133,7 +134,7 @@
     },
     clearLink: {
       text: 'Clear filters',
-      href: '/case/' + crn + '/activity-log?clear=true'
+      href: '/case/' + crn + '/activity-log' + clearLink
     },
     categories: filterCategories
   } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length,
