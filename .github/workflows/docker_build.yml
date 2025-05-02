@@ -65,3 +65,17 @@ jobs:
           additional_docker_tag: ${{ secrets.SENTRY_AUTH_TOKEN }}
           push: ${{ inputs.push }}
           app_version: ${{ steps.app_version.outputs.version }}
+
+      - name: Package build output for Veracode
+        run: |
+          mkdir -p veracode-package
+          cp -r . veracode-package/
+          cd veracode-package
+          zip -r ../veracode-artifact.zip .
+        shell: bash
+
+      - name: Upload Veracode artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: veracode-artifact
+          path: veracode-artifact.zip

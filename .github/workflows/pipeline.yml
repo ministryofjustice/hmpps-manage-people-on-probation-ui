@@ -75,6 +75,13 @@ jobs:
       registry_org: 'ministryofjustice'
       push: ${{ inputs.push || true }}
       docker_multiplatform: true
+  veracode_scan:
+    name: Veracode Scan
+    uses: ./.github/workflows/veracode_scan.yml
+    needs: [build]
+    secrets: inherit
+    with:
+      artifact_name: 'veracode-artifact'
   deploy_dev:
     name: Deploy to the development environment
     needs:
@@ -86,22 +93,22 @@ jobs:
       environment: 'dev'
       app_version: '${{ needs.build.outputs.app_version }}'
   deploy_preprod:
-     name: Deploy to pre-production environment
-     needs:
-       - build
-       - deploy_dev
-     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
-     secrets: inherit
-     with:
-       environment: 'preprod'
-       app_version: '${{ needs.build.outputs.app_version }}'
+    name: Deploy to pre-production environment
+    needs:
+      - build
+      - deploy_dev
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'preprod'
+      app_version: '${{ needs.build.outputs.app_version }}'
   deploy_prod:
-     name: Deploy to production environment
-     needs:
-       - build
-       - deploy_preprod
-     uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
-     secrets: inherit
-     with:
-       environment: 'prod'
-       app_version: '${{ needs.build.outputs.app_version }}'
+    name: Deploy to production environment
+    needs:
+      - build
+      - deploy_preprod
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/deploy_env.yml@v2 # WORKFLOW_VERSION
+    secrets: inherit
+    with:
+      environment: 'prod'
+      app_version: '${{ needs.build.outputs.app_version }}'
