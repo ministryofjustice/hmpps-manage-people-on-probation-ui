@@ -72,7 +72,7 @@
  {{ appPagination({
   currentPage: page | int,
   totalPages: personActivity.totalPages,
-  url: filters.baseUrl + '?view=' + view + '&'
+  url: filters.baseUrl + '?view=' + view + '&' if view else filters.baseUrl + '?'
   }) }}
 </div>
 {% endif %}

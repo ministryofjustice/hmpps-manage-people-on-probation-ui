@@ -576,5 +576,7 @@ context('Activity log', () => {
     checkCompactViewPersists()
     page.getSelectedFilterTag(1).click()
     checkCompactViewPersists()
+    page.getPaginationLink(2).click()
+    checkCompactViewPersists()
   })
 })
