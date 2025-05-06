@@ -1,0 +1,40 @@
+name: Veracode Scan
+
+on:
+  workflow_call:
+    inputs:
+      artifact_name:
+        required: true
+        type: string
+    secrets:
+      VERACODE_API_ID:
+        required: true
+      VERACODE_API_KEY:
+        required: true
+
+jobs:
+  veracode_scan:
+    name: Veracode Static Analysis Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download Veracode artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.artifact_name }}
+          path: veracode-artifact
+
+      - name: Verify artifact content
+        run: ls -l veracode-artifact
+
+      - name: Upload to Veracode and scan
+        uses: veracode/veracode-uploadandscan-action@v1.0.9
+        with:
+          appname: 'hmpps-manage-people-on-probation' # Replace with your actual app name in Veracode
+          filepath: 'veracode-artifact/veracode-artifact.zip'
+          version: ${{ github.sha }}
+          createprofile: true
+          criticality: 'Medium'
+        env:
+          VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
+          VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
