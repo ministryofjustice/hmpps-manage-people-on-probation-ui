@@ -53,20 +53,13 @@ jobs:
     uses: ./.github/workflows/sonarqube.yml
     needs: [node_unit_tests, node_integration_tests]
     secrets: inherit
-  veracode_artifact:
-    name: Build Veracode Artifact
+  veracode:
+    name: Veracode
     needs: [sonarcloud]
-    uses: ./.github/workflows/artifact_build.yml
+    uses: ./.github/workflows/veracode.yml
     secrets:
       VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
       VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
-  veracode_scan:
-    name: Veracode Scan
-    uses: ./.github/workflows/veracode_scan.yml
-    needs: [veracode_artifact]
-    secrets: inherit
-    with:
-      artifact_name: 'veracode-artifact'
   helm_lint:
     strategy:
       matrix:
