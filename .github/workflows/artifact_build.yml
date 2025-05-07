@@ -23,7 +23,7 @@ jobs:
       - name: Download Veracode Pipeline Scan
         run: |
           curl -LO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
-          unzip pipeline-scan-LATEST.zip
+          unzip -o pipeline-scan-LATEST.zip
         shell: bash
 
       - name: Run Veracode Pipeline Scan
