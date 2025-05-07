@@ -69,7 +69,7 @@ jobs:
       - name: Package build output for Veracode
         run: |
           mkdir -p veracode-package
-          cp -r . veracode-package/
+          rsync -av --exclude 'veracode-package' ./ veracode-package/
           cd veracode-package
           zip -r ../veracode-artifact.zip .
         shell: bash
