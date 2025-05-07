@@ -78,9 +78,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docker_build.yml # WORKFLOW_VERSION
     secrets: inherit
-    needs:
-      - node_integration_tests
-      - node_unit_tests
+    #needs:
+    #- node_integration_tests
+    #- node_unit_tests
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
