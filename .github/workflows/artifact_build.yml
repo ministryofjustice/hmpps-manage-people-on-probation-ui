@@ -34,10 +34,8 @@ jobs:
       - name: Run Veracode Pipeline Scan
         run: |
           java -jar pipeline-scan.jar \
-            -vid ${{ secrets.VERACODE_API_ID }} \
-            -vkey ${{ secrets.VERACODE_API_KEY }} \
-            -f veracode-artifact.zip \
-            --appname hmpps-manage-people-on-probation \
-            --createprofile true \
-            --fail_on_severity=VeryHigh
+          -vid ${{ secrets.VERACODE_API_ID }} \
+          -vkey ${{ secrets.VERACODE_API_KEY }} \
+          -f veracode-artifact.zip \
+          -fs VeryHigh
         shell: bash
