@@ -54,6 +54,7 @@ jobs:
     needs: [node_unit_tests, node_integration_tests]
     secrets: inherit
   veracode_artifact:
+    name: Build Veracode artifact
     needs: [sonarcloud]
     uses: ./.github/workflows/artifact_build.yml
   veracode_scan:
