@@ -5,6 +5,7 @@ on:
 
 jobs:
   veracode_scan:
+    name: Generate and Upload Veracode Artifact
     runs-on: ubuntu-latest
 
     steps:
