@@ -5,7 +5,6 @@ on:
 
 jobs:
   veracode_scan:
-    name: Generate and Upload Veracode Artifact
     runs-on: ubuntu-latest
 
     steps:
@@ -20,10 +19,9 @@ jobs:
           zip -r ../veracode-artifact.zip .
         shell: bash
 
-      - name: Download Veracode Java API Wrapper
+      - name: Download Veracode Upload API Wrapper
         run: |
-          curl -O https://downloads.veracode.com/securityscan/JavaAPI.zip
-          unzip JavaAPI.zip
+          curl -L -o VeracodeJavaAPI.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/22.4.10.6/vosp-api-wrappers-java-22.4.10.6.jar
         shell: bash
 
       - name: Upload to Veracode
