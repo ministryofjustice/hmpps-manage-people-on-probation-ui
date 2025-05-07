@@ -53,6 +53,16 @@ jobs:
     uses: ./.github/workflows/sonarqube.yml
     needs: [node_unit_tests, node_integration_tests]
     secrets: inherit
+  veracode_artifact:
+    needs: [sonarcloud]
+    uses: ./.github/workflows/artifact_build.yml
+  veracode_scan:
+    name: Veracode Scan
+    uses: ./.github/workflows/veracode_scan.yml
+    needs: [veracode_artifact]
+    secrets: inherit
+    with:
+      artifact_name: 'veracode-artifact'
   helm_lint:
     strategy:
       matrix:
@@ -75,13 +85,6 @@ jobs:
       registry_org: 'ministryofjustice'
       push: ${{ inputs.push || true }}
       docker_multiplatform: true
-  veracode_scan:
-    name: Veracode Scan
-    uses: ./.github/workflows/veracode_scan.yml
-    needs: [sonarcloud]
-    secrets: inherit
-    with:
-      artifact_name: 'veracode-artifact'
   deploy_dev:
     name: Deploy to the development environment
     needs:
