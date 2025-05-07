@@ -57,6 +57,9 @@ jobs:
     name: Build Veracode Artifact
     needs: [sonarcloud]
     uses: ./.github/workflows/artifact_build.yml
+    secrets:
+      VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
+      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
   veracode_scan:
     name: Veracode Scan
     uses: ./.github/workflows/veracode_scan.yml

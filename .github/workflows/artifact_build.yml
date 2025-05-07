@@ -2,6 +2,11 @@ name: Generate and Scan with Veracode Pipeline Scan
 
 on:
   workflow_call:
+    secrets:
+      VERACODE_API_ID:
+        required: true
+      VERACODE_API_KEY:
+        required: true
 
 jobs:
   veracode_scan:
