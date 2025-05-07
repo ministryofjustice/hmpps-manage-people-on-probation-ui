@@ -1,17 +1,18 @@
-name: Generate and Upload Veracode Artifact
+name: Generate and Scan with Veracode Pipeline Scan
 
 on:
   workflow_call:
 
 jobs:
   veracode_scan:
+    name: Generate and Scan with Veracode Pipeline Scan
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
-      - name: Package build output for Veracode
+      - name: Package build output
         run: |
           mkdir -p veracode-package
           rsync -av --exclude 'veracode-package' ./ veracode-package/
@@ -19,20 +20,19 @@ jobs:
           zip -r ../veracode-artifact.zip .
         shell: bash
 
-      - name: Download Veracode Upload API Wrapper
+      - name: Download Veracode Pipeline Scan
         run: |
-          curl -L -o VeracodeJavaAPI.jar https://repo1.maven.org/maven2/com/veracode/vosp/api/wrappers/vosp-api-wrappers-java/22.4.10.6/vosp-api-wrappers-java-22.4.10.6.jar
+          curl -LO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip pipeline-scan-LATEST.zip
         shell: bash
 
-      - name: Upload to Veracode
+      - name: Run Veracode Pipeline Scan
         run: |
-          java -jar VeracodeJavaAPI.jar \
+          java -jar pipeline-scan.jar \
             -vid ${{ secrets.VERACODE_API_ID }} \
             -vkey ${{ secrets.VERACODE_API_KEY }} \
-            -action uploadandscan \
-            -appname hmpps-manage-people-on-probation \
-            -createprofile true \
-            -filepath veracode-artifact.zip \
-            -version ${{ github.sha }} \
-            -criticality Medium
+            -f veracode-artifact.zip \
+            --appname hmpps-manage-people-on-probation \
+            --createprofile true \
+            --fail_on_severity=VeryHigh
         shell: bash
