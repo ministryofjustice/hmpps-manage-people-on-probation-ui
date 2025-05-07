@@ -1,19 +1,15 @@
-name: Generate Veracode Artifact
+name: Generate and Upload Veracode Artifact
 
 on:
   workflow_call:
-    outputs:
-      artifact-name:
-        description: Name of the uploaded Veracode artifact
-        value: veracode-artifact
 
 jobs:
-  package_veracode:
-    name: Package Veracode artifact
+  veracode_scan:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout source code
+        uses: actions/checkout@v4
 
       - name: Package build output for Veracode
         run: |
@@ -23,8 +19,21 @@ jobs:
           zip -r ../veracode-artifact.zip .
         shell: bash
 
-      - name: Upload Veracode artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: veracode-artifact
-          path: veracode-artifact.zip
+      - name: Download Veracode Java API Wrapper
+        run: |
+          curl -O https://downloads.veracode.com/securityscan/JavaAPI.zip
+          unzip JavaAPI.zip
+        shell: bash
+
+      - name: Upload to Veracode
+        run: |
+          java -jar VeracodeJavaAPI.jar \
+            -vid ${{ secrets.VERACODE_API_ID }} \
+            -vkey ${{ secrets.VERACODE_API_KEY }} \
+            -action uploadandscan \
+            -appname hmpps-manage-people-on-probation \
+            -createprofile true \
+            -filepath veracode-artifact.zip \
+            -version ${{ github.sha }} \
+            -criticality Medium
+        shell: bash
