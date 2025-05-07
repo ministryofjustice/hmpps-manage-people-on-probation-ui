@@ -37,24 +37,24 @@ jobs:
     uses: ./.github/workflows/node_build.yml # WORKFLOW_VERSION
     secrets: inherit
   # generic node unit tests - feel free to override with local tests if required
-  #node_unit_tests:
-  #name: node unit tests
-  #uses: ministryofjustice/hmpps-github-actions/.github/workflows/node_unit_tests.yml@v2 # WORKFLOW_VERSION
-  #needs: [node_build]
-  #secrets: inherit
+  node_unit_tests:
+    name: node unit tests
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/node_unit_tests.yml@v2 # WORKFLOW_VERSION
+    needs: [node_build]
+    secrets: inherit
   # generic node integration tests using wiremock - feel free to override with local tests if required
-  #node_integration_tests:
-  #name: node integration tests
-  #uses: ./.github/workflows/node_integration_tests.yml # WORKFLOW_VERSION
-  #needs: [node_unit_tests]
-  #secrets: inherit
+  node_integration_tests:
+    name: node integration tests
+    uses: ./.github/workflows/node_integration_tests.yml # WORKFLOW_VERSION
+    needs: [node_unit_tests]
+    secrets: inherit
   sonarcloud:
     name: SonarCloud
     uses: ./.github/workflows/sonarqube.yml
-    #needs: [node_unit_tests, node_integration_tests]
+    needs: [node_unit_tests, node_integration_tests]
     secrets: inherit
   veracode_artifact:
-    name: Veracode Artifact
+    name: Build Veracode Artifact
     needs: [sonarcloud]
     uses: ./.github/workflows/artifact_build.yml
   veracode_scan:
@@ -78,9 +78,9 @@ jobs:
     if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docker_build.yml # WORKFLOW_VERSION
     secrets: inherit
-    #needs:
-    #- node_integration_tests
-    #- node_unit_tests
+    needs:
+      - node_integration_tests
+      - node_unit_tests
     with:
       docker_registry: 'ghcr.io'
       registry_org: 'ministryofjustice'
