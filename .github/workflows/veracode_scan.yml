@@ -28,7 +28,7 @@ jobs:
         run: ls -l veracode-artifact
 
       - name: Upload to Veracode and scan
-        uses: veracode/veracode-uploadandscan-action@v0.2.7
+        uses: veracode/veracode-uploadandscan-action@v0.2.6
         with:
           appname: 'hmpps-manage-people-on-probation' # Replace with your actual app name in Veracode
           filepath: 'veracode-artifact/veracode-artifact.zip'
