@@ -9,6 +9,7 @@ on:
 
 jobs:
   package_veracode:
+    name: Package Veracode artifact
     runs-on: ubuntu-latest
 
     steps:
