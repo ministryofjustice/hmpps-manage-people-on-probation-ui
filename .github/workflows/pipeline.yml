@@ -51,7 +51,7 @@ jobs:
   sonarcloud:
     name: SonarCloud
     uses: ./.github/workflows/sonarqube.yml
-    needs: [node_unit_tests, node_integration_tests]
+    #needs: [node_unit_tests, node_integration_tests]
     secrets: inherit
   veracode_artifact:
     name: Veracode Artifact
