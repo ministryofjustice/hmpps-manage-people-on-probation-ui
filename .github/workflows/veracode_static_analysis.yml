@@ -26,7 +26,7 @@ jobs:
         shell: bash
 
       - name: Upload and Scan with Veracode Static Analysis
-        uses: veracode/veracode-uploadandscan-action@v1.1.4
+        uses: veracode/veracode-uploadandscan-action@0.2.7
         with:
           appname: hmpps-manage-people-on-probation
           createprofile: true
