@@ -1,0 +1,36 @@
+name: Veracode Static Analysis Scan
+
+on:
+  workflow_call:
+    secrets:
+      VERACODE_API_ID:
+        required: true
+      VERACODE_API_KEY:
+        required: true
+
+jobs:
+  veracode_static_scan:
+    name: Upload and Scan with Veracode Static Analysis
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Package build output
+        run: |
+          mkdir -p veracode-package
+          rsync -av --exclude 'veracode-package' ./ veracode-package/
+          cd veracode-package
+          zip -r ../veracode-artifact.zip .
+        shell: bash
+
+      - name: Upload and Scan with Veracode Static Analysis
+        uses: veracode/veracode-uploadandscan-action@v1.1.4
+        with:
+          appname: your-veracode-app-name
+          createprofile: true
+          filepath: veracode-artifact.zip
+          version: ${{ github.run_number }}
+          vid: ${{ secrets.VERACODE_API_ID }}
+          vkey: ${{ secrets.VERACODE_API_KEY }}
