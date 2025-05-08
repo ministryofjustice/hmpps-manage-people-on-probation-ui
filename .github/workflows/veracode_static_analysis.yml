@@ -28,7 +28,7 @@ jobs:
       - name: Upload and Scan with Veracode Static Analysis
         uses: veracode/veracode-uploadandscan-action@v1.1.4
         with:
-          appname: your-veracode-app-name
+          appname: hmpps-manage-people-on-probation
           createprofile: true
           filepath: veracode-artifact.zip
           version: ${{ github.run_number }}
