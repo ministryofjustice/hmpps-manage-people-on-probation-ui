@@ -8,8 +8,8 @@
             "position": {
               "x": 0,
               "y": 0,
-              "colSpan": 6,
-              "rowSpan": 5
+              "colSpan": 5,
+              "rowSpan": 4
             },
             "metadata": {
               "inputs": [
@@ -96,7 +96,27 @@
                   "GridColumnsWidth": {
                     "user_Id": "102px"
                   },
-                  "Query": "requests\n| where startofday(timestamp) == startofday(ago(0d))\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| where name in (\"GET /sign-in\")\n| where isnotempty(user_Id)\n| summarize count() by user_Id, bin(timestamp, 1d)\n| order by timestamp desc, count_ desc \n| extend row_number=row_number()\n| project row_number, user_Id, count_\n\n"
+                  "Query": "let startOfDay=startofday(ago(0d));\nlet pg=pageViews\n    | where timestamp > startOfDay\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\"\n    | where isnotempty(user_Id)\n    | summarize arg_min(timestamp, *) by user_Id;\npg\n| sort by timestamp asc \n| project user_number=row_number(), datetime_utc_to_local(timestamp, \"Europe/London\")\n| render scatterchart    \n\n",
+                  "ControlType": "FrameControlChart",
+                  "SpecificChart": "Scatter",
+                  "Dimensions": {
+                    "xAxis": {
+                      "name": "Column1",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "user_number",
+                        "type": "long"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "LegendOptions": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  }
                 }
               },
               "partHeader": {
@@ -107,10 +127,108 @@
           },
           {
             "position": {
-              "x": 6,
+              "x": 5,
               "y": 0,
-              "colSpan": 6,
-              "rowSpan": 5
+              "colSpan": 5,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "1243bb6c-277e-4397-a745-73ad1b11d9d6",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "pageViews\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| where startofday(timestamp) == startofday(ago(0d))\n| where isnotempty(user_Id)\n| summarize pageViews=count() by username=hash_md5(user_Id)\n| sort by pageViews desc\n| take 100\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "pageViews\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| where startofday(timestamp) == startofday(ago(0d))\n| where isnotempty(user_Id)\n| summarize pageViews=count() by user_Id\n| sort by pageViews desc\n| take 100\n| project hash_username=hash_md5(user_Id), page_views=pageViews\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Requests by user today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 10,
+              "y": 0,
+              "colSpan": 5,
+              "rowSpan": 4
             },
             "metadata": {
               "inputs": [
@@ -197,11 +315,11 @@
                   "GridColumnsWidth": {
                     "name": "341px"
                   },
-                  "Query": "let dataset=pageViews\n    // additional filters can be applied here\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet partitionByName=dataset\n    | partition hint.strategy=native by name (\n        summarize pageVisits=count() by name\n        );\npartitionByName\n| sort by pageVisits desc  \n| take 30\n\n"
+                  "Query": "let dataset=pageViews\n    // additional filters can be applied here\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet partitionByName=dataset\n    | partition hint.strategy=native by name (\n        summarize pageVisits=count() by name\n        );\npartitionByName\n| sort by pageVisits desc  \n| take 30\n| project name, page_visits=pageVisits\n\n"
                 }
               },
               "partHeader": {
-                "title": "Top 30 page visist today",
+                "title": "Top 30 page visists today",
                 "subtitle": ""
               }
             }
@@ -209,8 +327,8 @@
           {
             "position": {
               "x": 0,
-              "y": 5,
-              "colSpan": 6,
+              "y": 4,
+              "colSpan": 5,
               "rowSpan": 5
             },
             "metadata": {
@@ -314,7 +432,7 @@
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
               "settings": {
                 "content": {
-                  "Query": "let now=now();\nlet startOfDay=startofday(ago(0d));\nlet usg_events = dynamic([\"*\"]);\nlet grain = 15m;\nlet mainTable = union pageViews\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| make-series Users = dcountif(user_Id, 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))) default = 0 on timestamp from startOfDay to now step grain\n| render columnchart \n\n"
+                  "Query": "let now=datetime_utc_to_local(now(), \"Europe/London\");\nlet startOfDay=datetime_utc_to_local(startofday(ago(0d)), \"Europe/London\");\nlet grain = 15m;\nlet mainTable = union pageViews\n    | extend timestamp=datetime_utc_to_local(timestamp, \"Europe/London\")\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| make-series Users = dcountif(user_Id, 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))) default = 0 on timestamp from startOfDay to now step grain\n| render columnchart \n\n"
                 }
               },
               "partHeader": {
@@ -325,9 +443,9 @@
           },
           {
             "position": {
-              "x": 6,
-              "y": 5,
-              "colSpan": 6,
+              "x": 5,
+              "y": 4,
+              "colSpan": 5,
               "rowSpan": 5
             },
             "metadata": {
@@ -436,7 +554,7 @@
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
               "settings": {
                 "content": {
-                  "Query": "let usg_events = dynamic([\"*\"]);\nlet mainTable = union pageViews\n    | where timestamp > startofday(ago(0d))\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet queryTable = mainTable;\nlet splitTable =  () {\n    queryTable\n    | extend dimension = column_ifexists('name', '')\n    | extend dimension = iif(isempty(dimension), \"<undefined>\", dimension)\n};\nlet cohortedTable = splitTable\n    | where 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))\n    | extend byDimension = bin(timestamp, 15m)\n    | summarize metricHll = hll(user_Id) by byDimension, dimension;\nlet topSegments = cohortedTable\n    | summarize mergedMetricHll = hll_merge(metricHll) by dimension\n    | project dimension, dcount_user_Id = dcount_hll(mergedMetricHll)\n    | top 5 by dcount_user_Id desc nulls last\n    | summarize makelist(dimension);\ncohortedTable\n| extend dimension = iff(dimension in (topSegments), dimension, \"Other\")\n| project byDimension, dimension, metricHll\n| summarize metric = hll_merge(metricHll) by dimension, byDimension\n| project byDimension, dimension, metric = dcount_hll(metric)\n| render columnchart \n\n"
+                  "Query": "let startOfDay=datetime_utc_to_local(startofday(ago(0d)), \"Europe/London\");\nlet mainTable = union pageViews\n    | extend timestamp=datetime_utc_to_local(timestamp, \"Europe/London\")\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet queryTable = mainTable;\nlet splitTable =  () {\n    queryTable\n    | extend dimension = column_ifexists('name', '')\n    | extend dimension = iif(isempty(dimension), \"<undefined>\", dimension)\n};\nlet cohortedTable = splitTable\n    | where 'user_Id' != 'user_AuthenticatedId' or ('user_Id' == 'user_AuthenticatedId' and isnotempty(user_Id))\n    | extend byDimension = bin(timestamp, 15m)\n    | summarize metricHll = hll(user_Id) by byDimension, dimension;\nlet topSegments = cohortedTable\n    | summarize mergedMetricHll = hll_merge(metricHll) by dimension\n    | project dimension, dcount_user_Id = dcount_hll(mergedMetricHll)\n    | top 5 by dcount_user_Id desc nulls last\n    | summarize makelist(dimension);\ncohortedTable\n| extend dimension = iff(dimension in (topSegments), dimension, \"Other\")\n| project byDimension, dimension, metricHll\n| summarize metric = hll_merge(metricHll) by dimension, byDimension\n| project byDimension, dimension, metric = dcount_hll(metric)\n| render columnchart \n\n"
                 }
               },
               "partHeader": {
@@ -448,8 +566,528 @@
           {
             "position": {
               "x": 0,
-              "y": 10,
-              "colSpan": 6,
+              "y": 9,
+              "colSpan": 5,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "35fd7f23-a871-467b-9158-c77da116f02e",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n| order by duration desc \n| take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project operation_Name,  durationInSeconds, timestamp, performanceBucket\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "operation_Name": "206px"
+                  },
+                  "Query": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n    | order by duration desc \n    | take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project\n    operation_Name=operation_Name,\n    duration_in_seconds=durationInSeconds,\n    timestamp=format_datetime(datetime_utc_to_local(timestamp, \"Europe/London\"), 'dd-MM-yyyy HH:mm:ss'),\n    performance_bucket=performanceBucket\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Top 100 slowest page loads today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 9,
+              "colSpan": 5,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "14457e1a-3cb1-46ea-8616-5e34064ea34c",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n| order by duration asc\n| take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project operation_Name,  durationInSeconds, timestamp, performanceBucket\n\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n    | order by duration asc\n    | take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project\n    operation_name=operation_Name,\n    duration_in_seconds=durationInSeconds,\n    timestamp=format_datetime(datetime_utc_to_local(timestamp, \"Europe/London\"),'dd-MM-yyyy HH:mm:ss'),\n    performance_bucket=performanceBucket"
+                }
+              },
+              "partHeader": {
+                "title": "Top 100 fastest page loads today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 13,
+              "colSpan": 5,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "4242cc11-3c41-4211-8978-d73c3147ea27",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let usg_events = dynamic([\"*\"]);\nlet grain = 15m;\nlet mainTable = union pageViews\n    | where timestamp > ago(1d)\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| make-series Sessions = dcount(session_Id) default = 0 on timestamp from ago(1d) to now() step grain\n| render columnchart \n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "FrameControlChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "value": "StackedColumn",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "value": {
+                    "xAxis": {
+                      "name": "timestamp",
+                      "type": "datetime"
+                    },
+                    "yAxis": [
+                      {
+                        "name": "Sessions",
+                        "type": "real"
+                      }
+                    ],
+                    "splitBy": [],
+                    "aggregation": "Sum"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "value": {
+                    "isEnabled": true,
+                    "position": "Bottom"
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "Query": "let now=datetime_utc_to_local(now(), \"Europe/London\");\nlet startOfDay=datetime_utc_to_local(startofday(ago(0d)), \"Europe/London\");\nlet grain = 15m;\nlet mainTable = union pageViews\n    | extend timestamp=datetime_utc_to_local(timestamp, \"Europe/London\")\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| make-series Sessions = dcount(session_Id) default = 0 on timestamp from startOfDay to now step grain\n| render columnchart \n\n"
+                }
+              },
+              "partHeader": {
+                "title": "User sessions for today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 13,
+              "colSpan": 5,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "1d2c46af-94d0-4501-b0b1-ab12310dab66",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let now=now();\nlet startOfDay=startofday(ago(0d));\nlet usg_events = dynamic([\"*\"]);\nlet grain = 15m;\nlet mainTable = union pageViews\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | extend name =replace(\"\\n\", \"\", name)\n    | extend name =replace(\"\\r\", \"\", name)\n    | where '*' in (usg_events) or name in (usg_events)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet resultTable = mainTable;\nresultTable\n| summarize count() by user_Id\n| extend userId=hash_md5(user_Id)\n| project userId, count_\n| order by count_ desc\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "numberOfPageViewsInSession": "232px",
+                    "userId": "184px",
+                    "number_of_page_views_in_session": "257.994px"
+                  },
+                  "Query": "let now=now();\nlet startOfDay=startofday(ago(0d));\nlet grain = 15m;\nlet mainTable = union pageViews\n    | where timestamp > startOfDay\n    | where isempty(operation_SyntheticSource)\n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\"\n    | extend userId=hash_md5(user_Id);\nlet resultTable = mainTable;\nresultTable\n| summarize count() by userId, session_Id\n| order by count_ desc\n| extend number_of_page_views_in_session=count_\n| take 100\n| project hash_username=userId, number_of_page_views_in_session\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Session page views by user",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 0,
+              "y": 17,
+              "colSpan": 5,
+              "rowSpan": 4
+            },
+            "metadata": {
+              "inputs": [
+                {
+                  "name": "resourceTypeMode",
+                  "isOptional": true
+                },
+                {
+                  "name": "ComponentId",
+                  "isOptional": true
+                },
+                {
+                  "name": "Scope",
+                  "value": {
+                    "resourceIds": [
+                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
+                    ]
+                  },
+                  "isOptional": true
+                },
+                {
+                  "name": "PartId",
+                  "value": "1307ad2f-4412-4810-ba08-c366f53c6d38",
+                  "isOptional": true
+                },
+                {
+                  "name": "Version",
+                  "value": "2.0",
+                  "isOptional": true
+                },
+                {
+                  "name": "TimeRange",
+                  "isOptional": true
+                },
+                {
+                  "name": "DashboardId",
+                  "isOptional": true
+                },
+                {
+                  "name": "DraftRequestParameters",
+                  "isOptional": true
+                },
+                {
+                  "name": "Query",
+                  "value": "let cutoff = startofday(ago(0d));\nlet ce=customEvents\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| where timestamp >= cutoff\n| extend type=name\n| where type in (\"Manage (opens in new tab)\", \"Log an outcome on NDelius (opens in new tab)\", \"Log an outcome (opens in new tab)\", \"Edit all other addresses on NDelius (opens in new tab)\", \"Change contact details on NDelius (opens in new tab)\", \"Change disability information on NDelius (opens in new tab)\", \"Change adjustments on NDelius (opens in new tab)\", \"View more in NDelius (opens in new tab)\");\npageViews\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| join kind=inner ce on operation_Id\n| where timestamp >= cutoff\n| summarize count() by name, type\n| extend pageName=name, linkName=type\n| project pageName, linkName, count_;\n",
+                  "isOptional": true
+                },
+                {
+                  "name": "ControlType",
+                  "value": "AnalyticsGrid",
+                  "isOptional": true
+                },
+                {
+                  "name": "SpecificChart",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartTitle",
+                  "value": "Analytics",
+                  "isOptional": true
+                },
+                {
+                  "name": "PartSubTitle",
+                  "value": "nomisapi-preprod",
+                  "isOptional": true
+                },
+                {
+                  "name": "Dimensions",
+                  "isOptional": true
+                },
+                {
+                  "name": "LegendOptions",
+                  "isOptional": true
+                },
+                {
+                  "name": "IsQueryContainTimeRange",
+                  "value": true,
+                  "isOptional": true
+                }
+              ],
+              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
+              "settings": {
+                "content": {
+                  "GridColumnsWidth": {
+                    "pageName": "270.996px"
+                  },
+                  "Query": "let cutoff = startofday(ago(0d));\nlet ce=customEvents\n    | where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n    | where timestamp >= cutoff\n    | extend type=name\n    | where type in (\"Manage (opens in new tab)\", \"Log an outcome on NDelius (opens in new tab)\", \"Log an outcome (opens in new tab)\", \"Edit all other addresses on NDelius (opens in new tab)\", \"Change contact details on NDelius (opens in new tab)\", \"Change disability information on NDelius (opens in new tab)\", \"Change adjustments on NDelius (opens in new tab)\", \"View more in NDelius (opens in new tab)\");\npageViews\n| where cloud_RoleName in (\"hmpps-manage-people-on-probation-ui\")\n| join kind=inner ce on operation_Id\n| where timestamp >= cutoff\n| summarize count() by name, type\n| extend pageName=name, linkName=type\n| order by count_ desc \n| project pageName, linkName, count_;\n\n"
+                }
+              },
+              "partHeader": {
+                "title": "Hand off to delius - today",
+                "subtitle": ""
+              }
+            }
+          },
+          {
+            "position": {
+              "x": 5,
+              "y": 17,
+              "colSpan": 5,
               "rowSpan": 4
             },
             "metadata": {
@@ -558,7 +1196,7 @@
               "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
               "settings": {
                 "content": {
-                  "Query": "// average pageView duration by name\nlet timeGrain=5m;\nlet dataset=pageViews\n    // additional filters can be applied here\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\n// calculate average pageView duration for all pageViews\ndataset\n| summarize avg(duration/1000) by bin(timestamp, timeGrain)\n| extend pageView='Overall'\n// render result in a chart\n| render timechart\n\n",
+                  "Query": "let timeGrain=5m;\nlet startOfDay=datetime_utc_to_local(startofday(ago(0d)), \"Europe/London\");\nlet dataset=pageViews\n    | extend timestamp=datetime_utc_to_local(timestamp, \"Europe/London\")\n    | where timestamp > startOfDay\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\ndataset\n| summarize avg(duration / 1000) by bin(timestamp, timeGrain)\n| extend pageView='Overall'\n| render timechart\n\n",
                   "Dimensions": {
                     "xAxis": {
                       "name": "timestamp",
@@ -588,202 +1226,8 @@
           },
           {
             "position": {
-              "x": 6,
-              "y": 10,
-              "colSpan": 6,
-              "rowSpan": 4
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "35fd7f23-a871-467b-9158-c77da116f02e",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n| order by duration desc \n| take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project operation_Name,  durationInSeconds, timestamp, performanceBucket\n\n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "AnalyticsGrid",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "nomisapi-preprod",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": true,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {
-                "content": {
-                  "GridColumnsWidth": {
-                    "operation_Name": "206px"
-                  }
-                }
-              },
-              "partHeader": {
-                "title": "Top 100 slowest page loads today",
-                "subtitle": ""
-              }
-            }
-          },
-          {
-            "position": {
               "x": 0,
-              "y": 14,
-              "colSpan": 6,
-              "rowSpan": 4
-            },
-            "metadata": {
-              "inputs": [
-                {
-                  "name": "resourceTypeMode",
-                  "isOptional": true
-                },
-                {
-                  "name": "ComponentId",
-                  "isOptional": true
-                },
-                {
-                  "name": "Scope",
-                  "value": {
-                    "resourceIds": [
-                      "/subscriptions/a5ddf257-3b21-4ba9-a28c-ab30f751b383/resourceGroups/nomisapi-preprod-rg/providers/microsoft.insights/components/nomisapi-preprod"
-                    ]
-                  },
-                  "isOptional": true
-                },
-                {
-                  "name": "PartId",
-                  "value": "14457e1a-3cb1-46ea-8616-5e34064ea34c",
-                  "isOptional": true
-                },
-                {
-                  "name": "Version",
-                  "value": "2.0",
-                  "isOptional": true
-                },
-                {
-                  "name": "TimeRange",
-                  "isOptional": true
-                },
-                {
-                  "name": "DashboardId",
-                  "isOptional": true
-                },
-                {
-                  "name": "DraftRequestParameters",
-                  "isOptional": true
-                },
-                {
-                  "name": "Query",
-                  "value": "let timeGrain=5m;\nlet dataset=pageViews\n    | where timestamp > startofday(ago(0d))\n    | where client_Type == \"Browser\" \n    | where cloud_RoleName == \"hmpps-manage-people-on-probation-ui\";\nlet data = dataset\n| order by duration asc\n| take 100;\ndata\n| extend durationInSeconds = (duration / 1000)\n| project operation_Name,  durationInSeconds, timestamp, performanceBucket\n\n",
-                  "isOptional": true
-                },
-                {
-                  "name": "ControlType",
-                  "value": "AnalyticsGrid",
-                  "isOptional": true
-                },
-                {
-                  "name": "SpecificChart",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartTitle",
-                  "value": "Analytics",
-                  "isOptional": true
-                },
-                {
-                  "name": "PartSubTitle",
-                  "value": "nomisapi-preprod",
-                  "isOptional": true
-                },
-                {
-                  "name": "Dimensions",
-                  "isOptional": true
-                },
-                {
-                  "name": "LegendOptions",
-                  "isOptional": true
-                },
-                {
-                  "name": "IsQueryContainTimeRange",
-                  "value": true,
-                  "isOptional": true
-                }
-              ],
-              "type": "Extension/Microsoft_OperationsManagementSuite_Workspace/PartType/LogsDashboardPart",
-              "settings": {},
-              "partHeader": {
-                "title": "Top 100 fastest page loads today",
-                "subtitle": ""
-              }
-            }
-          },
-          {
-            "position": {
-              "x": 6,
-              "y": 14,
+              "y": 21,
               "colSpan": 2,
               "rowSpan": 2
             },
@@ -857,8 +1301,8 @@
           },
           {
             "position": {
-              "x": 8,
-              "y": 14,
+              "x": 2,
+              "y": 21,
               "colSpan": 2,
               "rowSpan": 2
             },
@@ -964,13 +1408,17 @@
                 "value": "Past 24 hours"
               },
               "filteredPartIds": [
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8187",
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8189",
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d818b",
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d818d",
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d818f",
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8191",
-                "StartboardPart-LogsDashboardPart-b07c28a4-7ab9-41d6-b939-57c34d1d8197"
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b524893",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b524895",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b524897",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b524899",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b52489b",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b52489d",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b52489f",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b5248a1",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b5248a3",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b5248a5",
+                "StartboardPart-LogsDashboardPart-de6fcf8f-ca22-40e9-9b94-5b279b5248a7"
               ]
             }
           }
