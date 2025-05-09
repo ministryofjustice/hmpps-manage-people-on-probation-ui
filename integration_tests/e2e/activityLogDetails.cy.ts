@@ -11,7 +11,9 @@ context('Activity log details', () => {
     page
       .getCardElement('appointmentDetails', '.govuk-summary-list__key', 0)
       .should('contain.text', 'Type of appointment')
-    page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 0).should('contain.text', 'Previous')
+    page
+      .getCardElement('appointmentDetails', '.govuk-summary-list__value', 0)
+      .should('contain.text', 'Office appointment')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 1).should('contain.text', 'Description')
     page
       .getCardElement('appointmentDetails', '.govuk-summary-list__value', 1)
@@ -78,7 +80,9 @@ context('Activity log details', () => {
     page
       .getCardElement('appointmentDetails', '.govuk-summary-list__key', 0)
       .should('contain.text', 'Type of appointment')
-    page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 0).should('contain.text', 'Previous')
+    page
+      .getCardElement('appointmentDetails', '.govuk-summary-list__value', 0)
+      .should('contain.text', 'Office appointment')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 1).should('contain.text', 'Date')
     page
       .getCardElement('appointmentDetails', '.govuk-summary-list__value', 1)
