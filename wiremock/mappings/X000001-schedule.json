@@ -109,7 +109,8 @@
               "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
-              "hasOutcome": false,
+              "hasOutcome": true,
+              "outcome": "User-generated free text content",
               "wasAbsent": true,
               "notes": "Some notes",
               "isAppointment": true,
@@ -330,6 +331,7 @@
             "repeating": true,
             "rarCategory": "Choices and Changes",
             "hasOutcome": true,
+            "outcome": "User-generated free text content",
             "wasAbsent": true,
             "acceptableAbsence": true,
             "appointmentNotes": [
