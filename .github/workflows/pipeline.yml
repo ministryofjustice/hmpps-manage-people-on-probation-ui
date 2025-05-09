@@ -56,17 +56,10 @@ jobs:
   veracode_static_scan:
     name: Veracode
     needs: [sonarcloud]
-    uses: ./.github/workflows/veracode_static_analysis.yml
+    uses: ./.github/workflows/veracode_static_scan.yml
     secrets:
       VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
       VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
-  # veracode:
-  #   name: Veracode
-  #   needs: [sonarcloud]
-  #   uses: ./.github/workflows/veracode.yml
-  #   secrets:
-  #     VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
-  #     VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
   helm_lint:
     strategy:
       matrix:
