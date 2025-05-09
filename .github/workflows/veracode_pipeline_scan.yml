@@ -1,0 +1,41 @@
+name: Generate and Scan with Veracode Pipeline Scan
+
+on:
+  workflow_call:
+    secrets:
+      VERACODE_API_ID:
+        required: true
+      VERACODE_API_KEY:
+        required: true
+
+jobs:
+  veracode_scan:
+    name: Generate and Scan with Veracode Pipeline Scan
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v4
+
+      - name: Package build output
+        run: |
+          mkdir -p veracode-package
+          rsync -av --exclude 'veracode-package' ./ veracode-package/
+          cd veracode-package
+          zip -r ../veracode-artifact.zip .
+        shell: bash
+
+      - name: Download Veracode Pipeline Scan
+        run: |
+          curl -LO https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip
+          unzip -o pipeline-scan-LATEST.zip
+        shell: bash
+
+      - name: Run Veracode Pipeline Scan
+        run: |
+          java -jar pipeline-scan.jar \
+          -vid ${{ secrets.VERACODE_API_ID }} \
+          -vkey ${{ secrets.VERACODE_API_KEY }} \
+          -f veracode-artifact.zip \
+          -fs VeryHigh
+        shell: bash
