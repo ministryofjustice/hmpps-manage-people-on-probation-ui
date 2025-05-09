@@ -232,6 +232,8 @@
   "overrides": {
     "csurf": {
       "cookie": "0.7.2"
-    }
+    },
+    "cross-spawn": "^7.0.6",
+    "formidable": "^3.5.4"
   }
 }
