@@ -1,5 +1,5 @@
 # Stage: base image
-FROM node:20.13-bullseye-slim as base
+FROM node:20.13-bookworm-slim as base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
@@ -26,9 +26,14 @@ ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
 RUN apt-get update && \
-        apt-get upgrade -y && \
-        apt-get autoremove -y && \
-        rm -rf /var/lib/apt/lists/*
+    apt-get upgrade -y && \
+    apt-get install --only-upgrade -y \
+        libpam-modules \
+        libpam-modules-bin \
+        libpam-runtime \
+        libpam0g && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
 
 # Stage: build assets
 FROM base as build
@@ -39,8 +44,10 @@ ARG GIT_BRANCH
 
 # hadolint ignore=DL3008
 RUN apt-get update && \
-        apt-get install -y --no-install-recommends make python g++ ca-certificates && \
-        apt-get clean
+    apt-get install -y --no-install-recommends build-essential \
+    && apt-get install -y --no-install-recommends python3-dev \
+    && apt-get install -y --no-install-recommends ca-certificates \
+    && apt-get clean
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
@@ -56,21 +63,13 @@ RUN npm prune --no-audit --omit=dev
 # Stage: copy production assets and dependencies
 FROM base
 
-COPY --from=build --chown=appuser:appgroup \
-        /app/package.json \
-        /app/package-lock.json \
-        ./
+COPY --from=build --chown=appuser:appgroup /app/package.json /app/package-lock.json /app/node_modules ./ 
 
-COPY --from=build --chown=appuser:appgroup \
-        /app/assets ./assets
-
-COPY --from=build --chown=appuser:appgroup \
-        /app/dist ./dist
-
-COPY --from=build --chown=appuser:appgroup \
-        /app/node_modules ./node_modules
+COPY --from=build --chown=appuser:appgroup /app/assets ./assets
+COPY --from=build --chown=appuser:appgroup /app/dist ./dist
 
 EXPOSE 3000 3001
+
 ENV NODE_ENV='production'
 USER 2000
 
