@@ -36,6 +36,22 @@ context('Activity log', () => {
   const year = today.getFullYear()
   const date = `${day}/${month}/${year}`
 
+  it('should render the activity log results', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getTimelineCardValue(1, 'enforcement', 'Label').should('contain.text', 'Enforcement')
+    page.getTimelineCardValue(1, 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
+    page.getTimelineCard(1).should('contain.text', 'No notes')
+    page.getTimelineCardValue(2, 'rarActivity', 'Label').should('contain.text', 'RAR activity')
+    page.getTimelineCardValue(2, 'rarActivity', 'Value').should('contain.text', 'Stepping Stones')
+    page.getTimelineCard(3).should('contain.text', 'No notes')
+    page.getTimelineCardValue(4, 'reschedule', 'Label').should('contain.text', 'Reschedule')
+    page.getTimelineCardValue(4, 'reschedule', 'Value').should('contain.text', 'Requested by Terry Jones')
+    page.getTimelineCardValue(4, 'outcome', 'Label').should('contain.text', 'Outcome')
+    page.getTimelineCardValue(4, 'outcome', 'Value').should('contain.text', 'User-generated free text content')
+    page.getTimelineCardValue(4, 'documents', 'Label').should('contain.text', 'Documents')
+    page.getTimelineCardValue(4, 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
+  })
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -370,7 +386,6 @@ context('Activity log', () => {
     page.getCardHeader('timeline5').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline5').get('.app-summary-card__actions').should('contain.text', 'Complied')
     page.getCardHeader('timeline6').should('contain.text', 'Phone call at 8:15am')
-    // cy.pause()
     page
       .getCardHeader('timeline6')
       .get('.app-summary-card__actions a')

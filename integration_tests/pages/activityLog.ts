@@ -36,7 +36,10 @@ export default class ActivityLogPage extends Page {
 
   getPaginationItem = (index: number): PageElement => cy.get(`.govuk-pagination li:nth-of-type(${index})`)
 
-  getTimelineCard = (index: number): PageElement => cy.get(`.app-summary-card:nth-type-of(${index})`)
+  getTimelineCard = (index: number): PageElement => cy.get(`.app-summary-card:nth-of-type(${index})`)
+
+  getTimelineCardValue = (index: number, row: string, item: string) =>
+    cy.get(`.app-summary-card:nth-of-type(${index})`).find(`[data-qa="${row}${item}"]`)
 
   getNoResults = (): PageElement => cy.get('[data-qa="no-results"]')
 }
