@@ -47,21 +47,6 @@
       }
     },
     {
-      key: { html: '<span data-qa="nonComplianceReasonLabel">Reason for not complying</span>' },
-      value: { html: '<span data-qa="nonComplianceReasonValue">' + appointment.nonComplianceReason + '</span>' },
-      actions: {
-        items: [
-          {
-            classes: "govuk-link--no-visited-state",
-            attributes: { "target": "_blank", "aria-label":"Change reason for not complying for '" + appointment.type | lower + " on NDelius" },
-            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
-            text:'Change',
-            visuallyHiddenText: '(opens in new tab)'
-          }
-        ]
-      }
-    } if appointment.didTheyComply === false,
-    {
       key: { html: '<span data-qa="acceptableAbsenceReasonLabel">Reason for absence</span>' },
       value: { html: '<span data-qa="acceptableAbsenceReasonValue">' + appointment.acceptableAbsenceReason + '</span>' if appointment.acceptableAbsence === true },
       actions: {
