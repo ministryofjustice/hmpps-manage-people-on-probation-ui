@@ -1,5 +1,5 @@
 # Stage: base image
-FROM node:20.13-bookworm-slim as base
+FROM node:20.13-alpine as base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
@@ -10,8 +10,8 @@ LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
 
-RUN addgroup --gid 2000 --system appgroup && \
-        adduser --uid 2000 --system appuser --gid 2000
+RUN addgroup -g 2000 appgroup && \
+    adduser -u 2000 -G appgroup -D appuser
 
 WORKDIR /app
 
@@ -25,15 +25,12 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apt-get update && \
-    apt-get upgrade -y && \
-    apt-get install --only-upgrade -y \
-        libpam-modules \
-        libpam-modules-bin \
-        libpam-runtime \
-        libpam0g && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN apk add --no-cache \
+    build-base \
+    python3 \
+    python3-dev \
+    make \
+    g++
 
 # Stage: build assets
 FROM base as build
@@ -43,19 +40,19 @@ ARG GIT_REF
 ARG GIT_BRANCH
 
 # hadolint ignore=DL3008
-RUN apt-get update && \
-    apt-get install -y --no-install-recommends build-essential \
-    && apt-get install -y --no-install-recommends python3-dev \
-    && apt-get install -y --no-install-recommends ca-certificates \
-    && apt-get clean
+RUN apk add --no-cache \
+    build-base \
+    python3 \
+    python3-dev \
+    ca-certificates
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 
 ENV NODE_ENV='production'
-
+ENV SENTRY_AUTH_TOKEN=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
 COPY . .
-RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry) \
+RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN} \
     npm run build
 
 RUN npm prune --no-audit --omit=dev
