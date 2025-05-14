@@ -1,5 +1,5 @@
 # Stage: base image
-FROM node:20.13-bullseye-slim as base
+FROM node:22-alpine as base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
@@ -10,8 +10,8 @@ LABEL maintainer="HMPPS Digital Studio <info@digital.justice.gov.uk>"
 ENV TZ=Europe/London
 RUN ln -snf "/usr/share/zoneinfo/$TZ" /etc/localtime && echo "$TZ" > /etc/timezone
 
-RUN addgroup --gid 2000 --system appgroup && \
-        adduser --uid 2000 --system appuser --gid 2000
+RUN addgroup -g 2000 appgroup && \
+    adduser -u 2000 -G appgroup -D appuser
 
 WORKDIR /app
 
@@ -25,10 +25,13 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apt-get update && \
-        apt-get upgrade -y && \
-        apt-get autoremove -y && \
-        rm -rf /var/lib/apt/lists/*
+RUN apk update && apk add --no-cache \
+    build-base=0.5-r3 \
+    python3=3.12.10-r0 \
+    python3-dev=3.12.10-r0 \
+    make=4.4.1-r2 \
+    g++=14.2.0-r4 \
+    ca-certificates=20241121-r1
 
 # Stage: build assets
 FROM base as build
@@ -36,11 +39,6 @@ FROM base as build
 ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
-
-# hadolint ignore=DL3008
-RUN apt-get update && \
-        apt-get install -y --no-install-recommends make python g++ ca-certificates && \
-        apt-get clean
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
@@ -56,19 +54,10 @@ RUN npm prune --no-audit --omit=dev
 # Stage: copy production assets and dependencies
 FROM base
 
-COPY --from=build --chown=appuser:appgroup \
-        /app/package.json \
-        /app/package-lock.json \
-        ./
+COPY --from=build --chown=appuser:appgroup /app/package.json /app/package-lock.json /app/node_modules ./ 
 
-COPY --from=build --chown=appuser:appgroup \
-        /app/assets ./assets
-
-COPY --from=build --chown=appuser:appgroup \
-        /app/dist ./dist
-
-COPY --from=build --chown=appuser:appgroup \
-        /app/node_modules ./node_modules
+COPY --from=build --chown=appuser:appgroup /app/assets ./assets
+COPY --from=build --chown=appuser:appgroup /app/dist ./dist
 
 EXPOSE 3000 3001
 ENV NODE_ENV='production'
