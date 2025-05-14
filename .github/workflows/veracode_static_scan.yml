@@ -14,8 +14,8 @@ jobs:
     runs-on: ubuntu-latest
 
     concurrency:
-    group: veracode-scan-hmpps-manage-people-on-probation
-    cancel-in-progress: false
+      group: veracode-scan-hmpps-manage-people-on-probation
+      cancel-in-progress: false
 
     steps:
       - name: Checkout source code
