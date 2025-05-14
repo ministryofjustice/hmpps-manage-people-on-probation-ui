@@ -25,8 +25,7 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apk update \
-    apk add --no-cache \
+RUN apk update && apk add --no-cache \
     build-base \
     python3 \
     python3-dev \
