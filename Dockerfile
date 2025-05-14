@@ -1,7 +1,7 @@
 # Stage: base image
 FROM node:22-alpine as base
 
-ARG BUILD_NUMBER P
+ARG BUILD_NUMBER 
 ARG GIT_REF
 ARG GIT_BRANCH
 
@@ -25,7 +25,8 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN apk add --no-cache \
+RUN apk update \
+    apk add --no-cache \
     build-base \
     python3 \
     python3-dev \
@@ -50,9 +51,11 @@ COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 
 ENV NODE_ENV='production'
-ENV SENTRY_AUTH_TOKEN=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
+
 COPY . .
-RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=${SENTRY_AUTH_TOKEN} \
+
+RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry) \
+
     npm run build
 
 RUN npm prune --no-audit --omit=dev
