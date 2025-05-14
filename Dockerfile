@@ -1,7 +1,7 @@
 # Stage: base image
-FROM node:20.13-alpine as base
+FROM node:22-alpine as base
 
-ARG BUILD_NUMBER
+ARG BUILD_NUMBER P
 ARG GIT_REF
 ARG GIT_BRANCH
 

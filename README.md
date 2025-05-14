@@ -2,7 +2,7 @@
 
 [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ministryofjustice_hmpps-manage-a-supervision-ui&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=ministryofjustice_hmpps-manage-a-supervision-ui)
 
-[![Repository Standards](https://img.shields.io/badge/dynamic/json?color=blue&logo=github&label=MoJ%20Compliant&query=%24.message&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-manage-people-on-probation-ui)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-report/hmpps-manage-people-on-probation-ui "Link to report")
+[![Repository Standards](https://img.shields.io/badge/dynamic/json?color=blue&logo=github&label=MoJ%20Compliant&query=%24.message&url=https%3A%2F%2Foperations-engineering-reports.cloud-platform.service.justice.gov.uk%2Fapi%2Fv1%2Fcompliant_public_repositories%2Fhmpps-manage-people-on-probation-ui)](https://operations-engineering-reports.cloud-platform.service.justice.gov.uk/public-report/hmpps-manage-people-on-probation-ui 'Link to report')
 
 User interface for the Manage a Supervision service.
 
@@ -14,10 +14,10 @@ Try it out in the dev environment: https://manage-people-on-probation-dev.hmpps.
 
 You'll need to install:
 
-* [Node 20.x](https://nodejs.org/download/release/latest-v20.x)*
-* [Docker](https://www.docker.com/)
+- [Node 22.x](https://nodejs.org/download/release/latest-v22.x)\*
+- [Docker](https://www.docker.com/)
 
-*If you're already using [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm), run:
+\*If you're already using [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm), run:
 `nvm install --latest-npm` at the project root to install the correct Node version automatically.
 
 ### Dependencies
@@ -69,6 +69,7 @@ kubectl -n hmpps-manage-people-on-probation-dev get secret hmpps-manage-people-o
 | jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
 | grep CLIENT  >> .env
 ```
+
 Run the following to grab the flipt credentials from the dev namespace:
 
 ```shell
@@ -82,7 +83,6 @@ Then, start the UI service:
 ```shell
 npm run start:dev
 ```
-
 
 ### Feature Flags
 
@@ -102,11 +102,13 @@ export class FeatureFlags {
   enableAppointmentCreate?: boolean = undefined
 }
 ```
+
 Important - Create the boolean feature flag in flipt with the same name and casing.
 
 The feature flag boolean will then be available in all nunjucks views within the 'flags' object 'flags' or in res.locals.flags for routes.
 
 e.g.
+
 ```code
 {% if flags.enableNavInterventions === true %}
 <li class="moj-sub-navigation__item" data-qa="interventionsTab">
@@ -115,6 +117,7 @@ e.g.
 </li>
 {% endif %}
 ```
+
 Important - For running locally make sure you add the flipt token from cloudplatform to your local .env file by running the following command.
 
 ```shell
@@ -124,6 +127,7 @@ kubectl -n hmpps-manage-people-on-probation-dev get secret flipt -o json \
 ```
 
 Also add the FLIPT_URL for dev to your .env file
+
 ```shell
 FLIPT_URL="https://feature-flags-dev.hmpps.service.justice.gov.uk"
 ```
@@ -163,12 +167,15 @@ npm run int-test-ui
 ```
 
 ### Running end-to-end tests
+
 Create a `.env` file in the e2e_tests directory with your Delius credentials. You can use `.env.example` as a template.
+
 ```shell
 cp -n .env.example .env
 ```
 
 Run the tests
+
 ```shell
 npm run e2e-test
 
