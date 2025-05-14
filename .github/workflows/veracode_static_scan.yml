@@ -12,6 +12,9 @@ jobs:
   veracode_static_scan:
     name: Upload and Scan with Veracode Static Analysis
     runs-on: ubuntu-latest
+    concurrency:
+    group: veracode-scan-hmpps-manage-people-on-probation
+    cancel-in-progress: false
 
     steps:
       - name: Checkout source code
