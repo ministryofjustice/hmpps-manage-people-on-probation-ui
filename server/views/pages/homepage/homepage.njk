@@ -33,14 +33,16 @@
     attributes: {
      'data-qa': 'homepage-appointments'
     },
+    rememberExpanded: false,
     items: [
       {
         heading: {
-            html: 'My upcoming appointments<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a'
+            html: 'My upcoming appointments' + ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a' if appointments.length else '')
         },
         content: {
             html: appointmentsTable
-        }
+        },
+        expanded: true if appointments.length == 0 else false
       }
     ]
   }) }}
@@ -50,14 +52,16 @@
     attributes: {
      'data-qa': 'homepage-outcomes'
     },
+    rememberExpanded: false,
     items: [
       {
         heading: {
-            html: 'Outcomes to log (' + totalOutcomes + ')<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>'
+            html: 'Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '') + ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>' if outcomes.length else '')
         },
         content: {
             html: outcomesTable
-        }
+        },
+        expanded: true if outcomes.length == 0 else false
       }
     ]
   }) }}

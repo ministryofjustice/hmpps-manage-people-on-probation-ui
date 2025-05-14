@@ -10,32 +10,34 @@ context('Sign In', () => {
   it('Renders the the appointments', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
-
     page.getAppointments().should('exist')
     page.getAppointments().should('contain.text', 'My upcoming appointments')
     page.getAppointmentRows().should('have.length', 5)
+    page.getAppointments().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
   it('Renders the the outcomes to log', () => {
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
-
     page.getOutcomesToLog().should('exist')
     page.getOutcomesToLog().should('contain.text', 'Outcomes to log (21)')
     page.getAppointmentRows().should('have.length', 5)
+    page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'false')
   })
 
   it('Renders correctly when appointments and outcomes to log are empty', () => {
     cy.task('stubEmptyHomepage')
-
     cy.visit('/')
     const page = Page.verifyOnPage(IndexPage)
-
     page.getAppointments().should('exist')
     page.getAppointments().should('contain.text', 'My upcoming appointments')
+    page.getAppointments().should('not.contain.text', 'View all upcoming appointments')
+    page.getAppointments().find('button').should('have.attr', 'aria-expanded', 'true')
     page.getAppointmentRows().should('not.exist')
     page.getOutcomesToLog().should('exist')
-    page.getOutcomesToLog().should('contain.text', 'Outcomes to log (0)')
+    page.getOutcomesToLog().should('not.contain.text', '(0)').should('contain.text', 'Outcomes to log')
+    page.getOutcomesToLog().should('not.contain.text', 'Log more outcomes')
+    page.getOutcomesToLog().find('button').should('have.attr', 'aria-expanded', 'true')
     page.getAppointmentRows().should('not.exist')
   })
 
