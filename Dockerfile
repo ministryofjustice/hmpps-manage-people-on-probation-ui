@@ -30,7 +30,8 @@ RUN apk update && apk add --no-cache \
     python3=3.12.10-r0 \
     python3-dev=3.12.10-r0 \
     make=4.4.1-r2 \
-    g++=14.2.0-r4
+    g++=14.2.0-r4 \
+    ca-certificates
 
 # Stage: build assets
 FROM base as build
@@ -38,13 +39,6 @@ FROM base as build
 ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
-
-# hadolint ignore=DL3008
-RUN apk add --no-cache \
-    build-base \
-    python3 \
-    python3-dev \
-    ca-certificates
 
 COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
