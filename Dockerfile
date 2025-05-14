@@ -1,7 +1,7 @@
 # Stage: base image
 FROM node:22-alpine as base
 
-ARG BUILD_NUMBER 
+ARG BUILD_NUMBER
 ARG GIT_REF
 ARG GIT_BRANCH
 
@@ -62,7 +62,6 @@ COPY --from=build --chown=appuser:appgroup /app/assets ./assets
 COPY --from=build --chown=appuser:appgroup /app/dist ./dist
 
 EXPOSE 3000 3001
-
 ENV NODE_ENV='production'
 USER 2000
 
