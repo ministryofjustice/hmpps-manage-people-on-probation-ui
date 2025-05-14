@@ -31,7 +31,7 @@ RUN apk update && apk add --no-cache \
     python3-dev=3.12.10-r0 \
     make=4.4.1-r2 \
     g++=14.2.0-r4 \
-    ca-certificates
+    ca-certificates=20240203-r0
 
 # Stage: build assets
 FROM base as build
