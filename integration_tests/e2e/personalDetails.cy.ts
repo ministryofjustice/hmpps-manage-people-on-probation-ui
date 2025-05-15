@@ -52,6 +52,9 @@ context('Personal Details', () => {
     page
       .getRowData('personalDetails', 'criminogenicNeeds', 'Value')
       .should('contain.text', 'Education, Training and Employability')
+    cy.get('[data-qa="criminogenicNeedsValue')
+      .find('a')
+      .should('have.text', 'Sign in to OASys to view the sentence plan (opens in new tab)')
     page.getRowData('personalDetails', 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
 
     page.getRowData('identityNumber', 'crn', 'Value').should('contain.text', 'X000001')
