@@ -239,19 +239,19 @@
                   {{ govukSummaryList({
                       rows: [
                           {
-                              key: { text: "Main offence" },
+                              key: { html: '<span data-qa="mainOffenceLabel">Main offence</span>' },
                               value: { html: '<span data-qa="mainOffenceValue">' + sentence.offenceDetails.offence.description + ' (' + sentence.offenceDetails.offence.count + ' count)' + '</span>' }
                           },
                           {
-                              key: { text: "Offence date" },
+                              key: { html: '<span data-qa="dateOfOffenceLabel">Offence date</span>' },
                               value: { html: '<span data-qa="dateOfOffenceValue">' + sentence.offenceDetails.dateOfOffence | dateWithYear + '</span>' }
                           },
                           {
-                              key: { text: "Notes" },
+                              key: { html: '<span data-qa="offenceNotesLabel">Notes</span>' },
                               value: { html: '<span data-qa="offenceNotesValue">' + sentence.offenceDetails.notes | nl2br if sentence.offenceDetails.notes else 'No notes' + '</span>' }
                           },
                           {
-                              key: { text: "Additional offences" },
+                              key: { html: '<span data-qa="additionalOffencesLabel">Additional offences</span>' },
                               value: { html: '<span data-qa="additionalOffencesValue">' + additionalOffences if hasAdditionalOffences else 'No additional offences' + '</span>' }
                           }
                       ]
@@ -262,19 +262,19 @@
                   {{ govukSummaryList({
                       rows: [
                           {
-                              key: { text: "Sentencing court" },
+                              key: { html: '<span data-qa="sentencingCourtLabel">Sentencing court</span>' },
                               value: { html: '<span data-qa="sentencingCourtValue">' + sentence.conviction.sentencingCourt | nl2br if sentence.conviction.sentencingCourt else 'No court details' + '</span>' }
                           },
                           {
-                              key: { text: "Responsible court" },
+                              key: { html: '<span data-qa="responsibleCourtLabel">Responsible court</span>' },
                               value: { html: '<span data-qa="responsibleCourtValue">' + sentence.conviction.responsibleCourt | nl2br if sentence.conviction.responsibleCourt else 'No court details' + '</span>' }
                           },
                           {
-                              key: { text: "Conviction date" },
+                              key: { html: '<span data-qa="convictionDateLabel">Conviction date</span>' },
                               value: { html: '<span data-qa="convictionDateValue">' + sentence.conviction.convictionDate | dateWithYear | nl2br if sentence.conviction.convictionDate  else 'No conviction date' + '</span>'}
                           },
                           {
-                              key: { text: "Additional sentences" },
+                              key: { html: '<span data-qa="additionalSentencesLabel">Additional sentences</span>' },
                               value: { html: '<span data-qa="additionalSentencesValue">' + additionalSentences if hasAdditionalSentences else 'No additional sentences' + '</span>'}
                           }
                       ]
@@ -285,40 +285,44 @@
                   {{ govukSummaryList({
                       rows: [
                           {
-                              key: { text: "Order" },
-                              value: { html: '<span data-qa="orderDescriptionValue">' + sentence.order.description | nl2br if sentence.order.description else 'No order details' + '</span>' }
+                              key: { html: '<span data-qa="orderDescriptionLabel">Order</span>' },
+                              value: { html: '<span data-qa="orderDescriptionValue">' + (sentence.order.description | nl2br if sentence.order.description else 'No order details') + '</span>' }
                           },
                           {
-                              key: { text: "Sentence start date" },
-                              value: { html: '<span data-qa="orderStartDateValue">' + sentence.order.startDate | dateWithYear | nl2br if sentence.order.startDate else 'No start date details' + '</span>' }
+                              key: { html: '<span data-qa="orderEventNumberLabel">NDelius event number</span>' },
+                              value: { html: '<span data-qa="orderEventNumberValue">' + (sentence.offenceDetails.eventNumber if sentence.offenceDetails.eventNumber else 'No event number') + '</span>' }
                           },
                           {
-                              key: { text: "Date released on licence" },
-                              value: { html: '<span data-qa="orderStartDateValue">' + sentence.order.releaseDate | dateWithYear | nl2br if sentence.order.releaseDate else 'No release date details' + '</span>' }
+                              key: { html: '<span data-qa="orderStartDateLabel">Sentence start date</span>' },
+                              value: { html: '<span data-qa="orderStartDateValue">' + (sentence.order.startDate | dateWithYear | nl2br if sentence.order.startDate else 'No start date details') + '</span>' }
                           },
                           {
-                              key: { text: "Expected sentence end date" },
-                              value: { html: '<span data-qa="orderEndDateValue">' + sentence.order.endDate | dateWithYear | nl2br if sentence.order.endDate else 'No end date details' + '</span>' }
+                              key: { html: '<span data-qa="orderReleaseDateLabel">Date released on licence</span>' },
+                              value: { html: '<span data-qa="orderReleaseDateValue">' + (sentence.order.releaseDate | dateWithYear | nl2br if sentence.order.releaseDate else 'No release date details') + '</span>' }
                           },
                           {
-                              key: { text: "Time elapsed" },
-                              value: { html: '<span data-qa="orderTimeElapsedValue">' + sentence.order.startDate | monthsOrDaysElapsed + ' elasped (of ' + sentence.order.length + ' months)' | nl2br if sentence.order.startDate else 'No details'  + '</span>' }
+                              key: { html: '<span data-qa="orderEndDateLabel">Expected sentence end date</span>' },
+                              value: { html: '<span data-qa="orderEndDateValue">' + (sentence.order.endDate | dateWithYear | nl2br if sentence.order.endDate else 'No end date details') + '</span>' }
                           },
                           {
-                              key: { text: "Licence conditions" },
+                              key: { html: '<span data-qa="orderTimeElapsedLabel">Time elapsed</span>' },
+                              value: { html: '<span data-qa="orderTimeElapsedValue">' + (sentence.order.startDate | monthsOrDaysElapsed + ' elasped (of ' + sentence.order.length + ' months)' | nl2br if sentence.order.startDate else 'No details')  + '</span>' }
+                          },
+                          {
+                              key: { html: '<span data-qa="licenceConditionsLabel">Licence conditions</span>' },
                               value: { html: '<span data-qa="licenceConditionsValue">' + licenceConditions + '</span>'}
                           } if hasLicenceConditions,
                           {
-                              key: { text: "Requirements" },
+                              key: { html: '<span data-qa="requirementsLabel">Requirements</span>' },
                               value: { html: '<span data-qa="requirementsValue">' + requirements + '</span>'}
                           } if hasRequirements,
                           {
-                              key: { text: "Unpaid work progress" },
+                              key: { html: '<span data-qa="unpaidWorkProgressLabel">Unpaid work progress</span>' },
                               value: { html: '<span data-qa="unpaidWorkProgress">' + sentence.unpaidWorkProgress + '</span>' }
                           } if sentence.unpaidWorkProgress,
                           {
-                              key: { text: "Court documents" },
-                              value: { html: '<span data-qa="courtDocumentsValue">' + courtDocuments if hasCourtDocuments else 'No court documents' + '</span>' }
+                              key: { html: '<span data-qa="courtDocumentsLabel">Court documents</span>' },
+                              value: { html: '<span data-qa="courtDocumentsValue">' + (courtDocuments if hasCourtDocuments else 'No court documents') + '</span>' }
                           }
                       ]
                   }) }}
