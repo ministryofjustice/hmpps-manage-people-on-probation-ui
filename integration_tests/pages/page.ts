@@ -44,6 +44,18 @@ export default abstract class Page {
     return cy.get(`[data-qa=${cardName}Card]`).within(() => cy.get(`[data-qa=${rowName}${type}]`).eq(index))
   }
 
+  getLicenceConditionsSummaryLink = (detailsIndex = 0) =>
+    cy.get('[data-qa="licenceConditionsValue"]').find('details').eq(detailsIndex).find('summary')
+
+  getLicenceConditionsLabel = (detailsIndex = 0, rowIndex = 0, element = 'key') =>
+    cy
+      .get('[data-qa="licenceConditionsValue"]')
+      .find('details')
+      .eq(detailsIndex)
+      .find('.govuk-details__text .govuk-summary-list div')
+      .eq(rowIndex)
+      .find(`.govuk-summary-list__${element}`)
+
   getColumnHeader = (cardName: string, index = 0): PageElement => {
     return cy.get(`[data-qa=${cardName}Card]`).find(`.govuk-table__header`).eq(index)
   }
