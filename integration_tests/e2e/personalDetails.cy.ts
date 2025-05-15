@@ -41,6 +41,8 @@ context('Personal Details', () => {
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
     page.getRowData('personalDetails', 'dateOfBirth', 'Value').should('contain.text', '18 August 1979')
     page.getRowData('personalDetails', 'aliases', 'Value').should('contain.text', 'Jonny Smith')
+    page.getRowData('personalDetails', 'previousSurname', 'Label').should('contain.text', 'Previous name')
+    page.getRowData('personalDetails', 'previousSurname', 'Value').should('contain.text', 'Jones')
     page.getRowData('personalDetails', 'preferredLanguage', 'Value').should('contain.text', 'Urdu')
     page
       .getRowData('personalDetails', 'currentCircumstances', 'Value')
@@ -53,7 +55,6 @@ context('Personal Details', () => {
       .getRowData('personalDetails', 'criminogenicNeeds', 'Value')
       .should('contain.text', 'Education, Training and Employability')
     page.getRowData('personalDetails', 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
-
     page.getRowData('identityNumber', 'crn', 'Value').should('contain.text', 'X000001')
     page.getRowData('identityNumber', 'pnc', 'Value').should('contain.text', '1954/0018147W')
     page.getRowData('identityNumber', 'noms', 'Value').should('contain.text', 'G9566GQ')
