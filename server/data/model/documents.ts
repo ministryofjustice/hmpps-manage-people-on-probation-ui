@@ -15,9 +15,17 @@ export interface SearchDocumentsRequest {
   dateTo?: string
 }
 
+export interface TextSearchDocumentsRequest {
+  query?: string
+  levelCode?: string
+  dateFrom?: string
+  dateTo?: string
+}
+
 export interface Document {
   alfrescoId: string
   name: string
+  filenameHighlighted?: string
   docLevel: string
   tableName: string
   createdAt: string

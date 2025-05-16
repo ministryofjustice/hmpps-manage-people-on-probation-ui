@@ -108,6 +108,10 @@ dd.govuk-summary-list__value span.app-notes-author {
   max-width: 41ex;
 }
 
+.govuk-select--autosize {
+  min-width: 0 !important;
+}
+
 .ui-timepicker-wrapper {
   overflow-y: auto;
   max-height: 150px;

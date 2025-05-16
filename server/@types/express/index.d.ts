@@ -27,7 +27,10 @@ declare module 'express-session' {
   }
 
   interface DocumentFilters {
+    [key: string]: string
     fileName?: string
+    query?: string
+    documentLevel?: string
     dateFrom?: string
     dateTo?: string
   }

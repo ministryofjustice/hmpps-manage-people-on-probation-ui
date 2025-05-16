@@ -10,4 +10,7 @@ describe('utils/setSortOrder', () => {
   it('should return none', () => {
     expect(setSortOrder('name', 'sentence.asc')).toEqual('none')
   })
+  it('null sort should return none', () => {
+    expect(setSortOrder('name', null)).toEqual('none')
+  })
 })
