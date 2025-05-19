@@ -60,7 +60,10 @@ context('Sentence', () => {
     page.getRowData('sentence', 'orderEndDate', 'Label').should('contain.text', 'Expected sentence end date')
     page.getRowData('sentence', 'orderEndDate', 'Value').should('contain.text', '19 March 2025')
     page.getRowData('sentence', 'orderTimeElapsed', 'Label').should('contain.text', 'Time elapsed')
-    page.getRowData('sentence', 'orderTimeElapsed', 'Value').should('contain.text', '13 months elasped (of 12 months)')
+    cy.get('[data-qa="orderTimeElapsedValue"]')
+      .invoke('text')
+      .should('match', /\d+ months elapsed \(of 12 months\)/)
+
     page.getRowData('sentence', 'licenceConditions', 'Label').should('contain.text', 'Licence conditions')
     page.getLicenceConditionsSummaryLink(0).should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)').click()
     page.getLicenceConditionsLabel(0, 0, 'key').should('contain.text', 'Subtype')
