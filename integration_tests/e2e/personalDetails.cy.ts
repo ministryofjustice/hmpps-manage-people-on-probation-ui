@@ -88,7 +88,7 @@ context('Personal Details', () => {
     page.getRowData('equalityMonitoring', 'genderIdentity', 'Value').should('contain.text', 'Non-Binary')
     page.getRowData('equalityMonitoring', 'sexualOrientation', 'Value').should('contain.text', 'Heterosexual')
     cy.get('[data-qa="equalityMonitoringDeliusLink"]')
-      .should('contain.text', 'View more in NDelius (opens in new tab)')
+      .should('contain.text', 'View more equality monitoring on NDelius (opens in new tab)')
       .should('have.attr', 'target', '_blank')
       .should(
         'have.attr',
