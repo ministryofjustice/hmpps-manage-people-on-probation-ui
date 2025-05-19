@@ -45,14 +45,14 @@
 
               <form name="case-filter" action="/case" method="post" novalidate>
                 <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-                <div class="govuk-form-group">
+                <div class="govuk-form-group govuk-!-margin-bottom-2">
                   {{ govukInput({
                     label: {
                       classes: "govuk-label",
                       text: "Name or CRN"
                     },
                     formGroup: {
-                      classes: "govuk-select--inline"
+                      classes: "govuk-select--inline govuk-!-margin-bottom-0"
                     },
                     id: 'nameOrCrn',
                     name: 'nameOrCrn',
@@ -67,7 +67,7 @@
                     },
                     classes: "govuk-select--width-20",
                     formGroup: {
-                      classes: "govuk-select--inline"
+                      classes: "govuk-select--inline govuk-!-margin-bottom-0"
                     },
                     id: 'sentenceCode',
                     name: 'sentenceCode',
@@ -82,7 +82,7 @@
                     },
                     classes: "govuk-select--width-20",
                     formGroup: {
-                    classes: "govuk-select--inline"
+                    classes: "govuk-select--inline govuk-!-margin-bottom-0"
                     },
                     id: 'nextContactCode',
                     name: 'nextContactCode',
