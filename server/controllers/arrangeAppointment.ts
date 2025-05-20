@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import { appointmentTypes } from '../properties'
-import { getDataValue, setDataValue } from '../utils'
+import { getDataValue, sanitiseId, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 
 const routes = [
@@ -31,7 +31,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   redirectToType: () => {
     return async (req, res) => {
       const id = uuidv4()
-      const { crn } = req.params
+      const { crn: crnParam } = req.params
+      const crn = sanitiseId(crnParam)
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
     }
   },
@@ -54,16 +55,20 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postType: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const change = req?.query?.change as string
-      const query = req?.query?.number ? `?number=${req.query.number}` : ''
+      const { number: numberQuery } = req.query as Record<string, string>
+      const number = sanitiseId(numberQuery)
+      const query = number ? `?number=${number}` : ''
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/sentence${query}`
       return res.redirect(redirect)
     }
   },
   getSentence: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const { data } = req.session
       const requiredValues = ['type']
       for (const requiredValue of requiredValues) {
@@ -78,7 +83,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postSentence: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const change = req?.query?.change as string
       const { data } = req.session
       if (req?.body?.appointments?.[crn]?.[id]?.['sentence-licence-condition']) {
@@ -93,7 +99,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   getLocation: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const { change } = req.query
       const errors = req?.session?.data?.errors
       if (errors) {
@@ -104,7 +111,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postLocation: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const change = req?.query?.change as string
       const { data } = req.session
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'location'])
@@ -116,13 +124,15 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   getLocationNotInList: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id })
     }
   },
   getDateTime: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const { change } = req.query
       const today = new Date()
       const minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
@@ -131,7 +141,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postDateTime: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const change = req?.query?.change as string
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/repeating`
       return res.redirect(redirect)
@@ -140,7 +151,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   getRepeating: () => {
     return async (req, res) => {
       const { data } = req.session
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const { 'repeating-frequency': repeatingFrequency, 'repeating-count': repeatingCount } = req.query
       if (repeatingFrequency || repeatingCount) {
         setDataValue(data, ['appointments', crn, id, 'repeating'], 'Yes')
@@ -171,7 +183,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postRepeating: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const change = req?.query?.change as string
       const { data } = req.session
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/preview`
@@ -186,20 +199,23 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   getPreview: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       return res.render(`pages/arrange-appointment/preview`, { crn, id })
     }
   },
   postPreview: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
   getCheckYourAnswers: () => {
     return async (req, res) => {
       const { params, url } = req
-      const { crn, id } = params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       const { data } = req.session
       let location = null
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'location'])
@@ -215,7 +231,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postCheckYourAnswers: () => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn: crnParam, id: idParam } = req.params as Record<string, string>
+      const [crn, id] = sanitiseId([crnParam, idParam])
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }
   },

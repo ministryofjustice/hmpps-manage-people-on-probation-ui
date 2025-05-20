@@ -5,7 +5,7 @@ import { AppResponse, Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
+import { toRoshWidget, toPredictors, sanitiseId } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
 
@@ -20,7 +20,8 @@ const routes = [
 const appointmentsController: Controller<typeof routes> = {
   getAppointments: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn: crnParam } = req.params as Record<string, string>
+      const crn = sanitiseId(crnParam)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
@@ -54,7 +55,8 @@ const appointmentsController: Controller<typeof routes> = {
   },
   postAppointments: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn: crnParam } = req.params
+      const crn = sanitiseId(crnParam)
       return res.redirect(`/case/${crn}/arrange-appointment/type`)
     }
   },
@@ -102,11 +104,13 @@ const appointmentsController: Controller<typeof routes> = {
   },
   postRecordAnOutcome: hmppsAuthClient => {
     return async (req: Request, res: AppResponse) => {
-      const { crn, actionType } = req.params
+      const { crn: crnParam, actionType } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const errorMessages: ErrorMessages = {}
-      if (req.body['appointment-id'] == null) {
+      const appointmentIdBody = req?.body?.['appointment-id'] as string
+      const [crn, appointmentId] = sanitiseId([crnParam, appointmentIdBody])
+      if (appointmentId == null) {
         logger.info('Appointment not selected')
         errorMessages.appointment = { text: 'Please select an appointment' }
         const schedule = await masClient.getPersonSchedule(crn, 'previous')
