@@ -2,7 +2,6 @@
   <div class="govuk-grid-column-full">
     <nav class="moj-sub-navigation" aria-label="Sub navigation" data-qa="navigation">
       <ul class="moj-sub-navigation__list">
-        {% if flags.enableNavOverview === true %}
         <li class="moj-sub-navigation__item" data-qa="overviewTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'overview' %}
@@ -10,8 +9,6 @@
             {% endif %}
             href="/case/{{ crn }}">Overview</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavAppointments === true %}
         <li class="moj-sub-navigation__item" data-qa="appointmentsTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'appointments' %}
@@ -19,8 +16,6 @@
             {% endif %}
             href="/case/{{ crn }}/appointments">Appointments</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavPersonalDetails === true %}
         <li class="moj-sub-navigation__item" data-qa="personalDetailsTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'personal-details' %}
@@ -28,17 +23,13 @@
             {% endif %}
             href="/case/{{ crn }}/personal-details">Personal details</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavDocuments === true %}
-          <li class="moj-sub-navigation__item" data-qa="personalDetailsTab">
-            <a class="moj-sub-navigation__link govuk-link--no-visited-state"
-                    {% if currentNavSection == 'documents' %}
-                      aria-current="page"
-                    {% endif %}
-               href="/case/{{ crn }}/documents">Documents</a>
-          </li>
-        {% endif %}
-        {% if flags.enableNavRisk === true %}
+        <li class="moj-sub-navigation__item" data-qa="personalDetailsTab">
+          <a class="moj-sub-navigation__link govuk-link--no-visited-state"
+                  {% if currentNavSection == 'documents' %}
+                    aria-current="page"
+                  {% endif %}
+             href="/case/{{ crn }}/documents">Documents</a>
+        </li>
         <li class="moj-sub-navigation__item" data-qa="riskTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'risk' %}
@@ -46,8 +37,6 @@
             {% endif %}
             href="/case/{{ crn }}/risk">Risk</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavSentence === true %}
         <li class="moj-sub-navigation__item" data-qa="sentenceTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'sentence' %}
@@ -55,8 +44,6 @@
             {% endif %}
             href="/case/{{ crn }}/sentence">Sentence</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavActivityLog === true %}
         <li class="moj-sub-navigation__item" data-qa="activityLogTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'timeline' %}
@@ -64,8 +51,6 @@
             {% endif %}
             href="/case/{{ crn }}/activity-log">Activity log</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavCompliance === true %}
         <li class="moj-sub-navigation__item" data-qa="complianceTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'compliance' %}
@@ -73,8 +58,6 @@
             {% endif %}
             href="/case/{{ crn }}/compliance">Compliance</a>
         </li>
-        {% endif %}
-        {% if flags.enableNavInterventions === true %}
         <li class="moj-sub-navigation__item" data-qa="interventionsTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'interventions' %}
@@ -82,7 +65,6 @@
             {% endif %}
             href="/case/{{ crn }}/interventions">Interventions</a>
         </li>
-        {% endif %}
       </ul>
     </nav>
   </div>

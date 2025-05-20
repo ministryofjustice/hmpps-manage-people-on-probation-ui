@@ -1,23 +1,70 @@
-{%- from "moj/components/filter/macro.njk" import mojFilter -%}
-{%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
+{%- from "moj/components/filter/macro.njk"          import mojFilter -%}
+{%- from "govuk/components/checkboxes/macro.njk"    import govukCheckboxes -%}
+{%- from "govuk/components/textarea/macro.njk"      import govukTextarea -%}
+{%- from "govuk/components/select/macro.njk"        import govukSelect -%}
 
 {%- set filterHtml %}
 
-  {{ govukInput({
-    id: 'fileName',
-    name: 'fileName',
-    label: {
-      text: 'File name',
-      classes: "govuk-label--s govuk-!-font-weight-bold"
-    },
-    formGroup: {
-      classes: "govuk-!-margin-bottom-3",
-      attributes: {
-        'data-qa': 'fileName'
-      }
-    },
-    value: filter.fileName
-  }) }}
+{% if flags.enableDocumentTextSearch === true %}
+    {{ govukTextarea({
+        id: 'query',
+        name: 'query',
+        label: {
+            html: 'Text search<br /><span class="govuk-!-font-weight-regular secondary-text">Enter keyword or file name</span>',
+            classes: "govuk-label--s govuk-!-font-weight-bold"
+        },
+        formGroup: {
+            classes: "govuk-!-margin-bottom-3",
+            attributes: {
+                'data-qa': 'query'
+            }
+        },
+        value: filter.query
+    }) }}
+
+    {% set documentLevelSelectItems = [] %}
+    {% for documentLevel in documents.metadata.documentLevels %}
+        {% set documentLevelSelectItems = (documentLevelSelectItems.push({
+            text: documentLevel.description,
+            value: documentLevel.code,
+            selected: documentLevel.code === filter.documentLevel
+        }), documentLevelSelectItems) %}
+    {% endfor %}
+    {{ govukSelect({
+        id: 'documentLevel',
+        name: 'documentLevel',
+        label: {
+            text: "Document level",
+            classes: "govuk-label--s govuk-!-font-weight-bold"
+        },
+        classes: "govuk-select--autosize",
+        formGroup: {
+            classes: "govuk-!-margin-bottom-3",
+            attributes: {
+                'data-qa': 'documentLevel'
+            }
+        },
+        items: documentLevelSelectItems
+    })
+    }}
+{% else %}
+    {{ govukInput({
+        id: 'fileName',
+        name: 'fileName',
+        label: {
+            text: 'File name',
+            classes: "govuk-label--s govuk-!-font-weight-bold"
+        },
+        formGroup: {
+            classes: "govuk-!-margin-bottom-3",
+            attributes: {
+                'data-qa': 'fileName'
+            }
+        },
+        value: filter.fileName
+    }) }}
+{% endif %}
+
 {{ mojDatePicker({
   id: "dateFrom",
   name: "dateFrom",
@@ -75,6 +122,24 @@
         items: filter.selectedFilterItems.fileName
    }), filterCategories) %}
 {% endif %}
+{% if filter.selectedFilterItems.query.length %}
+    {% set filterCategories = (filterCategories.push(
+        {
+            heading: {
+            text: 'Text search'
+        },
+            items: filter.selectedFilterItems.query
+        }), filterCategories) %}
+{% endif %}
+{% if filter.selectedFilterItems.documentLevel.length %}
+    {% set filterCategories = (filterCategories.push(
+        {
+            heading: {
+            text: 'Document level'
+        },
+            items: filter.selectedFilterItems.documentLevel
+        }), filterCategories) %}
+{% endif %}
 {% if filter.selectedFilterItems.dateRange.length %}
    {% set filterCategories = (filterCategories.push(
     {
@@ -110,7 +175,8 @@
       }
     },
     categories: filterCategories
-  } if filter.selectedFilterItems.fileName.length or filter.selectedFilterItems.dateRange.length,
+  } if filter.selectedFilterItems.fileName.length or filter.selectedFilterItems.dateRange.length
+    or filter.selectedFilterItems.query.length or filter.selectedFilterItems.documentLevel.length,
   optionsHtml: filterHtml
 }) }}
 <input type="hidden" name="_csrf" value="{{ csrfToken }}">

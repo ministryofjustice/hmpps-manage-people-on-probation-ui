@@ -7,6 +7,10 @@ export default class DocumentsPage extends Page {
 
   getFileNameInput = (): PageElement => cy.get('[data-qa="fileName"] input')
 
+  getDocLevel = (): PageElement => cy.get('[data-qa="documentLevel"] select')
+
+  getQueryInput = (): PageElement => cy.get('[data-qa="query"] textarea')
+
   getDateFromInput = (): PageElement => cy.get('[data-qa="dateFrom"] input')
 
   getDateToInput = (): PageElement => cy.get('[data-qa="dateTo"] input')
@@ -16,4 +20,6 @@ export default class DocumentsPage extends Page {
   getSelectedFilterTag = (index: number) => cy.get(`.moj-filter-tags li:nth-of-type(${index}) a`)
 
   getClearAllLink = (crn: string) => cy.get(`a[href="/case/${crn}/documents?clear=all"]`)
+
+  getDocLevelsLink = () => cy.get(`a[href="documents?clear=documentLevel"]`)
 }

@@ -73,7 +73,7 @@ kubectl -n hmpps-manage-people-on-probation-dev get secret hmpps-manage-people-o
 Run the following to grab the flipt credentials from the dev namespace:
 
 ```shell
-kubectl -n hmpps-manage-people-on-probation-dev get secret flipt -o json \
+kubectl -n hmpps-manage-people-on-probation-dev get secret flipt-bootstrap-token -o json \
 | jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
 | grep API_TOKEN | sed 's/API_TOKEN/FLIPT_TOKEN/' >> .env
 ```
