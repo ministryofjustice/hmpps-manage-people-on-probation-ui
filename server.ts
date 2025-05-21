@@ -13,13 +13,12 @@ const validatePort = (port: number) => {
   }
   throw new Error(`Port number out of range ${port}`)
 }
-const port = validatePort(app.get('port') && 3007)
+const port = validatePort(app.get('port'))
 app.set('port', port)
 app.listen(port, () => {
   logger.info(`Server listening on port ${port}`)
 })
-
-const metricsPort = validatePort(metricsApp.get('port') && 3000)
+const metricsPort = validatePort(metricsApp.get('port'))
 metricsApp.listen(metricsPort, () => {
   logger.info(`Metrics server listening on port ${metricsPort}`)
 })
