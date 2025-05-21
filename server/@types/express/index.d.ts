@@ -3,6 +3,7 @@ import { Errors } from '../Errors.type'
 import { UserLocations } from '../../data/model/caseload'
 import { ActivityLogCache, Data } from '../index'
 import { ActivityLogFilters } from '../ActivityLog.type'
+import { DocumentLevel } from '../../data/model/documents'
 
 export default {}
 
@@ -18,6 +19,7 @@ declare module 'express-session' {
     caseFilter: CaseFilter
     activityLogFilters?: ActivityLogFilters
     documentFilters?: DocumentFilters
+    documentLevels?: DocumentLevel[]
     data?: Data
     errors?: Errors
     errorMessages?: Record<string, string>
@@ -27,7 +29,10 @@ declare module 'express-session' {
   }
 
   interface DocumentFilters {
+    [key: string]: string
     fileName?: string
+    query?: string
+    documentLevel?: string
     dateFrom?: string
     dateTo?: string
   }

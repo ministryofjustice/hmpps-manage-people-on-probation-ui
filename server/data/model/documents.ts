@@ -7,6 +7,11 @@ export interface PersonDocuments {
   pageSize: number
   sortedBy: string
   documents: Document[]
+  metadata?: DocumentMetadata
+}
+
+export interface DocumentMetadata {
+  documentLevels?: DocumentLevel[]
 }
 
 export interface SearchDocumentsRequest {
@@ -15,9 +20,22 @@ export interface SearchDocumentsRequest {
   dateTo?: string
 }
 
+export interface DocumentLevel {
+  code?: string
+  description?: string
+}
+
+export interface TextSearchDocumentsRequest {
+  query?: string
+  levelCode?: string
+  dateFrom?: string
+  dateTo?: string
+}
+
 export interface Document {
   alfrescoId: string
   name: string
+  filenameHighlighted?: string
   docLevel: string
   tableName: string
   createdAt: string

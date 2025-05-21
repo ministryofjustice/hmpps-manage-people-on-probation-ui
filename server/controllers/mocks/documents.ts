@@ -42,4 +42,33 @@ export const mockDocuments = {
   totalPages: 4,
   totalElements: 33,
   sortedBy: 'lastUpdatedAt.desc',
+  metadata: {
+    documentLevels: [
+      { code: 'ALL', description: 'All documents' },
+      { code: 'ADDRESS', description: 'Address' },
+      { code: 'ADDRESS_ASSESSMENT', description: 'Address assessment' },
+      { code: 'AP_REFERRAL', description: 'AP Referral' },
+      { code: 'ASSESSMENT', description: 'Assessment' },
+      { code: 'CASE_ALLOCATION', description: 'Case allocation' },
+      { code: 'CONTACT', description: 'Contact' },
+      { code: 'COURT_REPORT', description: 'Court report' },
+      { code: 'CPS', description: 'CPS Pack' },
+      { code: 'EVENT', description: 'Event' },
+      {
+        code: 'INSTITUTIONAL_REPORT',
+        description: 'Institutional report',
+      },
+      { code: 'NSI', description: 'NSI' },
+      { code: 'PERSON', description: 'Person' },
+      {
+        code: 'PERSONAL_CIRCUMSTANCE',
+        description: 'Personal circumstance',
+      },
+      { code: 'PERSONAL_CONTACT', description: 'Personal contact' },
+      { code: 'PRE_CONS', description: 'Pre Cons' },
+      { code: 'REFERRAL', description: 'Referral' },
+      { code: 'REGISTER', description: 'Register' },
+      { code: 'UPW', description: 'UPW Appointment' },
+    ],
+  },
 } as unknown as PersonDocuments

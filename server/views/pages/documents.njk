@@ -54,14 +54,21 @@
     <p class="govuk-!-text-align-right" data-qa="pagination">Showing <b>{{ pagination.from }}</b> to <b>{{ pagination.to }}</b> of <b>{{ pagination.total }}</b> results</p>
     {% set rows = [] %}
     {% for document in documents.documents %}
+
+      {% if document.filenameHighlighted %}
+        {% set displayName = document.filenameHighlighted %}
+      {% else %}
+        {% set displayName = document.name %}
+      {% endif %}
+
       {% set name = '' %}
       {% set wipLabel = '' %}
       {% set sensitiveLabel  = '' %}
       {% if document.workInProgress === true %}
-        {% set name = document.name  %}
+        {% set name = displayName  %}
         {% set wipLabel = '<span data-qa="wipValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--grey">WIP</span>' %}
       {% else %}
-        {% set name = '<a class="document-link" data-ai-id="documentDownload" href="personal-details/documents/' + document.alfrescoId +'/download" download="' + document.name +'">' + document.name + '</a>' %}
+        {% set name = '<a class="document-link" data-ai-id="documentDownload" href="personal-details/documents/' + document.alfrescoId +'/download" download="' + document.name +'">' + displayName + '</a>' %}
       {% endif %}
       {% if document.status === 'Sensitive' %}
         {% set sensitiveLabel = '<span data-qa="statusValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--orange">' + document.status +'</span>' %}

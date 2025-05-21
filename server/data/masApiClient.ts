@@ -28,7 +28,7 @@ import { PreviousOrderDetail } from './model/previousOrderDetail'
 import { CaseAccess, UserAccess } from './model/caseAccess'
 import { DeliusRoles } from './model/deliusRoles'
 import { UserSchedule } from './model/userSchedule'
-import { PersonDocuments, SearchDocumentsRequest } from './model/documents'
+import { PersonDocuments, SearchDocumentsRequest, TextSearchDocumentsRequest } from './model/documents'
 
 interface GetUserScheduleProps {
   username: string
@@ -228,6 +228,16 @@ export default class MasApiClient extends RestClient {
   async getDocuments(crn: string, page: string, sortBy: string): Promise<PersonDocuments> {
     const pageQuery = `?${new URLSearchParams({ size: '15', page, sortBy }).toString()}`
     return this.get({ path: `/documents/${crn}${pageQuery}`, handle404: true })
+  }
+
+  async textSearchDocuments(
+    crn: string,
+    page: string,
+    request: TextSearchDocumentsRequest,
+    sortBy?: string,
+  ): Promise<PersonDocuments> {
+    const pageQuery = `?useDBFilenameSearch=true&${sortBy ? new URLSearchParams({ size: '15', page, sortBy }).toString() : new URLSearchParams({ size: '15', page }).toString()}`
+    return this.post({ path: `/documents/${crn}/search/text${pageQuery}`, data: request, handle404: true })
   }
 
   async searchDocuments(

@@ -17,7 +17,7 @@ generic-service:
     ARNS_API_URL: "https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk"
     TIER_API_URL: "https://hmpps-tier-dev.hmpps.service.justice.gov.uk"
     INTERVENTIONS_API_URL: "https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk"
-    FLIPT_URL: "https://feature-flags-dev.hmpps.service.justice.gov.uk"
+    FLIPT_URL: "https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk"
     INTERVENTIONS_LINK: "https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk"
     DELIUS_LINK: "https://ndelius.test.probation.service.justice.gov.uk"
     OASYS_LINK: "https://t2.oasys.service.justice.gov.uk"

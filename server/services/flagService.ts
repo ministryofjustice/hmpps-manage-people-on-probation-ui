@@ -25,7 +25,7 @@ export default class FlagService {
     const flags = fliptEvaluationClient.evaluateBatch(requests)
 
     function result(results: EvaluationResponse[], key: string) {
-      const filtered = results.filter(flag => flag.booleanEvaluationResponse.flagKey === key)
+      const filtered = results.filter(flag => flag.booleanEvaluationResponse?.flagKey === key)
       if (filtered.length === 1) {
         return filtered[0].booleanEvaluationResponse.enabled
       }

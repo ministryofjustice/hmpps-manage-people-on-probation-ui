@@ -53,7 +53,7 @@ generic-service:
       SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       SESSION_SECRET: "SESSION_SECRET"
-    flipt:
+    flipt-bootstrap-token:
       FLIPT_TOKEN: "API_TOKEN"
     elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
