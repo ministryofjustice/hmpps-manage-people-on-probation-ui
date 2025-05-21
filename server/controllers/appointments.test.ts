@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, sanitiseId } from '../utils'
+import { toRoshWidget, toPredictors } from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -46,11 +46,8 @@ jest.mock('../utils', () => {
     ...actualUtils,
     toRoshWidget: jest.fn(),
     toPredictors: jest.fn(),
-    sanitiseId: jest.fn(),
   }
 })
-
-const mockedSanitiseId = sanitiseId as jest.MockedFunction<typeof sanitiseId>
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
@@ -100,7 +97,6 @@ describe('controllers/appointments', () => {
   })
   describe('get appointments', () => {
     beforeEach(async () => {
-      mockedSanitiseId.mockReturnValue(crn)
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENTS', uuidv4(), crn, 'CRN')
@@ -132,7 +128,6 @@ describe('controllers/appointments', () => {
   describe('post appointments', () => {
     const redirectSpy = jest.spyOn(res, 'redirect')
     beforeEach(() => {
-      mockedSanitiseId.mockReturnValue(crn)
       controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
     })
     it('should redirect to the arrange appointment type page', () => {
@@ -142,7 +137,6 @@ describe('controllers/appointments', () => {
 
   describe('appointment details', () => {
     beforeEach(async () => {
-      mockedSanitiseId.mockReturnValue(crn)
       await controllers.appointments.getAppointmentDetails(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
@@ -159,7 +153,6 @@ describe('controllers/appointments', () => {
 
   describe('get record an outcome', () => {
     beforeEach(async () => {
-      mockedSanitiseId.mockReturnValue(crn)
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
@@ -178,7 +171,6 @@ describe('controllers/appointments', () => {
   describe('post record an outcome', () => {
     describe('If appointment id is null in request body', () => {
       beforeEach(async () => {
-        mockedSanitiseId.mockReturnValue([crn, null])
         const mockReq = httpMocks.createRequest({
           params: {
             crn,
@@ -213,7 +205,6 @@ describe('controllers/appointments', () => {
     describe('If appointment id in request body', () => {
       const appointmentId = '1234'
       beforeEach(async () => {
-        mockedSanitiseId.mockReturnValue([crn, appointmentId])
         const mockReq = httpMocks.createRequest({
           params: {
             crn,
