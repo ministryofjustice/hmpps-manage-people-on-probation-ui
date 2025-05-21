@@ -65,7 +65,7 @@
       {% set wipLabel = '' %}
       {% set sensitiveLabel  = '' %}
       {% if document.workInProgress === true %}
-        {% set name = document.name  %}
+        {% set name = displayName  %}
         {% set wipLabel = '<span data-qa="wipValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--grey">WIP</span>' %}
       {% else %}
         {% set name = '<a class="document-link" data-ai-id="documentDownload" href="personal-details/documents/' + document.alfrescoId +'/download" download="' + document.name +'">' + displayName + '</a>' %}
