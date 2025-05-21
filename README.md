@@ -54,7 +54,7 @@ MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
 MAS_API_URL=https://manage-supervision-and-delius-dev.hmpps.service.justice.gov.uk
 ARNS_API_URL=https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
 TIER_API_URL="https://hmpps-tier-dev.hmpps.service.justice.gov.uk"
-FLIPT_URL="https://feature-flags-dev.hmpps.service.justice.gov.uk"
+FLIPT_URL="https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk"
 TIER_LINK="https://tier-dev.hmpps.service.justice.gov.uk/case"
 DELIUS_LINK=https://ndelius.test.probation.service.justice.gov.uk
 INTERVENTIONS_API_URL=http://localhost:9091/interventions
@@ -75,7 +75,7 @@ Run the following to grab the flipt credentials from the dev namespace:
 ```shell
 kubectl -n hmpps-manage-people-on-probation-dev get secret flipt-bootstrap-token -o json \
 | jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
-| grep API_TOKEN | sed 's/API_TOKEN/FLIPT_TOKEN/' >> .env
+| grep TOKEN | sed 's/TOKEN/FLIPT_TOKEN/' >> .env
 ```
 
 Then, start the UI service:
