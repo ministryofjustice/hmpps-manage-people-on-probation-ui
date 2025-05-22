@@ -2,6 +2,19 @@ import nock from 'nock'
 
 import { AgentConfig } from '../config'
 import RestClient from './restClient'
+import { isValidHost, isValidPath } from '../utils'
+
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    isValidPath: jest.fn(),
+    isValidHost: jest.fn(),
+  }
+})
+
+const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
+const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
 
 const restClient = new RestClient(
   'api-name',
@@ -17,6 +30,10 @@ const restClient = new RestClient(
 )
 
 describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', method => {
+  jest.clearAllMocks()
+  mockedIsValidHost.mockReturnValue(true)
+  mockedIsValidPath.mockReturnValue(true)
+
   it('should return response body', async () => {
     nock('http://localhost:8080', {
       reqheaders: { authorization: 'Bearer token-1' },

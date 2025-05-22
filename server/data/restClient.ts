@@ -8,6 +8,8 @@ import type { ApiConfig } from '../config'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
 import { escapeForLog } from '../utils/escapeForLog'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 
 interface Request {
   path: string
@@ -63,6 +65,13 @@ export default class RestClient {
     errorMessageFor500 = '',
   }: Request): Promise<TResponse> {
     logger.info(escapeForLog(`${this.name} GET: ${path}`))
+
+    const apiUrl = this.apiUrl()
+    if (!isValidHost(apiUrl) || !isValidPath(path)) {
+      logger.warn(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`)
+      throw new Error(`Invalid API URL or path`)
+    }
+
     try {
       const result: Response = await superagent
         .get(`${this.apiUrl()}${path}`)
@@ -169,6 +178,13 @@ export default class RestClient {
     raw = false,
   }: Request): Promise<Response> {
     logger.info(escapeForLog(`${this.name} DELETE: ${path}`))
+
+    const apiUrl = this.apiUrl()
+    if (!isValidHost(apiUrl) || !isValidPath(path)) {
+      logger.warn(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`)
+      throw new Error(`Invalid API URL or path`)
+    }
+
     try {
       const result = await superagent
         .delete(`${this.apiUrl()}${path}`)
