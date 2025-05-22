@@ -4,7 +4,8 @@ describe('utils/isValidPath', () => {
   it('should return true if path is valid format', () => {
     expect(isValidPath('folder/')).toBe(true)
     expect(isValidPath('folder')).toBe(true)
-    expect(isValidPath('/folder')).toBe(true)
+    expect(isValidPath('sentence/X000001?activeSentence=true&number=1')).toBe(true)
+    expect(isValidPath('/sentence/X000001?activeSentence=true&number=1')).toBe(true)
     expect(isValidPath('dir/subdir/')).toBe(true)
     expect(isValidPath('/dir/subdir')).toBe(true)
     expect(isValidPath('A/B/C/')).toBe(true)
