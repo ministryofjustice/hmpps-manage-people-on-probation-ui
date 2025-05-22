@@ -68,7 +68,7 @@ export default class RestClient {
 
     const apiUrl = this.apiUrl()
     if (!isValidHost(apiUrl) || !isValidPath(path)) {
-      logger.warn(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`)
+      logger.warn(escapeForLog(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`))
       throw new Error(`Invalid API URL or path`)
     }
 
@@ -181,7 +181,7 @@ export default class RestClient {
 
     const apiUrl = this.apiUrl()
     if (!isValidHost(apiUrl) || !isValidPath(path)) {
-      logger.warn(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`)
+      logger.warn(escapeForLog(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`))
       throw new Error(`Invalid API URL or path`)
     }
 
