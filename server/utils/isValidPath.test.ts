@@ -10,8 +10,9 @@ describe('utils/isValidPath', () => {
     expect(isValidPath('A/B/C/')).toBe(true)
     expect(isValidPath('abc/DEF/ghi/')).toBe(true)
     expect(isValidPath('/abc/DEF/ghi/')).toBe(true)
+    expect(isValidPath('/user/USER1/access/X000001')).toBe(true)
   })
   it('should return false if path is invalid format', () => {
-    expect(isValidPath('http://path/to/malicious/host')).toBe(false)
+    expect(isValidPath('http://malicious-host/user/USER1/access/X000001')).toBe(false)
   })
 })
