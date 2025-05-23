@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
 import TierApiClient from '../data/tierApiClient'
 import RoleService from '../services/roleService'
-import { toRoshWidget, toPredictors, toIsoDateFromPicker } from '../utils'
+import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn } from '../utils'
 import type { Controller } from '../@types'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
@@ -34,6 +34,9 @@ const personalDetailsController: Controller<typeof routes> = {
   getPersonalDetails: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      if (!isValidCrn(crn)) {
+        return res.status(404).render('pages/error', { message: 'Page not found' })
+      }
       const success = req.query.update
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -203,6 +206,9 @@ const personalDetailsController: Controller<typeof routes> = {
         })
       } else {
         await masClient[updateFn](crn, Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')))
+        if (!isValidCrn(crn)) {
+          res.status(404).render('pages/error', { message: 'Page not found' })
+        }
         res.redirect(`/case/${crn}/personal-details?update=success`)
       }
     }

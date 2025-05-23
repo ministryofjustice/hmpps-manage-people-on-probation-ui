@@ -8,7 +8,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient, { Needs } from '../data/arnsApiClient'
 import { mockTierCalculation, mockRisks, mockPredictors, mockContacts, mockAppResponse } from './mocks'
-import { toRoshWidget, toPredictors } from '../utils'
+import { toRoshWidget, toPredictors, isValidCrn } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
 import {
   CircumstanceOverview,
@@ -47,7 +47,10 @@ jest.mock('../utils', () => ({
   toRoshWidget: jest.fn(),
   toPredictors: jest.fn(),
   toIsoDateFromPicker: jest.fn().mockImplementation(() => '2025-03-12'),
+  isValidCrn: jest.fn(),
 }))
+
+const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 
 jest.mock('../utils/validationUtils', () => ({
   validateWithSpec: jest.fn(),
@@ -131,6 +134,7 @@ describe('/controllers/personalDetails', () => {
 
       describe('If user does not have access', () => {
         beforeEach(async () => {
+          mockedIsValidCrn.mockReturnValue(true)
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(false))
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
@@ -140,6 +144,7 @@ describe('/controllers/personalDetails', () => {
       })
       describe('If user has access', () => {
         beforeEach(async () => {
+          mockedIsValidCrn.mockReturnValue(true)
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(true))
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
@@ -159,6 +164,18 @@ describe('/controllers/personalDetails', () => {
           })
         })
       })
+      describe('CRN in url parameter is not valid', () => {
+        const statusSpy = jest.spyOn(res, 'status')
+        beforeEach(async () => {
+          mockedIsValidCrn.mockReturnValue(false)
+          jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(true))
+          await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
+        })
+        it('should return a 404 status and render the error page', () => {
+          expect(statusSpy).toHaveBeenCalledWith(404)
+          expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+        })
+      })
     })
     describe('Requested page is edit main address', () => {
       const mockReq = {
@@ -171,6 +188,7 @@ describe('/controllers/personalDetails', () => {
       } as httpMocks.MockRequest<any>
       describe('If user does not have access', () => {
         beforeEach(async () => {
+          mockedIsValidCrn.mockReturnValue(true)
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(false))
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
@@ -180,6 +198,7 @@ describe('/controllers/personalDetails', () => {
       })
       describe('If user has access', () => {
         beforeEach(async () => {
+          mockedIsValidCrn.mockReturnValue(true)
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(true))
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
@@ -246,6 +265,7 @@ describe('/controllers/personalDetails', () => {
           path: 'personal-details/edit-main-address',
         } as httpMocks.MockRequest<any>
         beforeEach(async () => {
+          mockedIsValidCrn.mockReturnValue(true)
           jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({
             error: 'Error',
           }))
@@ -329,6 +349,30 @@ describe('/controllers/personalDetails', () => {
         it('should redirect to the personal details url with update=success query param', () => {
           expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/personal-details?update=success`)
         })
+      })
+    })
+    describe('CRN in url params is invalid', () => {
+      const statusSpy = jest.spyOn(res, 'status')
+      const mockReq = {
+        ...req,
+        query: {
+          ...req.query,
+        },
+        body: {
+          ...req.body,
+          ...mainAddressBody,
+          endDateWarningDisplayed: true,
+        },
+        path: 'personal-details/edit-main-address',
+      } as httpMocks.MockRequest<any>
+      beforeEach(async () => {
+        mockedIsValidCrn.mockReturnValue(false)
+        jest.spyOn(validationUtils, 'validateWithSpec').mockImplementation(() => ({}))
+        await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, res)
+      })
+      it('should return a 404 status and render the error page', () => {
+        expect(statusSpy).toHaveBeenCalledWith(404)
+        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
       })
     })
     describe('Edit contact details', () => {

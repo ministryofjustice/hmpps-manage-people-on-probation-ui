@@ -27,6 +27,9 @@ const activityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters = req.body as ActivityLogFilters
       req.session.activityLogFilters.compliance = complianceFilters
       const view = req?.query?.view || req?.body?.view
+      if (view && view !== 'compact') {
+        return res.status(404).render('pages/error', { message: 'Page not found' })
+      }
       const query = `error=true${view ? `&view=${view}` : ''}`
       return res.redirect(`${url}?${query}`)
     }

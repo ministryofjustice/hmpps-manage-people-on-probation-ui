@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { getDataValue } from '../utils'
+import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { Route } from '../@types'
 
 export const redirectWizard = (requiredValues: string[]): Route<Promise<void>> => {
@@ -10,6 +10,9 @@ export const redirectWizard = (requiredValues: string[]): Route<Promise<void>> =
     for (const requiredValue of requiredValues) {
       const value = getDataValue(data, ['appointments', crn, id, requiredValue])
       if (!value) {
+        if (!isValidCrn(crn) || !isValidUUID(id)) {
+          return res.status(404).render('pages/error', { message: 'Page not found' })
+        }
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
       }
     }
