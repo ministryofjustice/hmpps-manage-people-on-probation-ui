@@ -3,6 +3,7 @@ import nock from 'nock'
 import { AgentConfig } from '../config'
 import RestClient from './restClient'
 import { isValidHost, isValidPath } from '../utils'
+import logger from '../../logger'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -73,6 +74,19 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
       text: '{"success":true}',
     })
   })
+  // if (method === 'get') {
+  //   it('should throw an error if host or path are invalid values', async () => {
+  //     mockedIsValidHost.mockReturnValueOnce(false)
+  //     mockedIsValidPath.mockReturnValueOnce(false)
+
+  //     expect(() =>
+  //       restClient.get({
+  //         path: '/test',
+  //         headers: { header1: 'headerValue1' },
+  //       }),
+  //     ).toThrow('Invalid API URL or path')
+  //   })
+  // }
 
   if (method === 'get' || method === 'delete') {
     it('should retry by default', async () => {
@@ -155,5 +169,28 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
 
     expect(result).toStrictEqual({ success: true })
     expect(nock.isDone()).toBe(true)
+  })
+})
+
+describe('RestClient.get', () => {
+  it('throws an error if apiUrl or path is invalid', async () => {
+    mockedIsValidHost.mockReturnValue(false)
+    mockedIsValidPath.mockReturnValue(true)
+    Object.defineProperty(restClient as any, 'apiUrl', {
+      value: () => 'http://invalid-url',
+    })
+    const warnSpy = jest.spyOn(logger, 'warn')
+    await expect(restClient.get({ path: '/test' } as any)).rejects.toThrow('Invalid API URL or path')
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
+  })
+})
+
+describe('RestClient.delete', () => {
+  it('throws an error if apiUrl or path is invalid', async () => {
+    mockedIsValidHost.mockReturnValue(false)
+    mockedIsValidPath.mockReturnValue(true)
+    const warnSpy = jest.spyOn(logger, 'warn')
+    await expect(restClient.delete({ path: '/test' } as any)).rejects.toThrow('Invalid API URL or path')
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
   })
 })

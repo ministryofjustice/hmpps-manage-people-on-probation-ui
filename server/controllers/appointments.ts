@@ -56,7 +56,7 @@ const appointmentsController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn } = req.params
       if (!isValidCrn(crn)) {
-        res.status(404).render('pages/error', { message: 'Page not found' })
+        return res.status(404).render('pages/error', { message: 'Page not found' })
       }
       return res.redirect(`/case/${crn}/arrange-appointment/type`)
     }
@@ -121,10 +121,12 @@ const appointmentsController: Controller<typeof routes> = {
           actionType,
         })
       } else {
+        // eslint-disable-next-line no-lonely-if
         if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
           res.status(404).render('pages/error', { message: 'Page not found' })
+        } else {
+          res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
         }
-        res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
       }
     }
   },
