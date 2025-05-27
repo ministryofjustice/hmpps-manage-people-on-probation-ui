@@ -95,6 +95,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         setDataValue(data, ['appointments', crn, id, 'sentence-requirement'], '')
       }
       if (req?.body?.appointments?.[crn]?.[id]?.['sentence-requirement']) {
+        // console.log('reset sentence-licence-condition!!!')
         setDataValue(data, ['appointments', crn, id, 'sentence-licence-condition'], '')
       }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
