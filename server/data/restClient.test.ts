@@ -74,19 +74,6 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
       text: '{"success":true}',
     })
   })
-  // if (method === 'get') {
-  //   it('should throw an error if host or path are invalid values', async () => {
-  //     mockedIsValidHost.mockReturnValueOnce(false)
-  //     mockedIsValidPath.mockReturnValueOnce(false)
-
-  //     expect(() =>
-  //       restClient.get({
-  //         path: '/test',
-  //         headers: { header1: 'headerValue1' },
-  //       }),
-  //     ).toThrow('Invalid API URL or path')
-  //   })
-  // }
 
   if (method === 'get' || method === 'delete') {
     it('should retry by default', async () => {
