@@ -22,7 +22,7 @@ function highlightDoc(text: string, doc: Document): Document {
     filenameHighlighted = doc.name
     text.split(/\s+/).forEach(word => {
       pos = filenameHighlighted.toUpperCase().indexOf(word.toUpperCase())
-      if (pos !== -1) {
+      if (pos !== -1 && word.length > 0) {
         const str = filenameHighlighted.substring(pos, pos + word.length)
         filenameHighlighted = filenameHighlighted.replaceAll(str, `<span class="govuk-tag--yellow">${str}</span>`)
       }
