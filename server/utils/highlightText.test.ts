@@ -49,4 +49,7 @@ describe('utils/highlightText', () => {
   it('should return the original list if text is not found', () => {
     expect(highlightText('not', docs)).toEqual(docs)
   })
+  it('should handle new lines', () => {
+    expect(highlightText('hi\n  there world\n', docs)).toEqual(expected)
+  })
 })
