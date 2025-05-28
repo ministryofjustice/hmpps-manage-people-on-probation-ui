@@ -1,5 +1,5 @@
 # Stage: base image
-FROM node:22-alpine as base
+FROM node:22-alpine3.21 as base
 
 ARG BUILD_NUMBER
 ARG GIT_REF
@@ -27,8 +27,8 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 
 RUN apk update && apk add --no-cache \
     build-base=0.5-r3 \
-    python3=3.12.10-r0 \
-    python3-dev=3.12.10-r0 \
+    python3=3.12.10-r1 \
+    python3-dev=3.12.10-r1 \
     make=4.4.1-r2 \
     g++=14.2.0-r4 \
     ca-certificates=20241121-r1
@@ -44,6 +44,7 @@ COPY package*.json ./
 RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 
 ENV NODE_ENV='production'
+
 COPY . .
 RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry) \
     npm run build
