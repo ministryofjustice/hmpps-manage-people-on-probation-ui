@@ -7,10 +7,18 @@ import logger from './logger'
 initialiseAppInsights()
 buildAppInsightsClient()
 
-app.listen(app.get('port'), () => {
-  logger.info(`Server listening on port ${app.get('port')}`)
+const validatePort = (port: number) => {
+  if (port >= 0 && port <= 65535) {
+    return port
+  }
+  throw new Error(`Port number out of range ${port}`)
+}
+const port = validatePort(app.get('port'))
+app.set('port', port)
+app.listen(port, () => {
+  logger.info(`Server listening on port ${port}`)
 })
-
-metricsApp.listen(metricsApp.get('port'), () => {
-  logger.info(`Metrics server listening on port ${metricsApp.get('port')}`)
+const metricsPort = validatePort(metricsApp.get('port'))
+metricsApp.listen(metricsPort, () => {
+  logger.info(`Metrics server listening on port ${metricsPort}`)
 })

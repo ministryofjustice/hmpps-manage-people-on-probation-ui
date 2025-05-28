@@ -5,7 +5,7 @@ import { AppResponse, Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
+import { toRoshWidget, toPredictors, isNumericString, isValidCrn } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
 
@@ -20,7 +20,7 @@ const routes = [
 const appointmentsController: Controller<typeof routes> = {
   getAppointments: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
@@ -55,6 +55,9 @@ const appointmentsController: Controller<typeof routes> = {
   postAppointments: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      if (!isValidCrn(crn)) {
+        return res.status(404).render('pages/error', { message: 'Page not found' })
+      }
       return res.redirect(`/case/${crn}/arrange-appointment/type`)
     }
   },
@@ -106,7 +109,8 @@ const appointmentsController: Controller<typeof routes> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const errorMessages: ErrorMessages = {}
-      if (req.body['appointment-id'] == null) {
+      const appointmentId = req?.body?.['appointment-id'] as string
+      if (appointmentId == null) {
         logger.info('Appointment not selected')
         errorMessages.appointment = { text: 'Please select an appointment' }
         const schedule = await masClient.getPersonSchedule(crn, 'previous')
@@ -117,7 +121,12 @@ const appointmentsController: Controller<typeof routes> = {
           actionType,
         })
       } else {
-        res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
+        // eslint-disable-next-line no-lonely-if
+        if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
+          res.status(404).render('pages/error', { message: 'Page not found' })
+        } else {
+          res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
+        }
       }
     }
   },

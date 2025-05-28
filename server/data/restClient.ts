@@ -7,6 +7,9 @@ import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
+import { escapeForLog } from '../utils/escapeForLog'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 
 interface Request {
   path: string
@@ -61,7 +64,14 @@ export default class RestClient {
     handle401 = false,
     errorMessageFor500 = '',
   }: Request): Promise<TResponse> {
-    logger.info(`${this.name} GET: ${path}`)
+    logger.info(escapeForLog(`${this.name} GET: ${path}`))
+
+    const apiUrl = this.apiUrl()
+    if (!isValidHost(apiUrl) || !isValidPath(path)) {
+      logger.warn(escapeForLog(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`))
+      throw new Error(`Invalid API URL or path`)
+    }
+
     try {
       const result: Response = await superagent
         .get(`${this.apiUrl()}${path}`)
@@ -98,7 +108,7 @@ export default class RestClient {
         return error.response
       }
       const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'GET'`)
+      logger.warn({ ...sanitisedError }, escapeForLog(`Error calling ${this.name}, path: '${path}', verb: 'GET'`))
       throw sanitisedError
     }
   }
@@ -116,7 +126,7 @@ export default class RestClient {
       handle404 = false,
     }: RequestWithBody,
   ): Promise<Response> {
-    logger.info(`${this.name} ${method.toUpperCase()}: ${path}`)
+    logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
 
     try {
       const result = await superagent[method](`${this.apiUrl()}${path}`)
@@ -140,7 +150,10 @@ export default class RestClient {
     } catch (error) {
       if (handle404 && error.response?.status === 404) return null
       const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: '${method.toUpperCase()}'`)
+      logger.warn(
+        { ...sanitisedError },
+        escapeForLog(`Error calling ${this.name}, path: '${path}', verb: '${method.toUpperCase()}'`),
+      )
       throw sanitisedError
     }
   }
@@ -164,7 +177,14 @@ export default class RestClient {
     responseType = '',
     raw = false,
   }: Request): Promise<Response> {
-    logger.info(`${this.name} DELETE: ${path}`)
+    logger.info(escapeForLog(`${this.name} DELETE: ${path}`))
+
+    const apiUrl = this.apiUrl()
+    if (!isValidHost(apiUrl) || !isValidPath(path)) {
+      logger.warn(escapeForLog(`Invalid API URL or path: apiUrl='${apiUrl}', path='${path}'`))
+      throw new Error(`Invalid API URL or path`)
+    }
+
     try {
       const result = await superagent
         .delete(`${this.apiUrl()}${path}`)
@@ -183,7 +203,7 @@ export default class RestClient {
       return raw ? (result as Response) : result.body
     } catch (error) {
       const sanitisedError = sanitiseError(error)
-      logger.warn({ ...sanitisedError }, `Error calling ${this.name}, path: '${path}', verb: 'DELETE'`)
+      logger.warn({ ...sanitisedError }, escapeForLog(`Error calling ${this.name}, path: '${path}', verb: 'DELETE'`))
       throw sanitisedError
     }
   }

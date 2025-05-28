@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
+import { toRoshWidget, toPredictors, isValidCrn, isNumericString } from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -39,12 +39,21 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/arnsApiClient')
-jest.mock('../utils', () => ({
-  toRoshWidget: jest.fn(),
-  toPredictors: jest.fn(),
-}))
+
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    toRoshWidget: jest.fn(),
+    toPredictors: jest.fn(),
+    isValidCrn: jest.fn(),
+    isNumericString: jest.fn(),
+  }
+})
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
+const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNumericString>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const req = httpMocks.createRequest({
@@ -66,6 +75,8 @@ const res = mockAppResponse({
 })
 
 const renderSpy = jest.spyOn(res, 'render')
+const statusSpy = jest.spyOn(res, 'status')
+const redirectSpy = jest.spyOn(res, 'redirect')
 
 const getPersonScheduleSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonSchedule')
@@ -87,7 +98,7 @@ const getPredictorsSpy = jest
 const loggerSpy = jest.spyOn(logger, 'info')
 
 describe('controllers/appointments', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
   describe('get appointments', () => {
@@ -121,15 +132,31 @@ describe('controllers/appointments', () => {
   })
 
   describe('post appointments', () => {
-    const redirectSpy = jest.spyOn(res, 'redirect')
     beforeEach(() => {
-      controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
+      jest.clearAllMocks()
     })
-    it('should redirect to the arrange appointment type page', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/type`)
+
+    describe('CRN request parameter is valid', () => {
+      beforeEach(() => {
+        mockIsValidCrn.mockReturnValue(true)
+        controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
+      })
+
+      it('should redirect to the arrange appointment type page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/type`)
+      })
+    })
+    describe('CRN request parameter is invalid', () => {
+      beforeEach(() => {
+        mockIsValidCrn.mockReturnValue(false)
+        controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
+      })
+      it('should return a 404 status', () => {
+        expect(statusSpy).toHaveBeenCalledWith(404)
+        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      })
     })
   })
-
   describe('appointment details', () => {
     beforeEach(async () => {
       await controllers.appointments.getAppointmentDetails(hmppsAuthClient)(req, res)
@@ -200,6 +227,8 @@ describe('controllers/appointments', () => {
     describe('If appointment id in request body', () => {
       const appointmentId = '1234'
       beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
         const mockReq = httpMocks.createRequest({
           params: {
             crn,
@@ -215,8 +244,37 @@ describe('controllers/appointments', () => {
         await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
       })
       it('should redirect to the appointment details page', () => {
-        const redirectSpy = jest.spyOn(res, 'redirect')
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${appointmentId}`)
+      })
+    })
+    describe('If CRN request param is invalid', () => {
+      const appointmentId = '1234'
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsNumericString.mockReturnValue(false)
+
+        const mockReq = httpMocks.createRequest({
+          params: {
+            crn,
+            id,
+            contactId,
+            actionType,
+          },
+          query: { page: '', view: 'default', category: 'mock-category' },
+          body: {
+            'appointment-id': appointmentId,
+          },
+        })
+        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+      })
+      it('should return a 404 status', () => {
+        expect(statusSpy).toHaveBeenCalledWith(404)
+      })
+      it('should render the error page', () => {
+        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      })
+      it('should not redirect', () => {
+        expect(redirectSpy).not.toHaveBeenCalled()
       })
     })
   })
