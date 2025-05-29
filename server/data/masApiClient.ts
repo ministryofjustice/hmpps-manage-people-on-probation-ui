@@ -210,8 +210,8 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/activity/${crn}${pageQuery}`,
-      handle404: true,
-      handle500: true,
+      handle404: false,
+      handle500: false,
     })
   }
 

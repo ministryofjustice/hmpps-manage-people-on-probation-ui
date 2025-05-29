@@ -46,7 +46,7 @@ const activityLogController: Controller<typeof routes> = {
       const currentPage = parseInt(page as string, 10)
       const resultsStart = currentPage > 0 ? 10 * currentPage + 1 : 1
       let resultsEnd = currentPage > 0 ? (currentPage + 1) * 10 : 10
-      if (personActivity.totalResults >= resultsStart && personActivity.totalResults <= resultsEnd) {
+      if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
       const [risks, predictors] = await Promise.all([arnsClient.getRisks(crn), arnsClient.getPredictorsAll(crn)])

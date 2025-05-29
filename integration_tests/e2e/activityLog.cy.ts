@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
+import ErrorPage from '../pages/error'
 import { activityLogValidation } from '../../server/properties'
 import { getErrorMessage } from '../utils'
 
@@ -36,6 +37,11 @@ context('Activity log', () => {
   const year = today.getFullYear()
   const date = `${day}/${month}/${year}`
 
+  it('should render the 404 error page if CRN does not exist', () => {
+    cy.visit('/case/XXXXXXX/activity-log', { failOnStatusCode: false })
+    const page = new ErrorPage()
+    page.setPageTitle('Page not found')
+  })
   it('should render the activity log results', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
