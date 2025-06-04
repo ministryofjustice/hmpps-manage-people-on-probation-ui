@@ -1,22 +1,22 @@
 import NotFoundPage from '../pages/notFound'
 
 context('Invalid crn in url', () => {
-  it('Overview should render the 404 error page if CRN does not exist', () => {
+  it('Overview page should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX', { failOnStatusCode: false })
     const page = new NotFoundPage()
     page.setPageTitle('Page not found')
   })
-  it('Appointments should render the 404 error page if CRN does not exist', () => {
+  it('Appointments page should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/appointments', { failOnStatusCode: false })
     const page = new NotFoundPage()
     page.setPageTitle('Page not found')
   })
-  it('Personal details should render the 404 error page if CRN does not exist', () => {
+  it('Personal details page should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/personal-details', { failOnStatusCode: false })
     const page = new NotFoundPage()
     page.setPageTitle('Page not found')
   })
-  it('Documents should render the 404 error page if CRN does not exist', () => {
+  it('Documents page should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/documents', { failOnStatusCode: false })
     const page = new NotFoundPage()
     page.setPageTitle('Page not found')
@@ -36,8 +36,13 @@ context('Invalid crn in url', () => {
     const page = new NotFoundPage()
     page.setPageTitle('Page not found')
   })
-  it('Compliance log page should render the 404 error page if CRN does not exist', () => {
+  it('Compliance page should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/compliance', { failOnStatusCode: false })
+    const page = new NotFoundPage()
+    page.setPageTitle('Page not found')
+  })
+  it('Interventions page should render the 404 error page if CRN does not exist', () => {
+    cy.visit('/case/XXXXXXX/interventions', { failOnStatusCode: false })
     const page = new NotFoundPage()
     page.setPageTitle('Page not found')
   })
