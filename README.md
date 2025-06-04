@@ -118,18 +118,18 @@ e.g.
 {% endif %}
 ```
 
-Important - For running locally make sure you add the flipt token from cloudplatform to your local .env file by running the following command.
+Important - For running locally make sure you add the flipt token from cloud platform to your local .env file by running the following command.
 
 ```shell
-kubectl -n hmpps-manage-people-on-probation-dev get secret flipt -o json \
+kubectl -n hmpps-manage-people-on-probation-dev get secret flipt-bootstrap-token -o json \
 | jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
-| grep API_TOKEN | sed 's/API_TOKEN/FLIPT_TOKEN/' >> .env
+| grep TOKEN | sed 's/TOKEN/FLIPT_TOKEN/' >> .env
 ```
 
 Also add the FLIPT_URL for dev to your .env file
 
 ```shell
-FLIPT_URL="https://feature-flags-dev.hmpps.service.justice.gov.uk"
+FLIPT_URL="https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk""
 ```
 
 ## Formatting

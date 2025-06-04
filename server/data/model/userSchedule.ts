@@ -1,4 +1,4 @@
-import { Name } from './common'
+import { Name } from './personalDetails'
 
 export interface UserActivity {
   caseName: Name

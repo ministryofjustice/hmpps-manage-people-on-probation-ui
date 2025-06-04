@@ -1,4 +1,4 @@
-import { Name } from '../data/model/common'
+import { Name } from '../data/model/personalDetails'
 import { lastUpdatedBy } from './lastUpdatedBy'
 
 const mockName: Name = {

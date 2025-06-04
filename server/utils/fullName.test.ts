@@ -1,5 +1,5 @@
 import { fullName } from './fullName'
-import { Name } from '../data/model/common'
+import { Name } from '../data/model/personalDetails'
 
 describe('utils/fullName', () => {
   it.each([

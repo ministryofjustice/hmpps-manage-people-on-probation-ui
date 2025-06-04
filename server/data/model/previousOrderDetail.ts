@@ -1,5 +1,5 @@
-import { Name } from './common'
 import { Sentence } from './sentenceDetails'
+import { Name } from './personalDetails'
 
 export interface PreviousOrderDetail {
   name: Name

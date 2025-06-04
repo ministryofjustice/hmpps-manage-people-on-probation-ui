@@ -8,17 +8,16 @@ const activityLog: Route<void> = (req, res, next): void => {
   if (Object.keys(req.query).length === 0 && req.method === 'GET') {
     delete req.session.errorMessages
   }
+  function isEmpty(str: string): boolean {
+    return !str || (str && str.trim() === '')
+  }
+
   if (req.method === 'POST') {
     if (req?.session?.errorMessages) {
       delete req.session.errorMessages
     }
-
-    const dateToIsEmpty =
-      !req?.body?.dateTo || req?.body?.dateTo === undefined || (req?.body?.dateTo && req.body.dateTo.trim() === '')
-    const dateFromIsEmpty =
-      !req?.body?.dateFrom ||
-      req?.body?.dateFrom === undefined ||
-      (req?.body?.dateFrom && req.body.dateFrom.trim() === '')
+    const dateToIsEmpty = isEmpty(req?.body?.dateTo)
+    const dateFromIsEmpty = isEmpty(req?.body?.dateFrom)
     errorMessages = validateWithSpec(req.body, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
 
     if (Object.keys(errorMessages).length) {
@@ -30,7 +29,7 @@ const activityLog: Route<void> = (req, res, next): void => {
       if (view && view !== 'compact') {
         return res.status(404).render('pages/error', { message: 'Page not found' })
       }
-      const query = `error=true${view ? `&view=${view}` : ''}`
+      const query = view ? `error=true&view=${view}` : `error=true`
       return res.redirect(`${url}?${query}`)
     }
   }

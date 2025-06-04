@@ -38,7 +38,7 @@ const activityLogController: Controller<typeof routes> = {
       if (req.query.requirement) {
         res.locals.requirement = req.query.requirement as string
       }
-      const currentView = view || body?.view
+      const currentView = view ?? body?.view
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

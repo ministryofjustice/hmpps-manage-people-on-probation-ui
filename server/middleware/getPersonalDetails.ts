@@ -10,9 +10,9 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       const masClient = new MasApiClient(token)
       const overview = await masClient.getPersonalDetails(crn)
       req.session.data = {
-        ...(req?.session?.data || {}),
+        ...(req?.session?.data ?? {}),
         personalDetails: {
-          ...(req?.session?.data?.personalDetails || {}),
+          ...(req?.session?.data?.personalDetails ?? {}),
           [crn]: overview,
         },
       }

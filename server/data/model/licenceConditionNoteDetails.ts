@@ -1,4 +1,4 @@
-import { PersonSummary } from './common'
+import { PersonSummary } from './personalDetails'
 import { Note } from './note'
 
 export interface LicenceConditionNoteDetails {

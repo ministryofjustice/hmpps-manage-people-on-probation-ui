@@ -6,7 +6,7 @@ export interface AppointmentsValidationArgs {
   page: string
   validateSentenceRequirement?: boolean
   validateSentenceLicenceCondition?: boolean
-  repeatingValue?: 'Yes' | 'No' | undefined
+  repeatingValue?: 'Yes' | 'No'
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {

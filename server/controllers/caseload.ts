@@ -217,7 +217,7 @@ const caseloadController: Controller<typeof routes, Args> = {
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const currentTeam = req.session?.mas?.team ? req.session?.mas?.team : undefined
+      const currentTeam = req.session?.mas?.team ?? req.session?.mas?.team
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_TEAMS',
         who: res.locals.user.username,

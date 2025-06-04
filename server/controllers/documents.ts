@@ -41,7 +41,7 @@ const documentController: Controller<typeof routes> = {
       }
 
       if (req.method === 'POST') {
-        req.session.documentFilters = req?.body || {}
+        req.session.documentFilters = req?.body ?? {}
       }
 
       const dateRangeFilter = () => {

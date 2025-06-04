@@ -1,4 +1,4 @@
-import { PersonSummary } from './common'
+import { PersonSummary } from './personalDetails'
 
 export interface PersonDocuments {
   personSummary: PersonSummary

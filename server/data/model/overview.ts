@@ -1,5 +1,5 @@
-import { Name, PersonalCircumstance } from './common'
 import { Mappa } from './risk'
+import { Name, PersonalCircumstance } from './personalDetails'
 
 export interface Overview {
   appointmentsWithoutOutcome: number
