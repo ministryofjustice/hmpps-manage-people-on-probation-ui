@@ -218,7 +218,7 @@ export default class MasApiClient extends RestClient {
   async getPersonRiskFlags(crn: string): Promise<PersonRiskFlags> {
     return this.get({
       path: `/risk-flags/${crn}`,
-      handle404: true,
+      handle404: false,
       handle500: true,
       errorMessageFor500:
         'OASys is experiencing technical difficulties. It has not been possible to provide the Criminogenic needs information held in OASys',
@@ -237,7 +237,7 @@ export default class MasApiClient extends RestClient {
     sortBy?: string,
   ): Promise<PersonDocuments> {
     const pageQuery = `?useDBFilenameSearch=true&${sortBy ? new URLSearchParams({ size: '15', page, sortBy }).toString() : new URLSearchParams({ size: '15', page }).toString()}`
-    return this.post({ path: `/documents/${crn}/search/text${pageQuery}`, data: request, handle404: true })
+    return this.post({ path: `/documents/${crn}/search/text${pageQuery}`, data: request, handle404: false })
   }
 
   async searchDocuments(
@@ -247,7 +247,7 @@ export default class MasApiClient extends RestClient {
     request: SearchDocumentsRequest,
   ): Promise<PersonDocuments> {
     const pageQuery = `?${new URLSearchParams({ size: '15', page, sortBy }).toString()}`
-    return this.post({ path: `/documents/${crn}/search${pageQuery}`, data: request, handle404: true })
+    return this.post({ path: `/documents/${crn}/search${pageQuery}`, data: request, handle404: false })
   }
 
   async getPersonRiskFlag(crn: string, id: string): Promise<PersonRiskFlag> {
