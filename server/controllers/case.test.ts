@@ -93,4 +93,36 @@ describe('caseController', () => {
       })
     })
   })
+  describe('getCaseNoSentenceNumber', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      url: '/caseload/appointments/upcoming',
+    })
+    beforeEach(async () => {
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_OVERVIEW', uuidv4(), crn, 'CRN')
+    it('should request the data from the api', () => {
+      expect(getOverviewSpy).toHaveBeenCalledWith(crn, '')
+      expect(risksSpy).toHaveBeenCalledWith(crn)
+      expect(needsSpy).toHaveBeenCalledWith(crn)
+      expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
+      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
+      expect(predictorsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should render the case overview page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
+        overview: mockOverview,
+        needs: mockNeeds,
+        personRisks: mockRiskFlags,
+        risks: mockRisks,
+        crn,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+      })
+    })
+  })
 })
