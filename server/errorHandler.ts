@@ -20,7 +20,7 @@ export default function createErrorHandler(production: boolean) {
     res.locals.status = status
     res.locals.stack = production ? null : error.stack
 
-    res.status(error?.status || 500)
+    res.status(error?.status ?? 500)
 
     return res.render('pages/error')
   }

@@ -26,10 +26,10 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       checkClearFilterKeys()
     }
     return {
-      keywords: req.session?.activityLogFilters?.keywords || '',
-      dateFrom: req.session?.activityLogFilters?.dateFrom || '',
-      dateTo: req.session?.activityLogFilters?.dateTo || '',
-      compliance: req.session?.activityLogFilters?.compliance || [],
+      keywords: req.session?.activityLogFilters?.keywords ?? '',
+      dateFrom: req.session?.activityLogFilters?.dateFrom ?? '',
+      dateTo: req.session?.activityLogFilters?.dateTo ?? '',
+      compliance: req.session?.activityLogFilters?.compliance ?? [],
     }
   }
   function checkClearFilterKeys() {

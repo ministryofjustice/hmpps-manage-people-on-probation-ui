@@ -10,9 +10,9 @@ export const getUserLocations = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const masClient = new MasApiClient(token)
       const userLocations = await masClient.getUserLocations(username)
       req.session.data = {
-        ...(req?.session?.data || {}),
+        ...(req?.session?.data ?? {}),
         locations: {
-          ...(req?.session?.data?.locations || {}),
+          ...(req?.session?.data?.locations ?? {}),
           [username]: userLocations.locations,
         },
       }

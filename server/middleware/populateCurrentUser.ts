@@ -15,7 +15,7 @@ export default function populateCurrentUser(userService: UserService): Route<Pro
       }
       next()
     } catch (error) {
-      logger.error(error, `Failed to retrieve user for: ${res.locals.user && res.locals.user.username}`)
+      logger.error(error, `Failed to retrieve user for: ${res.locals.user?.username}`)
       next(error)
     }
   }

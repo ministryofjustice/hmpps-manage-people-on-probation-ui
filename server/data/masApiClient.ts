@@ -11,8 +11,10 @@ import {
   PersonalDetailsMainAddress,
   PersonalDetailsUpdateRequest,
   ProvisionOverview,
+  AddressOverview,
+  AddressOverviewSummary,
+  PersonSummary,
 } from './model/personalDetails'
-import { AddressOverview, AddressOverviewSummary, PersonSummary } from './model/common'
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
 import { PersonRiskFlag, PersonRiskFlags } from './model/risk'

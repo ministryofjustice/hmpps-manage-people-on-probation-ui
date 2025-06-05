@@ -1,4 +1,4 @@
-import { Name } from '../data/model/common'
+import { Name } from '../data/model/personalDetails'
 import { dateWithYearShortMonth } from './dateWithYearShortMonth'
 import { fullName } from './fullName'
 

@@ -16,7 +16,7 @@ const caseController: Controller<typeof routes> = {
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
-      const sentenceNumber = (req?.query?.sentenceNumber || '') as string
+      const sentenceNumber = (req?.query?.sentenceNumber ?? '') as string
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_OVERVIEW',
         who: res.locals.user.username,

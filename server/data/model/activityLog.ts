@@ -1,4 +1,4 @@
-import { PersonSummary } from './common'
+import { PersonSummary } from './personalDetails'
 import { Activity } from './schedule'
 
 export interface PersonActivity {

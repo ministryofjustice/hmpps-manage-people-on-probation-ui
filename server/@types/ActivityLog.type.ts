@@ -1,4 +1,4 @@
-import type { Errors, Option } from './index'
+import type { Option } from './index'
 
 export interface ActivityLogFilters {
   keywords: string

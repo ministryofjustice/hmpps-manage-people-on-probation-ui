@@ -1,4 +1,4 @@
-import { Name, PersonSummary } from './common'
+import { Name, PersonSummary } from './personalDetails'
 import { Note } from './note'
 
 export interface TimelineItem {

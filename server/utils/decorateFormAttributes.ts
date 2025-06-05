@@ -19,7 +19,7 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
   if (storedValue && config.dateFields.includes(sections[sections.length - 1]) && storedValue.includes('-')) {
     const [year, month, day] = storedValue
       .split('-')
-      .map((value: string) => (value.charAt(0) === '0' ? value.substring(1) : value))
+      .map((value: string) => (value.startsWith('0') ? value.substring(1) : value))
     storedValue = [day, month, year].join('/')
   }
   if (newObj.items !== undefined) {

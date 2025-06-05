@@ -1,8 +1,54 @@
-// eslint-disable-next-line import/no-cycle
-import { Name, PersonalCircumstance, PersonSummary } from './common'
 import { Validateable } from '../../utils/validationUtils'
 import { Note } from './note'
 
+export interface Name {
+  forename: string
+  middleName?: string
+  surname: string
+}
+export interface PersonalCircumstance {
+  subType: string
+  type: string
+}
+export interface AddressOverview {
+  personSummary: PersonSummary
+  mainAddress?: PersonAddress
+  otherAddresses: PersonAddress[]
+  previousAddresses: PersonAddress[]
+}
+
+export interface AddressOverviewSummary {
+  personSummary: PersonSummary
+  address: PersonAddress[]
+}
+export interface PersonAddress {
+  buildingName?: string
+  buildingNumber?: string
+  streetName?: string
+  district?: string
+  town?: string
+  county?: string
+  postcode?: string
+  telephoneNumber?: string
+  lastUpdated?: string
+  lastUpdatedBy?: Name
+  from: string
+  to: string
+  type?: string
+  typeCode?: string
+  status?: string
+  verified?: string | boolean
+  noFixedAddress?: string | boolean
+  notes?: string
+}
+
+export interface PersonSummary {
+  name: Name
+  crn: string
+  pnc?: string
+  dateOfBirth: string
+  preferredLanguage?: string
+}
 export interface PersonalDetails {
   crn: string
   name: Name
@@ -81,27 +127,6 @@ export interface Address {
 export interface AddressType {
   code?: string
   description?: string
-}
-
-export interface PersonAddress {
-  buildingName?: string
-  buildingNumber?: string
-  streetName?: string
-  district?: string
-  town?: string
-  county?: string
-  postcode?: string
-  telephoneNumber?: string
-  lastUpdated?: string
-  lastUpdatedBy?: Name
-  from: string
-  to: string
-  type?: string
-  typeCode?: string
-  status?: string
-  verified?: string | boolean
-  noFixedAddress?: string | boolean
-  notes?: string
 }
 
 export interface Circumstances {

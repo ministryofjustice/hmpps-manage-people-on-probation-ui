@@ -1,4 +1,4 @@
-import { Name } from '../data/model/common'
+import { Name } from '../data/model/personalDetails'
 
 export const fullName = (name: Name): string => {
   if (name === undefined || name === null) return ''

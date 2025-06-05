@@ -1,4 +1,4 @@
-import { PersonSummary } from '../../data/model/common'
+import { PersonSummary } from '../../data/model/personalDetails'
 
 export const mockPersonSummary = {
   name: {

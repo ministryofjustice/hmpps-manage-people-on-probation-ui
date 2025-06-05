@@ -17,6 +17,7 @@ interface Args {
   clearFilterValue?: string
   submit?: boolean
   errors?: boolean
+  clear?: string
 }
 
 const defaultRequest: Args = {
@@ -41,7 +42,7 @@ const getRequest = (args?: Args) => {
         dateTo: 'Enter or select a to date',
       }
     : null
-  const req = httpMocks.createRequest({
+  return httpMocks.createRequest({
     body: {
       ...defaultRequest,
       ...(args || {}),
@@ -55,7 +56,6 @@ const getRequest = (args?: Args) => {
       errors: sessionErrors,
     },
   })
-  return req
 }
 
 describe('/middleware/filterActivityLog()', () => {
@@ -68,31 +68,25 @@ describe('/middleware/filterActivityLog()', () => {
     redirect: jest.fn().mockReturnThis(),
   } as unknown as AppResponse
   const nextSpy = jest.fn()
-  const redirectSpy = jest.spyOn(res, 'redirect')
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('submit is in request query params', () => {
-    const req = getRequest({ submit: true })
-    beforeEach(() => {
-      filterActivityLog(req, res, nextSpy)
-    })
+  describe('clear is in request query params', () => {
+    const req = getRequest({ submit: false, clear: 'clear' })
     it('should load the page setting the session activityLogFilters to undefined', () => {
-      expect(req.session.activityLogFilters).toEqual({
-        clearFilterKey: '',
-        clearFilterValue: '',
-        compliance: ['no outcome', 'complied', 'not complied'],
-        dateFrom: '21/03/2025',
-        dateTo: '22/03/2025',
-        errors: false,
-        keywords: 'test',
-        submit: true,
-      })
+      filterActivityLog(req, res, nextSpy)
+      expect(req.session.activityLogFilters).toEqual(undefined)
     })
   })
-
+  describe('session is cleared due to no query params at all', () => {
+    const req = httpMocks.createRequest({ session: {} })
+    it('should load the page setting the session activityLogFilters to undefined', () => {
+      filterActivityLog(req, res, nextSpy)
+      expect(req.session.activityLogFilters).toEqual(undefined)
+    })
+  })
   describe('submit is in request query params', () => {
     const req = getRequest({ submit: true })
     beforeEach(() => {
@@ -212,7 +206,6 @@ describe('/middleware/filterActivityLog()', () => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should refresh the page with the correct url and query parameters', () => {
-      const query = req.query as Record<string, string | string[]>
       expect(req.session.activityLogFilters.dateTo).toEqual('')
       expect(req.session.activityLogFilters.dateFrom).toEqual('')
     })

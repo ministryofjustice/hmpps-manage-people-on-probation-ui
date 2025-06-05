@@ -1,4 +1,4 @@
-import { Name } from './common'
+import { Name } from './personalDetails'
 import { Appointment } from './overview'
 
 export interface UserCaseload {

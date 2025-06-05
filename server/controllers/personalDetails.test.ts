@@ -17,8 +17,10 @@ import {
   PersonalDetails,
   PersonalDetailsMainAddress,
   ProvisionOverview,
+  AddressOverview,
+  AddressOverviewSummary,
+  PersonSummary,
 } from '../data/model/personalDetails'
-import { AddressOverview, AddressOverviewSummary, PersonSummary } from '../data/model/common'
 import controllers from '.'
 import { checkAuditMessage } from './testutils'
 

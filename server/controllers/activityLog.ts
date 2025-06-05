@@ -11,7 +11,7 @@ const routes = ['getOrPostActivityLog', 'getActivityLog', 'getActivityDetails', 
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
-  const usedParams = ['view', 'requirement', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page']
+  const usedParams = ['view', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page']
   for (const usedParam of usedParams) {
     if (params?.[usedParam]) {
       if (!Array.isArray(params[usedParam])) {
@@ -35,10 +35,7 @@ const activityLogController: Controller<typeof routes> = {
       } else {
         res.locals.defaultView = true
       }
-      if (req.query.requirement) {
-        res.locals.requirement = req.query.requirement as string
-      }
-      const currentView = view || body?.view
+      const currentView = view ?? body?.view
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -88,9 +85,6 @@ const activityLogController: Controller<typeof routes> = {
         res.locals.compactView = true
       } else {
         res.locals.defaultView = true
-      }
-      if (req.query.requirement) {
-        res.locals.requirement = req.query.requirement as string
       }
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
