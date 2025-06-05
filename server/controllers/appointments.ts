@@ -8,6 +8,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toRoshWidget, toPredictors, isNumericString, isValidCrn } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
+import { renderError } from '../middleware'
 
 const routes = [
   'getAppointments',
@@ -56,7 +57,7 @@ const appointmentsController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn } = req.params
       if (!isValidCrn(crn)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/type`)
     }
@@ -123,7 +124,7 @@ const appointmentsController: Controller<typeof routes> = {
       } else {
         // eslint-disable-next-line no-lonely-if
         if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
-          res.status(404).render('pages/error', { message: 'Page not found' })
+          renderError(404)(req, res)
         } else {
           res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
         }

@@ -1,7 +1,8 @@
 import httpMocks from 'node-mocks-http'
 import { redirectWizard } from './redirectWizard'
 import { Appointment, AppResponse } from '../@types'
-import { isValidCrn, isValidUUID } from '../utils'
+import { getDataValue, isValidCrn, isValidUUID } from '../utils'
+import { renderError } from './renderError'
 
 const crn = 'X000001'
 const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
@@ -12,11 +13,19 @@ jest.mock('../utils', () => {
     ...actualUtils,
     isValidCrn: jest.fn(),
     isValidUUID: jest.fn(),
+    getDataValue: jest.fn(),
   }
 })
+const mockMiddlewareFn = jest.fn()
 
+jest.mock('./renderError', () => ({
+  renderError: jest.fn(() => mockMiddlewareFn),
+}))
+
+const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
+const mockedGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const mockAppointment: Appointment = {
   type: 'Phone call',
@@ -58,14 +67,13 @@ const res = {
 } as unknown as AppResponse
 
 const redirectSpy = jest.spyOn(res, 'redirect')
-const renderSpy = jest.spyOn(res, 'render')
-const statusSpy = jest.spyOn(res, 'status')
 const nextSpy = jest.fn()
 
 describe('/middleware/redirectWizard', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
+
   describe('location is required, but it is undefined in the session appointment', () => {
     const requiredValues = ['location']
     beforeEach(() => {
@@ -99,6 +107,7 @@ describe('/middleware/redirectWizard', () => {
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
+      mockedGetDataValue.mockReturnValue('type')
       redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
@@ -108,18 +117,19 @@ describe('/middleware/redirectWizard', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
   })
+
   describe('CRN and UUID in request url are invalid', () => {
     const requiredValues = ['location']
+
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
+      mockedGetDataValue.mockReturnValue(null)
       redirectWizard(requiredValues)(req, res, nextSpy)
     })
-    it('should return a 404 status', () => {
-      expect(statusSpy).toHaveBeenCalledWith(404)
-    })
-    it('should render the error page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+    it('should return a 404 status and render the error page', () => {
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${id}/type`)

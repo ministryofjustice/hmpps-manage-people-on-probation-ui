@@ -17,6 +17,7 @@ import {
   mockPersonAppointment,
 } from './mocks'
 import { checkAuditMessage } from './testutils'
+import { renderError } from '../middleware'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -50,6 +51,12 @@ jest.mock('../utils', () => {
     isNumericString: jest.fn(),
   }
 })
+const mockMiddlewareFn = jest.fn()
+jest.mock('../middleware', () => ({
+  renderError: jest.fn(() => mockMiddlewareFn),
+}))
+
+const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
@@ -151,9 +158,9 @@ describe('controllers/appointments', () => {
         mockIsValidCrn.mockReturnValue(false)
         controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
       })
-      it('should return a 404 status', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      it('should return a 404 status and render the error page', () => {
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
     })
   })
@@ -249,29 +256,27 @@ describe('controllers/appointments', () => {
     })
     describe('If CRN request param is invalid', () => {
       const appointmentId = '1234'
+      const mockReq = httpMocks.createRequest({
+        params: {
+          crn,
+          id,
+          contactId,
+          actionType,
+        },
+        query: { page: '', view: 'default', category: 'mock-category' },
+        body: {
+          'appointment-id': appointmentId,
+        },
+      })
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(false)
         mockIsNumericString.mockReturnValue(false)
 
-        const mockReq = httpMocks.createRequest({
-          params: {
-            crn,
-            id,
-            contactId,
-            actionType,
-          },
-          query: { page: '', view: 'default', category: 'mock-category' },
-          body: {
-            'appointment-id': appointmentId,
-          },
-        })
         await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
       })
-      it('should return a 404 status', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-      })
-      it('should render the error page', () => {
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      it('should return a 404 status and render the error page', () => {
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
       it('should not redirect', () => {
         expect(redirectSpy).not.toHaveBeenCalled()

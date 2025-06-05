@@ -10,6 +10,7 @@ import ArnsApiClient, { Needs } from '../data/arnsApiClient'
 import { mockTierCalculation, mockRisks, mockPredictors, mockContacts, mockAppResponse } from './mocks'
 import { toRoshWidget, toPredictors, isValidCrn } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
+import { renderError } from '../middleware'
 import {
   CircumstanceOverview,
   DisabilityOverview,
@@ -50,6 +51,12 @@ jest.mock('../utils', () => ({
   isValidCrn: jest.fn(),
 }))
 
+const mockMiddlewareFn = jest.fn()
+jest.mock('../middleware', () => ({
+  renderError: jest.fn(() => mockMiddlewareFn),
+}))
+
+const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 
 jest.mock('../utils/validationUtils', () => ({
@@ -172,8 +179,8 @@ describe('/controllers/personalDetails', () => {
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
         it('should return a 404 status and render the error page', () => {
-          expect(statusSpy).toHaveBeenCalledWith(404)
-          expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+          expect(mockRenderError).toHaveBeenCalledWith(404)
+          expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
         })
       })
     })
@@ -352,7 +359,6 @@ describe('/controllers/personalDetails', () => {
       })
     })
     describe('CRN in url params is invalid', () => {
-      const statusSpy = jest.spyOn(res, 'status')
       const mockReq = {
         ...req,
         query: {
@@ -371,8 +377,8 @@ describe('/controllers/personalDetails', () => {
         await controllers.personalDetails.postEditDetails(hmppsAuthClient)(mockReq, res)
       })
       it('should return a 404 status and render the error page', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
     })
     describe('Edit contact details', () => {

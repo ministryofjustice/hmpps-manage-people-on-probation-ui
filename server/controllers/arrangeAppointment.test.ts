@@ -9,6 +9,7 @@ import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors, isValidCrn, isNumericString, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
+import { renderError } from '../middleware'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const crn = 'X000001'
@@ -28,6 +29,12 @@ jest.mock('../utils', () => {
   }
 })
 
+const mockMiddlewareFn = jest.fn()
+jest.mock('../middleware', () => ({
+  renderError: jest.fn(() => mockMiddlewareFn),
+}))
+
+const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNumericString>
@@ -122,8 +129,8 @@ describe('controllers/arrangeAppointment', () => {
         await controllers.arrangeAppointments.redirectToType()(mockReq, res)
       })
       it('should return a status of 404 and render the error page', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
       it('should not redirect to the type page', () => {
         expect(redirectSpy).not.toHaveBeenCalled()
@@ -168,16 +175,16 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
     describe('if CRN is invalid format in request params', () => {
+      const mockReq = createMockRequest({})
       beforeEach(async () => {
-        const mockReq = createMockRequest({})
         mockedIsValidCrn.mockReturnValue(false)
         mockedIsValidUUID.mockReturnValue(true)
         mockedIsNumberString.mockReturnValue(true)
         await controllers.arrangeAppointments.postType()(mockReq, res)
       })
       it('should return a status of 404 and render the error page', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
     })
     describe('if UUID is invalid format in request params', () => {
@@ -188,21 +195,21 @@ describe('controllers/arrangeAppointment', () => {
         await controllers.arrangeAppointments.postType()(req, res)
       })
       it('should return a status of 404 and render the error page', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
     })
     describe('if number is invalid format in request params', () => {
+      const mockReq = createMockRequest({})
       beforeEach(async () => {
-        const mockReq = createMockRequest({})
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(true)
         mockedIsNumberString.mockReturnValue(false)
         await controllers.arrangeAppointments.postType()(mockReq, res)
       })
       it('should return a status of 404 and render the error page', () => {
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
     })
   })
@@ -221,15 +228,15 @@ describe('controllers/arrangeAppointment', () => {
         mockedIsValidCrn.mockReturnValue(false)
         mockedIsValidUUID.mockReturnValue(true)
         await controllers.arrangeAppointments.getSentence()(mockReq, res)
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenLastCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
       it('if uuid is invalid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(false)
         await controllers.arrangeAppointments.getSentence()(mockReq, res)
-        expect(statusSpy).toHaveBeenCalledWith(404)
-        expect(renderSpy).toHaveBeenLastCalledWith('pages/error', { message: 'Page not found' })
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
     })
     describe('If type page has been completed', () => {
@@ -283,8 +290,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       await controllers.arrangeAppointments.postSentence()(req, res)
-      expect(statusSpy).toHaveBeenCalledWith(404)
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
   })
@@ -295,8 +302,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postLocation()(mockReq, res)
-      expect(statusSpy).toHaveBeenCalledWith(404)
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
     it('should redirect to the location not in list page if selected', async () => {
@@ -331,8 +338,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postDateTime()(mockReq, res)
-      expect(statusSpy).toHaveBeenCalledWith(404)
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
     it('should redirect to the repeating page', async () => {
@@ -377,8 +384,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(statusSpy).toHaveBeenCalledWith(404)
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
     it('should redirect to the preview page', async () => {
@@ -403,8 +410,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({})
       await controllers.arrangeAppointments.postPreview()(mockReq, res)
-      expect(statusSpy).toHaveBeenCalledWith(404)
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
     it('should redirect to the check your answers page', async () => {
@@ -422,8 +429,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({})
       await controllers.arrangeAppointments.postCheckYourAnswers()(mockReq, res)
-      expect(statusSpy).toHaveBeenCalledWith(404)
-      expect(renderSpy).toHaveBeenCalledWith('pages/error', { message: 'Page not found' })
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
     it('should redirect to the confirmation page', async () => {

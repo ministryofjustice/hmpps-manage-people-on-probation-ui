@@ -1,6 +1,7 @@
 import { ActivityLogFilters, Route } from '../../@types'
 import { activityLogValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
+import { renderError } from '../renderError'
 
 const activityLog: Route<void> = (req, res, next): void => {
   let errorMessages: Record<string, string> = {}
@@ -28,7 +29,7 @@ const activityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters.compliance = complianceFilters
       const view = req?.query?.view || req?.body?.view
       if (view && view !== 'compact') {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const query = `error=true${view ? `&view=${view}` : ''}`
       return res.redirect(`${url}?${query}`)

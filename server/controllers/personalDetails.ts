@@ -8,8 +8,9 @@ import RoleService from '../services/roleService'
 import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn } from '../utils'
 import type { Controller } from '../@types'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { personDetailsValidation } from '../properties'
+import { personDetailsValidation, StatusErrorCode, statusErrors } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
+import { renderError } from '../middleware'
 
 const routes = [
   'getPersonalDetails',
@@ -35,7 +36,7 @@ const personalDetailsController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn } = req.params
       if (!isValidCrn(crn)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const success = req.query.update
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -207,7 +208,7 @@ const personalDetailsController: Controller<typeof routes> = {
       } else {
         await masClient[updateFn](crn, Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')))
         if (!isValidCrn(crn)) {
-          res.status(404).render('pages/error', { message: 'Page not found' })
+          renderError(404)(req, res)
         }
         res.redirect(`/case/${crn}/personal-details?update=success`)
       }
