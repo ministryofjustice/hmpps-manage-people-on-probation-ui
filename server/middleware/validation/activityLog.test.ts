@@ -18,11 +18,11 @@ const req = httpMocks.createRequest({
 
 const reqCompact = httpMocks.createRequest({
   method: 'POST',
-  body: { dateTo: '01/12/2024', dateFrom: '' },
+  body: { dateTo: '01/12/2024', dateFrom: '', view: 'compact', compliance: ['no outcome', 'complied', 'not complied'] },
   params: {
     crn,
   },
-  query: { page: '', view: 'compact' },
+  query: { page: '' },
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
@@ -47,7 +47,7 @@ const getRequest = httpMocks.createRequest({
   params: {
     crn,
   },
-  query: { page: '' },
+  query: {},
   session: {
     activityLogFilters: { page: '' },
     errorMessages: [{ dateTo: 'error' }],
