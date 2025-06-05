@@ -4,6 +4,7 @@ import { Controller } from '../@types'
 import { appointmentTypes } from '../properties'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
+import { renderError } from '../middleware'
 
 const routes = [
   'redirectToType',
@@ -33,7 +34,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const uuid = uuidv4()
       const { crn } = req.params
       if (!isValidCrn(crn) || !isValidUUID(uuid)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/type`)
     }
@@ -62,7 +63,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { number } = req.query as Record<string, string>
       const query = number ? `?number=${number}` : ''
       if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/sentence${query}`
       return res.redirect(redirect)
@@ -79,7 +80,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
           if (isValidCrn(crn) && isValidUUID(id)) {
             return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
           }
-          return res.status(404).render('pages/error', { message: 'Page not found' })
+          return renderError(404)(req, res)
         }
       }
       const { change } = req.query
@@ -95,11 +96,10 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         setDataValue(data, ['appointments', crn, id, 'sentence-requirement'], '')
       }
       if (req?.body?.appointments?.[crn]?.[id]?.['sentence-requirement']) {
-        // console.log('reset sentence-licence-condition!!!')
         setDataValue(data, ['appointments', crn, id, 'sentence-licence-condition'], '')
       }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
@@ -123,7 +123,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { data } = req.session
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'location'])
       if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const page =
         selectedLocation === `The location I’m looking for is not in this list` ? 'location-not-in-list' : 'date-time'
@@ -151,7 +151,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/repeating`
       return res.redirect(redirect)
@@ -201,7 +201,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         setDataValue(data, ['appointments', crn, id, 'repeating-dates'], [])
       }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/preview`
       return res.redirect(redirect)
@@ -217,7 +217,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
@@ -243,7 +243,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return res.status(404).render('pages/error', { message: 'Page not found' })
+        return renderError(404)(req, res)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }
