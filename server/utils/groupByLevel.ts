@@ -7,7 +7,7 @@ export const groupByLevel = (level: string, data: Need[] | RiskFlag[]) => {
     return []
   }
   if (isRisk(data)) {
-    return (data as Need[]).filter(item => item?.severity === level)
+    return data.filter(item => item?.severity === level)
   }
-  return (data as RiskFlag[]).filter(item => item.level === level)
+  return data.filter(item => item.level === level)
 }
