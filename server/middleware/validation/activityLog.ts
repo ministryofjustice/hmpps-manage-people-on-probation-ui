@@ -11,11 +11,14 @@ const activityLog: Route<void> = (req, res, next): void => {
   function isEmpty(str: string): boolean {
     return !str || (str && str.trim() === '')
   }
-
-  if (req.method === 'POST') {
+  function clearSession() {
     if (req?.session?.errorMessages) {
       delete req.session.errorMessages
     }
+  }
+
+  if (req.method === 'POST') {
+    clearSession()
     const dateToIsEmpty = isEmpty(req?.body?.dateTo)
     const dateFromIsEmpty = isEmpty(req?.body?.dateFrom)
     errorMessages = validateWithSpec(req.body, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
@@ -25,7 +28,7 @@ const activityLog: Route<void> = (req, res, next): void => {
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
       req.session.activityLogFilters = req.body as ActivityLogFilters
       req.session.activityLogFilters.compliance = complianceFilters
-      const view = req?.query?.view || req?.body?.view
+      const view = req?.query?.view ?? req?.body?.view
       if (view && view !== 'compact') {
         return res.status(404).render('pages/error', { message: 'Page not found' })
       }
