@@ -85,6 +85,18 @@ const reqCompact = httpMocks.createRequest({
   },
 })
 
+const reqDefault = httpMocks.createRequest({
+  params: {
+    crn,
+    id,
+    noteId,
+  },
+  query: { page: '', requirement: '' },
+  session: {
+    activityLogFilters: { page: '', view: 'default', requirement: '' },
+  },
+})
+
 const res = mockAppResponse({
   filters: {
     dateFrom: '',
@@ -99,65 +111,16 @@ describe('/controllers/activityLogController', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  describe('getActivityLog', () => {
-    beforeEach(async () => {
-      await controllers.activityLog.getActivityLog(hmppsAuthClient)(req, res)
-    })
-    it('should set res.locals.compactView to true', async () => {
-      await controllers.activityLog.getActivityLog(hmppsAuthClient)(reqCompact, res)
-      expect(res.locals.compactView).toEqual(true)
-    })
-
-    it('should set res.locals.defaultView to true', async () => {
-      await controllers.activityLog.getActivityLog(hmppsAuthClient)(req, res)
-      expect(res.locals.defaultView).toEqual(true)
-    })
-    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG', uuidv4(), crn, 'CRN')
-    it('should request the person activity from the api', () => {
-      const expectedBody = {
-        keywords: '',
-        dateFrom: '',
-        dateTo: '',
-        filters: [] as string[],
-      }
-      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page)
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request risks from api', async () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request all predictors from the api', () => {
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should render the activity log page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
-        personActivity: mockActivities,
-        baseUrl: '',
-        crn,
-        query: req.query,
-        queryParams: [],
-        page: req.query.page,
-        view: req.query.view,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
-        url: req.url,
-        resultsStart: 1,
-        resultsEnd: 1,
-      })
-    })
-  })
-
   describe('getOrPostActivityLog', () => {
     beforeEach(async () => {
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, res)
     })
     it('should set res.locals.compactView to true', async () => {
-      await controllers.activityLog.getActivityLog(hmppsAuthClient)(reqCompact, res)
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqCompact, res)
       expect(res.locals.compactView).toEqual(true)
     })
     it('should set res.locals.defaultView to true', async () => {
-      await controllers.activityLog.getActivityLog(hmppsAuthClient)(req, res)
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqDefault, res)
       expect(res.locals.defaultView).toEqual(true)
     })
     checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG', uuidv4(), crn, 'CRN')

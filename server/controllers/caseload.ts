@@ -5,9 +5,9 @@ import { v4 } from 'uuid'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity } from '../data/model/userSchedule'
-import { getSearchParamsString, checkRecentlyViewedAccess } from '../utils'
+import { checkRecentlyViewedAccess, getSearchParamsString } from '../utils'
 import { Controller } from '../@types'
-import { UserCaseload, CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
+import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
 
@@ -35,14 +35,22 @@ const routes = [
 ] as const
 
 interface Args {
-  caseload: UserCaseload
   filter: CaseSearchFilter
 }
 
 const caseloadController: Controller<typeof routes, Args> = {
-  showCaseload: () => {
+  showCaseload: hmppsAuthClient => {
     return async (req, res, _next, args) => {
-      const { caseload, filter } = args
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const pageNum: number = req.session.page ? Number.parseInt(req.session.page, config.apis.masApi.pageSize) : 1
+      const caseload = await masClient.searchUserCaseload(
+        res.locals.user.username,
+        (pageNum - 1).toString(),
+        req.session.sortBy,
+        req.session.caseFilter,
+      )
+      const { filter } = args
       let newCaseload = caseload
       const currentNavSection = 'yourCases'
       await auditService.sendAuditMessage({
@@ -54,7 +62,7 @@ const caseloadController: Controller<typeof routes, Args> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const pagination: Pagination = getPaginationLinks(
-        req.session.page ? Number.parseInt(req.session.page as string, config.apis.masApi.pageSize) : 1,
+        req.session.page ? Number.parseInt(req.session.page, config.apis.masApi.pageSize) : 1,
         caseload?.totalPages || 0,
         caseload?.totalElements || 0,
         page => addParameters(req, { page: page.toString() }),
@@ -82,19 +90,7 @@ const caseloadController: Controller<typeof routes, Args> = {
         nextContactCode: req.body.nextContactCode,
       }
       req.session.page = '1'
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const pageNum: number = req.session.page
-        ? Number.parseInt(req.session.page as string, config.apis.masApi.pageSize)
-        : 1
-      const caseload = await masClient.searchUserCaseload(
-        res.locals.user.username,
-        (pageNum - 1).toString(),
-        req.session.sortBy,
-        req.session.caseFilter,
-      )
       await caseloadController.showCaseload(hmppsAuthClient)(req, res, next, {
-        caseload,
         filter: req.session.caseFilter,
       })
     }
@@ -123,19 +119,7 @@ const caseloadController: Controller<typeof routes, Args> = {
       } else {
         req.session.page = req.query.page as string
       }
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const pageNum: number = req.session.page
-        ? Number.parseInt(req.session.page as string, config.apis.masApi.pageSize)
-        : 1
-      const caseload = await masClient.searchUserCaseload(
-        res.locals.user.username,
-        (pageNum - 1).toString(),
-        req.session.sortBy,
-        req.session.caseFilter,
-      )
       await caseloadController.showCaseload(hmppsAuthClient)(req, res, next, {
-        caseload,
         filter: req.session.caseFilter,
       })
     }
@@ -171,7 +155,12 @@ const caseloadController: Controller<typeof routes, Args> = {
       })
       const baseUrl = req.url.split('?')[0]
       const sortUrl = `${baseUrl}${getSearchParamsString({ req, ignore: ['sortBy'] })}`
-      const paginationUrl = `${baseUrl}${getSearchParamsString({ req, ignore: ['page'], suffix: '&', showPrefixIfNoQuery: true })}`
+      const paginationUrl = `${baseUrl}${getSearchParamsString({
+        req,
+        ignore: ['page'],
+        suffix: '&',
+        showPrefixIfNoQuery: true,
+      })}`
       userSchedule = {
         ...userSchedule,
         appointments,
@@ -183,7 +172,7 @@ const caseloadController: Controller<typeof routes, Args> = {
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      if (req.session.mas === undefined || req.session.mas.team === undefined) {
+      if (req.session?.mas?.team === undefined) {
         const userTeams = await masClient.getUserTeams(res.locals.user.username)
         req.session.mas = { hasStaffRecord: userTeams !== null, teamCount: userTeams?.teams?.length || 0 }
         switch (req.session.mas.teamCount) {

@@ -1,5 +1,4 @@
 import httpMocks from 'node-mocks-http'
-import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { v4 as uuidv4 } from 'uuid'
 import logger from '../../logger'
@@ -71,7 +70,7 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const nextSpy = jest.fn()
-const auditSpy = jest.spyOn(auditService, 'sendAuditMessage')
+const showCaseloadSpy = jest.spyOn(caseloadController, 'showCaseload')
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 const mockCaseload = {} as UserCaseload
@@ -100,6 +99,14 @@ describe('caseloadController', () => {
   })
 
   describe('showCaseload', () => {
+    jest.mock('../data/hmppsAuthClient', () => {
+      return jest.fn().mockImplementation(() => {
+        return {
+          getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
+        }
+      })
+    })
+
     const req = httpMocks.createRequest({
       session: {
         page: '1',
@@ -110,7 +117,8 @@ describe('caseloadController', () => {
       filter: mockFilters,
     }
     beforeEach(async () => {
-      await controllers.caseload.showCaseload()(req, res, nextSpy, mockArgs)
+      jest.clearAllMocks()
+      await controllers.caseload.showCaseload(hmppsAuthClient)(req, res, nextSpy, mockArgs)
     })
     checkAuditMessage(res, 'VIEW_MAS_CASELOAD', uuidv4())
     it('should render minimal cases', () => {
@@ -154,14 +162,8 @@ describe('caseloadController', () => {
       )
     })
     it('should call caseloadController.showCaseload', async () => {
-      const showCaseloadMock = jest.fn()
-      caseloadController.showCaseload = jest.fn().mockReturnValue(showCaseloadMock)
       await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
-      expect(caseloadController.showCaseload).toHaveBeenCalledWith(hmppsAuthClient)
-      expect(showCaseloadMock).toHaveBeenCalledWith(req, res, nextSpy, {
-        caseload: mockUserCaseload,
-        filter: expectedCaseFilter,
-      })
+      expect(showCaseloadSpy).toHaveBeenCalledWith(hmppsAuthClient)
     })
   })
 
@@ -265,6 +267,7 @@ describe('caseloadController', () => {
       })
     })
     it('should request the caseload from the api', async () => {
+      jest.clearAllMocks()
       const req = createMockRequest()
       await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
       expect(searchUserCaseloadSpy).toHaveBeenCalledWith(
@@ -275,15 +278,9 @@ describe('caseloadController', () => {
       )
     })
     it('should call caseloadController.showCaseload', async () => {
-      const showCaseloadMock = jest.fn()
       const req = createMockRequest()
-      caseloadController.showCaseload = jest.fn().mockReturnValue(showCaseloadMock)
       await controllers.caseload.postCase(hmppsAuthClient)(req, res, nextSpy)
-      expect(caseloadController.showCaseload).toHaveBeenCalledWith(hmppsAuthClient)
-      expect(showCaseloadMock).toHaveBeenCalledWith(req, res, nextSpy, {
-        caseload: mockUserCaseload,
-        filter: req.session.caseFilter,
-      })
+      expect(showCaseloadSpy).toHaveBeenCalledWith(hmppsAuthClient)
     })
   })
 
