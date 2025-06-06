@@ -9,6 +9,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   if (req?.query?.clear || (Object.keys(req.query).length === 0 && req.method === 'GET')) {
     // Only clear session when there is no query params in a GET request, or it has been explicitly requested
     req.session.activityLogFilters = undefined
+    req.session.errorMessages = undefined
   }
   const { clearFilterKey, clearFilterValue } = req.query
   const view = req?.query?.view ?? req?.body?.view

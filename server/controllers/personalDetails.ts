@@ -8,7 +8,7 @@ import RoleService from '../services/roleService'
 import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn } from '../utils'
 import type { Controller } from '../@types'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { personDetailsValidation, StatusErrorCode, statusErrors } from '../properties'
+import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
 import { renderError } from '../middleware'
 
@@ -140,8 +140,7 @@ const personalDetailsController: Controller<typeof routes> = {
         }
         action = 'SAVE_EDIT_MAIN_ADDRESS'
       }
-      const warningDisplayed: boolean =
-        !request.endDate || Object.prototype.hasOwnProperty.call(req.body, 'endDateWarningDisplayed')
+      const warningDisplayed: boolean = !request.endDate || Object.hasOwn(req.body, 'endDateWarningDisplayed')
       const isValid = Object.keys(errorMessages).length === 0 && warningDisplayed
       const { crn } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
