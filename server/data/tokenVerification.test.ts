@@ -2,9 +2,12 @@ import nock from 'nock'
 import { Request } from 'express'
 import verifyToken from './tokenVerification'
 import config from '../config'
+import logger from '../../logger'
 
 describe('token verification api tests', () => {
   let fakeApi: nock.Scope
+
+  const loggerErrorSpy = jest.spyOn(logger, 'error')
 
   beforeEach(() => {
     config.apis.tokenVerification.url = 'http://localhost:8100'
@@ -57,6 +60,12 @@ describe('token verification api tests', () => {
         const data = await verifyToken({ verified: true } as Request)
         expect(data).toEqual(true)
         expect(nock.isDone()).toBe(false) // assert api was not called
+      })
+
+      it('Superagent throws error', async () => {
+        fakeApi.post('/token/verify', '').reply(500, { active: true })
+        await verifyToken({ user: {}, verified: false } as Request)
+        expect(loggerErrorSpy).toHaveBeenCalled()
       })
     })
   })
