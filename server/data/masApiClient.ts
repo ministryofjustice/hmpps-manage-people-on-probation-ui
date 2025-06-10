@@ -47,7 +47,7 @@ export default class MasApiClient extends RestClient {
   }
 
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
-    const queryParam = sentenceNumber !== undefined ? `?sentenceNumber=${sentenceNumber}` : ''
+    const queryParam = `?sentenceNumber=${sentenceNumber}`
     return this.get({ path: `/overview/${crn}${queryParam}`, handle404: false })
   }
 
@@ -201,10 +201,6 @@ export default class MasApiClient extends RestClient {
     noteId: string,
   ): Promise<PersonAppointment | null> {
     return this.get({ path: `/schedule/${crn}/appointment/${appointmentId}/note/${noteId}`, handle404: false })
-  }
-
-  async getPersonActivityLog(crn: string): Promise<PersonActivity> {
-    return this.get({ path: `/activity/${crn}`, handle404: false })
   }
 
   async postPersonActivityLog(crn: string, body: ActivityLogRequestBody, page: string): Promise<PersonActivity | null> {
