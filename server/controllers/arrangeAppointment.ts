@@ -40,11 +40,16 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     }
   },
   getOrPostType: hmppsAuthClient => {
-    return async (_req, res, next) => {
+    return async (req, res, next) => {
+      const { crn } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const response = await masClient.getAppointmentTypes()
-      res.locals.appointmentTypes = response.appointmentTypes
+      const [currentCase, appointmentTypesResponse] = await Promise.all([
+        masClient.getOverview(crn),
+        masClient.getAppointmentTypes(),
+      ])
+      res.locals.appointmentTypes = appointmentTypesResponse.appointmentTypes
+      res.locals.visor = currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor')
       return next()
     }
   },

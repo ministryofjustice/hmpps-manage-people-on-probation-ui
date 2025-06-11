@@ -33,6 +33,7 @@ interface Locals {
   errors?: Errors
   change?: string
   appointmentTypes?: AppointmentType[]
+  visor?: boolean
   lastAppointmentDate?: string
   version: string
   backLink: string

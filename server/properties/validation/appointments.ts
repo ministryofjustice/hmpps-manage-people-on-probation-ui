@@ -7,10 +7,11 @@ export interface AppointmentsValidationArgs {
   validateSentenceRequirement?: boolean
   validateSentenceLicenceCondition?: boolean
   repeatingValue?: 'Yes' | 'No'
+  visor?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, validateSentenceRequirement, validateSentenceLicenceCondition, repeatingValue } = args
+  const { crn, id, page, visor, validateSentenceRequirement, validateSentenceLicenceCondition, repeatingValue } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -23,7 +24,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][visorReport]`]: {
-      optional: page !== 'type',
+      optional: page !== 'type' || !visor,
       checks: [
         {
           validator: isNotEmpty,

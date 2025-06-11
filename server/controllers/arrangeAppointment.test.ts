@@ -8,7 +8,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors, isValidCrn, isNumericString, isValidUUID, setDataValue } from '../utils'
-import { mockAppResponse } from './mocks'
+import { mockAppResponse, mockOverview } from './mocks'
 import { renderError } from '../middleware'
 import { mockAppointmentTypes } from './mocks/appointmentTypes'
 
@@ -118,6 +118,9 @@ const renderSpy = jest.spyOn(res, 'render')
 const getAppointmentTypesSpy = jest
   .spyOn(MasApiClient.prototype, 'getAppointmentTypes')
   .mockImplementation(() => Promise.resolve(mockAppointmentTypes))
+const getOverviewSpy = jest
+  .spyOn(MasApiClient.prototype, 'getOverview')
+  .mockImplementation(() => Promise.resolve(mockOverview))
 
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
@@ -157,6 +160,19 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
+    })
+    // describe('No VISOR report', () => {
+    //   beforeEach(() => {
+
+    //   })
+    // })
+    // describe('VISOR report', () => {
+    //   beforeEach(() => {
+
+    //   })
+    // })
+    it('should request the overview from the api', () => {
+      expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     })
     it('should request the appointment types from the api', () => {
       expect(getAppointmentTypesSpy).toHaveBeenCalled()
