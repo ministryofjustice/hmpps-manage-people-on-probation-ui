@@ -1,7 +1,6 @@
 import nock from 'nock'
 
 import { HttpsAgent } from 'agentkeepalive'
-import { HttpError } from 'http-errors'
 import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
 import { isValidHost, isValidPath } from '../utils'
@@ -120,11 +119,6 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
         expect(response.errors[0].text).toEqual('A 500 error')
         expect(nock.isDone()).toBe(true)
       })
-      //          // .reply((uri, body, callback) => {
-      //           //
-      //           //
-      //           //   // callback(null, [500, 'Error body'])
-      //           // })
       it('should handle 404s if configured to do so', async () => {
         nock('http://localhost:8080', {
           reqheaders: { authorization: 'Bearer token-1' },
@@ -163,7 +157,7 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
         reqheaders: { authorization: 'Bearer token-1' },
       })
         [method]('/api/test')
-        .reply(500, (uri, body, callback) => {
+        .reply(500, (_, _body, callback) => {
           return callback(new Error('This is a test error'), [500, 'Error body'])
         })
       await expect(
@@ -187,7 +181,7 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
       const response = await restClient[method]<ErrorSummary>({
         path: `/test`,
         handle404: true,
-        errorMessageFor500: 'A 404 error',
+        errorMessageFor500: 'Another 404 error',
         headers: { header1: 'headerValue1' },
       })
       expect(response).toEqual(null)
@@ -235,7 +229,7 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
         reqheaders: { authorization: 'Bearer token-1' },
       })
         [method]('/api/test')
-        .reply(500, (uri, body, callback) => {
+        .reply(500, (_uri, _body, callback) => {
           return callback(new Error('This is a test error'), [500, 'Error body'])
         })
       await expect(
