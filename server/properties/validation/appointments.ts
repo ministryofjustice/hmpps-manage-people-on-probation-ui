@@ -22,6 +22,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][visorReport]`]: {
+      optional: page !== 'type',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if appointment should be included in ViSOR report',
+          log: 'VISOR report not selected',
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][sentence]`]: {
       optional: page !== 'sentence',
       checks: [

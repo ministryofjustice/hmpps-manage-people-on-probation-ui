@@ -3,7 +3,13 @@ import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import { appointmentTypes } from '../../../server/properties'
 import 'cypress-plugin-tab'
+import mockResponse from '../../../wiremock/mappings/appointment-types.json'
+import { AppointmentType } from '../../../server/models/Appointments'
+import { getWiremockData, Wiremock } from '../../utils'
 
+const mockData = mockResponse as Wiremock
+
+const mockAppointmentTypes = getWiremockData<AppointmentType[]>(mockData, '/mas/appointment/types', 'appointmentTypes')
 const crn = 'X778160'
 const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 
@@ -24,10 +30,20 @@ describe('Arrange an appointment', () => {
         expect($backLink.text()).to.eq('Back')
       })
       typePage.getBackLink().should('have.attr', 'href', '/')
-      for (let i = 1; i < appointmentTypes.length; i += 1) {
-        typePage.getRadioLabel('type', i).should('contain.text', appointmentTypes[i - 1].text)
+      cy.get('[data-qa="type"] legend').should('contain.text', 'What appointment are you arranging?')
+      for (let i = 1; i < mockAppointmentTypes.length; i += 1) {
+        typePage.getRadioLabel('type', i).should('contain.text', mockAppointmentTypes[i - 1].description)
         typePage.getRadio('type', i).should('not.be.checked')
       }
+      cy.get('[data-qa="visorReport"] legend').should('contain.text', 'Include appointment in VISOR report?')
+      cy.get('[data-qa="visorReport"] .govuk-hint').should(
+        'contain.text',
+        'This will add the appointment to their record on the ViSOR secure national database.',
+      )
+      ;['Yes', 'No'].forEach((label, i) => {
+        typePage.getRadioLabel('visorReport', i).should('contain.text', label)
+        typePage.getRadio('visorReport', i).should('not.be.checked')
+      })
       typePage.getSubmitBtn().should('contain.text', 'Continue')
     })
   })

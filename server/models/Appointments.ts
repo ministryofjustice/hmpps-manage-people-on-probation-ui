@@ -17,6 +17,10 @@ export interface AppointmentType {
   isLocationRequired: boolean
 }
 
+export interface AppointmentTypeResponse {
+  appointmentTypes: AppointmentType[]
+}
+
 export interface AppointmentTypeOption {
   text: string
   value: AppointmentType

@@ -6,7 +6,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { Location } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { Appointment, AppointmentTypeOption } from './Appointments'
+import { Appointment, AppointmentType } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 
@@ -32,7 +32,7 @@ interface Locals {
   cspNonce?: string
   errors?: Errors
   change?: string
-  appointmentTypes?: AppointmentTypeOption[]
+  appointmentTypes?: AppointmentType[]
   lastAppointmentDate?: string
   version: string
   backLink: string

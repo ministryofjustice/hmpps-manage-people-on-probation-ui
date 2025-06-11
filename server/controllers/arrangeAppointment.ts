@@ -43,8 +43,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (_req, res, next) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const appointmentTypes = await masClient.getAppointmentTypes()
-      res.locals.appointmentTypes = appointmentTypes
+      const response = await masClient.getAppointmentTypes()
+      res.locals.appointmentTypes = response.appointmentTypes
       return next()
     }
   },

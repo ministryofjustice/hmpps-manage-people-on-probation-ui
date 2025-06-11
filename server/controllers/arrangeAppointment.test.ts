@@ -10,6 +10,7 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors, isValidCrn, isNumericString, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import { renderError } from '../middleware'
+import { mockAppointmentTypes } from './mocks/appointmentTypes'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const crn = 'X000001'
@@ -114,9 +115,9 @@ const redirectSpy = jest.spyOn(res, 'redirect')
 const statusSpy = jest.spyOn(res, 'status')
 const renderSpy = jest.spyOn(res, 'render')
 
-// const getAppointmentTypesSpy = jest
-//   .spyOn(MasApiClient.prototype, 'getAppointmentTypes')
-//   .mockImplementation(() => Promise.resolve(mockRisks))
+const getAppointmentTypesSpy = jest
+  .spyOn(MasApiClient.prototype, 'getAppointmentTypes')
+  .mockImplementation(() => Promise.resolve(mockAppointmentTypes))
 
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
@@ -149,15 +150,24 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
   })
-  // describe('getOrPostType', () => {
-  //   const mockReq = createMockRequest({})
-  //   beforeEach(async () => {
-  //     mockedIsValidCrn.mockReturnValue(true)
-  //     mockedIsValidUUID.mockReturnValue(true)
-  //     await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res)
-  //   })
-  //   it('')
-  // })
+  describe('getOrPostType', () => {
+    const mockReq = createMockRequest({})
+    const nextSpy = jest.fn()
+    beforeEach(async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
+    })
+    it('should request the appointment types from the api', () => {
+      expect(getAppointmentTypesSpy).toHaveBeenCalled()
+    })
+    it('should assign the appointment types to the local var', () => {
+      expect(res.locals.appointmentTypes).toEqual(mockAppointmentTypes.appointmentTypes)
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
+    })
+  })
   //   describe('getType', () => {})
   describe('postType', () => {
     describe('CRN and UUID are valid in request params', () => {

@@ -25,7 +25,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   })
   get('/case/:crn/arrange-appointment/type', controllers.arrangeAppointments.redirectToType())
 
-  router.all('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getOrPostType())
+  router.all('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getOrPostType(hmppsAuthClient))
 
   get('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getType())
 

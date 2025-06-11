@@ -31,7 +31,7 @@ import { DeliusRoles } from './model/deliusRoles'
 import { UserSchedule } from './model/userSchedule'
 import { PersonDocuments, SearchDocumentsRequest, TextSearchDocumentsRequest } from './model/documents'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
-import { AppointmentRequestBody } from '../models/Appointments'
+import { AppointmentRequestBody, AppointmentTypeResponse } from '../models/Appointments'
 
 interface GetUserScheduleProps {
   username: string
@@ -335,7 +335,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}`, handle404: true })
   }
 
-  async getAppointmentTypes(): Promise<AppointmentType[]> {
+  async getAppointmentTypes(): Promise<AppointmentTypeResponse> {
     return this.get({ path: `/appointment/types`, handle404: false })
   }
 }
