@@ -5,7 +5,7 @@ import flash from 'connect-flash'
 import * as Sentry from '@sentry/node'
 import config from '../config'
 import auth from '../authentication/auth'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const router = express.Router()
 

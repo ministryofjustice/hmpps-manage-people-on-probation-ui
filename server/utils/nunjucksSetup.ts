@@ -66,7 +66,7 @@ import {
 
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   const production = process.env.NODE_ENV === 'production'

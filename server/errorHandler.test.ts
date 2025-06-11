@@ -5,8 +5,8 @@ import httpMocks from 'node-mocks-http'
 import { appWithAllRoutes } from './routes/testutils/appSetup'
 import { statusErrors, type StatusErrorCode } from './properties'
 import createErrorHandler from './errorHandler'
-import { AppResponse } from './@types'
 import logger from '../logger'
+import { AppResponse } from './models/Locals'
 
 let app: Express
 

@@ -4,7 +4,8 @@ import { getDataValue } from '../utils'
 import { appointmentTypes } from '../properties'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
-import { AppointmentRequestBody, Route } from '../@types'
+import { Route } from '../@types'
+import { AppointmentRequestBody } from '../models/Appointments'
 
 export const dateTime = (date: string, time: string): Date => {
   const isPm = time.includes('pm')

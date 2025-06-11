@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 import sentryMiddleware from './sentryMiddleware'
 import config from '../config'
 

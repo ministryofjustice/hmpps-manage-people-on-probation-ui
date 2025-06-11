@@ -3,7 +3,7 @@ import type { RequestHandler, Request, NextFunction } from 'express'
 
 import logger from '../../logger'
 import asyncMiddleware from './asyncMiddleware'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 export default function authorisationMiddleware(allowedRoles: string[] = []): RequestHandler {
   return asyncMiddleware((req: Request, res: AppResponse, next: NextFunction) => {

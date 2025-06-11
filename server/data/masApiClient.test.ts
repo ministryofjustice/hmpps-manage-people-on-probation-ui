@@ -35,11 +35,11 @@ describe('masApiClient', () => {
   describe('getSentenceDetails', () => {
     beforeEach(() => {
       jest.clearAllMocks()
+      mockedIsValidHost.mockReturnValue(true)
+      mockedIsValidPath.mockReturnValue(true)
     })
     fakeMasApiClient = nock(config.apis.masApi.url)
     masApiClient = new MasApiClient(token.access_token)
-    mockedIsValidHost.mockReturnValue(true)
-    mockedIsValidPath.mockReturnValue(true)
 
     it.each([
       ['getOverview', '/overview/X000001?sentenceNumber=1', () => masApiClient.getOverview('X000001')],

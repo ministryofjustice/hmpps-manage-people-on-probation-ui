@@ -1,5 +1,6 @@
 import { Name, PersonSummary } from './personalDetails'
 import { Note } from './note'
+import { ErrorSummaryItem } from './common'
 
 export interface TimelineItem {
   date: string
@@ -136,4 +137,54 @@ export interface RiskFlag {
   createdBy: Name
   removed: boolean
   removalHistory: RemovalHistory[]
+}
+
+export type RiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
+
+export type RiskResponse = 'YES' | 'NO' | 'DK'
+
+export interface Risk {
+  [index: string]: string
+  risk: RiskResponse | null
+  current: RiskResponse | null
+  currentConcernsText: string | null
+  previous?: RiskResponse | null
+  previousConcernsText?: string | null
+}
+
+export interface RiskToSelf {
+  [index: string]: Risk
+  suicide?: Risk | null
+  selfHarm?: Risk | null
+  custody?: Risk | null
+  hostelSetting?: Risk | null
+  vulnerability?: Risk | null
+}
+
+export interface RiskSummary {
+  errors?: ErrorSummaryItem[]
+  riskToSelf?: RiskToSelf
+  summary?: {
+    whoIsAtRisk?: string | null
+    natureOfRisk?: string | null
+    riskImminence?: string | null
+    riskIncreaseFactors?: string | null
+    riskMitigationFactors?: string | null
+    riskInCommunity?: Partial<Record<RiskScore, string[]>>
+    riskInCustody?: Partial<Record<RiskScore, string[]>>
+    overallRiskLevel: RiskScore
+  }
+  assessedOn?: string | null
+}
+
+export interface Needs {
+  identifiedNeeds: Need[]
+}
+
+export interface Need {
+  section: string
+  name: string
+  riskOfHarm: boolean
+  riskOfReoffending: boolean
+  severity: string
 }

@@ -1,4 +1,4 @@
-import { RiskScore } from '../data/arnsApiClient'
+import { RiskScore } from '../data/model/risk'
 import { getTagClass } from './getTagClass'
 
 describe('utils/getTagClass', () => {

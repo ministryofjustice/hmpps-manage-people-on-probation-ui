@@ -1,4 +1,4 @@
-import { Need } from '../../data/arnsApiClient'
+import { Need } from '../../data/model/risk'
 
 export const needs: Need[] = [
   {

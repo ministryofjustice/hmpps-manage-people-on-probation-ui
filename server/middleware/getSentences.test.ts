@@ -3,8 +3,8 @@ import { getSentences } from './getSentences'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
-import { AppResponse } from '../@types'
 import { Sentences } from '../data/model/sentenceDetails'
+import { AppResponse } from '../models/Locals'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')

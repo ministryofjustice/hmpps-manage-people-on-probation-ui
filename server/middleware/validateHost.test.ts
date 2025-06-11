@@ -1,7 +1,7 @@
 import { NextFunction, Request } from 'express'
 
 import validateHost, { allowedHosts } from './validateHost'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const getRequest = (host: string): Request => {
   const req = {

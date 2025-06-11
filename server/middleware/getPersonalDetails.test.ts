@@ -1,9 +1,9 @@
 import httpMocks from 'node-mocks-http'
 import { getPersonalDetails } from './getPersonalDetails'
-import { AppResponse } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
+import { AppResponse } from '../models/Locals'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 

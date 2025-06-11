@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import limitedAccess from './limitedAccessMiddleware'
 import MasApiClient from '../data/masApiClient'
-import type { AppResponse } from '../@types'
+import type { AppResponse } from '../models/Locals'
 import { services } from '../services'
 import type { CaseAccess } from '../data/model/caseAccess'
 

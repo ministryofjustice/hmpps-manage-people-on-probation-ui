@@ -1,4 +1,4 @@
-import { RiskToSelf } from '../../data/arnsApiClient'
+import { RiskToSelf } from '../../data/model/risk'
 
 export const riskToSelf = {
   suicide: {

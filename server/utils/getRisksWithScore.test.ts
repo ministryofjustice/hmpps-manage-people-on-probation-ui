@@ -1,4 +1,4 @@
-import { RiskScore } from '../data/arnsApiClient'
+import { RiskScore } from '../data/model/risk'
 import { getRisksWithScore } from './getRisksWithScore'
 
 describe('gets risks with score', () => {

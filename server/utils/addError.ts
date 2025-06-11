@@ -1,4 +1,4 @@
-import { Errors } from '../@types'
+import { Errors } from '../models/Errors'
 
 export const addError = (errors: Errors, { text, anchor }: { text: string; anchor: string }): Errors => {
   const errorList = [...(errors?.errorList || []), { text, href: `#${anchor}` }]

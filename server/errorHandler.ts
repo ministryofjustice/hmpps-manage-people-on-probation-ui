@@ -1,8 +1,8 @@
 import type { Request, NextFunction } from 'express'
 import type { HTTPError } from 'superagent'
 import logger from '../logger'
-import type { AppResponse } from './@types'
 import { statusErrors, type StatusErrorCode } from './properties'
+import { AppResponse } from './models/Locals'
 
 export default function createErrorHandler(production: boolean) {
   return (error: HTTPError, req: Request, res: AppResponse, _next: NextFunction): void => {

@@ -7,13 +7,14 @@ import {
   getSentences,
   getAppointment,
   redirectWizard,
-} from '../middleware/index'
+} from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
 import { postAppointments } from '../middleware/postAppointments'
 import { getTimeOptions } from '../middleware/getTimeOptions'
-import type { AppResponse, Route } from '../@types'
+import type { Route } from '../@types'
 import controllers from '../controllers'
+import { AppResponse } from '../models/Locals'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))

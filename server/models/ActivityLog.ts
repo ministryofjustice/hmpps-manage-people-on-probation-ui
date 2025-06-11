@@ -1,4 +1,4 @@
-import type { Option } from './index'
+import { Option } from './Option'
 
 export interface ActivityLogFilters {
   keywords: string

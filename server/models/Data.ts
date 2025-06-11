@@ -1,8 +1,8 @@
-/* eslint-disable import/no-cycle */
 import { Location } from '../data/model/caseload'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { Sentence } from '../data/model/sentenceDetails'
-import { Errors, Appointment } from './index'
+import { Appointment } from './Appointments'
+import { Errors } from './Errors'
 
 export interface Data {
   appointments?: {

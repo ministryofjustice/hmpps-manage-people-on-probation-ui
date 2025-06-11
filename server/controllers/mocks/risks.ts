@@ -1,4 +1,4 @@
-import { RiskSummary } from '../../data/arnsApiClient'
+import { RiskSummary } from '../../data/model/risk'
 
 export const mockRisks = {
   overallRisk: 'VERY_HIGH',

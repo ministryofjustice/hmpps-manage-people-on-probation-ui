@@ -1,5 +1,4 @@
-import { RiskSummary } from '../data/arnsApiClient'
-import { RoshRiskWidgetDto } from '../data/model/risk'
+import { RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
 import { toMap } from './toMap'
 
 export const toRoshWidget = (roshSummary: RiskSummary): RoshRiskWidgetDto => {

@@ -1,7 +1,7 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import { Request } from 'express'
-import { AppResponse, Controller } from '../@types'
+import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -9,6 +9,7 @@ import { toRoshWidget, toPredictors, isNumericString, isValidCrn } from '../util
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
 import { renderError } from '../middleware'
+import { AppResponse } from '../models/Locals'
 
 const routes = [
   'getAppointments',

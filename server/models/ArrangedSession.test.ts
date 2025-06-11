@@ -1,5 +1,5 @@
 import { ArrangedSession } from './ArrangedSession'
-import { Appointment } from '../@types'
+import { Appointment } from './Appointments'
 
 describe('Arranged Session', () => {
   it('call the constructor with no params and set default params', () => {

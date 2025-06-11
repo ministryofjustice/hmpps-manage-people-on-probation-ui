@@ -1,4 +1,4 @@
-import { RiskToSelf } from '../data/arnsApiClient'
+import { RiskToSelf } from '../data/model/risk'
 
 export const getRisksToThemselves = (riskToSelf: RiskToSelf, type: string): string[] => {
   const risksToThemselves: string[] = []

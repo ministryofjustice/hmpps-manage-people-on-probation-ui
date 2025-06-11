@@ -1,4 +1,5 @@
-import { Route, Option } from '../@types'
+import { Route } from '../@types'
+import { Option } from '../models/Option'
 
 export const getTimeOptions: Route<void> = (_req, res, next) => {
   const startHour = 9

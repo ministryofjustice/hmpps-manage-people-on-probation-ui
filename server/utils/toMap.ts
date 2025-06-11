@@ -1,4 +1,4 @@
-import { RiskScore } from '../data/arnsApiClient'
+import { RiskScore } from '../data/model/risk'
 
 export const toMap = (partial: Partial<Record<RiskScore, string[]>>): { [key: string]: string } => {
   const x: { [key: string]: string } = {}

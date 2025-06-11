@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { getAppointment } from './getAppointment'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const mockAppt = {
   type: 'Phone call',

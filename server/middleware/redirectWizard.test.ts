@@ -1,8 +1,9 @@
 import httpMocks from 'node-mocks-http'
 import { redirectWizard } from './redirectWizard'
-import { Appointment, AppResponse } from '../@types'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
+import { Appointment } from '../models/Appointments'
+import { AppResponse } from '../models/Locals'
 
 const crn = 'X000001'
 const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'

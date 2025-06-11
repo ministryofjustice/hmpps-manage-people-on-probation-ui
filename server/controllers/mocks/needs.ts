@@ -1,4 +1,4 @@
-import { Needs } from '../../data/arnsApiClient'
+import { Needs } from '../../data/model/risk'
 
 export const mockNeeds = {
   identifiedNeeds: [

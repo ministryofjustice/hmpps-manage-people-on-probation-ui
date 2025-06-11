@@ -24,13 +24,14 @@ import { Offences } from './model/offences'
 import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserTeam } from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
-import { ActivityLogRequestBody, AppointmentRequestBody } from '../@types'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
 import { PreviousOrderDetail } from './model/previousOrderDetail'
 import { CaseAccess, UserAccess } from './model/caseAccess'
 import { DeliusRoles } from './model/deliusRoles'
 import { UserSchedule } from './model/userSchedule'
 import { PersonDocuments, SearchDocumentsRequest, TextSearchDocumentsRequest } from './model/documents'
+import { ActivityLogRequestBody } from '../models/ActivityLog'
+import { AppointmentRequestBody } from '../models/Appointments'
 
 interface GetUserScheduleProps {
   username: string
