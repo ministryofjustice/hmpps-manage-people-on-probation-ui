@@ -1,10 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { appointmentTypes } from '../properties'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError } from '../middleware'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToType',
@@ -39,8 +39,11 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/type`)
     }
   },
-  getOrPostType: () => {
+  getOrPostType: hmppsAuthClient => {
     return async (_req, res, next) => {
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const appointmentTypes = await masClient.getAppointmentTypes()
       res.locals.appointmentTypes = appointmentTypes
       return next()
     }

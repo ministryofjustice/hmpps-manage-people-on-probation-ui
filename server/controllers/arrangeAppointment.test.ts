@@ -33,7 +33,15 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
 }))
+jest.mock('../data/hmppsAuthClient', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
+    }
+  })
+})
 
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
@@ -106,6 +114,10 @@ const redirectSpy = jest.spyOn(res, 'redirect')
 const statusSpy = jest.spyOn(res, 'status')
 const renderSpy = jest.spyOn(res, 'render')
 
+// const getAppointmentTypesSpy = jest
+//   .spyOn(MasApiClient.prototype, 'getAppointmentTypes')
+//   .mockImplementation(() => Promise.resolve(mockRisks))
+
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -137,7 +149,15 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
   })
-  //   describe('getOrPostType', () => {})
+  // describe('getOrPostType', () => {
+  //   const mockReq = createMockRequest({})
+  //   beforeEach(async () => {
+  //     mockedIsValidCrn.mockReturnValue(true)
+  //     mockedIsValidUUID.mockReturnValue(true)
+  //     await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res)
+  //   })
+  //   it('')
+  // })
   //   describe('getType', () => {})
   describe('postType', () => {
     describe('CRN and UUID are valid in request params', () => {

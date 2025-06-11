@@ -10,11 +10,12 @@ export interface Appointment {
   id?: string
 }
 
-export type AppointmentType =
-  | 'HomeVisitToCaseNS'
-  | 'InitialAppointmentInOfficeNS'
-  | 'PlannedOfficeVisitNS'
-  | 'InitialAppointmentHomeVisitNS'
+export interface AppointmentType {
+  code: string
+  description: string
+  isPersonLevelContact: boolean
+  isLocationRequired: boolean
+}
 
 export interface AppointmentTypeOption {
   text: string
@@ -28,7 +29,7 @@ export interface AppointmentRequestBody {
     username: string
     locationId: number
   }
-  type: AppointmentType
+  type: any
   start: Date
   end: Date
   interval: AppointmentInterval

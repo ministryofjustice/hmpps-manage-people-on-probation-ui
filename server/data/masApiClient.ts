@@ -334,4 +334,8 @@ export default class MasApiClient extends RestClient {
   async getDeliusRoles(username: string): Promise<DeliusRoles> {
     return this.get({ path: `/user/${username}`, handle404: true })
   }
+
+  async getAppointmentTypes(): Promise<AppointmentType[]> {
+    return this.get({ path: `/appointment/types`, handle404: false })
+  }
 }
