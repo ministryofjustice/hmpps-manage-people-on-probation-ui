@@ -1,10 +1,11 @@
 import { Request } from 'express'
 import { getPersonActivity } from './getPersonActivity'
-import { ActivityLogRequestBody, AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
+import { ActivityLogRequestBody } from '../models/ActivityLog'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')

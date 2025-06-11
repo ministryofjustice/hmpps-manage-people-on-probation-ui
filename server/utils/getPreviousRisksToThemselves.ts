@@ -1,4 +1,4 @@
-import { RiskToSelf } from '../data/arnsApiClient'
+import { RiskToSelf } from '../data/model/risk'
 import { getCurrentRisksToThemselves } from './getCurrentRisksToThemselves'
 import { getRisksToThemselves } from './getRisksToThemselves'
 

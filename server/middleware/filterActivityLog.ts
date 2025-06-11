@@ -1,9 +1,11 @@
 /* eslint-disable no-param-reassign */
 
 import { DateTime } from 'luxon'
-import { ActivityLogFilters, Option, Route, SelectedFilterItem } from '../@types'
+import { Route } from '../@types'
 
 import { filterOptions as complianceFilterOptions } from '../properties'
+import { ActivityLogFilters, SelectedFilterItem } from '../models/ActivityLog'
+import { Option } from '../models/Option'
 
 export const filterActivityLog: Route<void> = (req, res, next): void => {
   if (req?.query?.clear || (Object.keys(req.query).length === 0 && req.method === 'GET')) {
@@ -36,7 +38,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   function checkClearFilterKeys() {
     if (clearFilterKey === 'compliance') {
       req.session.activityLogFilters.compliance = req.session.activityLogFilters.compliance.filter(
-        value => value !== clearFilterValue,
+        (value: string) => value !== clearFilterValue,
       )
     } else if (clearFilterKey === 'dateRange') {
       req.session.activityLogFilters.dateFrom = ''

@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
 import { Request } from 'express'
-import { AppResponse } from '../@types'
 import { getDataValue } from './getDataValue'
 import config from '../config'
+import { AppResponse } from '../models/Locals'
 
 interface Item {
   checked?: string

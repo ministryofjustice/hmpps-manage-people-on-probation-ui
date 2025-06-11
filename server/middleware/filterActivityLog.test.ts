@@ -1,7 +1,8 @@
 import httpMocks from 'node-mocks-http'
 import { filterActivityLog } from './filterActivityLog'
-import { ActivityLogFiltersResponse, AppResponse } from '../@types'
 import { filterOptions } from '../properties'
+import { AppResponse } from '../models/Locals'
+import { ActivityLogFiltersResponse } from '../models/ActivityLog'
 
 const now = new Date()
 const maxDate = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`

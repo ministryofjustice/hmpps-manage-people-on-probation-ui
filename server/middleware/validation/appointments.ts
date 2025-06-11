@@ -1,7 +1,8 @@
-import { Errors, Route } from '../../@types'
+import { Route } from '../../@types'
 import { getDataValue } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
+import { Errors } from '../../models/Errors'
 
 interface LocalParams {
   crn: string

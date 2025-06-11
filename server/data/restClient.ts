@@ -1,15 +1,12 @@
-import Agent, { HttpsAgent } from 'agentkeepalive'
+import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
 
 import logger from '../../logger'
-import type { UnsanitisedError } from '../sanitisedError'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
-import { escapeForLog } from '../utils/escapeForLog'
-import { isValidHost } from '../utils/isValidHost'
-import { isValidPath } from '../utils/isValidPath'
+import { escapeForLog, isValidHost, isValidPath } from '../utils'
 
 interface Request {
   path: string
@@ -26,12 +23,6 @@ interface Request {
 interface RequestWithBody extends Request {
   data?: Record<string, any>
   retry?: boolean
-}
-
-interface StreamRequest {
-  path?: string
-  headers?: Record<string, string>
-  errorLogger?: (e: UnsanitisedError) => void
 }
 
 export default class RestClient {
@@ -78,7 +69,7 @@ export default class RestClient {
         .query(query)
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
-        .retry(2, (err, res) => {
+        .retry(2, (err, _) => {
           if (err) logger.info(`Retry handler found ${this.name} API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
         })
@@ -94,6 +85,8 @@ export default class RestClient {
         warnings.push({ text: errorMessageFor500 })
         error.response.errors = warnings
         logger.info('Handling 500')
+        JSON.stringify(error.response)
+
         return error.response
       }
       if (handle404 && error?.response?.status === 404) {
@@ -134,7 +127,7 @@ export default class RestClient {
         .send(data)
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
-        .retry(2, (err, res) => {
+        .retry(2, (err, _) => {
           if (retry === false) {
             return false
           }
@@ -191,7 +184,7 @@ export default class RestClient {
         .query(query)
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
-        .retry(2, (err, res) => {
+        .retry(2, (err, _) => {
           if (err) logger.info(`Retry handler found ${this.name} API error with ${err.code} ${err.message}`)
           return undefined // retry handler only for logging retries, not to influence retry logic
         })

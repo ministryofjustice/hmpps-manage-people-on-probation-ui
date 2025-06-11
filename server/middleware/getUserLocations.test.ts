@@ -3,7 +3,7 @@ import { getUserLocations } from './getUserLocations'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 

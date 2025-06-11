@@ -1,10 +1,11 @@
 import { Request } from 'express'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { ActivityLogRequestBody, AppResponse } from '../@types'
 import { PersonActivity } from '../data/model/activityLog'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
+import { AppResponse } from '../models/Locals'
+import { ActivityLogRequestBody } from '../models/ActivityLog'
 
 export const getPersonActivity = async (
   req: Request,

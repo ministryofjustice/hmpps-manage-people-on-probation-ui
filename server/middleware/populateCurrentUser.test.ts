@@ -1,10 +1,11 @@
 import httpMocks from 'node-mocks-http'
 import logger from '../../logger'
 import populateCurrentUser from './populateCurrentUser'
-import { AppResponse } from '../@types'
+
 import { UserService } from '../services'
 import ManageUsersApiClient from '../data/manageUsersApiClient'
 import { UserDetails } from '../services/userService'
+import { AppResponse } from '../models/Locals'
 
 const crn = 'X000001'
 const username = 'user-1'

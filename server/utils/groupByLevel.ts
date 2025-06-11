@@ -1,5 +1,4 @@
-import { Need } from '../data/arnsApiClient'
-import { RiskFlag } from '../data/model/risk'
+import { Need, RiskFlag } from '../data/model/risk'
 import { isRisk } from './isRisk'
 
 export const groupByLevel = (level: string, data: Need[] | RiskFlag[]) => {

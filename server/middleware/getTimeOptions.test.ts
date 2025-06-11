@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { getTimeOptions } from './getTimeOptions'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const req = httpMocks.createRequest()
 

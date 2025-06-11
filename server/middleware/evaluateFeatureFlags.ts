@@ -1,7 +1,7 @@
 import { RequestHandler } from 'express'
 import logger from '../../logger'
 import FlagService from '../services/flagService'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 export default function evaluateFeatureFlags(flagService: FlagService): RequestHandler {
   return async (_req, res: AppResponse, next) => {

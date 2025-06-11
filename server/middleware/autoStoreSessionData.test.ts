@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { autoStoreSessionData } from './autoStoreSessionData'
-import type { AppResponse } from '../@types'
+import type { AppResponse } from '../models/Locals'
 
 const crn = 'X778160'
 const id = '19a88188-6013-43a7-bb4d-6e338516818f'

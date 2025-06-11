@@ -1,4 +1,5 @@
-import { AppResponse, Route } from '../@types'
+import { Route } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 export const allowedHosts = [
   'localhost:3007',

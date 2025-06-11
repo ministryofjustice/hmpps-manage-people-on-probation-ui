@@ -1,4 +1,4 @@
-import { AppResponse } from '../../@types'
+import { AppResponse } from '../../models/Locals'
 
 export const mockAppResponse = (locals?: Record<string, any>) =>
   ({

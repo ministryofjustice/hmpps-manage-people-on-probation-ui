@@ -1,4 +1,4 @@
-import { RiskSummary } from '../data/arnsApiClient'
+import { RiskSummary } from '../data/model/risk'
 import { toRoshWidget } from './toRoshWidget'
 import { roshSummary } from './mocks'
 

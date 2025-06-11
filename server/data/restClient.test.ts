@@ -1,9 +1,11 @@
 import nock from 'nock'
 
-import { AgentConfig } from '../config'
+import { HttpsAgent } from 'agentkeepalive'
+import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
 import { isValidHost, isValidPath } from '../utils'
 import logger from '../../logger'
+import { ErrorSummary } from './model/common'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -96,7 +98,95 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
 
       expect(nock.isDone()).toBe(true)
     })
+    if (method === 'get') {
+      it('should handle 500s if configured to do so', async () => {
+        nock('http://localhost:8080', {
+          reqheaders: { authorization: 'Bearer token-1' },
+        })
+          [method]('/api/test')
+          .reply(500, { code: 500, message: 'An error' })
+          [method]('/api/test')
+          .reply(500)
+          [method]('/api/test')
+          .reply(500)
+
+        const response = await restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle500: true,
+          errorMessageFor500: 'A 500 error',
+          headers: { header1: 'headerValue1' },
+        })
+        expect(response.errors[0].text).toEqual('A 500 error')
+        expect(nock.isDone()).toBe(true)
+      })
+      it('should handle 404s if configured to do so', async () => {
+        nock('http://localhost:8080', {
+          reqheaders: { authorization: 'Bearer token-1' },
+        })
+          [method]('/api/test')
+          .reply(404)
+
+        const response = await restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle404: true,
+          errorMessageFor500: 'A 404 error',
+          headers: { header1: 'headerValue1' },
+        })
+        expect(response).toEqual(null)
+        expect(nock.isDone()).toBe(true)
+      })
+      it('should handle 401s if configured to do so', async () => {
+        nock('http://localhost:8080', {
+          reqheaders: { authorization: 'Bearer token-1' },
+        })
+          [method]('/api/test')
+          .reply(401)
+
+        const response = await restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle401: true,
+          errorMessageFor500: 'A 401 error',
+          headers: { header1: 'headerValue1' },
+        })
+        expect(response.errors[0].text).toEqual('A 401 error')
+        expect(nock.isDone()).toBe(true)
+      })
+    }
+    it('should log any errors if found', async () => {
+      nock('http://localhost:8080', {
+        reqheaders: { authorization: 'Bearer token-1' },
+      })
+        [method]('/api/test')
+        .reply(500, (_, _body, callback) => {
+          return callback(new Error('This is a test error'), [500, 'Error body'])
+        })
+      await expect(
+        restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle500: true,
+          errorMessageFor500: 'A 500 error',
+          headers: { header1: 'headerValue1' },
+        }),
+      ).rejects.toThrow('This is a test error')
+      expect(nock.isDone()).toBe(true)
+    })
   } else {
+    it('should handle 404s for put or ppst if configured to do so', async () => {
+      nock('http://localhost:8080', {
+        reqheaders: { authorization: 'Bearer token-1' },
+      })
+        [method]('/api/test')
+        .reply(404)
+
+      const response = await restClient[method]<ErrorSummary>({
+        path: `/test`,
+        handle404: true,
+        errorMessageFor500: 'Another 404 error',
+        headers: { header1: 'headerValue1' },
+      })
+      expect(response).toEqual(null)
+      expect(nock.isDone()).toBe(true)
+    })
     it('should not retry by default', async () => {
       nock('http://localhost:8080', {
         reqheaders: { authorization: 'Bearer token-1' },
@@ -113,7 +203,6 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
 
       expect(nock.isDone()).toBe(true)
     })
-
     it('should retry if configured to do so', async () => {
       nock('http://localhost:8080', {
         reqheaders: { authorization: 'Bearer token-1' },
@@ -133,6 +222,25 @@ describe.each(['get', 'patch', 'post', 'put', 'delete'] as const)('Method: %s', 
         }),
       ).rejects.toThrow('Internal Server Error')
 
+      expect(nock.isDone()).toBe(true)
+    })
+    it('should log any errors if found for post', async () => {
+      nock('http://localhost:8080', {
+        reqheaders: { authorization: 'Bearer token-1' },
+      })
+        [method]('/api/test')
+        .reply(500, (_uri, _body, callback) => {
+          return callback(new Error('This is a test error'), [500, 'Error body'])
+        })
+      await expect(
+        restClient[method]<ErrorSummary>({
+          path: `/test`,
+          retry: true,
+          handle500: true,
+          errorMessageFor500: 'A 500 error',
+          headers: { header1: 'headerValue1' },
+        }),
+      ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
     })
   }
@@ -179,5 +287,23 @@ describe('RestClient.delete', () => {
     const warnSpy = jest.spyOn(logger, 'warn')
     await expect(restClient.delete({ path: '/test' } as any)).rejects.toThrow('Invalid API URL or path')
     expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
+  })
+})
+
+describe('RestClient.construct', () => {
+  it('sets new HttpAgent', async () => {
+    const agentConfig: AgentConfig = {
+      timeout: 30,
+    }
+    const config: ApiConfig = {
+      url: 'https',
+      agent: agentConfig,
+      timeout: {
+        response: 10,
+        deadline: 10,
+      },
+    }
+    const client = new RestClient('test', config, 'token')
+    expect(client.agent).toBeInstanceOf(HttpsAgent)
   })
 })

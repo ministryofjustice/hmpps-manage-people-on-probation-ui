@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import csurf from 'csurf'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const testMode = process.env.NODE_ENV === 'test'
 

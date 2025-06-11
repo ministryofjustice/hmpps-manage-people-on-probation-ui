@@ -1,4 +1,4 @@
-import { Need } from '../data/arnsApiClient'
+import { Need } from '../data/model/risk'
 import { isRisk } from './isRisk'
 import { needs } from './mocks'
 

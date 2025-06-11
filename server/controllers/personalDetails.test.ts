@@ -6,7 +6,7 @@ import RoleService from '../services/roleService'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient, { Needs } from '../data/arnsApiClient'
+import ArnsApiClient from '../data/arnsApiClient'
 import { mockTierCalculation, mockRisks, mockPredictors, mockContacts, mockAppResponse } from './mocks'
 import { toRoshWidget, toPredictors, isValidCrn } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
@@ -24,6 +24,7 @@ import {
 } from '../data/model/personalDetails'
 import controllers from '.'
 import { checkAuditMessage } from './testutils'
+import { Needs } from '../data/model/risk'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>

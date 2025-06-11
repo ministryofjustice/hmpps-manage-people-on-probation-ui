@@ -2,7 +2,7 @@ import type { NextFunction, Request } from 'express'
 import MasApiClient from '../data/masApiClient'
 import { Services } from '../services'
 import asyncMiddleware from './asyncMiddleware'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 export default function limitedAccess(services: Services) {
   return asyncMiddleware(async (req: Request, res: AppResponse, next: NextFunction): Promise<void> => {

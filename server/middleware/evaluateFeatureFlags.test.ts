@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http'
 import evaluateFeatureFlags from './evaluateFeatureFlags'
 import FlagService from '../services/flagService'
 import logger from '../../logger'
-import { AppResponse } from '../@types'
+import { AppResponse } from '../models/Locals'
 
 const mockFlags = {
   enableNavOverview: true,
