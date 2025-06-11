@@ -1,5 +1,5 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
-import superagent, { Response, ResponseError } from 'superagent'
+import superagent, { Response } from 'superagent'
 
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'

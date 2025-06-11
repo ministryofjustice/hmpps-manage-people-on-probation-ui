@@ -9,7 +9,6 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { Appointment, AppointmentTypeOption } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
-import { ErrorSummaryItem } from '../data/model/common'
 
 interface Locals {
   errorMessages: Record<string, string>
