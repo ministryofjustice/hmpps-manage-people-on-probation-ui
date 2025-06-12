@@ -118,9 +118,6 @@ const renderSpy = jest.spyOn(res, 'render')
 const getAppointmentTypesSpy = jest
   .spyOn(MasApiClient.prototype, 'getAppointmentTypes')
   .mockImplementation(() => Promise.resolve(mockAppointmentTypes))
-const getOverviewSpy = jest
-  .spyOn(MasApiClient.prototype, 'getOverview')
-  .mockImplementation(() => Promise.resolve(mockOverview))
 
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
@@ -155,33 +152,61 @@ describe('controllers/arrangeAppointment', () => {
   })
   describe('getOrPostType', () => {
     const mockReq = createMockRequest({})
+    let getOverviewSpy: jest.SpyInstance
     const nextSpy = jest.fn()
     beforeEach(async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
     })
-    // describe('No VISOR report', () => {
-    //   beforeEach(() => {
-
-    //   })
-    // })
-    // describe('VISOR report', () => {
-    //   beforeEach(() => {
-
-    //   })
-    // })
-    it('should request the overview from the api', () => {
-      expect(getOverviewSpy).toHaveBeenCalledWith(crn)
+    describe('No VISOR report', () => {
+      beforeEach(async () => {
+        getOverviewSpy = jest
+          .spyOn(MasApiClient.prototype, 'getOverview')
+          .mockImplementationOnce(() => Promise.resolve(mockOverview))
+        await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
+      })
+      it('should request the overview from the api', () => {
+        expect(getOverviewSpy).toHaveBeenCalledWith(crn)
+      })
+      it('should request the appointment types from the api', () => {
+        expect(getAppointmentTypesSpy).toHaveBeenCalled()
+      })
+      it('should assign the appointment types to the local var', () => {
+        expect(res.locals.appointmentTypes).toEqual(mockAppointmentTypes.appointmentTypes)
+      })
+      it('should set visor as false in res.locals', () => {
+        expect(res.locals.visor).toEqual(false)
+      })
+      it('should call next()', () => {
+        expect(nextSpy).toHaveBeenCalled()
+      })
     })
-    it('should request the appointment types from the api', () => {
-      expect(getAppointmentTypesSpy).toHaveBeenCalled()
-    })
-    it('should assign the appointment types to the local var', () => {
-      expect(res.locals.appointmentTypes).toEqual(mockAppointmentTypes.appointmentTypes)
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalled()
+    describe('VISOR report', () => {
+      const mockOverviewWithVisor = {
+        ...mockOverview,
+        registrations: ['VISOR', 'Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
+      }
+      beforeEach(async () => {
+        getOverviewSpy = jest
+          .spyOn(MasApiClient.prototype, 'getOverview')
+          .mockImplementationOnce(() => Promise.resolve(mockOverviewWithVisor))
+        await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
+      })
+      it('should request the overview from the api', () => {
+        expect(getOverviewSpy).toHaveBeenCalledWith(crn)
+      })
+      it('should request the appointment types from the api', () => {
+        expect(getAppointmentTypesSpy).toHaveBeenCalled()
+      })
+      it('should assign the appointment types to the local var', () => {
+        expect(res.locals.appointmentTypes).toEqual(mockAppointmentTypes.appointmentTypes)
+      })
+      it('should set visor as true in res.locals', () => {
+        expect(res.locals.visor).toEqual(true)
+      })
+      it('should call next()', () => {
+        expect(nextSpy).toHaveBeenCalled()
+      })
     })
   })
   //   describe('getType', () => {})
