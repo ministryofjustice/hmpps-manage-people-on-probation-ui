@@ -25,7 +25,10 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateType = (): void => {
     if (req.url.includes('/type')) {
-      errorMessages = validateWithSpec(req.body, appointmentsValidation({ crn, id, page: 'type' }))
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor }),
+      )
     }
   }
 

@@ -6,9 +6,17 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { Location } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { Appointment, AppointmentTypeOption } from './Appointments'
+import { Appointment, AppointmentType } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
+
+export interface AppointmentLocals extends Appointment {
+  types?: AppointmentType[]
+  type?: AppointmentType
+  visor?: boolean
+  forename?: string
+  change?: string
+}
 
 interface Locals {
   errorMessages: Record<string, string>
@@ -17,7 +25,7 @@ interface Locals {
   compactView?: boolean
   defaultView?: boolean
   requirement?: string
-  appointment?: Appointment
+  appointment?: AppointmentLocals
   case?: PersonalDetails
   message?: string
   title?: string
@@ -32,7 +40,13 @@ interface Locals {
   cspNonce?: string
   errors?: Errors
   change?: string
-  appointmentTypes?: AppointmentTypeOption[]
+  appointmentTypes?: AppointmentType[]
+  arrangeAppointments?: {
+    types: AppointmentType[]
+    visor: boolean
+    forename: string
+  }
+  visor?: boolean
   lastAppointmentDate?: string
   version: string
   backLink: string

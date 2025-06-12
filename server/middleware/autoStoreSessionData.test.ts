@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { autoStoreSessionData } from './autoStoreSessionData'
 import type { AppResponse } from '../models/Locals'
+import { HmppsAuthClient } from '../data'
 
 const crn = 'X778160'
 const id = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -14,6 +15,9 @@ const res = {
   redirect: jest.fn().mockReturnThis(),
 } as unknown as AppResponse
 
+jest.mock('../data/hmppsAuthClient')
+
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const nextSpy = jest.fn()
 
 describe('/middleware/autoStoreSessionData', () => {
@@ -53,7 +57,7 @@ describe('/middleware/autoStoreSessionData', () => {
       },
     })
     beforeEach(() => {
-      autoStoreSessionData(req, res, nextSpy)
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should increment the session appointment', () => {
       expect(req.session.data.appointments[crn][id]).toEqual({
@@ -96,7 +100,7 @@ describe('/middleware/autoStoreSessionData', () => {
       },
     })
     beforeEach(() => {
-      autoStoreSessionData(req, res, nextSpy)
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should create a new appointment session for the id', () => {
       expect(req.session.data.appointments).toEqual({
