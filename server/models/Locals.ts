@@ -11,9 +11,10 @@ import { Option } from './Option'
 import { Errors } from './Errors'
 
 export interface AppointmentLocals extends Appointment {
-  types: AppointmentType[]
-  visor: boolean
-  forename: string
+  types?: AppointmentType[]
+  type?: AppointmentType
+  visor?: boolean
+  forename?: string
   change?: string
 }
 

@@ -53,6 +53,9 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       const { number } = req.query as Record<string, string>
+      const appointmentType = res.locals.appointment.types.find(type => type.code === req.body.type)
+      const isPersonLevelContact = appointmentType?.isPersonLevelContact
+      req.session.data.isPersonLevelContact = isPersonLevelContact
       const query = number ? `?number=${number}` : ''
       if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
         return renderError(404)(req, res)

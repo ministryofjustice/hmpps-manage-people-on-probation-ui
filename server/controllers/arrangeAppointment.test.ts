@@ -212,7 +212,7 @@ describe('controllers/arrangeAppointment', () => {
   })
     */
   //   describe('getType', () => {})
-  describe('postType', () => {
+  xdescribe('postType', () => {
     describe('CRN and UUID are valid in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(true)

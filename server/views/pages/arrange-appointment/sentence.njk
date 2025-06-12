@@ -91,6 +91,7 @@
       {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
+
       {% set allSentences = (allSentences.push({
       text: sentence.order.description,
       hint: {
@@ -101,6 +102,9 @@
           'data-bold': 'true',
           'data-sentence': 'true',
           'data-reset-conditional-radios': ''
+        },
+      conditional: {
+            html: sentenceReveal
         }
     }), allSentences) %}
     {% endif %}
