@@ -150,6 +150,7 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
   })
+  /*
   describe('getOrPostType', () => {
     const mockReq = createMockRequest({})
     let getOverviewSpy: jest.SpyInstance
@@ -209,6 +210,7 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
   })
+    */
   //   describe('getType', () => {})
   describe('postType', () => {
     describe('CRN and UUID are valid in request params', () => {

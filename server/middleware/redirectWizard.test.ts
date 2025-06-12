@@ -29,7 +29,12 @@ const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const mockAppointment: Appointment = {
-  type: 'Phone call',
+  type: {
+    code: 'C084',
+    description: '3 Way Meeting (NS)',
+    isPersonLevelContact: false,
+    isLocationRequired: true,
+  },
   location: '',
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   'start-time': '2044-12-22T09:15:00.382936Z[Europe/London]',

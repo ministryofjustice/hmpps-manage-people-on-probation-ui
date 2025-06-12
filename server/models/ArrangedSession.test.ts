@@ -23,7 +23,12 @@ describe('Arranged Session', () => {
       'start-time': '11:00am',
       date: '2023-05-18',
       location: 'LOC',
-      type: 'TYPE',
+      type: {
+        code: 'C084',
+        description: '3 Way Meeting (NS)',
+        isPersonLevelContact: false,
+        isLocationRequired: true,
+      },
     }
     const repeated = ArrangedSession.generateRepeatedAppointments(appointment, 'week')
     expect(repeated.length).toEqual(0)
@@ -35,7 +40,12 @@ describe('Arranged Session', () => {
       'start-time': '11:00am',
       date: '2023-05-18',
       location: 'LOC',
-      type: 'TYPE',
+      type: {
+        code: 'C084',
+        description: '3 Way Meeting (NS)',
+        isPersonLevelContact: false,
+        isLocationRequired: true,
+      },
       repeating: 'Yes',
       'repeating-count': '1',
     }
@@ -50,7 +60,12 @@ describe('Arranged Session', () => {
       'start-time': '11:00am',
       date: '2023-05-18',
       location: 'LOC',
-      type: 'TYPE',
+      type: {
+        code: 'C084',
+        description: '3 Way Meeting (NS)',
+        isPersonLevelContact: false,
+        isLocationRequired: true,
+      },
       repeating: 'Yes',
       'repeating-count': '2',
     }

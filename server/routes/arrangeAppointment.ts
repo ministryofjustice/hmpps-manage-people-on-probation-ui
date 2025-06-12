@@ -14,24 +14,19 @@ import { postAppointments } from '../middleware/postAppointments'
 import { getTimeOptions } from '../middleware/getTimeOptions'
 import type { Route } from '../@types'
 import controllers from '../controllers'
-import { AppResponse } from '../models/Locals'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all('/case/:crn/arrange-appointment/:id/*path', (req, res: AppResponse, next) => {
-    res.locals.change = req.query.change as string
-    return next()
-  })
+  router.get('/case/:crn/arrange-appointment/:id/*path', getAppointment(hmppsAuthClient))
+
   get('/case/:crn/arrange-appointment/type', controllers.arrangeAppointments.redirectToType())
 
-  router.all('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getOrPostType(hmppsAuthClient))
+  // router.all('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getOrPostType(hmppsAuthClient))
 
   get('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getType())
 
-  router.all('/case/:crn/arrange-appointment/:id/*path', getAppointment)
-
-  router.post('/case/:crn/arrange-appointment/:id/*path', autoStoreSessionData)
+  router.post('/case/:crn/arrange-appointment/:id/*path', [autoStoreSessionData, getAppointment(hmppsAuthClient)])
 
   router.post(
     '/case/:crn/arrange-appointment/:id/type',

@@ -8,7 +8,6 @@ import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToType',
-  'getOrPostType',
   'getType',
   'postType',
   'getSentence',
@@ -39,20 +38,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/type`)
     }
   },
-  getOrPostType: hmppsAuthClient => {
-    return async (req, res, next) => {
-      const { crn } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const [currentCase, appointmentTypesResponse] = await Promise.all([
-        masClient.getOverview(crn),
-        masClient.getAppointmentTypes(),
-      ])
-      res.locals.appointmentTypes = appointmentTypesResponse.appointmentTypes
-      res.locals.visor = currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor')
-      return next()
-    }
-  },
   getType: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
@@ -60,8 +45,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params
-      const { change } = req.query
-      return res.render(`pages/arrange-appointment/type`, { crn, id, errors, change })
+      return res.render(`pages/arrange-appointment/type`, { crn, id, errors })
     }
   },
   postType: () => {

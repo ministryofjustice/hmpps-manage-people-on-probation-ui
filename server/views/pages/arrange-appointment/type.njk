@@ -1,9 +1,9 @@
 {% extends "../_form.njk" %}
 {% set title = 'What appointment are you arranging?' %}
-{% set backLink = change if change else 
+{% set backLink = appointment.change if appointment.change else 
   '/' %}
 {% set types = [] %}
-{% for appointmentType in appointmentTypes %}
+{% for appointmentType in appointment.types %}
   {% set types = (types.push({text: appointmentType.description, value: appointmentType.code}), types) %}
 {% endfor %}
 {% block heading %}{% endblock %}
@@ -38,7 +38,7 @@
  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
   <p class="govuk-!-margin-bottom-7">
     <a href="{{ deliusDeepLinkUrl('ContactList', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" data-qa="ndeliusAppointmentsLink">Create all other appointments on NDelius (opens in new tab)</a>.</p>
-  {% if visor %}
+  {% if appointment.visor %}
     {{ govukRadios({
   classes: "govuk-radios--inline",
     fieldset: {
