@@ -37,7 +37,7 @@
                 text: "Select region"
             },
             items: providerItems
-        } | decorateFormAttributes(['appointments', crn, id, 'attendance'])) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'region'])) }}
 
         {{ govukSelect({
             id: "team",
@@ -46,7 +46,7 @@
                 text: "Select team"
             },
             items: teamItems
-        } | decorateFormAttributes(['appointments', crn, id, 'attendance'])) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'team'])) }}
 
         {{ govukSelect({
             id: "name",
@@ -55,6 +55,6 @@
                 text: "Select name"
             },
             items: userItems
-        } | decorateFormAttributes(['appointments', crn, id, 'attendance'])) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'name'])) }}
 
 {% endblock %}
