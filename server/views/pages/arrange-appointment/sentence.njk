@@ -63,7 +63,9 @@
       }
     },
     items: licenceConditions
+<<<<<<< HEAD
 } | decorateFormAttributes(['appointments', crn, id, 'licenceConditionId'])) }}
+      ======= } | decorateFormAttributes(['appointments', crn, id, 'sentence-licence-condition'])) }} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip)
       {% endset -%}
     {% endif %}
     {% if sentence.nsis.length %}
@@ -88,6 +90,7 @@
     },
     items: nsis
 } | decorateFormAttributes(['appointments', crn, id, 'nsiId'])) }}
+      ======= 'data-qa': 'sentence-nsi' } }, items: nsis } | decorateFormAttributes(['appointments', crn, id, 'sentence-nsi'])) }} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip)
       {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
@@ -112,19 +115,10 @@
     {% endif %}
   {% endfor %}
   {% if appointment.type.isPersonLevelContact %}
-    {% set allSentences = (allSentences.push(
-    {
-    text: appointment.meta.forename,
-    value: '1',
-    attributes: {
-    'data-qa': 'personLevelContact'
-    },
-    label: {
-      attributes: {
-'data-qa': 'personLevelContactLabel'
-      }
-    }
-    }), allSentences) %}
+    {% set allSentences = (allSentences.push( { text: appointment.meta.forename, value: '1', attributes: { 'data-qa': 'personLevelContact' }, label: { attributes: { 'data-qa': 'personLevelContactLabel' } } }), allSentences) %}
+    =======
+    {% set allSentences = (allSentences.push({text: appointment.meta.forename, value: '1'}), allSentences) %}
+    >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip)
   {% endif %}
   {{ govukRadios({
     fieldset: {
@@ -142,5 +136,6 @@
       },
     items: allSentences
 } | decorateFormAttributes(['appointments', crn, id, 'eventId'])) }}
+  ======= } | decorateFormAttributes(['appointments', crn, id, 'sentence'])) }} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip)
 
 {% endblock %}
