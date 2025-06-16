@@ -54,42 +54,73 @@ const spy = jest.spyOn(MasApiClient.prototype, 'getSentences').mockImplementatio
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
-const req = httpMocks.createRequest({
-  params: {
-    crn,
-  },
-  query: {
-    number,
-  },
-  session: {
-    data: {
-      sentences: {
-        X000002: sentencesMock.sentences,
-      },
-    },
-  },
-})
-
 describe('/middleware/getSentences', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  beforeEach(async () => {
-    await getSentences(hmppsAuthClient)(req, res, nextSpy)
-  })
-  it('should request the sentences from the api', () => {
-    expect(spy).toHaveBeenCalledWith(crn, number)
-  })
-  it('should add the api response to the session', () => {
-    expect(req.session.data.sentences).toEqual({
-      ...req.session.data.sentences,
-      [crn]: sentencesMock.sentences,
+  describe('Sentences session is not defined', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      query: {
+        number,
+      },
+      session: {
+        data: {
+          sentences: {
+            X000002: sentencesMock.sentences,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      await getSentences(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should request the sentences from the api', () => {
+      expect(spy).toHaveBeenCalledWith(crn, number)
+    })
+    it('should add the api response to the session', () => {
+      expect(req.session.data.sentences).toEqual({
+        ...req.session.data.sentences,
+        [crn]: sentencesMock.sentences,
+      })
+    })
+    it('should assign the sentence to res.locals.sentences', () => {
+      expect(res.locals.sentences).toEqual(sentencesMock.sentences)
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
     })
   })
-  it('should assign the sentence to res.locals.sentences', () => {
-    expect(res.locals.sentences).toEqual(sentencesMock.sentences)
-  })
-  it('should call next()', () => {
-    expect(nextSpy).toHaveBeenCalled()
+
+  describe('Sentences session is defined', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      query: {
+        number,
+      },
+      session: {
+        data: {
+          sentences: {
+            X000001: sentencesMock.sentences,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      await getSentences(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should not request the sentences from the api', () => {
+      expect(spy).not.toHaveBeenCalled()
+    })
+    it('should assign the sentence to res.locals.sentences', () => {
+      expect(res.locals.sentences).toEqual(req.session.data.sentences[crn])
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
+    })
   })
 })

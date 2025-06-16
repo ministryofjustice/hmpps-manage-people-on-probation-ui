@@ -3,98 +3,104 @@
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% set title = 'Enter the date and time of the appointment' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/location' %}
+{% set backLink = appointment.change if appointment.change else '/case/' + crn + '/arrange-appointment/' + id + '/location' %}
 {% set disabilities = [] %}
 {% set employment = '' %}
 {% set dependents = [] %}
 {% set provisions = [] %}
 
-  {% for disability in case.disabilities.disabilities %}
-    {% set disabilities = (disabilities.push(disability), disabilities) %}
-  {% endfor %}
+{% for disability in case.disabilities.disabilities %}
+  {% set disabilities = (disabilities.push(disability), disabilities) %}
+{% endfor %}
 
-  {% for provision in case.provisions.provisions %}
-     {% set provisions = (provisions.push(provision), provisions) %}
-  {% endfor %}
+{% for provision in case.provisions.provisions %}
+  {% set provisions = (provisions.push(provision), provisions) %}
+{% endfor %}
 
-  {% for circumstance in case.circumstances.circumstances %}
-    {% if circumstance.type === 'Employment' %}
-      {% set employment = circumstance.subType %}
-    {% endif %}
-    {% if circumstance.type === 'Dependents' %}
-      {% set dependents = (dependents.push(circumstance.subType), dependents) %}
-    {% endif %}
- {% endfor %}
+{% for circumstance in case.circumstances.circumstances %}
+  {% if circumstance.type === 'Employment' %}
+    {% set employment = circumstance.subType %}
+  {% endif %}
+  {% if circumstance.type === 'Dependents' %}
+    {% set dependents = (dependents.push(circumstance.subType), dependents) %}
+  {% endif %}
+{% endfor %}
 
 {% set circumstancesHTML %}
 <dl class="govuk-!-static-margin-0">
-<div data-qa="disability">
-<dt class="govuk-body govuk-!-static-margin-bottom-1"><b>Disability</b></dt>
-<dd class="govuk-!-static-margin-left-0 govuk-!-static-margin-bottom-3">
-{% if disabilities.length > 0 %}
-{% for disability in disabilities %}
-{% if loop.index > 1 %}<br>{% endif %}{{ disability }}
-{% endfor %}
-{% else %}
-None known
-{% endif %}
-</dd>
-</div>
-<div data-qa="provisions">
-<dt class="govuk-body govuk-!-static-margin-bottom-1"><b>Reasonable adjustments</b></dt>
-<dd class="govuk-!-static-margin-left-0 govuk-!-static-margin-bottom-3">
-{% if provisions.length > 0 %}
-{% for provision in provisions %}
-{% if loop.index > 1 %}<br>{% endif %}{{ provision }}
-{% endfor %}
-{% else %}
-None known
-{% endif %}
-</dd>
-</div>
-<div data-qa="dependents">
-<dt class="govuk-body govuk-!-static-margin-bottom-1"><b>Dependents</b></dt>
-<dd class="govuk-!-static-margin-left-0 govuk-!-static-margin-bottom-0">
-{% if dependents.length > 0 %}
-{% for dependent in dependents %}
-{% if loop.index > 1 %}<br>{% endif %}{{ dependent }}
-{% endfor %}
-{% else %}
-None known
-{% endif %}
-</dd>
-</div>
+  <div data-qa="disability">
+    <dt class="govuk-body govuk-!-static-margin-bottom-1">
+      <b>Disability</b>
+    </dt>
+    <dd class="govuk-!-static-margin-left-0 govuk-!-static-margin-bottom-3">
+      {% if disabilities.length > 0 %}
+        {% for disability in disabilities %}
+          {% if loop.index > 1 %}<br>{% endif %}{{ disability }}
+        {% endfor %}
+      {% else %}
+        None known
+      {% endif %}
+    </dd>
+  </div>
+  <div data-qa="provisions">
+    <dt class="govuk-body govuk-!-static-margin-bottom-1">
+      <b>Reasonable adjustments</b>
+    </dt>
+    <dd class="govuk-!-static-margin-left-0 govuk-!-static-margin-bottom-3">
+      {% if provisions.length > 0 %}
+        {% for provision in provisions %}
+          {% if loop.index > 1 %}<br>{% endif %}{{ provision }}
+        {% endfor %}
+      {% else %}
+        None known
+      {% endif %}
+    </dd>
+  </div>
+  <div data-qa="dependents">
+    <dt class="govuk-body govuk-!-static-margin-bottom-1">
+      <b>Dependents</b>
+    </dt>
+    <dd class="govuk-!-static-margin-left-0 govuk-!-static-margin-bottom-0">
+      {% if dependents.length > 0 %}
+        {% for dependent in dependents %}
+          {% if loop.index > 1 %}<br>{% endif %}{{ dependent }}
+        {% endfor %}
+      {% else %}
+        None known
+      {% endif %}
+    </dd>
+  </div>
 </dl>
-   {% endset %}
+{% endset %}
 
 {% block form %}
   {% if warningMessages %}
-      <input type="hidden" name="_warningMessagesSeen" value="true">
-      {{ mojAlert({
+    <input type="hidden" name="_warningMessagesSeen" value="true">
+    {{ mojAlert({
           variant: "warning",
           title: warningMessages.isWithinOneHourOfMeetingWith,
           dismissible: true,
           attributes: { "data-qa": "isWithinOneHourOfMeetingWithWarning"},
           html: warningMessages.isWithinOneHourOfMeetingWith
       }) if warningMessages.isWithinOneHourOfMeetingWith }}
-      {{ mojAlert({
+    {{ mojAlert({
           variant: "warning",
           title: warningMessages.nonWorkingDayName,
           dismissible: true,
           attributes: { "data-qa": "nonWorkingDayNameWarning"},
           html: warningMessages.nonWorkingDayName
       }) if warningMessages.nonWorkingDayName }}
-  {%  endif %}
+  {% endif %}
   {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
-        {% if errorList.length > 0 %}
-            {{ govukErrorSummary({
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
-        {% endif %}
     {% endif %}
+  {% endif %}
   {{ govukDetails({
     summaryText: case.name.forename + "’s circumstances",
     html: circumstancesHTML
@@ -110,7 +116,7 @@ None known
     minDate: minDate
   } | decorateFormAttributes(['appointments', crn, id, 'date'])) }}
 
-{{ govukSelect({
+  {{ govukSelect({
    label: {
       text: "Start time",
       classes: "govuk-label--s"
@@ -118,8 +124,7 @@ None known
   items: timeOptions
   } | decorateFormAttributes(['appointments', crn, id, 'start-time'])) }}
 
-
-{{ govukSelect({
+  {{ govukSelect({
    label: {
       text: "End time",
       classes: "govuk-label--s"
@@ -127,6 +132,5 @@ None known
   items: endTimeOptions
   } | decorateFormAttributes(['appointments', crn, id, 'end-time'])) }}
 
- 
   <input type="hidden" name="_minDate" value="{{minDate}}">
 {% endblock %}

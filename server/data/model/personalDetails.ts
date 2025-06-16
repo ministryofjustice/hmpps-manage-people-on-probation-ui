@@ -45,6 +45,7 @@ export interface PersonAddress {
 export interface PersonSummary {
   name: Name
   crn: string
+  offenderId?: number
   pnc?: string
   dateOfBirth: string
   preferredLanguage?: string

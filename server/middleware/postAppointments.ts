@@ -32,7 +32,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 
     const type = appointmentTypes.find(t => t.text === appointmentType).value
     const sentence = sentences.find(s => s.order.description === selectedSentence)
-    const { eventId } = sentence
+    const { eventNumber } = sentence
     const locationId = userLocations.find(location => location.description === selectedLocation).id
     const requirementId =
       sentence?.requirements?.find(requirement => requirement.description === sentenceRequirement)?.id || 0
@@ -51,7 +51,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       end: dateTime(date, endTime),
       interval,
       numberOfAppointments: parseInt(repeatCount, 10),
-      eventId,
+      eventNumber,
       createOverlappingAppointment: true,
       requirementId,
       licenceConditionId,

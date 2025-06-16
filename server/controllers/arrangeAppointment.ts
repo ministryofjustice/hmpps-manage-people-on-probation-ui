@@ -1,14 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { appointmentTypes } from '../properties'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError } from '../middleware'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToType',
-  'getOrPostType',
   'getType',
   'postType',
   'getSentence',
@@ -39,12 +38,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/type`)
     }
   },
-  getOrPostType: () => {
-    return async (_req, res, next) => {
-      res.locals.appointmentTypes = appointmentTypes
-      return next()
-    }
-  },
   getType: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
@@ -52,8 +45,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params
-      const { change } = req.query
-      return res.render(`pages/arrange-appointment/type`, { crn, id, errors, change })
+      return res.render(`pages/arrange-appointment/type`, { crn, id, errors })
     }
   },
   postType: () => {
@@ -94,9 +86,15 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { data } = req.session
       if (req?.body?.appointments?.[crn]?.[id]?.['sentence-licence-condition']) {
         setDataValue(data, ['appointments', crn, id, 'sentence-requirement'], '')
+        setDataValue(data, ['appointments', crn, id, 'sentence-nsi'], '')
       }
       if (req?.body?.appointments?.[crn]?.[id]?.['sentence-requirement']) {
         setDataValue(data, ['appointments', crn, id, 'sentence-licence-condition'], '')
+        setDataValue(data, ['appointments', crn, id, 'sentence-nsi'], '')
+      }
+      if (req?.body?.appointments?.[crn]?.[id]?.nsi) {
+        setDataValue(data, ['appointments', crn, id, 'sentence-licence-condition'], '')
+        setDataValue(data, ['appointments', crn, id, 'sentence-requirement'], '')
       }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)

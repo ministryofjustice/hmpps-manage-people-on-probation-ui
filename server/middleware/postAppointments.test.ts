@@ -46,7 +46,7 @@ const mockUserLocations = [
 
 const mockSentences = [
   {
-    eventId: 12345,
+    eventNumber: 12345,
     mainOffence: {
       code: '18502',
       description: '12 month community order',
@@ -130,7 +130,7 @@ describe('/middleware/postAppointments', () => {
     end: dateTime(date, endTime),
     interval,
     numberOfAppointments: parseInt(repeatCount, 10),
-    eventId: mockSentences[0].eventId,
+    eventNumber: mockSentences[0].eventNumber,
     createOverlappingAppointment: true,
     requirementId: 0,
     licenceConditionId: 0,

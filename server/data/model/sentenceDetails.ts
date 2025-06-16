@@ -18,15 +18,17 @@ export interface SentenceDescription {
 }
 
 export interface Sentence {
-  eventId?: number
-  mainOffence: Offence
-  offenceDetails: OffenceDetails
-  conviction: Conviction
+  id: number
+  eventNumber?: number
   order: Order
-  requirements: Requirement[]
-  courtDocuments: CourtDocument[]
-  unpaidWorkProgress: string
+  nsis: Nsi[]
   licenceConditions: LicenceCondition[]
+  requirements: Requirement[]
+  mainOffence?: Offence
+  offenceDetails?: OffenceDetails
+  conviction?: Conviction
+  courtDocuments?: CourtDocument[]
+  unpaidWorkProgress?: string
 }
 
 export interface OffenceDetails {
@@ -51,24 +53,19 @@ export interface Offence {
 
 export interface Order {
   description: string
-  length: string
   startDate: string
+  endDate: string
+  length?: string
 }
 
 export interface Requirement {
   id: number
-  code: string
-  expectedStartDate: string
-  actualStartDate: string
-  expectedEndDate: string
-  actualEndDate: string
-  terminationReason: string
   description: string
-  codeDescription: string
-  length: string
-  requirementNotes?: Note[]
-  requirementNote?: Note
-  rar: Rar
+}
+
+export interface Nsi {
+  id: number
+  description: string
 }
 
 export interface Rar {
@@ -86,10 +83,6 @@ export interface CourtDocument {
 export interface LicenceCondition {
   id: number
   mainDescription: string
-  subTypeDescription: string
-  imposedReleasedDate: string
-  actualStartDate: string
-  notes: Note[]
 }
 
 export interface ProbationHistory {

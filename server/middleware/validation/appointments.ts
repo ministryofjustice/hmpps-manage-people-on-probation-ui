@@ -18,29 +18,21 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateType = (): void => {
     if (req.url.includes('/type')) {
-      errorMessages = validateWithSpec(req.body, appointmentsValidation({ crn, id, page: 'type' }))
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor }),
+      )
     }
   }
 
   const validateSentence = (): void => {
     if (req.url.includes('/sentence')) {
-      const { data } = req.session
-      const type = getDataValue(data, ['appointments', crn, id, 'type'])
-      const showReveal = ['Home visit', 'Planned office visit'].includes(type)
-      const sentences = req.session.data.sentences[crn]
-      const sentence = sentences.find(
-        (s: any) => s?.order?.description === req.body?.appointments?.[crn]?.[id]?.sentence,
-      )
-      const validateSentenceRequirement = showReveal && sentence?.requirements?.length > 0
-      const validateSentenceLicenceCondition = showReveal && sentence?.licenceConditions?.length > 0
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           page: 'sentence',
-          validateSentenceRequirement,
-          validateSentenceLicenceCondition,
         }),
       )
     }

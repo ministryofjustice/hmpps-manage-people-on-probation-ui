@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { redirectWizard } from './redirectWizard'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
-import { Appointment } from '../models/Appointments'
+import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 
 const crn = 'X000001'
@@ -28,8 +28,8 @@ const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
-const mockAppointment: Appointment = {
-  type: 'Phone call',
+const mockAppointment: AppointmentSession = {
+  type: 'C084',
   location: '',
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   'start-time': '2044-12-22T09:15:00.382936Z[Europe/London]',
