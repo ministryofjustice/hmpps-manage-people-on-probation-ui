@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon-business-days'
 import { v4 as uuidv4 } from 'uuid'
-import { Appointment } from './Appointments'
+import { AppointmentSession } from './Appointments'
 
 interface Params {
-  appointment: Appointment
+  appointment: AppointmentSession
   weeksInFuture?: number
   monthsInFuture?: number
 }
@@ -29,10 +29,10 @@ export class ArrangedSession {
   }
 
   static generateRepeatedAppointments(
-    appointment: Appointment,
+    appointment: AppointmentSession,
     period: 'week' | 'month' = 'week',
     increment = 1,
-  ): Appointment[] {
+  ): AppointmentSession[] {
     const hasRepeatAppointments = appointment.repeating === 'Yes' && appointment['repeating-count']
     const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment['repeating-count'], 10) : 0
     return Array.from(Array(numberOfRepeatedAppts)).map((_, i) => {
@@ -43,8 +43,8 @@ export class ArrangedSession {
     })
   }
 
-  static generateRepeatMonthlyAppointment(params: Params): Appointment {
-    const clonedAppointment: Appointment = { ...params.appointment }
+  static generateRepeatMonthlyAppointment(params: Params): AppointmentSession {
+    const clonedAppointment: AppointmentSession = { ...params.appointment }
     return {
       ...clonedAppointment,
       id: uuidv4(),
@@ -52,7 +52,7 @@ export class ArrangedSession {
     }
   }
 
-  static generateRepeatWeeklyAppointment(params: Params): Appointment {
+  static generateRepeatWeeklyAppointment(params: Params): AppointmentSession {
     const clonedAppointment = { ...params.appointment }
     return {
       ...clonedAppointment,

@@ -4,13 +4,12 @@ export interface AppointmentsValidationArgs {
   crn: string
   id: string
   page: string
-  validateSentenceRequirement?: boolean
-  validateSentenceLicenceCondition?: boolean
   repeatingValue?: 'Yes' | 'No'
+  visor?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, validateSentenceRequirement, validateSentenceLicenceCondition, repeatingValue } = args
+  const { crn, id, page, visor, repeatingValue } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -19,6 +18,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select an appointment type',
           log: 'Appointment type not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][visorReport]`]: {
+      optional: page !== 'type' || !visor,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if appointment should be included in ViSOR report',
+          log: 'VISOR report not selected',
         },
       ],
     },
@@ -32,26 +41,26 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][sentence-requirement]`]: {
-      optional: page !== 'sentence' || (page === 'sentence' && !validateSentenceRequirement),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select a requirement',
-          log: 'Sentence requirement not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][sentence-licence-condition]`]: {
-      optional: page !== 'sentence' || (page === 'sentence' && !validateSentenceLicenceCondition),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select a licence condition',
-          log: 'Sentence licence condition not selected',
-        },
-      ],
-    },
+    // [`[appointments][${crn}][${id}][sentence-requirement]`]: {
+    //   optional: page !== 'sentence' || (page === 'sentence' && !validateSentenceRequirement),
+    //   checks: [
+    //     {
+    //       validator: isNotEmpty,
+    //       msg: 'Select a requirement',
+    //       log: 'Sentence requirement not selected',
+    //     },
+    //   ],
+    // },
+    // [`[appointments][${crn}][${id}][sentence-licence-condition]`]: {
+    //   optional: page !== 'sentence' || (page === 'sentence' && !validateSentenceLicenceCondition),
+    //   checks: [
+    //     {
+    //       validator: isNotEmpty,
+    //       msg: 'Select a licence condition',
+    //       log: 'Sentence licence condition not selected',
+    //     },
+    //   ],
+    // },
     [`[appointments][${crn}][${id}][location]`]: {
       optional: page !== 'location',
       checks: [

@@ -5,7 +5,7 @@
         "urlPathPattern": "/mas/overview/X778160",
         "queryParameters": {
           "sentenceNumber": {
-            "equalTo": ""
+            "matches": ".*"
           }
         }
       },
