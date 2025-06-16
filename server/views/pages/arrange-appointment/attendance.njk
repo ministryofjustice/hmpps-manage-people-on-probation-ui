@@ -29,8 +29,6 @@
 
     <p>You can attend or book for a colleague</p>
 
-    <form method="post">
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
         {{ govukSelect({
             id: "region",
@@ -39,7 +37,7 @@
                 text: "Select region"
             },
             items: providerItems
-        }) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'attendance'])) }}
 
         {{ govukSelect({
             id: "team",
@@ -48,7 +46,7 @@
                 text: "Select team"
             },
             items: teamItems
-        }) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'attendance'])) }}
 
         {{ govukSelect({
             id: "name",
@@ -57,7 +55,6 @@
                 text: "Select name"
             },
             items: userItems
-        }) }}
-    </form>
+        } | decorateFormAttributes(['appointments', crn, id, 'attendance'])) }}
 
 {% endblock %}
