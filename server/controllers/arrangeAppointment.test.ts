@@ -279,7 +279,7 @@ describe('controllers/arrangeAppointment', () => {
         ['appointments', crn, uuid, 'sentence-licence-condition'],
         '',
       )
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/attendance`)
     })
     it('should redirect to the change url if found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })

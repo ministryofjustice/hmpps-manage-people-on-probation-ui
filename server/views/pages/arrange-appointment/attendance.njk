@@ -1,0 +1,63 @@
+{% extends "../_form.njk" %}
+{% set title = 'Who will attend the appointment?' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+
+{% block form %}
+    {% set providerItems = [] %}
+    {% for provider in userProviders %}
+        {% set providerItems = (providerItems.push({
+            value: provider.code,
+            text: provider.name
+        }), providerItems) %}
+    {% endfor %}
+
+    {% set teamItems = [] %}
+    {% for team in userTeams %}
+        {% set teamItems = (teamItems.push({
+            value: team.code,
+            text: team.description
+        }), teamItems) %}
+    {% endfor %}
+
+    {% set userItems = [] %}
+    {% for user in userStaff %}
+        {% set userItems = (userItems.push({
+            value: user.username,
+            text: user.name
+        }), userItems) %}
+    {% endfor %}
+
+    <p>You can attend or book for a colleague</p>
+
+    <form method="post">
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+        {{ govukSelect({
+            id: "region",
+            name: "region",
+            label: {
+                text: "Select region"
+            },
+            items: providerItems
+        }) }}
+
+        {{ govukSelect({
+            id: "team",
+            name: "team",
+            label: {
+                text: "Select team"
+            },
+            items: teamItems
+        }) }}
+
+        {{ govukSelect({
+            id: "name",
+            name: "name",
+            label: {
+                text: "Select name"
+            },
+            items: userItems
+        }) }}
+    </form>
+
+{% endblock %}

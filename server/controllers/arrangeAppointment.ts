@@ -13,6 +13,7 @@ const routes = [
   'postType',
   'getSentence',
   'postSentence',
+  'getWhoWillAttend',
   'getLocation',
   'postLocation',
   'getLocationNotInList',
@@ -101,8 +102,19 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance`
       return res.redirect(redirect)
+    }
+  },
+  getWhoWillAttend: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { change } = req.query
+      const errors = req?.session?.data?.errors
+      if (errors) {
+        delete req.session.data.errors
+      }
+      return res.render(`pages/arrange-appointment/attendance`, { crn, id, errors, change })
     }
   },
   getLocation: () => {

@@ -1,0 +1,449 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/user/USER1/providers",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            },
+            {
+              "code": "N51",
+              "name": "North West Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "Automated Allocation Team",
+              "code": "N07AAT"
+            },
+            {
+              "description": "Automation SPG",
+              "code": "N07CHT"
+            },
+            {
+              "description": "Homelessness Prevention Team,",
+              "code": "N07HPT"
+            }
+          ],
+          "users": [
+            {
+              "username": "peter-parker",
+              "name": "peter parker (PS-PSO)"
+            },
+            {
+              "username": "jon-smith",
+              "name": "jon smith (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/sentence/X000001",
+        "queryParameters": {
+          "activeSentence": {
+            "equalTo": "false"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "2012-03-13"
+          },
+          "sentenceSummaryList": [],
+          "sentence": null,
+          "conviction": null,
+          "order": null,
+          "requirements": [],
+          "courtDocuments": [],
+          "unpaidWorkProgress": "7 minutes completed (of 100 hours)",
+          "licenceConditions": []
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/sentence/X000001",
+        "queryParameters": {
+          "number": {
+            "equalTo": "1"
+          },
+          "activeSentence": {
+            "equalTo": "true"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "sentenceSummaryList": [
+            {
+              "eventNumber": "3",
+              "description": "Default Sentence Type"
+            },
+            {
+              "eventNumber": "1",
+              "description": "12 month community order"
+            }
+          ],
+          "sentence": {
+            "offenceDetails": {
+              "eventNumber": "1",
+              "offence": {
+                "description": "Another Murder",
+                "count": 1
+              },
+              "dateOfOffence": "2024-01-20",
+              "notes": "",
+              "additionalOffences": []
+            },
+            "conviction": {
+              "additionalSentences": []
+            },
+            "order": {
+              "description": "12 month community order",
+              "length": 12,
+              "endDate": "2025-01-31",
+              "releaseDate": "2024-11-01",
+              "startDate": "2024-02-01"
+            },
+            "requirements": [
+              {
+                "id": 1,
+                "code": "F",
+                "actualStartDate": "2024-04-12",
+                "description": "3 of 12 RAR days completed",
+                "length": 12,
+                "lengthUnitValue": "Days",
+                "requirementNotes": [
+                  {
+                    "id": 0,
+                    "createdBy": "Jon Jones",
+                    "createdByDate": "2024-08-21",
+                    "note": "Requirement created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer. Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer.Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as desi\n",
+                    "hasNoteBeenTruncated": true
+                  }
+                ],
+                "rar": {
+                  "completed": 1,
+                  "nsiCompleted": 2,
+                  "scheduled": 9,
+                  "totalDays": 12
+                }
+              },
+              {
+                "id": 2,
+                "code": "RM49",
+                "expectedStartDate": "2024-01-07",
+                "actualStartDate": "2024-01-12",
+                "expectedEndDate": "2024-03-10",
+                "actualEndDate": "2024-01-09",
+                "terminationReason": "Expired (Normal)",
+                "description": "Curfew (Electronic Monitored)",
+                "length": "10",
+                "lengthUnitValue": "Hours",
+                "requirementNotes": [
+                  {
+                    "id": 0,
+                    "createdBy": "Jon Jones",
+                    "createdByDate": "2024-08-21",
+                    "note": "curfew notes",
+                    "hasNoteBeenTruncated": false
+                  }
+                ]
+              },
+              {
+                "id": 3,
+                "code": "W",
+                "actualStartDate": "2015-05-22",
+                "description": "Unpaid Work - Regular",
+                "length": 100,
+                "lengthUnitValue": "Hours",
+                "requirementNotes": [
+                  {
+                    "id": 0,
+                    "createdBy": "Jon Jones",
+                    "createdByDate": "2024-08-21",
+                    "note": "unpaid work notes",
+                    "hasNoteBeenTruncated": false
+                  }
+                ]
+              }
+            ],
+            "courtDocuments": [],
+            "unpaidWorkProgress": "3 minutes completed (of 12 hours)",
+            "licenceConditions": []
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/sentence/X000001",
+        "queryParameters": {
+          "number": {
+            "equalTo": "3"
+          },
+          "activeSentence": {
+            "equalTo": "true"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "sentenceSummaryList": [
+            {
+              "eventNumber": "3",
+              "description": "Default Sentence Type"
+            },
+            {
+              "eventNumber": "1",
+              "description": "12 month community order"
+            }
+          ],
+          "sentence": {
+            "offenceDetails": {
+              "eventNumber": "3",
+              "offence": {
+                "description": "Murder",
+                "count": 3
+              },
+              "dateOfOffence": "2024-03-20",
+              "notes": "overview",
+              "additionalOffences": [
+                {
+                  "description": "Burglary",
+                  "count": 2
+                },
+                {
+                  "description": "Assault",
+                  "count": 1
+                }
+              ]
+            },
+            "conviction": {
+              "sentencingCourt": "Hull Court",
+              "responsibleCourt": "Birmingham Court",
+              "convictionDate": "2024-03-20",
+              "additionalSentences": [
+                {
+                  "length": 3,
+                  "description": "Disqualified from Driving"
+                }
+              ]
+            },
+            "order": {
+              "description": "Default Sentence Type",
+              "length": 12,
+              "endDate": "2025-03-19",
+              "startDate": "2024-03-19"
+            },
+            "requirements": [],
+            "courtDocuments": [
+              {
+                "id": "4d74f43c-5b42-4317-852e-56c7d29b610b",
+                "lastSaved": "2024-04-03",
+                "documentName": "Pre-sentence report"
+              },
+              {
+                "id": "6037becb-0d0c-44e1-8727-193f22df0494",
+                "lastSaved": "2024-04-01",
+                "documentName": "CPS Pack"
+              },
+              {
+                "id": "d072ed9a-999f-4333-a116-a871a845aeb3",
+                "lastSaved": "",
+                "documentName": "Previous convictions"
+              }
+            ],
+            "licenceConditions": [
+              {
+                "id": 7007,
+                "mainDescription": "Alcohol Monitoring (Electronic Monitoring)",
+                "subTypeDescription": "You must not drink any alcohol until [END DATE].",
+                "imposedReleasedDate": "2024-12-25",
+                "actualStartDate": "2024-12-26",
+                "licenceConditionNotes": [
+                  {
+                    "id": 0,
+                    "createdBy": "Jon Jones",
+                    "createdByDate": "2024-08-21",
+                    "note": "Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer. Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer.Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
+                    "hasNoteBeenTruncated": true
+                  }
+                ]
+              },
+              {
+                "id": 3003,
+                "mainDescription": "Freedom of movement",
+                "imposedReleasedDate": "2022-02-04",
+                "licenceConditionNotes": [
+                  {
+                    "id": 1,
+                    "note": "Not to go to a football game.\nmulti-line\n\nnote\n\nthis is the forth line",
+                    "hasNoteBeenTruncated": false
+                  }
+                ]
+              },
+              {
+                "id": 2002,
+                "mainDescription": "Residence at a specific place",
+                "subTypeDescription": "Bespoke Condition (See Notes)",
+                "imposedReleasedDate": "2024-10-03",
+                "actualStartDate": "2023-11-15",
+                "licenceConditionNotes": [
+                  {
+                    "id": 2,
+                    "createdBy": "Mark Smith",
+                    "createdByDate": "2023-10-04",
+                    "note": "James must reside at his parent's house in Scotland for the duration of his release on licence.",
+                    "hasNoteBeenTruncated": false
+                  }
+                ]
+              },
+              {
+                "id": 1001,
+                "mainDescription": "Licence - Prohibited Activity",
+                "imposedReleasedDate": "2023-09-26",
+                "licenceConditionNotes": []
+              },
+              {
+                "id": 101,
+                "mainDescription": "Residence at a specific place",
+                "subTypeDescription": "Bespoke Condition (See Notes)",
+                "imposedReleasedDate": "2024-10-03",
+                "actualStartDate": "2023-11-15",
+                "licenceConditionNotes": [
+                  {
+                    "id": 1,
+                    "createdBy": "Gary Jones",
+                    "createdByDate": "2021-10-04",
+                    "note": "Need to be home by 10pm.",
+                    "hasNoteBeenTruncated": false
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/personal-details/X000001/document/4d74f43c-5b42-4317-852e-56c7d29b610b",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "bodyFileName": "document.pdf",
+        "headers": {
+          "content-type": "application/msword;charset=UTF-8",
+          "content-length": "14812",
+          "content-disposition": "attachment; filename=\"doc1\"; filename*=UTF-8''doc1",
+          "accept-ranges": "bytes",
+          "content-range": "bytes 0-14811/14812",
+          "cache-control": "max-age=0,  must-revalidate",
+          "etag": "1699630109776",
+          "last-modified": "Fri, 10 Nov 2023 15:28:29 GMT",
+          "Custom-Alfresco-Header": "should be ignored"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/sentence/X000001/probation-history",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "sentenceSummaryList": [
+            {
+              "eventNumber": "3",
+              "description": "Default Sentence Type"
+            },
+            {
+              "eventNumber": "1",
+              "description": "12 month community order"
+            }
+          ],
+          "probationHistory": {
+            "numberOfTerminatedEvents": 2,
+            "dateOfMostRecentTerminatedEvent": "2011-01-21",
+            "numberOfTerminatedEventBreaches": 2,
+            "numberOfProfessionalContacts": 3
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

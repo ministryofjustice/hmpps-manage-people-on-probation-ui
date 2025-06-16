@@ -37,6 +37,19 @@ export interface Team {
   code: string
 }
 
+export interface Provider {
+  code: string
+  name: string
+}
+
+export interface User {
+  username: string
+  name: {
+    forename: string
+    surname: string
+  }
+}
+
 export interface Location {
   id: number
   name: string
@@ -83,6 +96,17 @@ export interface UserLocation {
 export interface UserTeam {
   provider: string
   teams: Team[]
+}
+
+export interface UserProviders {
+  name: {
+    forename: string
+    middleName: string
+    surname: string
+  }
+  providers: Provider[]
+  teams: Team[]
+  users: User[]
 }
 
 export interface UserLocations {
