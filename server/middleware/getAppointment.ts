@@ -45,7 +45,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
       let sentenceNsi: Nsi
       if (sentenceId) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(sentenceId, 10))
-        sentence = parseInt(sentenceId, 10) !== 1 ? sentenceObj.order.description : forename
+        sentence = parseInt(sentenceId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (sentenceRequirementId) {
           sentenceRequirement = sentenceObj.requirements.find(
             requirement => requirement.id === parseInt(sentenceRequirementId, 10),
