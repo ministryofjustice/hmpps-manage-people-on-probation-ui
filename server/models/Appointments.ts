@@ -69,7 +69,7 @@ export interface AppointmentRequestBody {
   end: Date
   interval: AppointmentInterval
   numberOfAppointments: number
-  eventId: number
+  eventNumber: number
   uuid: string
   createOverlappingAppointment: true
   requirementId: number
