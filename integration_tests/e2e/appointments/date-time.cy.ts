@@ -100,7 +100,7 @@ describe('Enter the date and time of the appointment', () => {
         .getWarning('isWithinOneHourOfMeetingWith')
         .should(
           'contain.text',
-          'Your colleague Alma already has an appointment with Alton within an hour of this date and time. Continue with these details or make changes.',
+          'Alma Barlow already has an appointment with Alton within an hour of this date and time. Continue with these details or make changes.',
         )
       dateTimePage
         .getWarning('nonWorkingDayName')
