@@ -12,7 +12,6 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<v
     Object.entries(inputs).forEach(([key, _]: [string, any]) => {
       if (!key.startsWith('_')) {
         const getPath = id ? [key, crn, id] : [key, crn]
-        console.log({ inputs, getPath })
         const body: Record<string, string> = getDataValue(inputs, getPath)
         if (body) {
           Object.keys(body).forEach(valueKey => {
