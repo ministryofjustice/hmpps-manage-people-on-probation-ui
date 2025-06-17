@@ -59,6 +59,7 @@ const res = {
 } as unknown as AppResponse
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+mockGetDataValue.mockReturnValue(username)
 
 mockGetDataValue.mockImplementation((_data, path) => {
   if (path.join('.') === `appointments.${crn}.${id}.user.providerCode`) {
