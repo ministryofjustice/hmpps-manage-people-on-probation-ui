@@ -1,10 +1,14 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
+import { getDataValue } from '../utils'
 
 export const getUserLocations = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
-    const { username } = res.locals.user
+    const { crn, id } = req.params
+    const { data } = req.session
+    const username = getDataValue(data, ['appointments', crn, id, 'username'])
+    // const username = 'marcusaspin'
     const token = await hmppsAuthClient.getSystemClientToken(username)
     if (!req?.session?.data?.locations?.[username]) {
       const masClient = new MasApiClient(token)

@@ -4,6 +4,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
+import { getDataValue } from '../utils'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -11,7 +12,19 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    getDataValue: jest.fn(),
+  }
+})
+
+const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
+
 const username = 'user-1'
+const crn = 'X000001'
+const id = 'mock-id'
 
 const mockLocationsResponse = {
   name: {
@@ -44,6 +57,7 @@ const res = {
 } as unknown as AppResponse
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+mockGetDataValue.mockReturnValue(username)
 
 describe('/middleware/getUserLocations()', () => {
   const nextSpy = jest.fn()
@@ -60,6 +74,13 @@ describe('/middleware/getUserLocations()', () => {
     const req = httpMocks.createRequest({
       session: {
         data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                username,
+              },
+            },
+          },
           locations: {
             'user-2': mockLocationsResponse.locations,
           },
@@ -87,6 +108,13 @@ describe('/middleware/getUserLocations()', () => {
     const req = httpMocks.createRequest({
       session: {
         data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                username,
+              },
+            },
+          },
           locations: {
             [username]: mockLocationsResponse.locations,
           },
