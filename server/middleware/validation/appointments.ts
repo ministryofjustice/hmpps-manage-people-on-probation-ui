@@ -2,14 +2,7 @@ import { Route } from '../../@types'
 import { getDataValue } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
-import { Errors } from '../../models/Errors'
-
-interface LocalParams {
-  crn: string
-  id: string
-  errors?: Errors
-  minDate?: string
-}
+import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req

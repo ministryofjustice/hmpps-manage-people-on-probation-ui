@@ -44,6 +44,8 @@ export const completeDateTimePage = () => {
   dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select(startTime)
   dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select(endTime).tab()
   dateTimePage.getSubmitBtn().click()
+  // Ignore warnings on second click
+  dateTimePage.getSubmitBtn().click()
 }
 
 export const completeRepeatingPage = (repeat = 2) => {

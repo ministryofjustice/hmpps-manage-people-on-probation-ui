@@ -1,0 +1,27 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/appointment/X778160/check",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "nonWorkingDayName": "Sunday",
+          "isWithinOneHourOfMeetingWith": {
+            "isCurrentUser": false,
+            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" }
+          },
+          "overlapsWithMeetingWith": {
+            "isCurrentUser": false,
+            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" }
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

@@ -225,7 +225,16 @@ describe('masApiClient', () => {
           }),
         'post',
       ],
-
+      [
+        'checkAppointments',
+        '/appointment/X000001/check',
+        () =>
+          masApiClient.checkAppointments('X000001', {
+            start: undefined,
+            end: undefined,
+          }),
+        'post',
+      ],
       [
         'searchUserCaseload',
         '/caseload/user/USER/search?size=10&page=1&sortBy=case',

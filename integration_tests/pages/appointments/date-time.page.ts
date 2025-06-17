@@ -44,4 +44,8 @@ export default class AppointmentDateTimePage extends Page {
   getTimePickerListItems = () => {
     return cy.get('.ui-timepicker-list li', { timeout: 3000 })
   }
+
+  getWarning = (name: string) => {
+    return cy.get(`[data-qa="${name}Warning"]`)
+  }
 }

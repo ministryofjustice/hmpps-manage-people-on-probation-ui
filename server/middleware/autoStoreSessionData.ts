@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 
-export const autoStoreSessionData = (req: Request, res: Response, next: NextFunction): void => {
+export const autoStoreSessionData = (req: Request, _res: Response, next: NextFunction): void => {
   const newSessionData = req?.session?.data ?? {}
   const { crn, id } = req.params
   const inputs: Record<string, any> = req.body ?? {}

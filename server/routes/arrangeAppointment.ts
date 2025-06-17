@@ -15,6 +15,7 @@ import { getTimeOptions } from '../middleware/getTimeOptions'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import { AppResponse } from '../models/Locals'
+import { checkAppointments } from '../middleware/checkAppointments'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -84,6 +85,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/date-time',
     validate.appointments,
+    checkAppointments(hmppsAuthClient),
     controllers.arrangeAppointments.postDateTime(),
   )
 
