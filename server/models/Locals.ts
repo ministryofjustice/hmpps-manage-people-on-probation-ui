@@ -12,6 +12,7 @@ import { Errors } from './Errors'
 
 interface Locals {
   errorMessages: Record<string, string>
+  warningMessages: Record<string, string>
   filters?: ActivityLogFiltersResponse
   user: { token: string; authSource: string; username?: string }
   compactView?: boolean

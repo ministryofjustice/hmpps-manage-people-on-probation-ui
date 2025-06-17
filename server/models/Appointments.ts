@@ -1,3 +1,6 @@
+import { Name } from '../data/model/personalDetails'
+import { Errors } from './Errors'
+
 export interface Appointment {
   type: string
   location: string
@@ -39,4 +42,28 @@ export interface AppointmentRequestBody {
   requirementId: number
   licenceConditionId: number
   until?: string
+}
+
+export interface CheckAppointment {
+  start: Date
+  end: Date
+}
+
+export interface AppointmentChecks {
+  [index: string]: AppointmentCheck | string
+  nonWorkingDayName?: string
+  isWithinOneHourOfMeetingWith?: AppointmentCheck
+  overlapsWithMeetingWith?: AppointmentCheck
+}
+
+export interface AppointmentCheck {
+  isCurrentUser: boolean
+  appointmentIsWith: Name
+}
+
+export interface LocalParams {
+  crn: string
+  id: string
+  errors?: Errors
+  minDate?: string
 }

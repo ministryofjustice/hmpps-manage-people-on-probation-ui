@@ -88,13 +88,26 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getDatePickerInput().should('have.value', value)
     })
   })
-  describe('Start time and end time are selected, continue is clicked', () => {
+  describe('Start time and end time are selected, continue is clicked - warnings are displayed first', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('9:30am').tab()
+      dateTimePage.getSubmitBtn().click()
+      dateTimePage
+        .getWarning('isWithinOneHourOfMeetingWith')
+        .should(
+          'contain.text',
+          'Your colleague Alma already has an appointment with Alton within an hour of this date and time. Continue with these details or make changes.',
+        )
+      dateTimePage
+        .getWarning('nonWorkingDayName')
+        .should(
+          'contain.text',
+          'You have selected a non-working day (Sunday). Continue with these details or make changes.',
+        )
       dateTimePage.getSubmitBtn().click()
     })
     it('should redirect to the appointment repeating page', () => {
