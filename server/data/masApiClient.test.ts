@@ -213,7 +213,7 @@ describe('masApiClient', () => {
           masApiClient.postAppointments('X000001', {
             createOverlappingAppointment: true,
             end: undefined,
-            eventNumber: 0,
+            eventId: 0,
             interval: undefined,
             licenceConditionId: 0,
             numberOfAppointments: 0,
