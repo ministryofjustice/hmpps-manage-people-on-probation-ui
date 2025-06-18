@@ -78,6 +78,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           msg: 'Enter a date in the correct format, for example 17/5/2024',
           log: 'Appointment date is not valid',
         },
+      ],
+    },
+    [`[appointments][${crn}][${id}][start]`]: {
+      optional: page !== 'datetime',
+      checks: [
         {
           validator: isTodayOrLater,
           msg: 'Date must be today or in the future',
@@ -85,7 +90,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][start]`]: {
+    [`[appointments][${crn}][${id}][end]`]: {
       optional: page !== 'datetime',
       checks: [
         {
