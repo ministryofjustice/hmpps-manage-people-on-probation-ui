@@ -55,7 +55,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location',
-    redirectWizard(['type', 'sentence']),
+    redirectWizard(['type', 'eventId']),
     controllers.arrangeAppointments.getLocation(),
   )
 
@@ -75,7 +75,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/date-time',
-    redirectWizard(['type', 'sentence', 'location']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getDateTime(),
   )
 
@@ -88,7 +88,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/repeating',
-    redirectWizard(['type', 'sentence', 'location', 'date']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date']),
     controllers.arrangeAppointments.getRepeating(),
   )
 
@@ -100,7 +100,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/preview',
-    redirectWizard(['type', 'sentence', 'location', 'date', 'repeating']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
     controllers.arrangeAppointments.getPreview(),
   )
 
@@ -108,7 +108,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
-    redirectWizard(['type', 'sentence', 'location', 'date', 'repeating']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
     getUserLocations(hmppsAuthClient),
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )

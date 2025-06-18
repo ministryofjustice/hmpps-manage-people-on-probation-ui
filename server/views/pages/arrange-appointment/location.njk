@@ -15,7 +15,7 @@
   {% endif %}
   {% set locationItems = [] %}
   {% for location in userLocations %}
-    {% set locationItems = (locationItems.push({text: location.description}), locationItems) %}
+    {% set locationItems = (locationItems.push({text: location.description, value: location.id}), locationItems) %}
   {% endfor %}
   {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
   {% set locationItems = (locationItems.push({text: 'The location I’m looking for is not in this list'}), locationItems) %}
@@ -30,9 +30,9 @@
         isPageHeading: true
       },
       attributes: {
-        'data-qa': 'location'
+        'data-qa': 'locationCode'
       }
     },
     items: locationItems
-   } | decorateFormAttributes(['appointments', crn, id, 'location'])) }}
+   } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
 {% endblock %}

@@ -2,44 +2,52 @@
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/repeating' %}
 {% set title = 'Appointments you’re arranging' %}
 {% block form %}
-{% block heading %}{% endblock %}
+  {% block heading %}{% endblock %}
   <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
-   <section data-qa="this-appointment">
-  <h2 class="govuk-heading-m">This appointment</h2>
-  <table class="govuk-table">
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th class="govuk-table__header">Date</th>
-        <th class="govuk-table__header" style="width: 50%">Time</th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell">{{ appointment.date | dayOfWeek }} {{ appointment.date | dateWithYear }}</td>
-        <td class="govuk-table__cell">{{ appointment['start-time'] }} to {{ appointment['end-time'] }}</td>
-      </tr>
-    </tbody>
-  </table>
-  </section>
-  {% if appointment['repeating-dates'].length %}
-  <section data-qa="repeat-appointments">
-  <h2 class="govuk-heading-m">{{ appointment['repeating-count'] }} repeat appointment{% if appointment['repeating-count'] !== '1' %}s{% endif %}</h2>
-  <table class="govuk-table">
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th class="govuk-table__header">Date</th>
-        <th class="govuk-table__header" style="width: 50%">Time</th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body">
-      {% for repeatAppointmentDate in appointment['repeating-dates'] %}
+  <section data-qa="this-appointment">
+    <h2 class="govuk-heading-m">This appointment</h2>
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
         <tr class="govuk-table__row">
-          <td class="govuk-table__cell">{{ repeatAppointmentDate | dayOfWeek }} {{ repeatAppointmentDate | dateWithYear }}</td>
-          <td class="govuk-table__cell">{{ appointment['start-time'] }} to {{ appointment['end-time'] }}</td>
+          <th class="govuk-table__header">Date</th>
+          <th class="govuk-table__header" style="width: 50%">Time</th>
         </tr>
-      {% endfor %}
-    </tbody>
-  </table>
+      </thead>
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">{{ appointment.date | dayOfWeek }}
+            {{ appointment.date | dateWithYear }}</td>
+          <td class="govuk-table__cell">{{ appointment.start }}
+            to
+            {{ appointment.end }}</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
+  {% if appointment.repeatingDates.length %}
+    <section data-qa="repeat-appointments">
+      <h2 class="govuk-heading-m">{{ appointment.numberOfAppointments }}
+        repeat appointment{% if appointment.numberOfAppointments !== '1' %}s{% endif %}
+      </h2>
+      <table class="govuk-table">
+        <thead class="govuk-table__head">
+          <tr class="govuk-table__row">
+            <th class="govuk-table__header">Date</th>
+            <th class="govuk-table__header" style="width: 50%">Time</th>
+          </tr>
+        </thead>
+        <tbody class="govuk-table__body">
+          {% for repeatAppointmentDate in appointment.repeatingDates %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell">{{ repeatAppointmentDate | dayOfWeek }}
+                {{ repeatAppointmentDate | dateWithYear }}</td>
+              <td class="govuk-table__cell">{{ appointment.start }}
+                to
+                {{ appointment.end }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
   {% endif %}
 {% endblock %}

@@ -50,7 +50,7 @@ describe('Enter the date and time of the appointment', () => {
       locationPage.checkOnPage()
     })
     it('should persist the location selection', () => {
-      locationPage.getRadio('location', 1).should('be.checked')
+      locationPage.getRadio('locationCode', 1).should('be.checked')
     })
   })
 
@@ -66,10 +66,10 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
         expect($error.text().trim()).to.include('Enter or select a date')
       })
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
         expect($error.text().trim()).to.include('Select a start time')
       })
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
         expect($error.text().trim()).to.include('Select an end time')
       })
     })
@@ -80,8 +80,8 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -91,10 +91,10 @@ describe('Enter the date and time of the appointment', () => {
       ])
     })
     it('should display the error messages', () => {
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
     })
@@ -105,8 +105,8 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('10:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box again', () => {
@@ -116,10 +116,10 @@ describe('Enter the date and time of the appointment', () => {
       ])
     })
     it('should display the error messages again', () => {
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
     })
@@ -131,8 +131,8 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('11:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('11:15am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('11:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am').tab()
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -141,7 +141,7 @@ describe('Enter the date and time of the appointment', () => {
       ])
     })
     it('should display the error messages', () => {
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
         expect($error.text().trim()).to.include(
           'Choose a time that does not clash with Alton’s existing appointment at 11am to 12pm',
         )
@@ -166,8 +166,8 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('9:30am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am').tab()
       dateTimePage.getSubmitBtn().click()
       dateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')

@@ -1,61 +1,47 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue } from '../utils'
-import { appointmentTypes } from '../properties'
-import { Sentence } from '../data/model/sentenceDetails'
-import { UserLocation } from '../data/model/caseload'
+import { getDataValue, dateTime } from '../utils'
+import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import { AppointmentRequestBody } from '../models/Appointments'
-import { dateTime } from '../utils/dateTime'
-import { HmppsAuthClient } from '../data'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn, id: uuid } = req.params
-    const { username } = res.locals.user
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const { data } = req.session
-    const sentences: Sentence[] = getDataValue(data, ['sentences', crn])
-    const userLocations: UserLocation[] = getDataValue(data, ['locations', username])
     const {
-      type: appointmentType,
+      user: { username, teamCode, locationCode },
+      type,
       date,
-      location: selectedLocation,
-      'start-time': startTime,
-      'end-time': endTime,
-      'repeating-frequency': interval,
-      'repeating-count': repeatCount,
-      sentence: selectedSentence,
-      'sentence-requirement': sentenceRequirement,
-      'sentence-licence-condition': sentenceLicenceCondition,
+      start,
+      end,
+      interval,
+      numberOfAppointments = 0,
+      eventId,
+      requirementId = 0,
+      licenceConditionId = 0,
+      nsiId = 0,
     } = getDataValue(data, ['appointments', crn, uuid])
-
-    const type = appointmentTypes.find(t => t.text === appointmentType).value
-    const sentence = sentences.find(s => s.order.description === selectedSentence)
-    const { eventNumber } = sentence
-    const locationId = userLocations.find(location => location.description === selectedLocation).id
-    const requirementId =
-      sentence?.requirements?.find(requirement => requirement.description === sentenceRequirement)?.id || 0
-    const licenceConditionId =
-      sentence?.licenceConditions?.find(
-        licenceCondition => licenceCondition.mainDescription === sentenceLicenceCondition,
-      )?.id || 0
 
     const body: AppointmentRequestBody = {
       user: {
         username,
-        locationId,
+        teamCode,
+        locationCode,
       },
       type,
-      start: dateTime(date, startTime),
-      end: dateTime(date, endTime),
+      start: dateTime(date, start),
+      end: dateTime(date, end),
       interval,
-      numberOfAppointments: parseInt(repeatCount, 10),
-      eventNumber,
+      numberOfAppointments: parseInt(numberOfAppointments, 10),
+      eventId,
+      uuid,
       createOverlappingAppointment: true,
       requirementId,
       licenceConditionId,
-      uuid,
+      nsiId,
+      until: '',
     }
     await masClient.postAppointments(crn, body)
     return next()

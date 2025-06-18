@@ -6,6 +6,8 @@ import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
 import { getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
+import { Location } from '../data/model/caseload'
+// import { DateTime } from 'luxon'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> => {
   return async (req, res, next) => {
@@ -28,12 +30,18 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
     >
     if (appointmentSession) {
       const {
+        user: { username, locationCode, teamCode },
         type: typeId,
         visorReport,
-        sentence: sentenceId,
-        'sentence-requirement': sentenceRequirementId,
-        'sentence-licence-condition': sentenceLicenceConditionId,
-        'sentence-nsi': sentenceNsiId,
+        eventId,
+        requirementId,
+        licenceConditionId,
+        nsiId,
+        date,
+        start,
+        end,
+        repeatingDates,
+        repeating,
       } = appointmentSession
       const type: AppointmentType | null = typeId
         ? req.session.data.appointmentTypes.find(t => t.code === typeId)
@@ -43,23 +51,40 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      if (sentenceId) {
-        sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(sentenceId, 10))
-        sentence = parseInt(sentenceId, 10) !== 1 ? sentenceObj?.order?.description : forename
-        if (sentenceRequirementId) {
+      // let date: string = ''
+      // let start: string = ''
+      // let end: string = ''
+      // if (startDate) {
+      //   const dt = DateTime.fromISO(startDate, { zone: 'utc' })
+      //   start = dt.toFormat('h:mma').toLowerCase()
+      //   date = dt.toFormat('dd/MM/yyyy')
+      // }
+      // if (endDate) {
+      //   const dt = DateTime.fromISO(endDate, { zone: 'utc' })
+      //   end = dt.toFormat('h:mma').toLowerCase()
+      // }
+      if (eventId) {
+        sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
+        sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
+        if (requirementId) {
           sentenceRequirement = sentenceObj.requirements.find(
-            requirement => requirement.id === parseInt(sentenceRequirementId, 10),
+            requirement => requirement.id === parseInt(requirementId, 10),
           )
         }
-        if (sentenceLicenceConditionId) {
+        if (licenceConditionId) {
+          // console.dir(sentenceObj, { depth: null })
           sentenceLicenceCondition = sentenceObj.licenceConditions.find(
-            lc => lc.id === parseInt(sentenceLicenceConditionId, 10),
+            lc => lc.id === parseInt(licenceConditionId, 10),
           )
         }
-        if (sentenceNsiId) {
-          sentenceNsi = sentenceObj.nsis.find(n => n.id === parseInt(sentenceNsiId, 10))
+        if (nsiId) {
+          sentenceNsi = sentenceObj.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
+      const location: Location =
+        locationCode && username
+          ? req.session.data.locations[username].find(l => l.id === parseInt(locationCode, 10))
+          : null
       appointment = {
         ...appointment,
         type,
@@ -75,22 +100,18 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
           team: '',
           region: '',
         },
-        location: {
-          buildingName: '',
-          buildingNumber: '',
-          streetName: '',
-          district: '',
-          town: '',
-          county: '',
-          postcode: '',
-        },
-        dateTime: [],
-        repeating: 'Yes',
+        location,
+        date,
+        start,
+        end,
+        repeating,
+        repeatingDates,
         notes: '',
         sensitivity: 'No',
       }
     }
     res.locals.appointment = appointment
+    // console.dir(appointment, { depth: null })
     return next()
   }
 }

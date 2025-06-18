@@ -122,7 +122,7 @@
       classes: "govuk-label--s"
     },
   items: timeOptions
-  } | decorateFormAttributes(['appointments', crn, id, 'start-time'])) }}
+  } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
 
   {{ govukSelect({
    label: {
@@ -130,7 +130,7 @@
       classes: "govuk-label--s"
     },
   items: endTimeOptions
-  } | decorateFormAttributes(['appointments', crn, id, 'end-time'])) }}
+  } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
 
   <input type="hidden" name="_minDate" value="{{minDate}}">
 {% endblock %}

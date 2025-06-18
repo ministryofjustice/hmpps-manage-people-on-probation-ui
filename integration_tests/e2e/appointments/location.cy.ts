@@ -18,12 +18,12 @@ describe('Pick a location for this appointment', () => {
       locationPage = new AppointmentLocationPage()
     })
     it('should display the options', () => {
-      locationPage.getRadioLabel('location', 1).should('contain.text', 'HMP Wakefield')
-      locationPage.getRadioLabel('location', 2).should('contain.text', '102 Petty France')
+      locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'HMP Wakefield')
+      locationPage.getRadioLabel('locationCode', 2).should('contain.text', '102 Petty France')
       locationPage
-        .getRadioLabel('location', 4)
+        .getRadioLabel('locationCode', 4)
         .should('contain.text', 'The location I’m looking for is not in this list')
-      locationPage.getRadioLabel('location', 5).should('contain.text', 'I do not need to pick a location')
+      locationPage.getRadioLabel('locationCode', 5).should('contain.text', 'I do not need to pick a location')
     })
     it('should display the continue button', () => {
       locationPage.getSubmitBtn().should('contain.text', 'Continue')
@@ -52,20 +52,20 @@ describe('Pick a location for this appointment', () => {
       locationPage.checkErrorSummaryBox(['Select an appointment location'])
     })
     it('should display the error message', () => {
-      locationPage.getElement(`#appointments-${crn}-${uuid}-location-error`).should($error => {
+      locationPage.getElement(`#appointments-${crn}-${uuid}-user-locationCode-error`).should($error => {
         expect($error.text().trim()).to.include('Select an appointment location')
       })
     })
     it('should focus the first radio button when the summary link is clicked', () => {
       locationPage.getErrorSummaryLink(0).click()
-      locationPage.getElement(`#appointments-${crn}-${uuid}-location`).should('be.focused')
+      locationPage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).should('be.focused')
     })
   })
 
   describe('Location is selected, and continue is clicked', () => {
     beforeEach(() => {
       loadPage()
-      locationPage.getElement(`#appointments-${crn}-${uuid}-location`).click()
+      locationPage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationPage.getSubmitBtn().click()
     })
     it('should redirect to the date time page', () => {

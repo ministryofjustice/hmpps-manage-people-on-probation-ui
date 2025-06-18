@@ -75,8 +75,8 @@ describe('/middleware/autoStoreSessionData', () => {
           [crn]: {
             [id]: {
               date: '13/3/2025',
-              'start-time': '9:00am',
-              'end-time': '9:30am',
+              start: '9:00am',
+              end: '9:30am',
             },
           },
         },
@@ -119,8 +119,8 @@ describe('/middleware/autoStoreSessionData', () => {
         appointments: {
           [crn]: {
             [id]: {
-              sentence: '12 month Community order',
-              'sentence-licence-condition': 'Freedom of movement',
+              eventId: '12 month Community order',
+              licenceConditionId: 'Freedom of movement',
             },
           },
         },

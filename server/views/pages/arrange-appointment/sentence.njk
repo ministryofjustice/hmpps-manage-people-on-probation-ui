@@ -35,11 +35,11 @@
         classes: "govuk-fieldset__legend--s"
       },
       attributes: {
-        'data-qa': 'sentence-requirement'
+        'data-qa': 'requirementId'
       }
     },
     items: requirements
-} | decorateFormAttributes(['appointments', crn, id, 'sentence-requirement'])) }}
+} | decorateFormAttributes(['appointments', crn, id, 'requirementId'])) }}
       {% endset -%}
     {% endif %}
     {% if sentence.licenceConditions.length %}
@@ -59,11 +59,11 @@
         classes: "govuk-fieldset__legend--s"
       },
       attributes: {
-        'data-qa': 'sentence-licence-condition'
+        'data-qa': 'licenceConditionId'
       }
     },
     items: licenceConditions
-} | decorateFormAttributes(['appointments', crn, id, 'sentence-licence-condition'])) }}
+} | decorateFormAttributes(['appointments', crn, id, 'licenceConditionId'])) }}
       {% endset -%}
     {% endif %}
     {% if sentence.nsis.length %}
@@ -83,11 +83,11 @@
         classes: "govuk-fieldset__legend--s"
       },
       attributes: {
-        'data-qa': 'sentence-nsi'
+        'data-qa': 'nsiId'
       }
     },
     items: nsis
-} | decorateFormAttributes(['appointments', crn, id, 'sentence-nsi'])) }}
+} | decorateFormAttributes(['appointments', crn, id, 'nsiId'])) }}
       {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
@@ -100,6 +100,7 @@
       hint: {
         text: 'Sentence start date: ' + sentence.order.startDate | dateWithYear if sentence.order.startDate else ''
       },
+      checked: sentences.length == 1,
       attributes: {
           'data-sentence': 'true',
           'data-reset-conditional-radios': ''
@@ -111,7 +112,19 @@
     {% endif %}
   {% endfor %}
   {% if appointment.type.isPersonLevelContact %}
-    {% set allSentences = (allSentences.push({text: appointment.meta.forename, value: '1'}), allSentences) %}
+    {% set allSentences = (allSentences.push(
+    {
+    text: appointment.meta.forename,
+    value: '1',
+    attributes: {
+    'data-qa': 'personLevelContact'
+    },
+    label: {
+      attributes: {
+'data-qa': 'personLevelContactLabel'
+      }
+    }
+    }), allSentences) %}
   {% endif %}
   {{ govukRadios({
     fieldset: {
@@ -128,6 +141,6 @@
         text: "Select all that apply."
       },
     items: allSentences
-} | decorateFormAttributes(['appointments', crn, id, 'sentence'])) }}
+} | decorateFormAttributes(['appointments', crn, id, 'eventId'])) }}
 
 {% endblock %}

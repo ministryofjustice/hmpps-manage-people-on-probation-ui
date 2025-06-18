@@ -7,11 +7,11 @@ const mockAppt = {
   type: 'Phone call',
   location: '',
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  'start-time': '2044-12-22T09:15:00.382936Z[Europe/London]',
-  'end-time': '2044-12-22T09:15:00.382936Z[Europe/London]',
+  start: '2044-12-22T09:15:00.382936Z[Europe/London]',
+  end: '2044-12-22T09:15:00.382936Z[Europe/London]',
   repeating: 'Yes',
-  'repeating-frequency': '',
-  'repeating-count': '',
+  interval: '',
+  numberOfAppointments: '',
   id: 1,
 }
 

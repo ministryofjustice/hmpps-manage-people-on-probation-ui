@@ -1,4 +1,4 @@
-import { Name } from './personalDetails'
+import { Address, Name } from './personalDetails'
 import { Appointment } from './overview'
 
 export interface UserCaseload {
@@ -39,7 +39,9 @@ export interface Team {
 
 export interface Location {
   id: number
-  name: string
+  code: string
+  description?: string
+  address?: Address
 }
 
 export interface UserAppontment {

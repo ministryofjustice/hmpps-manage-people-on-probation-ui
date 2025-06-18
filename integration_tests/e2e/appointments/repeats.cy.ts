@@ -94,27 +94,27 @@ describe('Will the appointment repeat?', () => {
       ])
     })
     it('should display the error messages', () => {
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency-error`).should($error => {
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval-error`).should($error => {
         expect($error.text().trim()).to.include('Select the frequency the appointment will repeat')
       })
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-count-error`).should($error => {
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments-error`).should($error => {
         expect($error.text().trim()).to.include('Enter the number of times the appointment will repeat')
       })
     })
     it('should focus the first frequency radio button when the first error summary link is clicked', () => {
       repeatingPage.getErrorSummaryLink(0).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency`).should('be.focused')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).should('be.focused')
     })
     it('should focus the count field when the second error summary link is clicked', () => {
       repeatingPage.getErrorSummaryLink(1).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-count`).should('be.focused')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).should('be.focused')
     })
   })
   describe('Weekly frequency is selected, the continue is clicked', () => {
     beforeEach(() => {
       loadPage()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency`).click()
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
       repeatingPage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -125,8 +125,8 @@ describe('Will the appointment repeat?', () => {
     beforeEach(() => {
       loadPage()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-count`).type('xx')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).type('xx')
       repeatingPage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -138,7 +138,7 @@ describe('Will the appointment repeat?', () => {
       loadPage()
       cy.intercept(
         'GET',
-        `http://localhost:3007/case/${crn}/arrange-appointment/${uuid}/repeating?repeating-frequency=WEEK&repeating-count=4`,
+        `http://localhost:3007/case/${crn}/arrange-appointment/${uuid}/repeating?interval=WEEK&numberOfAppointments=4`,
         {
           statusCode: 200,
           body: `<!DOCTYPE html>
@@ -155,8 +155,8 @@ describe('Will the appointment repeat?', () => {
         },
       )
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-count`).type('4')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).type('4')
     })
     it('Should display the last appointment date', () => {
       repeatingPage.getLastAppointment().should('be.visible')

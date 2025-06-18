@@ -4,47 +4,56 @@
 {% set buttonText = 'Finish' %}
 {% set notStandardForm = true %}
 {% set appointmentDates = [appointment.date] %}
-{% for appointmentDate in appointment['repeating-dates'] %}
- {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
+{% for appointmentDate in appointment.repeatingDates %}
+  {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
 {% endfor %}
-{% set title = 'Appointments arranged' if appointmentDates.length > 1 else 'Appointment arranged' %}
+{% set title = 'Appointments arranged' if appointmentDates.length > 1 else 
+  'Appointment arranged' %}
 {% set appointmentDatesHtml %}
-  {% for appointmentDate in appointmentDates %}
-  {% if loop.index > 1 %}<br>{% endif %}<span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }} {{ appointmentDate | dateWithYear }} from {{appointment['start-time']}} to {{ appointment['end-time'] }}</span>
-  {% endfor %}
+{% for appointmentDate in appointmentDates %}
+  {% if loop.index > 1 %}<br>{% endif %}
+  <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
+    {{ appointmentDate | dateWithYear }}
+    from
+    {{ appointment.start }}
+    to
+    {{ appointment.end }}</span>
+{% endfor %}
 {% endset %}
 
 {% set panelHtml %}
-  <div class="govuk-!-font-size-27">
-    <strong>{{ appointment.type }}</strong><br />
-    {{ appointmentDatesHtml | safe }}
-    </div>
-    {% endset %}
+<div class="govuk-!-font-size-27">
+  <strong>{{ appointment.type.description }}</strong><br/>
+  {{ appointmentDatesHtml | safe }}
+</div>
+{% endset %}
 
 {% block beforeContent %}{% endblock %}
 {% block primary %}
-{{ govukPanel({
+  {{ govukPanel({
   titleHtml: '<span data-qa="pageHeading">' + title + '</span>',
   html: panelHtml
 }) }}
- <div class="govuk-grid-row">
+  <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
-<h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-  <p class="govuk-body">
-    You need to send {{case.name.forename}} the appointment details.
-  </p>
-  <p class="govuk-body">
-    {{case.name.forename}}’s phone number is {{ case.telephoneNumber }}.</p>
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+      <p class="govuk-body">
+        You need to send
+        {{case.name.forename}}
+        the appointment details.
+      </p>
+      <p class="govuk-body">
+        {{case.name.forename}}’s phone number is
+        {{ case.telephoneNumber }}.</p>
     </div>
-</div>
+  </div>
   <form method="post" autocomplete="off" action="{{ paths.current }}">
- {{ govukButton({
+    {{ govukButton({
       html: buttonText,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-     </form>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+  </form>
 {% endblock %}
-

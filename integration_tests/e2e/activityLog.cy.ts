@@ -474,7 +474,6 @@ context('Activity log', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getPaginationLink(3).click()
-    // cy.pause()
     cy.get('.govuk-pagination__link[rel="next"]').click()
     page.getPaginationLink(3).should('not.have.attr', 'aria-current')
     page.getPaginationLink(4).should('have.attr', 'aria-current')

@@ -113,11 +113,15 @@ describe('utils/decorateFormAttributes', () => {
           appointments: {
             [crn]: {
               [id]: {
+                user: {
+                  username: 'user-1',
+                  locationCode: 'COP',
+                  teamCode: 'TEA',
+                },
                 type: 'Home visit',
-                sentence: '12 month Community order',
-                'sentence-licence-condition': 'Alcohol Monitoring (Electronic Monitoring)',
-                'sentence-requirement': '',
-                location: 'HMP Wakefield',
+                eventId: '123456789',
+                licenceConditionId: '1234',
+                requirementId: '5678',
                 date: '2025-04-09',
               },
             },

@@ -1,18 +1,23 @@
 export interface AppointmentSession {
+  user?: {
+    username: string
+    teamCode: string
+    locationCode: string
+  }
   type?: string
   visorReport?: 'Yes' | 'No'
-  location?: string
   date?: string
-  'start-time'?: string
-  'end-time'?: string
+  start?: string
+  end?: string
+  interval?: string
+  numberOfAppointments?: string
+  eventId?: string
+  uuid?: string
+  requirementId?: string
+  licenceConditionId?: string
+  nsiId?: string
   repeating?: 'Yes' | 'No'
-  'repeating-frequency'?: string
-  'repeating-count'?: string
-  sentence?: string
-  'sentence-licence-condition'?: string
-  'sentence-requirement'?: string
-  'sentence-nsi'?: string
-  id?: string
+  repeatingDates?: string[]
 }
 
 export interface AppointmentType {
@@ -36,18 +41,20 @@ export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 export interface AppointmentRequestBody {
   user: {
     username: string
-    locationId: number
+    teamCode: string
+    locationCode: string
   }
-  type: any
+  type: string
   start: Date
   end: Date
   interval: AppointmentInterval
   numberOfAppointments: number
-  eventNumber: number
+  eventId: number
   uuid: string
-  createOverlappingAppointment: boolean
+  createOverlappingAppointment: true
   requirementId: number
   licenceConditionId: number
+  nsiId: number
   until?: string
 }
 

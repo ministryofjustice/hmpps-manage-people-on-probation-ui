@@ -29,17 +29,12 @@ export interface AppointmentLocals {
     team: string
     region: string
   }
-  location?: {
-    buildingName: string
-    buildingNumber: string
-    streetName: string
-    district: string
-    town: string
-    county: string
-    postcode: string
-  }
-  dateTime?: string[]
+  location?: Location
+  start?: string
+  end?: string
+  date?: string
   repeating?: string
+  repeatingDates?: string[]
   notes?: string
   sensitivity?: string
 }

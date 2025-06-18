@@ -33,8 +33,8 @@ export class ArrangedSession {
     period: 'week' | 'month' = 'week',
     increment = 1,
   ): AppointmentSession[] {
-    const hasRepeatAppointments = appointment.repeating === 'Yes' && appointment['repeating-count']
-    const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment['repeating-count'], 10) : 0
+    const hasRepeatAppointments = appointment.repeating === 'Yes' && appointment.numberOfAppointments
+    const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment.numberOfAppointments, 10) : 0
     return Array.from(Array(numberOfRepeatedAppts)).map((_, i) => {
       if (period === 'week') {
         return this.generateRepeatWeeklyAppointment({ appointment, weeksInFuture: (i + 1) * increment })
@@ -47,7 +47,7 @@ export class ArrangedSession {
     const clonedAppointment: AppointmentSession = { ...params.appointment }
     return {
       ...clonedAppointment,
-      id: uuidv4(),
+      uuid: uuidv4(),
       date: DateTime.fromISO(clonedAppointment.date).plus({ months: params.monthsInFuture }).toISODate(),
     }
   }
@@ -56,7 +56,7 @@ export class ArrangedSession {
     const clonedAppointment = { ...params.appointment }
     return {
       ...clonedAppointment,
-      id: uuidv4(),
+      uuid: uuidv4(),
       date: DateTime.fromISO(clonedAppointment.date).plus({ weeks: params.weeksInFuture }).toISODate(),
     }
   }

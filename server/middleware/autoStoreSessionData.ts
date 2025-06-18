@@ -1,3 +1,5 @@
+/* eslint-disable no-restricted-syntax */
+import { DateTime } from 'luxon'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 import { AppointmentType } from '../models/Appointments'
@@ -9,6 +11,15 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<v
     const newSessionData = req?.session?.data ?? {}
     const { crn, id } = req.params
     const inputs: Record<string, any> = req.body ?? {}
+
+    const resetValues = (keys: Record<string, string | string[]>) => {
+      for (const key in keys) {
+        if ((req?.session?.data?.appointments as any)?.[crn]?.[id]?.[key]) {
+          setDataValue(newSessionData, ['appointments', crn, id, key], keys[key])
+        }
+      }
+    }
+
     Object.entries(inputs).forEach(([key, _]: [string, any]) => {
       if (!key.startsWith('_')) {
         const getPath = id ? [key, crn, id] : [key, crn]
@@ -19,13 +30,40 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<v
             if (config.dateFields.includes(valueKey) && body[valueKey].includes('/')) {
               newValue = toIsoDateFromPicker(body[valueKey])
             }
+            // if (config.timeFields.some(field => field.name === valueKey)) {
+            //   const field = config.timeFields.find(timeField => timeField.name === valueKey)
+            //   const date = getDataValue(req.session.data, [key, crn, id, field.dateField])
+            //   const dt = DateTime.fromFormat(`${date} ${newValue}`, 'yyyy-MM-dd h:mma', {
+            //     zone: 'UTC',
+            //   })
+            //   newValue = dt.toUTC().toISO()
+            // }
+            if (typeof newValue === 'object') {
+              newValue = {
+                ...((req?.session?.data as any)[key]?.[crn]?.[id]?.[valueKey] || {}),
+                ...(newValue as Record<string, string>),
+              }
+            }
             const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
             setDataValue(newSessionData, setPath, newValue)
           })
+          if (req?.body?.appointments?.[crn]?.[id]?.repeating === 'No') {
+            resetValues({ numberOfAppointments: '', interval: '', repeatingDates: [] })
+          }
+          if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
+            resetValues({ requirementId: '', nsiId: '' })
+          }
+          if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
+            resetValues({ licenceConditionId: '', nsiId: '' })
+          }
+          if (req?.body?.appointments?.[crn]?.[id]?.nsi) {
+            resetValues({ licenceConditionId: '', requirementId: '' })
+          }
         }
       }
     })
     req.session.data = newSessionData
+    // console.dir(newSessionData, { depth: null })
     return next()
   }
 }

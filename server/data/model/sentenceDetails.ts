@@ -19,7 +19,7 @@ export interface SentenceDescription {
 
 export interface Sentence {
   id: number
-  eventNumber?: number
+  eventNumber?: string
   order: Order
   nsis: Nsi[]
   licenceConditions: LicenceCondition[]

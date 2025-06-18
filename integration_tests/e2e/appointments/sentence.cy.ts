@@ -11,61 +11,27 @@ const checkRequirementSentence = (type = 1) => {
   describe('Sentence with a requirement is clicked', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
-      loadPage(type)
+      loadPage()
       sentencePage = new AppointmentSentencePage()
-      sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-2`).click()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-2`).click()
     })
-    if ([1, 4].includes(type)) {
-      it('should display the requirement reveal', () => {
-        sentencePage.getElement(`[data-qa="sentence-requirement"]`).should('be.visible')
-        sentencePage.getElement('[data-qa="sentence-requirement"] legend').should($legend => {
-          expect($legend.text().trim()).to.eq('Which requirement is this appointment for?')
-        })
-        sentencePage.getElement('[data-qa="sentence-requirement"] .govuk-hint').should($hint => {
-          expect($hint.text().trim()).to.eq('Select requirement.')
-        })
+    it('should display the requirement reveal', () => {
+      sentencePage.getElement(`[data-qa="requirementId"]`).should('be.visible')
+      sentencePage.getElement('[data-qa="requirementId"] legend').should($legend => {
+        expect($legend.text().trim()).to.eq('Which requirement is this appointment for? (optional)')
       })
-      it('should display the error summary and error when continue is clicked without selecting a requirement', () => {
-        loadPage(type)
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-2`).click()
-        sentencePage.getSubmitBtn().click()
-        sentencePage.checkErrorSummaryBox(['Select a requirement'])
-
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-requirement-error`).should($error => {
-          expect($error.text().trim()).to.include('Select a requirement')
-        })
-      })
-
-      it('should persist the sentence selection', () => {
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-2`).should('be.checked')
-      })
-
-      it('should focus the first radio button when the error summary link is clicked', () => {
-        loadPage(type)
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-2`).click()
-        sentencePage.getSubmitBtn().click()
-        sentencePage.getErrorSummaryLink(0).click()
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-requirement`).should('be.focused')
-      })
-
-      it('should link to the location page when requirement is selected and continue is clicked', () => {
-        loadPage(type)
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-2`).click()
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-requirement`).click()
-        sentencePage.getSubmitBtn().click()
-        const locationPage = new AppointmentLocationPage()
-        locationPage.checkOnPage()
-      })
-    } else {
-      it('should not display the requirement reveal', () => {
-        sentencePage.getElement(`[data-qa="sentence-requirement"]`).should('not.exist')
-      })
-      it('should render the location page when continue is clicked', () => {
-        sentencePage.getSubmitBtn().click()
-        const locationPage = new AppointmentLocationPage()
-        locationPage.checkOnPage()
-      })
-    }
+    })
+    it('should not display the licence condition reveal', () => {
+      sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('not.be.visible')
+    })
+    it('should link to the location page when requirement is selected and continue is clicked', () => {
+      loadPage()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-2`).click()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
+      sentencePage.getSubmitBtn().click()
+      const locationPage = new AppointmentLocationPage()
+      locationPage.checkOnPage()
+    })
   })
 }
 
@@ -73,61 +39,31 @@ const checkLicenceConditionSentence = (type = 1) => {
   describe('Sentence with a licence condition is selected', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
-      loadPage(type)
+      loadPage()
       sentencePage = new AppointmentSentencePage()
-      sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).click()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
     })
-    if ([1, 4].includes(type)) {
-      it('should display the licence condition reveal', () => {
-        sentencePage.getElement(`[data-qa="sentence-licence-condition"]`).should('be.visible')
-        sentencePage.getElement('[data-qa="sentence-licence-condition"] legend').should($legend => {
-          expect($legend.text().trim()).to.eq('Which licence condition is this appointment for?')
-        })
-        sentencePage.getElement('[data-qa="sentence-licence-condition"] .govuk-hint').should($hint => {
-          expect($hint.text().trim()).to.eq('Select licence condition.')
-        })
+    it('should display the licence condition reveal', () => {
+      sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('be.visible')
+      sentencePage.getElement('[data-qa="licenceConditionId"] legend').should($legend => {
+        expect($legend.text().trim()).to.eq('Which licence condition is this appointment for? (optional)')
       })
-      it('should display the error summary and error when continue is clicked without selecting a licence condition', () => {
-        loadPage(type)
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).click()
-        sentencePage.getSubmitBtn().click()
-        sentencePage.checkErrorSummaryBox(['Select a licence condition'])
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-licence-condition-error`).should($error => {
-          expect($error.text().trim()).to.include('Select a licence condition')
-        })
-      })
-      it('should persist the sentence selection', () => {
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).should('be.checked')
-      })
-      it('should focus the first radio button when the error summary link is clicked', () => {
-        loadPage(type)
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).click()
-        sentencePage.getSubmitBtn().click()
-        sentencePage.getErrorSummaryLink(0).click()
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-licence-condition`).should('be.focused')
-      })
-      it('should link to the location page when licence condition is selected and continue is clicked', () => {
-        loadPage(type)
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).click()
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-licence-condition`).click()
-        sentencePage.getSubmitBtn().click()
-        const locationPage = new AppointmentLocationPage()
-        locationPage.checkOnPage()
-      })
-    } else {
-      it('should not display the licence condition reveal', () => {
-        sentencePage.getElement(`[data-qa="sentence-licence-condition"]`).should('not.exist')
-      })
-      it('should render the location page when continue is clicked', () => {
-        sentencePage.getSubmitBtn().click()
-        const locationPage = new AppointmentLocationPage()
-        locationPage.checkOnPage()
-      })
-    }
+    })
+    it('should not display the requirement reveal', () => {
+      sentencePage.getElement(`[data-qa="requirementId"]`).should('not.be.visible')
+    })
+    it('should link to the location page when licence condition is selected and continue is clicked', () => {
+      loadPage()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
+      sentencePage.getSubmitBtn().click()
+      const locationPage = new AppointmentLocationPage()
+      locationPage.checkOnPage()
+    })
   })
 }
 
-describe('Which sentence is this appointment for?', () => {
+describe('What is this appointment for?', () => {
   describe('Page is rendered', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
@@ -135,8 +71,8 @@ describe('Which sentence is this appointment for?', () => {
       sentencePage = new AppointmentSentencePage()
     })
     it('should display the hint text', () => {
-      sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-hint`).should($hint => {
-        expect($hint.text().trim()).to.eq('Select sentence.')
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-hint`).should($hint => {
+        expect($hint.text().trim()).to.eq('Select all that apply.')
       })
     })
     it('should display 2 sentences that are not selected', () => {
@@ -147,10 +83,10 @@ describe('Which sentence is this appointment for?', () => {
       })
     })
     it('should not display the licence condition options', () => {
-      sentencePage.getElement(`[data-qa="sentence-licence-condition"]`).should('not.be.visible')
+      sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('not.be.visible')
     })
     it('should not display the requirement options', () => {
-      sentencePage.getElement(`[data-qa="sentence-requirement"]`).should('not.be.visible')
+      sentencePage.getElement(`[data-qa="requirementId"]`).should('not.be.visible')
     })
   })
 
@@ -182,7 +118,7 @@ describe('Which sentence is this appointment for?', () => {
     })
 
     it('should display the error message', () => {
-      sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-error`).should($error => {
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-error`).should($error => {
         expect($error.text().trim()).to.include('Select a sentence')
       })
     })
@@ -191,27 +127,35 @@ describe('Which sentence is this appointment for?', () => {
         sentencePage.getErrorSummaryLink(0).click()
       })
       it('should focus the first radio button', () => {
-        sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).should('be.focused')
+        sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).should('be.focused')
       })
     })
   })
-  describe('Home visit appointment type is selected', () => {
-    checkLicenceConditionSentence(1)
-    checkRequirementSentence(1)
+  describe('Sentence with requirement is selected', () => {
+    checkRequirementSentence()
   })
-  describe('Initial home visit appointment type is selected', () => {
-    checkLicenceConditionSentence(2)
-    checkRequirementSentence(2)
+  describe('Sentence with licence condition is selected', () => {
+    checkLicenceConditionSentence()
   })
-  describe('Initial in office appointment type is selected', () => {
-    checkLicenceConditionSentence(3)
-    checkRequirementSentence(3)
+  describe('Sentence with no requirement or licence condition is selected', () => {})
+  describe('Personal contact is selected', () => {
+    let sentencePage: AppointmentSentencePage
+    beforeEach(() => {
+      loadPage(5)
+      sentencePage = new AppointmentSentencePage()
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
+    })
+    it('should display the personal contact option', () => {
+      cy.get('[data-qa="personLevelContactLabel"]').should('contain.text', 'Alton')
+    })
+    it('should link to the location page when the contact option is selected and continue is clicked', () => {
+      loadPage(5)
+      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-3`).click()
+      sentencePage.getSubmitBtn().click()
+      const locationPage = new AppointmentLocationPage()
+      locationPage.checkOnPage()
+    })
   })
-  describe('Planned office visit appointment type is selected', () => {
-    checkLicenceConditionSentence(4)
-    checkRequirementSentence(4)
-  })
-
   describe('Page is rendered for a single sentence with licence condition', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
@@ -226,7 +170,7 @@ describe('Which sentence is this appointment for?', () => {
       })
     })
     it('should display the licence condition reveal', () => {
-      sentencePage.getElement(`[data-qa="sentence-licence-condition"]`).should('be.visible')
+      sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('be.visible')
     })
   })
 })
