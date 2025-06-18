@@ -115,6 +115,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (errors) {
         delete req.session.data.errors
       }
+
       return res.render(`pages/arrange-appointment/attendance`, { crn, id, errors, change })
     }
   },

@@ -3,11 +3,13 @@
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
 
 {% block form %}
+    <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
     {% set providerItems = [] %}
     {% for provider in userProviders %}
         {% set providerItems = (providerItems.push({
             value: provider.code,
-            text: provider.name
+            text: provider.name,
+            selected: provider.selected
         }), providerItems) %}
     {% endfor %}
 
@@ -57,4 +59,25 @@
             items: userItems
         } | decorateFormAttributes(['appointments', crn, id, 'name'])) }}
 
+    <script nonce="{{ cspNonce }}">
+      const teams = ["Apple", "Banana", "Cherry"];
+      document.addEventListener("DOMContentLoaded", () => {
+        const regionSelect = document.getElementById("region")
+        const teamSelect = document.getElementById("team")
+        const nameSelect = document.getElementById("name")
+
+        regionSelect.addEventListener("change", (event) => {
+          // const teamCode = teamSelect.value
+          window.location.href = document.getElementById('uri_ref').value + "?regionCode=" + event.target.value
+          // teamSelect.length = 0
+          // teams.forEach(team => {
+          //   const option = document.createElement("option");
+          //   option.value = team;
+          //   option.textContent = team;
+          //   teamSelect.appendChild(option);
+          // });
+
+        });
+      });
+    </script>
 {% endblock %}

@@ -40,3 +40,8 @@ export interface AppointmentRequestBody {
   licenceConditionId: number
   until?: string
 }
+
+export interface ProviderRequestBody {
+  provider?: string
+  team?: string
+}

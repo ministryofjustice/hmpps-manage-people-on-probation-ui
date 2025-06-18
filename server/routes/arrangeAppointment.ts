@@ -53,15 +53,12 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     validate.appointments,
     controllers.arrangeAppointments.postSentence(),
   )
-
   router.all('/case/:crn/arrange-appointment/:id/attendance', getWhoWillAttend(hmppsAuthClient))
-
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
     redirectWizard(['type', 'sentence']),
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
-
   router.post(
     '/case/:crn/arrange-appointment/:id/attendance',
     validate.appointments,
