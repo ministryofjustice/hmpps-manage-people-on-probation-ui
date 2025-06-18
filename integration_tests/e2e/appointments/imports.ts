@@ -59,8 +59,6 @@ export const completeDateTimePage = () => {
   dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select(startTime)
   dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(endTime).tab()
   dateTimePage.getSubmitBtn().click()
-  // Ignore warnings on second click
-  dateTimePage.getSubmitBtn().click()
 }
 
 export const completeNotePage = () => {

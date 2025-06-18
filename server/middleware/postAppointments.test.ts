@@ -142,7 +142,6 @@ describe('/middleware/postAppointments', () => {
     end: dateTime(date, endTime),
     interval,
     numberOfAppointments: parseInt(repeatCount, 10),
-    eventNumber: mockSentences[0].eventNumber,
     createOverlappingAppointment: true,
     requirementId: 1,
     nsiId: undefined as number,
