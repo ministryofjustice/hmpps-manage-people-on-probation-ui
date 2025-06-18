@@ -38,7 +38,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       end: dateTime(date, end),
       interval,
       numberOfAppointments: parseInt(numberOfAppointments, 10),
-      eventNumber,
+      eventId,
       uuid,
       createOverlappingAppointment: true,
       requirementId,

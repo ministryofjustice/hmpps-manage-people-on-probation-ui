@@ -3,7 +3,7 @@ import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { Route } from '../@types'
 import { renderError } from './renderError'
 
-export const redirectWizard = (requiredValues: string[] | string[][]): Route<Promise<void>> => {
+export const redirectWizard = (requiredValues: (string | string[])[]): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { crn, id } = req.params
     const { data } = req.session
