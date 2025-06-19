@@ -1,6 +1,16 @@
 {% extends "../_form.njk" %}
 {% set title = "Pick a location for this appointment" %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
+
+{% if change %}
+    {% set backLink = change if change %}
+{% elseif regionCode and teamCode %}
+    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?' + 'regionCode=' + regionCode + '&teamCode=' + teamCode%}
+{% elseif regionCode %}
+    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?' + 'regionCode=' + regionCode %}
+{% else %}
+    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
+{% endif %}
+
 {% block heading %}{% endblock %}
 {% block form %}
  {% if errorMessages %}

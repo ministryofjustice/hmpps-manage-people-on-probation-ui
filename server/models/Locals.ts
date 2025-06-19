@@ -30,6 +30,8 @@ interface Locals {
   userProviders?: Provider[]
   userTeams?: Team[]
   userStaff?: User[]
+  regionCode?: string
+  teamCode?: string
   selectProvider?: Provider[]
   sentry?: SentryConfig
   csrfToken?: string

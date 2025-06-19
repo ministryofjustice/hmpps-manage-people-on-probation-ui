@@ -22,7 +22,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
     const teams: Team[] = userProviders.teams.map(t => {
       if (t.code === teamCode) {
-        return { code: t.code, description: t.description, selected: true }
+        return { code: t.code, description: t.description, selected: 'selected' }
       }
 
       return t
