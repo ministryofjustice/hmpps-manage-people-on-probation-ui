@@ -1,6 +1,6 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 import { Route } from '../@types'
 import { CheckAppointment, LocalParams } from '../models/Appointments'
 import { isEmptyObject } from '../utils/isEmptyObject'
@@ -14,7 +14,14 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     }
     const { crn, id } = req.params
     const { data } = req.session
-    const { date, 'start-time': startTime, 'end-time': endTime } = getDataValue(data, ['appointments', crn, id])
+    const {
+      date,
+      'start-time': startTime,
+      'end-time': endTime,
+      previousValues,
+    } = getDataValue(data, ['appointments', crn, id])
+    const sameValuesHaveBeenSubmitted = JSON.stringify({ date, startTime, endTime }) === JSON.stringify(previousValues)
+    setDataValue(data, ['appointments', crn, id, 'previousValues'], { date, startTime, endTime })
     const start = dateTime(date, startTime)
     const end = dateTime(date, endTime)
 
@@ -47,7 +54,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
         `Choose a time that does not clash with ${res.locals.case.name.forename}’s existing appointment at ${checks.overlapsWithMeetingWith.startAndEnd}`
     }
 
-    if (warningMessagesSeen && Object.keys(errorMessages).length === 0) {
+    if (warningMessagesSeen && Object.keys(errorMessages).length === 0 && sameValuesHaveBeenSubmitted === true) {
       return next()
     }
 

@@ -64,6 +64,11 @@ const secondReq = httpMocks.createRequest({
             date: '2025-03-12',
             'start-time': '9:00am',
             'end-time': '9:30pm',
+            previousValues: {
+              date: '2025-03-12',
+              startTime: '9:00am',
+              endTime: '9:30pm',
+            },
           },
         },
       },
