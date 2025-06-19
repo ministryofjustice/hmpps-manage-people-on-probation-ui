@@ -19,10 +19,15 @@
   {% for location in userLocations %}
     {% set locationItems = (locationItems.push({
       text: location.description | convertToTitleCase,
-      value: location.id
+      value: location.id,
+      attributes: {
+        'data-qa': 'locationOption'
+      }
     }), locationItems) %}
   {% endfor %}
-  {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
+  {% if userLocations.length > 0 %}
+    {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
+  {% endif %}
   {% set locationItems = (locationItems.push({text: 'The location I’m looking for is not in this list'}), locationItems) %}
 
   {% set locationItems = (locationItems.push({text: 'I do not need to pick a location'}), locationItems) %}

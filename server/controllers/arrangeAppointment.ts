@@ -28,11 +28,6 @@ const routes = [
   'postConfirmation',
 ] as const
 
-const renderLocationNotInList: Route<void> = (req, res, next): void => {
-  const { crn, id } = req.params as Record<string, string>
-  return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id })
-}
-
 const arrangeAppointmentController: Controller<typeof routes> = {
   redirectToType: () => {
     return async (req, res) => {
@@ -135,9 +130,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       const errors = req?.session?.data?.errors
-      if (!res?.locals?.userLocations?.length) {
-        return renderLocationNotInList(req, res)
-      }
       if (errors) {
         delete req.session.data.errors
       }
@@ -160,7 +152,10 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     }
   },
   getLocationNotInList: () => {
-    return async (req, res) => renderLocationNotInList(req, res)
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id })
+    }
   },
   getDateTime: () => {
     return async (req, res) => {
