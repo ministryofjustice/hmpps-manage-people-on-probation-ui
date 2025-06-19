@@ -114,6 +114,8 @@ describe('Check your answers then confirm the appointment', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select(changedStart)
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(changedEnd).tab()
       dateTimePage.getSubmitBtn().click()
+      // Ignore warnings
+      dateTimePage.getSubmitBtn().click()
       cyaPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value li:nth-child(1)')
