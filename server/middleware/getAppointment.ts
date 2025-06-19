@@ -8,7 +8,7 @@ import { getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location } from '../data/model/caseload'
 
-export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> => {
+export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn, id } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

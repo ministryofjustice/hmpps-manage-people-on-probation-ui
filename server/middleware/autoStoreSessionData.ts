@@ -4,7 +4,7 @@ import { AppointmentType } from '../models/Appointments'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 
-export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<void> => {
+export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, _res, next) => {
     const newSessionData = req?.session?.data ?? {}
     const { crn, id } = req.params
