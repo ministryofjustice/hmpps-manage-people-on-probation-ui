@@ -151,67 +151,6 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
   })
-  /*
-  describe('getOrPostType', () => {
-    const mockReq = createMockRequest({})
-    let getOverviewSpy: jest.SpyInstance
-    const nextSpy = jest.fn()
-    beforeEach(async () => {
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-    })
-    describe('No VISOR report', () => {
-      beforeEach(async () => {
-        getOverviewSpy = jest
-          .spyOn(MasApiClient.prototype, 'getOverview')
-          .mockImplementationOnce(() => Promise.resolve(mockOverview))
-        await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
-      })
-      it('should request the overview from the api', () => {
-        expect(getOverviewSpy).toHaveBeenCalledWith(crn)
-      })
-      it('should request the appointment types from the api', () => {
-        expect(getAppointmentTypesSpy).toHaveBeenCalled()
-      })
-      it('should assign the appointment types to the local var', () => {
-        expect(res.locals.appointmentTypes).toEqual(mockAppointmentTypes.appointmentTypes)
-      })
-      it('should set visor as false in res.locals', () => {
-        expect(res.locals.visor).toEqual(false)
-      })
-      it('should call next()', () => {
-        expect(nextSpy).toHaveBeenCalled()
-      })
-    })
-    describe('VISOR report', () => {
-      const mockOverviewWithVisor = {
-        ...mockOverview,
-        registrations: ['VISOR', 'Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
-      }
-      beforeEach(async () => {
-        getOverviewSpy = jest
-          .spyOn(MasApiClient.prototype, 'getOverview')
-          .mockImplementationOnce(() => Promise.resolve(mockOverviewWithVisor))
-        await controllers.arrangeAppointments.getOrPostType(hmppsAuthClient)(mockReq, res, nextSpy)
-      })
-      it('should request the overview from the api', () => {
-        expect(getOverviewSpy).toHaveBeenCalledWith(crn)
-      })
-      it('should request the appointment types from the api', () => {
-        expect(getAppointmentTypesSpy).toHaveBeenCalled()
-      })
-      it('should assign the appointment types to the local var', () => {
-        expect(res.locals.appointmentTypes).toEqual(mockAppointmentTypes.appointmentTypes)
-      })
-      it('should set visor as true in res.locals', () => {
-        expect(res.locals.visor).toEqual(true)
-      })
-      it('should call next()', () => {
-        expect(nextSpy).toHaveBeenCalled()
-      })
-    })
-  })
-    */
   //   describe('getType', () => {})
   xdescribe('postType', () => {
     describe('CRN and UUID are valid in request params', () => {
@@ -332,29 +271,6 @@ describe('controllers/arrangeAppointment', () => {
   })
 
   describe('postSentence', () => {
-    // it('should reset the sentence requirement value if sentence licence condition value in request body', async () => {
-    //   const appointmentBody: Record<string, string> = { licenceConditionId: 'value' }
-    //   const appointmentSession: Record<string, string> = { requirementId: 'value' }
-    //   const mockReq = createMockRequest({ appointmentSession, appointmentBody })
-    //   await controllers.arrangeAppointments.postSentence()(mockReq, res)
-    //   expect(mockedSetDataValue).toHaveBeenCalledWith(
-    //     mockReq.session.data,
-    //     ['appointments', crn, uuid, 'requirementId'],
-    //     '',
-    //   )
-    // })
-    // it('should reset the sentence licence condition value if sentence requirement value in request body', async () => {
-    //   const appointmentSession: Record<string, string> = { licenceConditionId: 'value' }
-    //   const appointmentBody: Record<string, string> = { requirementId: 'value' }
-    //   const mockReq = createMockRequest({ appointmentSession, appointmentBody, query: {} })
-    //   await controllers.arrangeAppointments.postSentence()(mockReq, res)
-    //   expect(mockedSetDataValue).toHaveBeenCalledWith(
-    //     mockReq.session.data,
-    //     ['appointments', crn, uuid, 'licenceConditionId'],
-    //     '',
-    //   )
-    //   expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location`)
-    // })
     it('should redirect to the change url if found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postSentence()(mockReq, res)
