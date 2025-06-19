@@ -63,10 +63,7 @@
       }
     },
     items: licenceConditions
-<<<<<<< HEAD
-<<<<<<< HEAD
 } | decorateFormAttributes(['appointments', crn, id, 'licenceConditionId'])) }}
-      ======= } | decorateFormAttributes(['appointments', crn, id, 'sentence-licence-condition'])) }} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip) ======= } | decorateFormAttributes(['appointments', crn, id, 'licenceConditionId'])) }} >>>>>>> e016133 (MAN-633-634 complete pages with passing int and unit tests)
       {% endset -%}
     {% endif %}
     {% if sentence.nsis.length %}
@@ -91,7 +88,6 @@
     },
     items: nsis
 } | decorateFormAttributes(['appointments', crn, id, 'nsiId'])) }}
-      <<<<<<< HEAD ======= 'data-qa': 'sentence-nsi' } }, items: nsis } | decorateFormAttributes(['appointments', crn, id, 'sentence-nsi'])) }} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip) ======= >>>>>>> e016133 (MAN-633-634 complete pages with passing int and unit tests)
       {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
@@ -116,7 +112,6 @@
     {% endif %}
   {% endfor %}
   {% if appointment.type.isPersonLevelContact %}
-    <<<<<<< HEAD {% set allSentences = (allSentences.push( { text: appointment.meta.forename, value: '1', attributes: { 'data-qa': 'personLevelContact' }, label: { attributes: { 'data-qa': 'personLevelContactLabel' } } }), allSentences) %} ======= {% set allSentences = (allSentences.push({text: appointment.meta.forename, value: '1'}), allSentences) %} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip) =======
     {% set allSentences = (allSentences.push(
     {
     text: appointment.meta.forename,
@@ -130,7 +125,6 @@
       }
     }
     }), allSentences) %}
-    >>>>>>> e016133 (MAN-633-634 complete pages with passing int and unit tests)
   {% endif %}
   {{ govukRadios({
     fieldset: {
@@ -148,6 +142,5 @@
       },
     items: allSentences
 } | decorateFormAttributes(['appointments', crn, id, 'eventId'])) }}
-  <<<<<<< HEAD ======= } | decorateFormAttributes(['appointments', crn, id, 'sentence'])) }} >>>>>>> fd0198c (MAN-633/634 type and sentence pages wip) ======= >>>>>>> e016133 (MAN-633-634 complete pages with passing int and unit tests)
 
 {% endblock %}
