@@ -1,10 +1,9 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, setDataValue } from '../utils'
+import { getDataValue, setDataValue, dateTime } from '../utils'
 import { Route } from '../@types'
 import { CheckAppointment, LocalParams } from '../models/Appointments'
 import { isEmptyObject } from '../utils/isEmptyObject'
-import { dateTime } from '../utils/dateTime'
 
 export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -14,12 +13,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     }
     const { crn, id } = req.params
     const { data } = req.session
-    const {
-      date,
-      'start-time': startTime,
-      'end-time': endTime,
-      previousValues,
-    } = getDataValue(data, ['appointments', crn, id])
+    const { date, start: startTime, end: endTime, previousValues } = getDataValue(data, ['appointments', crn, id])
     const sameValuesHaveBeenSubmitted = JSON.stringify({ date, startTime, endTime }) === JSON.stringify(previousValues)
     setDataValue(data, ['appointments', crn, id, 'previousValues'], { date, startTime, endTime })
     const start = dateTime(date, startTime)

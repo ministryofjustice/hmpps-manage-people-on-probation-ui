@@ -1,11 +1,11 @@
 import httpMocks from 'node-mocks-http'
+import { dateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
 import { checkAppointments } from './checkAppointments'
 import { AppointmentChecks } from '../models/Appointments'
-import { dateTime } from '../utils/dateTime'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -40,8 +40,8 @@ const req = httpMocks.createRequest({
         [crn]: {
           [id]: {
             date: '2025-03-12',
-            'start-time': '9:00am',
-            'end-time': '9:30pm',
+            start: '9:00am',
+            end: '9:30pm',
           },
         },
       },
@@ -77,7 +77,7 @@ const secondReq = httpMocks.createRequest({
 })
 const nextSpy = jest.fn()
 const renderSpy = jest.spyOn(res, 'render')
-const { date, 'start-time': startTime, 'end-time': endTime } = req.session.data.appointments[crn][id]
+const { date, start: startTime, end: endTime } = req.session.data.appointments[crn][id]
 
 const expectedBody = {
   start: dateTime(date, startTime),

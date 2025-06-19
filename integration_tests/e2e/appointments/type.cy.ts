@@ -20,7 +20,7 @@ const loadPage = () => {
 describe('Arrange an appointment', () => {
   let typePage: AppointmentTypePage
   let sentencePage: AppointmentSentencePage
-  beforeEach(() => {
+  afterEach(() => {
     cy.task('resetMocks')
   })
   describe('What appointment are you arranging?', () => {

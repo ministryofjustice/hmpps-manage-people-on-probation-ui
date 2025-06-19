@@ -1,3 +1,6 @@
+import { Name } from '../data/model/personalDetails'
+import { Errors } from './Errors'
+
 export interface AppointmentSession {
   user?: {
     username: string
