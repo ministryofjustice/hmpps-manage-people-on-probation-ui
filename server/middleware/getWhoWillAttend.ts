@@ -1,6 +1,7 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
+import { Provider, Team } from '../data/model/caseload'
 
 export const getWhoWillAttend = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -11,12 +12,20 @@ export const getWhoWillAttend = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const userProviders = await masClient.getUserProviders(username, regionCode, teamCode)
 
-    const providers = userProviders.providers.map((p, index) => {
+    const providers: Provider[] = userProviders.providers.map(p => {
       if (p.code === regionCode) {
-        return { code: p.code, name: p.name, selected: true }
+        return { code: p.code, name: p.name, selected: 'selected' }
       }
 
-      return { code: p.code, name: p.name }
+      return p
+    })
+
+    const teams: Team[] = userProviders.teams.map(t => {
+      if (t.code === teamCode) {
+        return { code: t.code, description: t.description, selected: true }
+      }
+
+      return t
     })
 
     req.session.data = {
@@ -27,7 +36,7 @@ export const getWhoWillAttend = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       },
       teams: {
         ...(req?.session?.data?.teams ?? {}),
-        [username]: userProviders.teams,
+        [username]: teams,
       },
       staff: {
         ...(req?.session?.data?.providers ?? {}),

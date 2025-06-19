@@ -17,7 +17,8 @@
     {% for team in userTeams %}
         {% set teamItems = (teamItems.push({
             value: team.code,
-            text: team.description
+            text: team.description,
+            selected: team.selected
         }), teamItems) %}
     {% endfor %}
 
@@ -30,7 +31,6 @@
     {% endfor %}
 
     <p>You can attend or book for a colleague</p>
-
 
         {{ govukSelect({
             id: "region",
@@ -60,24 +60,18 @@
         } | decorateFormAttributes(['appointments', crn, id, 'name'])) }}
 
     <script nonce="{{ cspNonce }}">
-      const teams = ["Apple", "Banana", "Cherry"];
       document.addEventListener("DOMContentLoaded", () => {
         const regionSelect = document.getElementById("region")
         const teamSelect = document.getElementById("team")
-        const nameSelect = document.getElementById("name")
 
         regionSelect.addEventListener("change", (event) => {
-          // const teamCode = teamSelect.value
           window.location.href = document.getElementById('uri_ref').value + "?regionCode=" + event.target.value
-          // teamSelect.length = 0
-          // teams.forEach(team => {
-          //   const option = document.createElement("option");
-          //   option.value = team;
-          //   option.textContent = team;
-          //   teamSelect.appendChild(option);
-          // });
+        })
 
-        });
-      });
+        teamSelect.addEventListener("change", (event) => {
+          const regionCode = regionSelect.value
+          window.location.href = document.getElementById('uri_ref').value + "?regionCode=" + regionCode + "&teamCode=" + event.target.value
+        })
+      })
     </script>
 {% endblock %}

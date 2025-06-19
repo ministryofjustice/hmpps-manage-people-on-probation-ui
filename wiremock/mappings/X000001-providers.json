@@ -85,10 +85,6 @@
             {
               "code": "N54",
               "name": "North East Region"
-            },
-            {
-              "code": "N51",
-              "name": "North West Region"
             }
           ],
           "teams": [
@@ -113,6 +109,70 @@
             {
               "username": "jon-smith",
               "name": "jon smith (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/providers",
+        "queryParameters": {
+          "region": {
+            "equalTo": "N50"
+          },
+          "team": {
+            "equalTo": "N50AHA"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "A P Central Admissions Unit",
+              "code": "N50CAU"
+            },
+            {
+              "description": "Ascot House Approved Premises",
+              "code": "N50AHA"
+            },
+            {
+              "description": "Atherton Court",
+              "code": "N50ACT"
+            }
+          ],
+          "users": [
+            {
+              "username": "jon-quick",
+              "name": "jon quick (PS-PSO)"
+            },
+            {
+              "username": "fred-plug",
+              "name": "fred plug (PS-PSO)"
             }
           ]
         },
@@ -168,12 +228,12 @@
           ],
           "users": [
             {
-              "username": "mike-parker",
-              "name": "mike parker (PS-PSO)"
+              "username": "max-cool",
+              "name": "max parker (PS-PSO)"
             },
             {
-              "username": "peter-smith",
-              "name": "peter smith (PS-PSO)"
+              "username": "tony-pan",
+              "name": "tony pan (PS-PSO)"
             }
           ]
         },

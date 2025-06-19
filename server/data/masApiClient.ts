@@ -293,8 +293,8 @@ export default class MasApiClient extends RestClient {
   }
 
   async getUserProviders(username: string, regionCode?: string, teamCode?: string): Promise<UserProviders> {
-    // &team=${teamCode}
-    const queryParameters = regionCode ? `?region=${regionCode}` : ''
+    const teamQueryParam = teamCode ? `&team=${teamCode}` : ''
+    const queryParameters = regionCode ? `?region=${regionCode}${teamQueryParam}` : ''
     return this.get({ path: `/user/${username}/providers${queryParameters}`, handle404: true })
   }
 
