@@ -27,6 +27,7 @@ interface Locals {
   flags?: FeatureFlags
   sentences?: Sentence[]
   timeOptions?: Option[]
+  endTimeOptions?: Option[]
   userLocations?: Location[]
   sentry?: SentryConfig
   csrfToken?: string

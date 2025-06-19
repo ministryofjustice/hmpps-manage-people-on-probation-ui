@@ -10,4 +10,7 @@ describe('utils/isEmptyObject', () => {
   it('should return false if object has nested object with no defined fields', () => {
     expect(isEmptyObject({ f1: null, f2: undefined, f3: undefined, f4: { f5: null } })).toEqual(false)
   })
+  it('should return true if object is undefined', () => {
+    expect(isEmptyObject(undefined)).toEqual(true)
+  })
 })

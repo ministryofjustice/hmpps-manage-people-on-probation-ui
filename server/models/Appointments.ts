@@ -59,6 +59,7 @@ export interface AppointmentChecks {
 export interface AppointmentCheck {
   isCurrentUser: boolean
   appointmentIsWith: Name
+  startAndEnd: string
 }
 
 export interface LocalParams {

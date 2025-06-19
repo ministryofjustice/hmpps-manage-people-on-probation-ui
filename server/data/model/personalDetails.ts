@@ -1,5 +1,5 @@
-import { Validateable } from '../../utils/validationUtils'
 import { Note } from './note'
+import { Validateable } from '../../models/Errors'
 
 export interface Name {
   forename: string

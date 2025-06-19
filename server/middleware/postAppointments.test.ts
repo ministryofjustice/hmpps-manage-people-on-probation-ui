@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { postAppointments, dateTime } from './postAppointments'
+import { postAppointments } from './postAppointments'
 
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -8,6 +8,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { appointmentTypes } from '../properties'
 import { AppResponse } from '../models/Locals'
+import { dateTime } from '../utils/dateTime'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 

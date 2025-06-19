@@ -3,7 +3,15 @@
     {
       "request": {
         "urlPattern": "/mas/appointment/X778160/check",
-        "method": "POST"
+        "method": "POST",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.start",
+              "contains": "11:00"
+            }
+          }
+        ]
       },
       "response": {
         "status": 200,
@@ -11,11 +19,41 @@
           "nonWorkingDayName": "Sunday",
           "isWithinOneHourOfMeetingWith": {
             "isCurrentUser": false,
-            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" }
+            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" },
+            "startAndEnd": "11am to 12pm"
           },
           "overlapsWithMeetingWith": {
             "isCurrentUser": false,
-            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" }
+            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" },
+            "startAndEnd": "11am to 12pm"
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/appointment/X778160/check",
+        "method": "POST",
+        "bodyPatterns": [
+          {
+            "matchesJsonPath": {
+              "expression": "$.start",
+              "doesNotContain": "11:00"
+            }
+          }
+        ]
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "nonWorkingDayName": "Sunday",
+          "isWithinOneHourOfMeetingWith": {
+            "isCurrentUser": false,
+            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" },
+            "startAndEnd": "11am to 12pm"
           }
         },
         "headers": {
