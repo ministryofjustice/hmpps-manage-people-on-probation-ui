@@ -1,4 +1,4 @@
-export * from './getWhoWillAttend'
+export * from './getWhoAttends'
 export * from './getUserLocations'
 export * from './autoStoreSessionData'
 export * from './getPersonalDetails'

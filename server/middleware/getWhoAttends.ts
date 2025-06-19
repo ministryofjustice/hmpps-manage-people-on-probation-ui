@@ -3,7 +3,7 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team } from '../data/model/caseload'
 
-export const getWhoWillAttend = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { username } = res.locals.user
     const regionCode = req.query.regionCode as string

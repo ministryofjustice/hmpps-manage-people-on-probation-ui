@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { getWhoWillAttend } from './getWhoWillAttend'
+import { getWhoAttends } from './getWhoAttends'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -69,7 +69,7 @@ const res = {
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
-describe('/middleware/getWhoWillAttend()', () => {
+describe('/middleware/getWhoAttends()', () => {
   const nextSpy = jest.fn()
 
   const spy = jest
@@ -91,7 +91,7 @@ describe('/middleware/getWhoWillAttend()', () => {
       },
     })
     beforeEach(async () => {
-      await getWhoWillAttend(hmppsAuthClient)(req, res, nextSpy)
+      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should fetch the user providers from the api and assign to session', () => {
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
@@ -118,7 +118,7 @@ describe('/middleware/getWhoWillAttend()', () => {
       },
     })
     beforeEach(async () => {
-      await getWhoWillAttend(hmppsAuthClient)(req, res, nextSpy)
+      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should fetch the user providers from the api and assign to session', () => {
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)

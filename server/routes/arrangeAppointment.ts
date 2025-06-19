@@ -3,7 +3,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import {
   autoStoreSessionData,
   getPersonalDetails,
-  getWhoWillAttend,
+  getWhoAttends,
   getUserLocations,
   getSentences,
   getAppointment,
@@ -53,7 +53,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     validate.appointments,
     controllers.arrangeAppointments.postSentence(),
   )
-  router.all('/case/:crn/arrange-appointment/:id/attendance', getWhoWillAttend(hmppsAuthClient))
+  router.all('/case/:crn/arrange-appointment/:id/attendance', getWhoAttends(hmppsAuthClient))
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
     redirectWizard(['type', 'sentence']),
