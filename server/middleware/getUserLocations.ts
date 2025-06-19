@@ -7,7 +7,7 @@ export const getUserLocations = (hmppsAuthClient: HmppsAuthClient): Route<Promis
   return async (req, res, next) => {
     const { crn, id } = req.params
     const { data } = req.session
-    const username = getDataValue(data, ['appointments', crn, id, 'username'])
+    const username = getDataValue(data, ['appointments', crn, id, 'user', 'username'])
     // const username = 'marcusaspin'
     const token = await hmppsAuthClient.getSystemClientToken(username)
     if (!req?.session?.data?.locations?.[username]) {
