@@ -139,4 +139,221 @@ describe('/middleware/autoStoreSessionData', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
   })
+  describe('If a non-repeating appointment', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                licenceConditionId: '2500711169',
+                numberOfAppointments: '2',
+                interval: 'DAY',
+                repeatingDates: ['2025-06-1', '2025-06-8'],
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'eWgbIYQJ-4cb7KuSKWXvFK87nZ0M3D0RvaPA',
+        appointments: {
+          [crn]: {
+            [id]: {
+              repeating: 'No',
+            },
+          },
+        },
+      },
+    })
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should reset the number of appointments, interval and repeating dates in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].numberOfAppointments).toEqual('')
+      expect(req.session.data.appointments[crn][id].interval).toEqual('')
+      expect(req.session.data.appointments[crn][id].repeatingDates).toEqual([])
+    })
+  })
+  describe('If sentence with licence condition', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                licenceConditionId: '',
+                requirementId: '2500711169',
+                nsiId: '2500711277',
+                numberOfAppointments: '',
+                interval: '',
+                repeatingDates: [],
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'eWgbIYQJ-4cb7KuSKWXvFK87nZ0M3D0RvaPA',
+        appointments: {
+          [crn]: {
+            [id]: {
+              eventId: '2501192724',
+              licenceConditionId: '2500686668',
+            },
+          },
+        },
+      },
+    })
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should reset the requirement and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].requirementId).toEqual('')
+      expect(req.session.data.appointments[crn][id].nsiId).toEqual('')
+    })
+  })
+  describe('If sentence with requirement', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                licenceConditionId: '2500711169',
+                requirementId: '',
+                nsiId: '2500711277',
+                numberOfAppointments: '',
+                interval: '',
+                repeatingDates: [],
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'eWgbIYQJ-4cb7KuSKWXvFK87nZ0M3D0RvaPA',
+        appointments: {
+          [crn]: {
+            [id]: {
+              eventId: '2501192724',
+              requirementId: '2500686668',
+            },
+          },
+        },
+      },
+    })
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should reset the licence condition and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('')
+      expect(req.session.data.appointments[crn][id].nsiId).toEqual('')
+    })
+  })
+  describe('If sentence with nsi', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                licenceConditionId: '2500711169',
+                requirementId: '2500711277',
+                nsiId: '',
+                numberOfAppointments: '',
+                interval: '',
+                repeatingDates: [],
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'eWgbIYQJ-4cb7KuSKWXvFK87nZ0M3D0RvaPA',
+        appointments: {
+          [crn]: {
+            [id]: {
+              eventId: '2501192724',
+              nsiId: '2500686668',
+            },
+          },
+        },
+      },
+    })
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should reset the licence condition and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('')
+      expect(req.session.data.appointments[crn][id].requirementId).toEqual('')
+    })
+  })
+  describe('If value is an object', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                user: {
+                  username: 'USER1',
+                },
+                type: 'COAI',
+                licenceConditionId: '2500711169',
+                requirementId: '2500711277',
+                nsiId: '',
+                numberOfAppointments: '',
+                interval: '',
+                repeatingDates: [],
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'eWgbIYQJ-4cb7KuSKWXvFK87nZ0M3D0RvaPA',
+        appointments: {
+          [crn]: {
+            [id]: {
+              user: { locationCode: '2500035096' },
+            },
+          },
+        },
+      },
+    })
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should reset the licence condition and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].user).toStrictEqual({
+        username: 'USER1',
+        locationCode: '2500035096',
+      })
+    })
+  })
 })

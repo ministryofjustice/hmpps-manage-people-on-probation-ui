@@ -46,7 +46,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
           if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
             resetValues({ licenceConditionId: '', nsiId: '' })
           }
-          if (req?.body?.appointments?.[crn]?.[id]?.nsi) {
+          if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
             resetValues({ licenceConditionId: '', requirementId: '' })
           }
         }
