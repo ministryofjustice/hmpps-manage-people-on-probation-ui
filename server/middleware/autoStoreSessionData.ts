@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-syntax */
-import { DateTime } from 'luxon'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 import { AppointmentType } from '../models/Appointments'
@@ -55,7 +53,6 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
       }
     })
     req.session.data = newSessionData
-    // console.dir(newSessionData, { depth: null })
     return next()
   }
 }
