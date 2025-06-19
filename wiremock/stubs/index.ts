@@ -7,6 +7,7 @@ import userSchedule from './userSchedule'
 import interventions from './interventions'
 import personalDetails from './personalDetails'
 import flags from './flags'
+import appointments from './appointments'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -18,4 +19,5 @@ export default {
   ...interventions,
   ...personalDetails,
   ...flags,
+  ...appointments,
 }

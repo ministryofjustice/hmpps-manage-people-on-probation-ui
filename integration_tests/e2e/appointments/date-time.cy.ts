@@ -11,6 +11,9 @@ const loadPage = () => {
 describe('Enter the date and time of the appointment', () => {
   let dateTimePage: AppointmentDateTimePage
   let repeatingPage: AppointmentRepeatingPage
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
 
   describe('Page is rendered', () => {
     beforeEach(() => {
@@ -124,6 +127,7 @@ describe('Enter the date and time of the appointment', () => {
 
   describe('Continue is clicked selecting a date and time that clashes', () => {
     beforeEach(() => {
+      cy.task('stubAppointmentClash')
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
