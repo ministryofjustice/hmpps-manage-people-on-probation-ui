@@ -7,7 +7,6 @@ import { AppointmentLocals } from '../models/Locals'
 import { getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location } from '../data/model/caseload'
-// import { DateTime } from 'luxon'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> => {
   return async (req, res, next) => {
@@ -51,18 +50,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      // let date: string = ''
-      // let start: string = ''
-      // let end: string = ''
-      // if (startDate) {
-      //   const dt = DateTime.fromISO(startDate, { zone: 'utc' })
-      //   start = dt.toFormat('h:mma').toLowerCase()
-      //   date = dt.toFormat('dd/MM/yyyy')
-      // }
-      // if (endDate) {
-      //   const dt = DateTime.fromISO(endDate, { zone: 'utc' })
-      //   end = dt.toFormat('h:mma').toLowerCase()
-      // }
       if (eventId) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
@@ -72,7 +59,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
           )
         }
         if (licenceConditionId) {
-          // console.dir(sentenceObj, { depth: null })
           sentenceLicenceCondition = sentenceObj.licenceConditions.find(
             lc => lc.id === parseInt(licenceConditionId, 10),
           )
@@ -111,7 +97,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<void> =>
       }
     }
     res.locals.appointment = appointment
-    // console.dir(appointment, { depth: null })
     return next()
   }
 }

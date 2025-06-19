@@ -1,5 +1,3 @@
-/* eslint-disable no-restricted-syntax */
-import { DateTime } from 'luxon'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 import { AppointmentType } from '../models/Appointments'
@@ -12,12 +10,12 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<v
     const { crn, id } = req.params
     const inputs: Record<string, any> = req.body ?? {}
 
-    const resetValues = (keys: Record<string, string | string[]>) => {
-      for (const key in keys) {
+    const resetValues = (keys: Record<string, string | string[]>): void => {
+      Object.entries(keys).forEach(([key, value]) => {
         if ((req?.session?.data?.appointments as any)?.[crn]?.[id]?.[key]) {
-          setDataValue(newSessionData, ['appointments', crn, id, key], keys[key])
+          setDataValue(newSessionData, ['appointments', crn, id, key], value)
         }
-      }
+      })
     }
 
     Object.entries(inputs).forEach(([key, _]: [string, any]) => {
@@ -30,14 +28,6 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<v
             if (config.dateFields.includes(valueKey) && body[valueKey].includes('/')) {
               newValue = toIsoDateFromPicker(body[valueKey])
             }
-            // if (config.timeFields.some(field => field.name === valueKey)) {
-            //   const field = config.timeFields.find(timeField => timeField.name === valueKey)
-            //   const date = getDataValue(req.session.data, [key, crn, id, field.dateField])
-            //   const dt = DateTime.fromFormat(`${date} ${newValue}`, 'yyyy-MM-dd h:mma', {
-            //     zone: 'UTC',
-            //   })
-            //   newValue = dt.toUTC().toISO()
-            // }
             if (typeof newValue === 'object') {
               newValue = {
                 ...((req?.session?.data as any)[key]?.[crn]?.[id]?.[valueKey] || {}),
@@ -63,7 +53,6 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<v
       }
     })
     req.session.data = newSessionData
-    // console.dir(newSessionData, { depth: null })
     return next()
   }
 }
