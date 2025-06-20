@@ -6,6 +6,7 @@ import {
   hasNestedKeys,
   isEmail,
   isNotEarlierThan,
+  timeIsNotEarlierThan,
   isNotEmpty,
   isNotLaterThan,
   isNotLaterThanToday,
@@ -14,9 +15,9 @@ import {
   isUkPostcode,
   isValidDate,
   isValidDateFormat,
-  Validateable,
   validateWithSpec,
-  ValidationSpec,
+  timeIsNotLaterThan,
+  isTodayOrLater,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -26,6 +27,7 @@ import {
   documentSearchValidation,
   personDetailsValidation,
 } from '../properties'
+import { Validateable, ValidationSpec } from '../models/Errors'
 
 const loggerSpy = jest.spyOn(logger, 'info')
 const crn = 'X000001'
@@ -119,6 +121,20 @@ describe('is not later than today', () => {
   })
 })
 
+describe('is today or later', () => {
+  it.each([
+    ['empty string', [''], false],
+    ['null', [null], false],
+    ['undefined', [undefined], false],
+    ['populated invalid date', ['XXDFDS'], false],
+    ['populated valid', [DateTime.now().plus({ days: -1 }).toFormat('d/M/yyyy').toString()], false],
+    ['populated valid', [DateTime.now().toFormat('d/M/yyyy').toString()], true],
+    ['populated invalid', [DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString()], true],
+  ])('%s isTodayOrLater(%s, %s)', (_: string, a: [], expected: boolean) => {
+    expect(isTodayOrLater(a)).toEqual(expected)
+  })
+})
+
 describe('date which is not later than date', () => {
   it.each([
     ['empty string', ['', ''], true],
@@ -142,6 +158,34 @@ describe('date which is not later than date', () => {
     ['populated valid', ['02/02/2024', '01/02/2024'], true],
   ])('%s isNotEarlierThan(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(isNotEarlierThan(a)).toEqual(expected)
+  })
+})
+
+describe('time which is not later than time', () => {
+  it.each([
+    ['empty string', ['', ''], true],
+    ['null', [null], true],
+    ['undefined', [undefined], true],
+    ['populated invalid date', ['XXDFDS', '02/02/2024'], true],
+    ['populated valid', ['9:45pm', '10:45am'], false],
+    ['populated valid', ['9:45pm', '9:45pm'], false],
+    ['populated valid', ['9:45am', '10:45am'], true],
+  ])('%s timeIsNotLaterThan(%s, %s)', (_: string, a: [], expected: boolean) => {
+    expect(timeIsNotLaterThan(a)).toEqual(expected)
+  })
+})
+
+describe('time which is not earlier than time', () => {
+  it.each([
+    ['empty string', ['', ''], true],
+    ['null', [null], true],
+    ['undefined', [undefined], true],
+    ['populated invalid date', ['XXDFDS', '02/02/2024'], true],
+    ['populated valid', ['9:45am', '10:45am'], false],
+    ['populated valid', ['9:45pm', '9:45pm'], false],
+    ['populated valid', ['9:45pm', '10:45am'], true],
+  ])('%s isNotEarlierThan(%s, %s)', (_: string, a: [], expected: boolean) => {
+    expect(timeIsNotEarlierThan(a)).toEqual(expected)
   })
 })
 
@@ -232,8 +276,8 @@ describe(`validates appointment repeat request with spec when no repeating optio
     },
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
-    [`appointments-${crn}-${id}-repeating-frequency`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-repeating-count`]: 'Enter the number of times the appointment will repeat',
+    [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
+    [`appointments-${crn}-${id}-numberOfAppointments`]: 'Enter the number of times the appointment will repeat',
   }
   const args: AppointmentsValidationArgs = {
     crn,
@@ -261,8 +305,8 @@ describe(`validates appointment repeat request with spec when no repeating optio
     },
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
-    [`appointments-${crn}-${id}-repeating-frequency`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-repeating-count`]: 'Enter the number of times the appointment will repeat',
+    [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
+    [`appointments-${crn}-${id}-numberOfAppointments`]: 'Enter the number of times the appointment will repeat',
   }
   const args: AppointmentsValidationArgs = {
     crn,
@@ -282,8 +326,8 @@ describe('validates appointment date time request with spec', () => {
       [crn]: {
         [id]: {
           date: '21/11/2',
-          'start-time': '9:00am',
-          'end-time': '9:30am',
+          start: '9:00am',
+          end: '9:30am',
         },
       },
     },

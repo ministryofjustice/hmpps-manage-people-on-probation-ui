@@ -1,7 +1,8 @@
 import type { UserDetails } from '../../services/userService'
 import { Errors } from '../../models/Errors'
-import { ActivityLogCache, Data } from '../index'
+import { ActivityLogCache } from '../index'
 import { DocumentLevel } from '../../data/model/documents'
+import { Data } from '../../models/Data'
 
 export default {}
 

@@ -13,7 +13,8 @@
           },
           "sentences": [
             {
-              "eventId": 12345,
+              "id": 2501192724,
+              "eventNumber": 12345,
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831"
@@ -77,7 +78,8 @@
               ]
             },
             {
-              "eventId": "5678",
+              "id": 2501192725,
+              "eventNumber": "5678",
               "mainOffence": {
                 "code": "18502",
                 "description": "(Having possession a picklock or other implement with intent to break into any premises - 18502)"

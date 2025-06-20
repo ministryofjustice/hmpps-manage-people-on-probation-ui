@@ -34,21 +34,33 @@ describe('Appointments arranged', () => {
     confirmPage = new AppointmentConfirmationPage()
   })
   it('should render the page', () => {
-    confirmPage.getPanel().find('strong').should('contain.text', 'Home visit')
+    confirmPage.getPanel().find('strong').should('contain.text', '3 Way Meeting (NS)')
     confirmPage
       .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
-      .should('contain.text', `${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
+      })
     confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
     confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
     confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
     confirmPage
       .getWhatHappensNext()
       .find('p:nth-of-type(1)')
-      .should('contain.text', `You need to send Alton the appointment details.`)
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.include(`You need to send Alton the appointment details.`)
+      })
     confirmPage
       .getWhatHappensNext()
       .find('p:nth-of-type(2)')
-      .should('contain.text', `Alton’s phone number is 0123456999.`)
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.include(`Alton’s phone number is 0123456999.`)
+      })
 
     confirmPage.getSubmitBtn().should('contain.text', 'Finish')
     confirmPage.getSubmitBtn().click()

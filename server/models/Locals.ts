@@ -6,18 +6,48 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { Appointment, AppointmentTypeOption } from './Appointments'
+import { AppointmentType } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 
+export interface AppointmentLocals {
+  meta: {
+    isVisor: boolean
+    forename: string
+    change: string
+  }
+  type?: AppointmentType
+  visorReport?: string
+  appointmentFor?: {
+    sentence: string
+    requirement: string
+    licenceCondition: string
+    nsi: string
+  }
+  attending?: {
+    name: string
+    team: string
+    region: string
+  }
+  location?: Location
+  start?: string
+  end?: string
+  date?: string
+  repeating?: string
+  repeatingDates?: string[]
+  notes?: string
+  sensitivity?: string
+}
+
 interface Locals {
   errorMessages: Record<string, string>
+  warningMessages: Record<string, string>
   filters?: ActivityLogFiltersResponse
   user: { token: string; authSource: string; username?: string }
   compactView?: boolean
   defaultView?: boolean
   requirement?: string
-  appointment?: Appointment
+  appointment?: AppointmentLocals
   case?: PersonalDetails
   message?: string
   title?: string
@@ -26,6 +56,7 @@ interface Locals {
   flags?: FeatureFlags
   sentences?: Sentence[]
   timeOptions?: Option[]
+  endTimeOptions?: Option[]
   userLocations?: Location[]
   userProviders?: Provider[]
   userTeams?: Team[]
@@ -38,7 +69,8 @@ interface Locals {
   cspNonce?: string
   errors?: Errors
   change?: string
-  appointmentTypes?: AppointmentTypeOption[]
+  appointmentTypes?: AppointmentType[]
+  visor?: boolean
   lastAppointmentDate?: string
   version: string
   backLink: string

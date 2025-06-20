@@ -1,6 +1,4 @@
-import { AppointmentTypeOption } from '../models/Appointments'
-
-export const appointmentTypes: AppointmentTypeOption[] = [
+export const appointmentTypes = [
   {
     text: 'Home visit',
     value: 'HomeVisitToCaseNS',

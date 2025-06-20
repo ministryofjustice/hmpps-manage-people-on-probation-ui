@@ -3,12 +3,15 @@ import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { Route } from '../@types'
 import { renderError } from './renderError'
 
-export const redirectWizard = (requiredValues: string[]): Route<Promise<void>> => {
+export const redirectWizard = (requiredValues: (string | string[])[]): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { crn, id } = req.params
     const { data } = req.session
     for (const requiredValue of requiredValues) {
-      const value = getDataValue(data, ['appointments', crn, id, requiredValue])
+      const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
+      const value = getDataValue(data, ['appointments', crn, id, ...path])
+      console.log(data.appointments)
+      console.log(path)
       if (!value) {
         if (!isValidCrn(crn) || !isValidUUID(id)) {
           return renderError(404)(req, res)

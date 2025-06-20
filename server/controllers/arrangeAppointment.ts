@@ -1,14 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { appointmentTypes } from '../properties'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError } from '../middleware'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToType',
-  'getOrPostType',
   'getType',
   'postType',
   'getSentence',
@@ -41,12 +40,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/type`)
     }
   },
-  getOrPostType: () => {
-    return async (_req, res, next) => {
-      res.locals.appointmentTypes = appointmentTypes
-      return next()
-    }
-  },
   getType: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
@@ -54,8 +47,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params
-      const { change } = req.query
-      return res.render(`pages/arrange-appointment/type`, { crn, id, errors, change })
+      return res.render(`pages/arrange-appointment/type`, { crn, id, errors })
     }
   },
   postType: () => {
@@ -93,13 +85,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
-      const { data } = req.session
-      if (req?.body?.appointments?.[crn]?.[id]?.['sentence-licence-condition']) {
-        setDataValue(data, ['appointments', crn, id, 'sentence-requirement'], '')
-      }
-      if (req?.body?.appointments?.[crn]?.[id]?.['sentence-requirement']) {
-        setDataValue(data, ['appointments', crn, id, 'sentence-licence-condition'], '')
-      }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -157,7 +142,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       const { data } = req.session
-      const selectedLocation = getDataValue(data, ['appointments', crn, id, 'location'])
+      const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -197,25 +182,25 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
-      const { 'repeating-frequency': repeatingFrequency, 'repeating-count': repeatingCount } = req.query
-      if (repeatingFrequency || repeatingCount) {
+      const { interval, numberOfAppointments } = req.query
+      if (interval || numberOfAppointments) {
         setDataValue(data, ['appointments', crn, id, 'repeating'], 'Yes')
-        if (repeatingFrequency) {
-          setDataValue(data, ['appointments', crn, id, 'repeating-frequency'], decodeURI(repeatingFrequency as string))
+        if (interval) {
+          setDataValue(data, ['appointments', crn, id, 'interval'], decodeURI(interval as string))
         }
-        if (repeatingCount) {
-          setDataValue(data, ['appointments', crn, id, 'repeating-count'], repeatingCount)
+        if (numberOfAppointments) {
+          setDataValue(data, ['appointments', crn, id, 'numberOfAppointments'], numberOfAppointments)
         }
       }
       const appointment = getDataValue(data, ['appointments', crn, id])
-      if (appointment?.date && appointment?.['repeating-frequency'] && appointment?.['repeating-count']) {
+      if (appointment?.date && appointment?.interval && appointment?.numberOfAppointments) {
         const clonedAppointment = { ...appointment }
-        const period = ['WEEK', 'FORTNIGHT'].includes(appointment['repeating-frequency']) ? 'week' : 'month'
-        const increment = appointment['repeating-frequency'] === 'FORTNIGHT' ? 2 : 1
+        const period = ['WEEK', 'FORTNIGHT'].includes(appointment.interval) ? 'week' : 'month'
+        const increment = appointment.interval === 'FORTNIGHT' ? 2 : 1
         const repeatAppointments = ArrangedSession.generateRepeatedAppointments(clonedAppointment, period, increment)
         setDataValue(
           data,
-          ['appointments', crn, id, 'repeating-dates'],
+          ['appointments', crn, id, 'repeatingDates'],
           repeatAppointments.map(appt => appt.date),
         )
         res.locals.lastAppointmentDate = repeatAppointments.length
@@ -231,10 +216,10 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const change = req?.query?.change as string
       const { data } = req.session
       const repeating = getDataValue(data, ['appointments', crn, id, 'repeating'])
-      if (repeating === 'No, it’s a one-off appointment') {
-        setDataValue(data, ['appointments', crn, id, 'repeating-count'], '')
-        setDataValue(data, ['appointments', crn, id, 'repeating-frequency'], '')
-        setDataValue(data, ['appointments', crn, id, 'repeating-dates'], [])
+      if (repeating === 'No') {
+        setDataValue(data, ['appointments', crn, id, 'numberOfAppointments'], '')
+        setDataValue(data, ['appointments', crn, id, 'interval'], '')
+        setDataValue(data, ['appointments', crn, id, 'repeatingDates'], [])
       }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -264,7 +249,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       let location = null
-      const selectedLocation = getDataValue(data, ['appointments', crn, id, 'location'])
+      const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       if (
         ![`The location I’m looking for is not in this list`, 'I do not need to pick a location'].includes(
           selectedLocation,

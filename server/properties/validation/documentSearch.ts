@@ -1,10 +1,5 @@
-import {
-  isNotEarlierThan,
-  isNotLaterThan,
-  isNotLaterThanToday,
-  isValidDate,
-  ValidationSpec,
-} from '../../utils/validationUtils'
+import { isNotEarlierThan, isNotLaterThan, isNotLaterThanToday, isValidDate } from '../../utils/validationUtils'
+import { ValidationSpec } from '../../models/Errors'
 
 export const documentSearchValidation = (): ValidationSpec => ({
   fileName: {

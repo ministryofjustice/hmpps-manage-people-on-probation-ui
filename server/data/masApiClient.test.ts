@@ -211,21 +211,31 @@ describe('masApiClient', () => {
         '/appointment/X000001',
         () =>
           masApiClient.postAppointments('X000001', {
-            createOverlappingAppointment: false,
+            createOverlappingAppointment: true,
             end: undefined,
             eventId: 0,
             interval: undefined,
             licenceConditionId: 0,
             numberOfAppointments: 0,
             requirementId: 0,
+            nsiId: 0,
             start: undefined,
             type: undefined,
-            user: { locationId: 0, username: '' },
+            user: { locationCode: 'C084', username: '', teamCode: 'TEA' },
             uuid: '',
           }),
         'post',
       ],
-
+      [
+        'checkAppointments',
+        '/appointment/X000001/check',
+        () =>
+          masApiClient.checkAppointments('X000001', {
+            start: undefined,
+            end: undefined,
+          }),
+        'post',
+      ],
       [
         'searchUserCaseload',
         '/caseload/user/USER/search?size=10&page=1&sortBy=case',

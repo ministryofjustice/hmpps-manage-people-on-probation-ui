@@ -9,16 +9,16 @@ mojFrontend.initAll()
 
 /* eslint-disable no-restricted-globals */
 const lastAppointment = () => {
-  const repeatingFrequency = document.querySelector('div[data-repeating-frequency]')
+  const repeatingFrequency = document.querySelector('div[data-interval]')
   if (repeatingFrequency) {
     const repeatingFrequencyRadios = repeatingFrequency.querySelectorAll('input[type="radio"]')
-    const repeatingCount = document.querySelector('div[data-repeating-count] input')
+    const repeatingCount = document.querySelector('div[data-numberOfAppointments] input')
     const lastAppointmentElm = document.querySelector('div[data-last-appointment')
     const lastAppointmentHandler = async () => {
       const repeatingFrequencyRadioSelected = repeatingFrequency.querySelector('input:checked')
       if (parseInt(repeatingCount.value, 10) > 0 && repeatingFrequencyRadioSelected) {
         const divider = location.href.includes('?') ? '&' : '?'
-        const url = `${location.href}${divider}repeating-frequency=${encodeURI(repeatingFrequencyRadioSelected.value)}&repeating-count=${repeatingCount.value}`
+        const url = `${location.href}${divider}interval=${encodeURI(repeatingFrequencyRadioSelected.value)}&numberOfAppointments=${repeatingCount.value}`
         const headers = {
           Accept: '*/*',
           'Content-Type': 'application/x-www-form-urlencoded',

@@ -1,16 +1,24 @@
-import { isNotEmpty, isValidDate, ValidationSpec, isValidDateFormat, isStringNumber } from '../../utils/validationUtils'
+import {
+  isNotEmpty,
+  isValidDate,
+  isValidDateFormat,
+  isStringNumber,
+  timeIsNotLaterThan,
+  timeIsNotEarlierThan,
+  isTodayOrLater,
+} from '../../utils/validationUtils'
+import { ValidationSpec } from '../../models/Errors'
 
 export interface AppointmentsValidationArgs {
   crn: string
   id: string
   page: string
-  validateSentenceRequirement?: boolean
-  validateSentenceLicenceCondition?: boolean
   repeatingValue?: 'Yes' | 'No'
+  visor?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, validateSentenceRequirement, validateSentenceLicenceCondition, repeatingValue } = args
+  const { crn, id, page, visor, repeatingValue } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -22,7 +30,17 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][sentence]`]: {
+    [`[appointments][${crn}][${id}][visorReport]`]: {
+      optional: page !== 'type' || !visor,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if appointment should be included in ViSOR report',
+          log: 'VISOR report not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][eventId]`]: {
       optional: page !== 'sentence',
       checks: [
         {
@@ -32,27 +50,8 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][sentence-requirement]`]: {
-      optional: page !== 'sentence' || (page === 'sentence' && !validateSentenceRequirement),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select a requirement',
-          log: 'Sentence requirement not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][sentence-licence-condition]`]: {
-      optional: page !== 'sentence' || (page === 'sentence' && !validateSentenceLicenceCondition),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select a licence condition',
-          log: 'Sentence licence condition not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][location]`]: {
+
+    [`[appointments][${crn}][${id}][user][locationCode]`]: {
       optional: page !== 'location',
       checks: [
         {
@@ -67,7 +66,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an appointment date',
+          msg: 'Enter or select a date',
         },
         {
           validator: isValidDateFormat,
@@ -76,28 +75,45 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
         {
           validator: isValidDate,
-          msg: 'Enter a real date',
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
           log: 'Appointment date is not valid',
         },
-      ],
-    },
-    [`[appointments][${crn}][${id}][start-time]`]: {
-      optional: page !== 'datetime',
-      checks: [
         {
-          validator: isNotEmpty,
-          msg: 'Select an appointment start time',
-          log: 'Appointment start time not selected or entered',
+          validator: isTodayOrLater,
+          msg: 'Date must be today or in the future',
+          log: 'Date must be today or in the future',
         },
       ],
     },
-    [`[appointments][${crn}][${id}][end-time]`]: {
+    [`[appointments][${crn}][${id}][start]`]: {
       optional: page !== 'datetime',
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an appointment end time',
+          msg: 'Select a start time',
+          log: 'Appointment start time not selected or entered',
+        },
+        {
+          validator: timeIsNotEarlierThan,
+          msg: 'The end time must be after the start time',
+          log: 'The end time must be after the start time',
+          crossField: `[appointments][${crn}][${id}][end]`,
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][end]`]: {
+      optional: page !== 'datetime',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an end time',
           log: 'Appointment end time not selected or entered',
+        },
+        {
+          validator: timeIsNotLaterThan,
+          msg: 'The end time must be after the start time',
+          log: 'The end time must be after the start time',
+          crossField: `[appointments][${crn}][${id}][start]`,
         },
       ],
     },
@@ -111,7 +127,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][repeating-frequency]`]: {
+    [`[appointments][${crn}][${id}][interval]`]: {
       optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
       checks: [
         {
@@ -121,7 +137,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][repeating-count]`]: {
+    [`[appointments][${crn}][${id}][numberOfAppointments]`]: {
       optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
       checks: [
         {

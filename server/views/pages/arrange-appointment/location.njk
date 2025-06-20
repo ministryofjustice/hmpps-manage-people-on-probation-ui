@@ -1,46 +1,30 @@
 {% extends "../_form.njk" %}
 {% set title = "Pick a location for this appointment" %}
 
-{% if change %}
-    {% set backLink = change if change %}
-{% elseif regionCode and teamCode %}
-    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?' + 'regionCode=' + regionCode + '&teamCode=' + teamCode%}
-{% elseif regionCode %}
-    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?' + 'regionCode=' + regionCode %}
-{% else %}
-    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
-{% endif %}
+{% set backLink = appointment.change if appointment.change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
 
 {% block heading %}{% endblock %}
 {% block form %}
- {% if errorMessages %}
+  {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
-        {% if errorList.length > 0 %}
-            {{ govukErrorSummary({
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
-        {% endif %}
     {% endif %}
-    {% set locationItems = [] %}
-{% for location in userLocations %}
- {% set locationItems = (locationItems.push({
-      text: location.description
-    }), locationItems) %}
+  {% endif %}
+  {% set locationItems = [] %}
+  {% for location in userLocations %}
+    {% set locationItems = (locationItems.push({text: location.description, value: location.id}), locationItems) %}
   {% endfor %}
-{% set locationItems = (locationItems.push({
-    divider: 'or'
-  }), locationItems) %}
-  {% set locationItems = (locationItems.push({
-    text: 'The location I’m looking for is not in this list'
-  }), locationItems) %}
+  {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
+  {% set locationItems = (locationItems.push({text: 'The location I’m looking for is not in this list'}), locationItems) %}
 
-  {% set locationItems = (locationItems.push({
-    text: 'I do not need to pick a location'
-  }), locationItems) %}
+  {% set locationItems = (locationItems.push({text: 'I do not need to pick a location'}), locationItems) %}
 
-{{ govukRadios({
+  {{ govukRadios({
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title | safe + '</span>',
@@ -48,9 +32,9 @@
         isPageHeading: true
       },
       attributes: {
-        'data-qa': 'location'
+        'data-qa': 'locationCode'
       }
     },
     items: locationItems
-   } | decorateFormAttributes(['appointments', crn, id, 'location'])) }}
+   } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
 {% endblock %}

@@ -1,26 +1,29 @@
 {% extends "../_form.njk" %}
 {% set title = 'What appointment are you arranging?' %}
-{% set backLink = change if change else '/' %}
+{% set backLink = appointment.change if appointment.change else 
+  '/' %}
 {% set types = [] %}
 {% for appointmentType in appointmentTypes %}
-{% set types = (types.push({
-      text: appointmentType.text,
-      value: appointmentType.text
-    }), types) %}
+  {% set types = (types.push({text: appointmentType.description, value: appointmentType.code}), types) %}
 {% endfor %}
 {% block heading %}{% endblock %}
 {% block form %}
-{% if errorMessages %}
+  {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
-        {% if errorList.length > 0 %}
-            {{ govukErrorSummary({
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
-        {% endif %}
     {% endif %}
+  {% endif %}
   {{ govukRadios({
+    formGroup: {
+      attributes: {
+      'data-qa': 'type'
+      }
+    },
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title + '</span>',
@@ -33,4 +36,36 @@
     },
     items: types
  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
-  {% endblock %}
+  <input type="hidden" name="[appointments][{{crn}}][{{id}}][user][username]" id="username" value="{{user.username}}">
+  <p class="govuk-!-margin-bottom-7">
+    <a href="{{ deliusDeepLinkUrl('ContactList', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" data-qa="ndeliusAppointmentsLink">Create all other appointments on NDelius (opens in new tab)</a>.</p>
+  {% if appointment.meta.isVisor %}
+    {{ govukRadios({
+  classes: "govuk-radios--inline",
+    fieldset: {
+      legend: {
+        text: 'Include appointment in VISOR report?',
+        classes: "govuk-fieldset__legend--l",
+        isPageHeading: false
+      }
+    },
+    formGroup: {
+      attributes: {
+      'data-qa': 'visorReport'
+      }
+    },
+    hint: {
+      text: 'This will add the appointment to their record on the ViSOR secure national database.'
+    },
+    items: [
+      {
+        text: "Yes"
+      },
+      {
+        text: "No"
+      }
+    ]
+  } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
+    <input type="hidden" name="visor" id="visor" value="{{appointment.meta.isVisor}}">
+  {% endif %}
+{% endblock %}

@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon-business-days'
 import { v4 as uuidv4 } from 'uuid'
-import { Appointment } from './Appointments'
+import { AppointmentSession } from './Appointments'
 
 interface Params {
-  appointment: Appointment
+  appointment: AppointmentSession
   weeksInFuture?: number
   monthsInFuture?: number
 }
@@ -29,12 +29,12 @@ export class ArrangedSession {
   }
 
   static generateRepeatedAppointments(
-    appointment: Appointment,
+    appointment: AppointmentSession,
     period: 'week' | 'month' = 'week',
     increment = 1,
-  ): Appointment[] {
-    const hasRepeatAppointments = appointment.repeating === 'Yes' && appointment['repeating-count']
-    const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment['repeating-count'], 10) : 0
+  ): AppointmentSession[] {
+    const hasRepeatAppointments = appointment.repeating === 'Yes' && appointment.numberOfAppointments
+    const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment.numberOfAppointments, 10) : 0
     return Array.from(Array(numberOfRepeatedAppts)).map((_, i) => {
       if (period === 'week') {
         return this.generateRepeatWeeklyAppointment({ appointment, weeksInFuture: (i + 1) * increment })
@@ -43,20 +43,20 @@ export class ArrangedSession {
     })
   }
 
-  static generateRepeatMonthlyAppointment(params: Params): Appointment {
-    const clonedAppointment: Appointment = { ...params.appointment }
+  static generateRepeatMonthlyAppointment(params: Params): AppointmentSession {
+    const clonedAppointment: AppointmentSession = { ...params.appointment }
     return {
       ...clonedAppointment,
-      id: uuidv4(),
+      uuid: uuidv4(),
       date: DateTime.fromISO(clonedAppointment.date).plus({ months: params.monthsInFuture }).toISODate(),
     }
   }
 
-  static generateRepeatWeeklyAppointment(params: Params): Appointment {
+  static generateRepeatWeeklyAppointment(params: Params): AppointmentSession {
     const clonedAppointment = { ...params.appointment }
     return {
       ...clonedAppointment,
-      id: uuidv4(),
+      uuid: uuidv4(),
       date: DateTime.fromISO(clonedAppointment.date).plus({ weeks: params.weeksInFuture }).toISODate(),
     }
   }

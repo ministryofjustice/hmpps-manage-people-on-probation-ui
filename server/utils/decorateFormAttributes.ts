@@ -28,7 +28,10 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
         item.value = item.text
       }
       if (storedValue) {
-        if ((Array.isArray(storedValue) && storedValue.includes(item.value)) || storedValue === item.value) {
+        if (
+          (Array.isArray(storedValue) && storedValue.includes(item?.value?.toString())) ||
+          storedValue === item?.value?.toString()
+        ) {
           if (storedValue.indexOf(item.value) !== -1) {
             item.checked = 'checked'
             item.selected = 'selected'

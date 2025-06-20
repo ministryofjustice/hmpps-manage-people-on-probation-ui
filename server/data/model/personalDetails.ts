@@ -1,5 +1,5 @@
-import { Validateable } from '../../utils/validationUtils'
 import { Note } from './note'
+import { Validateable } from '../../models/Errors'
 
 export interface Name {
   forename: string
@@ -45,6 +45,7 @@ export interface PersonAddress {
 export interface PersonSummary {
   name: Name
   crn: string
+  offenderId?: number
   pnc?: string
   dateOfBirth: string
   preferredLanguage?: string

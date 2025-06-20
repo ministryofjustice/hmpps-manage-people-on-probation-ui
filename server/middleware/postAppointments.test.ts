@@ -1,12 +1,11 @@
 import httpMocks from 'node-mocks-http'
-import { postAppointments, dateTime } from './postAppointments'
-
+import { postAppointments } from './postAppointments'
+import { dateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
-import { appointmentTypes } from '../properties'
 import { AppResponse } from '../models/Locals'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -45,7 +44,8 @@ const mockUserLocations = [
 
 const mockSentences = [
   {
-    eventId: 12345,
+    id: 12345,
+    eventNumber: '16',
     mainOffence: {
       code: '18502',
       description: '12 month community order',
@@ -55,8 +55,9 @@ const mockSentences = [
       startDate: '2023-12-01',
       length: '2',
     },
-    licenceConditions: [],
-    requirements: [],
+    licenceConditions: [{ id: 12345, mainDescription: '12 month Community order' }],
+    requirements: [{ id: 12345, description: '12 month Community order' }],
+    nsis: [],
     offenceDetails: {
       eventNumber: '1234',
       offence: null,
@@ -91,16 +92,20 @@ const req = httpMocks.createRequest({
       appointments: {
         [crn]: {
           [id]: {
-            type: 'Home visit',
+            user: {
+              username,
+              locationCode: 'HMP',
+              teamCode: 'TEA',
+            },
+            type: 'C084',
             date: '2025-03-12',
-            location: 'HMP Wakefield',
-            'start-time': '9:00am',
-            'end-time': '9:30am',
-            'repeating-frequency': 'WEEK',
-            'repeating-count': '2',
-            sentence: '12 month Community order',
-            'sentence-requirement': '',
-            'sentence-licence-condition': 'Alcohol Monitoring (Electronic Monitoring)',
+            start: '9:00am',
+            end: '9:30pm',
+            interval: 'WEEK',
+            numberOfAppointments: '2',
+            eventId: 2501138253,
+            requirementId: 0,
+            licenceConditionId: 2500686668,
           },
         },
       },
@@ -112,33 +117,39 @@ const nextSpy = jest.fn()
 
 describe('/middleware/postAppointments', () => {
   const {
+    user: { locationCode, teamCode },
     date,
-    'start-time': startTime,
-    'end-time': endTime,
-    'repeating-frequency': interval,
-    'repeating-count': repeatCount,
+    start: startTime,
+    end: endTime,
+    type,
+    interval,
+    eventId,
+    numberOfAppointments: repeatCount,
+    licenceConditionId,
   } = req.session.data.appointments[crn][id]
 
   const expectedBody = {
     user: {
       username,
-      locationId: mockUserLocations[0].id,
+      locationCode,
+      teamCode,
     },
-    type: appointmentTypes[0].value,
+    type,
     start: dateTime(date, startTime),
     end: dateTime(date, endTime),
     interval,
     numberOfAppointments: parseInt(repeatCount, 10),
-    eventId: mockSentences[0].eventId,
     createOverlappingAppointment: true,
     requirementId: 0,
-    licenceConditionId: 0,
+    nsiId: 0,
+    licenceConditionId,
+    eventId,
     uuid: id,
+    until: '',
   }
   let spy: jest.SpyInstance
   beforeEach(async () => {
     spy = jest.spyOn(MasApiClient.prototype, 'postAppointments').mockImplementation(() => Promise.resolve(''))
-
     await postAppointments(hmppsAuthClient)(req, res, nextSpy)
   })
   it('should post the correct request body', () => {

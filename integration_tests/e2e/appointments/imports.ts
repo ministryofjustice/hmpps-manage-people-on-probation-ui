@@ -21,13 +21,21 @@ export const completeTypePage = (index = 1, query = '') => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`)
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
+  // cy.get('[data-qa="visorReport"] .govuk-radios__item:nth-child(1) input').then($el => {
+  //   if ($el.length) {
+  //     $el.click()
+  //     // Element exists
+  //     // Do something with $el
+  //   }
+  // })
+
   typePage.getSubmitBtn().click()
 }
 
 export const completeSentencePage = () => {
   const sentencePage = new AppointmentSentencePage()
-  sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence`).click()
-  sentencePage.getElement(`#appointments-${crn}-${uuid}-sentence-licence-condition`).click()
+  sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
+  sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
   sentencePage.getSubmitBtn().click()
 }
 
@@ -39,7 +47,7 @@ export const completeAttendancePage = () => {
 export const completeLocationPage = (index = 1) => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationPage = new AppointmentLocationPage()
-  locationPage.getElement(`#appointments-${crn}-${uuid}-location${suffix}`).click()
+  locationPage.getElement(`#appointments-${crn}-${uuid}-user-locationCode${suffix}`).click()
   locationPage.getSubmitBtn().click()
 }
 
@@ -47,8 +55,10 @@ export const completeDateTimePage = () => {
   const dateTimePage = new AppointmentDateTimePage()
   dateTimePage.getDatePickerToggle().click()
   dateTimePage.getActiveDayButton().click()
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select(startTime)
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select(endTime).tab()
+  dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select(startTime)
+  dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(endTime).tab()
+  dateTimePage.getSubmitBtn().click()
+  // Ignore warnings on second click
   dateTimePage.getSubmitBtn().click()
 }
 
@@ -56,8 +66,8 @@ export const completeRepeatingPage = (repeat = 2) => {
   const repeatingPage = new AppointmentRepeatingPage()
   if (repeat) {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-frequency`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-count`).clear().type(repeat.toString())
+    repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
+    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).clear().type(repeat.toString())
   } else {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
     cy.debug()

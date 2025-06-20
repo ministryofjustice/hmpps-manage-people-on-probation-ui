@@ -7,8 +7,8 @@ import {
   isNumeric,
   isUkPostcode,
   isValidDate,
-  ValidationSpec,
 } from '../../utils/validationUtils'
+import { ValidationSpec } from '../../models/Errors'
 
 export const personDetailsValidation = (editingMainAddress: boolean): ValidationSpec => ({
   phoneNumber: {

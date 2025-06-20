@@ -25,7 +25,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
         [username]: userProviders.teams,
       },
       staff: {
-        ...(req?.session?.data?.providers ?? {}),
+        ...(req?.session?.data?.staff ?? {}),
         [username]: userProviders.users,
       },
     }

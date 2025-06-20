@@ -31,7 +31,12 @@ import { DeliusRoles } from './model/deliusRoles'
 import { UserSchedule } from './model/userSchedule'
 import { PersonDocuments, SearchDocumentsRequest, TextSearchDocumentsRequest } from './model/documents'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
-import { AppointmentRequestBody } from '../models/Appointments'
+import {
+  AppointmentChecks,
+  AppointmentRequestBody,
+  CheckAppointment,
+  AppointmentTypeResponse,
+} from '../models/Appointments'
 
 interface GetUserScheduleProps {
   username: string
@@ -274,6 +279,15 @@ export default class MasApiClient extends RestClient {
     })
   }
 
+  async checkAppointments(crn: string, body: CheckAppointment): Promise<AppointmentChecks> {
+    return this.post({
+      data: body,
+      path: `/appointment/${crn}/check`,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
   async searchUserCaseload(
     username: string,
     page: string,
@@ -339,5 +353,9 @@ export default class MasApiClient extends RestClient {
 
   async getDeliusRoles(username: string): Promise<DeliusRoles> {
     return this.get({ path: `/user/${username}`, handle404: true })
+  }
+
+  async getAppointmentTypes(): Promise<AppointmentTypeResponse> {
+    return this.get({ path: `/appointment/types`, handle404: false })
   }
 }

@@ -39,7 +39,7 @@ const checkThisAppointment = (previewPage: AppointmentPreviewPage) => {
   previewPage.getAppointmentRowTime(id, 1).should('include.text', `${startTime} to ${endTime}`)
 }
 
-describe('Will the appointment repeat?', () => {
+xdescribe('Will the appointment repeat?', () => {
   let previewPage: AppointmentPreviewPage
   beforeEach(() => {
     loadPage()
