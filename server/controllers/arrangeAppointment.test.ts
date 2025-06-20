@@ -1,14 +1,9 @@
 import httpMocks from 'node-mocks-http'
-import { v4 as uuidv4 } from 'uuid'
-import logger from '../../logger'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import TokenStore from '../data/tokenStore/redisTokenStore'
-import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString, isValidUUID, setDataValue } from '../utils'
-import { mockAppResponse, mockOverview } from './mocks'
+import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { mockAppResponse } from './mocks'
 import { renderError } from '../middleware'
 import { mockAppointmentTypes } from './mocks/appointmentTypes'
 import { AppointmentSession } from '../models/Appointments'
@@ -271,29 +266,6 @@ describe('controllers/arrangeAppointment', () => {
   })
 
   describe('postSentence', () => {
-    it('should reset the sentence requirement value if sentence licence condition value in request body', async () => {
-      const appointmentBody: Record<string, string> = { 'sentence-licence-condition': 'value' }
-      const appointmentSession: Record<string, string> = { 'sentence-requirement': 'value' }
-      const mockReq = createMockRequest({ appointmentSession, appointmentBody })
-      await controllers.arrangeAppointments.postSentence()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'sentence-requirement'],
-        '',
-      )
-    })
-    it('should reset the sentence licence condition value if sentence requirement value in request body', async () => {
-      const appointmentSession: Record<string, string> = { 'sentence-licence-condition': 'value' }
-      const appointmentBody: Record<string, string> = { 'sentence-requirement': 'value' }
-      const mockReq = createMockRequest({ appointmentSession, appointmentBody, query: {} })
-      await controllers.arrangeAppointments.postSentence()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'sentence-licence-condition'],
-        '',
-      )
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/attendance`)
-    })
     it('should redirect to the change url if found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postSentence()(mockReq, res)

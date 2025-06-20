@@ -10,8 +10,6 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
     for (const requiredValue of requiredValues) {
       const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
       const value = getDataValue(data, ['appointments', crn, id, ...path])
-      console.log(data.appointments)
-      console.log(path)
       if (!value) {
         if (!isValidCrn(crn) || !isValidUUID(id)) {
           return renderError(404)(req, res)
