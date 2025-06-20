@@ -1,82 +1,107 @@
 {% extends "../_form.njk" %}
-{% set title = 'Which sentence is this appointment for?' %}
+{% set title = 'What is this appointment for?' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type' %}
 
 {% block heading %}{% endblock %}
 {% block form %}
-{% if errorMessages %}
+  {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
-        {% if errorList.length > 0 %}
-            {{ govukErrorSummary({
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
-        {% endif %}
     {% endif %}
-{% set allSentences = [] %}
-{% set sentenceReveal = '' %}
-{% for sentence in sentences %}
-{% set reveal = '' %}
-{% if sentence.requirements.length %}
-{% set requirements = [] %}
-{% for requirement in sentence.requirements %}
- {% set requirements = (requirements.push({
-      text: requirement.description
-    }), requirements) %}
-  {% endfor %}
-{% set sentenceReveal %}
-{{ govukRadios({
+  {% endif %}
+  {% set allSentences = [] %}
+  {% set sentenceReveal = '' %}
+  {% for sentence in sentences %}
+    {% set reveal = '' %}
+    {% if sentence.requirements.length %}
+      {% set requirements = [] %}
+      {% for requirement in sentence.requirements %}
+        {% set requirements = (requirements.push({text: requirement.description, value: requirement.id}), requirements) %}
+      {% endfor %}
+      {% set sentenceReveal %}
+      {{ govukRadios({
+    formGroup: {
+      classes: 'govuk-!-margin-top-4'
+    },
     fieldset: {
       legend: {
-        text: "Which requirement is this appointment for?",
+        text: "Which requirement is this appointment for? (optional)",
         isPageHeading: false,
         classes: "govuk-fieldset__legend--s"
       },
       attributes: {
-        'data-qa': 'sentence-requirement'
+        'data-qa': 'requirementId'
       }
-    },
-    hint: {
-      text: "Select requirement."
     },
     items: requirements
-} | decorateFormAttributes(['appointments', crn, id, 'sentence-requirement'])) }}
-{% endset -%}
-{% endif %}
-{% if sentence.licenceConditions.length %}
-{% set licenceConditions = [] %}
-{% for licenceCondition in sentence.licenceConditions %}
- {% set licenceConditions = (licenceConditions.push({
-      text: licenceCondition.mainDescription
-    }), licenceConditions) %}
-  {% endfor %}
-  {% set sentenceReveal %}
-{{ govukRadios({
-    fieldset: {
+} | decorateFormAttributes(['appointments', crn, id, 'requirementId'])) }}
+      {% endset -%}
+    {% endif %}
+    {% if sentence.licenceConditions.length %}
+      {% set licenceConditions = [] %}
+      {% for licenceCondition in sentence.licenceConditions %}
+        {% set licenceConditions = (licenceConditions.push({text: licenceCondition.mainDescription, value: licenceCondition.id}), licenceConditions) %}
+      {% endfor %}
+      {% set sentenceReveal %}
+      {{ govukRadios({
+       formGroup: {
+          classes: 'govuk-!-margin-top-4'
+        },
+        fieldset: {
       legend: {
-        text: "Which licence condition is this appointment for?",
+        text: "Which licence condition is this appointment for? (optional)",
         isPageHeading: false,
         classes: "govuk-fieldset__legend--s"
       },
       attributes: {
-        'data-qa': 'sentence-licence-condition'
+        'data-qa': 'licenceConditionId'
       }
     },
-    hint: {
-      text: "Select licence condition."
-    },
     items: licenceConditions
-} | decorateFormAttributes(['appointments', crn, id, 'sentence-licence-condition'])) }}
-{% endset -%}
-{% endif %}
-{% if appointment['type'] === 'Home visit' or appointment['type'] === 'Planned office visit' %}
-{% set allSentences = (allSentences.push({
-      text: sentence.order.description,
-      hint: 'Sentence start date: ' + sentence.order.startDate | dateWithYear,
-      checked: true if sentences.length === 1 else false,
+} | decorateFormAttributes(['appointments', crn, id, 'licenceConditionId'])) }}
+      {% endset -%}
+    {% endif %}
+    {% if sentence.nsis.length %}
+      {% set nsis = [] %}
+      {% for nsi in sentence.nsis %}
+        {% set nsis = (nsis.push({text: nsi.description, value: nsi.id}), nsis) %}
+      {% endfor %}
+      {% set sentenceReveal %}
+      {{ govukRadios({
+       formGroup: {
+          classes: 'govuk-!-margin-top-4'
+        },
+    fieldset: {
+      legend: {
+        text: "Which nsi is this appointment for? (optional)",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--s"
+      },
       attributes: {
-          'data-bold': 'true',
+        'data-qa': 'nsiId'
+      }
+    },
+    items: nsis
+} | decorateFormAttributes(['appointments', crn, id, 'nsiId'])) }}
+      {% endset -%}
+    {% endif %}
+    {% if sentence.order.description %}
+      {% set allSentences = (allSentences.push({
+      text: sentence.order.description,
+      value: sentence.id,
+      label: {
+        classes: 'govuk-!-font-weight-bold'
+      },
+      hint: {
+        text: 'Sentence start date: ' + sentence.order.startDate | dateWithYear if sentence.order.startDate else ''
+      },
+      checked: sentences.length == 1,
+      attributes: {
           'data-sentence': 'true',
           'data-reset-conditional-radios': ''
         },
@@ -84,21 +109,24 @@
             html: sentenceReveal
         }
     }), allSentences) %}
-{% else %}
-{% set allSentences = (allSentences.push({
-      text: sentence.order.description,
-      hint: 'Sentence start date: ' + sentence.order.startDate | dateWithYear,
-      checked: true if sentences.length === 1 else false,
+    {% endif %}
+  {% endfor %}
+  {% if appointment.type.isPersonLevelContact %}
+    {% set allSentences = (allSentences.push(
+    {
+    text: appointment.meta.forename,
+    value: '1',
+    attributes: {
+    'data-qa': 'personLevelContact'
+    },
+    label: {
       attributes: {
-          'data-bold': 'true',
-          'data-sentence': 'true',
-          'data-reset-conditional-radios': ''
-        }
+'data-qa': 'personLevelContactLabel'
+      }
+    }
     }), allSentences) %}
-{% endif %}
-{% endfor %}
-
-{{ govukRadios({
+  {% endif %}
+  {{ govukRadios({
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title + '</span>',
@@ -110,10 +138,9 @@
       }
     },
     hint: {
-        text: "Select sentence."
+        text: "Select all that apply."
       },
     items: allSentences
-} | decorateFormAttributes(['appointments', crn, id, 'sentence'])) }}
-
+} | decorateFormAttributes(['appointments', crn, id, 'eventId'])) }}
 
 {% endblock %}

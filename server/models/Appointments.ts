@@ -1,23 +1,38 @@
 import { Name } from '../data/model/personalDetails'
 import { Errors } from './Errors'
 
-export interface Appointment {
-  type: string
-  location: string
-  date: string
-  'start-time': string
-  'end-time': string
+export interface AppointmentSession {
+  user?: {
+    username: string
+    teamCode: string
+    locationCode: string
+  }
+  type?: string
+  visorReport?: 'Yes' | 'No'
+  date?: string
+  start?: string
+  end?: string
+  interval?: string
+  numberOfAppointments?: string
+  eventId?: string
+  uuid?: string
+  requirementId?: string
+  licenceConditionId?: string
+  nsiId?: string
   repeating?: 'Yes' | 'No'
-  'repeating-frequency'?: string
-  'repeating-count'?: string
-  id?: string
+  repeatingDates?: string[]
 }
 
-export type AppointmentType =
-  | 'HomeVisitToCaseNS'
-  | 'InitialAppointmentInOfficeNS'
-  | 'PlannedOfficeVisitNS'
-  | 'InitialAppointmentHomeVisitNS'
+export interface AppointmentType {
+  code: string
+  description: string
+  isPersonLevelContact: boolean
+  isLocationRequired: boolean
+}
+
+export interface AppointmentTypeResponse {
+  appointmentTypes: AppointmentType[]
+}
 
 export interface AppointmentTypeOption {
   text: string
@@ -29,18 +44,20 @@ export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 export interface AppointmentRequestBody {
   user: {
     username: string
-    locationId: number
+    teamCode: string
+    locationCode: string
   }
-  type: AppointmentType
+  type: string
   start: Date
   end: Date
   interval: AppointmentInterval
   numberOfAppointments: number
   eventId: number
   uuid: string
-  createOverlappingAppointment: boolean
+  createOverlappingAppointment: true
   requirementId: number
   licenceConditionId: number
+  nsiId: number
   until?: string
 }
 

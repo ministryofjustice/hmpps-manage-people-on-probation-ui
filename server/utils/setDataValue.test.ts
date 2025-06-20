@@ -4,13 +4,13 @@ const mockSession = {
   appointments: {
     X000001: {
       '1234': {
-        type: 'Planned office visit',
-        'repeating-count': '2',
+        type: 'C084',
+        numberOfAppointments: '2',
         date: '2024-04-10',
       },
       '4567': {
-        type: '3 Way Meeting',
-        'repeating-count': '3',
+        type: 'CHVS',
+        numberOfAppointments: '3',
         date: '2024-03-11',
       },
     },

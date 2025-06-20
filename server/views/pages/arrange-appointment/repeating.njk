@@ -4,19 +4,19 @@
 {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/date-time' %}
 
 {% block form %}
-{% if errorMessages %}
+  {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
-        {% if errorList.length > 0 %}
-            {{ govukErrorSummary({
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
-        {% endif %}
     {% endif %}
+  {% endif %}
 
-{% set repeatingReveal %}
-    {{ govukRadios({
+  {% set repeatingReveal %}
+  {{ govukRadios({
       fieldset: {
         legend: {
           text: "How often will it repeat?",
@@ -25,7 +25,7 @@
       },
       formGroup: {
         attributes: {
-          'data-repeating-frequency': ''
+          'data-interval': ''
         }
       },
       items: [
@@ -45,9 +45,9 @@
           }
         }
       ]
-    } | decorateFormAttributes(['appointments', crn, id, 'repeating-frequency'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'interval'])) }}
 
-    {{ govukInput({
+  {{ govukInput({
       label: {
         text: "How often will the appointment repeat?",
         classes: "govuk-label--s govuk-!-font-weight-bold"
@@ -57,21 +57,25 @@
       },
       formGroup: {
         attributes: {
-          'data-repeating-count': ''
+          'data-numberOfAppointments': ''
         }
       },
       classes: "govuk-input--width-3"
-    } | decorateFormAttributes(['appointments', crn, id, 'repeating-count'])) }}
-    
-    <div class="form-group" data-last-appointment>
-      {% if lastAppointmentDate  %}
+    } | decorateFormAttributes(['appointments', crn, id, 'numberOfAppointments'])) }}
+
+  <div class="form-group" data-last-appointment="data-last-appointment">
+    {% if lastAppointmentDate %}
       <h3 class="govuk-heading-s govuk-!-font-weight-regular govuk-!-static-margin-bottom-0 govuk-hint">Last appointment on</h3>
-       <p><b>{{ lastAppointmentDate | dayOfWeek }} {{ lastAppointmentDate | dateWithYear }}</b></p>
-       {% endif %}
-    </div>
+      <p>
+        <b>{{ lastAppointmentDate | dayOfWeek }}
+          {{ lastAppointmentDate | dateWithYear }}</b>
+      </p>
+      <input type="hidden" name="[appointments][{{crn}}][{{id}}][until]" value="{{ lastAppointmentDate }}">
+    {% endif %}
+  </div>
   {% endset %}
 
-{{ govukRadios({
+  {{ govukRadios({
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title + '</span>',
@@ -87,7 +91,7 @@
         }
       },
       {
-        text: "No, it’s a one-off appointment"
+        text: "No"
       }
     ]
   } | decorateFormAttributes(['appointments', crn, id, 'repeating'])) }}

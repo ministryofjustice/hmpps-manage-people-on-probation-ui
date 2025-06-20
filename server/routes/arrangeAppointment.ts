@@ -5,6 +5,7 @@ import {
   getPersonalDetails,
   getUserLocations,
   getSentences,
+  getAppointmentTypes,
   getAppointment,
   redirectWizard,
 } from '../middleware'
@@ -20,19 +21,15 @@ import { checkAppointments } from '../middleware/checkAppointments'
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all('/case/:crn/arrange-appointment/:id/*path', (req, res: AppResponse, next) => {
-    res.locals.change = req.query.change as string
-    return next()
-  })
+  router.all('/case/:crn/arrange-appointment/:id/*path', getAppointmentTypes(hmppsAuthClient))
+  router.get('/case/:crn/arrange-appointment/:id/*path', getAppointment(hmppsAuthClient))
   get('/case/:crn/arrange-appointment/type', controllers.arrangeAppointments.redirectToType())
-
-  router.all('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getOrPostType())
-
   get('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getType())
 
-  router.all('/case/:crn/arrange-appointment/:id/*path', getAppointment)
-
-  router.post('/case/:crn/arrange-appointment/:id/*path', autoStoreSessionData)
+  router.post('/case/:crn/arrange-appointment/:id/*path', [
+    autoStoreSessionData(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  ])
 
   router.post(
     '/case/:crn/arrange-appointment/:id/type',
@@ -58,7 +55,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location',
-    redirectWizard(['type', 'sentence']),
+    redirectWizard(['type', 'eventId']),
     controllers.arrangeAppointments.getLocation(),
   )
 
@@ -78,7 +75,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/date-time',
-    redirectWizard(['type', 'sentence', 'location']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getDateTime(),
   )
 
@@ -91,7 +88,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/repeating',
-    redirectWizard(['type', 'sentence', 'location', 'date']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date']),
     controllers.arrangeAppointments.getRepeating(),
   )
 
@@ -103,7 +100,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/preview',
-    redirectWizard(['type', 'sentence', 'location', 'date', 'repeating']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
     controllers.arrangeAppointments.getPreview(),
   )
 
@@ -111,7 +108,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
-    redirectWizard(['type', 'sentence', 'location', 'date', 'repeating']),
+    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
     getUserLocations(hmppsAuthClient),
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )

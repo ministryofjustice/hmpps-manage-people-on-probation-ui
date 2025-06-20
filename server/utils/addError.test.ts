@@ -30,12 +30,12 @@ describe('utils/addError', () => {
         },
         {
           text: 'Select an appointment start time',
-          href: '#appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start-time',
+          href: '#appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start',
         },
       ],
       errorMessages: {
         'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-date': { text: 'Select an appointment date' },
-        'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start-time': {
+        'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start': {
           text: 'Select an appointment start time',
         },
       },
@@ -48,19 +48,19 @@ describe('utils/addError', () => {
         },
         {
           text: 'Select an appointment start time',
-          href: '#appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start-time',
+          href: '#appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start',
         },
         {
           text: 'Select an appointment end time',
-          href: '#appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-end-time',
+          href: '#appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-end',
         },
       ],
       errorMessages: {
         'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-date': { text: 'Select an appointment date' },
-        'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start-time': {
+        'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-start': {
           text: 'Select an appointment start time',
         },
-        'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-end-time': {
+        'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-end': {
           text: 'Select an appointment end time',
         },
       },
@@ -68,7 +68,7 @@ describe('utils/addError', () => {
     expect(
       addError(errors, {
         text: 'Select an appointment end time',
-        anchor: 'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-end-time',
+        anchor: 'appointments-X778160-19a88188-6013-43a7-bb4d-6e338516818f-end',
       }),
     ).toEqual(expected)
   })
