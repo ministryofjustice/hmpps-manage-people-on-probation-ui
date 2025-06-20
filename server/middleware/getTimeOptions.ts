@@ -2,6 +2,12 @@ import { Route } from '../@types'
 import { Option } from '../models/Option'
 
 export const getTimeOptions: Route<void> = (_req, res, next) => {
+  res.locals.timeOptions = createTimeOptions()
+  res.locals.endTimeOptions = createTimeOptions()
+  return next()
+}
+
+function createTimeOptions() {
   const startHour = 9
   const endHour = 16
   const timeOptions: Option[] = [{ text: 'Choose time', value: '' }]
@@ -13,6 +19,5 @@ export const getTimeOptions: Route<void> = (_req, res, next) => {
       timeOptions.push({ text: `${hour}:${min}${suffix}` })
     })
   }
-  res.locals.timeOptions = timeOptions
-  return next()
+  return timeOptions
 }

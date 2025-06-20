@@ -1,30 +1,8 @@
 import { postcodeValidator } from 'postcode-validator'
 import { DateTime } from 'luxon'
 import logger from '../../logger'
-
-export interface Validateable {
-  [index: string]: string | boolean
-}
-
-export interface ErrorCheck {
-  validator: (...args: any[]) => boolean
-  msg: string
-  length?: number
-  crossField?: string
-  isActive?: boolean
-  log?: string
-}
-
-export interface ErrorChecks {
-  optional: boolean
-  mandatoryWhenFieldSet?: string
-  mandatoryMsg?: string
-  checks: ErrorCheck[]
-}
-
-export interface ValidationSpec {
-  [index: string]: ErrorChecks
-}
+import { dateTime } from './dateTime'
+import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const isNotEmpty = (args: any[]) => {
@@ -56,6 +34,30 @@ export const isNotLaterThanToday = (args: any[]) => {
   return date.isValid && date <= DateTime.now()
 }
 
+export const isTodayOrLater = (args: any[]) => {
+  if (!args[0]) {
+    return false
+  }
+  const date = DateTime.fromFormat(args[0], 'd/M/yyyy')
+  if (!date.isValid) {
+    return false
+  }
+  return date.startOf('day') >= DateTime.now().startOf('day')
+}
+
+export const timeIsNotEarlierThan = (args: any[]) => {
+  if (!args[0]) {
+    return true
+  }
+  const dateNow = DateTime.now().toSQLDate()
+  const notEarlierThanTime = DateTime.fromJSDate(dateTime(dateNow, args[0]))
+  const date = DateTime.fromJSDate(dateTime(dateNow, args[1]))
+  if (!notEarlierThanTime || !date.isValid) {
+    return true
+  }
+  return notEarlierThanTime > date
+}
+
 export const isNotEarlierThan = (args: any[]) => {
   if (!args[0]) {
     return true
@@ -80,6 +82,19 @@ export const isNotLaterThan = (args: any[]) => {
   return notLaterThanDate <= date
 }
 
+export const timeIsNotLaterThan = (args: any[]) => {
+  if (!args[0]) {
+    return true
+  }
+  const dateNow = DateTime.now().toSQLDate()
+  const notLaterThanDate = DateTime.fromJSDate(dateTime(dateNow, args[0]))
+  const date = DateTime.fromJSDate(dateTime(dateNow, args[1]))
+  if (!notLaterThanDate.isValid || !date.isValid) {
+    return true
+  }
+  return notLaterThanDate < date
+}
+
 export function validateWithSpec<R extends Validateable>(request: R, validationSpec: ValidationSpec) {
   const errors: Record<string, string> = {}
   Object.entries(validationSpec).forEach(([fieldName, checks]) => {
@@ -91,7 +106,7 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
     if (!request?.[fieldName] && checks.optional === true) {
       return
     }
-    let hasProperty = false
+    let hasProperty: boolean
     if (isObjectFieldName(fieldName)) {
       const keys = fieldName.slice(1, -1).split('][')
       hasProperty = hasNestedKeys(request, keys)
@@ -135,7 +150,12 @@ function setArgs(fieldName: string, check: ErrorCheck, request: Validateable) {
   }
   let args: any[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
-    args = [request[check.crossField], request[fieldName]]
+    args = isObjectFieldName(check?.crossField)
+      ? [
+          getNestedValue(request, check?.crossField.slice(1, -1).split('][')),
+          getNestedValue(request, fieldName.slice(1, -1).split('][')),
+        ]
+      : [request[check.crossField], request[fieldName]]
   }
   return args
 }

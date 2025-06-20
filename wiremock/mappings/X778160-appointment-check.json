@@ -11,11 +11,8 @@
           "nonWorkingDayName": "Sunday",
           "isWithinOneHourOfMeetingWith": {
             "isCurrentUser": false,
-            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" }
-          },
-          "overlapsWithMeetingWith": {
-            "isCurrentUser": false,
-            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" }
+            "appointmentIsWith": { "forename": "Alma", "surname": "Barlow" },
+            "startAndEnd": "11am to 12pm"
           }
         },
         "headers": {

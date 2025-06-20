@@ -1,11 +1,11 @@
 import httpMocks from 'node-mocks-http'
-import { dateTime } from './postAppointments'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
 import { checkAppointments } from './checkAppointments'
 import { AppointmentChecks } from '../models/Appointments'
+import { dateTime } from '../utils/dateTime'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -56,7 +56,24 @@ const secondReq = httpMocks.createRequest({
   body: {
     _warningMessagesSeen: 'true',
   },
-  session: {},
+  session: {
+    data: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            date: '2025-03-12',
+            'start-time': '9:00am',
+            'end-time': '9:30pm',
+            previousValues: {
+              date: '2025-03-12',
+              startTime: '9:00am',
+              endTime: '9:30pm',
+            },
+          },
+        },
+      },
+    },
+  },
 })
 const nextSpy = jest.fn()
 const renderSpy = jest.spyOn(res, 'render')
@@ -74,6 +91,7 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
     isWithinOneHourOfMeetingWith: {
       isCurrentUser: true,
       appointmentIsWith: { forename: 'Test', surname: 'User' },
+      startAndEnd: '11am to 12pm',
     },
   }
 
@@ -110,6 +128,7 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
       isWithinOneHourOfMeetingWith: {
         isCurrentUser: false,
         appointmentIsWith: { forename: 'Test', surname: 'User' },
+        startAndEnd: '11am to 12pm',
       },
     }
     spy = jest
@@ -140,15 +159,26 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
 
 describe('/middleware/checkAppointments does not show warnings the second time', () => {
   beforeEach(async () => {
+    const mockAppointmentChecks: AppointmentChecks = {
+      nonWorkingDayName: 'Saturday',
+      isWithinOneHourOfMeetingWith: {
+        isCurrentUser: false,
+        appointmentIsWith: { forename: 'Test', surname: 'User' },
+        startAndEnd: '11am to 12pm',
+      },
+    }
+    spy = jest
+      .spyOn(MasApiClient.prototype, 'checkAppointments')
+      .mockImplementation(() => Promise.resolve(mockAppointmentChecks))
     await checkAppointments(hmppsAuthClient)(secondReq, res, nextSpy)
   })
   afterEach(() => {
     jest.resetAllMocks()
   })
-  it('should show the warnings the first time', () => {
+  it('should not show the warnings the second time', () => {
     expect(renderSpy).toHaveBeenCalledTimes(0)
   })
-  it('should not call next()', () => {
+  it('should call next()', () => {
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })
@@ -175,7 +205,7 @@ describe('/middleware/checkAppointments does not show any warnings if none are r
   })
 })
 
-describe('/middleware/checkAppointments does not show any warnings if checks do not return the required warnings', () => {
+describe('/middleware/checkAppointments does not show any warnings if checks do not return the required warnings, but shows errors', () => {
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: null,
@@ -183,6 +213,7 @@ describe('/middleware/checkAppointments does not show any warnings if checks do 
       overlapsWithMeetingWith: {
         isCurrentUser: false,
         appointmentIsWith: { forename: 'Test', surname: 'User' },
+        startAndEnd: '11am to 12pm',
       },
     }
     spy = jest
@@ -193,10 +224,10 @@ describe('/middleware/checkAppointments does not show any warnings if checks do 
   afterEach(() => {
     jest.resetAllMocks()
   })
-  it('should show the warnings the first time', () => {
-    expect(renderSpy).toHaveBeenCalledTimes(0)
+  it('should show errors', () => {
+    expect(renderSpy).toHaveBeenCalledTimes(1)
   })
   it('should not call next()', () => {
-    expect(nextSpy).toHaveBeenCalledTimes(1)
+    expect(nextSpy).toHaveBeenCalledTimes(0)
   })
 })

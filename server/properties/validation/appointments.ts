@@ -1,4 +1,13 @@
-import { isNotEmpty, isValidDate, ValidationSpec, isValidDateFormat, isStringNumber } from '../../utils/validationUtils'
+import {
+  isNotEmpty,
+  isValidDate,
+  isValidDateFormat,
+  isStringNumber,
+  timeIsNotLaterThan,
+  timeIsNotEarlierThan,
+  isTodayOrLater,
+} from '../../utils/validationUtils'
+import { ValidationSpec } from '../../models/Errors'
 
 export interface AppointmentsValidationArgs {
   crn: string
@@ -67,7 +76,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an appointment date',
+          msg: 'Enter or select a date',
         },
         {
           validator: isValidDateFormat,
@@ -76,8 +85,13 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
         {
           validator: isValidDate,
-          msg: 'Enter a real date',
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
           log: 'Appointment date is not valid',
+        },
+        {
+          validator: isTodayOrLater,
+          msg: 'Date must be today or in the future',
+          log: 'Date must be today or in the future',
         },
       ],
     },
@@ -86,8 +100,14 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an appointment start time',
+          msg: 'Select a start time',
           log: 'Appointment start time not selected or entered',
+        },
+        {
+          validator: timeIsNotEarlierThan,
+          msg: 'The end time must be after the start time',
+          log: 'The end time must be after the start time',
+          crossField: `[appointments][${crn}][${id}][end-time]`,
         },
       ],
     },
@@ -96,8 +116,14 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an appointment end time',
+          msg: 'Select an end time',
           log: 'Appointment end time not selected or entered',
+        },
+        {
+          validator: timeIsNotLaterThan,
+          msg: 'The end time must be after the start time',
+          log: 'The end time must be after the start time',
+          crossField: `[appointments][${crn}][${id}][start-time]`,
         },
       ],
     },

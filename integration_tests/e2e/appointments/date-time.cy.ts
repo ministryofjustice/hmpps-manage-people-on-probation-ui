@@ -11,6 +11,9 @@ const loadPage = () => {
 describe('Enter the date and time of the appointment', () => {
   let dateTimePage: AppointmentDateTimePage
   let repeatingPage: AppointmentRepeatingPage
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
 
   describe('Page is rendered', () => {
     beforeEach(() => {
@@ -57,21 +60,91 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      dateTimePage.checkErrorSummaryBox([
-        'Select an appointment date',
-        'Select an appointment start time',
-        'Select an appointment end time',
-      ])
+      dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Select a start time', 'Select an end time'])
     })
     it('should display the error messages', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
-        expect($error.text().trim()).to.include('Select an appointment date')
+        expect($error.text().trim()).to.include('Enter or select a date')
       })
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
-        expect($error.text().trim()).to.include('Select an appointment start time')
+        expect($error.text().trim()).to.include('Select a start time')
       })
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time-error`).should($error => {
-        expect($error.text().trim()).to.include('Select an appointment end time')
+        expect($error.text().trim()).to.include('Select an end time')
+      })
+    })
+  })
+
+  describe('Continue is clicked selecting an end time the same as the start time', () => {
+    beforeEach(() => {
+      loadPage()
+      dateTimePage.getDatePickerToggle().click()
+      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('9:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('9:00am').tab()
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox([
+        'The end time must be after the start time',
+        'The end time must be after the start time',
+      ])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+        expect($error.text().trim()).to.include('The end time must be after the start time')
+      })
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time-error`).should($error => {
+        expect($error.text().trim()).to.include('The end time must be after the start time')
+      })
+    })
+  })
+
+  describe('Continue is clicked selecting an end time before the start time', () => {
+    beforeEach(() => {
+      loadPage()
+      dateTimePage.getDatePickerToggle().click()
+      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('10:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('9:00am').tab()
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box again', () => {
+      dateTimePage.checkErrorSummaryBox([
+        'The end time must be after the start time',
+        'The end time must be after the start time',
+      ])
+    })
+    it('should display the error messages again', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+        expect($error.text().trim()).to.include('The end time must be after the start time')
+      })
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time-error`).should($error => {
+        expect($error.text().trim()).to.include('The end time must be after the start time')
+      })
+    })
+  })
+
+  describe('Continue is clicked selecting a date and time that clashes', () => {
+    beforeEach(() => {
+      cy.task('stubAppointmentClash')
+      loadPage()
+      dateTimePage.getDatePickerToggle().click()
+      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time`).select('11:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-time`).focus().select('11:15am').tab()
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox([
+        'Choose a time that does not clash with Alton’s existing appointment at 11am to 12pm',
+      ])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-time-error`).should($error => {
+        expect($error.text().trim()).to.include(
+          'Choose a time that does not clash with Alton’s existing appointment at 11am to 12pm',
+        )
       })
     })
   })

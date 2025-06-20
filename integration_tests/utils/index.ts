@@ -1,4 +1,4 @@
-import { ValidationSpec } from '../../server/utils/validationUtils'
+import { ValidationSpec } from '../../server/models/Errors'
 
 export interface WiremockMapping {
   request: {
