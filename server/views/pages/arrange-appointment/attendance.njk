@@ -1,7 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Who will attend the appointment?' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
-{% set formId = 'attend' %}
 
 {% block form %}
     <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
@@ -64,7 +63,7 @@
       document.addEventListener("DOMContentLoaded", () => {
         const regionSelect = document.getElementById("region")
         const teamSelect = document.getElementById("team")
-        const form = document.getElementById("attend");
+        const form = document.forms[0];
 
         regionSelect.addEventListener("change", (event) => {
           form.action = "attendance?page=self&regionCode=" + event.target.value
@@ -74,6 +73,7 @@
         teamSelect.addEventListener("change", (event) => {
           const regionCode = regionSelect.value
           form.action = "attendance?page=self&regionCode=" + regionCode + "&teamCode=" + event.target.value
+          form.submit()
         })
       })
     </script>
