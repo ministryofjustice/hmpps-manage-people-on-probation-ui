@@ -4,7 +4,6 @@ import { Controller } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError } from '../middleware'
-import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToType',
