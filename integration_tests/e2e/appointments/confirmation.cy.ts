@@ -1,6 +1,7 @@
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import {
+  completeAttendancePage,
   completeCYAPage,
   completeDateTimePage,
   completeLocationPage,
@@ -19,6 +20,7 @@ const regex: RegExp =
 const loadPage = () => {
   completeTypePage()
   completeSentencePage()
+  completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()

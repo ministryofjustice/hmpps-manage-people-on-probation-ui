@@ -1,4 +1,4 @@
-import { Location } from '../data/model/caseload'
+import { Location, Provider, Team, User } from '../data/model/caseload'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { Sentence } from '../data/model/sentenceDetails'
 import { AppointmentSession, AppointmentType } from './Appointments'
@@ -20,5 +20,16 @@ export interface Data {
   errors?: Errors
   locations?: {
     [userId: string]: Location[]
+  }
+  region?: string
+  team?: string
+  providers?: {
+    [userId: string]: Provider[]
+  }
+  teams?: {
+    [userId: string]: Team[]
+  }
+  staff?: {
+    [userId: string]: User[]
   }
 }

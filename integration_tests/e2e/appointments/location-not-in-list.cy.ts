@@ -1,10 +1,11 @@
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
-import { completeLocationPage, completeSentencePage, completeTypePage } from './imports'
+import { completeAttendancePage, completeLocationPage, completeSentencePage, completeTypePage } from './imports'
 
 describe('Arrange an appointment in another location', () => {
   beforeEach(() => {
     completeTypePage()
     completeSentencePage()
+    completeAttendancePage()
     completeLocationPage(4)
   })
   it('should render the page', () => {

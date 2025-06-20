@@ -1,11 +1,13 @@
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import { completeSentencePage, completeTypePage, crn, uuid } from './imports'
+import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid } from './imports'
+import AttendancePage from '../../pages/appointments/attendance.page'
 
 const loadPage = () => {
   completeTypePage()
   completeSentencePage()
+  completeAttendancePage()
 }
 
 describe('Pick a location for this appointment', () => {
@@ -37,8 +39,8 @@ describe('Pick a location for this appointment', () => {
       locationPage.getBackLink().click()
     })
     it('should render the sentence page', () => {
-      const sentencePage = new AppointmentSentencePage()
-      sentencePage.checkOnPage()
+      const attendancePage = new AttendancePage()
+      attendancePage.checkOnPage()
     })
   })
 

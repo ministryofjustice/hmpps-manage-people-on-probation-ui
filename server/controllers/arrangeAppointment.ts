@@ -4,7 +4,6 @@ import { Controller } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError } from '../middleware'
-import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToType',
@@ -12,6 +11,8 @@ const routes = [
   'postType',
   'getSentence',
   'postSentence',
+  'getWhoWillAttend',
+  'postWhoWillAttend',
   'getLocation',
   'postLocation',
   'getLocationNotInList',
@@ -86,6 +87,40 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance`
+      return res.redirect(redirect)
+    }
+  },
+  getWhoWillAttend: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { change } = req.query
+      const errors = req?.session?.data?.errors
+      if (errors) {
+        delete req.session.data.errors
+      }
+
+      return res.render(`pages/arrange-appointment/attendance`, { crn, id, errors, change })
+    }
+  },
+  postWhoWillAttend: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
+      const page = req.query.page as string
+      const regionCode = req.query.regionCode as string
+      const teamCode = req.query.teamCode as string
+      const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
+      const queryParameters = regionCode ? `?regionCode=${regionCode}${teamQueryParam}` : ''
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      if (page) {
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`)
+      }
+
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
     }

@@ -5,6 +5,9 @@ import { Route } from '../@types'
 export const getUserLocations = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { username } = res.locals.user
+    const regionCode = req.query.regionCode as string
+    const teamCode = req.query.teamCode as string
+
     const token = await hmppsAuthClient.getSystemClientToken(username)
     if (!req?.session?.data?.locations?.[username]) {
       const masClient = new MasApiClient(token)
@@ -17,6 +20,8 @@ export const getUserLocations = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         },
       }
     }
+    res.locals.regionCode = regionCode
+    res.locals.teamCode = teamCode
     res.locals.userLocations = req.session.data.locations[username]
     return next()
   }

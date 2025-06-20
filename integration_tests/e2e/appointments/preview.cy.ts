@@ -5,6 +5,7 @@ import {
   endTime,
   completeTypePage,
   completeSentencePage,
+  completeAttendancePage,
   completeLocationPage,
   completeDateTimePage,
   completeRepeatingPage,
@@ -23,6 +24,7 @@ const loadPage = (repeat = 2) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type`)
   completeTypePage()
   completeSentencePage()
+  completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage(repeat)

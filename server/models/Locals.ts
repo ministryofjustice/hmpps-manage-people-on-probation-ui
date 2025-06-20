@@ -3,7 +3,7 @@ import { Response } from 'express'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
-import { Location } from '../data/model/caseload'
+import { Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentType } from './Appointments'
@@ -58,6 +58,12 @@ interface Locals {
   timeOptions?: Option[]
   endTimeOptions?: Option[]
   userLocations?: Location[]
+  userProviders?: Provider[]
+  userTeams?: Team[]
+  userStaff?: User[]
+  regionCode?: string
+  teamCode?: string
+  selectProvider?: Provider[]
   sentry?: SentryConfig
   csrfToken?: string
   cspNonce?: string
