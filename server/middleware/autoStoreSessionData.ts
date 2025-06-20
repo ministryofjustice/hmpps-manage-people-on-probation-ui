@@ -10,16 +10,14 @@ export const autoStoreSessionData = (req: Request, res: Response, next: NextFunc
     if (!key.startsWith('_')) {
       const getPath = id ? [key, crn, id] : [key, crn]
       const body: Record<string, string> = getDataValue(inputs, getPath)
-      if (body !== undefined) {
-        Object.keys(body).forEach(valueKey => {
-          let newValue = body[valueKey]
-          if (config.dateFields.includes(valueKey) && body[valueKey].includes('/')) {
-            newValue = toIsoDateFromPicker(body[valueKey])
-          }
-          const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
-          setDataValue(newSessionData, setPath, newValue)
-        })
-      }
+      Object.keys(body).forEach(valueKey => {
+        let newValue = body[valueKey]
+        if (config.dateFields.includes(valueKey) && body[valueKey].includes('/')) {
+          newValue = toIsoDateFromPicker(body[valueKey])
+        }
+        const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
+        setDataValue(newSessionData, setPath, newValue)
+      })
     }
   })
   req.session.data = newSessionData

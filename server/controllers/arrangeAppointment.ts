@@ -123,6 +123,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
+      const page = req.query.page as string
       const regionCode = req.query.regionCode as string
       const teamCode = req.query.teamCode as string
       const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
@@ -131,7 +132,12 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/location${queryParameters}`
+
+      if (page) {
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`)
+      }
+
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
     }
   },

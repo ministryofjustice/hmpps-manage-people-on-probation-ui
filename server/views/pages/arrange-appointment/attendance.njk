@@ -1,6 +1,7 @@
 {% extends "../_form.njk" %}
 {% set title = 'Who will attend the appointment?' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+{% set formId = 'attend' %}
 
 {% block form %}
     <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
@@ -39,7 +40,7 @@
                 text: "Select region"
             },
             items: providerItems
-        } ) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'region'])) }}
 
         {{ govukSelect({
             id: "team",
@@ -48,7 +49,7 @@
                 text: "Select team"
             },
             items: teamItems
-        } ) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'team'])) }}
 
         {{ govukSelect({
             id: "name",
@@ -63,14 +64,16 @@
       document.addEventListener("DOMContentLoaded", () => {
         const regionSelect = document.getElementById("region")
         const teamSelect = document.getElementById("team")
+        const form = document.getElementById("attend");
 
         regionSelect.addEventListener("change", (event) => {
-          window.location.href = document.getElementById('uri_ref').value + "?regionCode=" + event.target.value
+          form.action = "attendance?page=self&regionCode=" + event.target.value
+          form.submit()
         })
 
         teamSelect.addEventListener("change", (event) => {
           const regionCode = regionSelect.value
-          window.location.href = document.getElementById('uri_ref').value + "?regionCode=" + regionCode + "&teamCode=" + event.target.value
+          form.action = "attendance?page=self&regionCode=" + regionCode + "&teamCode=" + event.target.value
         })
       })
     </script>
