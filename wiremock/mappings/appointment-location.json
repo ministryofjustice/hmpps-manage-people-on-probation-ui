@@ -2,20 +2,24 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/user/USER1/locations",
-        "method": "GET"
+        "urlPathPattern": "/mas/appointment/location",
+        "method": "GET",
+        "queryParameters": {
+          "providerCode": {
+            "matches": ".*"
+          },
+          "teamCode": {
+            "matches": ".*"
+          }
+        }
       },
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Eula",
-            "middleName": "",
-            "surname": "Schmeler"
-          },
           "locations": [
             {
               "id": 1234,
+              "code": "N56NTMC",
               "description": "HMP Wakefield",
               "address": {
                 "buildingNumber": "5",
@@ -27,6 +31,7 @@
             },
             {
               "id": 5678,
+              "code": "N56NTMD",
               "description": "102 Petty France",
               "address": {
                 "buildingNumber": "102",

@@ -4,7 +4,7 @@ import {
   autoStoreSessionData,
   getPersonalDetails,
   getWhoAttends,
-  getUserLocations,
+  getOfficeLocationsByTeamAndProvider,
   getSentences,
   getAppointmentTypes,
   getAppointment,
@@ -67,13 +67,13 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/location',
     redirectWizard(['type', 'eventId']),
-    getUserLocations(hmppsAuthClient),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     controllers.arrangeAppointments.getLocation(),
   )
 
   router.post(
     '/case/:crn/arrange-appointment/:id/location',
-    getUserLocations(hmppsAuthClient),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     validate.appointments,
     controllers.arrangeAppointments.postLocation(),
   )
@@ -122,7 +122,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
     redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
-    getUserLocations(hmppsAuthClient),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
   router.post(

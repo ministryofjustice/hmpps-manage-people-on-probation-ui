@@ -252,7 +252,11 @@ describe('masApiClient', () => {
 
       ['getUserAppointments', '/user/USER/appointments', () => masApiClient.getUserAppointments('USER')],
       ['getUserTeams', '/caseload/user/USER/teams', () => masApiClient.getUserTeams('USER')],
-      ['getUserLocations', '/user/USER/locations', () => masApiClient.getUserLocations('USER')],
+      [
+        'getOfficeLocationsByTeamAndProvider',
+        '/appointment/location?providerCode=N56&teamCode=N56N02',
+        () => masApiClient.getOfficeLocationsByTeamAndProvider('N56', 'N56N02'),
+      ],
       [
         'getUserSchedule',
         '/user/USER/schedule/TYPE?size=1&page=1&sortBy=user&ascending=asc',
