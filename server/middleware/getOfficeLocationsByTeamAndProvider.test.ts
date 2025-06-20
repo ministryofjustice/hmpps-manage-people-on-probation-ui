@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { getUserLocations } from './getUserLocations'
+import { getOfficeLocationsByTeamAndProvider } from './getOfficeLocationsByTeamAndProvider'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -23,6 +23,8 @@ jest.mock('../utils', () => {
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const username = 'user-1'
+const providerCode = 'N56'
+const teamCode = 'N56N02'
 const crn = 'X000001'
 const id = 'mock-id'
 
@@ -57,13 +59,22 @@ const res = {
 } as unknown as AppResponse
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
-mockGetDataValue.mockReturnValue(username)
 
-describe('/middleware/getUserLocations()', () => {
+mockGetDataValue.mockImplementation((_data, path) => {
+  if (path.join('.') === `appointments.${crn}.${id}.user.providerCode`) {
+    return providerCode
+  }
+  if (path.join('.') === `appointments.${crn}.${id}.user.teamCode`) {
+    return teamCode
+  }
+  return undefined
+})
+
+describe('/middleware/getOfficeLocationsByTeamAndProvider()', () => {
   const nextSpy = jest.fn()
 
   const spy = jest
-    .spyOn(MasApiClient.prototype, 'getUserLocations')
+    .spyOn(MasApiClient.prototype, 'getOfficeLocationsByTeamAndProvider')
     .mockImplementation(() => Promise.resolve(mockLocationsResponse))
 
   afterEach(() => {
@@ -88,16 +99,16 @@ describe('/middleware/getUserLocations()', () => {
       },
     })
     beforeEach(async () => {
-      await getUserLocations(hmppsAuthClient)(req, res, nextSpy)
+      await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should fetch the user locations from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith(username)
+    it('should fetch the office locations from the api and assign to session', () => {
+      expect(spy).toHaveBeenCalledWith(providerCode, teamCode)
       expect(req.session.data.locations).toEqual({
         ...req.session.data.locations,
         [username]: mockLocationsResponse.locations,
       })
     })
-    it('should assign the user locations to res.locals', () => {
+    it('should assign the office locations to res.locals', () => {
       expect(res.locals.userLocations).toEqual(mockLocationsResponse.locations)
     })
     it('should call next()', () => {
@@ -122,12 +133,12 @@ describe('/middleware/getUserLocations()', () => {
       },
     })
     beforeEach(async () => {
-      await getUserLocations(hmppsAuthClient)(req, res, nextSpy)
+      await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should not fetch the user locations from the api', () => {
+    it('should not fetch the office locations from the api', () => {
       expect(spy).not.toHaveBeenCalled()
     })
-    it('should assign the existing session user locations to res.locals', () => {
+    it('should assign the existing session office locations to res.locals', () => {
       expect(res.locals.userLocations).toEqual(req.session.data.locations[username])
     })
     it('should call next()', () => {

@@ -1,4 +1,4 @@
-export * from './getUserLocations'
+export * from './getOfficeLocationsByTeamAndProvider'
 export * from './autoStoreSessionData'
 export * from './getPersonalDetails'
 export * from './getSentences'
