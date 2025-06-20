@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-syntax */
 import { DateTime } from 'luxon'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
