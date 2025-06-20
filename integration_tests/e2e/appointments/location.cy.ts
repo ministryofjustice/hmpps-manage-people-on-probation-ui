@@ -33,7 +33,7 @@ describe('Pick a location for this appointment', () => {
   })
 
   describe('Page is rendered with no locations', () => {
-    afterEach(() => {
+    beforeEach(() => {
       cy.task('resetMocks')
     })
     it('should only display the last 2 radio options', () => {
