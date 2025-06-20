@@ -51,13 +51,13 @@
         } | decorateFormAttributes(['appointments', crn, id, 'team'])) }}
 
         {{ govukSelect({
-            id: "name",
+            id: "username",
             name: "name",
             label: {
                 text: "Select name"
             },
             items: userItems
-        } | decorateFormAttributes(['appointments', crn, id, 'name'])) }}
+        } | decorateFormAttributes(['appointments', crn, id, 'username'])) }}
 
     <script nonce="{{ cspNonce }}">
       document.addEventListener("DOMContentLoaded", () => {
