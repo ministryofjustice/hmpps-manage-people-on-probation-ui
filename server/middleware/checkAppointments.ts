@@ -44,7 +44,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     // Check errors
     const errorMessages: Record<string, string> = {}
     if (checks.overlapsWithMeetingWith) {
-      errorMessages[`appointments-${crn}-${id}-start-time`] =
+      errorMessages[`appointments-${crn}-${id}-start`] =
         `Choose a time that does not clash with ${res.locals.case.name.forename}’s existing appointment at ${checks.overlapsWithMeetingWith.startAndEnd}`
     }
 
