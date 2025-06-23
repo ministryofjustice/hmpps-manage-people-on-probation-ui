@@ -9,7 +9,6 @@ import AppointmentTypePage from '../../pages/appointments/type.page'
 import {
   completeDateTimePage,
   completeLocationPage,
-  completePreviewPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
@@ -19,6 +18,7 @@ import {
   crn,
   uuid,
   completeAttendancePage,
+  completeNotePage,
 } from './imports'
 
 const regex: RegExp = /^\d{1,2}\s[A-Za-z]+ \d{4}\sfrom\s\d{1,2}:\d{2}[ap]m\sto\s\d{1,2}:\d{2}[ap]m$/
@@ -30,7 +30,7 @@ const loadPage = () => {
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()
-  completePreviewPage()
+  completeNotePage()
 }
 
 describe('Check your answers then confirm the appointment', () => {
@@ -58,6 +58,10 @@ describe('Check your answers then confirm the appointment', () => {
     cyaPage.getSummaryListRow(4).find('.govuk-summary-list__value li:nth-child(3)').contains(regex)
     cyaPage.getSummaryListRow(5).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
     cyaPage.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+    cyaPage.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
+    cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
+    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
+    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Yes')
     cyaPage.getSubmitBtn().should('include.text', 'Confirm this appointment')
   })
 

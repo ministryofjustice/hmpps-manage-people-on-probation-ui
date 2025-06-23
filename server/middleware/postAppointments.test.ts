@@ -93,10 +93,11 @@ const req = httpMocks.createRequest({
         [crn]: {
           [id]: {
             user: {
-              username,
               locationCode: 'HMP',
               teamCode: 'TEA',
             },
+            username,
+            team: 'TEA',
             type: 'C084',
             date: '2025-03-12',
             start: '9:00am',
@@ -104,8 +105,10 @@ const req = httpMocks.createRequest({
             interval: 'WEEK',
             numberOfAppointments: '2',
             eventId: 2501138253,
-            requirementId: 0,
+            requirementId: 1,
             licenceConditionId: 2500686668,
+            notes: 'Some notes',
+            sensitivity: false,
           },
         },
       },
@@ -140,12 +143,59 @@ describe('/middleware/postAppointments', () => {
     interval,
     numberOfAppointments: parseInt(repeatCount, 10),
     createOverlappingAppointment: true,
-    requirementId: 0,
-    nsiId: 0,
+    requirementId: 1,
+    nsiId: undefined as number,
     licenceConditionId,
     eventId,
     uuid: id,
-    until: '',
+    notes: 'Some notes',
+    sensitive: false,
+  }
+  let spy: jest.SpyInstance
+  beforeEach(async () => {
+    spy = jest.spyOn(MasApiClient.prototype, 'postAppointments').mockImplementation(() => Promise.resolve(''))
+    await postAppointments(hmppsAuthClient)(req, res, nextSpy)
+  })
+  it('should post the correct request body', () => {
+    expect(spy).toHaveBeenCalledWith(crn, expectedBody)
+  })
+  it('should call next()', () => {
+    expect(nextSpy).toHaveBeenCalled()
+  })
+})
+
+describe('/middleware/postAppointments', () => {
+  const {
+    user: { locationCode, teamCode },
+    date,
+    start: startTime,
+    end: endTime,
+    type,
+    interval,
+    eventId,
+    numberOfAppointments: repeatCount,
+    licenceConditionId,
+  } = req.session.data.appointments[crn][id]
+
+  const expectedBody = {
+    user: {
+      username,
+      locationCode,
+      teamCode,
+    },
+    type,
+    start: dateTime(date, startTime),
+    end: dateTime(date, endTime),
+    interval,
+    numberOfAppointments: parseInt(repeatCount, 10),
+    createOverlappingAppointment: true,
+    requirementId: 1,
+    nsiId: undefined as number,
+    licenceConditionId,
+    eventId,
+    uuid: id,
+    notes: 'Some notes',
+    sensitive: false,
   }
   let spy: jest.SpyInstance
   beforeEach(async () => {

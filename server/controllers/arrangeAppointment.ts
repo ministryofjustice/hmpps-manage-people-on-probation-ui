@@ -20,8 +20,8 @@ const routes = [
   'postDateTime',
   'getRepeating',
   'postRepeating',
-  'getPreview',
-  'postPreview',
+  'getNotes',
+  'postNotes',
   'getCheckYourAnswers',
   'postCheckYourAnswers',
   'getConfirmation',
@@ -173,12 +173,28 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/repeating`
+      const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
+      if (!repeatAppointmentsEnabled) {
+        setDataValue(req.session.data, ['appointments', crn, id, 'repeating'], 'No')
+        setDataValue(req.session.data, ['appointments', crn, id, 'repeating-count'], '')
+        setDataValue(req.session.data, ['appointments', crn, id, 'repeating-frequency'], '')
+        setDataValue(req.session.data, ['appointments', crn, id, 'repeating-dates'], [])
+        setDataValue(req.session.data, ['appointments', crn, id, 'interval'], undefined)
+        setDataValue(req.session.data, ['appointments', crn, id, 'numberOfAppointments'], 1)
+      }
+      const nextPage =
+        repeatAppointmentsEnabled === true
+          ? `/case/${crn}/arrange-appointment/${id}/repeating`
+          : `/case/${crn}/arrange-appointment/${id}/add-notes`
+      const redirect = change || nextPage
       return res.redirect(redirect)
     }
   },
   getRepeating: () => {
     return async (req, res) => {
+      if (res.locals.flags.enableRepeatAppointments !== true) {
+        return renderError(404)(req, res)
+      }
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
       const { interval, numberOfAppointments } = req.query
@@ -211,6 +227,9 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postRepeating: () => {
     return async (req, res) => {
+      if (res.locals.flags.enableRepeatAppointments !== true) {
+        return renderError(404)(req, res)
+      }
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
       const { data } = req.session
@@ -223,17 +242,23 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/preview`
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/add-notes`
       return res.redirect(redirect)
     }
   },
-  getPreview: () => {
+  getNotes: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      return res.render(`pages/arrange-appointment/preview`, { crn, id })
+      const { data } = req.session
+      if (!getDataValue(data, ['appointments', crn, id, 'sensitivity'])) {
+        setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'No')
+      }
+      const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
+      const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
+      return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back })
     }
   },
-  postPreview: () => {
+  postNotes: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -244,6 +269,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   getCheckYourAnswers: () => {
     return async (req, res) => {
+      const repeatingEnabled = res.locals.flags.enableRepeatAppointments === true
       const { url } = req
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
@@ -256,7 +282,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       ) {
         location = res.locals.userLocations.find((loc: any) => loc.description === selectedLocation)
       }
-      return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, location, url })
+      return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, location, url, repeatingEnabled })
     }
   },
   postCheckYourAnswers: () => {

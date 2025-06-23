@@ -11,6 +11,8 @@ import {
   completeLocationPage,
   completeDateTimePage,
 } from './imports'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
+import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = () => {
   completeTypePage()
@@ -20,11 +22,29 @@ const loadPage = () => {
   completeDateTimePage()
 }
 
+describe('Will the appointment repeat? (with feature flag disabled)', () => {
+  let appointmentNotePage: AppointmentNotePage
+  beforeEach(() => {
+    cy.task('stubNoRepeats')
+    loadPage()
+    appointmentNotePage = new AppointmentNotePage()
+  })
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
+  it('should be on add note page', () => {
+    appointmentNotePage.checkOnPage()
+  })
+})
+
 describe('Will the appointment repeat?', () => {
   let repeatingPage: AppointmentRepeatingPage
   beforeEach(() => {
     loadPage()
     repeatingPage = new AppointmentRepeatingPage()
+  })
+  afterEach(() => {
+    cy.task('resetMocks')
   })
   it('should be on the repeating page', () => {
     repeatingPage.checkOnPage()
@@ -165,10 +185,10 @@ describe('Will the appointment repeat?', () => {
       repeatingPage.getLastAppointmentHeading().should('include.text', 'Last appointment on')
       repeatingPage.getLastAppointmentDate().should('include.text', 'Thursday 13 February 2025')
     })
-    it('should redirect to the appointment confirmation page when continue is clicked', () => {
+    it('should redirect to the add note page when continue is clicked', () => {
       repeatingPage.getSubmitBtn().click()
-      const previewPage = new AppointmentPreviewPage()
-      previewPage.checkOnPage()
+      const notePage = new AppointmentNotePage()
+      notePage.checkOnPage()
     })
   })
 })

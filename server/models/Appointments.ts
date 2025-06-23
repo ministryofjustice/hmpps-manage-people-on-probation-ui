@@ -23,6 +23,8 @@ export interface AppointmentSession {
   nsiId?: string
   repeating?: 'Yes' | 'No'
   repeatingDates?: string[]
+  notes?: string
+  sensitivity?: 'Yes' | 'No'
 }
 
 export interface AppointmentType {
@@ -34,6 +36,19 @@ export interface AppointmentType {
 
 export interface AppointmentTypeResponse {
   appointmentTypes: AppointmentType[]
+}
+
+export interface AppointmentLocationRequest {
+  provideCode: string
+  teamCode: string
+}
+export interface AppointmentLocationResponse {
+  locations: AppointmentLocation[]
+}
+
+export interface AppointmentLocation {
+  id: number
+  code: string
 }
 
 export interface AppointmentTypeOption {
@@ -61,6 +76,8 @@ export interface AppointmentRequestBody {
   licenceConditionId: number
   nsiId: number
   until?: string
+  notes?: string
+  sensitive?: boolean
 }
 
 export interface CheckAppointment {

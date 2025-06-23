@@ -8,6 +8,7 @@ import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentPreviewPage from '../../pages/appointments/preview.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendancePage from '../../pages/appointments/attendance.page'
+import AppointmentNotePage from '../../pages/appointments/note.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -60,6 +61,13 @@ export const completeDateTimePage = () => {
   dateTimePage.getSubmitBtn().click()
   // Ignore warnings on second click
   dateTimePage.getSubmitBtn().click()
+}
+
+export const completeNotePage = () => {
+  const notePage = new AppointmentNotePage()
+  notePage.getElement(`#notes`).focus().type('Some notes')
+  notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity`).click()
+  notePage.getSubmitBtn().click()
 }
 
 export const completeRepeatingPage = (repeat = 2) => {

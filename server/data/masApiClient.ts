@@ -36,6 +36,8 @@ import {
   AppointmentRequestBody,
   CheckAppointment,
   AppointmentTypeResponse,
+  AppointmentLocationResponse,
+  AppointmentLocationRequest,
 } from '../models/Appointments'
 
 interface GetUserScheduleProps {
