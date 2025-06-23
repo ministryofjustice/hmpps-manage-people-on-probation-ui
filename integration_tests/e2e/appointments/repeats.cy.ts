@@ -7,6 +7,7 @@ import {
   uuid,
   completeTypePage,
   completeSentencePage,
+  completeAttendancePage,
   completeLocationPage,
   completeDateTimePage,
 } from './imports'
@@ -14,6 +15,7 @@ import {
 const loadPage = () => {
   completeTypePage()
   completeSentencePage()
+  completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
 }

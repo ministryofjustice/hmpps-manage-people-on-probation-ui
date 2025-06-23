@@ -1,11 +1,19 @@
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
-import { completeLocationPage, completeSentencePage, completeTypePage, crn, uuid } from './imports'
+import {
+  completeAttendancePage,
+  completeLocationPage,
+  completeSentencePage,
+  completeTypePage,
+  crn,
+  uuid,
+} from './imports'
 
 const loadPage = () => {
   completeTypePage()
   completeSentencePage()
+  completeAttendancePage()
   completeLocationPage()
 }
 describe('Enter the date and time of the appointment', () => {

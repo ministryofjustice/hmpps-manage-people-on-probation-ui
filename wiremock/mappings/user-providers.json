@@ -1,0 +1,307 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/user/USER1/providers",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "A P Central Admissions Unit",
+              "code": "N50CAU"
+            },
+            {
+              "description": "Ascot House Approved Premises",
+              "code": "N50AHA"
+            },
+            {
+              "description": "Atherton Court",
+              "code": "N50ACT"
+            }
+          ],
+          "users": [
+            {
+              "username": "peter-parker",
+              "nameAndRole": "peter parker (PS-PSO)"
+            },
+            {
+              "username": "jon-smith",
+              "nameAndRole": "jon smith (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/providers",
+        "queryParameters": {
+          "region": {
+            "equalTo": "N50"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "A P Central Admissions Unit",
+              "code": "N50CAU"
+            },
+            {
+              "description": "Ascot House Approved Premises",
+              "code": "N50AHA"
+            },
+            {
+              "description": "Atherton Court",
+              "code": "N50ACT"
+            }
+          ],
+          "users": [
+            {
+              "username": "peter-parker",
+              "nameAndRole": "peter parker (PS-PSO)"
+            },
+            {
+              "username": "jon-smith",
+              "nameAndRole": "jon smith (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/providers",
+        "queryParameters": {
+          "region": {
+            "equalTo": "N50"
+          },
+          "team": {
+            "equalTo": "N50AHA"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "A P Central Admissions Unit",
+              "code": "N50CAU"
+            },
+            {
+              "description": "Ascot House Approved Premises",
+              "code": "N50AHA"
+            },
+            {
+              "description": "Atherton Court",
+              "code": "N50ACT"
+            }
+          ],
+          "users": [
+            {
+              "username": "jon-quick",
+              "nameAndRole": "jon quick (PS-PSO)"
+            },
+            {
+              "username": "fred-plug",
+              "nameAndRole": "fred plug (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/providers",
+        "queryParameters": {
+          "region": {
+            "equalTo": "N07"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "Automated Allocation Team",
+              "code": "N07AAT"
+            },
+            {
+              "description": "Automation SPG",
+              "code": "N07CHT"
+            },
+            {
+              "description": "Homelessness Prevention Team,",
+              "code": "N07HPT"
+            }
+          ],
+          "users": [
+            {
+              "username": "max-cool",
+              "nameAndRole": "max parker (PS-PSO)"
+            },
+            {
+              "username": "tony-pan",
+              "nameAndRole": "tony pan (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/USER1/providers",
+        "queryParameters": {
+          "region": {
+            "equalTo": "N54"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Caroline",
+            "surname": "Wolff"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "Automated Allocation Team North",
+              "code": "N54AAT"
+            },
+            {
+              "description": "Breach Team (Durham and Cleveland)",
+              "code": "N54N03"
+            },
+            {
+              "description": "CRC Created",
+              "code": "N54PRC"
+            }
+          ],
+          "users": [
+            {
+              "username": "george-parker",
+              "nameAndRole": "george parker (PS-PSO)"
+            },
+            {
+              "username": "jack-smith",
+              "nameAndRole": "jack smith (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

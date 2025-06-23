@@ -7,6 +7,7 @@ import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentPreviewPage from '../../pages/appointments/preview.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
+import AttendancePage from '../../pages/appointments/attendance.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -36,6 +37,11 @@ export const completeSentencePage = () => {
   sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
   sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
   sentencePage.getSubmitBtn().click()
+}
+
+export const completeAttendancePage = () => {
+  const attendancePage = new AttendancePage()
+  attendancePage.getSubmitBtn().click()
 }
 
 export const completeLocationPage = (index = 1) => {

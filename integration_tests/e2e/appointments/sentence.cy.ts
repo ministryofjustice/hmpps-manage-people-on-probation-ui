@@ -1,6 +1,7 @@
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
+import AttendancePage from '../../pages/appointments/attendance.page'
 import { crn, uuid, completeTypePage } from './imports'
 
 const loadPage = (type = 1, query = '') => {
@@ -24,13 +25,13 @@ const checkRequirementSentence = (type = 1) => {
     it('should not display the licence condition reveal', () => {
       sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('not.be.visible')
     })
-    it('should link to the location page when requirement is selected and continue is clicked', () => {
+    it('should link to the attendance page when requirement is selected and continue is clicked', () => {
       loadPage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-2`).click()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
       sentencePage.getSubmitBtn().click()
-      const locationPage = new AppointmentLocationPage()
-      locationPage.checkOnPage()
+      const attendancePage = new AttendancePage()
+      attendancePage.checkOnPage()
     })
   })
 }
@@ -52,13 +53,13 @@ const checkLicenceConditionSentence = (type = 1) => {
     it('should not display the requirement reveal', () => {
       sentencePage.getElement(`[data-qa="requirementId"]`).should('not.be.visible')
     })
-    it('should link to the location page when licence condition is selected and continue is clicked', () => {
+    it('should link to the attendance page when licence condition is selected and continue is clicked', () => {
       loadPage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
       sentencePage.getSubmitBtn().click()
-      const locationPage = new AppointmentLocationPage()
-      locationPage.checkOnPage()
+      const attendencePage = new AttendancePage()
+      attendencePage.checkOnPage()
     })
   })
 }
@@ -148,12 +149,12 @@ describe('What is this appointment for?', () => {
     it('should display the personal contact option', () => {
       cy.get('[data-qa="personLevelContactLabel"]').should('contain.text', 'Alton')
     })
-    it('should link to the location page when the contact option is selected and continue is clicked', () => {
+    it('should link to the attendance page when the contact option is selected and continue is clicked', () => {
       loadPage(5)
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-3`).click()
       sentencePage.getSubmitBtn().click()
-      const locationPage = new AppointmentLocationPage()
-      locationPage.checkOnPage()
+      const attendancePage = new AttendancePage()
+      attendancePage.checkOnPage()
     })
   })
   describe('Page is rendered for a single sentence with licence condition', () => {

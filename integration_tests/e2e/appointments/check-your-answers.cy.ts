@@ -18,6 +18,7 @@ import {
   endTime,
   crn,
   uuid,
+  completeAttendancePage,
 } from './imports'
 
 const regex: RegExp = /^\d{1,2}\s[A-Za-z]+ \d{4}\sfrom\s\d{1,2}:\d{2}[ap]m\sto\s\d{1,2}:\d{2}[ap]m$/
@@ -25,6 +26,7 @@ const regex: RegExp = /^\d{1,2}\s[A-Za-z]+ \d{4}\sfrom\s\d{1,2}:\d{2}[ap]m\sto\s
 const loadPage = () => {
   completeTypePage()
   completeSentencePage()
+  completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()

@@ -10,6 +10,7 @@ export interface UserCaseload {
   sortedBy: string
   caseload: Caseload[]
 }
+
 export interface TeamCaseload {
   totalPages: number
   totalElements: number
@@ -18,6 +19,7 @@ export interface TeamCaseload {
   team: Team
   caseload: Caseload[]
 }
+
 export interface Caseload {
   caseName: Name
   crn: string
@@ -35,6 +37,16 @@ export interface CaseloadResponse {
 export interface Team {
   description: string
   code: string
+}
+
+export interface Provider {
+  code: string
+  name: string
+}
+
+export interface User {
+  username: string
+  nameAndRole: string
 }
 
 export interface Location {
@@ -85,6 +97,17 @@ export interface UserLocation {
 export interface UserTeam {
   provider: string
   teams: Team[]
+}
+
+export interface UserProviders {
+  name: {
+    forename: string
+    middleName: string
+    surname: string
+  }
+  providers: Provider[]
+  teams: Team[]
+  users: User[]
 }
 
 export interface UserLocations {

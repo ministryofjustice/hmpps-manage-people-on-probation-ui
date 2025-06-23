@@ -56,5 +56,6 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
       newObj.errorMessage = { text: res.locals.errorMessages[id] }
     }
   }
+
   return newObj
 }
