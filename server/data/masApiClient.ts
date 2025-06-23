@@ -318,6 +318,11 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
 
+  async getOfficeLocationsByTeamAndProvider(providerCode: string, teamCode: string): Promise<UserLocations> {
+    const query = `?${new URLSearchParams({ providerCode, teamCode }).toString()}`
+    return this.get({ path: `/appointment/location${query}`, handle404: true })
+  }
+
   async getUserSchedule({
     username,
     page,

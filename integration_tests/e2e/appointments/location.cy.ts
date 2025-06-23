@@ -20,7 +20,7 @@ describe('Pick a location for this appointment', () => {
       locationPage = new AppointmentLocationPage()
     })
     it('should display the options', () => {
-      locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'HMP Wakefield')
+      locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')
       locationPage.getRadioLabel('locationCode', 2).should('contain.text', '102 Petty France')
       locationPage
         .getRadioLabel('locationCode', 4)
@@ -29,6 +29,25 @@ describe('Pick a location for this appointment', () => {
     })
     it('should display the continue button', () => {
       locationPage.getSubmitBtn().should('contain.text', 'Continue')
+    })
+  })
+
+  describe('Page is rendered with no locations', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+    })
+    it('should only display the last 2 radio options', () => {
+      cy.task('stubNoUserLocationsFound')
+      loadPage()
+      locationPage = new AppointmentLocationPage()
+      locationPage
+        .getRadioLabel('locationCode', 1)
+        .should('contain.text', 'The location I’m looking for is not in this list')
+      locationPage.getRadioLabel('locationCode', 2).should('contain.text', 'I do not need to pick a location')
+      cy.get('[data-qa="locationOption"]').should('not.exist')
+    })
+    it('should not display the radio list divider', () => {
+      cy.get('.govuk-radios__divider').should('not.exist')
     })
   })
 
