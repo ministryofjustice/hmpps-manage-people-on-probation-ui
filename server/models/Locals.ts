@@ -23,6 +23,7 @@ export interface AppointmentLocals {
     requirement: string
     licenceCondition: string
     nsi: string
+    forename: string
   }
   attending?: {
     name: string

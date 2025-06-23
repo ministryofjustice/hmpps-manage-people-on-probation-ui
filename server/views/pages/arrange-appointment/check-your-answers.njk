@@ -5,15 +5,23 @@
 {% set notStandardForm = true %}
 {% set changePath = "/case/" + crn + "/arrange-appointment/"  + id %}
 {% set sentenceHtml %}
-{{ appointment.appointmentFor.sentence }}
+{% if appointment.appointmentFor.sentence %}
+  <span data-qa="appointmentSentence">{{ appointment.appointmentFor.sentence }}</span>
+{% endif %}
 {% if appointment.appointmentFor.requirement %}
-  <br>{{ appointment.appointmentFor.requirement }}
+  <br>
+  <span data-qa="appointmentRequirement">{{ appointment.appointmentFor.requirement }}</span>
 {% endif %}
 {% if appointment.appointmentFor.licenceCondition %}
-  <br>{{ appointment.appointmentFor.licenceCondition }}
+  <br>
+  <span data-qa="appointmentLicenceCondition">{{ appointment.appointmentFor.licenceCondition }}</span>
 {% endif %}
 {% if appointment.appointmentFor.nsi %}
-  <br>{{ appointment.appointmentFor.nsi }}
+  <br>
+  <span data-qa="appointmentNsi">{{ appointment.appointmentFor.nsi }}</span>
+{% endif %}
+{% if appointment.appointmentFor.forename %}
+  <span data-qa="appointmentForename">{{ appointment.appointmentFor.forename }}</span>
 {% endif %}
 {% endset %}
 
