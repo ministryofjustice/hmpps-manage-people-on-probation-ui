@@ -24,7 +24,13 @@
   <span data-qa="appointmentForename">{{ appointment.appointmentFor.forename }}</span>
 {% endif %}
 {% endset %}
-
+{% set attendingHtml %}
+{% if appointment.meta.userIsAttending %}
+  {{ appointment.attending.name }}
+{% else %}
+  {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region  }}
+{% endif %}
+{% endset %}
 {% set locationAddress %}
 {{appointment.location.description}}<br>
 {% if appointment.location.address.buildingNumber %}{{location.address.buildingNumber}}
@@ -50,6 +56,8 @@
       <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
     </div>
   </div>
+  {{appointment.user.username}}
+  {{appointment.username}}
   <form method="post" autocomplete="off" action="{{ paths.current }}">
     {% set showAction = true %}
     {% set appointmentDates = [appointment.date] %}
@@ -84,86 +92,74 @@
           } if showAction
         },
         {
-          key: { text: "Sentence" },
-          value: { html: sentenceHtml | safe },
-          actions: {
-            items: [
-              {
-                href: changePath + "/sentence?change=" + url,
-                text: "Change",
-                visuallyHiddenText: "sentence"
-              }
-            ]
-          } if showAction
-        },
-        {
-          key: { text: "Location" },
-          value: { text: locationAddress | safe if appointment.location else appointment.location },
-          actions: {
-            items: [
-              {
-                href: changePath + "/location?change=" + url,
-                text: "Change",
-                visuallyHiddenText: "location"
-              }
-            ]
-          } if showAction
-        },
-          {
-            key: { text: "Date and time" },
-            value: { html: appointmentDatesHtml  },
-            actions: {
-              items: [
-                {
-                  href: changePath + "/date-time?change=" + url,
-                  text: "Change",
-                  visuallyHiddenText: "date and time of the appointment"
-                }
-              ]
-            }
-          },
-          {
-            key: { text: "Repeating appointment" },
-            value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
-            actions: {
-              items: [
-                {
-                  href: changePath + "/repeating?change=" + url,
-                  text: "Change",
-                  visuallyHiddenText: "repeating appointment"
-                }
-              ]
-            }
-          } if repeatingEnabled,
-          {
-            key: { text: "Appointment notes" },
-            value: { text: appointment.notes },
-            actions: {
-              items: [
-                {
-                  href: changePath + "/add-notes?change=" + url,
-                  text: "Change",
-                  visuallyHiddenText: "appointment notes"
-                }
-              ]
-            }
-          },
-          {
-            key: { text: "Sensitivity" },
-            value: { text: 'Yes' if appointment.sensitivity === 'Yes' else 'No' },
-            actions: {
-            items: [
-                {
-                  href: changePath + "/add-notes?change=" + url,
-                  text: "Change",
-                  visuallyHiddenText: "appointment sensitivity"
-                }
-              ]
-            }
-          }
-        ]
-      }) }}
-
+        key: { text: "VISOR report"},
+        value: { text: appointment.visorReport },
+        actions: {
+    items: [ { 
+    href: changePath + "/sentence?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "sentence"
+     } 
+     ] 
+     } if showAction
+        } if appointment.meta.isVisor,
+    { key: { text: "Appointment for" },
+    value: { html: sentenceHtml | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/sentence?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "sentence"
+     } 
+     ] 
+     } if showAction }, 
+    { key: { text: "Attending" },
+    value: { html: attendingHtml | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/attendance?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "attendance"
+     } 
+     ] 
+     } if showAction }, 
+     { key: { text: "Location" }, 
+     value: { text: locationAddress | safe if appointment.location else appointment.location }, 
+     actions: { items: [ { href: changePath + "/location?change=" + url, 
+     text: "Change",
+      visuallyHiddenText: "location"
+      }
+      ]
+      } if showAction },
+      { key: { text: "Date and time" },
+      value: { html: appointmentDatesHtml }, 
+      actions: { items: [ { href: changePath + "/date-time?change=" + url,
+      text: "Change",
+      visuallyHiddenText: "date and time of the appointment" } ] } },
+         { key: { text: "Repeating appointment" },
+      value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
+      actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } },
+       { key: { text: "Appointment notes" },
+    value: { html: '' | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/notes?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "notes"
+     } 
+     ] 
+     } if showAction }, 
+      { key: { text: "Sensitivity" },
+    value: { html: '' | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/notes?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "sensitivity"
+     } 
+     ] 
+     } if showAction }
+] }) }}
     {{ govukButton({
       html: buttonText,
       attributes: {
