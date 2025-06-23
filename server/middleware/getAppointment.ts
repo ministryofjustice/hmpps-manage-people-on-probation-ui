@@ -80,19 +80,19 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       const selectedRegion =
         region && req?.session?.data?.providers?.[username]
-          ? req.session.data.providers[username].find(r => r.code === region).name
+          ? req.session.data.providers[username].find(r => r.code === region)?.name
           : null
       const selectedTeam =
         region && req?.session?.data.teams?.[username]
-          ? req.session.data.teams[username].find(t => t.code === team).description
+          ? req.session.data.teams[username].find(t => t.code === team)?.description
           : null
       const selectedUser =
         staffId && req?.session?.data?.staff?.[username]
-          ? req.session.data.staff[username].find(s => s.username === staffId).nameAndRole
+          ? req.session.data.staff[username].find(s => s.username === staffId)?.nameAndRole
           : null
       const location: Location =
         locationCode && username
-          ? req.session.data.locations[username].find(l => l.id === parseInt(locationCode, 10))
+          ? req?.session?.data?.locations?.[username]?.find(l => l.id === parseInt(locationCode, 10))
           : null
       appointment = {
         ...appointment,
