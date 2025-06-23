@@ -52,7 +52,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      if (eventId) {
+      // console.dir(req.session.data, { depth: null })
+      if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
@@ -78,10 +79,11 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {
-          sentence: sentence || null,
+          sentence: parseInt(eventId, 10) !== 0 ? sentence : null,
           requirement: sentenceRequirement?.description || null,
           licenceCondition: sentenceLicenceCondition?.mainDescription || null,
           nsi: sentenceNsi?.description || null,
+          forename: parseInt(eventId, 10) === 1 ? forename : null,
         },
         attending: {
           name: '',
@@ -99,7 +101,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
     }
     res.locals.appointment = appointment
-    // console.dir(appointment, { depth: null })
+    console.dir(appointment, { depth: null })
     return next()
   }
 }
