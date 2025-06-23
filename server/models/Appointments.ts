@@ -17,6 +17,7 @@ export interface AppointmentSession {
   interval?: string
   numberOfAppointments?: string
   eventId?: string
+  username?: string
   uuid?: string
   requirementId?: string
   licenceConditionId?: string
