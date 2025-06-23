@@ -1,0 +1,44 @@
+{% extends "../_form.njk" %}
+
+{% set title = 'Add a note (optional)' %}
+{% set backLink = appointment.change if appointment.change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
+{% block form %}
+{{ govukTextarea({
+    hint: {
+        text: "Use paragraphs to make your notes easy to read."
+    },
+    id: "notes",
+    name: "notes",
+    formGroup: {
+        attributes: { "data-qa": "notes"}
+    }
+} | decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
+
+{{ govukRadios({
+    fieldset: {
+        legend: {
+            text: 'Does this appointment include sensitive information?',
+            classes: "govuk-fieldset__legend--l",
+            isPageHeading: false
+        }
+    },
+    formGroup: {
+        attributes: {
+            'data-qa': 'visorReport'
+        }
+    },
+    hint: {
+        text: 'This is information that would cause harm or undermine the investigation of a crime if it were disclosed to a person on probation, For example, a victim’s personal details.'
+    },
+    items: [
+        {
+            value: 'Yes',
+            text: "Yes, it includes sensitive information"
+        },
+        {
+            value: 'No',
+            text: "No, it is not sensitive"
+        }
+    ]
+} | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
+{% endblock %}

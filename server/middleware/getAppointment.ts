@@ -41,6 +41,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         repeatingDates,
         repeating,
+        notes,
+        sensitivity,
       } = appointmentSession
       const type: AppointmentType | null = typeId
         ? req.session.data.appointmentTypes.find(t => t.code === typeId)
@@ -92,8 +94,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         repeating,
         repeatingDates,
-        notes: '',
-        sensitivity: 'No',
+        notes: notes || null,
+        sensitivity: sensitivity || 'No',
       }
     }
     res.locals.appointment = appointment

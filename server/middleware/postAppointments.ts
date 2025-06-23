@@ -11,23 +11,26 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const { data } = req.session
     const {
-      user: { username, teamCode, locationCode },
+      user: { locationCode },
+      username,
+      team,
       type,
       date,
       start,
       end,
       interval,
-      numberOfAppointments = 0,
+      numberOfAppointments,
       eventId,
-      requirementId = 0,
-      licenceConditionId = 0,
-      nsiId = 0,
+      requirementId,
+      licenceConditionId,
+      nsiId,
+      notes,
+      sensitvity,
     } = getDataValue(data, ['appointments', crn, uuid])
-
     const body: AppointmentRequestBody = {
       user: {
         username,
-        teamCode,
+        teamCode: team,
         locationCode,
       },
       type,
@@ -41,7 +44,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       requirementId,
       licenceConditionId,
       nsiId,
-      until: '',
+      notes,
+      sensitive: sensitvity === 'Yes',
     }
     await masClient.postAppointments(crn, body)
     return next()

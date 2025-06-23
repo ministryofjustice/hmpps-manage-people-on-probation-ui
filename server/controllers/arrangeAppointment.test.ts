@@ -105,6 +105,9 @@ const res = mockAppResponse({
     dateTo: '',
     keywords: '',
   },
+  flags: {
+    enableRepeatAppointments: true,
+  },
 })
 
 const redirectSpy = jest.spyOn(res, 'redirect')
@@ -388,12 +391,12 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-    it('should redirect to the preview page', async () => {
+    it('should redirect to the notes page', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({})
       await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/preview`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/add-notes`)
     })
     it('should redirect to change url if in request params', async () => {
       const mockReq = createMockRequest({ query: { change } })
@@ -409,7 +412,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postPreview()(mockReq, res)
+      await controllers.arrangeAppointments.postNotes()(mockReq, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -418,7 +421,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postPreview()(mockReq, res)
+      await controllers.arrangeAppointments.postNotes()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
   })

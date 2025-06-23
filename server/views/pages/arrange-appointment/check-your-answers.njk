@@ -126,6 +126,32 @@
                 }
               ]
             }
+          } if repeatingEnabled,
+          {
+            key: { text: "Appointment notes" },
+            value: { text: appointment.notes },
+            actions: {
+              items: [
+                {
+                  href: changePath + "/add-notes?change=" + url,
+                  text: "Change",
+                  visuallyHiddenText: "appointment notes"
+                }
+              ]
+            }
+          },
+          {
+            key: { text: "Sensitivity" },
+            value: { text: 'Yes' if appointment.sensitivity === 'Yes' else 'No' },
+            actions: {
+            items: [
+                {
+                  href: changePath + "/add-notes?change=" + url,
+                  text: "Change",
+                  visuallyHiddenText: "appointment sensitivity"
+                }
+              ]
+            }
           }
         ]
       }) }}
