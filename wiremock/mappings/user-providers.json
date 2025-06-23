@@ -43,11 +43,11 @@
           "users": [
             {
               "username": "peter-parker",
-              "name": "peter parker (PS-PSO)"
+              "nameAndRole": "peter parker (PS-PSO)"
             },
             {
               "username": "jon-smith",
-              "name": "jon smith (PS-PSO)"
+              "nameAndRole": "jon smith (PS-PSO)"
             }
           ]
         },
@@ -104,11 +104,11 @@
           "users": [
             {
               "username": "peter-parker",
-              "name": "peter parker (PS-PSO)"
+              "nameAndRole": "peter parker (PS-PSO)"
             },
             {
               "username": "jon-smith",
-              "name": "jon smith (PS-PSO)"
+              "nameAndRole": "jon smith (PS-PSO)"
             }
           ]
         },
@@ -168,11 +168,11 @@
           "users": [
             {
               "username": "jon-quick",
-              "name": "jon quick (PS-PSO)"
+              "nameAndRole": "jon quick (PS-PSO)"
             },
             {
               "username": "fred-plug",
-              "name": "fred plug (PS-PSO)"
+              "nameAndRole": "fred plug (PS-PSO)"
             }
           ]
         },
@@ -229,11 +229,11 @@
           "users": [
             {
               "username": "max-cool",
-              "name": "max parker (PS-PSO)"
+              "nameAndRole": "max parker (PS-PSO)"
             },
             {
               "username": "tony-pan",
-              "name": "tony pan (PS-PSO)"
+              "nameAndRole": "tony pan (PS-PSO)"
             }
           ]
         },
@@ -290,11 +290,11 @@
           "users": [
             {
               "username": "george-parker",
-              "name": "george parker (PS-PSO)"
+              "nameAndRole": "george parker (PS-PSO)"
             },
             {
               "username": "jack-smith",
-              "name": "jack smith (PS-PSO)"
+              "nameAndRole": "jack smith (PS-PSO)"
             }
           ]
         },

@@ -11,7 +11,6 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
     const region = regionCode || req?.session?.data?.appointments?.[crn]?.[id]?.region
     const team = teamCode || req?.session?.data?.appointments?.[crn]?.[id]?.team
-
     const userProviders = await masClient.getUserProviders(username, region, team)
 
     req.session.data = {
@@ -30,9 +29,9 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       },
     }
 
-    res.locals.userProviders = req.session.data.providers[username]
-    res.locals.userTeams = req.session.data.teams[username]
-    res.locals.userStaff = req.session.data.staff[username]
+    res.locals.userProviders = userProviders.providers
+    res.locals.userTeams = userProviders.teams
+    res.locals.userStaff = userProviders.users
 
     return next()
   }

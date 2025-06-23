@@ -1,4 +1,5 @@
 {% extends "../_form.njk" %}
+
 {% set title = 'Who will attend the appointment?' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
 
@@ -26,38 +27,32 @@
     {% for user in userStaff %}
         {% set userItems = (userItems.push({
             value: user.username,
-            text: user.name
+            text: user.nameAndRole
         }), userItems) %}
     {% endfor %}
 
     <p>You can attend or book for a colleague</p>
 
-        {{ govukSelect({
-            id: "region",
-            name: "region",
-            label: {
-                text: "Select region"
-            },
-            items: providerItems
-        } | decorateFormAttributes(['appointments', crn, id, 'region'])) }}
+    {{ govukSelect({
+        id: "region",
+        name: "region",
+        label: { text: "Select region" },
+        items: providerItems
+    } | decorateFormAttributes(['appointments', crn, id, 'region'])) }}
 
-        {{ govukSelect({
+    {{ govukSelect({
             id: "team",
             name: "team",
-            label: {
-                text: "Select team"
-            },
-            items: teamItems
-        } | decorateFormAttributes(['appointments', crn, id, 'team'])) }}
+        label: { text: "Select team" },
+        items: teamItems
+    } | decorateFormAttributes(['appointments', crn, id, 'team'])) }}
 
-        {{ govukSelect({
-            id: "username",
-            name: "name",
-            label: {
-                text: "Select name"
-            },
-            items: userItems
-        } | decorateFormAttributes(['appointments', crn, id, 'username'])) }}
+    {{ govukSelect({
+        id: "username",
+        name: "username",
+        label: { text: "Select name" },
+        items: userItems
+    } | decorateFormAttributes(['appointments', crn, id, 'username'])) }}
 
     <script nonce="{{ cspNonce }}">
       document.addEventListener("DOMContentLoaded", () => {
