@@ -140,20 +140,20 @@
       value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
       actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } },
        { key: { text: "Appointment notes" },
-    value: { html: '' | safe },
+    value: { html: appointment.notes | nl2br },
     actions: {
     items: [ { 
-    href: changePath + "/notes?change=" + url, 
+    href: changePath + "/add-notes?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "notes"
      } 
      ] 
      } if showAction }, 
       { key: { text: "Sensitivity" },
-    value: { html: '' | safe },
+    value: { text: appointment.sensitivity | safe },
     actions: {
     items: [ { 
-    href: changePath + "/notes?change=" + url, 
+    href: changePath + "/add-notes?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "sensitivity"
      } 
