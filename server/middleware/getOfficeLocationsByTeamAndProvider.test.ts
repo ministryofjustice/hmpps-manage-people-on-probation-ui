@@ -61,7 +61,6 @@ const res = {
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
 mockGetDataValue.mockImplementation((_data, path) => {
-  console.log(path)
   if (path.join('.') === `appointments.${crn}.${id}.region`) {
     return region
   }
