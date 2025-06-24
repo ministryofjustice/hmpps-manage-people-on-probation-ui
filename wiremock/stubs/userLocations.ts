@@ -3,16 +3,8 @@ import superagent, { SuperAgentRequest } from 'superagent'
 const stubNoUserLocationsFound = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPathPattern: '/mas/appointment/location',
+      urlPattern: '/mas/appointment/location/provider/.*/team/.*',
       method: 'GET',
-      queryParameters: {
-        providerCode: {
-          matches: '.*',
-        },
-        teamCode: {
-          matches: '.*',
-        },
-      },
     },
     response: {
       status: 200,

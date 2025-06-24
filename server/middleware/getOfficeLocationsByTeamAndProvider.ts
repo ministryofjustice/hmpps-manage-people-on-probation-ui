@@ -8,7 +8,6 @@ export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthCl
     const { crn, id } = req.params
     const { data } = req.session
     const { username } = res.locals.user
-    // const username = 'marcusaspin'
     const region = getDataValue(data, ['appointments', crn, id, 'region'])
     const team = getDataValue(data, ['appointments', crn, id, 'team'])
     const token = await hmppsAuthClient.getSystemClientToken(username)
