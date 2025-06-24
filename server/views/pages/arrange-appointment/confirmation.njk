@@ -1,7 +1,7 @@
 {% extends "../_form.njk" %}
 {% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
-{% set buttonText = 'Finish' %}
+{% set buttonText = 'Arrange next appointment' %}
 {% set notStandardForm = true %}
 {% set appointmentDates = [appointment.date] %}
 {% for appointmentDate in appointment.repeatingDates %}
@@ -45,6 +45,10 @@
       <p class="govuk-body">
         {{case.name.forename}}’s phone number is
         {{ case.telephoneNumber }}.</p>
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">Arrange another appointment</h2>
+      <p class="govuk-body">
+        Use the saved details of this appointment to create a new one. You can amend any of the details.</p>
+
     </div>
   </div>
   <form method="post" autocomplete="off" action="{{ paths.current }}">
@@ -56,4 +60,7 @@
     }) }}
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
   </form>
+  <p>
+    <a href="/case/{{ crn }}/appointments" data-qa="finishLink">Finish a return to Appointments</a>
+  </p>
 {% endblock %}

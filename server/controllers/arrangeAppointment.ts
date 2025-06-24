@@ -300,7 +300,10 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     }
   },
   getConfirmation: () => {
-    return async (_req, res) => res.render(`pages/arrange-appointment/confirmation`)
+    return async (req, res) => {
+      const { crn } = req.params
+      return res.render(`pages/arrange-appointment/confirmation`, { crn })
+    }
   },
   postConfirmation: () => {
     return async (_req, res) => res.redirect('/')
