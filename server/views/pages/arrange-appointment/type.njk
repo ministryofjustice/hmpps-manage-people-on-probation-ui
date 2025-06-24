@@ -4,7 +4,10 @@
   '/' %}
 {% set types = [] %}
 {% for appointmentType in appointmentTypes %}
-  {% set types = (types.push({text: appointmentType.description, value: appointmentType.code}), types) %}
+  {% set types = (types.push({
+    text: appointmentType.description | convertToTitleCase(['(NS)']),
+    value: appointmentType.code
+  }), types) %}
 {% endfor %}
 {% block heading %}{% endblock %}
 {% block form %}
