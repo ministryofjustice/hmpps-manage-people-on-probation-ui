@@ -6,33 +6,31 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
   return async (req, res, next) => {
     const { username } = res.locals.user
     const { crn, id } = req.params
-    const regionCode = req.query.regionCode as string
-    const teamCode = req.query.teamCode as string
+    const { providerCode, teamCode } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
-
-    const region = regionCode || req?.session?.data?.appointments?.[crn]?.[id]?.region
-    const userProviders = await masClient.getUserProviders(username, region, teamCode)
+    const region = providerCode || req?.session?.data?.appointments?.[crn]?.[id]?.user?.providerCode
+    const { providers, teams, users } = await masClient.getUserProviders(username, region, teamCode)
 
     req.session.data = {
       ...(req?.session?.data ?? {}),
       providers: {
         ...(req?.session?.data?.providers ?? {}),
-        [username]: userProviders.providers,
+        [username]: providers,
       },
       teams: {
         ...(req?.session?.data?.teams ?? {}),
-        [username]: userProviders.teams,
+        [username]: teams,
       },
       staff: {
         ...(req?.session?.data?.staff ?? {}),
-        [username]: userProviders.users,
+        [username]: users,
       },
     }
 
-    res.locals.userProviders = userProviders.providers
-    res.locals.userTeams = userProviders.teams
-    res.locals.userStaff = userProviders.users
+    res.locals.userProviders = providers
+    res.locals.userTeams = teams
+    res.locals.userStaff = users
 
     return next()
   }

@@ -104,28 +104,21 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (errors) {
         delete req.session.data.errors
       }
-
       return res.render(`pages/arrange-appointment/attendance`, { crn, id, errors, change })
     }
   },
   postWhoWillAttend: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const change = req?.query?.change as string
-      const page = req.query.page as string
-      const regionCode = req.query.regionCode as string
-      const teamCode = req.query.teamCode as string
-      const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
-      const queryParameters = regionCode ? `?regionCode=${regionCode}${teamQueryParam}` : ''
-
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
+      const { change, page, providerCode, teamCode } = req.query as Record<string, string>
+      const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
+      const queryParameters = providerCode ? `?providerCode=${providerCode}${teamQueryParam}` : ''
       if (page) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`)
       }
-
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
     }

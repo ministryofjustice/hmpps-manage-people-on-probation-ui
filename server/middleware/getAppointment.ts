@@ -15,6 +15,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const masClient = new MasApiClient(token)
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
+    const { username } = res.locals.user
     const { data } = req.session
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.username && res?.locals?.user?.username) {
@@ -34,19 +35,16 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     >
     if (appointmentSession) {
       const {
-        user: { username, locationCode },
+        user: { username: staffId, locationCode, providerCode, teamCode },
         type: typeId,
         visorReport,
         eventId,
         requirementId,
         licenceConditionId,
         nsiId,
-        region,
-        team,
         date,
         start,
         end,
-        username: staffId,
         repeatingDates,
         repeating,
         notes,
@@ -79,12 +77,12 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         }
       }
       const selectedRegion =
-        region && req?.session?.data?.providers?.[username]
-          ? req.session.data.providers[username].find(r => r.code === region)?.name
+        providerCode && req?.session?.data?.providers?.[username]
+          ? req.session.data.providers[username].find(r => r.code === providerCode)?.name
           : null
       const selectedTeam =
-        region && req?.session?.data.teams?.[username]
-          ? req.session.data.teams[username].find(t => t.code === team)?.description
+        teamCode && req?.session?.data.teams?.[username]
+          ? req.session.data.teams[username].find(t => t.code === teamCode)?.description
           : null
       const selectedUser =
         staffId && req?.session?.data?.staff?.[username]

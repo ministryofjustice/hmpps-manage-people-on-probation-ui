@@ -74,9 +74,31 @@ const setNoFixedAddressConditional = () => {
   }
 }
 
+const attendanceSelectors = () => {
+  const providerSelect = document.querySelector('[data-qa="providerCode"]')
+  const teamSelect = document.querySelector('[data-qa="teamCode"]')
+  let providerCode = ''
+  if (providerSelect) {
+    providerCode = providerSelect.value
+    providerSelect.addEventListener('change', event => {
+      const { form, value } = event.target
+      form.action = `attendance?page=self&providerCode=${value}`
+      form.submit()
+    })
+  }
+  if (teamSelect) {
+    teamSelect.addEventListener('change', event => {
+      const { form, value } = event.target
+      form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${value}`
+      form.submit()
+    })
+  }
+}
+
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
+attendanceSelectors()
 
 const search = document.getElementById('homepage-search-suggestions')
 
