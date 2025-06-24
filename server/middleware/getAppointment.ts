@@ -16,11 +16,16 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
+    let userIsAttending = null
+    if (req?.session?.data?.appointments?.[crn]?.[id]?.username && res?.locals?.user?.username) {
+      userIsAttending = req.session.data.appointments[crn][id].username === res.locals.user.username
+    }
     let appointment: AppointmentLocals = {
       meta: {
         isVisor: currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
         forename,
         change: (req?.query?.change as string) || null,
+        userIsAttending,
       },
     }
     const appointmentSession: AppointmentSession = getDataValue(data, ['appointments', crn, id]) as Record<
@@ -29,16 +34,19 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     >
     if (appointmentSession) {
       const {
-        user: { username, locationCode, teamCode },
+        user: { username, locationCode },
         type: typeId,
         visorReport,
         eventId,
         requirementId,
         licenceConditionId,
         nsiId,
+        region,
+        team,
         date,
         start,
         end,
+        username: staffId,
         repeatingDates,
         repeating,
         notes,
@@ -52,7 +60,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      if (eventId) {
+      // console.dir(req.session.data, { depth: null })
+      if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
@@ -69,24 +78,37 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           sentenceNsi = sentenceObj.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
+      const selectedRegion =
+        region && req?.session?.data?.providers?.[username]
+          ? req.session.data.providers[username].find(r => r.code === region)?.name
+          : null
+      const selectedTeam =
+        region && req?.session?.data.teams?.[username]
+          ? req.session.data.teams[username].find(t => t.code === team)?.description
+          : null
+      const selectedUser =
+        staffId && req?.session?.data?.staff?.[username]
+          ? req.session.data.staff[username].find(s => s.username === staffId)?.nameAndRole
+          : null
       const location: Location =
         locationCode && username
-          ? req.session.data.locations[username].find(l => l.id === parseInt(locationCode, 10))
+          ? req?.session?.data?.locations?.[username]?.find(l => l.id === parseInt(locationCode, 10))
           : null
       appointment = {
         ...appointment,
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {
-          sentence: sentence || null,
+          sentence: parseInt(eventId, 10) !== 0 ? sentence : null,
           requirement: sentenceRequirement?.description || null,
           licenceCondition: sentenceLicenceCondition?.mainDescription || null,
           nsi: sentenceNsi?.description || null,
+          forename: parseInt(eventId, 10) === 1 ? forename : null,
         },
         attending: {
-          name: '',
-          team: '',
-          region: '',
+          name: selectedUser,
+          team: selectedTeam,
+          region: selectedRegion,
         },
         location,
         date,
@@ -94,7 +116,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         repeating,
         repeatingDates,
-        notes: notes || null,
+        notes: notes || 'None',
         sensitivity: sensitivity || 'No',
       }
     }

@@ -5,19 +5,16 @@ import { getDataValue } from '../utils'
 
 export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
-    const regionCode = req.query.regionCode as string
     const { crn, id } = req.params
     const { data } = req.session
     const { username } = res.locals.user
-    // const providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
-    // const teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
-    const providerCode = 'N56'
-    const teamCode = 'N56N02'
     // const username = 'marcusaspin'
+    const region = getDataValue(data, ['appointments', crn, id, 'region'])
+    const team = getDataValue(data, ['appointments', crn, id, 'team'])
     const token = await hmppsAuthClient.getSystemClientToken(username)
     if (!req?.session?.data?.locations?.[username]) {
       const masClient = new MasApiClient(token)
-      const userLocations = await masClient.getOfficeLocationsByTeamAndProvider(providerCode, teamCode)
+      const userLocations = await masClient.getOfficeLocationsByTeamAndProvider(region, team)
       req.session.data = {
         ...(req?.session?.data ?? {}),
         locations: {
@@ -26,8 +23,6 @@ export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthCl
         },
       }
     }
-    res.locals.regionCode = regionCode
-    res.locals.teamCode = teamCode
     res.locals.userLocations = req.session.data.locations[username]
     return next()
   }

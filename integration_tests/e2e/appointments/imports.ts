@@ -18,25 +18,27 @@ export const endTime = '9:30am'
 export const dateRegex: RegExp =
   /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/
 
-export const completeTypePage = (index = 1, query = '') => {
+export const completeTypePage = (index = 1, query = '', hasVisor = false) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`)
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
-  // cy.get('[data-qa="visorReport"] .govuk-radios__item:nth-child(1) input').then($el => {
-  //   if ($el.length) {
-  //     $el.click()
-  //     // Element exists
-  //     // Do something with $el
-  //   }
-  // })
-
+  if (hasVisor) {
+    typePage.getRadio('visorReport', index).click()
+    cy.pause()
+  }
   typePage.getSubmitBtn().click()
 }
 
-export const completeSentencePage = () => {
+export const completeSentencePage = (eventIndex = 1) => {
   const sentencePage = new AppointmentSentencePage()
-  sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
-  sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
+  const suffix = eventIndex !== 1 ? `-${eventIndex}` : ''
+  sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId${suffix}`).click()
+  if (eventIndex === 1) {
+    sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
+  }
+  if (eventIndex === 2) {
+    sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
+  }
   sentencePage.getSubmitBtn().click()
 }
 

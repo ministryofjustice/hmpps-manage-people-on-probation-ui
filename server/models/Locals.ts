@@ -15,6 +15,7 @@ export interface AppointmentLocals {
     isVisor: boolean
     forename: string
     change: string
+    userIsAttending: boolean
   }
   type?: AppointmentType
   visorReport?: string
@@ -23,6 +24,7 @@ export interface AppointmentLocals {
     requirement: string
     licenceCondition: string
     nsi: string
+    forename: string
   }
   attending?: {
     name: string
