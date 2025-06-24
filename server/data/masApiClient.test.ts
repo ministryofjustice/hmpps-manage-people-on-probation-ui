@@ -254,7 +254,7 @@ describe('masApiClient', () => {
       ['getUserTeams', '/caseload/user/USER/teams', () => masApiClient.getUserTeams('USER')],
       [
         'getOfficeLocationsByTeamAndProvider',
-        '/appointment/location?providerCode=N56&teamCode=N56N02',
+        '/appointment/location/provider/N56/team/N56N02',
         () => masApiClient.getOfficeLocationsByTeamAndProvider('N56', 'N56N02'),
       ],
       [
