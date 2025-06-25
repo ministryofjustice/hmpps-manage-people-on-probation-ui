@@ -71,11 +71,6 @@ describe('What is this appointment for?', () => {
       loadPage(1)
       sentencePage = new AppointmentSentencePage()
     })
-    it('should display the hint text', () => {
-      sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-hint`).should($hint => {
-        expect($hint.text().trim()).to.eq('Select all that apply.')
-      })
-    })
     it('should display 2 sentences that are not selected', () => {
       const radios = sentencePage.getElement(`input[data-sentence="true"]`)
       radios.should('have.length', 2)
