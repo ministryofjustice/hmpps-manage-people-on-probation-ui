@@ -4,6 +4,7 @@ import { Controller, Route } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError } from '../middleware'
+import { AppointmentSession } from '../models/Appointments'
 
 const routes = [
   'redirectToType',
@@ -309,8 +310,14 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const uuid = uuidv4()
       // dupe the current appt
       const { data } = req.session
-      const currentAppt = getDataValue(data, ['appointments', crn, id])
-      setDataValue(data, ['appointments', crn, uuid], currentAppt)
+      const currentAppt = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+      const copiedAppt = {
+        ...currentAppt,
+        date: '',
+        start: '',
+        end: '',
+      }
+      setDataValue(data, ['appointments', crn, uuid], copiedAppt)
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
     }
   },
