@@ -26,6 +26,8 @@ const routes = [
   'postCheckYourAnswers',
   'getConfirmation',
   'postConfirmation',
+  'getArrangeAnotherAppointment',
+  'postArrangeAnotherAppointment',
 ] as const
 
 const renderLocationNotInList: Route<void> = (req, res, next): void => {
@@ -299,7 +301,32 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     }
   },
   postConfirmation: () => {
-    return async (_req, res) => res.redirect('/')
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const uuid = uuidv4()
+      // dupe the current appt
+      const { data } = req.session
+      const currentAppt = getDataValue(data, ['appointments', crn, id])
+      setDataValue(data, ['appointments', crn, uuid], currentAppt)
+      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
+    }
+  },
+  getArrangeAnotherAppointment: () => {
+    return async (_req, res) => {
+      return res.render(`pages/arrange-appointment/arrange-another-appointment`, {})
+    }
+  },
+  postArrangeAnotherAppointment: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+    }
   },
 }
 
