@@ -11,14 +11,15 @@ import { Location } from '../data/model/caseload'
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn, id } = req.params
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+    const { username: loggedInUsername = '' } = res.locals.user
+    const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
     const masClient = new MasApiClient(token)
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
     let userIsAttending = null
-    if (req?.session?.data?.appointments?.[crn]?.[id]?.username && res?.locals?.user?.username) {
-      userIsAttending = req.session.data.appointments[crn][id].username === res.locals.user.username
+    if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
+      userIsAttending = req.session.data.appointments[crn][id].user.username === loggedInUsername
     }
     let appointment: AppointmentLocals = {
       meta: {
@@ -34,19 +35,16 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     >
     if (appointmentSession) {
       const {
-        user: { username, locationCode },
+        user: { username: staffId = null, locationCode = null, providerCode = null, teamCode = null } = {},
         type: typeId,
         visorReport,
         eventId,
         requirementId,
         licenceConditionId,
         nsiId,
-        region,
-        team,
         date,
         start,
         end,
-        username: staffId,
         repeatingDates,
         repeating,
         notes,
@@ -60,7 +58,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      // console.dir(req.session.data, { depth: null })
+
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
@@ -79,20 +77,20 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         }
       }
       const selectedRegion =
-        region && req?.session?.data?.providers?.[username]
-          ? req.session.data.providers[username].find(r => r.code === region)?.name
+        providerCode && req?.session?.data?.providers?.[loggedInUsername]
+          ? req.session.data.providers[loggedInUsername].find(r => r.code === providerCode)?.name
           : null
       const selectedTeam =
-        region && req?.session?.data.teams?.[username]
-          ? req.session.data.teams[username].find(t => t.code === team)?.description
+        teamCode && req?.session?.data.teams?.[loggedInUsername]
+          ? req.session.data.teams[loggedInUsername].find(t => t.code === teamCode)?.description
           : null
       const selectedUser =
-        staffId && req?.session?.data?.staff?.[username]
-          ? req.session.data.staff[username].find(s => s.username === staffId)?.nameAndRole
+        staffId && req?.session?.data?.staff?.[loggedInUsername]
+          ? req.session.data.staff[loggedInUsername].find(s => s.username === staffId)?.nameAndRole
           : null
       const location: Location =
-        locationCode && username
-          ? req?.session?.data?.locations?.[username]?.find(l => l.id === parseInt(locationCode, 10))
+        locationCode && loggedInUsername
+          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.id === parseInt(locationCode, 10))
           : null
       appointment = {
         ...appointment,
@@ -121,7 +119,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
     }
     res.locals.appointment = appointment
-    // console.dir(appointment, { depth: null })
     return next()
   }
 }

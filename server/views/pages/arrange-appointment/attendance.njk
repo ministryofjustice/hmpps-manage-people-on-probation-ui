@@ -7,69 +7,43 @@
     <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
     {% set providerItems = [] %}
     {% for provider in userProviders %}
-        {% set providerItems = (providerItems.push({
-            value: provider.code,
-            text: provider.name,
-            selected: provider.selected
-        }), providerItems) %}
+        {% set providerItems = (providerItems.push({value: provider.code, text: provider.name, selected: provider.selected}), providerItems) %}
     {% endfor %}
 
     {% set teamItems = [] %}
     {% for team in userTeams %}
-        {% set teamItems = (teamItems.push({
-            value: team.code,
-            text: team.description,
-            selected: team.selected
-        }), teamItems) %}
+        {% set teamItems = (teamItems.push({value: team.code, text: team.description, selected: team.selected}), teamItems) %}
     {% endfor %}
 
     {% set userItems = [] %}
     {% for user in userStaff %}
-        {% set userItems = (userItems.push({
-            value: user.username,
-            text: user.nameAndRole
-        }), userItems) %}
+        {% set userItems = (userItems.push({value: user.username, text: user.nameAndRole}), userItems) %}
     {% endfor %}
 
     <p>You can attend or book for a colleague</p>
 
     {{ govukSelect({
-        id: "region",
-        name: "region",
         label: { text: "Select region" },
-        items: providerItems
-    } | decorateFormAttributes(['appointments', crn, id, 'region'])) }}
+        items: providerItems,
+        attributes: {
+            'data-qa': 'providerCode'
+        }
+    } | decorateFormAttributes(['appointments', crn, id, 'user', 'providerCode'])) }}
 
     {{ govukSelect({
-            id: "team",
-            name: "team",
         label: { text: "Select team" },
-        items: teamItems
-    } | decorateFormAttributes(['appointments', crn, id, 'team'])) }}
+        items: teamItems,
+         attributes: {
+            'data-qa': 'teamCode'
+        }
+    } | decorateFormAttributes(['appointments', crn, id, 'user', 'teamCode'])) }}
 
     {{ govukSelect({
-        id: "username",
-        name: "username",
         label: { text: "Select name" },
-        items: userItems
-    } | decorateFormAttributes(['appointments', crn, id, 'username'])) }}
+        items: userItems,
+         attributes: {
+            'data-qa': 'username'
+        }
+    } | decorateFormAttributes(['appointments', crn, id, 'user', 'username'])) }}
 
-    <script nonce="{{ cspNonce }}">
-      document.addEventListener("DOMContentLoaded", () => {
-        const regionSelect = document.getElementById("region")
-        const teamSelect = document.getElementById("team")
-        const form = document.forms[0];
-
-        regionSelect.addEventListener("change", (event) => {
-          form.action = "attendance?page=self&regionCode=" + event.target.value
-          form.submit()
-        })
-
-        teamSelect.addEventListener("change", (event) => {
-          const regionCode = regionSelect.value
-          form.action = "attendance?page=self&regionCode=" + regionCode + "&teamCode=" + event.target.value
-          form.submit()
-        })
-      })
-    </script>
 {% endblock %}

@@ -302,6 +302,7 @@ describe('controllers/arrangeAppointment', () => {
           username: 'user-1',
           locationCode: `The location I’m looking for is not in this list`,
           teamCode: '',
+          providerCode: '',
         },
       }
       const mockReq = createMockRequest({ appointmentSession })
@@ -315,6 +316,7 @@ describe('controllers/arrangeAppointment', () => {
         user: {
           username: 'user-1',
           locationCode: `location`,
+          providerCode: '',
           teamCode: '',
         },
       }

@@ -56,8 +56,6 @@
       <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
     </div>
   </div>
-  {{appointment.user.username}}
-  {{appointment.username}}
   <form method="post" autocomplete="off" action="{{ paths.current }}">
     {% set showAction = true %}
     {% set appointmentDates = [appointment.date] %}

@@ -2,12 +2,11 @@ import { Name } from '../data/model/personalDetails'
 import { Errors } from './Errors'
 
 export interface AppointmentSession {
-  region?: string
-  team?: string
   user?: {
-    username: string
-    teamCode: string
-    locationCode: string
+    providerCode?: string
+    teamCode?: string
+    username?: string
+    locationCode?: string
   }
   type?: string
   visorReport?: 'Yes' | 'No'

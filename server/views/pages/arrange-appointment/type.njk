@@ -39,7 +39,6 @@
     },
     items: types
  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
-  <input type="hidden" name="[appointments][{{crn}}][{{id}}][user][username]" id="username" value="{{user.username}}">
   <p class="govuk-!-margin-bottom-7">
     <a href="{{ deliusDeepLinkUrl('ContactList', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" data-qa="ndeliusAppointmentsLink">Create all other appointments on NDelius (opens in new tab)</a>.</p>
   {% if appointment.meta.isVisor %}
