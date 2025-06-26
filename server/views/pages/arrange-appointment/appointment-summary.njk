@@ -27,22 +27,26 @@
 {% endif %}
 {% endset %}
 {% set locationAddress %}
-{{appointment.location.description}}<br>
-{% if appointment.location.address.buildingNumber %}{{location.address.buildingNumber}}
-{% endif %}
-{% if appointment.location.address.streetName %}{{appointment.location.address.streetName}}<br>
-{% endif %}
-{% if appointment.location.address.district %}
-    {{appointment.location.address.district}}<br>
-{% endif %}
-{% if appointment.location.address.town %}
-    {{appointment.location.address.town}}<br>
-{% endif %}
-{% if appointment.location.address.county %}
-    {{appointment.location.address.county}}<br>
-{% endif %}
-{% if appointment.location.address.postcode %}
-    {{ appointment.location.address.postcode }}
+{% if appointment.meta.hasLocation %}
+    {{appointment.location.description}}<br>
+    {% if appointment.location.address.buildingNumber %}{{location.address.buildingNumber}}
+    {% endif %}
+    {% if appointment.location.address.streetName %}{{appointment.location.address.streetName}}<br>
+    {% endif %}
+    {% if appointment.location.address.district %}
+        {{appointment.location.address.district}}<br>
+    {% endif %}
+    {% if appointment.location.address.town %}
+        {{appointment.location.address.town}}<br>
+    {% endif %}
+    {% if appointment.location.address.county %}
+        {{appointment.location.address.county}}<br>
+    {% endif %}
+    {% if appointment.location.address.postcode %}
+        {{ appointment.location.address.postcode }}
+    {% endif %}
+{% else %}
+    {{appointment.location}}
 {% endif %}
 {% endset %}
 <form method="post" autocomplete="off" action="{{ paths.current }}">
@@ -128,7 +132,7 @@
       visuallyHiddenText: "date and time of the appointment" } ] } },
          { key: { text: "Repeating appointment" },
       value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
-      actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } },
+      actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
        { key: { text: "Appointment notes" },
     value: { html: "Not entered" if anotherAppointment and not appointment.notes else appointment.notes | nl2br },
     actions: {

@@ -174,10 +174,24 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   getDateTime: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { change } = req.query
+      const { change, validation } = req.query
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
+          [`appointments-${crn}-${id}-start`]: 'Select a start time',
+          [`appointments-${crn}-${id}-end`]: 'Select an end time',
+        }
+      }
       const today = new Date()
       const minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
-      return res.render(`pages/arrange-appointment/date-time`, { crn, id, minDate, change })
+      return res.render(`pages/arrange-appointment/date-time`, {
+        crn,
+        id,
+        minDate,
+        change,
+        showValidation,
+      })
     }
   },
   postDateTime: () => {
@@ -188,7 +202,9 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         return renderError(404)(req, res)
       }
       const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
-      resetRepeatingAppointment(req, res)
+      if (res.locals.flags.enableRepeatAppointments === true && !change) {
+        resetRepeatingAppointment(req, res)
+      }
       const nextPage = repeatAppointmentsEnabled
         ? `/case/${crn}/arrange-appointment/${id}/repeating`
         : `/case/${crn}/arrange-appointment/${id}/add-notes`
@@ -343,9 +359,14 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postArrangeAnotherAppointment: () => {
     return async (req, res) => {
+      const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+      const date = getDataValue(data, ['appointments', crn, id, 'date'])
+      if (!date) {
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/date-time?validation=true&change=${req.url}`)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }

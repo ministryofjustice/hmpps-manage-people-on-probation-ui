@@ -25,13 +25,14 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       until: repeatUntilDate = '',
       notes,
       sensitivity,
+      visorReport,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const until = repeatUntilDate || date
     const body: AppointmentRequestBody = {
       user: {
         username,
         teamCode,
-        locationCode,
+        locationCode: locationCode !== 'I do not need to pick a location' ? locationCode : '',
       },
       type,
       start: dateTime(date, start),
@@ -47,8 +48,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       until: dateTime(until, end),
       notes,
       sensitive: sensitivity === 'Yes',
+      visorReport: visorReport === 'Yes',
     }
-    // console.dir(body, { depth: null })
     await masClient.postAppointments(crn, body)
     return next()
   }

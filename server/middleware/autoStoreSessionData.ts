@@ -51,7 +51,6 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
       }
     })
     req.session.data = newSessionData
-    // console.dir(newSessionData.appointments, { depth: null })
     return next()
   }
 }

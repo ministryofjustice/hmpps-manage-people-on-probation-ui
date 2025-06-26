@@ -151,6 +151,7 @@ describe('/middleware/postAppointments', () => {
     until: dateTime(date, endTime),
     notes: 'Some notes',
     sensitive: false,
+    visorReport: false,
   }
   let spy: jest.SpyInstance
   beforeEach(async () => {
@@ -198,6 +199,7 @@ describe('/middleware/postAppointments', () => {
     until: dateTime(date, endTime),
     notes: 'Some notes',
     sensitive: false,
+    visorReport: false,
   }
   let spy: jest.SpyInstance
   beforeEach(async () => {

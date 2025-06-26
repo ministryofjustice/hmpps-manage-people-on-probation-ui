@@ -80,6 +80,7 @@ export interface AppointmentRequestBody {
   until?: Date
   notes?: string
   sensitive?: boolean
+  visorReport?: boolean
 }
 
 export interface CheckAppointment {

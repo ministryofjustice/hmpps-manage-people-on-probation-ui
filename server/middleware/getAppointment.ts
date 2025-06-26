@@ -88,12 +88,17 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         staffId && req?.session?.data?.staff?.[loggedInUsername]
           ? req.session.data.staff[loggedInUsername].find(s => s.username === staffId)?.nameAndRole
           : null
-      const location: Location =
-        locationCode && loggedInUsername
+      const noLocationValue = 'I do not need to pick a location'
+      const location: Location | string =
+        locationCode && locationCode !== noLocationValue && loggedInUsername
           ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.id === parseInt(locationCode, 10))
-          : null
+          : 'Not needed'
       appointment = {
         ...appointment,
+        meta: {
+          ...appointment.meta,
+          hasLocation: locationCode !== noLocationValue,
+        },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {

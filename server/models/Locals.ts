@@ -16,6 +16,7 @@ export interface AppointmentLocals {
     forename: string
     change: string
     userIsAttending: boolean
+    hasLocation?: boolean
   }
   type?: AppointmentType
   visorReport?: string
@@ -31,7 +32,7 @@ export interface AppointmentLocals {
     team: string
     region: string
   }
-  location?: Location
+  location?: Location | string
   start?: string
   end?: string
   date?: string
