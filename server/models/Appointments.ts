@@ -13,8 +13,10 @@ export interface AppointmentSession {
   date?: string
   start?: string
   end?: string
-  interval?: string
+  until?: string
+  interval?: AppointmentInterval
   numberOfAppointments?: string
+  numberOfRepeatAppointments?: string
   eventId?: string
   username?: string
   uuid?: string
@@ -75,7 +77,7 @@ export interface AppointmentRequestBody {
   requirementId: number
   licenceConditionId: number
   nsiId: number
-  until?: string
+  until?: Date
   notes?: string
   sensitive?: boolean
 }

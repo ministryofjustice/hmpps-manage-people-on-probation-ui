@@ -12,13 +12,13 @@ const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-interval]')
   if (repeatingFrequency) {
     const repeatingFrequencyRadios = repeatingFrequency.querySelectorAll('input[type="radio"]')
-    const repeatingCount = document.querySelector('div[data-numberOfAppointments] input')
+    const repeatingCount = document.querySelector('div[data-numberOfRepeatAppointments] input')
     const lastAppointmentElm = document.querySelector('div[data-last-appointment')
     const lastAppointmentHandler = async () => {
       const repeatingFrequencyRadioSelected = repeatingFrequency.querySelector('input:checked')
       if (parseInt(repeatingCount.value, 10) > 0 && repeatingFrequencyRadioSelected) {
         const divider = location.href.includes('?') ? '&' : '?'
-        const url = `${location.href}${divider}interval=${encodeURI(repeatingFrequencyRadioSelected.value)}&numberOfAppointments=${repeatingCount.value}`
+        const url = `${location.href}${divider}interval=${encodeURI(repeatingFrequencyRadioSelected.value)}&numberOfRepeatAppointments=${repeatingCount.value}`
         const headers = {
           Accept: '*/*',
           'Content-Type': 'application/x-www-form-urlencoded',

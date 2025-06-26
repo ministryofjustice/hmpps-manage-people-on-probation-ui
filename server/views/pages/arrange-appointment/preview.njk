@@ -26,8 +26,8 @@
   </section>
   {% if appointment.repeatingDates.length %}
     <section data-qa="repeat-appointments">
-      <h2 class="govuk-heading-m">{{ appointment.numberOfAppointments }}
-        repeat appointment{% if appointment.numberOfAppointments !== '1' %}s{% endif %}
+      <h2 class="govuk-heading-m">{{ appointment.numberOfRepeatAppointments }}
+        repeat appointment{% if appointment.numberOfRepeatAppointments !== '1' %}s{% endif %}
       </h2>
       <table class="govuk-table">
         <thead class="govuk-table__head">

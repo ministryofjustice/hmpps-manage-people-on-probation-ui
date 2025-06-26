@@ -77,7 +77,7 @@ export const completeRepeatingPage = (repeat = 2) => {
   if (repeat) {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).clear().type(repeat.toString())
+    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).clear().type(repeat.toString())
   } else {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
     cy.debug()

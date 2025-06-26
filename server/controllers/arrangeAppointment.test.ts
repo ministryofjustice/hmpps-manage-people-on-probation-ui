@@ -371,18 +371,16 @@ describe('controllers/arrangeAppointment', () => {
         repeating: 'No',
       }
       const mockReq = createMockRequest({ appointmentSession })
+      const expected: AppointmentSession = {
+        ...appointmentSession,
+        repeating: 'No',
+        interval: 'DAY',
+        numberOfAppointments: '1',
+        repeatingDates: [],
+        numberOfRepeatAppointments: '0',
+      }
       await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'numberOfAppointments'],
-        '',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'interval'], '')
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'repeatingDates'],
-        [],
-      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid], expected)
     })
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)

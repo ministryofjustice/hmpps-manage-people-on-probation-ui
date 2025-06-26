@@ -31,9 +31,22 @@ const routes = [
   'postArrangeAnotherAppointment',
 ] as const
 
-const renderLocationNotInList: Route<void> = (req, res, next): void => {
+const renderLocationNotInList: Route<void> = (req, res): void => {
   const { crn, id } = req.params as Record<string, string>
   return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id })
+}
+
+const resetRepeatingAppointment: Route<void> = (req, _res): void => {
+  const { crn, id } = req.params as Record<string, string>
+  const updatedAppointment: AppointmentSession = {
+    ...(req?.session?.data?.appointments?.[crn]?.[id] || {}),
+    repeating: 'No',
+    numberOfRepeatAppointments: '0',
+    numberOfAppointments: '1',
+    interval: 'DAY',
+    repeatingDates: [] as string[],
+  }
+  setDataValue(req.session.data, ['appointments', crn, id], updatedAppointment)
 }
 
 const arrangeAppointmentController: Controller<typeof routes> = {
@@ -174,19 +187,11 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
-      if (!repeatAppointmentsEnabled) {
-        setDataValue(req.session.data, ['appointments', crn, id, 'repeating'], 'No')
-        setDataValue(req.session.data, ['appointments', crn, id, 'repeating-count'], '')
-        setDataValue(req.session.data, ['appointments', crn, id, 'repeating-frequency'], '')
-        setDataValue(req.session.data, ['appointments', crn, id, 'repeating-dates'], [])
-        setDataValue(req.session.data, ['appointments', crn, id, 'interval'], undefined)
-        setDataValue(req.session.data, ['appointments', crn, id, 'numberOfAppointments'], 1)
-      }
-      const nextPage =
-        repeatAppointmentsEnabled === true
-          ? `/case/${crn}/arrange-appointment/${id}/repeating`
-          : `/case/${crn}/arrange-appointment/${id}/add-notes`
+      const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
+      resetRepeatingAppointment(req, res)
+      const nextPage = repeatAppointmentsEnabled
+        ? `/case/${crn}/arrange-appointment/${id}/repeating`
+        : `/case/${crn}/arrange-appointment/${id}/add-notes`
       const redirect = change || nextPage
       return res.redirect(redirect)
     }
@@ -198,18 +203,18 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       }
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
-      const { interval, numberOfAppointments } = req.query
-      if (interval || numberOfAppointments) {
+      const { interval, numberOfRepeatAppointments } = req.query
+      if (interval || numberOfRepeatAppointments) {
         setDataValue(data, ['appointments', crn, id, 'repeating'], 'Yes')
         if (interval) {
           setDataValue(data, ['appointments', crn, id, 'interval'], decodeURI(interval as string))
         }
-        if (numberOfAppointments) {
-          setDataValue(data, ['appointments', crn, id, 'numberOfAppointments'], numberOfAppointments)
+        if (numberOfRepeatAppointments) {
+          setDataValue(data, ['appointments', crn, id, 'numberOfRepeatAppointments'], numberOfRepeatAppointments)
         }
       }
       const appointment = getDataValue(data, ['appointments', crn, id])
-      if (appointment?.date && appointment?.interval && appointment?.numberOfAppointments) {
+      if (appointment?.date && appointment?.interval && appointment?.numberOfRepeatAppointments) {
         const clonedAppointment = { ...appointment }
         const period = ['WEEK', 'FORTNIGHT'].includes(appointment.interval) ? 'week' : 'month'
         const increment = appointment.interval === 'FORTNIGHT' ? 2 : 1
@@ -228,20 +233,28 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   },
   postRepeating: () => {
     return async (req, res) => {
-      if (res.locals.flags.enableRepeatAppointments !== true) {
+      if (res?.locals?.flags?.enableRepeatAppointments !== true) {
         return renderError(404)(req, res)
       }
       const { crn, id } = req.params as Record<string, string>
-      const change = req?.query?.change as string
-      const { data } = req.session
-      const repeating = getDataValue(data, ['appointments', crn, id, 'repeating'])
-      if (repeating === 'No') {
-        setDataValue(data, ['appointments', crn, id, 'numberOfAppointments'], '')
-        setDataValue(data, ['appointments', crn, id, 'interval'], '')
-        setDataValue(data, ['appointments', crn, id, 'repeatingDates'], [])
-      }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+      const change = req?.query?.change as string
+      const { data } = req.session
+      const { repeating, numberOfRepeatAppointments } = getDataValue<AppointmentSession>(data, [
+        'appointments',
+        crn,
+        id,
+      ])
+      if (repeating === 'No') {
+        resetRepeatingAppointment(req, res)
+      } else {
+        setDataValue(
+          data,
+          ['appointments', crn, id, 'numberOfAppointments'],
+          parseInt(numberOfRepeatAppointments, 10) + 1,
+        )
       }
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/add-notes`
       return res.redirect(redirect)
@@ -308,7 +321,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         return renderError(404)(req, res)
       }
       const uuid = uuidv4()
-      // dupe the current appt
       const { data } = req.session
       const currentAppt = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
       const copiedAppt = {
@@ -316,14 +328,17 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         date: '',
         start: '',
         end: '',
+        repeatingDates: [] as string[],
       }
       setDataValue(data, ['appointments', crn, uuid], copiedAppt)
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
     }
   },
   getArrangeAnotherAppointment: () => {
-    return async (_req, res) => {
-      return res.render(`pages/arrange-appointment/arrange-another-appointment`, {})
+    return async (req, res) => {
+      const { url } = req
+      const { crn, id } = req.params as Record<string, string>
+      return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id })
     }
   },
   postArrangeAnotherAppointment: () => {

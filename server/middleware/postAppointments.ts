@@ -2,7 +2,7 @@ import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
-import { AppointmentRequestBody } from '../models/Appointments'
+import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -11,9 +11,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masClient = new MasApiClient(token)
     const { data } = req.session
     const {
-      user: { locationCode },
-      username,
-      team,
+      user: { username, locationCode, teamCode },
       type,
       date,
       start,
@@ -21,16 +19,18 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       interval,
       numberOfAppointments,
       eventId,
-      requirementId,
-      licenceConditionId,
-      nsiId,
+      requirementId = '0',
+      licenceConditionId = '0',
+      nsiId = '0',
+      until: repeatUntilDate = '',
       notes,
-      sensitvity,
-    } = getDataValue(data, ['appointments', crn, uuid])
+      sensitivity,
+    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    const until = repeatUntilDate || date
     const body: AppointmentRequestBody = {
       user: {
         username,
-        teamCode: team,
+        teamCode,
         locationCode,
       },
       type,
@@ -38,15 +38,17 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       end: dateTime(date, end),
       interval,
       numberOfAppointments: parseInt(numberOfAppointments, 10),
-      eventId,
+      eventId: parseInt(eventId, 10),
       uuid,
       createOverlappingAppointment: true,
-      requirementId,
-      licenceConditionId,
-      nsiId,
+      requirementId: parseInt(requirementId as string, 10),
+      licenceConditionId: parseInt(licenceConditionId as string, 10),
+      nsiId: parseInt(nsiId as string, 10),
+      until: dateTime(until, end),
       notes,
-      sensitive: sensitvity === 'Yes',
+      sensitive: sensitivity === 'Yes',
     }
+    // console.dir(body, { depth: null })
     await masClient.postAppointments(crn, body)
     return next()
   }

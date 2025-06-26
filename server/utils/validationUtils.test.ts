@@ -277,7 +277,7 @@ describe(`validates appointment repeat request with spec when no repeating optio
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
     [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-numberOfAppointments`]: 'Enter the number of times the appointment will repeat',
+    [`appointments-${crn}-${id}-numberOfRepeatAppointments`]: 'Enter the number of times the appointment will repeat',
   }
   const args: AppointmentsValidationArgs = {
     crn,
@@ -306,7 +306,7 @@ describe(`validates appointment repeat request with spec when no repeating optio
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
     [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-numberOfAppointments`]: 'Enter the number of times the appointment will repeat',
+    [`appointments-${crn}-${id}-numberOfRepeatAppointments`]: 'Enter the number of times the appointment will repeat',
   }
   const args: AppointmentsValidationArgs = {
     crn,

@@ -137,7 +137,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][numberOfAppointments]`]: {
+    [`[appointments][${crn}][${id}][numberOfRepeatAppointments]`]: {
       optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
       checks: [
         {
