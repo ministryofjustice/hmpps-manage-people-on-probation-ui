@@ -21,8 +21,6 @@ import {
   completeNotePage,
 } from './imports'
 
-const regex: RegExp = /^\d{1,2}\s[A-Za-z]+ \d{4}\sfrom\s\d{1,2}:\d{2}[ap]m\sto\s\d{1,2}:\d{2}[ap]m$/
-
 const loadPage = (hasVisor = false, typeOptionIndex = 1, sentenceOptionIndex = 1) => {
   completeTypePage(typeOptionIndex, '', hasVisor)
   completeSentencePage(sentenceOptionIndex)
@@ -109,13 +107,19 @@ describe('Check your answers then confirm the appointment', () => {
     cy.get('[data-qa="appointmentForename"]').should('not.exist')
   })
 
-  // it('should render the page with sentence and nsi', () => {
-  // })
+  it('should render the page with sentence and nsi', () => {
+    const hasVisor = false
+    const selectType = 1
+    const selectSentence = 3
+    loadPage(hasVisor, selectType, selectSentence)
+    cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
+    cy.get('[data-qa="appointmentNsi"]').should('contain.text', 'BRE description')
+  })
 
   it('should render the page with personal contact', () => {
     const hasVisor = false
     const selectType = 5
-    const selectSentence = 3
+    const selectSentence = 4
     loadPage(hasVisor, selectType, selectSentence)
     cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
     cy.get('[data-qa="appointmentSentence"]').should('not.exist')
