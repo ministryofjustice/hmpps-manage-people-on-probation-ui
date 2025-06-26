@@ -63,17 +63,17 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
-          sentenceRequirement = sentenceObj.requirements.find(
+          sentenceRequirement = sentenceObj?.requirements?.find(
             requirement => requirement.id === parseInt(requirementId, 10),
           )
         }
         if (licenceConditionId) {
-          sentenceLicenceCondition = sentenceObj.licenceConditions.find(
+          sentenceLicenceCondition = sentenceObj?.licenceConditions?.find(
             lc => lc.id === parseInt(licenceConditionId, 10),
           )
         }
         if (nsiId) {
-          sentenceNsi = sentenceObj.nsis.find(n => n.id === parseInt(nsiId, 10))
+          sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
       const selectedRegion =
@@ -88,12 +88,17 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         staffId && req?.session?.data?.staff?.[loggedInUsername]
           ? req.session.data.staff[loggedInUsername].find(s => s.username === staffId)?.nameAndRole
           : null
-      const location: Location =
-        locationCode && loggedInUsername
+      const noLocationValue = 'I do not need to pick a location'
+      const location: Location | string =
+        locationCode && locationCode !== noLocationValue && loggedInUsername
           ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.id === parseInt(locationCode, 10))
-          : null
+          : 'Not needed'
       appointment = {
         ...appointment,
+        meta: {
+          ...appointment.meta,
+          hasLocation: locationCode !== noLocationValue,
+        },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {

@@ -38,23 +38,19 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
             const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
             setDataValue(newSessionData, setPath, newValue)
           })
-          if (req?.body?.appointments?.[crn]?.[id]?.repeating === 'No') {
-            resetValues({ numberOfAppointments: '', interval: '', repeatingDates: [] })
-          }
           if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
-            resetValues({ requirementId: '', nsiId: '' })
+            resetValues({ requirementId: '0', nsiId: '0' })
           }
           if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
-            resetValues({ licenceConditionId: '', nsiId: '' })
+            resetValues({ licenceConditionId: '0', nsiId: '0' })
           }
           if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
-            resetValues({ licenceConditionId: '', requirementId: '' })
+            resetValues({ licenceConditionId: '0', requirementId: '0' })
           }
         }
       }
     })
     req.session.data = newSessionData
-    // console.dir(newSessionData.appointments, { depth: null })
     return next()
   }
 }

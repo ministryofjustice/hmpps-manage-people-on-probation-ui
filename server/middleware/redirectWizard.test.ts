@@ -38,10 +38,10 @@ const mockAppointment: AppointmentSession = {
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  repeating: 'Yes',
-  interval: '',
-  numberOfAppointments: '',
-  uuid,
+  repeating: 'No',
+  interval: 'DAY',
+  numberOfAppointments: '1',
+  numberOfRepeatAppointments: '0',
 }
 
 const req = httpMocks.createRequest({

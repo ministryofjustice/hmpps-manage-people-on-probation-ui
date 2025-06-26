@@ -95,8 +95,8 @@ const req = httpMocks.createRequest({
             user: {
               locationCode: 'HMP',
               teamCode: 'TEA',
+              username,
             },
-            username,
             team: 'TEA',
             type: 'C084',
             date: '2025-03-12',
@@ -144,12 +144,14 @@ describe('/middleware/postAppointments', () => {
     numberOfAppointments: parseInt(repeatCount, 10),
     createOverlappingAppointment: true,
     requirementId: 1,
-    nsiId: undefined as number,
+    nsiId: 0,
     licenceConditionId,
     eventId,
     uuid: id,
+    until: dateTime(date, endTime),
     notes: 'Some notes',
     sensitive: false,
+    visorReport: false,
   }
   let spy: jest.SpyInstance
   beforeEach(async () => {
@@ -190,12 +192,14 @@ describe('/middleware/postAppointments', () => {
     numberOfAppointments: parseInt(repeatCount, 10),
     createOverlappingAppointment: true,
     requirementId: 1,
-    nsiId: undefined as number,
+    nsiId: 0,
     licenceConditionId,
     eventId,
     uuid: id,
+    until: dateTime(date, endTime),
     notes: 'Some notes',
     sensitive: false,
+    visorReport: false,
   }
   let spy: jest.SpyInstance
   beforeEach(async () => {

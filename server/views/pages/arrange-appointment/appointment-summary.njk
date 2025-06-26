@@ -1,0 +1,164 @@
+{% set changePath = "/case/" + crn + "/arrange-appointment/"  + id %}
+{% set sentenceHtml %}
+{% if appointment.appointmentFor.sentence %}
+    <span data-qa="appointmentSentence">{{ appointment.appointmentFor.sentence }}</span>
+{% endif %}
+{% if appointment.appointmentFor.requirement %}
+    <br>
+    <span data-qa="appointmentRequirement">{{ appointment.appointmentFor.requirement }}</span>
+{% endif %}
+{% if appointment.appointmentFor.licenceCondition %}
+    <br>
+    <span data-qa="appointmentLicenceCondition">{{ appointment.appointmentFor.licenceCondition }}</span>
+{% endif %}
+{% if appointment.appointmentFor.nsi %}
+    <br>
+    <span data-qa="appointmentNsi">{{ appointment.appointmentFor.nsi }}</span>
+{% endif %}
+{% if appointment.appointmentFor.forename %}
+    <span data-qa="appointmentForename">{{ appointment.appointmentFor.forename }}</span>
+{% endif %}
+{% endset %}
+{% set attendingHtml %}
+{% if appointment.meta.userIsAttending %}
+    {{ appointment.attending.name }}
+{% else %}
+    {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
+{% endif %}
+{% endset %}
+{% set locationAddress %}
+{% if appointment.meta.hasLocation %}
+    {{appointment.location.description}}<br>
+    {% if appointment.location.address.buildingNumber %}{{location.address.buildingNumber}}
+    {% endif %}
+    {% if appointment.location.address.streetName %}{{appointment.location.address.streetName}}<br>
+    {% endif %}
+    {% if appointment.location.address.district %}
+        {{appointment.location.address.district}}<br>
+    {% endif %}
+    {% if appointment.location.address.town %}
+        {{appointment.location.address.town}}<br>
+    {% endif %}
+    {% if appointment.location.address.county %}
+        {{appointment.location.address.county}}<br>
+    {% endif %}
+    {% if appointment.location.address.postcode %}
+        {{ appointment.location.address.postcode }}
+    {% endif %}
+{% else %}
+    {{appointment.location}}
+{% endif %}
+{% endset %}
+<form method="post" autocomplete="off" action="{{ paths.current }}">
+    {% set showAction = true %}
+    {% set appointmentDates = [] %}
+    {% if appointment.date %}
+        {% set appointmentDates = (appointmentDates.push(appointment.date), appointmentDates) %}
+    {% endif %}
+    {% for appointmentDate in appointment.repeatingDates %}
+        {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
+    {% endfor %}
+    {% set appointmentDatesHtml %}
+    <ul class="govuk-list">
+        {% for appointmentDate in appointmentDates %}
+            <li>{{  appointmentDate | dateWithYear }}
+          from
+          {{appointment.start}}
+          to
+          {{ appointment.end }}</li>
+        {% endfor %}
+    </ul>
+    {% endset %}
+    {{ govukSummaryList({
+        classes: 'govuk-!-margin-bottom-9',
+        rows: [
+        {
+          key: { text: "Appointment type" },
+          value: { text: appointment.type.description },
+          actions: {
+            items: [
+              {
+                href: changePath + "/type?change=" + url,
+                text: "Change",
+                visuallyHiddenText: "type of appointment"
+              }
+            ]
+          } if showAction
+        },
+        {
+        key: { text: "VISOR report"},
+        value: { text: appointment.visorReport },
+        actions: {
+    items: [ { 
+    href: changePath + "/sentence?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "sentence"
+     } 
+     ] 
+     } if showAction
+        } if appointment.meta.isVisor,
+    { key: { text: "Appointment for" },
+    value: { html: sentenceHtml | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/sentence?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "sentence"
+     } 
+     ] 
+     } if showAction }, 
+    { key: { text: "Attending" },
+    value: { html: attendingHtml | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/attendance?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "attendance"
+     } 
+     ] 
+     } if showAction }, 
+     { key: { text: "Location" }, 
+     value: { text: locationAddress | safe if appointment.location else appointment.location }, 
+     actions: { items: [ { href: changePath + "/location?change=" + url, 
+     text: "Change",
+      visuallyHiddenText: "location"
+      }
+      ]
+      } if showAction },
+      { key: { text: "Date and time" },
+      value: { html: 'Not entered' if anotherAppointment and appointmentDates.length == 0 else appointmentDatesHtml }, 
+      actions: { items: [ { href: changePath + "/date-time?change=" + url,
+      text: "Choose date and time" if anotherAppointment and appointmentDates.length == 0 else "Change",
+      visuallyHiddenText: "date and time of the appointment" } ] } },
+         { key: { text: "Repeating appointment" },
+      value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
+      actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
+       { key: { text: "Appointment notes" },
+    value: { html: "Not entered" if anotherAppointment and not appointment.notes else appointment.notes | nl2br },
+    actions: {
+    items: [ { 
+    href: changePath + "/add-notes?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "notes"
+     } 
+     ] 
+     } if showAction }, 
+      { key: { text: "Sensitivity" },
+    value: { text: "Not entered" if anotherAppointment and not appointment.sensitivity else appointment.sensitivity | safe },
+    actions: {
+    items: [ { 
+    href: changePath + "/add-notes?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "sensitivity"
+     } 
+     ] 
+     } if showAction }
+] }) }}
+    {{ govukButton({
+      html: buttonText,
+      attributes: {
+        'data-qa': 'submit-btn'
+      }
+    }) }}
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+</form>

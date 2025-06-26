@@ -24,7 +24,6 @@ export const completeTypePage = (index = 1, query = '', hasVisor = false) => {
   typePage.getRadio('type', index).click()
   if (hasVisor) {
     typePage.getRadio('visorReport', index).click()
-    cy.pause()
   }
   typePage.getSubmitBtn().click()
 }
@@ -38,6 +37,9 @@ export const completeSentencePage = (eventIndex = 1) => {
   }
   if (eventIndex === 2) {
     sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
+  }
+  if (eventIndex === 3) {
+    sentencePage.getElement(`#appointments-${crn}-${uuid}-nsiId`).click()
   }
   sentencePage.getSubmitBtn().click()
 }
@@ -77,7 +79,7 @@ export const completeRepeatingPage = (repeat = 2) => {
   if (repeat) {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).clear().type(repeat.toString())
+    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).clear().type(repeat.toString())
   } else {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
     cy.debug()

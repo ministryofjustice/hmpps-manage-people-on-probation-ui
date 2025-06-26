@@ -10,6 +10,7 @@ const appointments: Route<void> = (req, res, next) => {
   const localParams: LocalParams = { crn, id }
   const render = `pages/${[
     url
+      .split('?')[0]
       .split('/')
       .filter(item => item)
       .filter((_item, i) => ![0, 1, 3].includes(i))
