@@ -23,8 +23,8 @@ jest.mock('../utils', () => {
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const username = 'user-1'
-const region = 'N56'
-const team = 'N56N02'
+const providerCode = 'N56'
+const teamCode = 'N56N02'
 const crn = 'X000001'
 const id = 'mock-id'
 
@@ -61,11 +61,11 @@ const res = {
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
 mockGetDataValue.mockImplementation((_data, path) => {
-  if (path.join('.') === `appointments.${crn}.${id}.region`) {
-    return region
+  if (path.join('.') === `appointments.${crn}.${id}.user.providerCode`) {
+    return providerCode
   }
-  if (path.join('.') === `appointments.${crn}.${id}.team`) {
-    return team
+  if (path.join('.') === `appointments.${crn}.${id}.user.teamCode`) {
+    return teamCode
   }
   return undefined
 })
@@ -92,9 +92,11 @@ describe('/middleware/getOfficeLocationsByTeamAndProvider()', () => {
           appointments: {
             [crn]: {
               [id]: {
-                username,
-                region,
-                team,
+                user: {
+                  username,
+                  providerCode,
+                  teamCode,
+                },
               },
             },
           },
@@ -108,7 +110,7 @@ describe('/middleware/getOfficeLocationsByTeamAndProvider()', () => {
       await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should fetch the office locations from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith(region, team)
+      expect(spy).toHaveBeenCalledWith(providerCode, teamCode)
       expect(req.session.data.locations).toEqual({
         ...req.session.data.locations,
         [username]: mockLocationsResponse.locations,
@@ -132,9 +134,11 @@ describe('/middleware/getOfficeLocationsByTeamAndProvider()', () => {
           appointments: {
             [crn]: {
               [id]: {
-                username,
-                region,
-                team,
+                user: {
+                  username,
+                  providerCode,
+                  teamCode,
+                },
               },
             },
           },
