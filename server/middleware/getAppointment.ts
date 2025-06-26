@@ -63,17 +63,17 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
-          sentenceRequirement = sentenceObj.requirements.find(
+          sentenceRequirement = sentenceObj?.requirements?.find(
             requirement => requirement.id === parseInt(requirementId, 10),
           )
         }
         if (licenceConditionId) {
-          sentenceLicenceCondition = sentenceObj.licenceConditions.find(
+          sentenceLicenceCondition = sentenceObj?.licenceConditions?.find(
             lc => lc.id === parseInt(licenceConditionId, 10),
           )
         }
         if (nsiId) {
-          sentenceNsi = sentenceObj.nsis.find(n => n.id === parseInt(nsiId, 10))
+          sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
       const selectedRegion =
