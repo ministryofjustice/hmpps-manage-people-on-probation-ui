@@ -144,9 +144,6 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       const errors = req?.session?.data?.errors
-      if (!res?.locals?.userLocations?.length) {
-        return renderLocationNotInList(req, res)
-      }
       if (errors) {
         delete req.session.data.errors
       }
