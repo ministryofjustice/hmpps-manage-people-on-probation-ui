@@ -60,11 +60,6 @@ const mockAPIResponse = {
 } as any
 
 const session = {
-  defaultUserDetails: {
-    username: 'peter-parker',
-    homeArea: 'London',
-    team: 'Automated Allocation Team',
-  },
   providers: [
     {
       code: 'N50',
@@ -78,30 +73,6 @@ const session = {
     {
       code: 'N54',
       name: 'North East Region',
-    },
-  ],
-  teams: [
-    {
-      description: 'A P Central Admissions Unit',
-      code: 'N50CAU',
-    },
-    {
-      description: 'Ascot House Approved Premises',
-      code: 'N50AHA',
-    },
-    {
-      description: 'Atherton Court',
-      code: 'N50ACT',
-    },
-  ],
-  users: [
-    {
-      username: 'peter-parker',
-      name: 'peter parker (PS-PSO)',
-    },
-    {
-      username: 'jon-smith',
-      name: 'jon smith (PS-PSO)',
     },
   ],
 } as any
