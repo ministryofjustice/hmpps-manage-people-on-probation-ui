@@ -130,8 +130,9 @@
       actions: { items: [ { href: changePath + "/date-time?change=" + url,
       text: "Choose date and time" if anotherAppointment and appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
-         { key: { text: "Repeating appointment" },
-      value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
+         { 
+            key: { html: '<span data-qa="repeatingAppointmentLabel">Repeating appointment</span>' },
+      value: { html: '<span data-qa="repeatingAppointmentValue">' + ('Yes' if appointment.repeating === 'Yes' else 'No') + '</span>' },
       actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
        { key: { text: "Appointment notes" },
     value: { html: "Not entered" if anotherAppointment and not appointment.notes else appointment.notes | nl2br },

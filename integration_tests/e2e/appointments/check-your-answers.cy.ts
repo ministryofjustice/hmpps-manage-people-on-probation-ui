@@ -4,6 +4,7 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
+import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
@@ -25,22 +26,32 @@ import {
 } from './imports'
 import { statusErrors } from '../../../server/properties'
 
-const loadPage = (hasVisor = false, typeOptionIndex = 1, sentenceOptionIndex = 1) => {
+const loadPage = ({
+  hasVisor = false,
+  typeOptionIndex = 1,
+  sentenceOptionIndex = 1,
+  repeatAppointments = true,
+  notes = true,
+  sensitivity = true,
+} = {}) => {
   completeTypePage(typeOptionIndex, '', hasVisor)
   completeSentencePage(sentenceOptionIndex)
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
-  completeRepeatingPage()
-  completeNotePage()
+  if (repeatAppointments) {
+    completeRepeatingPage()
+  }
+  completeNotePage(notes, sensitivity)
 }
 
 describe('Check your answers then confirm the appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
-    loadPage()
   })
+
   it('should render the page', () => {
+    loadPage()
     const cyaPage = new AppointmentCheckYourAnswersPage()
     checkPopHeader('Alton Berge', true)
     cyaPage.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
@@ -53,6 +64,11 @@ describe('Check your answers then confirm the appointment', () => {
       .find('.govuk-summary-list__value')
       .should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)')
     cyaPage.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
+    cyaPage
+      .getSummaryListRow(3)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', 'peter parker (PS-PSO)')
+      .should('contain.text', '(A P Central Admissions Unit, Greater Manchester)')
     cyaPage.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
     cyaPage
       .getSummaryListRow(4)
@@ -74,16 +90,16 @@ describe('Check your answers then confirm the appointment', () => {
     cyaPage.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
     cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
     cyaPage.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
+    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
     cyaPage.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
-
+    cyaPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
     cyaPage.getSubmitBtn().should('include.text', 'Confirm this appointment')
   })
 
   it('should render the page with VISOR report', () => {
-    const hasVisor = true
     it('should display the visor report answer', () => {
       cy.task('stubOverviewVisorRegistration')
-      loadPage(hasVisor)
+      loadPage({ hasVisor: true })
       const cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'VISOR report')
       cyaPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Yes')
@@ -91,7 +107,7 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   it('should render the page with sentence and licence condition', () => {
-    loadPage()
+    loadPage({})
     cy.get('[data-qa="appointmentSentence"]').should('contain.text', '12 month Community order')
     cy.get('[data-qa="appointmentLicenceCondition"]').should(
       'contain.text',
@@ -102,10 +118,7 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   it('should render the page with sentence and requirment', () => {
-    const hasVisor = false
-    const selectType = 1
-    const selectSentence = 2
-    loadPage(hasVisor, selectType, selectSentence)
+    loadPage({ hasVisor: false, sentenceOptionIndex: 2 })
     cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
     cy.get('[data-qa="appointmentRequirement"]').should('contain.text', '12 days RAR, 1 completed')
     cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
@@ -113,23 +126,32 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   it('should render the page with sentence and nsi', () => {
-    const hasVisor = false
-    const selectType = 1
-    const selectSentence = 3
-    loadPage(hasVisor, selectType, selectSentence)
+    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3 })
     cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
     cy.get('[data-qa="appointmentNsi"]').should('contain.text', 'BRE description')
   })
 
   it('should render the page with personal contact', () => {
-    const hasVisor = false
-    const selectType = 5
-    const selectSentence = 4
-    loadPage(hasVisor, selectType, selectSentence)
+    loadPage({ hasVisor: false, typeOptionIndex: 5, sentenceOptionIndex: 4 })
     cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
     cy.get('[data-qa="appointmentSentence"]').should('not.exist')
     cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
     cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
+  })
+
+  it('should render the page when repeating appointment featureflag is toggled off', () => {
+    cy.task('stubNoRepeats')
+    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, repeatAppointments: false })
+    it('should not display the repeating appointment row', () => {
+      cy.get('[data-qa="repeatingAppointmentLabel"]').should('not.exist')
+      cy.get('[data-qa="repeatingAppointmentValue"]').should('not.exist')
+    })
+  })
+
+  it('should render the page when no notes have been entered', () => {
+    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, notes: false, sensitivity: false })
+    const cyaPage = new AppointmentCheckYourAnswersPage()
+    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'None')
   })
 
   describe('Change appointment values', () => {
@@ -140,8 +162,9 @@ describe('Check your answers then confirm the appointment', () => {
     let locationPage: AppointmentLocationPage
     let repeatingPage: AppointmentRepeatingPage
     let locationNotInListPage: AppointmentLocationNotInListPage
+    let notePage: AppointmentNotePage
     beforeEach(() => {
-      loadPage()
+      loadPage({})
       cyaPage = new AppointmentCheckYourAnswersPage()
     })
     it('should update the type when value is changed', () => {
@@ -204,7 +227,6 @@ describe('Check your answers then confirm the appointment', () => {
           expect(normalizedText).to.include(`${dateWithYear(date)} from ${changedStart} to ${changedEnd}`)
         })
     })
-
     it('should update the repeating appointment when value is changed', () => {
       cyaPage.getSummaryListRow(6).find('.govuk-link').click()
       repeatingPage = new AppointmentRepeatingPage()
@@ -220,6 +242,21 @@ describe('Check your answers then confirm the appointment', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
         })
+    })
+    it('should update the notes when value is changed', () => {
+      cyaPage.getSummaryListRow(7).find('.govuk-link').click()
+      const updatedNotes = 'Some updated notes'
+      notePage = new AppointmentNotePage()
+      notePage.getElement(`#notes`).focus().type(updatedNotes)
+      notePage.getSubmitBtn().click()
+      cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
+    })
+    it('should update the sensitivity when value is changed', () => {
+      cyaPage.getSummaryListRow(8).find('.govuk-link').click()
+      notePage = new AppointmentNotePage()
+      notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+      notePage.getSubmitBtn().click()
+      cyaPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
     })
   })
   describe('Confirm this appointment', () => {
