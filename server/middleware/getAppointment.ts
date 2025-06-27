@@ -91,7 +91,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const noLocationValue = 'I do not need to pick a location'
       const location: Location | string =
         locationCode && locationCode !== noLocationValue && loggedInUsername
-          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.id === parseInt(locationCode, 10))
+          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
           : 'Not needed'
       appointment = {
         ...appointment,
