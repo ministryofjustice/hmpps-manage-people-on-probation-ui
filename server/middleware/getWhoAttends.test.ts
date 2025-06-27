@@ -142,7 +142,6 @@ describe('/middleware/getWhoAttends()', () => {
       await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should fetch the user providers from the api and assign to session', () => {
-      console.log(req.session.data.providers)
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
       expect(req.session.data.providers).toEqual({
         ...req.session.data.providers,
