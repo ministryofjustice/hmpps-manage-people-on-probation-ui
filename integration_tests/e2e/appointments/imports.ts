@@ -77,7 +77,7 @@ export const completeDateTimePage = () => {
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeNotePage = (notes = true, sensitivity = true) => {
+export const completeNotePage = (notes = true, _sensitivity = true) => {
   const notePage = new AppointmentNotePage()
   cy.get('form').then(form => form[0].reset())
   if (notes) {
