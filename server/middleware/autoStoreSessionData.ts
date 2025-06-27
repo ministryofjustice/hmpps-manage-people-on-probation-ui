@@ -39,13 +39,13 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
             setDataValue(newSessionData, setPath, newValue)
           })
           if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
-            resetValues({ requirementId: '0', nsiId: '0' })
+            resetValues({ requirementId: '', nsiId: '' })
           }
           if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
-            resetValues({ licenceConditionId: '0', nsiId: '0' })
+            resetValues({ licenceConditionId: '', nsiId: '' })
           }
           if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
-            resetValues({ licenceConditionId: '0', requirementId: '0' })
+            resetValues({ licenceConditionId: '', requirementId: '' })
           }
         }
       }

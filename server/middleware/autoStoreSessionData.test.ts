@@ -180,8 +180,8 @@ describe('/middleware/autoStoreSessionData', () => {
       autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should reset the requirement and nsi ids in the appointment session', () => {
-      expect(req.session.data.appointments[crn][id].requirementId).toEqual('0')
-      expect(req.session.data.appointments[crn][id].nsiId).toEqual('0')
+      expect(req.session.data.appointments[crn][id].requirementId).toEqual('')
+      expect(req.session.data.appointments[crn][id].nsiId).toEqual('')
     })
   })
   describe('If sentence with requirement', () => {
@@ -224,8 +224,8 @@ describe('/middleware/autoStoreSessionData', () => {
       autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should reset the licence condition and nsi ids in the appointment session', () => {
-      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('0')
-      expect(req.session.data.appointments[crn][id].nsiId).toEqual('0')
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('')
+      expect(req.session.data.appointments[crn][id].nsiId).toEqual('')
     })
   })
   describe('If sentence with nsi', () => {
@@ -268,8 +268,8 @@ describe('/middleware/autoStoreSessionData', () => {
       autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
     it('should reset the licence condition and nsi ids in the appointment session', () => {
-      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('0')
-      expect(req.session.data.appointments[crn][id].requirementId).toEqual('0')
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('')
+      expect(req.session.data.appointments[crn][id].requirementId).toEqual('')
     })
   })
   describe('If value is an object', () => {

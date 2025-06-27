@@ -74,9 +74,9 @@ export interface AppointmentRequestBody {
   eventId: number
   uuid: string
   createOverlappingAppointment: true
-  requirementId: number
-  licenceConditionId: number
-  nsiId: number
+  requirementId?: number
+  licenceConditionId?: number
+  nsiId?: number
   until?: Date
   notes?: string
   sensitive?: boolean

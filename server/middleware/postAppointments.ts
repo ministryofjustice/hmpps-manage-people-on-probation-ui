@@ -19,9 +19,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       interval,
       numberOfAppointments,
       eventId,
-      requirementId = '0',
-      licenceConditionId = '0',
-      nsiId = '0',
+      requirementId = '',
+      licenceConditionId = '',
+      nsiId = '',
       until: repeatUntilDate = '',
       notes,
       sensitivity,
@@ -42,13 +42,19 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       eventId: parseInt(eventId, 10),
       uuid,
       createOverlappingAppointment: true,
-      requirementId: parseInt(requirementId as string, 10),
-      licenceConditionId: parseInt(licenceConditionId as string, 10),
-      nsiId: parseInt(nsiId as string, 10),
       until: dateTime(until, end),
       notes,
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
+    }
+    if (requirementId) {
+      body.requirementId = parseInt(requirementId as string, 10)
+    }
+    if (licenceConditionId) {
+      body.licenceConditionId = parseInt(licenceConditionId as string, 10)
+    }
+    if (nsiId) {
+      body.nsiId = parseInt(nsiId as string, 10)
     }
     await masClient.postAppointments(crn, body)
     return next()
