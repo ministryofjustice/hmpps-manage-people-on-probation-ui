@@ -67,10 +67,15 @@ export const completeDateTimePage = () => {
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeNotePage = () => {
+export const completeNotePage = (notes: boolean, sensitivity: boolean) => {
   const notePage = new AppointmentNotePage()
-  notePage.getElement(`#notes`).focus().type('Some notes')
-  notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity`).click()
+  cy.get('form').then(form => form[0].reset())
+  if (notes) {
+    notePage.getElement(`#notes`).focus().type('Some notes')
+  }
+  if (sensitivity) {
+    notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity`).click()
+  }
   notePage.getSubmitBtn().click()
 }
 
@@ -82,7 +87,6 @@ export const completeRepeatingPage = (repeat = 2) => {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).clear().type(repeat.toString())
   } else {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
-    cy.debug()
   }
   repeatingPage.getSubmitBtn().click()
 }
