@@ -19,7 +19,7 @@
   {% for location in userLocations %}
     {% set locationItems = (locationItems.push({
       text: location.description | convertToTitleCase,
-      value: location.id,
+      value: location.code,
       attributes: {
         'data-qa': 'locationOption'
       }

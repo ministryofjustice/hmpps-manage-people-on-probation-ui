@@ -36,19 +36,6 @@ const renderLocationNotInList: Route<void> = (req, res): void => {
   return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id })
 }
 
-const resetRepeatingAppointment: Route<void> = (req, _res): void => {
-  const { crn, id } = req.params as Record<string, string>
-  const updatedAppointment: AppointmentSession = {
-    ...(req?.session?.data?.appointments?.[crn]?.[id] || {}),
-    repeating: 'No',
-    numberOfRepeatAppointments: '0',
-    numberOfAppointments: '1',
-    interval: 'DAY',
-    repeatingDates: [] as string[],
-  }
-  setDataValue(req.session.data, ['appointments', crn, id], updatedAppointment)
-}
-
 const arrangeAppointmentController: Controller<typeof routes> = {
   redirectToType: () => {
     return async (req, res) => {
@@ -199,8 +186,21 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         return renderError(404)(req, res)
       }
       const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
-      if (res.locals.flags.enableRepeatAppointments === true && !change) {
-        resetRepeatingAppointment(req, res)
+      const { data } = req.session
+      const path = ['appointments', crn, id]
+      const { numberOfAppointments, numberOfRepeatAppointments, until, date, interval } =
+        getDataValue<AppointmentSession>(data, path)
+      if (!numberOfAppointments) {
+        setDataValue(data, [...path, 'numberOfAppointments'], '1')
+      }
+      if (!numberOfRepeatAppointments) {
+        setDataValue(data, [...path, 'numberOfRepeatAppointments'], '0')
+      }
+      if (!until) {
+        setDataValue(data, [...path, 'until'], date)
+      }
+      if (!interval) {
+        setDataValue(data, [...path, 'interval'], 'DAY')
       }
       const nextPage = repeatAppointmentsEnabled
         ? `/case/${crn}/arrange-appointment/${id}/repeating`
@@ -255,13 +255,22 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       }
       const change = req?.query?.change as string
       const { data } = req.session
-      const { repeating, numberOfRepeatAppointments } = getDataValue<AppointmentSession>(data, [
+      const { repeating, numberOfRepeatAppointments = '0' } = getDataValue<AppointmentSession>(data, [
         'appointments',
         crn,
         id,
       ])
       if (repeating === 'No') {
-        resetRepeatingAppointment(req, res)
+        const updatedAppointment: AppointmentSession = {
+          ...(data?.appointments?.[crn]?.[id] || {}),
+          repeating: 'No',
+          numberOfRepeatAppointments: '0',
+          numberOfAppointments: '1',
+          interval: 'DAY',
+          repeatingDates: [] as string[],
+          until: getDataValue(data, ['appointments', crn, id, 'date']),
+        }
+        setDataValue(req.session.data, ['appointments', crn, id], updatedAppointment)
       } else {
         setDataValue(
           data,
