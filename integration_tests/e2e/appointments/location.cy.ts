@@ -13,7 +13,9 @@ const loadPage = () => {
 describe('Pick a location for this appointment', () => {
   let locationPage: AppointmentLocationPage
   let dateTimePage: AppointmentDateTimePage
-
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   describe('Page is rendered', () => {
     beforeEach(() => {
       loadPage()
@@ -33,9 +35,6 @@ describe('Pick a location for this appointment', () => {
   })
 
   describe('Page is rendered with no locations', () => {
-    beforeEach(() => {
-      cy.task('resetMocks')
-    })
     it('should only display the last 2 radio options', () => {
       cy.task('stubNoUserLocationsFound')
       loadPage()
