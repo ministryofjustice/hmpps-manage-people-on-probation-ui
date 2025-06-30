@@ -9,7 +9,7 @@
         "status": 200,
         "jsonBody": {
           "defaultUserDetails": {
-            "username": "peter-parker",
+            "username": "PETER-PARKER",
             "homeArea": "London",
             "team": "Automated Allocation Team"
           },
@@ -140,7 +140,7 @@
         "status": 200,
         "jsonBody": {
           "defaultUserDetails": {
-            "username": "peter-parker",
+            "username": "PETER-PARKER",
             "homeArea": "London",
             "team": "Automated Allocation Team"
           },
@@ -201,12 +201,8 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Caroline",
-            "surname": "Wolff"
-          },
           "defaultUserDetails": {
-            "username": "peter-parker",
+            "username": "PETER-PARKER",
             "homeArea": "London",
             "team": "Automated Allocation Team"
           },
@@ -272,7 +268,7 @@
         "status": 200,
         "jsonBody": {
           "defaultUserDetails": {
-            "username": "peter-parker",
+            "username": "PETER-PARKER",
             "homeArea": "London",
             "team": "Automated Allocation Team"
           },
