@@ -100,10 +100,10 @@ export interface UserTeam {
 }
 
 export interface UserProviders {
-  name: {
-    forename: string
-    middleName: string
-    surname: string
+  defaultUserDetails: {
+    username: string
+    homeArea: string
+    team: string
   }
   providers: Provider[]
   teams: Team[]
