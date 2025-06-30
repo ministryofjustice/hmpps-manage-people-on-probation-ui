@@ -9,6 +9,9 @@ import AppointmentPreviewPage from '../../pages/appointments/preview.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
+import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
+import { dateWithYear } from '../../../server/utils'
+import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -67,7 +70,7 @@ export const completeDateTimePage = () => {
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeNotePage = (notes: boolean, sensitivity: boolean) => {
+export const completeNotePage = (notes = true, sensitivity = true) => {
   const notePage = new AppointmentNotePage()
   cy.get('form').then(form => form[0].reset())
   if (notes) {
@@ -115,4 +118,56 @@ export const checkPopHeader = (name = 'Caroline Wolff', appointments = false) =>
     cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__level').should('contain.text', 'MEDIUM')
     cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__score').should('contain.text', '12.1')
   }
+
+export const completeConfirmationPage = () => {
+  const confirmationPage = new AppointmentConfirmationPage()
+  confirmationPage.getSubmitBtn().click()
+}
+
+export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+  page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
+  page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
+  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
+  page
+    .getSummaryListRow(2)
+    .find('.govuk-summary-list__value')
+    .should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)')
+  page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
+  page
+    .getSummaryListRow(3)
+    .find('.govuk-summary-list__value')
+    .should('contain.text', 'peter parker (PS-PSO)')
+    .should('contain.text', '(A P Central Admissions Unit, Greater Manchester)')
+  page.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
+  page
+    .getSummaryListRow(4)
+    .find('.govuk-summary-list__value')
+    .should('contain.text', 'HMP Wakefield')
+    .should('contain.text', 'Love Lane')
+    .should('contain.text', 'Wakefield')
+    .should('contain.text', 'West Yorkshire')
+    .should('contain.text', 'WF2 9AG')
+  page.getSummaryListRow(5).find('.govuk-summary-list__key').should('contain.text', 'Date and time')
+  if (page instanceof AppointmentCheckYourAnswersPage) {
+    page
+      .getSummaryListRow(5)
+      .find('.govuk-summary-list__value li:nth-child(1)')
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+      })
+  }
+  if (page instanceof ArrangeAnotherAppointmentPage) {
+    page.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
+  }
+
+  page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
+  page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+  page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
+  page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
+  page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
+  page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
 }
