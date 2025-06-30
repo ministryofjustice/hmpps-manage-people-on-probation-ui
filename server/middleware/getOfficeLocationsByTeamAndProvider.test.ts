@@ -71,94 +71,54 @@ mockGetDataValue.mockImplementation((_data, path) => {
 })
 
 describe('/middleware/getOfficeLocationsByTeamAndProvider()', () => {
+  const req = httpMocks.createRequest({
+    params: {
+      crn,
+      id,
+    },
+    session: {
+      data: {
+        appointments: {
+          [crn]: {
+            [id]: {
+              user: {
+                username,
+                providerCode,
+                teamCode,
+              },
+            },
+          },
+        },
+        locations: {
+          'user-2': mockLocationsResponse.locations,
+        },
+      },
+    },
+  })
+
   const nextSpy = jest.fn()
 
   const spy = jest
     .spyOn(MasApiClient.prototype, 'getOfficeLocationsByTeamAndProvider')
     .mockImplementation(() => Promise.resolve(mockLocationsResponse))
-
+  beforeEach(async () => {
+    await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res, nextSpy)
+  })
   afterEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('If current user locations do not exist in session', () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-        id,
-      },
-      session: {
-        data: {
-          appointments: {
-            [crn]: {
-              [id]: {
-                user: {
-                  username,
-                  providerCode,
-                  teamCode,
-                },
-              },
-            },
-          },
-          locations: {
-            'user-2': mockLocationsResponse.locations,
-          },
-        },
-      },
-    })
-    beforeEach(async () => {
-      await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should fetch the office locations from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith(providerCode, teamCode)
-      expect(req.session.data.locations).toEqual({
-        ...req.session.data.locations,
-        [username]: mockLocationsResponse.locations,
-      })
-    })
-    it('should assign the office locations to res.locals', () => {
-      expect(res.locals.userLocations).toEqual(mockLocationsResponse.locations)
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalled()
+  it('should fetch the office locations from the api and assign to session', () => {
+    expect(spy).toHaveBeenCalledWith(providerCode, teamCode)
+    expect(req.session.data.locations).toEqual({
+      ...req.session.data.locations,
+      [username]: mockLocationsResponse.locations,
     })
   })
-  describe('If current user locations exists in session', () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-        id,
-      },
-      session: {
-        data: {
-          appointments: {
-            [crn]: {
-              [id]: {
-                user: {
-                  username,
-                  providerCode,
-                  teamCode,
-                },
-              },
-            },
-          },
-          locations: {
-            [username]: mockLocationsResponse.locations,
-          },
-        },
-      },
-    })
-    beforeEach(async () => {
-      await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should not fetch the office locations from the api', () => {
-      expect(spy).not.toHaveBeenCalled()
-    })
-    it('should assign the existing session office locations to res.locals', () => {
-      expect(res.locals.userLocations).toEqual(req.session.data.locations[username])
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalled()
-    })
+  it('should assign the office locations to res.locals', () => {
+    expect(res.locals.userLocations).toEqual(mockLocationsResponse.locations)
+  })
+  it('should call next()', () => {
+    expect(nextSpy).toHaveBeenCalled()
   })
 })
