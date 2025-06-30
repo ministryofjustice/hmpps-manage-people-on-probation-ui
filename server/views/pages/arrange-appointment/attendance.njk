@@ -17,7 +17,7 @@
 
     {% set userItems = [] %}
     {% for user in userStaff %}
-        {% set userItems = (userItems.push({value: user.username, text: user.nameAndRole}), userItems) %}
+        {% set userItems = (userItems.push({value: user.username, text: user.nameAndRole, selected: user.selected}), userItems) %}
     {% endfor %}
 
     <p>You can attend or book for a colleague</p>

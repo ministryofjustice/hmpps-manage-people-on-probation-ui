@@ -13,10 +13,11 @@ jest.mock('../data/tokenStore/redisTokenStore')
 
 const username = 'user-1'
 
-const mockProvidersResponse = {
-  name: {
-    forename: 'Caroline',
-    surname: 'Wolff',
+const mockAPIResponse = {
+  defaultUserDetails: {
+    username: 'peter-parker',
+    homeArea: 'London',
+    team: 'Automated Allocation Team',
   },
   providers: [
     {
@@ -58,6 +59,24 @@ const mockProvidersResponse = {
   ],
 } as any
 
+const expectedSession = {
+  providers: [
+    {
+      code: 'N50',
+      name: 'Greater Manchester',
+    },
+    {
+      code: 'N07',
+      name: 'London',
+      selected: 'selected',
+    },
+    {
+      code: 'N54',
+      name: 'North East Region',
+    },
+  ],
+} as any
+
 const res = {
   locals: {
     user: {
@@ -74,7 +93,7 @@ describe('/middleware/getWhoAttends()', () => {
 
   const spy = jest
     .spyOn(MasApiClient.prototype, 'getUserProviders')
-    .mockImplementation(() => Promise.resolve(mockProvidersResponse))
+    .mockImplementation(() => Promise.resolve(mockAPIResponse))
 
   afterEach(() => {
     jest.clearAllMocks()
@@ -85,7 +104,7 @@ describe('/middleware/getWhoAttends()', () => {
       session: {
         data: {
           providers: {
-            'user-2': mockProvidersResponse.providers,
+            'user-2': mockAPIResponse.providers,
           },
         },
       },
@@ -97,11 +116,11 @@ describe('/middleware/getWhoAttends()', () => {
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
       expect(req.session.data.providers).toEqual({
         ...req.session.data.providers,
-        [username]: mockProvidersResponse.providers,
+        [username]: expectedSession.providers,
       })
     })
     it('should assign the user providers to res.locals', () => {
-      expect(res.locals.userProviders).toEqual(mockProvidersResponse.providers)
+      expect(res.locals.userProviders).toEqual(expectedSession.providers)
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalled()
@@ -112,7 +131,7 @@ describe('/middleware/getWhoAttends()', () => {
       session: {
         data: {
           providers: {
-            [username]: mockProvidersResponse.providers,
+            [username]: mockAPIResponse.providers,
           },
         },
       },
@@ -124,7 +143,7 @@ describe('/middleware/getWhoAttends()', () => {
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
       expect(req.session.data.providers).toEqual({
         ...req.session.data.providers,
-        [username]: mockProvidersResponse.providers,
+        [username]: expectedSession.providers,
       })
     })
     it('should assign the existing session user providers to res.locals', () => {
