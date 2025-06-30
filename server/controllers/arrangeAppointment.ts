@@ -129,10 +129,20 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   getLocation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { data } = req.session
       const { change } = req.query
-      const errors = req?.session?.data?.errors
+      const errors = data?.errors
+      const { appointment } = res.locals
+      const { username } = res.locals.user
+      const locations = data.locations[username]
       if (errors) {
         delete req.session.data.errors
+      }
+      if (!locations?.length && appointment.type?.isLocationRequired) {
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list`)
       }
       return res.render(`pages/arrange-appointment/location`, { crn, id, errors, change })
     }

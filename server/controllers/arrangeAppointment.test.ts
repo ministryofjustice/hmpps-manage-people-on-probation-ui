@@ -1,17 +1,17 @@
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
-import HmppsAuthClient from '../data/hmppsAuthClient'
-import MasApiClient from '../data/masApiClient'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import { renderError } from '../middleware'
-import { mockAppointmentTypes } from './mocks/appointmentTypes'
 import { AppointmentSession } from '../models/Appointments'
+import { Data } from '../models/Data'
+import { AppResponse } from '../models/Locals'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const crn = 'X000001'
 const number = '1234'
 const change = '/path/to/change'
+const username = 'user-1'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -38,7 +38,6 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
@@ -52,10 +51,12 @@ jest.mock('uuid', () => ({
 const req = httpMocks.createRequest({ params: { crn, id: uuid }, session: { data: {} } })
 
 const createMockRequest = ({
+  dataSession,
   appointmentSession,
   appointmentBody,
   query,
 }: {
+  dataSession?: Data
   appointmentSession?: AppointmentSession
   appointmentBody?: Record<string, string>
   query?: Record<string, string>
@@ -70,8 +71,8 @@ const createMockRequest = ({
     ...(query || {}),
   },
   session: {
-    ...(req?.session || {}),
     data: {
+      ...(dataSession || {}),
       ...(req?.session?.data || {}),
       appointments: {
         ...(req?.session?.data?.appointments || {}),
@@ -99,24 +100,23 @@ const createMockRequest = ({
   },
 })
 
-const res = mockAppResponse({
-  filters: {
-    dateFrom: '',
-    dateTo: '',
-    keywords: '',
-  },
-  flags: {
-    enableRepeatAppointments: true,
-  },
-})
+const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =>
+  mockAppResponse({
+    filters: {
+      dateFrom: '',
+      dateTo: '',
+      keywords: '',
+    },
+    flags: {
+      enableRepeatAppointments: true,
+    },
+    ...(localsResponse || {}),
+  })
+
+const res = createMockResponse()
 
 const redirectSpy = jest.spyOn(res, 'redirect')
-const statusSpy = jest.spyOn(res, 'status')
 const renderSpy = jest.spyOn(res, 'render')
-
-const getAppointmentTypesSpy = jest
-  .spyOn(MasApiClient.prototype, 'getAppointmentTypes')
-  .mockImplementation(() => Promise.resolve(mockAppointmentTypes))
 
 describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
@@ -283,7 +283,88 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
     })
   })
-  //   describe('getLocation', () => {})
+  describe('getLocation', () => {
+    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
+      mockedIsValidCrn.mockReturnValue(false)
+      mockedIsValidUUID.mockReturnValue(false)
+      const mockReq = createMockRequest({ query: { change } })
+      await controllers.arrangeAppointments.getLocation()(mockReq, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
+      expect(redirectSpy).not.toHaveBeenCalled()
+    })
+    it('If session has errors, it should delete the errors', async () => {
+      const mockReq = createMockRequest({
+        dataSession: {
+          errors: {
+            errorList: [{ text: '', href: '' }],
+            errorMessages: {
+              '#field': { text: '' },
+            },
+          },
+        },
+      })
+      await controllers.arrangeAppointments.getLocation()(mockReq, res)
+      expect(mockReq.session.errors).toBeUndefined()
+    })
+    it('If session has no user locations and type of appointment requires a location, it should redirect to the location not in list page', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        dataSession: { locations: { [username]: [] } },
+      })
+      const mockRes = createMockResponse({
+        appointment: {
+          type: {
+            isLocationRequired: true,
+          },
+        },
+      })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list`)
+    })
+    it('user locations', async () => {
+      const mockReq = createMockRequest({
+        query: { change: '' },
+        dataSession: {
+          errors: null,
+          locations: {
+            [username]: [
+              {
+                id: 1500066114,
+                code: 'LDN_BCS',
+                description: '1 REGARTH AVENUE',
+                address: {
+                  buildingNumber: '1',
+                  streetName: 'Regarth Avenue',
+                  town: 'Romford',
+                  county: 'Essex',
+                  postcode: 'RM1 1TP',
+                },
+              },
+            ],
+          },
+        },
+      })
+      const mockRes = createMockResponse({
+        appointment: {
+          type: {
+            isLocationRequired: false,
+          },
+        },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/location`, {
+        crn,
+        id: uuid,
+        errors: mockReq.session.data.errors,
+        change: mockReq.query.change,
+      })
+    })
+  })
+
   describe('postLocation', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)

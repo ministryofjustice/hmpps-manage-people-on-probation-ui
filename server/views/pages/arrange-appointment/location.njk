@@ -29,8 +29,9 @@
     {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
   {% endif %}
   {% set locationItems = (locationItems.push({text: 'The location I’m looking for is not in this list'}), locationItems) %}
-
-  {% set locationItems = (locationItems.push({text: 'I do not need to pick a location'}), locationItems) %}
+  {% if not appointment.type.isLocationRequired %}
+    {% set locationItems = (locationItems.push({text: 'I do not need to pick a location'}), locationItems) %}
+  {% endif %}
 
   {{ govukRadios({
     fieldset: {
