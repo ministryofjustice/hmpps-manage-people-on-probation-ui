@@ -1,14 +1,15 @@
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import {
   completeAttendancePage,
   completeCYAPage,
   completeDateTimePage,
   completeLocationPage,
-  completePreviewPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
+  completeNotePage,
   date,
   endTime,
   startTime,
@@ -24,7 +25,7 @@ const loadPage = () => {
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()
-  completePreviewPage()
+  completeNotePage()
   completeCYAPage()
 }
 describe('Appointments arranged', () => {
@@ -62,10 +63,9 @@ describe('Appointments arranged', () => {
         expect(normalizedText).to.include(`Alton’s phone number is 0123456999.`)
       })
 
-    confirmPage.getSubmitBtn().should('contain.text', 'Finish')
+    confirmPage.getSubmitBtn().should('contain.text', 'Arrange next appointment')
     confirmPage.getSubmitBtn().click()
-    cy.location().should(location => {
-      expect(location.href).to.eq('http://localhost:3007/')
-    })
+    const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+    arrangeAnotherAppointmentPage.checkOnPage()
   })
 })
