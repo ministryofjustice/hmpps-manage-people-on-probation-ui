@@ -11,16 +11,14 @@ export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthCl
     const providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
     const teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
     const token = await hmppsAuthClient.getSystemClientToken(username)
-    if (!req?.session?.data?.locations?.[username]) {
-      const masClient = new MasApiClient(token)
-      const userLocations = await masClient.getOfficeLocationsByTeamAndProvider(providerCode, teamCode)
-      req.session.data = {
-        ...(req?.session?.data ?? {}),
-        locations: {
-          ...(req?.session?.data?.locations ?? {}),
-          [username]: userLocations.locations,
-        },
-      }
+    const masClient = new MasApiClient(token)
+    const userLocations = await masClient.getOfficeLocationsByTeamAndProvider(providerCode, teamCode)
+    req.session.data = {
+      ...(req?.session?.data ?? {}),
+      locations: {
+        ...(req?.session?.data?.locations ?? {}),
+        [username]: userLocations.locations,
+      },
     }
     res.locals.userLocations = req.session.data.locations[username]
     return next()
