@@ -59,7 +59,7 @@ const mockAPIResponse = {
   ],
 } as any
 
-const session = {
+const expectedSession = {
   providers: [
     {
       code: 'N50',
@@ -116,11 +116,11 @@ describe('/middleware/getWhoAttends()', () => {
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
       expect(req.session.data.providers).toEqual({
         ...req.session.data.providers,
-        [username]: session.providers,
+        [username]: expectedSession.providers,
       })
     })
     it('should assign the user providers to res.locals', () => {
-      expect(res.locals.userProviders).toEqual(session.providers)
+      expect(res.locals.userProviders).toEqual(expectedSession.providers)
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalled()
@@ -143,7 +143,7 @@ describe('/middleware/getWhoAttends()', () => {
       expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
       expect(req.session.data.providers).toEqual({
         ...req.session.data.providers,
-        [username]: session.providers,
+        [username]: expectedSession.providers,
       })
     })
     it('should assign the existing session user providers to res.locals', () => {
