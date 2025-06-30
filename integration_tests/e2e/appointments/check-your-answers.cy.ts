@@ -1,6 +1,5 @@
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
-import AppointmentNotePage from '../../pages/appointments/note.page'
 import IndexPage from '../../pages'
 import {
   completeDateTimePage,
@@ -12,15 +11,7 @@ import {
   completeNotePage,
   checkPopHeader,
   checkAppointmentSummary,
-  checkUpdateDateTime,
-  checkUpdateLocation,
-  checkUpdateNotes,
-  checkUpdateRepeating,
-  checkUpdateSensitivity,
-  checkUpdateSentence,
-  checkUpdateType,
-  crn,
-  uuid,
+  checkAppointmentUpdate,
 } from './imports'
 import { statusErrors } from '../../../server/properties'
 
@@ -114,47 +105,11 @@ describe('Check your answers then confirm the appointment', () => {
 
   describe('Change appointment values', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
-    let notePage: AppointmentNotePage
     beforeEach(() => {
       loadPage({})
       cyaPage = new AppointmentCheckYourAnswersPage()
     })
-    it('should update the type when value is changed', () => {
-      checkUpdateType(cyaPage)
-    })
-    it('should update the sentence when value is changed', () => {
-      checkUpdateSentence(cyaPage)
-    })
-    it('should update the location when value is changed', () => {
-      checkUpdateLocation(cyaPage)
-    })
-    it('should update the date when value is changed', () => {
-      checkUpdateDateTime(cyaPage)
-    })
-    it('should update the repeat appointment when value is changed', () => {
-      checkUpdateRepeating(cyaPage)
-    })
-    it('should update the notes when value is changed', () => {
-      checkUpdateNotes(cyaPage)
-    })
-    it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity(cyaPage)
-    })
-    it('should update the notes when value is changed', () => {
-      cyaPage.getSummaryListRow(7).find('.govuk-link').click()
-      const updatedNotes = 'Some updated notes'
-      notePage = new AppointmentNotePage()
-      notePage.getElement(`#notes`).focus().type(updatedNotes)
-      notePage.getSubmitBtn().click()
-      cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
-    })
-    it('should update the sensitivity when value is changed', () => {
-      cyaPage.getSummaryListRow(8).find('.govuk-link').click()
-      notePage = new AppointmentNotePage()
-      notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
-      notePage.getSubmitBtn().click()
-      cyaPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
-    })
+    checkAppointmentUpdate(cyaPage)
   })
   describe('Confirm this appointment', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
