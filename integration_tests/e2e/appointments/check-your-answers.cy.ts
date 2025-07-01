@@ -1,6 +1,7 @@
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import IndexPage from '../../pages'
+
 import {
   completeDateTimePage,
   completeLocationPage,
@@ -11,7 +12,13 @@ import {
   completeNotePage,
   checkPopHeader,
   checkAppointmentSummary,
-  checkAppointmentUpdate,
+  checkUpdateDateTime,
+  checkUpdateLocation,
+  checkUpdateNotes,
+  checkUpdateRepeating,
+  checkUpdateSensitivity,
+  checkUpdateSentence,
+  checkUpdateType,
 } from './imports'
 import { statusErrors } from '../../../server/properties'
 
@@ -107,10 +114,30 @@ describe('Check your answers then confirm the appointment', () => {
   describe('Change appointment values', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
     beforeEach(() => {
-      loadPage({})
+      loadPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
     })
-    checkAppointmentUpdate(cyaPage)
+    it('should update the type when value is changed', () => {
+      checkUpdateType(cyaPage)
+    })
+    it('should update the sentence when value is changed', () => {
+      checkUpdateSentence(cyaPage)
+    })
+    it('should update the location when value is changed', () => {
+      checkUpdateLocation(cyaPage)
+    })
+    it('should update the date when value is changed', () => {
+      checkUpdateDateTime(cyaPage)
+    })
+    it('should update the repeat appointment when value is changed', () => {
+      checkUpdateRepeating(cyaPage)
+    })
+    it('should update the notes when value is changed', () => {
+      checkUpdateNotes(cyaPage)
+    })
+    it('should update the sensitivity when value is changed', () => {
+      checkUpdateSensitivity(cyaPage)
+    })
   })
   describe('Confirm this appointment', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
