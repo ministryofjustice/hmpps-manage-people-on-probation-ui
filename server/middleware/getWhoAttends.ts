@@ -2,16 +2,34 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
+import { getDataValue } from '../utils'
 
 export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { username } = res.locals.user
     const { crn, id } = req.params
-    const { providerCode, teamCode } = req.query as Record<string, string>
+    const { providerCode, teamCode, back } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
     const region = providerCode || req?.session?.data?.appointments?.[crn]?.[id]?.user?.providerCode
-    const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(username, region, teamCode)
+
+    let selectedRegion: string
+    let selectedTeam: string
+
+    if (back) {
+      const { data } = req.session
+      selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
+      selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
+    } else {
+      selectedRegion = region
+      selectedTeam = teamCode
+    }
+
+    const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(
+      username,
+      selectedRegion,
+      selectedTeam,
+    )
 
     let displayedProviders: Provider[]
     let displayedTeams: Team[]
@@ -20,9 +38,11 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     // On page load only username will be provided
     // when drop down is changed in attendance.njk
     // providerCode will be populated and potentially teamCode.
-    // Therefore, on page load need to default the drop-down to
+    // When back link is selected from location page, treat this
+    // in the same instance as providerCode flow.
+    // On page load need to default the drop-down to
     // user default values
-    if (providerCode) {
+    if (providerCode || back) {
       displayedProviders = providers
       displayedTeams = teams
       displayedUsers = users
