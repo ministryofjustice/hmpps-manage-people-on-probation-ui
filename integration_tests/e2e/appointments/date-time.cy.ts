@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
@@ -87,7 +88,7 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
       dateTimePage.getSubmitBtn().click()
@@ -112,7 +113,7 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
       dateTimePage.getSubmitBtn().click()
@@ -138,7 +139,7 @@ describe('Enter the date and time of the appointment', () => {
       cy.task('stubAppointmentClash')
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('11:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am').tab()
       dateTimePage.getSubmitBtn().click()
@@ -158,12 +159,11 @@ describe('Enter the date and time of the appointment', () => {
   })
 
   describe('Date is selected', () => {
-    const now = new Date()
-    const value = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`
+    const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getNextDayButton().click()
     })
     it('should display the date value in the field', () => {
       dateTimePage.getDatePickerInput().should('have.value', value)
@@ -173,7 +173,7 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am').tab()
       dateTimePage.getSubmitBtn().click()
