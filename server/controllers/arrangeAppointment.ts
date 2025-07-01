@@ -322,10 +322,12 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   postNotes: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      return res.redirect(redirect)
     }
   },
   getCheckYourAnswers: () => {
