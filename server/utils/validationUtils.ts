@@ -35,14 +35,22 @@ export const isNotLaterThanToday = (args: any[]) => {
 }
 
 export const isTodayOrLater = (args: any[]) => {
-  if (!args[0]) {
+  if (!args[0] || !args[1]) {
     return false
   }
-  const date = DateTime.fromFormat(args[0], 'd/M/yyyy')
+  const [timeStr, dateStr] = args
+  const date = DateTime.fromFormat(dateStr, 'd/M/yyyy')
+  const time = DateTime.fromFormat(timeStr.toUpperCase(), 'h:mma')
+  const dateAndTime = date.set({
+    hour: time.hour,
+    minute: time.minute,
+    second: 0,
+    millisecond: 0,
+  })
   if (!date.isValid) {
     return false
   }
-  return date.startOf('day') >= DateTime.now().startOf('day')
+  return dateAndTime >= DateTime.now()
 }
 
 export const timeIsNotEarlierThan = (args: any[]) => {
