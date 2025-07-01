@@ -1,7 +1,7 @@
 {% extends "../_form.njk" %}
 {% set title = "Pick a location for this appointment" %}
 
-{% set backLink = appointment.change if appointment.change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance?back=attendance' %}
+{% set backLink = appointment.change if appointment.change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
 
 {% block heading %}{% endblock %}
 {% block form %}

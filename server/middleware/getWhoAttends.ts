@@ -8,7 +8,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
   return async (req, res, next) => {
     const { username } = res.locals.user
     const { crn, id } = req.params
-    const { providerCode, teamCode, back } = req.query as Record<string, string>
+    const { providerCode, teamCode } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
     const region = providerCode || req?.session?.data?.appointments?.[crn]?.[id]?.user?.providerCode
@@ -16,9 +16,10 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     let selectedRegion: string
     let selectedTeam: string
 
-    if (back) {
-      const { data } = req.session
-      selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
+    const { data } = req.session
+    selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
+
+    if (selectedRegion) {
       selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
     } else {
       selectedRegion = region
@@ -42,7 +43,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     // in the same instance as providerCode flow.
     // On page load need to default the drop-down to
     // user default values
-    if (providerCode || back) {
+    if (providerCode || selectedRegion) {
       displayedProviders = providers
       displayedTeams = teams
       displayedUsers = users
