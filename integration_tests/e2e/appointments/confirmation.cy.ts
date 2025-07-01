@@ -1,4 +1,5 @@
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import AppointmentsPage from '../../pages/appointments'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import {
@@ -67,5 +68,11 @@ describe('Appointments arranged', () => {
     confirmPage.getSubmitBtn().click()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     arrangeAnotherAppointmentPage.checkOnPage()
+  })
+  it('should link to the appointment page when practitioner click finish', () => {
+    loadPage()
+    cy.get('[data-qa="finishLink"]').click()
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
   })
 })
