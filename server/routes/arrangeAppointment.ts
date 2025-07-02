@@ -78,6 +78,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location-not-in-list',
+    redirectWizard(['type', 'eventId']),
     getPersonalDetails(hmppsAuthClient),
     controllers.arrangeAppointments.getLocationNotInList(),
   )

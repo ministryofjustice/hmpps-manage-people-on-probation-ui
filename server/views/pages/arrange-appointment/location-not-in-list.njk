@@ -1,15 +1,19 @@
 {% extends "../_form.njk" %}
 {% set title = 'Arrange an appointment in another location' %}
-{% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/location' %}
+{% set backLink = ('/case/' + crn + '/arrange-appointment/' + id + '/type') if noLocations else ('/case/' + crn + '/arrange-appointment/' + id + '/location')  %}
 {% set notStandardForm = true %}
 {% block primary %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
- <p>You can only arrange appointments from a list of locations associated with the probation practitioner’s team.</p>
-<p>You’ll need to open {{case.name.forename}}’s case on NDelius to arrange an appointment in another location.</p>
-<p><a href="#" target="_blank">Continue on NDelius</a> (opens in new tab)</p>
-<p><a href="/">Cancel and return to preview screen</a></p>
-</div>
-</div>
+      <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
+      {{noLocations}}
+      <p>You can only arrange appointments from a list of locations associated with the probation practitioner’s team.</p>
+      <p>You’ll need to open {{case.name.forename}}’s case on NDelius to arrange an appointment in another location.</p>
+      <p>
+        <a href="#" target="_blank">Continue on NDelius</a> (opens in new tab)</p>
+      <p>
+        <a href="/">Cancel and return to preview screen</a>
+      </p>
+    </div>
+  </div>
 {% endblock %}

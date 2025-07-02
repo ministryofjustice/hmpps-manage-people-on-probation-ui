@@ -31,11 +31,6 @@ const routes = [
   'postArrangeAnotherAppointment',
 ] as const
 
-const renderLocationNotInList: Route<void> = (req, res): void => {
-  const { crn, id } = req.params as Record<string, string>
-  return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id })
-}
-
 const arrangeAppointmentController: Controller<typeof routes> = {
   redirectToType: () => {
     return async (req, res) => {
@@ -144,13 +139,12 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { change } = req.query
       const errors = data?.errors
       const { appointment } = res.locals
-      const { username } = res.locals.user
-      const locations = data.locations[username]
+      const locations = res?.locals?.userLocations || []
       if (errors) {
         delete req.session.data.errors
       }
       if (!locations?.length && appointment.type?.isLocationRequired) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list`)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
       return res.render(`pages/arrange-appointment/location`, { crn, id, errors, change })
     }
@@ -171,7 +165,11 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     }
   },
   getLocationNotInList: () => {
-    return async (req, res) => renderLocationNotInList(req, res)
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { noLocations = '' } = req.query
+      return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id, noLocations })
+    }
   },
   getDateTime: () => {
     return async (req, res) => {
