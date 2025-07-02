@@ -906,7 +906,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      const expectedClone: AppointmentSession = {
+      const expectedClone = {
         ...appointmentSession,
         date: '',
         start: '',
