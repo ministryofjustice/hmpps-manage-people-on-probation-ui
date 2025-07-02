@@ -140,7 +140,7 @@
 
 {% block headerActions %}
     <div class="moj-button-group moj-button-group--inline">
-      {% if flags.enableAppointmentCreate !== true %}
+      {% if flags.enableAppointmentCreate === true %}
       <form method="POST" action="">
           <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0 govuk-!-static-margin-right-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
                 Arrange an appointment
