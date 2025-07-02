@@ -82,6 +82,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isTodayOrLater,
           msg: 'Date must be today or in the future',
           log: 'Date must be today or in the future',
+          crossField: `[appointments][${crn}][${id}][start]`,
         },
       ],
     },
