@@ -319,10 +319,11 @@ describe('controllers/arrangeAppointment', () => {
             isLocationRequired: true,
           },
         },
+        userLocations: [],
       })
       const spy = jest.spyOn(mockRes, 'redirect')
       await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list`)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list?noLocations=true`)
     })
     it('user locations', async () => {
       const mockReq = createMockRequest({
@@ -353,6 +354,20 @@ describe('controllers/arrangeAppointment', () => {
             isLocationRequired: false,
           },
         },
+        userLocations: [
+          {
+            id: 1500066114,
+            code: 'LDN_BCS',
+            description: '1 REGARTH AVENUE',
+            address: {
+              buildingNumber: '1',
+              streetName: 'Regarth Avenue',
+              town: 'Romford',
+              county: 'Essex',
+              postcode: 'RM1 1TP',
+            },
+          },
+        ],
       })
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
