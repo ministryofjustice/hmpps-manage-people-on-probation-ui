@@ -95,7 +95,15 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance`
+
+      const { data } = req.session
+      const selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
+      const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
+
+      const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
+      const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
+
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`
       return res.redirect(redirect)
     }
   },
