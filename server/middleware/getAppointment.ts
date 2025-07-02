@@ -6,7 +6,7 @@ import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
 import { getDataValue, setDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
-import { Location } from '../data/model/caseload'
+import { Location, Team } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -85,8 +85,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       // If the region is updated on the attendance page, but the team is not, and back is selected,
       // the team code in the session is not updated.  This is because the back link does not invoke
       // a post.  The logic below will handle this scenario.
-      let selectedTeam
-      if (providerCode && teamCode && providerCode.substring(0, 3) !== teamCode.substring(0, 3)) {
+      let selectedTeam: string
+      if (teamCode && providerCode?.substring(0, 3) !== teamCode?.substring(0, 3)) {
         const team = req?.session?.data.teams?.[loggedInUsername] ? req.session.data.teams[loggedInUsername][0] : null
         selectedTeam = team.description
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], team.code)
