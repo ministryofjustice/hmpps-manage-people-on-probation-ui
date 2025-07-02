@@ -88,7 +88,6 @@ const createMockRequest = ({
   },
   session: {
     data: {
-      ...(dataSession || {}),
       ...(req?.session?.data || {}),
       appointments: {
         ...(req?.session?.data?.appointments || {}),
@@ -100,6 +99,7 @@ const createMockRequest = ({
           },
         },
       },
+      ...(dataSession || {}),
     },
   },
   body: {
@@ -336,18 +336,28 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
     })
     it('If session has errors, it should delete the errors', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({
         dataSession: {
           errors: {
             errorList: [{ text: '', href: '' }],
             errorMessages: {
-              '#field': { text: '' },
+              '#anchor': { text: '' },
             },
           },
         },
       })
-      await controllers.arrangeAppointments.getLocation()(mockReq, res)
-      expect(mockReq.session.errors).toBeUndefined()
+      const mockRes = createMockResponse({
+        appointment: {
+          type: {
+            isLocationRequired: true,
+          },
+        },
+        userLocations: [],
+      })
+      await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
+      expect(mockReq.session.data.errors).toBeUndefined()
     })
     it('If session has no user locations and type of appointment requires a location, it should redirect to the location not in list page', async () => {
       mockedIsValidCrn.mockReturnValue(true)
