@@ -717,7 +717,11 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
   })
-  //   describe('getRepeating', () => {})
+  xdescribe('getRepeating', () => {
+    it('should render the 404 page if repeat appointments flag is not enabled', () => {})
+    it(`should update appointment.repeating to 'Yes' if interval or numberOfRepeatAppointments value is in req.query`, () => {})
+    it('should render the repeating page', () => {})
+  })
   describe('postRepeating', () => {
     it('should reset the count, frequency and dates if a one off appointment', async () => {
       const appointmentSession: AppointmentSession = {
