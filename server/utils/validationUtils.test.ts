@@ -18,6 +18,7 @@ import {
   validateWithSpec,
   timeIsNotLaterThan,
   isTodayOrLater,
+  timeIsNowOrInFuture,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -122,6 +123,20 @@ describe('is not later than today', () => {
 })
 
 describe('is today or later', () => {
+  it.each([
+    ['empty string', [''], false],
+    ['null', [null], false],
+    ['undefined', [undefined], false],
+    ['populated invalid date', ['XXDFDS'], false],
+    ['populated valid', [DateTime.now().plus({ days: -1 }).toFormat('d/M/yyyy').toString()], false],
+    ['populated valid', [DateTime.now().toFormat('d/M/yyyy').toString()], true],
+    ['populated invalid', [DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString()], true],
+  ])('%s isTodayOrLater(%s, %s)', (_: string, a: [], expected: boolean) => {
+    expect(isTodayOrLater(a)).toEqual(expected)
+  })
+})
+
+describe('time is now or in future', () => {
   beforeEach(() => {
     jest.useFakeTimers()
     jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
@@ -130,25 +145,25 @@ describe('is today or later', () => {
     jest.useRealTimers()
   })
   it('should return false if date is today, but time is in the past', () => {
-    expect(isTodayOrLater(['8:00am', '1/7/2025'])).toEqual(false)
+    expect(timeIsNowOrInFuture(['1/7/2025', '8:00am'])).toEqual(false)
   })
   it('should return true if today and time is now', () => {
-    expect(isTodayOrLater(['10:00am', '1/7/2025'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'])).toEqual(true)
   })
   it('should return true if today and time is in the future', () => {
-    expect(isTodayOrLater(['10:15am', '1/7/2025'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:15am'])).toEqual(true)
   })
   it('should return false if date and time are in the past', () => {
-    expect(isTodayOrLater(['8:00am', '30/6/2025'])).toEqual(false)
+    expect(timeIsNowOrInFuture(['30/6/2025', '8:00am'])).toEqual(false)
   })
-  it('should return false if date is invalid', () => {
-    expect(isTodayOrLater(['8:00am', 'XXDFDS'])).toEqual(false)
+  it('should return true if date is invalid', () => {
+    expect(timeIsNowOrInFuture(['XXDFDS', '8:00am'])).toEqual(true)
   })
   it('should return false if date is undefined', () => {
-    expect(isTodayOrLater(['8:00am', undefined])).toEqual(false)
+    expect(timeIsNowOrInFuture([undefined, '8:00am'])).toEqual(false)
   })
   it('should return true if date and time are in the future', () => {
-    expect(isTodayOrLater(['8:00am', '2/7/2025'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['2/7/2025', '8:00am'])).toEqual(true)
   })
 })
 

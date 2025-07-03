@@ -35,22 +35,15 @@ export const isNotLaterThanToday = (args: any[]) => {
 }
 
 export const isTodayOrLater = (args: any[]) => {
-  if (!args[0] || !args[1]) {
+  if (!args[0]) {
     return false
   }
-  const [timeStr, dateStr] = args
-  const date = DateTime.fromFormat(dateStr, 'd/M/yyyy')
-  const time = DateTime.fromFormat(timeStr.toUpperCase(), 'h:mma')
-  const dateAndTime = date.set({
-    hour: time.hour,
-    minute: time.minute,
-    second: 0,
-    millisecond: 0,
-  })
+  const date = DateTime.fromFormat(args[0], 'd/M/yyyy')
   if (!date.isValid) {
     return false
   }
-  return dateAndTime >= DateTime.now()
+
+  return date.startOf('day') >= DateTime.now().startOf('day')
 }
 
 export const timeIsNotEarlierThan = (args: any[]) => {
@@ -64,6 +57,25 @@ export const timeIsNotEarlierThan = (args: any[]) => {
     return true
   }
   return notEarlierThanTime > date
+}
+
+export const timeIsNowOrInFuture = (args: any[]) => {
+  if (!args[0] || !args[1]) {
+    return false
+  }
+  const [dateStr, timeStr] = args
+  const date = DateTime.fromFormat(dateStr, 'd/M/yyyy')
+  if (date.isValid) {
+    const time = DateTime.fromFormat(timeStr.toUpperCase(), 'h:mma')
+    const dateAndTime = date.set({
+      hour: time.hour,
+      minute: time.minute,
+      second: 0,
+      millisecond: 0,
+    })
+    return dateAndTime >= DateTime.now()
+  }
+  return true
 }
 
 export const isNotEarlierThan = (args: any[]) => {
