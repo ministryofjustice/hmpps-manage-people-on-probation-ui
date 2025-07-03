@@ -152,5 +152,15 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][sensitivity]`]: {
+      optional: page !== 'add-notes',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if appointment includes sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
   }
 }
