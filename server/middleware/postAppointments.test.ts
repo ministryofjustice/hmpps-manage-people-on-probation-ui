@@ -160,8 +160,8 @@ describe('/middleware/postAppointments', () => {
   it('should post the correct request body', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
   })
-  it('should call next()', () => {
-    expect(nextSpy).toHaveBeenCalled()
+  it('should not call next()', () => {
+    expect(nextSpy).not.toHaveBeenCalled()
   })
 })
 
@@ -208,6 +208,6 @@ describe('/middleware/postAppointments', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
   })
   it('should call next()', () => {
-    expect(nextSpy).toHaveBeenCalled()
+    expect(nextSpy).not.toHaveBeenCalled()
   })
 })

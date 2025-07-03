@@ -3,8 +3,9 @@ import { DateTime } from 'luxon'
 import { Controller, Route } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
-import { renderError } from '../middleware'
+import { renderError, postAppointments } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
+import { HmppsAuthClient } from '../data'
 
 const routes = [
   'redirectToType',
@@ -337,12 +338,13 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, location, url, repeatingEnabled })
     }
   },
-  postCheckYourAnswers: () => {
+  postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      await postAppointments(hmppsAuthClient)(req, res)
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }
   },
@@ -379,7 +381,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id })
     }
   },
-  postArrangeAnotherAppointment: () => {
+  postArrangeAnotherAppointment: hmppsAuthClient => {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
@@ -390,6 +392,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!date) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/date-time?validation=true&change=${req.url}`)
       }
+      await postAppointments(hmppsAuthClient)(req, res)
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
     }
   },

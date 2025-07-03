@@ -2,7 +2,8 @@ import httpMocks from 'node-mocks-http'
 import controllers from '.'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
-import { renderError } from '../middleware'
+import HmppsAuthClient from '../data/hmppsAuthClient'
+import { postAppointments, renderError } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
@@ -29,6 +30,7 @@ jest.mock('../utils', () => {
 const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
+  postAppointments: jest.fn(),
 }))
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
@@ -38,11 +40,13 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockedIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNumericString>
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockedPostAppointments = postAppointments as jest.MockedFunction<typeof postAppointments>
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
@@ -527,7 +531,8 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postCheckYourAnswers()(mockReq, res)
+      mockedPostAppointments.mockReturnValue(mockMiddlewareFn)
+      await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -536,7 +541,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postCheckYourAnswers()(mockReq, res)
+      await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })
   })
