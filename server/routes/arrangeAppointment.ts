@@ -116,7 +116,11 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     controllers.arrangeAppointments.getNotes(),
   )
 
-  router.post('/case/:crn/arrange-appointment/:id/add-notes', controllers.arrangeAppointments.postNotes())
+  router.post(
+    '/case/:crn/arrange-appointment/:id/add-notes',
+    validate.appointments,
+    controllers.arrangeAppointments.postNotes(),
+  )
 
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',

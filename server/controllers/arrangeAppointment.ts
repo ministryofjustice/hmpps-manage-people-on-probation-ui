@@ -303,11 +303,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   getNotes: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
       const { change } = req.query
-      if (!getDataValue(data, ['appointments', crn, id, 'sensitivity'])) {
-        setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'No')
-      }
       const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
       const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
       return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back, change })
