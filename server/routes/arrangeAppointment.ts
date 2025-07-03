@@ -126,8 +126,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
-    postAppointments(hmppsAuthClient),
-    controllers.arrangeAppointments.postCheckYourAnswers(),
+    controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient),
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
@@ -143,8 +142,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
-    postAppointments(hmppsAuthClient),
-    controllers.arrangeAppointments.postArrangeAnotherAppointment(),
+    controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
   )
 }
 

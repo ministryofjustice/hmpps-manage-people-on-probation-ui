@@ -5,7 +5,7 @@ import { Route } from '../@types'
 import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async (req, res) => {
     const { crn, id: uuid } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
@@ -57,6 +57,5 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       body.nsiId = parseInt(nsiId as string, 10)
     }
     await masClient.postAppointments(crn, body)
-    return next()
   }
 }
