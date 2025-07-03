@@ -4,7 +4,7 @@ import {
   isValidDateFormat,
   isStringNumber,
   timeIsNotLaterThan,
-  timeIsNotEarlierThan,
+  timeIsNowOrInFuture,
   isTodayOrLater,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
@@ -82,7 +82,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isTodayOrLater,
           msg: 'Date must be today or in the future',
           log: 'Date must be today or in the future',
-          crossField: `[appointments][${crn}][${id}][start]`,
         },
       ],
     },
@@ -95,10 +94,10 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Appointment start time not selected or entered',
         },
         {
-          validator: timeIsNotEarlierThan,
-          msg: 'The end time must be after the start time',
-          log: 'The end time must be after the start time',
-          crossField: `[appointments][${crn}][${id}][end]`,
+          validator: timeIsNowOrInFuture,
+          msg: 'The start time must be now or in the future',
+          log: 'The start time must be now or in the future',
+          crossField: `[appointments][${crn}][${id}][date]`,
         },
       ],
     },
