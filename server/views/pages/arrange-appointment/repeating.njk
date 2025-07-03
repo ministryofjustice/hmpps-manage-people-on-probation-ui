@@ -1,7 +1,7 @@
 {% extends "../_form.njk" %}
 {% set title = 'Will the appointment repeat?' %}
 {% block heading %}{% endblock %}
-{% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/date-time' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/date-time' %}
 
 {% block form %}
   {% if errorMessages %}

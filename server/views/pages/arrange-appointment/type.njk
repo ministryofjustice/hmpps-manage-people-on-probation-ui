@@ -1,7 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'What appointment are you arranging?' %}
-{% set backLink = appointment.change if appointment.change else 
-  '/case/' + crn + '/appointments' %}
+{% set backLink = change if change else '/case/' + crn + '/appointments' %}
 {% set types = [] %}
 {% for appointmentType in appointmentTypes %}
   {% set types = (types.push({
