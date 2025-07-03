@@ -49,7 +49,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params
-      return res.render(`pages/arrange-appointment/type`, { crn, id, errors })
+      const { change } = req.query
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
     }
   },
   postType: () => {
@@ -302,12 +303,13 @@ const arrangeAppointmentController: Controller<typeof routes> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
+      const { change } = req.query
       if (!getDataValue(data, ['appointments', crn, id, 'sensitivity'])) {
         setDataValue(data, ['appointments', crn, id, 'sensitivity'], 'No')
       }
       const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
       const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
-      return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back })
+      return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back, change })
     }
   },
   postNotes: () => {
