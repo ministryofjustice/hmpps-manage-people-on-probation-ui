@@ -101,17 +101,14 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateSensitivity = () => {
     if (req.url.includes('/add-notes')) {
-      const notes = req.body?.appointments?.[crn]?.[id]?.notes
-      if (notes) {
-        errorMessages = validateWithSpec(
-          req.body,
-          appointmentsValidation({
-            crn,
-            id,
-            page: 'add-notes',
-          }),
-        )
-      }
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'add-notes',
+        }),
+      )
     }
   }
 
