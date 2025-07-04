@@ -32,7 +32,7 @@ describe('Add a note', () => {
   it('should be on add note page', () => {
     appointmentNotePage.checkOnPage()
   })
-  it('should show validation errors if a note is entered and no sensitivity option is selected', () => {
+  it('should show validation errors if sensitivity option is selected', () => {
     cy.get('textarea').clear()
     cy.get('textarea').type('A test note')
     appointmentNotePage.getSubmitBtn().click()
