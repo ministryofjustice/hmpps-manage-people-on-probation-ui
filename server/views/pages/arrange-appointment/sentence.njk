@@ -15,8 +15,8 @@
     {% endif %}
   {% endif %}
   {% set allSentences = [] %}
-  {% set sentenceReveal = '' %}
   {% for sentence in sentences %}
+    {% set sentenceReveal = '' %}
     {% set reveal = '' %}
     {% if sentence.requirements.length %}
       {% set requirements = [] %}
