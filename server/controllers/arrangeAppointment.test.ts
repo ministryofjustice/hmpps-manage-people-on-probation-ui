@@ -8,6 +8,7 @@ import { postAppointments, renderError } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
+import { ArrangedSession } from '../models/ArrangedSession'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const uuid2 = 'f1654ea3-0abb-46eb-860b-654a96edbe21'
@@ -15,6 +16,8 @@ const crn = 'X000001'
 const number = '1234'
 const change = '/path/to/change'
 const username = 'user-1'
+
+jest.mock('../models/ArrangedSession')
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -717,12 +720,80 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
   })
-  xdescribe('getRepeating', () => {
-    it('should render the 404 page if repeat appointments flag is not enabled', () => {})
-    it(`should update appointment.repeating to 'Yes' if interval or numberOfRepeatAppointments value is in req.query`, () => {})
-    it('should render the repeating page', () => {})
+  describe('getRepeating', () => {
+    it('should render the 404 page if repeat appointments flag is not enabled', async () => {
+      const mockReq = createMockRequest()
+      const mockRes = createMockResponse({
+        flags: {
+          enableRepeatAppointments: false,
+        },
+      })
+      await controllers.arrangeAppointments.getRepeating()(mockReq, mockRes)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
+    })
+    it(`should update appointment.repeating to 'Yes' if interval or numberOfRepeatAppointments value is in req.query`, async () => {
+      const mockReq = createMockRequest({ query: { numberOfRepeatAppointments: '2' } })
+      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'repeating'],
+        'Yes',
+      )
+    })
+    it(`should update appointment.interval session value to req.query.interval if included in the url`, async () => {
+      const mockReq = createMockRequest({ query: { interval: 'DAY' } })
+      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'interval'],
+        mockReq.query.interval,
+      )
+    })
+    it(`should update appointment.numberOfRepeatAppointments session value to req.query.numberOfRepeatAppointments if included in the url`, async () => {
+      const mockReq = createMockRequest({ query: { numberOfRepeatAppointments: '3' } })
+      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
+        mockReq.query.numberOfRepeatAppointments,
+      )
+    })
+    it('should set the repeatingDates', async () => {
+      const spy = jest.spyOn(ArrangedSession, 'generateRepeatedAppointments').mockReturnValue([
+        { uuid: '1', date: '19/4/2025' },
+        { uuid: '2', date: '26/4/2025' },
+      ])
+      const mockReq = createMockRequest({
+        appointmentSession: {
+          date: '12/4/2025',
+          interval: 'FORTNIGHT',
+          numberOfRepeatAppointments: '2',
+        },
+      })
+      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
+      expect(spy).toHaveBeenCalledWith(mockReq.session.data.appointments[crn][uuid], 'week', 2)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'repeatingDates'],
+        ['19/4/2025', '26/4/2025'],
+      )
+      expect(res.locals.lastAppointmentDate).toEqual('26/4/2025')
+    })
+    // it('should render the repeating page', () => {})
   })
   describe('postRepeating', () => {
+    it('should render the 404 page if repeat appointments flag is not enabled', async () => {
+      const mockReq = createMockRequest()
+      const mockRes = createMockResponse({
+        flags: {
+          enableRepeatAppointments: false,
+        },
+      })
+      await controllers.arrangeAppointments.postRepeating()(mockReq, mockRes)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
+    })
     it('should reset the count, frequency and dates if a one off appointment', async () => {
       const appointmentSession: AppointmentSession = {
         user: {
@@ -768,25 +839,11 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
   })
-  //   describe('getPreview', () => {})
-  describe('postPreview', () => {
-    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
-      mockedIsValidCrn.mockReturnValue(false)
-      mockedIsValidUUID.mockReturnValue(false)
-      const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postNotes()(mockReq, res)
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
-      expect(redirectSpy).not.toHaveBeenCalled()
-    })
-    it('should redirect to the check your answers page', async () => {
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postNotes()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
-    })
-  })
+  // xdescribe('getNotes', () => {
+  //   it('should', async () => {
+  //     await controllers.arrangeAppointments.getNotes(hmppsAuthClient)(mockReq, res)
+  //   })
+  // })
   //   describe('getCheckYourAnswers', () => {})
   describe('postCheckYourAnswers', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
