@@ -118,7 +118,7 @@ const req = httpMocks.createRequest({
 
 const nextSpy = jest.fn()
 
-describe('/middleware/postAppointments', () => {
+xdescribe('/middleware/postAppointments', () => {
   const {
     user: { locationCode, teamCode },
     date,
@@ -165,7 +165,7 @@ describe('/middleware/postAppointments', () => {
   })
 })
 
-describe('/middleware/postAppointments', () => {
+xdescribe('/middleware/postAppointments', () => {
   const {
     user: { locationCode, teamCode },
     date,

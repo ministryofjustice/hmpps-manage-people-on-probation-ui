@@ -438,7 +438,7 @@ describe('controllers/arrangeAppointment', () => {
   //   describe('getLocationNotInList', () => {})
   //   describe('getDateTime', () => {})
   describe('postDateTime', () => {
-    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
+    it('should return a 404 status and render the error page, if CRN or UUID in request params are invalid', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({ query: { change } })
@@ -447,12 +447,110 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-    it('should redirect to the repeating page', async () => {
+
+    it('should update the repeating dates and until date if changing the date and repeating appointments enabled', async () => {
+      const mockReq = createMockRequest({
+        query: { change },
+        appointmentSession: {
+          date: '2025-07-07',
+          start: '9:00am',
+          end: '9:30am',
+          numberOfAppointments: '3',
+          numberOfRepeatAppointments: '2',
+          interval: 'WEEK',
+          repeating: 'Yes',
+        },
+      })
+      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: true } })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.postDateTime()(mockReq, mockRes)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'until'],
+        '2025-07-21',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'repeatingDates'],
+        ['2025-07-14', '2025-07-21'],
+      )
+    })
+    it('should set the default date values if repeating appointment disabled and not changing the date', async () => {
+      const mockReq = createMockRequest({
+        query: { change },
+        appointmentSession: {
+          date: '2025-07-07',
+          start: '9:00am',
+          end: '9:30am',
+          numberOfAppointments: '1',
+          numberOfRepeatAppointments: '0',
+          interval: 'DAY',
+        },
+      })
+      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: false } })
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.postDateTime()(mockReq, mockRes)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'numberOfAppointments'],
+        '1',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
+        '0',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
+        '0',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'interval'],
+        'DAY',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'until'],
+        '2025-07-07',
+      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'repeatingDates'],
+        [],
+      )
+    })
+
+    it('should redirect to the repeating page if repeating appointments flag enabled', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      const mockReq = createMockRequest({
+        appointmentSession: {
+          date: '2025-07-07',
+          start: '9:00am',
+          end: '9:30am',
+          numberOfAppointments: '1',
+          numberOfRepeatAppointments: '0',
+          interval: 'DAY',
+        },
+      })
+      await controllers.arrangeAppointments.postDateTime()(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/repeating`)
+    })
+
+    it('should redirect to the add notes page if repeating appointments flag disabled', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: false } })
+      const spy = jest.spyOn(mockRes, 'redirect')
       const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postDateTime()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/repeating`)
+      await controllers.arrangeAppointments.postDateTime()(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/add-notes`)
     })
     it('should redirect to change url if in request params', async () => {
       const mockReq = createMockRequest({ query: { change } })

@@ -206,20 +206,23 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
       const { data } = req.session
       const path = ['appointments', crn, id]
-      const { numberOfAppointments, numberOfRepeatAppointments, until, date, interval } =
-        getDataValue<AppointmentSession>(data, path)
-      if (!numberOfAppointments) {
+      const appointment = getDataValue<AppointmentSession>(data, path)
+      const { date, interval } = appointment
+      let until = date
+      let repeatingDates = [] as string[]
+      if (change && repeatAppointmentsEnabled) {
+        const period = ['WEEK', 'FORTNIGHT'].includes(interval) ? 'week' : 'month'
+        const increment = interval === 'FORTNIGHT' ? 2 : 1
+        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment)
+        repeatingDates = repeatAppointments.map(appt => appt.date)
+        until = repeatAppointments.length ? repeatAppointments[repeatAppointments.length - 1].date : ''
+      } else {
         setDataValue(data, [...path, 'numberOfAppointments'], '1')
-      }
-      if (!numberOfRepeatAppointments) {
         setDataValue(data, [...path, 'numberOfRepeatAppointments'], '0')
-      }
-      if (!until) {
-        setDataValue(data, [...path, 'until'], date)
-      }
-      if (!interval) {
         setDataValue(data, [...path, 'interval'], 'DAY')
       }
+      setDataValue(data, [...path, 'until'], until)
+      setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
       const nextPage = repeatAppointmentsEnabled
         ? `/case/${crn}/arrange-appointment/${id}/repeating`
         : `/case/${crn}/arrange-appointment/${id}/add-notes`
