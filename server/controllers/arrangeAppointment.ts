@@ -373,6 +373,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         until: '',
         numberOfAppointments: '1',
         numberOfRepeatAppointments: '0',
+        repeating: 'No',
       }
       setDataValue(data, ['appointments', crn, uuid], copiedAppt)
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
