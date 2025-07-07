@@ -901,11 +901,14 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      const expectedClone = {
+      const expectedClone: AppointmentSession = {
         ...appointmentSession,
         date: '',
         start: '',
         end: '',
+        until: '',
+        numberOfAppointments: '1',
+        numberOfRepeatAppointments: '0',
         repeatingDates: [] as string[],
       }
       expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid2], expectedClone)
