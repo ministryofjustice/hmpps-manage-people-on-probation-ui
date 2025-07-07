@@ -1,4 +1,5 @@
 import httpMocks from 'node-mocks-http'
+import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
@@ -9,6 +10,7 @@ import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
+const uuid2 = 'f1654ea3-0abb-46eb-860b-654a96edbe21'
 const crn = 'X000001'
 const number = '1234'
 const change = '/path/to/change'
@@ -39,6 +41,9 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+jest.mock('uuid', () => ({
+  v4: jest.fn(),
+}))
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
@@ -47,12 +52,10 @@ const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNumericString>
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockedPostAppointments = postAppointments as jest.MockedFunction<typeof postAppointments>
-
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => uuid),
-}))
-
+const mockedV4 = uuidv4 as jest.MockedFunction<typeof uuidv4>
 const req = httpMocks.createRequest({ params: { crn, id: uuid }, session: { data: {} } })
+
+mockedV4.mockReturnValue(uuid as unknown as ReturnType<typeof uuidv4>)
 
 const createMockRequest = ({
   dataSession,
@@ -154,7 +157,7 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
   //   describe('getType', () => {})
-  xdescribe('postType', () => {
+  describe('postType', () => {
     describe('CRN and UUID are valid in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(true)
@@ -546,5 +549,56 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
   //   describe('getConfirmation', () => {})
-  //   describe('postConfirmation', () => {})
+  describe('postConfirmation', () => {
+    const appointmentSession: AppointmentSession = {
+      user: {
+        username: 'user-1',
+        locationCode: `location`,
+        teamCode: '',
+      },
+      repeating: 'No',
+      date: '7/7/2025',
+      start: '9:00am',
+      end: '10:00am',
+      repeatingDates: ['14/7/2025', '21/7/2025'],
+      until: '21/7/2025',
+      numberOfAppointments: '3',
+      numberOfRepeatAppointments: '2',
+    }
+    const mockReq = createMockRequest({ appointmentSession })
+    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
+      mockedIsValidCrn.mockReturnValue(false)
+      mockedIsValidUUID.mockReturnValue(false)
+      mockedV4.mockReturnValueOnce(uuid2 as unknown as ReturnType<typeof uuidv4>)
+      mockedPostAppointments.mockReturnValue(mockMiddlewareFn)
+      await controllers.arrangeAppointments.postConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
+      expect(redirectSpy).not.toHaveBeenCalled()
+    })
+    it('should clone the current appointment with new uuid', async () => {
+      mockedV4.mockReturnValueOnce(uuid2 as unknown as ReturnType<typeof uuidv4>)
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.postConfirmation(hmppsAuthClient)(mockReq, res)
+      const expectedAppt: AppointmentSession = {
+        ...appointmentSession,
+        date: '',
+        start: '',
+        end: '',
+        repeatingDates: [],
+        until: '',
+        numberOfAppointments: '1',
+        numberOfRepeatAppointments: '0',
+      }
+      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid2], expectedAppt)
+    })
+    it('should redirect to arrange another appointment page', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      mockedV4.mockReturnValueOnce(uuid2 as unknown as ReturnType<typeof uuidv4>)
+      await controllers.arrangeAppointments.postConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid2}/arrange-another-appointment`)
+    })
+  })
 })

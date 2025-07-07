@@ -361,12 +361,15 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const uuid = uuidv4()
       const { data } = req.session
       const currentAppt = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-      const copiedAppt = {
+      const copiedAppt: AppointmentSession = {
         ...currentAppt,
         date: '',
         start: '',
         end: '',
         repeatingDates: [] as string[],
+        until: '',
+        numberOfAppointments: '1',
+        numberOfRepeatAppointments: '0',
       }
       setDataValue(data, ['appointments', crn, uuid], copiedAppt)
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
