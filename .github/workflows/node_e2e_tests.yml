@@ -1,9 +1,16 @@
 name: E2E Tests
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+  workflow_call:
+    inputs:
+      node_version_file:
+        description: 'Passed to setup-node action to specify where to source the version of node from'
+        required: false
+        type: string
+        default: '.nvmrc'
+
+permissions:
+  contents: read
 
 jobs:
   e2e:
