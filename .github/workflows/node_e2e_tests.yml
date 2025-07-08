@@ -1,63 +1,76 @@
-name: E2E Tests
+name: E2E Form Submission Tests
 
 on:
   workflow_call:
     inputs:
       node_version_file:
-        description: 'Passed to setup-node action to specify where to source the version of node from'
+        description: "Path to Node version file"
         required: false
         type: string
-        default: '.nvmrc'
+        default: ".nvmrc"
 
 permissions:
   contents: read
 
 jobs:
-  e2e:
+  e2e_form_tests:
+    name: Run Cypress form submit & replay tests
     runs-on: ubuntu-latest
 
-    services:
-      web:
-        image: node:20
-        ports:
-          - 3000:3000
-        options: >-
-          --health-cmd "curl -f http://localhost:3000 || exit 1"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ inputs.node_version_file }}
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ${{ inputs.node_version_file }}
+
+      - name: Restore cache
+        id: restore-cache
+        uses: actions/cache/restore@v4
+        env:
+          cache-name: node-modules
+        with:
+          path: |
+            ./node_modules
+            ~/.cache/Cypress
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: npm_build_artifacts
+          path: |
+            build/
+            dist/
+            assets/stylesheets/
+
+      - name: Start backend for Cypress E2E
+        shell: bash
+        run: |
+          nohup npm run start-feature &
+          sleep 10
         env:
           NODE_ENV: test
 
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - name: Run Cypress test: form + save request body
+        run: npx cypress run --spec "integration_tests/e2e/appointments/save-request.cy.ts"
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      - name: Run Cypress test: replay to API
+        run: npx cypress run --spec "integration_tests/e2e/appointments/post-appointment.cy.ts"
+
+      - name: Upload Cypress artifacts (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
         with:
-          node-version: 20
+          name: cypress-artifacts
+          path: |
+            cypress/screenshots
+            cypress/videos
 
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build and start the app
-        run: |
-          npm run build
-          npm start:dev &
-        env:
-          PORT: 3000
-          API_BASE_URL: http://localhost:3000 # If needed
-
-      - name: Wait for app to be up
-        run: npx wait-on http://localhost:3000
-
-      - name: Run Cypress E2E tests
-        uses: cypress-io/github-action@v6
+      - name: Fail if any Cypress test failed
+        if: failure()
+        uses: actions/github-script@v7
         with:
-          start: npm start
-          wait-on: 'http://localhost:3000'
-          browser: chrome
-          spec: |
-            integration_tests/e2e/appointments/save-request.cy.ts
-            integration_tests/e2e/appointments/post-appointment.cy.ts
+          script: |
+            core.setFailed('E2E form submit or replay test failed')
