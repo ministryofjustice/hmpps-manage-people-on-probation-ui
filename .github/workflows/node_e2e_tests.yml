@@ -53,10 +53,10 @@ jobs:
         env:
           NODE_ENV: test
 
-      - name: Run Cypress test: form + save request body
+      - name: Run Cypress test: save post appointment request
         run: npx cypress run --spec "integration_tests/e2e/appointments/save-request.cy.ts"
 
-      - name: Run Cypress test: replay to API
+      - name: Run Cypress test: post the request to the create appointment api endpoint
         run: npx cypress run --spec "integration_tests/e2e/appointments/post-appointment.cy.ts"
 
       - name: Upload Cypress artifacts (on failure)
