@@ -30,6 +30,8 @@ jest.mock('../utils', () => {
 })
 
 const mockMiddlewareFn = jest.fn()
+
+const mockPostAppointmentsFn = jest.fn().mockResolvedValue([{}, 'response'])
 jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
   postAppointments: jest.fn(),
@@ -534,7 +536,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       const mockReq = createMockRequest({})
-      mockedPostAppointments.mockReturnValue(mockMiddlewareFn)
+      mockedPostAppointments.mockReturnValue(mockPostAppointmentsFn)
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
@@ -544,6 +546,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({})
+      mockedPostAppointments.mockReturnValue(mockPostAppointmentsFn)
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })

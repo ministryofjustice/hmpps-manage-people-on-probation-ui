@@ -6,7 +6,7 @@ export default class AppointmentConfirmationPage extends Page {
   }
 
   getPanel = () => {
-    return cy.get(`.govuk-panel`)
+    return cy.get(`.govuk-panel`, { timeout: 10000 })
   }
 
   getWhatHappensNext = () => {

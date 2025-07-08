@@ -1,11 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
-import { Controller, Route } from '../@types'
+import { Controller } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments } from '../middleware'
-import { AppointmentSession } from '../models/Appointments'
-import { HmppsAuthClient } from '../data'
+import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
 
 const routes = [
   'redirectToType',
@@ -25,6 +24,7 @@ const routes = [
   'getNotes',
   'postNotes',
   'getCheckYourAnswers',
+  'getPostAppointmentsRequestBody',
   'postCheckYourAnswers',
   'getConfirmation',
   'postConfirmation',
@@ -32,6 +32,7 @@ const routes = [
   'postArrangeAnotherAppointment',
 ] as const
 
+let lastRequestBody: AppointmentRequestBody = null
 const arrangeAppointmentController: Controller<typeof routes> = {
   redirectToType: () => {
     return async (req, res) => {
@@ -342,8 +343,14 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      await postAppointments(hmppsAuthClient)(req, res)
+      const [body] = await postAppointments(hmppsAuthClient)(req, res)
+      lastRequestBody = body
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+    }
+  },
+  getPostAppointmentsRequestBody: () => {
+    return async (_req, res) => {
+      return res.json(lastRequestBody)
     }
   },
   getConfirmation: () => {

@@ -4,7 +4,9 @@ import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
 
-export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const postAppointments = (
+  hmppsAuthClient: HmppsAuthClient,
+): Route<Promise<[AppointmentRequestBody, unknown]>> => {
   return async (req, res) => {
     const { crn, id: uuid } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -56,6 +58,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
-    await masClient.postAppointments(crn, body)
+    const response = await masClient.postAppointments(crn, body)
+    return [body, response]
   }
 }
