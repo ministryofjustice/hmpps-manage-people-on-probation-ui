@@ -1,4 +1,4 @@
-name: E2E Form Submission Tests
+name: E2E Tests
 
 on:
   workflow_call:
@@ -45,19 +45,43 @@ jobs:
             dist/
             assets/stylesheets/
 
-      - name: Start backend for Cypress E2E
+      #####################################################
+      ## First Phase: Run app with feature env + form flow
+      #####################################################
+
+      - name: Start backend for capturing the request
         shell: bash
         run: |
-          nohup npm run start-feature &
+          npm run start-feature &
           sleep 10
         env:
           NODE_ENV: test
 
-      - name: Run Cypress test: save post appointment request
+      - name: Run Cypress test: save-request
         run: npx cypress run --spec "integration_tests/e2e/appointments/save-request.cy.ts"
 
-      - name: Run Cypress test: post the request to the create appointment api endpoint
+      - name: Kill server (after form test)
+        run: |
+          pkill -f "node.*server.js" || true
+
+      ####################################################
+      ## Second Phase: Run app with standard env + replay
+      ####################################################
+
+      - name: Start backend for posting request to api
+        shell: bash
+        run: |
+          npm run start &
+          sleep 10
+        env:
+          NODE_ENV: test
+
+      - name: Run Cypress test: post-appointment
         run: npx cypress run --spec "integration_tests/e2e/appointments/post-appointment.cy.ts"
+
+      - name: Kill server (after replay test)
+        run: |
+          pkill -f "node.*server.js" || true
 
       - name: Upload Cypress artifacts (on failure)
         if: failure()
