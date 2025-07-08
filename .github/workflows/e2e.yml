@@ -1,0 +1,56 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+
+    services:
+      web:
+        image: node:20
+        ports:
+          - 3000:3000
+        options: >-
+          --health-cmd "curl -f http://localhost:3000 || exit 1"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          NODE_ENV: test
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build and start the app
+        run: |
+          npm run build
+          npm start:dev &
+        env:
+          PORT: 3000
+          API_BASE_URL: http://localhost:3000 # If needed
+
+      - name: Wait for app to be up
+        run: npx wait-on http://localhost:3000
+
+      - name: Run Cypress E2E tests
+        uses: cypress-io/github-action@v6
+        with:
+          start: npm start
+          wait-on: 'http://localhost:3000'
+          browser: chrome
+          spec: |
+            integration_tests/e2e/appointments/save-request.cy.ts
+            integration_tests/e2e/appointments/post-appointment.cy.ts
