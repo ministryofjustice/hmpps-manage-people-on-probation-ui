@@ -22,12 +22,11 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       requirementId = '',
       licenceConditionId = '',
       nsiId = '',
-      until: repeatUntilDate = '',
       notes,
       sensitivity,
+      until: untilDate,
       visorReport,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
-    const until = repeatUntilDate || date
     const body: AppointmentRequestBody = {
       user: {
         username,
@@ -42,7 +41,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       eventId: parseInt(eventId, 10),
       uuid,
       createOverlappingAppointment: true,
-      until: dateTime(until, end),
+      until: dateTime(untilDate, end),
       notes,
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
