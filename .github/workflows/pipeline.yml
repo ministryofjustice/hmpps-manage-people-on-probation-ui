@@ -51,7 +51,9 @@ jobs:
   node_e2e_tests:
     name: node e2e tests
     uses: ./.github/workflows/node_e2e_tests.yml # WORKFLOW_VERSION
-    needs: [node_unit_tests, node_integration_tests]
+    needs:
+      - node_integration_tests
+      - node_unit_tests
     secrets: inherit
   sonarcloud:
     name: SonarCloud
