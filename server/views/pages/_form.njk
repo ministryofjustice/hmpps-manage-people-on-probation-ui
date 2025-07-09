@@ -2,23 +2,23 @@
 
 {% block beforeContent %}
   {{ govukBackLink({
-    href: backLink
+    href: backLink + ("?change=" + change if change else '')
   }) }}
 {% endblock %}
 
 {% block content %}
- {% if notStandardForm %}
+  {% if notStandardForm %}
     {% block primary %}{% endblock %}
   {% else %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-      {% block heading %}
-         <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+        {% block heading %}
+          <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
             {{ title }}
           </h1>
-          {% endblock %}
+        {% endblock %}
         <form method="post" autocomplete="off" action="{{ action if action else paths.current }}">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
           {% block form %}{% endblock %}
           {{ govukButton({
             html: buttonText if buttonText else 'Continue',
@@ -30,5 +30,5 @@
         </form>
       </div>
     </div>
-      {% endif %}
+  {% endif %}
 {% endblock %}
