@@ -92,14 +92,11 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
       const { data } = req.session
       const selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
       const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
-
       const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
-
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`
       return res.redirect(redirect)
     }
@@ -162,15 +159,22 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       }
       const page =
         selectedLocation === `The location I’m looking for is not in this list` ? 'location-not-in-list' : 'date-time'
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/${page}`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/${page}`
+      if (change && page !== 'location-not-in-list') {
+        redirect = change
+      }
+      if (change && page === 'location-not-in-list') {
+        redirect = `${redirect}?change=${change}`
+      }
       return res.redirect(redirect)
     }
   },
   getLocationNotInList: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
       const { noLocations = '' } = req.query
-      return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id, noLocations })
+      return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id, noLocations, change })
     }
   },
   getDateTime: () => {

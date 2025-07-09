@@ -2,6 +2,7 @@ import { dateWithYear } from '../../../server/utils'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
+import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
@@ -134,6 +135,7 @@ describe('Check your answers then confirm the appointment', () => {
     let dateTimePage: AppointmentDateTimePage
     let locationPage: AppointmentLocationPage
     let repeatingPage: AppointmentRepeatingPage
+    let locationNotInListPage: AppointmentLocationNotInListPage
     beforeEach(() => {
       loadPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
@@ -168,6 +170,17 @@ describe('Check your answers then confirm the appointment', () => {
       locationPage.getSubmitBtn().click()
       cyaPage.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', '102 Petty France')
     })
+    it('should update the location by clicking on location not in list, then back link, then updating the value', () => {
+      cyaPage.getSummaryListRow(4).find('.govuk-link').click()
+      locationPage = new AppointmentLocationPage()
+      locationPage.getRadio('locationCode', 4).click()
+      locationPage.getSubmitBtn().click()
+      locationNotInListPage = new AppointmentLocationNotInListPage()
+      locationNotInListPage.getBackLink().click()
+      locationPage.getRadio('locationCode', 2).click()
+      locationPage.getSubmitBtn().click()
+      cyaPage.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', '102 Petty France')
+    })
     it('should update the date/time when value is changed', () => {
       const changedStart = '9:30am'
       const changedEnd = '10:30am'
@@ -187,22 +200,23 @@ describe('Check your answers then confirm the appointment', () => {
           expect(normalizedText).to.include(`${dateWithYear(date)} from ${changedStart} to ${changedEnd}`)
         })
     })
-    // it('should update the repeating appointment when value is changed', () => {
-    //   cyaPage.getSummaryListRow(5).find('.govuk-link').click()
-    //   repeatingPage = new AppointmentRepeatingPage()
-    //   repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
-    //   repeatingPage.getSubmitBtn().click()
-    //   cyaPage.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'No')
-    //   cyaPage.getSummaryListRow(4).find('.govuk-summary-list__value li').should('have.length', 1)
-    //   cyaPage
-    //     .getSummaryListRow(4)
-    //     .find('.govuk-summary-list__value li:nth-child(1)')
-    //     .invoke('text')
-    //     .then(text => {
-    //       const normalizedText = text.replace(/\s+/g, ' ').trim()
-    //       expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
-    //     })
-    // })
+
+    it('should update the repeating appointment when value is changed', () => {
+      cyaPage.getSummaryListRow(6).find('.govuk-link').click()
+      repeatingPage = new AppointmentRepeatingPage()
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
+      repeatingPage.getSubmitBtn().click()
+      cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'No')
+      cyaPage.getSummaryListRow(5).find('.govuk-summary-list__value li').should('have.length', 1)
+      cyaPage
+        .getSummaryListRow(5)
+        .find('.govuk-summary-list__value li:nth-child(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+        })
+    })
   })
   describe('Confirm this appointment', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
