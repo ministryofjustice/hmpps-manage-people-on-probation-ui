@@ -1,7 +1,8 @@
-export type StatusErrorCode = 404 | 500
+export type StatusErrorCode = 404 | 409 | 500
 
+type StatusError = { title: string; message: string }
 type StatusErrorsType = {
-  [key in StatusErrorCode]: { title: string; message: string }
+  [key in StatusErrorCode]: StatusError
 }
 
 export const statusErrors: StatusErrorsType = {
@@ -14,5 +15,9 @@ export const statusErrors: StatusErrorsType = {
     title: 'Sorry, there is a problem with the service',
     message:
       '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p>',
+  },
+  409: {
+    title: 'You’ve already arranged this appointment',
+    message: `<p><a href="/" data-qa="homepageLink">Go to the Manage people on probation homepage</a> to see your upcoming appointments.</p>`,
   },
 }
