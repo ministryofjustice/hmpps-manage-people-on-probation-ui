@@ -24,6 +24,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       nsiId = '',
       notes,
       sensitivity,
+      file = null,
       until: untilDate,
       visorReport,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
@@ -55,6 +56,6 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
-    await masClient.postAppointments(crn, body)
+    await masClient.postAppointments(crn, body, file)
   }
 }

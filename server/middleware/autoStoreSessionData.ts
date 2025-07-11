@@ -10,7 +10,11 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
     const newSessionData = req?.session?.data ?? {}
     const { crn, id } = req.params
     const inputs: Record<string, any> = req.body ?? {}
-
+    const file = req?.file
+    if (req?.file) {
+      const { fieldname, originalname, mimetype, buffer } = req.file
+      setDataValue(newSessionData, ['appointments', crn, id, fieldname], { originalname, mimetype, buffer })
+    }
     const resetValues = (keys: Record<string, string | string[]>): void => {
       Object.entries(keys).forEach(([key, value]) => {
         if ((req?.session?.data?.appointments as any)?.[crn]?.[id]?.[key]) {

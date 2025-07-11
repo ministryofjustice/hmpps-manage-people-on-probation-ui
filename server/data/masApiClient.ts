@@ -272,9 +272,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  async postAppointments(crn: string, body: AppointmentRequestBody) {
+  async postAppointments(crn: string, body: AppointmentRequestBody, fileToUpload: Express.Multer.File = null) {
     return this.post({
       data: body,
+      fileToUpload,
       path: `/appointment/${crn}`,
       handle404: true,
       handle500: true,

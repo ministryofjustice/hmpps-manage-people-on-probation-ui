@@ -1,6 +1,6 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
-
+import fs from 'fs'
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
@@ -22,6 +22,7 @@ interface Request {
 
 interface RequestWithBody extends Request {
   data?: Record<string, any>
+  fileToUpload?: Express.Multer.File
   retry?: boolean
 }
 
@@ -117,28 +118,45 @@ export default class RestClient {
       raw = false,
       retry = false,
       handle404 = false,
-    }: RequestWithBody,
+      file,
+    }: RequestWithBody & {
+      file?: Express.Multer.File | { fieldname: string; buffer: Buffer; originalname: string }
+    },
   ): Promise<Response> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
 
     try {
-      const result = await superagent[method](`${this.apiUrl()}${path}`)
+      const request = superagent[method](`${this.apiUrl()}${path}`)
         .query(query)
-        .send(data)
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
-          if (retry === false) {
-            return false
-          }
+          if (retry === false) return false
           if (err) logger.info(`Retry handler found API error with ${err.code} ${err.message}`)
-          return undefined // retry handler only for logging retries, not to influence retry logic
+          return undefined
         })
         .auth(this.token, { type: 'bearer' })
         .set(headers)
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
+      // If a file is included, use multipart/form-data
+      if (file) {
+        request.type('multipart/form-data')
+        // Attach the file
+        request.attach(file.fieldname, file.buffer, file.originalname)
+        // Add other form fields (req.body)
+        Object.entries(data).forEach(([key, value]) => {
+          if (value !== undefined && value !== null) {
+            request.field(key, typeof value === 'string' ? value : JSON.stringify(value))
+          }
+        })
+      } else {
+        // Send regular JSON body if no file
+        request.send(data)
+      }
+
+      const result = await request
       return raw ? (result as Response) : result.body
     } catch (error) {
       if (handle404 && error.response?.status === 404) return null

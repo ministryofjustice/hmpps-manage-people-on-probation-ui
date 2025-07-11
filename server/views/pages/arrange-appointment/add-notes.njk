@@ -3,7 +3,7 @@
 {% set title = 'Add a note (optional)' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
 {% block form %}
-{{ govukTextarea({
+    {{ govukTextarea({
     hint: {
         text: "Use paragraphs to make your notes easy to read."
     },
@@ -14,11 +14,21 @@
     }
 } | decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
 
-{{ govukRadios({
+    {{ govukFileUpload({
+  id: "file-upload",
+  name: "fileUpload",
+  label: {
+    text: "Upload a file",
+    classes: 'govuk-label--m'
+  },
+  javascript: true
+}) }}
+
+    {{ govukRadios({
     fieldset: {
         legend: {
             text: 'Does this appointment include sensitive information?',
-            classes: "govuk-fieldset__legend--l",
+            classes: "govuk-fieldset__legend--m",
             isPageHeading: false
         }
     },

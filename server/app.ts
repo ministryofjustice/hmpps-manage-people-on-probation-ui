@@ -1,3 +1,4 @@
+import multer from 'multer'
 import express from 'express'
 
 import createError from 'http-errors'
@@ -48,6 +49,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   app.use(baseController())
   nunjucksSetup(app, services.applicationInfo)
+  app.use(multer().single('file'))
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCsrf())

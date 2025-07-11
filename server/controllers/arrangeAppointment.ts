@@ -5,7 +5,6 @@ import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } 
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
-import { HmppsAuthClient } from '../data'
 
 const routes = [
   'redirectToType',

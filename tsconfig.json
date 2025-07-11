@@ -15,7 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./server/@types", "./node_modules/@types"],
+    "typeRoots": ["./server/models", "./server/@types", "./node_modules/@types"],
     "inlineSources": true,
     "ignoreDeprecations": "5.0",
 
