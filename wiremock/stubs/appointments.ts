@@ -27,4 +27,19 @@ const stubAppointmentClash = (): SuperAgentRequest =>
     },
   })
 
-export default { stubAppointmentClash }
+const stubAppointmentDuplicate = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/appointment/X778160',
+      method: 'POST',
+    },
+    response: {
+      status: 409,
+      jsonBody: { message: '409 Error message' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default { stubAppointmentClash, stubAppointmentDuplicate }

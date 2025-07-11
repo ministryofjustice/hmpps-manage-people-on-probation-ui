@@ -7,6 +7,7 @@ import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
+import IndexPage from '../../pages'
 import {
   completeDateTimePage,
   completeLocationPage,
@@ -21,6 +22,7 @@ import {
   completeAttendancePage,
   completeNotePage,
 } from './imports'
+import { statusErrors } from '../../../server/properties'
 
 const loadPage = (hasVisor = false, typeOptionIndex = 1, sentenceOptionIndex = 1) => {
   completeTypePage(typeOptionIndex, '', hasVisor)
@@ -228,6 +230,22 @@ describe('Check your answers then confirm the appointment', () => {
     it('should submit the appointment and redirect to the confirmation page', () => {
       const confirmPage = new AppointmentConfirmationPage()
       confirmPage.checkOnPage()
+    })
+  })
+  describe('Duplicate appointment', () => {
+    let cyaPage: AppointmentCheckYourAnswersPage
+    beforeEach(() => {
+      cy.task('stubAppointmentDuplicate')
+      loadPage()
+      cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSubmitBtn().click()
+    })
+    it('should render the 409 error page', () => {
+      cy.get('h1').should('contain.text', statusErrors[409].title)
+      cy.get('[data-qa="errorMessage"]').should('contain.text', 'Go to the Manage people on probation homepage')
+      cy.get('[data-qa="homepageLink"]').click()
+      const homepage = new IndexPage()
+      homepage.checkOnPage()
     })
   })
 })

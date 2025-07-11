@@ -36,8 +36,6 @@ import {
   AppointmentRequestBody,
   CheckAppointment,
   AppointmentTypeResponse,
-  AppointmentLocationResponse,
-  AppointmentLocationRequest,
 } from '../models/Appointments'
 
 interface GetUserScheduleProps {
@@ -272,12 +270,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  async postAppointments(crn: string, body: AppointmentRequestBody) {
+  async postAppointments(crn: string, body: AppointmentRequestBody): Promise<any> {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,
-      handle404: true,
-      handle500: true,
     })
   }
 

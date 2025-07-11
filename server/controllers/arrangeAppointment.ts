@@ -1,11 +1,12 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
+import { ResponseError } from 'superagent'
 import { Controller, Route } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
-import { HmppsAuthClient } from '../data'
+import { StatusErrorCode } from '../properties'
 
 const routes = [
   'redirectToType',
@@ -349,8 +350,13 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      await postAppointments(hmppsAuthClient)(req, res)
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+      try {
+        await postAppointments(hmppsAuthClient)(req, res)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+      } catch (err: unknown) {
+        const error = err as ResponseError
+        return renderError(error.status as StatusErrorCode)(req, res)
+      }
     }
   },
   getConfirmation: () => {

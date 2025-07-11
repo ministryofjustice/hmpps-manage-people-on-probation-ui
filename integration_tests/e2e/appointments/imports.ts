@@ -19,7 +19,7 @@ export const dateRegex: RegExp =
   /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/
 
 export const completeTypePage = (index = 1, query = '', hasVisor = false) => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`)
+  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
   if (hasVisor) {
