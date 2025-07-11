@@ -119,6 +119,7 @@ export default class RestClient {
       retry = false,
       handle404 = false,
       file,
+      // files,
     }: RequestWithBody & {
       file?: Express.Multer.File | { fieldname: string; buffer: Buffer; originalname: string }
     },
@@ -141,10 +142,26 @@ export default class RestClient {
         .timeout(this.timeoutConfig())
 
       // If a file is included, use multipart/form-data
+      // const isMultipart = files && files.length > 0
+      // if (isMultipart) {
       if (file) {
         request.type('multipart/form-data')
         // Attach the file
         request.attach(file.fieldname, file.buffer, file.originalname)
+
+        /*
+        
+        For multifile
+ 
+        for (const file of files) {
+          if ('fieldname' in file && file.buffer) {
+            request.attach(file.fieldname, file.buffer, file.originalname)
+          } else if ('fieldname' in file && file.file) {
+            request.attach(file.fieldname, file.file, file.originalname)
+          }
+        }
+        */
+
         // Add other form fields (req.body)
         Object.entries(data).forEach(([key, value]) => {
           if (value !== undefined && value !== null) {
