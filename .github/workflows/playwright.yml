@@ -24,12 +24,3 @@ jobs:
         env:
           DELIUS_USERNAME: ${{ secrets.E2E_DELIUS_USERNAME }}
           DELIUS_PASSWORD: ${{ secrets.E2E_DELIUS_PASSWORD }}
-      - name: Publish HTML report
-        if: always()
-        uses: JamesIves/github-pages-deploy-action@6c2d9db40f9296374acc17b90404b6e8864128c8 # v4
-        with:
-          folder: playwright-report
-          target-folder: playwright-report/${{ github.ref_name }}/${{ github.run_id }}/${{ github.run_attempt }}
-      - name: Output HTML report URL
-        if: always()
-        run: echo '[🎭 Playwright HTML Report](https://ministryofjustice.github.io/hmpps-probation-integration-e2e-tests/playwright-report/${{ github.ref_name }}/${{ github.run_id }}/${{ github.run_attempt }})' | tee -a "$GITHUB_STEP_SUMMARY"
