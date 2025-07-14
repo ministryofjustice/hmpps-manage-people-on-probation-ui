@@ -26,7 +26,7 @@ jobs:
 
       - name: Setup Firefox
         id: firefox
-        uses: browser-actions/setup-firefox@634a60ccd6599686158cf5a570481b4cd30455a2 # v1
+        uses: browser-actions/setup-firefox@c04e669ab1d810acd2530e553388c1d183d765cf # v1
         with:
           firefox-version: latest-esr
 
@@ -62,7 +62,7 @@ jobs:
         shell: bash
 
       - name: Send message to Slack
-        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
+        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
         if: steps.json.outputs.high != '0' || steps.json.outputs.medium != '0'
         with:
           method: chat.postMessage
@@ -112,7 +112,7 @@ jobs:
           token: ${{ secrets.SLACK_BOT_TOKEN }}
 
       - name: Send failure message to Slack
-        uses: slackapi/slack-github-action@b0fa283ad8fea605de13dc3f449259339835fc52 # v2.1.0
+        uses: slackapi/slack-github-action@91efab103c0de0a537f72a35f6b8cda0ee76bf0a # v2.1.1
         if: failure()
         with:
           method: chat.postMessage
