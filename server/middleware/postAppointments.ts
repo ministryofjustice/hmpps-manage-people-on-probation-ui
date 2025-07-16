@@ -40,13 +40,15 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       end: dateTime(date, end),
       interval,
       numberOfAppointments: parseInt(numberOfAppointments, 10),
-      eventId: parseInt(eventId, 10),
       uuid,
       createOverlappingAppointment: true,
       until: dateTime(untilDate, end),
       notes,
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
+    }
+    if (eventId !== 'PERSON_LEVEL_CONTACT') {
+      body.eventId = parseInt(eventId, 10)
     }
     if (requirementId) {
       body.requirementId = parseInt(requirementId as string, 10)
