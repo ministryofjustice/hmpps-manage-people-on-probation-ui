@@ -118,7 +118,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           requirement: sentenceRequirement?.description || null,
           licenceCondition: sentenceLicenceCondition?.mainDescription || null,
           nsi: sentenceNsi?.description || null,
-          forename: parseInt(eventId, 10) === 1 ? forename : null,
+          forename: eventId === 'PERSON_LEVEL_CONTACT' ? forename : null,
         },
         attending: {
           name: selectedUser,
