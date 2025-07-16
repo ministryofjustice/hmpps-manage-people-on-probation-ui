@@ -135,6 +135,7 @@
     "compression": "^1.8.0",
     "connect-flash": "^0.1.1",
     "connect-redis": "^8.1.0",
+    "crypto": "^1.0.1",
     "csurf": "^1.11.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
