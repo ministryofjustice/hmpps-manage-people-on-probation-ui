@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import logger from '../../logger'
 import { dateTime } from './dateTime'
 import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
+import config from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const isNotEmpty = (args: any[]) => {
@@ -113,6 +114,14 @@ export const timeIsNotLaterThan = (args: any[]) => {
     return true
   }
   return notLaterThanDate < date
+}
+
+export const isValidMime = (file: Express.Multer.File) => {
+  return config.fileUpload.allowedMimeTypes.includes(file.mimetype)
+}
+
+export const isValidFileSize = (file: Express.Multer.File) => {
+  return config.fileUpload.maxFileSize >= file.size
 }
 
 export function validateWithSpec<R extends Validateable>(request: R, validationSpec: ValidationSpec) {

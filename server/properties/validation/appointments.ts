@@ -6,6 +6,8 @@ import {
   timeIsNotLaterThan,
   timeIsNowOrInFuture,
   isTodayOrLater,
+  isValidMime,
+  isValidFileSize,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -149,6 +151,21 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isStringNumber,
           msg: 'Enter a number',
           log: 'Appointment repeat count not entered in correct format',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][file]`]: {
+      optional: page !== 'add-notes',
+      checks: [
+        {
+          validator: isValidMime,
+          msg: 'Select a valid file type',
+          log: 'Invalid file type selected',
+        },
+        {
+          validator: isValidFileSize,
+          msg: 'Select a file 5mb or under',
+          log: 'Invalid file size selected',
         },
       ],
     },

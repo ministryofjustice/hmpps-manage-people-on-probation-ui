@@ -183,4 +183,8 @@ export default {
     { name: 'start', dateField: 'date' },
     { name: 'end', dateField: 'date' },
   ],
+  fileUpload: {
+    allowedMimeTypes: ['image/png', 'image.jpeg', 'application/pdf'],
+    maxFileSize: 5 * 1024 * 1024, // 5 MB
+  },
 }

@@ -3,6 +3,7 @@ import { getDataValue } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
+import config from '../../config'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req
@@ -99,6 +100,23 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateFileUpload = () => {
+    const file = req.body?.appointments?.[crn]?.[id]?.file
+    if (req.url.includes('/add-notes') && file) {
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'add-notes',
+        }),
+      )
+    }
+    // if(!config.fileUpload.allowedMimeTypes.includes(file.mimetype)) {
+
+    // }
+  }
+
   const validateSensitivity = () => {
     if (req.url.includes('/add-notes')) {
       errorMessages = validateWithSpec(
@@ -118,6 +136,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateLocation()
   validateDateTime()
   validateRepeating()
+  validateFileUpload()
   validateSensitivity()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
