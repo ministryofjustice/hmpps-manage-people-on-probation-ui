@@ -77,3 +77,45 @@
   -moz-hyphens: auto;
   hyphens: auto;
 }
+
+
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+
+.calendar {
+  border-collapse: collapse;
+  width: 50%;
+  align-content: center;
+}
+
+.calendar th {
+  text-align: center;
+  vertical-align: middle;
+  border: none;
+  padding: 10px 0;
+}
+
+.calendar td {
+  padding: 0;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.calendar td .cell {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  line-height: 40px;
+  border-radius: 50%;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.calendar td .cell.selected {
+  background-color: cornflowerblue;
+  color: black;
+}
+
+

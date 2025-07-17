@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ monthName }} {{ year }} Calendar</title>
+    <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
+</head>
+<body>
+<h1>{{ monthName }} {{ year }}</h1>
+<table class="calendar" tabindex="0">
+    <thead>
+    <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for week in calendar %}
+        <tr>
+            {% for day in week %}
+                {% if not day.isCurrentMonth %}
+                    <td>
+                        <span></span>
+                    </td>
+                {% else %}
+                    <td id="day{{ day.day }}" data-date="{{ day.iso }}" tabindex="0">
+                        <span class="cell">{{ day.day }}</span>
+                    </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<script nonce="{{ cspNonce }}">
+  document.addEventListener('DOMContentLoaded', function() {
+    const cellSpans = document.querySelectorAll('td[data-date] .cell')
+
+    cellSpans.forEach(span => {
+      span.addEventListener('click', () => {
+        // Remove 'selected' from all
+        document.querySelectorAll('.calendar td .cell.selected').forEach(c => {
+          c.classList.remove('selected')
+        })
+
+        span.classList.add('selected')
+      })
+    })
+  })
+</script>
+</body>
+</html>
+
