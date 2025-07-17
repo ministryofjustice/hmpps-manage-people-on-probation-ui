@@ -27,7 +27,6 @@ generic-service:
     EPF2_LINK: 'https://epf.linkspace.uk'
     TIER_LINK: 'https://tier.hmpps.service.justice.gov.uk/case'
     SENTENCE_PLAN_LINK: 'https://sentence-plan.hmpps.service.justice.gov.uk/about-pop'
-    ESUPERVISION_LINK: 'https://esupervision-dev.hmpps.service.justice.gov.uk'
     ENVIRONMENT_NAME: PRODUCTION
     ENVIRONMENT: prod
 

@@ -38,7 +38,12 @@
     heading: 'Refer and monitor an intervention',
     href: interventions_link,
     description: 'Find, refer and monitor interventions.'
-  }
+  },
+  {
+    heading: 'Probation check ins',
+    href: esupervision_link,
+    description: 'Set up and manage online probation check ins to reduce or replace face-to-face supervision.'
+  } if esupervision_link
 ] %}
 
 <section data-qa="homepage-services-section">
@@ -46,15 +51,15 @@
 
   <div class="hmpps-services">
     {% for link in links %}
-    <div class="hmpps-service-item">
-      <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
-      <div class="hmpps-service-item__header">
-        <p>
-          <a href="{{ link.href }}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer">{{ link.heading }}</a>
-        </p>
+      <div class="hmpps-service-item">
+        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
+        <div class="hmpps-service-item__header">
+          <p>
+            <a href="{{ link.href }}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer">{{ link.heading }}</a>
+          </p>
+        </div>
+        <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">{{ link.description }}</p>
       </div>
-      <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">{{ link.description }}</p>
-    </div>
     {% endfor %}
   </div>
 </section>

@@ -38,27 +38,61 @@ const req = httpMocks.createRequest({
 
 describe('homeController', () => {
   describe('getHome', () => {
+    const originalEnv = process.env.NODE_ENV
+    const { totalAppointments, totalOutcomes, appointments, outcomes } = mockUserAppointments
     beforeEach(async () => {
       await controllers.home.getHome(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      process.env.NODE_ENV = originalEnv
     })
     it('should request the user appointments from the api', () => {
       expect(getUserAppointmentsSpy).toHaveBeenCalledWith(res.locals.user.username)
     })
-    it('should render the home page', () => {
-      const { totalAppointments, totalOutcomes, appointments, outcomes } = mockUserAppointments
-      expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
-        totalAppointments,
-        totalOutcomes,
-        appointments,
-        outcomes,
-        delius_link: config.delius.link,
-        oasys_link: config.oaSys.link,
-        interventions_link: config.interventions.link,
-        recall_link: config.recall.link,
-        cas1_link: config.cas1.link,
-        cas3_link: config.cas3.link,
-        caval_link: config.caval.link,
-        epf2_link: config.epf2.link,
+    describe('development', () => {
+      beforeEach(async () => {
+        process.env.NODE_ENV = 'development'
+      })
+
+      it('should render the home page with the esupervision link', () => {
+        process.env.NODE_ENV = 'production'
+        expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
+          totalAppointments,
+          totalOutcomes,
+          appointments,
+          outcomes,
+          delius_link: config.delius.link,
+          oasys_link: config.oaSys.link,
+          interventions_link: config.interventions.link,
+          recall_link: config.recall.link,
+          cas1_link: config.cas1.link,
+          cas3_link: config.cas3.link,
+          caval_link: config.caval.link,
+          esupervision_link: null,
+          epf2_link: config.epf2.link,
+        })
+      })
+    })
+    describe('production', () => {
+      beforeEach(async () => {
+        process.env.NODE_ENV = 'production'
+      })
+      it('should render the page with no esupervision link', () => {
+        expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
+          totalAppointments,
+          totalOutcomes,
+          appointments,
+          outcomes,
+          delius_link: config.delius.link,
+          oasys_link: config.oaSys.link,
+          interventions_link: config.interventions.link,
+          recall_link: config.recall.link,
+          cas1_link: config.cas1.link,
+          cas3_link: config.cas3.link,
+          caval_link: config.caval.link,
+          esupervision_link: null,
+          epf2_link: config.epf2.link,
+        })
       })
     })
   })
