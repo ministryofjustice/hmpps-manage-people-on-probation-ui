@@ -27,9 +27,7 @@ const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
-const getUserAppointmentsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getUserAppointments')
-  .mockImplementation(() => Promise.resolve(mockUserAppointments))
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -40,22 +38,26 @@ describe('homeController', () => {
   describe('getHome', () => {
     const originalEnv = process.env.NODE_ENV
     const { totalAppointments, totalOutcomes, appointments, outcomes } = mockUserAppointments
+    let spy: jest.SpyInstance
     beforeEach(async () => {
+      jest.resetAllMocks()
+      jest.resetModules()
+      spy = jest
+        .spyOn(MasApiClient.prototype, 'getUserAppointments')
+        .mockImplementation(() => Promise.resolve(mockUserAppointments))
       await controllers.home.getHome(hmppsAuthClient)(req, res)
     })
     afterEach(() => {
       process.env.NODE_ENV = originalEnv
-    })
-    it('should request the user appointments from the api', () => {
-      expect(getUserAppointmentsSpy).toHaveBeenCalledWith(res.locals.user.username)
+      jest.resetModules()
     })
     describe('development', () => {
       beforeEach(async () => {
         process.env.NODE_ENV = 'development'
+        jest.resetModules()
       })
 
       it('should render the home page with the esupervision link', () => {
-        process.env.NODE_ENV = 'production'
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           totalAppointments,
           totalOutcomes,
@@ -68,16 +70,23 @@ describe('homeController', () => {
           cas1_link: config.cas1.link,
           cas3_link: config.cas3.link,
           caval_link: config.caval.link,
-          esupervision_link: null,
+          esupervision_link: config.esupervision.link,
           epf2_link: config.epf2.link,
         })
+      })
+      it('should request the user appointments from the api', () => {
+        expect(spy).toHaveBeenCalledWith(res.locals.user.username)
       })
     })
     describe('production', () => {
       beforeEach(async () => {
         process.env.NODE_ENV = 'production'
+        spy = jest
+          .spyOn(MasApiClient.prototype, 'getUserAppointments')
+          .mockImplementation(() => Promise.resolve(mockUserAppointments))
       })
-      it('should render the page with no esupervision link', () => {
+      it('should render the page with no esupervision link', async () => {
+        await controllers.home.getHome(hmppsAuthClient)(req, res)
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           totalAppointments,
           totalOutcomes,
