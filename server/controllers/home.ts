@@ -25,7 +25,6 @@ const homeController: Controller<typeof routes> = {
         cas3_link: config.cas3.link,
         caval_link: config.caval.link,
         epf2_link: config.epf2.link,
-        esupervision_link: config.esupervision.link,
       })
     }
   },

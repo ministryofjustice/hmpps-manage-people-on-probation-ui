@@ -58,7 +58,6 @@ describe('homeController', () => {
         cas1_link: config.cas1.link,
         cas3_link: config.cas3.link,
         caval_link: config.caval.link,
-        esupervision_link: config.esupervision.link,
         epf2_link: config.epf2.link,
       })
     })
