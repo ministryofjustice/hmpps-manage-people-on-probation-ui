@@ -8,25 +8,26 @@ generic-service:
     host: manage-people-on-probation-preprod.hmpps.service.justice.gov.uk
 
   env:
-    INGRESS_URL: "https://manage-people-on-probation-preprod.hmpps.service.justice.gov.uk"
-    HMPPS_AUTH_URL: "https://sign-in-preprod.hmpps.service.justice.gov.uk/auth"
-    MANAGE_USERS_API_URL: "https://manage-users-api-preprod.hmpps.service.justice.gov.uk"
-    TOKEN_VERIFICATION_API_URL: "https://token-verification-api-preprod.prison.service.justice.gov.uk"
-    MAS_API_URL: "https://manage-supervision-and-delius-preprod.hmpps.service.justice.gov.uk"
-    ARNS_API_URL: "https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk"
-    TIER_API_URL: "https://hmpps-tier-preprod.hmpps.service.justice.gov.uk"
-    INTERVENTIONS_API_URL: "https://hmpps-interventions-service-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
-    FLIPT_URL: "https://feature-flags-manage-people-on-probation-preprod.hmpps.service.justice.gov.uk"
-    INTERVENTIONS_LINK: "https://hmpps-interventions-ui-preprod.apps.live-1.cloud-platform.service.justice.gov.uk"
-    DELIUS_LINK: "https://ndelius.pre-prod.delius.probation.hmpps.dsd.io"
-    OASYS_LINK: "https://pp-int.oasys.service.justice.gov.uk"
-    RECALL_LINK: "https://consider-a-recall-preprod.hmpps.service.justice.gov.uk/"
-    CAS1_LINK: "https://approved-premises-preprod.hmpps.service.justice.gov.uk/"
-    CAS3_LINK: "https://transitional-accommodation-preprod.hmpps.service.justice.gov.uk/referrals"
-    CAVAL_LINK: "https://create-and-vary-a-licence-preprod.hmpps.service.justice.gov.uk"
-    EPF2_LINK: "/"
-    TIER_LINK: "https://tier-preprod.hmpps.service.justice.gov.uk/case"
-    SENTENCE_PLAN_LINK: "https://sentence-plan-preprod.hmpps.service.justice.gov.uk/about-pop"
+    INGRESS_URL: 'https://manage-people-on-probation-preprod.hmpps.service.justice.gov.uk'
+    HMPPS_AUTH_URL: 'https://sign-in-preprod.hmpps.service.justice.gov.uk/auth'
+    MANAGE_USERS_API_URL: 'https://manage-users-api-preprod.hmpps.service.justice.gov.uk'
+    TOKEN_VERIFICATION_API_URL: 'https://token-verification-api-preprod.prison.service.justice.gov.uk'
+    MAS_API_URL: 'https://manage-supervision-and-delius-preprod.hmpps.service.justice.gov.uk'
+    ARNS_API_URL: 'https://assess-risks-and-needs-preprod.hmpps.service.justice.gov.uk'
+    TIER_API_URL: 'https://hmpps-tier-preprod.hmpps.service.justice.gov.uk'
+    INTERVENTIONS_API_URL: 'https://hmpps-interventions-service-preprod.apps.live-1.cloud-platform.service.justice.gov.uk'
+    FLIPT_URL: 'https://feature-flags-manage-people-on-probation-preprod.hmpps.service.justice.gov.uk'
+    INTERVENTIONS_LINK: 'https://hmpps-interventions-ui-preprod.apps.live-1.cloud-platform.service.justice.gov.uk'
+    DELIUS_LINK: 'https://ndelius.pre-prod.delius.probation.hmpps.dsd.io'
+    OASYS_LINK: 'https://pp-int.oasys.service.justice.gov.uk'
+    RECALL_LINK: 'https://consider-a-recall-preprod.hmpps.service.justice.gov.uk/'
+    CAS1_LINK: 'https://approved-premises-preprod.hmpps.service.justice.gov.uk/'
+    CAS3_LINK: 'https://transitional-accommodation-preprod.hmpps.service.justice.gov.uk/referrals'
+    CAVAL_LINK: 'https://create-and-vary-a-licence-preprod.hmpps.service.justice.gov.uk'
+    EPF2_LINK: '/'
+    TIER_LINK: 'https://tier-preprod.hmpps.service.justice.gov.uk/case'
+    SENTENCE_PLAN_LINK: 'https://sentence-plan-preprod.hmpps.service.justice.gov.uk/about-pop'
+    ESUPERVISION_LINK: 'https://esupervision-dev.hmpps.service.justice.gov.uk'
     ENVIRONMENT_NAME: PRE-PRODUCTION
     ENVIRONMENT: preprod
 
