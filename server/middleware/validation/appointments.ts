@@ -4,6 +4,7 @@ import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
+import { normaliseMultipartBody } from '../normaliseMultipartBody'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req
@@ -22,7 +23,7 @@ const appointments: Route<void> = (req, res, next) => {
     if (req.url.includes('/type')) {
       errorMessages = validateWithSpec(
         req.body,
-        appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor }),
+        appointmentsValidation({ crn, id, page: 'type', visor: req.body?.visor }),
       )
     }
   }
@@ -101,26 +102,25 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateFileUpload = () => {
-    const file = req.body?.appointments?.[crn]?.[id]?.file
+    const file = req?.file
+    let isValid = true
+    // need to refactor this so it uses validateWithSpec
     if (req.url.includes('/add-notes') && file) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'add-notes',
-        }),
-      )
+      if (!config.fileUpload.allowedMimeTypes.includes(file.mimetype)) {
+        errorMessages[file.fieldname] = 'Select a valid file type'
+        isValid = false
+      }
+      if (isValid && config.fileUpload.maxFileSize < file.size) {
+        errorMessages[file.fieldname] = 'Select a file 5mb or less'
+      }
     }
-    // if(!config.fileUpload.allowedMimeTypes.includes(file.mimetype)) {
-
-    // }
   }
 
   const validateSensitivity = () => {
     if (req.url.includes('/add-notes')) {
+      const body = normaliseMultipartBody(req.body)
       errorMessages = validateWithSpec(
-        req.body,
+        body,
         appointmentsValidation({
           crn,
           id,
@@ -129,15 +129,15 @@ const appointments: Route<void> = (req, res, next) => {
       )
     }
   }
-
   let errorMessages: Record<string, string> = {}
+
   validateType()
   validateSentence()
   validateLocation()
   validateDateTime()
   validateRepeating()
-  validateFileUpload()
   validateSensitivity()
+  validateFileUpload()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

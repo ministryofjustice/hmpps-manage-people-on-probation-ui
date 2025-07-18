@@ -1,11 +1,9 @@
-import multer from 'multer'
-import express from 'express'
-
+/* eslint-disable import/no-extraneous-dependencies */
+import express, { Router } from 'express'
 import createError from 'http-errors'
 
 import * as Sentry from '@sentry/node'
 // @ts-expect-error Import untyped middleware for cypress coverage
-// eslint-disable-next-line import/no-extraneous-dependencies
 import cypressCoverage from '@cypress/code-coverage/middleware/express'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
@@ -28,6 +26,7 @@ import './sentry'
 import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
+import multipartRoute from './routes/multipartRoute'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -49,15 +48,17 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   app.use(baseController())
   nunjucksSetup(app, services.applicationInfo)
-  app.use(multer().single('file'))
+
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
-  app.use(setUpCsrf())
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
-
-  app.use(routes(services))
+  const router = Router()
+  // Routes that use multer for multipart upload must be registered before csrf executes
+  app.use(multipartRoute(router))
+  app.use(setUpCsrf())
+  app.use(routes(router, services))
 
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)
   app.use((_req, _res, next) => next(createError(404, 'Not found')))

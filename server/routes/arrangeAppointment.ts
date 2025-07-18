@@ -1,3 +1,4 @@
+import multer from 'multer'
 import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import {
@@ -18,6 +19,18 @@ import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 
+const upload = multer()
+// const upload = multer({
+//   storage: multer.memoryStorage(),
+//   limits: { fileSize: MAX_FILE_SIZE },
+//   fileFilter: (req, file, cb) => {
+//     if (ALLOWED_MIME_TYPES.includes(file.mimetype)) {
+//       cb(null, true)
+//     } else {
+//       cb(new Error(`Unsupported file type: ${file.mimetype}`))
+//     }
+//   },
+// })
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
@@ -112,15 +125,18 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/add-notes',
-    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
+    // redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
     controllers.arrangeAppointments.getNotes(),
   )
 
+  /*
   router.post(
     '/case/:crn/arrange-appointment/:id/add-notes',
+    upload.single('outOfBoundFilename'),
     validate.appointments,
     controllers.arrangeAppointments.postNotes(),
   )
+    */
 
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',

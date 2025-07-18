@@ -1,6 +1,7 @@
 {% extends "../_form.njk" %}
 
 {% set title = 'Add a note (optional)' %}
+{% set multipartForm = true %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
 {% block form %}
     {{ govukTextarea({
@@ -16,13 +17,17 @@
 
     {{ govukFileUpload({
   id: "file-upload",
-  name: "fileUpload",
+  name: "file",
   label: {
     text: "Upload a file",
     classes: 'govuk-label--m'
   },
+  errorMessage: {
+    text: errorMessages.file if errorMessages.file else ''
+  },
   javascript: true
-}) }}
+    })
+ }}
 
     {{ govukRadios({
     fieldset: {
