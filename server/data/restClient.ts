@@ -1,6 +1,7 @@
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
+import crypto from 'crypto'
+import fs from 'fs/promises'
 import superagent, { Response } from 'superagent'
-import fs from 'fs'
 import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
@@ -23,6 +24,7 @@ interface Request {
 interface RequestWithBody extends Request {
   data?: Record<string, any>
   fileToUpload?: Express.Multer.File
+  encryptFile?: boolean
   retry?: boolean
 }
 
@@ -118,7 +120,8 @@ export default class RestClient {
       raw = false,
       retry = false,
       handle404 = false,
-      file,
+      fileToUpload,
+      encryptFile = false,
       // files,
     }: RequestWithBody & {
       file?: Express.Multer.File | { fieldname: string; buffer: Buffer; originalname: string }
@@ -144,13 +147,25 @@ export default class RestClient {
       // If a file is included, use multipart/form-data
       // const isMultipart = files && files.length > 0
       // if (isMultipart) {
-      if (file) {
+      if (fileToUpload) {
         request.type('multipart/form-data')
-        // Attach the file
-        request.attach(file.fieldname, file.buffer, file.originalname)
-
-        /*
-        
+        if (encryptFile) {
+          try {
+            const key = crypto.randomBytes(32) // 256 bits for AES-256
+            const iv = crypto.randomBytes(12) // 96 bits recommended for GCM
+            const encyptedBuffer = await this.encryptFileToBuffer(key, iv, fileToUpload.path)
+            const { filename } = fileToUpload
+            request.field('iv', iv.toString('hex'))
+            request.attach('file', encyptedBuffer, filename)
+          } catch (error) {
+            logger.info('Upload failed:', error)
+          }
+        } else {
+          // Attach the raw file
+          const { fieldname, buffer, originalname } = fileToUpload
+          request.attach(fieldname, buffer, originalname)
+          /*
+      
         For multifile
  
         for (const file of files) {
@@ -161,6 +176,7 @@ export default class RestClient {
           }
         }
         */
+        }
 
         // Add other form fields (req.body)
         Object.entries(data).forEach(([key, value]) => {
@@ -184,6 +200,14 @@ export default class RestClient {
       )
       throw sanitisedError
     }
+  }
+
+  async encryptFileToBuffer(key: Buffer, iv: Buffer, filePath: string) {
+    const plainText = await fs.readFile(filePath)
+    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
+    const encrypted = Buffer.concat([cipher.update(plainText), cipher.final()])
+    const authTag = cipher.getAuthTag()
+    return Buffer.concat([encrypted, authTag])
   }
 
   async patch<Response = unknown>(request: RequestWithBody): Promise<Response> {
