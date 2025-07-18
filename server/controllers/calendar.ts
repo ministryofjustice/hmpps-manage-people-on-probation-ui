@@ -9,6 +9,9 @@ function generateCalendarData(year: any, month: any) {
   const startDate = moment(startOfMonth).startOf('week')
   const endDate = moment(endOfMonth).endOf('week')
 
+  const startMinusOneMonth = moment(startOfMonth).subtract(1, 'months').format('MMMM YYYY')
+  const startPlusOneMonth = moment(startOfMonth).add(1, 'months').format('MMMM YYYY')
+
   const date = moment(startDate)
   const calendar = []
 
@@ -31,6 +34,9 @@ function generateCalendarData(year: any, month: any) {
     calendar,
     monthName: startOfMonth.format('MMMM'),
     year,
+    month,
+    startMinusOneMonth,
+    startPlusOneMonth,
   }
 }
 
@@ -38,7 +44,12 @@ const dateController: Controller<typeof routes> = {
   getDate: hmppsAuthClient => {
     return async (req, res) => {
       const today = moment()
-      const calendarData = generateCalendarData(today.year(), today.month())
+      const month = Number(req.query.month as string) // 0–11
+      const year = Number(req.query.year as string)
+      const targetYear = Number.isNaN(year) ? today.year() : year
+      const targetMonth = Number.isNaN(month) ? today.month() : month
+
+      const calendarData = generateCalendarData(targetYear, targetMonth)
       res.render('pages/calendar.njk', calendarData)
     }
   },

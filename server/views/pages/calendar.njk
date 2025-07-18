@@ -7,9 +7,9 @@
 </head>
 <body>
     <div id="month-wrap">
-        <a href="#prev" id="prev-month" onclick="goToPreviousMonth()">Previous month</a>
+        <a href="#" id="prev-month">Previous month</a>
         <span id="current-month">{{ monthName }} {{ year }}</span>
-        <a href="#next" id="next-month" onclick="goToNextMonth()">Next month</a>
+        <a href="#" id="next-month">Next month</a>
     </div>
     <table class="calendar"  tabindex="0">
         <thead>
@@ -36,21 +36,68 @@
         {% endfor %}
         </tbody>
     </table>
+
+    <input type="hidden" id="currentMonth" value="{{ month }}">
+    <input type="hidden" id="currentYear" value="{{ year }}">
     <script nonce="{{ cspNonce }}">
-      document.addEventListener('DOMContentLoaded', function() {
-        const cellSpans = document.querySelectorAll('td[data-date] .cell')
+      document.addEventListener("DOMContentLoaded", function () {
+        const monthInput = document.getElementById("currentMonth");
+        const yearInput = document.getElementById("currentYear");
 
-        cellSpans.forEach(span => {
-          span.addEventListener('click', () => {
-            // Remove 'selected' from all
-            document.querySelectorAll('.calendar td .cell.selected').forEach(c => {
-              c.classList.remove('selected')
-            })
+        // Attach listeners to calendar cells
+        function attachCellListeners() {
+          const cellSpans = document.querySelectorAll("td[data-date] .cell");
 
-            span.classList.add('selected')
-          })
-        })
-      })
+          cellSpans.forEach(span => {
+            span.addEventListener("click", () => {
+              // Remove 'selected' from all
+              document.querySelectorAll(".calendar td .cell.selected").forEach(c => {
+                c.classList.remove("selected");
+              });
+
+              span.classList.add("selected");
+            });
+          });
+        }
+
+        // Attach listeners to navigation links
+        function attachMonthNavigation() {
+          const prevLink = document.getElementById("prev-month");
+          const nextLink = document.getElementById("next-month");
+
+          prevLink?.addEventListener("click", function (e) {
+            e.preventDefault();
+            changeMonth(-1);
+          });
+
+          nextLink?.addEventListener("click", function (e) {
+            e.preventDefault();
+            changeMonth(1);
+          });
+        }
+
+        // Update month/year and reload the page
+        function changeMonth(direction) {
+          let month = parseInt(monthInput.value, 10);
+          let year = parseInt(yearInput.value, 10);
+
+          month += direction;
+          if (month < 0) {
+            month = 11;
+            year -= 1;
+          } else if (month > 11) {
+            month = 0;
+            year += 1;
+          }
+
+          // Full-page reload with new query params
+          window.location.href = `/date?month=${month}&year=${year}`;
+        }
+
+        // Initial setup
+        attachCellListeners();
+        attachMonthNavigation();
+      });
     </script>
 </body>
 </html>
