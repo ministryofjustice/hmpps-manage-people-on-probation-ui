@@ -79,6 +79,9 @@
 }
 
 
+
+
+
 body {
   font-family: Arial, sans-serif;
   padding: 20px;
@@ -116,6 +119,48 @@ body {
 .calendar td .cell.selected {
   background-color: cornflowerblue;
   color: black;
+}
+
+.bn_prev, .bn_next {
+  height: 16px;
+  position: absolute;
+  top: 15px;
+  width: 16px;
+}
+
+#month-wrap {
+  display: flex;
+  width: 50%;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+  padding: 12px 16px;
+  background-color: white;
+  border-top: 1px solid black;
+  border-bottom: 1px solid black;
+  margin-bottom: 12px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#current-month {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 18px;
+  white-space: nowrap;
+}
+
+#prev-month, #next-month {
+  text-decoration: none;
+  color: #0077cc;
+  font-weight: normal;
+}
+
+#prev-month:hover,
+#next-month:hover {
+  text-decoration: underline;
+  color: #005fa3;
 }
 
 

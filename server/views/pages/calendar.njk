@@ -6,53 +6,52 @@
     <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
 </head>
 <body>
-<h1>{{ monthName }} {{ year }}</h1>
-<table class="calendar" tabindex="0">
-    <thead>
-    <tr>
-        <th>Sun</th>
-        <th>Mon</th>
-        <th>Tue</th>
-        <th>Wed</th>
-        <th>Thu</th>
-        <th>Fri</th>
-        <th>Sat</th>
-    </tr>
-    </thead>
-    <tbody>
-    {% for week in calendar %}
+    <div id="month-wrap">
+        <a href="#prev" id="prev-month" onclick="goToPreviousMonth()">Previous month</a>
+        <span id="current-month">{{ monthName }} {{ year }}</span>
+        <a href="#next" id="next-month" onclick="goToNextMonth()">Next month</a>
+    </div>
+    <table class="calendar"  tabindex="0">
+        <thead>
         <tr>
-            {% for day in week %}
-                {% if not day.isCurrentMonth %}
-                    <td>
-                        <span></span>
-                    </td>
-                {% else %}
-                    <td id="day{{ day.day }}" data-date="{{ day.iso }}" tabindex="0">
-                        <span class="cell">{{ day.day }}</span>
-                    </td>
-                {% endif %}
-            {% endfor %}
+            <th>Sun</th><th>Mon</th><th>Tue</th><th>Wed</th>
+            <th>Thu</th><th>Fri</th><th>Sat</th>
         </tr>
-    {% endfor %}
-    </tbody>
-</table>
-<script nonce="{{ cspNonce }}">
-  document.addEventListener('DOMContentLoaded', function() {
-    const cellSpans = document.querySelectorAll('td[data-date] .cell')
+        </thead>
+        <tbody>
+        {% for week in calendar %}
+            <tr>
+                {% for day in week %}
+                    {% if not day.isCurrentMonth  %}
+                        <td>
+                            <span></span>
+                        </td>
+                    {% else %}
+                        <td id="day{{ day.day }}" data-date="{{ day.iso }}" tabindex="0">
+                            <span class="cell">{{ day.day }}</span>
+                        </td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <script nonce="{{ cspNonce }}">
+      document.addEventListener('DOMContentLoaded', function() {
+        const cellSpans = document.querySelectorAll('td[data-date] .cell')
 
-    cellSpans.forEach(span => {
-      span.addEventListener('click', () => {
-        // Remove 'selected' from all
-        document.querySelectorAll('.calendar td .cell.selected').forEach(c => {
-          c.classList.remove('selected')
+        cellSpans.forEach(span => {
+          span.addEventListener('click', () => {
+            // Remove 'selected' from all
+            document.querySelectorAll('.calendar td .cell.selected').forEach(c => {
+              c.classList.remove('selected')
+            })
+
+            span.classList.add('selected')
+          })
         })
-
-        span.classList.add('selected')
       })
-    })
-  })
-</script>
+    </script>
 </body>
 </html>
 
