@@ -1,3 +1,4 @@
+import multer from 'multer'
 import { postcodeValidator } from 'postcode-validator'
 import { DateTime } from 'luxon'
 import logger from '../../logger'

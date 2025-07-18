@@ -36,8 +36,7 @@ import {
   AppointmentRequestBody,
   CheckAppointment,
   AppointmentTypeResponse,
-  AppointmentLocationResponse,
-  AppointmentLocationRequest,
+  SessionFile,
 } from '../models/Appointments'
 
 interface GetUserScheduleProps {
@@ -272,7 +271,8 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  async postAppointments(crn: string, body: AppointmentRequestBody, fileToUpload: Express.Multer.File = null) {
+  // fileToUpload is base64 string
+  async postAppointments(crn: string, body: AppointmentRequestBody, fileToUpload: SessionFile = null) {
     return this.post({
       data: body,
       fileToUpload,

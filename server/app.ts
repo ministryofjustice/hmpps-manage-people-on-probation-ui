@@ -56,7 +56,7 @@ export default function createApp(services: Services): express.Application {
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
   const router = Router()
   // Routes that use multer for multipart upload must be registered before csrf executes
-  app.use(multipartRoute(router))
+  app.use(multipartRoute(router, services))
   app.use(setUpCsrf())
   app.use(routes(router, services))
 

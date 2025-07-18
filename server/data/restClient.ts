@@ -8,6 +8,7 @@ import type { ApiConfig } from '../config'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
 import { escapeForLog, isValidHost, isValidPath } from '../utils'
+import { SessionFile } from '../models/Appointments'
 
 interface Request {
   path: string
@@ -23,7 +24,7 @@ interface Request {
 
 interface RequestWithBody extends Request {
   data?: Record<string, any>
-  fileToUpload?: Express.Multer.File
+  fileToUpload?: SessionFile
   encryptFile?: boolean
   retry?: boolean
 }
@@ -121,11 +122,8 @@ export default class RestClient {
       retry = false,
       handle404 = false,
       fileToUpload,
-      encryptFile = false,
       // files,
-    }: RequestWithBody & {
-      file?: Express.Multer.File | { fieldname: string; buffer: Buffer; originalname: string }
-    },
+    }: RequestWithBody,
   ): Promise<Response> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
 
@@ -148,25 +146,23 @@ export default class RestClient {
       // const isMultipart = files && files.length > 0
       // if (isMultipart) {
       if (fileToUpload) {
+        /*
+        const file = {
+          fieldname: 'file',
+          originalname: 'encrypted.dat',
+          encoding: '7bit',
+          mimetype: 'application/octet-stream',
+          size: buffer.length,
+          buffer,
+        }
+          */
         request.type('multipart/form-data')
-        if (encryptFile) {
-          try {
-            const key = crypto.randomBytes(32) // 256 bits for AES-256
-            const iv = crypto.randomBytes(12) // 96 bits recommended for GCM
-            const encyptedBuffer = await this.encryptFileToBuffer(key, iv, fileToUpload.path)
-            const { filename } = fileToUpload
-            request.field('iv', iv.toString('hex'))
-            request.attach('file', encyptedBuffer, filename)
-          } catch (error) {
-            logger.info('Upload failed:', error)
-          }
-        } else {
-          // Attach the raw file
-          const { fieldname, buffer, originalname } = fileToUpload
-          request.attach(fieldname, buffer, originalname)
-          /*
-      
-        For multifile
+        // Attach the encrypted file
+        const { buffer, originalname } = fileToUpload
+        request.attach('file', buffer, originalname)
+
+        /*
+        For multifile:
  
         for (const file of files) {
           if ('fieldname' in file && file.buffer) {
@@ -176,7 +172,6 @@ export default class RestClient {
           }
         }
         */
-        }
 
         // Add other form fields (req.body)
         Object.entries(data).forEach(([key, value]) => {
@@ -200,14 +195,6 @@ export default class RestClient {
       )
       throw sanitisedError
     }
-  }
-
-  async encryptFileToBuffer(key: Buffer, iv: Buffer, filePath: string) {
-    const plainText = await fs.readFile(filePath)
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv)
-    const encrypted = Buffer.concat([cipher.update(plainText), cipher.final()])
-    const authTag = cipher.getAuthTag()
-    return Buffer.concat([encrypted, authTag])
   }
 
   async patch<Response = unknown>(request: RequestWithBody): Promise<Response> {

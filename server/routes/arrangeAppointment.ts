@@ -1,4 +1,3 @@
-import multer from 'multer'
 import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import {
@@ -13,13 +12,12 @@ import {
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
-import { postAppointments } from '../middleware/postAppointments'
 import { getTimeOptions } from '../middleware/getTimeOptions'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 
-const upload = multer()
+// const upload = multer()
 // const upload = multer({
 //   storage: multer.memoryStorage(),
 //   limits: { fileSize: MAX_FILE_SIZE },

@@ -1,6 +1,11 @@
-import 'multer'
 import { Name } from '../data/model/personalDetails'
 import { Errors } from './Errors'
+
+export interface SessionFile {
+  originalname: string
+  mimetype: string
+  buffer: string
+}
 
 export interface AppointmentSession {
   user?: {
@@ -28,7 +33,7 @@ export interface AppointmentSession {
   repeatingDates?: string[]
   notes?: string
   sensitivity?: 'Yes' | 'No'
-  file?: Express.Multer.File
+  file?: SessionFile
 }
 
 export interface AppointmentType {

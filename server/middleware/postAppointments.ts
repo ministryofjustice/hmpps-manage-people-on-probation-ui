@@ -56,7 +56,15 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
-    console.dir(body)
+    /*
+    convert back to buffer to send as raw binary
+    headers would need to be set to:
+    'Content-Type': 'application/octet-stream'
+    */
+
+    /*
+    Alt approach here would be to post file as base64 string
+    */
     await masClient.postAppointments(crn, body, file)
   }
 }
