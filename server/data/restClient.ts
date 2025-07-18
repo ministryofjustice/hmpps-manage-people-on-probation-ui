@@ -161,7 +161,7 @@ export default class RestClient {
             logger.info('Upload failed:', error)
           }
         } else {
-          // Attach the file
+          // Attach the raw file
           const { fieldname, buffer, originalname } = fileToUpload
           request.attach(fieldname, buffer, originalname)
           /*

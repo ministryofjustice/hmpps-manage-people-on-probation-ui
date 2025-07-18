@@ -10,7 +10,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
     const newSessionData = req?.session?.data ?? {}
     const { crn, id } = req.params
     const inputs: Record<string, any> = req.body ?? {}
-    const file = req?.file
+    // save the file to session
     if (req?.file) {
       const { fieldname, originalname, mimetype, buffer } = req.file
       setDataValue(newSessionData, ['appointments', crn, id, fieldname], { originalname, mimetype, buffer })
@@ -54,6 +54,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
         }
       }
     })
+    console.dir(newSessionData, { depth: null })
     req.session.data = newSessionData
     return next()
   }

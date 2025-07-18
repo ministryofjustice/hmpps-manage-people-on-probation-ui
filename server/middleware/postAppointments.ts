@@ -56,6 +56,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
+    console.dir(body)
     await masClient.postAppointments(crn, body, file)
   }
 }
