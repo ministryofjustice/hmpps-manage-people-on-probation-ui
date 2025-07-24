@@ -6,11 +6,14 @@ const routes = ['getHome'] as const
 
 const homeController: Controller<typeof routes> = {
   getHome: hmppsAuthClient => {
-    return async (_req, res) => {
+    return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { appointments, outcomes, totalAppointments, totalOutcomes } = await masClient.getUserAppointments(
         res.locals.user.username,
+      )
+      const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
+        req.host.includes(host),
       )
       return res.render('pages/homepage/homepage', {
         totalAppointments,
@@ -25,7 +28,7 @@ const homeController: Controller<typeof routes> = {
         cas3_link: config.cas3.link,
         caval_link: config.caval.link,
         epf2_link: config.epf2.link,
-        esupervision_link: process.env.NODE_ENV !== 'production' ? config.esupervision.link : null,
+        esupervision_link: isDev ? config.esupervision.link : null,
       })
     }
   },
