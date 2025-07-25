@@ -192,10 +192,12 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       }
       const today = new Date()
       const minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+      const maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
       return res.render(`pages/arrange-appointment/date-time`, {
         crn,
         id,
         minDate,
+        maxDate,
         change,
         showValidation,
       })
