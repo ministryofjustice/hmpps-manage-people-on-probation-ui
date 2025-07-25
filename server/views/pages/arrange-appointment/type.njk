@@ -1,6 +1,7 @@
 {% extends "../_form.njk" %}
 {% set title = 'What appointment are you arranging?' %}
-{% set backLink = change if change else '/case/' + crn + '/appointments' %}
+{% set backLink = change if change else 
+  '/case/' + crn + '/appointments' %}
 {% set types = [] %}
 {% for appointmentType in appointmentTypes %}
   {% set types = (types.push({
@@ -29,8 +30,7 @@
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title + '</span>',
-        isPageHeading: true,
-        classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+        classes: "govuk-fieldset__legend--l"
       },
       attributes: {
         'data-qa': 'type'
@@ -46,8 +46,8 @@
     fieldset: {
       legend: {
         text: 'Include appointment in VISOR report?',
-        classes: "govuk-fieldset__legend--l",
-        isPageHeading: false
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--l"
       }
     },
     formGroup: {

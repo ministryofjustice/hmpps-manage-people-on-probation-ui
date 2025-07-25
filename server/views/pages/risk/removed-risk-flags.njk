@@ -1,9 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = "Removed risk flags" %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Risk"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Risk"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -25,50 +27,56 @@
 {% endblock %}
 
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
-      {{ title }}
-    </h1>
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+        {{ title }}
+      </h2>
+    </div>
   </div>
-</div>
 
-{% set removedRiskFlagsCount = personRisk.removedRiskFlags.length %}
-{% if removedRiskFlagsCount > 0 %}
-  <table class="govuk-table">
-    <thead class="govuk-table__head">
-      <tr class="govuk-table__row">
-        <th class="govuk-table__header">Flag</th>
-        <th class="govuk-table__header">Why flag was removed</th>
-        <th class="govuk-table__header">Date removed</th>
-      </tr>
-    </thead>
-    <tbody class="govuk-table__body" data-qa="removedRisksCard">
-      {% for flag in personRisk.removedRiskFlags %}
+  {% set removedRiskFlagsCount = personRisk.removedRiskFlags.length %}
+  {% if removedRiskFlagsCount > 0 %}
+    <table class="govuk-table">
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">
+          <th class="govuk-table__header">Flag</th>
+          <th class="govuk-table__header">Why flag was removed</th>
+          <th class="govuk-table__header">Date removed</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body" data-qa="removedRisksCard">
+        {% for flag in personRisk.removedRiskFlags %}
           {% if flag.removalHistory.length > 0 %}
-              {% set removal = flag.removalHistory[0] %}
-              {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
-              {% set removalNotes = '' %}
-              {% if hasRemovalNotes  %}
-                {% for removalNote in removal.riskRemovalNotes %}
-                  {% if removalNote.note %}
-                    {% set removalNotes = removalNotes.concat(appNote(removalNote, '/case/' + crn + '/risk/flag/' + flag.id + '/risk-removal-note/' + removalNote.id)) %}
-                  {% endif %}
-                {% endfor  %}
-              {% else %}
-                {% set removalNotes = 'No notes' %}
-              {% endif %}
-              <tr class="govuk-table__row">
-                <td class="govuk-table__cell" data-qa="removedRisk{{loop.index}}Value"><a href="/case/{{ crn }}/risk/flag/{{ flag.id }}">{{ flag.description }}</a></td>
-                <td class="govuk-table__cell">{{ removalNotes | safe }}</td>
-                <td class="govuk-table__cell">{{ removal.removalDate | dateWithYear }}</td>
-              </tr>
+            {% set removal = flag.removalHistory[0] %}
+            {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
+            {% set removalNotes = '' %}
+            {% if hasRemovalNotes %}
+              {% for removalNote in removal.riskRemovalNotes %}
+                {% if removalNote.note %}
+                  {% set removalNotes = removalNotes.concat(appNote(removalNote, '/case/' + crn + '/risk/flag/' + flag.id + '/risk-removal-note/' + removalNote.id)) %}
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% set removalNotes = 'No notes' %}
+            {% endif %}
+            <tr class="govuk-table__row">
+              <td class="govuk-table__cell" data-qa="removedRisk{{loop.index}}Value">
+                <a href="/case/{{ crn }}/risk/flag/{{ flag.id }}">{{ flag.description }}</a>
+              </td>
+              <td class="govuk-table__cell">{{ removalNotes | safe }}</td>
+              <td class="govuk-table__cell">{{ removal.removalDate | dateWithYear }}</td>
+            </tr>
           {% endif %}
-      {% endfor %}
-    </tbody>
-  </table>
-{% else %}
-  <p>No risk flags have been removed.</p>
-{% endif %}
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p>No risk flags have been removed.</p>
+  {% endif %}
 
 {% endblock %}

@@ -1,5 +1,5 @@
+/* eslint-disable import/no-cycle */
 import { Response } from 'express'
-
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
@@ -9,6 +9,9 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentType } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
+import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { TierCalculation } from '../data/tierApiClient'
+import { ErrorSummary } from '../data/model/common'
 
 export interface AppointmentLocals {
   meta: {
@@ -52,6 +55,12 @@ interface Locals {
   requirement?: string
   appointment?: AppointmentLocals
   case?: PersonalDetails
+  headerPersonName?: string
+  headerCRN?: string
+  headerDob?: string
+  risksWidget?: RoshRiskWidgetDto
+  tierCalculation?: TierCalculation | ErrorSummary
+  predictorScores?: TimelineItem
   message?: string
   title?: string
   status?: number
