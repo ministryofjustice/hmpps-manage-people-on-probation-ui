@@ -38,7 +38,6 @@ describe('Check your answers then confirm the appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
     loadPage()
-    // cy.pause()
   })
   it('should render the page', () => {
     const cyaPage = new AppointmentCheckYourAnswersPage()
