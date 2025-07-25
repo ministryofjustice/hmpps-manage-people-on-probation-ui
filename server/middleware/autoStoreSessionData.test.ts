@@ -103,6 +103,7 @@ describe('/middleware/autoStoreSessionData', () => {
         crn,
         id,
       },
+      url: `/case/${crn}/arrange-appointment/${id}/sentence`,
       session: {
         data: {
           appointments: {
@@ -146,6 +147,7 @@ describe('/middleware/autoStoreSessionData', () => {
         crn,
         id,
       },
+      url: `/case/${crn}/arrange-appointment/${id}/sentence`,
       session: {
         data: {
           appointments: {
@@ -179,9 +181,9 @@ describe('/middleware/autoStoreSessionData', () => {
     beforeEach(() => {
       autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should reset the requirement and nsi ids in the appointment session', () => {
-      expect(req.session.data.appointments[crn][id].requirementId).toEqual('')
-      expect(req.session.data.appointments[crn][id].nsiId).toEqual('')
+    it('should delete the requirement and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].requirementId).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].nsiId).toBeUndefined()
     })
   })
   describe('If sentence with requirement', () => {
@@ -190,6 +192,7 @@ describe('/middleware/autoStoreSessionData', () => {
         crn,
         id,
       },
+      url: `/case/${crn}/arrange-appointment/${id}/sentence`,
       session: {
         data: {
           appointments: {
@@ -223,9 +226,9 @@ describe('/middleware/autoStoreSessionData', () => {
     beforeEach(() => {
       autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should reset the licence condition and nsi ids in the appointment session', () => {
-      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('')
-      expect(req.session.data.appointments[crn][id].nsiId).toEqual('')
+    it('should delete the licence condition and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].nsiId).toBeUndefined()
     })
   })
   describe('If sentence with nsi', () => {
@@ -234,6 +237,7 @@ describe('/middleware/autoStoreSessionData', () => {
         crn,
         id,
       },
+      url: `/case/${crn}/arrange-appointment/${id}/sentence`,
       session: {
         data: {
           appointments: {
@@ -267,9 +271,54 @@ describe('/middleware/autoStoreSessionData', () => {
     beforeEach(() => {
       autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should reset the licence condition and nsi ids in the appointment session', () => {
-      expect(req.session.data.appointments[crn][id].licenceConditionId).toEqual('')
-      expect(req.session.data.appointments[crn][id].requirementId).toEqual('')
+    it('should delete the licence condition and requirement ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].requirementId).toBeUndefined()
+    })
+  })
+  describe('If sentence with no licence condition, requirement or nsi', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+      },
+      url: `/case/${crn}/arrange-appointment/${id}/sentence`,
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                licenceConditionId: '2500711169',
+                requirementId: '2500711277',
+                nsiId: '250071127',
+                numberOfAppointments: '2',
+                numberOfRepeatAppointments: '1',
+                interval: '',
+                repeatingDates: [],
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'eWgbIYQJ-4cb7KuSKWXvFK87nZ0M3D0RvaPA',
+        appointments: {
+          [crn]: {
+            [id]: {
+              eventId: '2501192724',
+            },
+          },
+        },
+      },
+    })
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should delete the licence condition, requirement and nsi ids in the appointment session', () => {
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].requirementId).toBeUndefined()
+      expect(req.session.data.appointments[crn][id].nsiId).toBeUndefined()
     })
   })
   describe('If value is an object', () => {
