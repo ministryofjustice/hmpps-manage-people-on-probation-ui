@@ -19,6 +19,27 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
       })
     }
 
+    const resetSentenceSession = () => {
+      if (req.url.includes('/sentence')) {
+        if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
+          resetValues({ requirementId: '', nsiId: '' })
+        }
+        if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
+          resetValues({ licenceConditionId: '', nsiId: '' })
+        }
+        if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
+          resetValues({ licenceConditionId: '', requirementId: '' })
+        }
+        if (
+          !req?.body?.appointments?.[crn]?.[id]?.licenceConditionId &&
+          !req?.body?.appointments?.[crn]?.[id]?.requirementId &&
+          !req?.body?.appointments?.[crn]?.[id]?.nsiId
+        ) {
+          resetValues({ licenceConditionId: '', requirementId: '', nsiId: '' })
+        }
+      }
+    }
+
     Object.entries(inputs).forEach(([key, _]: [string, any]) => {
       if (!key.startsWith('_')) {
         const getPath = id ? [key, crn, id] : [key, crn]
@@ -38,24 +59,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
             const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
             setDataValue(newSessionData, setPath, newValue)
           })
-          if (req.url.includes('/sentence')) {
-            if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
-              resetValues({ requirementId: '', nsiId: '' })
-            }
-            if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
-              resetValues({ licenceConditionId: '', nsiId: '' })
-            }
-            if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
-              resetValues({ licenceConditionId: '', requirementId: '' })
-            }
-            if (
-              !req?.body?.appointments?.[crn]?.[id]?.licenceConditionId &&
-              !req?.body?.appointments?.[crn]?.[id]?.requirementId &&
-              !req?.body?.appointments?.[crn]?.[id]?.nsiId
-            ) {
-              resetValues({ licenceConditionId: '', requirementId: '', nsiId: '' })
-            }
-          }
+          resetSentenceSession()
         }
       }
     })
