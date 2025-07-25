@@ -42,53 +42,58 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     // in the same instance as providerCode flow.
     // On page load need to default the drop-down to
     // user default values
-    if (providerCode || back) {
-      displayedProviders = providers
-      displayedTeams = teams
-      displayedUsers = users
+    if (req.method === 'GET') {
+      if (providerCode || back) {
+        displayedProviders = providers
+        displayedTeams = teams
+        displayedUsers = users
+      } else {
+        displayedProviders = providers.map(p => {
+          if (p.name === defaultUserDetails.homeArea) {
+            return { code: p.code, name: p.name, selected: 'selected' }
+          }
+          return { code: p.code, name: p.name }
+        })
+
+        displayedTeams = teams.map(t => {
+          if (t.description === defaultUserDetails.team) {
+            return { description: t.description, code: t.code, selected: 'selected' }
+          }
+          return { description: t.description, code: t.code }
+        })
+
+        displayedUsers = users.map(u => {
+          if (u.username.toUpperCase() === defaultUserDetails.username) {
+            return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
+          }
+          return { username: u.username, nameAndRole: u.nameAndRole }
+        })
+      }
+
+      req.session.data = {
+        ...(req?.session?.data ?? {}),
+        providers: {
+          ...(req?.session?.data?.providers ?? {}),
+          [username]: displayedProviders,
+        },
+        teams: {
+          ...(req?.session?.data?.teams ?? {}),
+          [username]: displayedTeams,
+        },
+        staff: {
+          ...(req?.session?.data?.staff ?? {}),
+          [username]: displayedUsers,
+        },
+      }
     } else {
-      displayedProviders = providers.map(p => {
-        if (p.name === defaultUserDetails.homeArea) {
-          return { code: p.code, name: p.name, selected: 'selected' }
-        }
-        return { code: p.code, name: p.name }
-      })
-
-      displayedTeams = teams.map(t => {
-        if (t.description === defaultUserDetails.team) {
-          return { description: t.description, code: t.code, selected: 'selected' }
-        }
-        return { description: t.description, code: t.code }
-      })
-
-      displayedUsers = users.map(u => {
-        if (u.username.toUpperCase() === defaultUserDetails.username) {
-          return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
-        }
-        return { username: u.username, nameAndRole: u.nameAndRole }
-      })
-    }
-
-    req.session.data = {
-      ...(req?.session?.data ?? {}),
-      providers: {
-        ...(req?.session?.data?.providers ?? {}),
-        [username]: displayedProviders,
-      },
-      teams: {
-        ...(req?.session?.data?.teams ?? {}),
-        [username]: displayedTeams,
-      },
-      staff: {
-        ...(req?.session?.data?.staff ?? {}),
-        [username]: displayedUsers,
-      },
+      displayedProviders = req.session.data.providers[username]
+      displayedTeams = req.session.data.teams[username]
+      displayedUsers = req.session.data.staff[username]
     }
 
     res.locals.userProviders = displayedProviders
     res.locals.userTeams = displayedTeams
     res.locals.userStaff = displayedUsers
-
     return next()
   }
 }
