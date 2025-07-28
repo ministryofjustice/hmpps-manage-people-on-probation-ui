@@ -216,6 +216,11 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
 
 export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
+    const now = new Date()
+    const year = now.getFullYear()
+    const month = now.getMonth() + 1
+    const day = now.getDate()
+    cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
     const changedStart = '9:30am'
     const changedEnd = '10:30am'
     page.getSummaryListRow(5).find('.govuk-link').click()
@@ -223,11 +228,12 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
     dateTimePage.getDatePickerToggle().click()
     dateTimePage.getActiveDayButton().click()
     dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-start`).select(changedStart)
-    dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-end`).focus().select(changedEnd).tab()
-    dateTimePage.getSubmitBtn().click()
+    dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-end`).focus().select(changedEnd)
     // Ignore warnings
     dateTimePage.getSubmitBtn().click()
+    dateTimePage.getSubmitBtn().click()
     page.checkOnPage()
+
     page
       .getSummaryListRow(5)
       .find('.govuk-summary-list__value li:nth-child(1)')
@@ -240,7 +246,6 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
 }
 
 export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  console.log(page)
   getUuid().then(pageUuid => {
     page.getSummaryListRow(6).find('.govuk-link').click()
     const repeatingPage = new AppointmentRepeatingPage()
