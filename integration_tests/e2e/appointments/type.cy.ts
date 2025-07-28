@@ -1,11 +1,12 @@
 import Page from '../../pages/page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import { appointmentTypes } from '../../../server/properties'
 import 'cypress-plugin-tab'
 import mockResponse from '../../../wiremock/mappings/appointment-types.json'
 import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
+import { checkPopHeader } from './imports'
+import { toSentenceCase } from '../../../server/utils'
 
 const mockData = mockResponse as Wiremock
 
@@ -27,14 +28,18 @@ describe('Arrange an appointment', () => {
     describe('No VISOR registration', () => {
       it('should render the page', () => {
         loadPage()
+        // cy.pause()
+        checkPopHeader('Alton Berge', true)
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')
         })
-        typePage.getBackLink().should('have.attr', 'href', '/')
+        typePage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
         cy.get('[data-qa="type"] legend').should('contain.text', 'What appointment are you arranging?')
         for (let i = 1; i < mockAppointmentTypes.length; i += 1) {
-          typePage.getRadioLabel('type', i).should('contain.text', mockAppointmentTypes[i - 1].description)
+          typePage
+            .getRadioLabel('type', i)
+            .should('contain.text', toSentenceCase(mockAppointmentTypes[i - 1].description, ['(NS)']))
           typePage.getRadio('type', i).should('not.be.checked')
         }
 

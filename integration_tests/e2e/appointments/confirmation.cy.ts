@@ -1,17 +1,20 @@
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import AppointmentsPage from '../../pages/appointments'
+import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import {
   completeAttendancePage,
   completeCYAPage,
   completeDateTimePage,
   completeLocationPage,
-  completePreviewPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
+  completeNotePage,
   date,
   endTime,
   startTime,
+  checkPopHeader,
 } from './imports'
 
 const regex: RegExp =
@@ -24,7 +27,7 @@ const loadPage = () => {
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()
-  completePreviewPage()
+  completeNotePage()
   completeCYAPage()
 }
 describe('Appointments arranged', () => {
@@ -34,6 +37,7 @@ describe('Appointments arranged', () => {
     confirmPage = new AppointmentConfirmationPage()
   })
   it('should render the page', () => {
+    checkPopHeader('Alton Berge', true)
     confirmPage.getPanel().find('strong').should('contain.text', '3 Way Meeting (NS)')
     confirmPage
       .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
@@ -62,10 +66,15 @@ describe('Appointments arranged', () => {
         expect(normalizedText).to.include(`Alton’s phone number is 0123456999.`)
       })
 
-    confirmPage.getSubmitBtn().should('contain.text', 'Finish')
+    confirmPage.getSubmitBtn().should('contain.text', 'Arrange next appointment')
     confirmPage.getSubmitBtn().click()
-    cy.location().should(location => {
-      expect(location.href).to.eq('http://localhost:3007/')
-    })
+    const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+    arrangeAnotherAppointmentPage.checkOnPage()
+  })
+  it('should link to the appointment page when practitioner click finish', () => {
+    loadPage()
+    cy.get('[data-qa="finishLink"]').click()
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
   })
 })

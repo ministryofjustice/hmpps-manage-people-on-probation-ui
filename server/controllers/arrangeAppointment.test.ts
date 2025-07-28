@@ -500,12 +500,12 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
-        '0',
+        '',
       )
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
-        '0',
+        '',
       )
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,

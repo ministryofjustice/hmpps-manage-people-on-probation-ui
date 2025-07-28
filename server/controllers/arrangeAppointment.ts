@@ -223,7 +223,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         until = repeatAppointments.length ? repeatAppointments[repeatAppointments.length - 1].date : ''
       } else {
         setDataValue(data, [...path, 'numberOfAppointments'], '1')
-        setDataValue(data, [...path, 'numberOfRepeatAppointments'], '0')
+        setDataValue(data, [...path, 'numberOfRepeatAppointments'], '')
         setDataValue(data, [...path, 'interval'], 'DAY')
       }
       setDataValue(data, [...path, 'until'], until)

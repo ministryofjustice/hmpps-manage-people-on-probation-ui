@@ -6,6 +6,7 @@ import {
   completeAttendancePage,
   completeLocationPage,
   completeDateTimePage,
+  checkPopHeader,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
@@ -31,6 +32,9 @@ describe('Add a note', () => {
   })
   it('should be on add note page', () => {
     appointmentNotePage.checkOnPage()
+  })
+  it('should render the pop header', () => {
+    checkPopHeader('Alton Berge', true)
   })
   it('should show validation errors if sensitivity option is selected', () => {
     cy.get('textarea').clear()

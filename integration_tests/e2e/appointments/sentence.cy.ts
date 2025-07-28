@@ -1,8 +1,7 @@
-import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AttendancePage from '../../pages/appointments/attendance.page'
-import { crn, uuid, completeTypePage } from './imports'
+import { crn, uuid, completeTypePage, checkPopHeader } from './imports'
 
 const loadPage = (type = 1, query = '') => {
   completeTypePage(type, query)
@@ -13,6 +12,7 @@ const checkRequirementSentence = (type = 1) => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
       loadPage()
+      checkPopHeader('Alton Berge', true)
       sentencePage = new AppointmentSentencePage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-2`).click()
     })

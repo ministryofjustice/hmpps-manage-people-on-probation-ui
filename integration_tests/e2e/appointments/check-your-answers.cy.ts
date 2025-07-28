@@ -21,6 +21,7 @@ import {
   uuid,
   completeAttendancePage,
   completeNotePage,
+  checkPopHeader,
 } from './imports'
 import { statusErrors } from '../../../server/properties'
 
@@ -41,6 +42,7 @@ describe('Check your answers then confirm the appointment', () => {
   })
   it('should render the page', () => {
     const cyaPage = new AppointmentCheckYourAnswersPage()
+    checkPopHeader('Alton Berge', true)
     cyaPage.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
     cyaPage.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
     cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')

@@ -95,3 +95,20 @@ export const completeCYAPage = () => {
   const cyaPage = new AppointmentCheckYourAnswersPage()
   cyaPage.getSubmitBtn().click()
 }
+export const checkPopHeader = (name = 'Caroline Wolff', appointments = false) => {
+  cy.get('h1').should('contain.text', name)
+  cy.get('[data-qa="crn"]').should('contain.text', 'X000001')
+  cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')
+  cy.get('[data-qa="headerDateOfBirthAge"]').should('contain.text', '45')
+  cy.get('[data-qa="tierValue"]').should('contain.text', appointments ? 'A3' : 'B2')
+  cy.get('.predictor-timeline-item').eq(0).find('.predictor-timeline-item__level').should('contain.text', 'ROSH')
+  cy.get('.predictor-timeline-item')
+    .eq(0)
+    .find('.predictor-timeline-item__level')
+    .should('contain.text', appointments ? 'HIGH' : 'VERY HIGH')
+  if (!appointments) {
+    cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__level').should('contain.text', 'RSR')
+    cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__level').should('contain.text', 'MEDIUM')
+    cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__score').should('contain.text', '12.1')
+  }
+}
