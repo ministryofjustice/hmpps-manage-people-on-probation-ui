@@ -55,6 +55,7 @@ export * from './isDefined'
 export * from './makePageTitle'
 export * from './getDataValue'
 export * from './setDataValue'
+// eslint-disable-next-line import/no-cycle
 export * from './decorateFormAttributes'
 export * from './getSearchParamsString'
 export * from './groupByLevel'
