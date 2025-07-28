@@ -220,7 +220,8 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (change && repeatAppointmentsEnabled) {
         const period = ['WEEK', 'FORTNIGHT'].includes(interval) ? 'week' : 'month'
         const increment = interval === 'FORTNIGHT' ? 2 : 1
-        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment)
+        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment) ?? []
+        console.log(repeatAppointments)
         repeatingDates = repeatAppointments.map(appt => appt.date)
         until = repeatAppointments.length ? repeatAppointments[repeatAppointments.length - 1].date : ''
       } else {

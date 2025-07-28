@@ -621,6 +621,10 @@ describe('controllers/arrangeAppointment', () => {
           repeating: 'Yes',
         },
       })
+      jest.spyOn(ArrangedSession, 'generateRepeatedAppointments').mockReturnValue([
+        { uuid: '1', date: '19/4/2025' },
+        { uuid: '2', date: '26/4/2025' },
+      ])
       const mockRes = createMockResponse({ flags: { enableRepeatAppointments: true } })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
@@ -628,12 +632,12 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'until'],
-        '2025-07-21',
+        '26/4/2025',
       )
       expect(mockedSetDataValue).toHaveBeenCalledWith(
         mockReq.session.data,
         ['appointments', crn, uuid, 'repeatingDates'],
-        ['2025-07-14', '2025-07-21'],
+        ['19/4/2025', '26/4/2025'],
       )
     })
     it('should set the default date values if repeating appointment disabled and not changing the date', async () => {
@@ -910,6 +914,7 @@ describe('controllers/arrangeAppointment', () => {
         numberOfAppointments: '1',
         numberOfRepeatAppointments: '0',
         repeatingDates: [] as string[],
+        repeating: 'No',
       }
       expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid2], expectedClone)
     })
