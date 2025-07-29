@@ -11,7 +11,6 @@ import {
   completeNotePage,
   completeCYAPage,
   completeConfirmationPage,
-  checkAppointmentUpdate,
   checkAppointmentSummary,
   crn,
   getUuid,
