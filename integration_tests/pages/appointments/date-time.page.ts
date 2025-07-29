@@ -31,7 +31,7 @@ export default class AppointmentDateTimePage extends Page {
   }
 
   getActiveDayButton = () => {
-    return cy.get('.moj-datepicker__button--today')
+    return cy.get('.moj-datepicker__button--current')
   }
 
   getNextDayButton = () => {

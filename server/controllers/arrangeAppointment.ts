@@ -220,7 +220,7 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       if (change && repeatAppointmentsEnabled) {
         const period = ['WEEK', 'FORTNIGHT'].includes(interval) ? 'week' : 'month'
         const increment = interval === 'FORTNIGHT' ? 2 : 1
-        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment)
+        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment) ?? []
         repeatingDates = repeatAppointments.map(appt => appt.date)
         until = repeatAppointments.length ? repeatAppointments[repeatAppointments.length - 1].date : ''
       } else {
@@ -322,10 +322,12 @@ const arrangeAppointmentController: Controller<typeof routes> = {
   postNotes: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      return res.redirect(redirect)
     }
   },
   getCheckYourAnswers: () => {
