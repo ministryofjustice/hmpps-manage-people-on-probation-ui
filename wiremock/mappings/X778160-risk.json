@@ -1,0 +1,773 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/arns/risks/crn/X778160/widget",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "overallRisk": "VERY_HIGH",
+          "assessedOn": "2024-11-29T13:01:15",
+          "riskInCommunity": {
+            "Public": "HIGH",
+            "Children": "LOW",
+            "Known Adult": "MEDIUM",
+            "Staff": "VERY_HIGH"
+          },
+          "riskInCustody": {
+            "Public": "HIGH",
+            "Children": "LOW",
+            "Known Adult": "MEDIUM",
+            "Staff": "VERY_HIGH",
+            "Prisoners": "MEDIUM"
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/arns/risks/crn/X778160/predictors/all",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [
+          {
+            "completedDate": "2024-12-09T08:13:33",
+            "assessmentStatus": "string",
+            "groupReconvictionScore": {
+              "oneYear": 3,
+              "twoYears": 6,
+              "scoreLevel": "LOW"
+            },
+            "violencePredictorScore": {
+              "ovpStaticWeightedScore": 0,
+              "ovpDynamicWeightedScore": 0,
+              "ovpTotalWeightedScore": 0,
+              "oneYear": 4,
+              "twoYears": 10.2,
+              "ovpRisk": "MEDIUM"
+            },
+            "generalPredictorScore": {
+              "ogpStaticWeightedScore": 0,
+              "ogpDynamicWeightedScore": 0,
+              "ogpTotalWeightedScore": 0,
+              "ogp1Year": 5,
+              "ogp2Year": 28.8,
+              "ogpRisk": "HIGH"
+            },
+            "riskOfSeriousRecidivismScore": {
+              "percentageScore": 12.1,
+              "staticOrDynamic": "STATIC",
+              "source": "OASYS",
+              "algorithmVersion": "string",
+              "scoreLevel": "MEDIUM"
+            },
+            "sexualPredictorScore": {
+              "ospIndecentPercentageScore": 31.1,
+              "ospContactPercentageScore": 2.1,
+              "ospIndecentScoreLevel": "HIGH",
+              "ospContactScoreLevel": "LOW",
+              "ospIndirectImagePercentageScore": 0,
+              "ospDirectContactPercentageScore": 12.9,
+              "ospIndirectImageScoreLevel": "MEDIUM",
+              "ospDirectContactScoreLevel": "HIGH"
+            }
+          },
+          {
+            "completedDate": "2024-11-01T18:56:33",
+            "assessmentStatus": "string",
+            "groupReconvictionScore": {
+              "oneYear": 5,
+              "twoYears": 6,
+              "scoreLevel": "LOW"
+            },
+            "violencePredictorScore": {
+              "ovpStaticWeightedScore": 0,
+              "ovpDynamicWeightedScore": 0,
+              "ovpTotalWeightedScore": 0,
+              "oneYear": 0,
+              "twoYears": 0,
+              "ovpRisk": "LOW"
+            },
+            "generalPredictorScore": {
+              "ogpStaticWeightedScore": 0,
+              "ogpDynamicWeightedScore": 0,
+              "ogpTotalWeightedScore": 0,
+              "ogp1Year": 5,
+              "ogp2Year": 28.8,
+              "ogpRisk": "HIGH"
+            },
+            "riskOfSeriousRecidivismScore": {
+              "percentageScore": 12.1,
+              "staticOrDynamic": "STATIC",
+              "source": "OASYS",
+              "algorithmVersion": "string",
+              "scoreLevel": "MEDIUM"
+            },
+            "sexualPredictorScore": {
+              "ospIndecentPercentageScore": 31.1,
+              "ospContactPercentageScore": 0,
+              "ospIndecentScoreLevel": "HIGH",
+              "ospContactScoreLevel": "LOW",
+              "ospIndirectImagePercentageScore": 0,
+              "ospDirectContactPercentageScore": 12.9,
+              "ospIndirectImageScoreLevel": "MEDIUM",
+              "ospDirectContactScoreLevel": "HIGH"
+            }
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "opd": {
+            "eligible": true,
+            "date": "2024-12-12"
+          },
+          "mappa": {
+            "level": 2,
+            "levelDescription": "M2 Desc",
+            "category": 0,
+            "categoryDescription": "X9 Desc",
+            "startDate": "2024-12-12",
+            "reviewDate": "2024-12-13"
+          },
+          "riskFlags": [
+            {
+              "id": 1,
+              "level": "HIGH",
+              "description": "Restraining Order",
+              "createdDate": "2022-12-18",
+              "nextReviewDate": "2024-12-15",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": false
+            },
+            {
+              "id": 2,
+              "description": "Domestic Abuse Perpetrator",
+              "level": "MEDIUM",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Patrick Bateman",
+                  "createdByDate": "2024-10-30",
+                  "note": "Risk Notes 1",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 1,
+                  "note": "Note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "nextReviewDate": "2025-08-18",
+              "mostRecentReviewDate": "2023-12-18",
+              "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": false
+            },
+            {
+              "id": 3,
+              "description": "Risk to Known Adult",
+              "level": "LOW",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Tom Brady",
+                  "createdByDate": "2024-10-30",
+                  "note": "Risk Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer. Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer.Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
+                  "hasNoteBeenTruncated": true
+                },
+                {
+                  "id": 1,
+                  "note": "Note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "nextReviewDate": "2025-08-18",
+              "mostRecentReviewDate": "2023-12-18",
+              "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": false
+            },
+            {
+              "id": 4,
+              "description": "Domestic Abuse Perpetrator",
+              "level": "INFORMATION_ONLY",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "John Wick",
+                  "createdByDate": "2024-10-30",
+                  "note": "Risk Notes 4",
+                  "hasNoteBeenTruncated": false
+                },
+                {
+                  "id": 1,
+                  "note": "Note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "nextReviewDate": "2025-08-18",
+              "mostRecentReviewDate": "2023-12-18",
+              "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": false
+            }
+          ],
+          "removedRiskFlags": [
+            {
+              "id": 4,
+              "description": "Restraining Order",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Harry Hole",
+                  "createdByDate": "2025-01-01",
+                  "note": "Removed risk note 1",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "nextReviewDate": "2025-08-18",
+              "mostRecentReviewDate": "2023-12-18",
+              "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": true,
+              "removalHistory": [
+                {
+                  "riskRemovalNotes": [
+                    {
+                      "id": 0,
+                      "createdBy": "Dave Holland",
+                      "createdByDate": "2025-01-02",
+                      "note": "Removal history note 1",
+                      "hasNoteBeenTruncated": false
+                    }
+                  ],
+                  "removalDate": "2022-11-18",
+                  "removedBy": {
+                    "forename": "Paul",
+                    "surname": "Smith"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 5,
+              "description": "Domestic Abuse Perpetrator",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Charlie Brown",
+                  "createdByDate": "2025-01-02",
+                  "note": "Removed risk note 2",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "nextReviewDate": "2025-08-18",
+              "mostRecentReviewDate": "2023-12-18",
+              "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": true,
+              "removalHistory": [
+                {
+                  "removalDate": "2022-11-18",
+                  "removedBy": {
+                    "forename": "Paul",
+                    "surname": "Smith"
+                  }
+                }
+              ]
+            },
+            {
+              "id": 6,
+              "description": "Risk to Known Adult",
+              "riskNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Mickey Haller",
+                  "createdByDate": "2025-01-03",
+                  "note": "Removed risk note 3",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "nextReviewDate": "2025-08-18",
+              "mostRecentReviewDate": "2023-12-18",
+              "createdDate": "2022-12-18",
+              "createdBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "removed": true,
+              "removalHistory": [
+                {
+                  "riskRemovalNotes": [
+                    {
+                      "id": 0,
+                      "createdBy": "Peter Jones",
+                      "createdByDate": "2025-01-10",
+                      "note": "Removal history note 2",
+                      "hasNoteBeenTruncated": false
+                    }
+                  ],
+                  "removalDate": "2022-11-18",
+                  "removedBy": {
+                    "forename": "Paul",
+                    "surname": "Smith"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/1",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 1,
+            "description": "Restraining Order",
+            "nextReviewDate": "2023-12-12",
+            "mostRecentReviewDate": "2023-12-12",
+            "createdDate": "2022-12-12",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": false
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/2",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 2,
+            "description": "Domestic Abuse Perpetrator",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "Patrick Bateman",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes 1",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": false
+              }
+            ],
+            "nextReviewDate": "2025-08-18",
+            "mostRecentReviewDate": "2023-12-18",
+            "createdDate": "2022-12-18",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": false
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/3",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 3,
+            "description": "Risk to Known Adult",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "Tom Brady",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer. Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer.Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
+                "hasNoteBeenTruncated": true
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": false
+              }
+            ],
+            "nextReviewDate": "2025-08-18",
+            "mostRecentReviewDate": "2023-12-18",
+            "createdDate": "2022-12-18",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": false
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/3/note/0",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 3,
+            "description": "Risk to Known Adult",
+            "riskNote": {
+              "id": 0,
+              "createdBy": "Tom Brady",
+              "createdByDate": "2024-10-30",
+              "note": "Risk Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer. Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Disability Notes(s) unless otherwise authorised by your supervising officer.Disability Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as desi"
+            },
+            "nextReviewDate": "2025-08-18",
+            "mostRecentReviewDate": "2023-12-18",
+            "createdDate": "2022-12-18",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": false
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/4",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 4,
+            "description": "Restraining Order",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "John Wick",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes 4",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": true
+              }
+            ],
+            "nextReviewDate": "2025-08-12",
+            "mostRecentReviewDate": "2023-12-12",
+            "createdDate": "2022-12-12",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": true,
+            "removalHistory": [
+              {
+                "riskRemovalNotes": [
+                  {
+                    "id": 0,
+                    "createdBy": "Bruce Banner",
+                    "createdByDate": "2024-10-30",
+                    "note": "Some removal notes",
+                    "hasNoteBeenTruncated": true
+                  },
+                  {
+                    "id": 1,
+                    "note": "Removal Notes 2",
+                    "hasNoteBeenTruncated": false
+                  }
+                ],
+                "removalDate": "2022-11-18",
+                "removedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                }
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/4/risk-removal-note/0",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 4,
+            "description": "Restraining Order",
+            "riskNotes": [
+              {
+                "id": 0,
+                "createdBy": "John Wick",
+                "createdByDate": "2024-10-30",
+                "note": "Risk Notes 4",
+                "hasNoteBeenTruncated": false
+              },
+              {
+                "id": 1,
+                "note": "Note 1",
+                "hasNoteBeenTruncated": false
+              }
+            ],
+            "nextReviewDate": "2025-08-12",
+            "mostRecentReviewDate": "2023-12-12",
+            "createdDate": "2022-12-12",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": true,
+            "removalHistory": [
+              {
+                "riskRemovalNote": {
+                  "id": 0,
+                  "createdBy": "Bruce Banner",
+                  "createdByDate": "2024-10-30",
+                  "note": "Some removal notes"
+                },
+                "removalDate": "2022-11-18",
+                "removedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                }
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/5",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 5,
+            "description": "Domestic Abuse Perpetrator",
+            "notes": "Some notes",
+            "nextReviewDate": "2025-08-18",
+            "mostRecentReviewDate": "2023-12-18",
+            "createdDate": "2022-12-18",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": true,
+            "removalHistory": [
+              {
+                "notes": "Some removal notes",
+                "removalDate": "2022-11-18",
+                "removedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                }
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/risk-flags/X778160/6",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "middleName": "Linda",
+              "surname": "Wolff"
+            },
+            "crn": "X778160",
+            "dateOfBirth": "1979-08-18"
+          },
+          "riskFlag": {
+            "id": 6,
+            "description": "Risk to Known Adult",
+            "notes": "Some notes",
+            "nextReviewDate": "2025-08-18",
+            "mostRecentReviewDate": "2023-12-18",
+            "createdDate": "2022-12-18",
+            "createdBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "removed": true,
+            "removalHistory": [
+              {
+                "notes": "Some removal notes",
+                "removalDate": "2022-11-18",
+                "removedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                }
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
