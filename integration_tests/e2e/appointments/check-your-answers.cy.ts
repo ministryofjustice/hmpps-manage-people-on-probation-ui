@@ -42,7 +42,7 @@ const loadPage = ({
 }
 
 describe('Check your answers then confirm the appointment', () => {
-  beforeEach(() => {
+  afterEach(() => {
     cy.task('resetMocks')
   })
 
@@ -50,46 +50,7 @@ describe('Check your answers then confirm the appointment', () => {
     loadPage()
     const cyaPage = new AppointmentCheckYourAnswersPage()
     checkPopHeader('Alton Berge', true)
-    cyaPage.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
-    cyaPage.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
-    cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
-    cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
-    cyaPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
-    cyaPage
-      .getSummaryListRow(2)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)')
-    cyaPage.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
-    cyaPage
-      .getSummaryListRow(3)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', 'peter parker (PS-PSO)')
-      .should('contain.text', '(A P Central Admissions Unit, Greater Manchester)')
-    cyaPage.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
-    cyaPage
-      .getSummaryListRow(4)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', 'HMP Wakefield')
-      .should('contain.text', 'Love Lane')
-      .should('contain.text', 'Wakefield')
-      .should('contain.text', 'West Yorkshire')
-      .should('contain.text', 'WF2 9AG')
-    cyaPage.getSummaryListRow(5).find('.govuk-summary-list__key').should('contain.text', 'Date and time')
-    cyaPage
-      .getSummaryListRow(5)
-      .find('.govuk-summary-list__value li:nth-child(1)')
-      .invoke('text')
-      .then(text => {
-        const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
-      })
-    cyaPage.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
-    cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
-    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
-    cyaPage.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
-    cyaPage.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-    cyaPage.getSubmitBtn().should('include.text', 'Confirm this appointment')
+    checkAppointmentSummary(cyaPage)
   })
 
   it('should render the page with VISOR report', () => {

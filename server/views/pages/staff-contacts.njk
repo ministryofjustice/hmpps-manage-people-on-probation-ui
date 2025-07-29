@@ -55,11 +55,12 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
       {% if currentContacts.length %}
-        <h3 class="govuk-heading-m">Current contacts</h3>
-        {% for contact in currentContacts %}
-          <div class="govuk-!-margin-bottom-0">
-            <h3 class="govuk-heading-s">{{ contact.name }}</h3>
-            {{ govukSummaryList({
+        <section data-qa="currentContacts">
+          <h3 class="govuk-heading-m">Current contacts</h3>
+          {% for contact in currentContacts %}
+            <div class="govuk-!-margin-bottom-0">
+              <h4 class="govuk-heading-s">{{ contact.name }}</h4>
+              {{ govukSummaryList({
               classes: 'govuk-summary-list--no-border',
               rows: [
                 {
@@ -92,19 +93,21 @@
                 } if contact.allocationDate
               ]
             }) }}
-          </div>
+            </div>
 
-          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4 {% if loop.index == currentContacts.length %}govuk-!-margin-bottom-8{% endif %}">
-        {% endfor %}
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4 {% if loop.index == currentContacts.length %}govuk-!-margin-bottom-8{% endif %}">
+          {% endfor %}
+        </section>
       {% endif %}
       {% if previousContacts.length %}
-        <h3 class="govuk-heading-m" id="previous">Previous contacts</h3>
-        {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">') %}
+        <section data-qa="previousContacts">
+          <h3 class="govuk-heading-m" id="previous">Previous contacts</h3>
+          {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">') %}
 
-        {% for contact in previousContacts %}
-          <div class="govuk-!-margin-bottom-0">
-            <h3 class="govuk-heading-s">{{ contact.name }}</h3>
-            {{ govukSummaryList({
+          {% for contact in previousContacts %}
+            <div class="govuk-!-margin-bottom-0">
+              <h4 class="govuk-heading-s">{{ contact.name }}</h4>
+              {{ govukSummaryList({
               classes: 'govuk-summary-list--no-border',
               rows: [
                 {
@@ -138,9 +141,10 @@
                 } if contact.allocatedUntil
               ]
             }) }}
-          </div>
-          <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4">
-        {% endfor %}
+            </div>
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4">
+          {% endfor %}
+        </section>
       {% endif %}
     </div>
   </div>

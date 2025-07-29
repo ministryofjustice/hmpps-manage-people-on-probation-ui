@@ -21,7 +21,7 @@
     "test": "jest --coverage",
     "test:ci": "jest --coverage --runInBand",
     "security_audit": "npx audit-ci --config audit-ci.json",
-    "int-test": "cypress run --spec='integration_tests/e2e/appointments/check-your-answers.cy.ts' --config video=false",
+    "int-test": "cypress run --spec='integration_tests/e2e/**/*.cy.ts' --config video=false",
     "int-test-ui": "cypress open --e2e --browser chrome",
     "clean": "rm -rf dist build node_modules stylesheets",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist && sentry-cli sourcemaps upload --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist",

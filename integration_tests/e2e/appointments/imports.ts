@@ -123,6 +123,7 @@ export const checkPopHeader = (name = 'Caroline Wolff', appointments = false) =>
     cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__level').should('contain.text', 'MEDIUM')
     cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__score').should('contain.text', '12.1')
   }
+}
 
 export const completeConfirmationPage = () => {
   const confirmationPage = new AppointmentConfirmationPage()
@@ -170,7 +171,10 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
   }
 
   page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
-  page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+  page
+    .getSummaryListRow(6)
+    .find('.govuk-summary-list__value')
+    .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
   page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
   page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
   page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
@@ -214,8 +218,8 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
   getUuid().then(pageUuid => {
     const now = new Date()
     const year = now.getFullYear()
-    const month = now.getMonth() + 1
-    const day = now.getDate()
+    const month = now.getMonth()
+    const day = now.getDate() + 1
     cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
     const changedStart = '9:30am'
     const changedEnd = '10:30am'
