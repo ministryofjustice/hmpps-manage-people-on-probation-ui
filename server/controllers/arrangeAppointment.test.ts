@@ -592,6 +592,7 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         minDate: '1/7/2025',
+        maxDate: '31/12/2199',
         change: undefined,
         showValidation: false,
       })

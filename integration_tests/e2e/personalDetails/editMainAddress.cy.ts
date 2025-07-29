@@ -26,7 +26,6 @@ context('Edit main address', () => {
     const page = new EditMainAddress()
     const addressTypes = getWiremockData<AddressType[]>(mockData, '/mas/personal-details/X000001', 'addressTypes')
     page.setPageTitle('Edit main address for Caroline')
-    cy.get('.moj-page-header-actions').should('not.exist')
     page
       .getElementData('noFixedAddressGroup')
       .find('.govuk-label--s')

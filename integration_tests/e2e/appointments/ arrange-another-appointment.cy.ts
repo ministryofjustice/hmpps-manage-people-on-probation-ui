@@ -36,10 +36,6 @@ const loadPage = () => {
 }
 
 describe('Arrange another appointment', () => {
-  beforeEach(() => {
-    loadPage()
-  })
-
   it('should render the page', () => {
     loadPage()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
@@ -50,6 +46,7 @@ describe('Arrange another appointment', () => {
     let dateTimePage: AppointmentDateTimePage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
+      loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
     })
