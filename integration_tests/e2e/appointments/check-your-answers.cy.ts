@@ -28,7 +28,6 @@ const loadPage = ({
   sentenceOptionIndex = 1,
   repeatAppointments = true,
   notes = true,
-  sensitivity = true,
 } = {}) => {
   completeTypePage(typeOptionIndex, '', hasVisor)
   completeSentencePage(sentenceOptionIndex)
@@ -38,7 +37,7 @@ const loadPage = ({
   if (repeatAppointments) {
     completeRepeatingPage()
   }
-  completeNotePage(notes, sensitivity)
+  completeNotePage(notes)
 }
 
 describe('Check your answers then confirm the appointment', () => {
@@ -106,7 +105,7 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   it('should render the page when no notes have been entered', () => {
-    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, notes: false, sensitivity: false })
+    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, notes: false })
     const cyaPage = new AppointmentCheckYourAnswersPage()
     cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'None')
   })
