@@ -46,18 +46,18 @@ export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOv
   typePage.getSubmitBtn().click()
 }
 
-export const completeSentencePage = (eventIndex = 1) => {
+export const completeSentencePage = (eventIndex = 1, crnOverride = '') => {
   const sentencePage = new AppointmentSentencePage()
   const suffix = eventIndex !== 1 ? `-${eventIndex}` : ''
-  sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId${suffix}`).click()
-  if (eventIndex === 1) {
-    sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
+  sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-eventId${suffix}`).click()
+  if (eventIndex === 1 && !crnOverride) {
+    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-licenceConditionId`).click()
   }
-  if (eventIndex === 2) {
-    sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
+  if (eventIndex === 2 && !crnOverride) {
+    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-requirementId`).click()
   }
-  if (eventIndex === 3) {
-    sentencePage.getElement(`#appointments-${crn}-${uuid}-nsiId`).click()
+  if (eventIndex === 3 && !crnOverride) {
+    sentencePage.getElement(`#appointments-${crnOverride || crn}}-${uuid}-nsiId`).click()
   }
   sentencePage.getSubmitBtn().click()
 }
@@ -67,14 +67,14 @@ export const completeAttendancePage = () => {
   attendancePage.getSubmitBtn().click()
 }
 
-export const completeLocationPage = (index = 1) => {
+export const completeLocationPage = (index = 1, crnOverride = '') => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationPage = new AppointmentLocationPage()
-  locationPage.getElement(`#appointments-${crn}-${uuid}-user-locationCode${suffix}`).click()
+  locationPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-user-locationCode${suffix}`).click()
   locationPage.getSubmitBtn().click()
 }
 
-export const completeDateTimePage = () => {
+export const completeDateTimePage = (crnOverride = '') => {
   const dateTimePage = new AppointmentDateTimePage()
 
   dateTimePage.getDatePickerToggle().click()
@@ -96,12 +96,15 @@ export const completeNotePage = (notes = true) => {
   notePage.getSubmitBtn().click()
 }
 
-export const completeRepeatingPage = (repeat = 2) => {
+export const completeRepeatingPage = (repeat = 2, crnOverride = '') => {
   const repeatingPage = new AppointmentRepeatingPage()
   if (repeat) {
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).clear().type(repeat.toString())
+    repeatingPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-repeating`).click()
+    repeatingPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-interval`).click()
+    repeatingPage
+      .getElement(`#appointments-${crnOverride || crn}-${uuid}-numberOfRepeatAppointments`)
+      .clear()
+      .type(repeat.toString())
   } else {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
   }

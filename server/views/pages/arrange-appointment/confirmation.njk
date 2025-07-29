@@ -1,9 +1,18 @@
+{% set phoneeNumber = case.mobileNumber %}
+
 {% extends "../_form.njk" %}
 {% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = 'Arrange next appointment' %}
 {% set notStandardForm = true %}
 {% set appointmentDates = [appointment.date] %}
+{% set phoneNumber = '' %}
+{% if case.mobileNumber %}
+  {% set phoneNumber = 'mobile' %}
+{% endif %}
+{% if not case.mobileNumber and case.telephoneNumber %}
+  {% set phoneNumber = 'telephone' %}
+{% endif %}
 {% for appointmentDate in appointment.repeatingDates %}
   {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
 {% endfor %}
@@ -41,9 +50,14 @@
         {{case.name.forename}}
         the appointment details.
       </p>
-      <p class="govuk-body">
-        {{case.name.forename}}’s phone number is
-        {{ case.telephoneNumber }}.</p>
+      {% if phoneNumber %}
+        <p class="govuk-body" data-qa="popContactNumber">
+          {{case.name.forename}}’s phone number is
+        <span data-qa="{{ phoneNumber }}">
+            {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
+            {% else %}{{ case.telephoneNumber + "." }}
+            {% endif %}</span></p>
+      {% endif %}
       <h2 class="govuk-heading-m govuk-!-margin-top-6">Arrange another appointment</h2>
       <p class="govuk-body">
         Use the saved details of this appointment to create a new one. You can amend any of the details.</p>
