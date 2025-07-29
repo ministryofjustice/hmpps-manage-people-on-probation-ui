@@ -218,8 +218,8 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
   getUuid().then(pageUuid => {
     const now = new Date()
     const year = now.getFullYear()
-    const month = now.getMonth() + 1
-    const day = now.getDate()
+    const month = now.getMonth()
+    const day = now.getDate() + 1
     cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
     const changedStart = '9:30am'
     const changedEnd = '10:30am'
