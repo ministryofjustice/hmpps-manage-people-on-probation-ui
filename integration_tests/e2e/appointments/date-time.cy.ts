@@ -9,6 +9,7 @@ import {
   completeTypePage,
   crn,
   uuid,
+  checkPopHeader,
 } from './imports'
 
 const loadPage = () => {
@@ -29,6 +30,9 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage = new AppointmentDateTimePage()
       dateTimePage.getSummaryLink().click()
+    })
+    it('should render the pop header', () => {
+      checkPopHeader('Alton Berge', true)
     })
     it('should display the circumstances link', () => {
       dateTimePage.getSummaryLink().should('contain.text', `Alton’s circumstances`)
@@ -87,9 +91,13 @@ describe('Enter the date and time of the appointment', () => {
   describe('Continue is clicked selecting a start time which is in the past', () => {
     beforeEach(() => {
       loadPage()
-      cy.clock(new Date(2025, 6, 3, 9, 30, 0).getTime())
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
+      const now = new Date()
+      const year = now.getFullYear()
+      const month = now.getMonth() + 1
+      const day = now.getDate()
+      cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()

@@ -8,6 +8,7 @@ import RiskDetailPage from '../pages/riskDetail'
 import mockRiskData from '../../wiremock/mappings/X000001-risk.json'
 import { RiskFlag } from '../../server/data/model/risk'
 import { dateWithYear, toSentenceCase } from '../../server/utils'
+import { checkPopHeader } from './appointments/imports'
 
 const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
@@ -229,5 +230,13 @@ context('Risk', () => {
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 0, 'Notes')
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Risk Notes')
     page.assertAnchorElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 1, '/case/X000001/risk/flag/3/note/0')
+  })
+  it('should display the pop header on the removed risk flags page', () => {
+    cy.visit('/case/X000001/risk/removed-risk-flags')
+    checkPopHeader()
+  })
+  it('should display the pop header on the individual risk flag page', () => {
+    cy.visit('/case/X000001/risk/flag/4')
+    checkPopHeader()
   })
 })

@@ -3,6 +3,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
+import { getPersonalDetails } from '../middleware'
 
 export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -12,7 +13,11 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   post('/case/:crn/appointments', controllers.appointments.postAppointments(hmppsAuthClient))
 
-  get('/case/:crn/appointments/appointment/:contactId', controllers.appointments.getAppointmentDetails(hmppsAuthClient))
+  router.get(
+    '/case/:crn/appointments/appointment/:contactId',
+    getPersonalDetails(hmppsAuthClient),
+    controllers.appointments.getAppointmentDetails(hmppsAuthClient),
+  )
 
   get('/case/:crn/record-an-outcome/:actionType', controllers.appointments.getRecordAnOutcome(hmppsAuthClient))
 

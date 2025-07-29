@@ -22,6 +22,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   router.all('/case/:crn/arrange-appointment/:id/*path', getAppointmentTypes(hmppsAuthClient))
+  router.all('/case/:crn/arrange-appointment/:id/*path', getPersonalDetails(hmppsAuthClient))
   router.get('/case/:crn/arrange-appointment/:id/*path', getAppointment(hmppsAuthClient))
   get('/case/:crn/arrange-appointment/type', controllers.arrangeAppointments.redirectToType())
   get('/case/:crn/arrange-appointment/:id/type', controllers.arrangeAppointments.getType())
@@ -79,11 +80,10 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/location-not-in-list',
     redirectWizard(['type', 'eventId']),
-    getPersonalDetails(hmppsAuthClient),
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
-  router.all('/case/:crn/arrange-appointment/:id/date-time', getPersonalDetails(hmppsAuthClient), getTimeOptions)
+  router.all('/case/:crn/arrange-appointment/:id/date-time', getTimeOptions)
 
   router.get(
     '/case/:crn/arrange-appointment/:id/date-time',
@@ -134,8 +134,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
-    redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
-    getPersonalDetails(hmppsAuthClient),
+    // redirectWizard(['type', 'eventId', ['user', 'locationCode'], 'date', 'repeating']),
     controllers.arrangeAppointments.getConfirmation(),
   )
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
