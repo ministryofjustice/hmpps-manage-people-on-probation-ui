@@ -47,6 +47,7 @@ describe('Arrange another appointment', () => {
     let dateTimePage: AppointmentDateTimePage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
+      loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
     })
