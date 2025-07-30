@@ -91,13 +91,13 @@ describe('Enter the date and time of the appointment', () => {
   describe('Continue is clicked selecting a start time which is in the past', () => {
     beforeEach(() => {
       loadPage()
-      dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
       const now = new Date()
       const year = now.getFullYear()
-      const month = now.getMonth() + 1
+      const month = now.getMonth()
       const day = now.getDate()
       cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
+      dateTimePage.getDatePickerToggle().click()
+      cy.get(`[data-testid="${day}/${month + 1}/${year}"]`).click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
