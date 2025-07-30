@@ -226,7 +226,7 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
     page.getSummaryListRow(5).find('.govuk-link').click()
     const dateTimePage = new AppointmentDateTimePage()
     dateTimePage.getDatePickerToggle().click()
-    dateTimePage.getActiveDayButton().click()
+    cy.get(`[data-testid="${day}/${month + 1}/${year}"]`).click()
     dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-start`).select(changedStart)
     dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-end`).focus().select(changedEnd)
     // Ignore warnings
