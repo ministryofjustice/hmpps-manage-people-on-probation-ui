@@ -192,6 +192,24 @@ describe('Enter the date and time of the appointment', () => {
     })
   })
 
+  describe('Continue is clicked entering a date which is later than 31/12/2199', () => {
+    beforeEach(() => {
+      loadPage()
+      dateTimePage.getDatePickerInput().type('1/1/2200')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:00am').tab()
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox(['Date must not be later than 31/12/2199'])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
+        expect($error.text().trim()).to.include('Date must not be later than 31/12/2199')
+      })
+    })
+  })
+
   describe('Date is selected', () => {
     const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
     beforeEach(() => {

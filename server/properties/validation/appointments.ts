@@ -6,6 +6,7 @@ import {
   timeIsNotLaterThan,
   timeIsNowOrInFuture,
   isTodayOrLater,
+  isNotEarlierThan,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -82,6 +83,12 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isTodayOrLater,
           msg: 'Date must be today or in the future',
           log: 'Date must be today or in the future',
+        },
+        {
+          validator: isNotEarlierThan,
+          msg: 'Date must not be later than 31/12/2199',
+          log: 'Date must not be later than 31/12/2199',
+          crossField: `_maxDate`,
         },
       ],
     },
