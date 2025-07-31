@@ -1,6 +1,9 @@
 import ActivityLogDetailsPage from '../pages/activityLogDetails'
 
 context('Activity log details', () => {
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('should render a complied appointment', () => {
     cy.visit('/case/X000001/activity-log/activity/15')
     const page = new ActivityLogDetailsPage()
@@ -110,13 +113,6 @@ context('Activity log details', () => {
     page.assertPageElementAtIndexWithin(cardBody, 1, 'dt', 6, 'Note')
     page.assertPageElementAtIndexWithin(cardBody, 1, 'dd', 7, 'Appointment Notes')
   })
-  it('should render an appointment and a note has not been recorded', () => {
-    cy.visit('/case/X000001/activity-log/activity/12')
-    const page = new ActivityLogDetailsPage()
-    const cardBody = '[class=app-summary-card__body]'
-    page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 4, 'Appointment notes')
-    page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 4, 'No notes')
-  })
   it('should render an appointment and note that has been truncated', () => {
     cy.visit('/case/X000001/activity-log/activity/11/note/1')
     const page = new ActivityLogDetailsPage()
@@ -127,5 +123,64 @@ context('Activity log details', () => {
     page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 6, '29 October 2024')
     page.assertPageElementAtIndexWithin(cardBody, 0, 'dt', 7, 'Note')
     page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 7, 'Email sent to Stuart')
+  })
+  describe('Appointment does not have an outcome', () => {
+    it('should display notes in appointment details if notes exist, but note does not exist', () => {
+      cy.visit('/case/X000001/activity-log/activity/11')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesLabel"]').should('exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesValue"]').should('exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteValue"]').should('not.exist')
+    })
+    it('should only display note in appointment details if both note and notes exist', () => {
+      cy.task('stubAppointmentNoOutcomeWithNote')
+      cy.visit('/case/X000001/activity-log/activity/11')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteLabel"]').should('exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteValue"]').should('exist')
+    })
+    it('should not display notes or note row in appointment details if no appointment notes or note', () => {
+      cy.visit('/case/X000001/activity-log/activity/12')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteValue"]').should('not.exist')
+    })
+  })
+  describe('Appointment has an outcome', () => {
+    it('should only display notes in outcome details if notes exist', () => {
+      cy.visit('/case/X000001/activity-log/activity/13')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteValue"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="notesLabel"]').should('exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="notesValue"]').should('exist')
+    })
+    it('should only display note in outcome details if both note and notes exist', () => {
+      cy.task('stubAppointmentOutcomeWithNote')
+      cy.visit('/case/X000001/activity-log/activity/11')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteValue"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="noteLabel"]').should('exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="noteValue"]').should('exist')
+    })
+    it('should not display notes or note row in outcome details if no appointment notes or note', () => {
+      cy.task('stubAppointmentOutcomeWithNoNotes')
+      cy.visit('/case/X000001/activity-log/activity/11')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteLabel"]').should('not.exist')
+      cy.get('[data-qa="appointmentDetailsCard"]').find('[data-qa="noteValue"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="notesLabel"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="notesValue"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="noteLabel"]').should('not.exist')
+      cy.get('[data-qa="outcomeDetailsCard"]').find('[data-qa="noteValue"]').should('not.exist')
+    })
   })
 })
