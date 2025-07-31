@@ -28,7 +28,15 @@ export const getUuid = () => {
   })
 }
 
-export const completeTypePage = (index = 1, query = '', hasVisor = false) => {
+export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOverride?: DateTime<true>) => {
+  const tomorrow = DateTime.now().plus({ days: 1 }).set({
+    hour: 9,
+    minute: 30,
+    second: 0,
+    millisecond: 0,
+  })
+  const setDate = dateOverride ?? tomorrow
+  cy.clock(setDate.toMillis())
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
@@ -68,12 +76,13 @@ export const completeLocationPage = (index = 1) => {
 
 export const completeDateTimePage = () => {
   const dateTimePage = new AppointmentDateTimePage()
+
   dateTimePage.getDatePickerToggle().click()
-  dateTimePage.getNextDayButton().click()
+  dateTimePage.getActiveDayButton().click()
   dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select(startTime)
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(endTime).tab()
-  dateTimePage.getSubmitBtn().click()
+  dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(endTime)
   // Ignore warnings on second click
+  dateTimePage.getSubmitBtn().click()
   dateTimePage.getSubmitBtn().click()
 }
 
@@ -216,17 +225,18 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
 
 export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
-    const now = new Date()
-    const year = now.getFullYear()
-    const month = now.getMonth()
-    const day = now.getDate() + 1
-    cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
+    const newDate = DateTime.now().plus({ days: 2 }).set({
+      hour: 7,
+      minute: 30,
+      second: 0,
+      millisecond: 0,
+    })
     const changedStart = '9:30am'
     const changedEnd = '10:30am'
     page.getSummaryListRow(5).find('.govuk-link').click()
     const dateTimePage = new AppointmentDateTimePage()
     dateTimePage.getDatePickerToggle().click()
-    cy.get(`[data-testid="${day}/${month + 1}/${year}"]`).click()
+    cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
     dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-start`).select(changedStart)
     dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-end`).focus().select(changedEnd)
     // Ignore warnings
@@ -240,7 +250,7 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
       .invoke('text')
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`${dateWithYear(date)} from ${changedStart} to ${changedEnd}`)
+        expect(normalizedText).to.include(`${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`)
       })
   })
 }

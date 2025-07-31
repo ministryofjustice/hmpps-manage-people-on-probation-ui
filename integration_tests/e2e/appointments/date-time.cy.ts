@@ -12,8 +12,8 @@ import {
   checkPopHeader,
 } from './imports'
 
-const loadPage = () => {
-  completeTypePage()
+const loadPage = (date?: DateTime<true>) => {
+  completeTypePage(1, '', false, date)
   completeSentencePage()
   completeAttendancePage()
   completeLocationPage()
@@ -90,14 +90,16 @@ describe('Enter the date and time of the appointment', () => {
 
   describe('Continue is clicked selecting a start time which is in the past', () => {
     beforeEach(() => {
-      loadPage()
-      const now = new Date()
-      const year = now.getFullYear()
-      const month = now.getMonth()
-      const day = now.getDate()
-      cy.clock(new Date(year, month, day, 9, 30, 0).getTime())
+      const newDate = DateTime.now().set({
+        hour: 9,
+        minute: 30,
+        second: 0,
+        millisecond: 0,
+      })
+      loadPage(newDate)
+      // cy.clock(newDate.toMillis())
       dateTimePage.getDatePickerToggle().click()
-      cy.get(`[data-testid="${day}/${month + 1}/${year}"]`).click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
@@ -134,9 +136,9 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -153,9 +155,9 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box again', () => {
@@ -173,9 +175,9 @@ describe('Enter the date and time of the appointment', () => {
       cy.task('stubAppointmentClash')
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('11:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -197,7 +199,7 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage.getDatePickerInput().type('1/1/2200')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -215,7 +217,7 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
     })
     it('should display the date value in the field', () => {
       dateTimePage.getDatePickerInput().should('have.value', value)
@@ -227,7 +229,7 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
       dateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')

@@ -28,7 +28,6 @@ describe('Arrange an appointment', () => {
     describe('No VISOR registration', () => {
       it('should render the page', () => {
         loadPage()
-        // cy.pause()
         checkPopHeader('Alton Berge', true)
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
