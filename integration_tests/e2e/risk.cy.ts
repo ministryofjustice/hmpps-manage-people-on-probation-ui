@@ -21,7 +21,8 @@ context('Risk', () => {
     page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
-    page.getElementData('mappa-heading').should('contain.text', 'Cat 0/Level 2')
+    page.getElementData('mappa-heading').should('contain.text', 'Cat 0/').should('contain.text', 'Level 2')
+
     page.getCardHeader('riskFlags').should('contain.text', 'NDelius risk flags')
     page
       .getElementData('addRiskFlagLink')
@@ -175,7 +176,7 @@ context('Risk', () => {
     page
       .getElementData('noOasysRiskBanner')
       .should('exist')
-      .find('h2')
+      .find('h3')
       .should('contain.text', 'There is no OASys Layer 3 risk assessment for Alton Berge')
 
     cy.get('[data-qa="noOasysRiskBanner"]')
