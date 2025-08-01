@@ -27,7 +27,7 @@ const loadPage = (crnOverride = '') => {
   completeLocationPage(1, crnOverride)
   completeDateTimePage(crnOverride)
   completeRepeatingPage(2, crnOverride)
-  completeNotePage(crnOverride)
+  completeNotePage(true, crnOverride)
   completeCYAPage()
 }
 describe('Confirmation page', () => {

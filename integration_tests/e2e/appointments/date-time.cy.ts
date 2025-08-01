@@ -13,7 +13,7 @@ import {
 } from './imports'
 
 const loadPage = (date?: DateTime<true>) => {
-  completeTypePage(1, '', false, date)
+  completeTypePage(1, '', false, '', date)
   completeSentencePage()
   completeAttendancePage()
   completeLocationPage()

@@ -28,7 +28,13 @@ export const getUuid = () => {
   })
 }
 
-export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOverride?: DateTime<true>) => {
+export const completeTypePage = (
+  index = 1,
+  query = '',
+  hasVisor = false,
+  crnOverride = '',
+  dateOverride?: DateTime<true>,
+) => {
   const tomorrow = DateTime.now().plus({ days: 1 }).set({
     hour: 9,
     minute: 30,
@@ -37,7 +43,7 @@ export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOv
   })
   const setDate = dateOverride ?? tomorrow
   cy.clock(setDate.toMillis())
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
+  cy.visit(`/case/${crnOverride || crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
   if (hasVisor) {
@@ -57,7 +63,7 @@ export const completeSentencePage = (eventIndex = 1, crnOverride = '') => {
     sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-requirementId`).click()
   }
   if (eventIndex === 3 && !crnOverride) {
-    sentencePage.getElement(`#appointments-${crnOverride || crn}}-${uuid}-nsiId`).click()
+    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-nsiId`).click()
   }
   sentencePage.getSubmitBtn().click()
 }
@@ -79,20 +85,23 @@ export const completeDateTimePage = (crnOverride = '') => {
 
   dateTimePage.getDatePickerToggle().click()
   dateTimePage.getActiveDayButton().click()
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select(startTime)
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(endTime)
+  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-start`).select(startTime)
+  dateTimePage
+    .getElement(`#appointments-${crnOverride || crn}-${uuid}-end`)
+    .focus()
+    .select(endTime)
   // Ignore warnings on second click
   dateTimePage.getSubmitBtn().click()
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeNotePage = (notes = true) => {
+export const completeNotePage = (notes = true, crnOverride = '') => {
   const notePage = new AppointmentNotePage()
   cy.get('form').then(form => form[0].reset())
   if (notes) {
     notePage.getElement(`#notes`).focus().type('Some notes')
   }
-  notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity`).click()
+  notePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-sensitivity`).click()
   notePage.getSubmitBtn().click()
 }
 
