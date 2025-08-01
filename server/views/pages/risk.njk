@@ -123,7 +123,7 @@
             <div aria-hidden="true">
               {{ predictorScore(predictorScores.scores.RSR) }}
             </div>
-            <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.RSR.score }}%</div>
+            <div class='govuk-visually-hidden'>RSR Score: {{ predictorScores.scores.RSR.score }}% - {{ predictorScores.scores.RSR.level | convertToTitleCase }} Risk</div>
           {% endif %}
           {% if predictorScores.scores.OGRS.level %}
             <h3 class="govuk-heading-m score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OGRS score">
@@ -162,7 +162,7 @@
             <div aria-hidden="true">
               {{ predictorScore(predictorScores.scores.OSPI) }}
             </div>
-            <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPI.score }}%</div>
+            <div class='govuk-visually-hidden'>OSPI Score: {{ predictorScores.scores.OSPI.score }}% - {{ predictorScores.scores.OSPI.level | convertToTitleCase }} Risk</div>
           {% endif %}
 
           {% if predictorScores.scores.OSPC.score %}
@@ -172,7 +172,7 @@
             <div aria-hidden="true">
               {{ predictorScore(predictorScores.scores.OSPC) }}
             </div>
-            <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPC.score }}%</div>
+            <div class='govuk-visually-hidden'>OSPC Score: {{ predictorScores.scores.OSPC.score }}% - {{ predictorScores.scores.OSPC.level | convertToTitleCase }} Risk</div>
           {% endif %}
 
           {% if predictorScores.scores.OVP.level %}
