@@ -28,7 +28,13 @@ export const getUuid = () => {
   })
 }
 
-export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOverride?: DateTime<true>) => {
+export const completeTypePage = (
+  index = 1,
+  query = '',
+  hasVisor = false,
+  crnOverride = '',
+  dateOverride?: DateTime<true>,
+) => {
   const tomorrow = DateTime.now().plus({ days: 1 }).set({
     hour: 9,
     minute: 30,
@@ -37,7 +43,7 @@ export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOv
   })
   const setDate = dateOverride ?? tomorrow
   cy.clock(setDate.toMillis())
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
+  cy.visit(`/case/${crnOverride || crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
   if (hasVisor) {
@@ -46,18 +52,18 @@ export const completeTypePage = (index = 1, query = '', hasVisor = false, dateOv
   typePage.getSubmitBtn().click()
 }
 
-export const completeSentencePage = (eventIndex = 1) => {
+export const completeSentencePage = (eventIndex = 1, crnOverride = '') => {
   const sentencePage = new AppointmentSentencePage()
   const suffix = eventIndex !== 1 ? `-${eventIndex}` : ''
-  sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId${suffix}`).click()
-  if (eventIndex === 1) {
-    sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
+  sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-eventId${suffix}`).click()
+  if (eventIndex === 1 && !crnOverride) {
+    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-licenceConditionId`).click()
   }
-  if (eventIndex === 2) {
-    sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
+  if (eventIndex === 2 && !crnOverride) {
+    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-requirementId`).click()
   }
-  if (eventIndex === 3) {
-    sentencePage.getElement(`#appointments-${crn}-${uuid}-nsiId`).click()
+  if (eventIndex === 3 && !crnOverride) {
+    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-nsiId`).click()
   }
   sentencePage.getSubmitBtn().click()
 }
@@ -67,41 +73,47 @@ export const completeAttendancePage = () => {
   attendancePage.getSubmitBtn().click()
 }
 
-export const completeLocationPage = (index = 1) => {
+export const completeLocationPage = (index = 1, crnOverride = '') => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationPage = new AppointmentLocationPage()
-  locationPage.getElement(`#appointments-${crn}-${uuid}-user-locationCode${suffix}`).click()
+  locationPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-user-locationCode${suffix}`).click()
   locationPage.getSubmitBtn().click()
 }
 
-export const completeDateTimePage = () => {
+export const completeDateTimePage = (crnOverride = '') => {
   const dateTimePage = new AppointmentDateTimePage()
 
   dateTimePage.getDatePickerToggle().click()
   dateTimePage.getActiveDayButton().click()
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select(startTime)
-  dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select(endTime)
+  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-start`).select(startTime)
+  dateTimePage
+    .getElement(`#appointments-${crnOverride || crn}-${uuid}-end`)
+    .focus()
+    .select(endTime)
   // Ignore warnings on second click
   dateTimePage.getSubmitBtn().click()
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeNotePage = (notes = true) => {
+export const completeNotePage = (notes = true, crnOverride = '') => {
   const notePage = new AppointmentNotePage()
   cy.get('form').then(form => form[0].reset())
   if (notes) {
     notePage.getElement(`#notes`).focus().type('Some notes')
   }
-  notePage.getElement(`#appointments-${crn}-${uuid}-sensitivity`).click()
+  notePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-sensitivity`).click()
   notePage.getSubmitBtn().click()
 }
 
-export const completeRepeatingPage = (repeat = 2) => {
+export const completeRepeatingPage = (repeat = 2, crnOverride = '') => {
   const repeatingPage = new AppointmentRepeatingPage()
   if (repeat) {
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).clear().type(repeat.toString())
+    repeatingPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-repeating`).click()
+    repeatingPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-interval`).click()
+    repeatingPage
+      .getElement(`#appointments-${crnOverride || crn}-${uuid}-numberOfRepeatAppointments`)
+      .clear()
+      .type(repeat.toString())
   } else {
     repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
   }

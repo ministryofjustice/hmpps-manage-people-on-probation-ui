@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/upcoming",
+        "urlPattern": "/mas/schedule/.*/upcoming",
         "method": "GET"
       },
       "response": {
@@ -66,7 +66,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/previous",
+        "urlPattern": "/mas/schedule/.*/previous",
         "method": "GET"
       },
       "response": {
@@ -175,7 +175,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/1",
+        "urlPattern": "/mas/schedule/.*/appointment/1",
         "method": "GET"
       },
       "response": {
@@ -258,7 +258,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/3",
+        "urlPattern": "/mas/schedule/.*/appointment/3",
         "method": "GET"
       },
       "response": {
@@ -301,7 +301,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/4",
+        "urlPattern": "/mas/schedule/.*/appointment/4",
         "method": "GET"
       },
       "response": {
@@ -375,7 +375,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/5",
+        "urlPattern": "/mas/schedule/.*/appointment/5",
         "method": "GET"
       },
       "response": {
@@ -417,7 +417,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/6",
+        "urlPattern": "/mas/schedule/.*/appointment/6",
         "method": "GET"
       },
       "response": {
