@@ -1,5 +1,5 @@
 {% extends "../../partials/layout.njk" %}
-{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
+{% from "../../_components/govuk/accordion-mpop/macro.njk" import govukAccordion %}
 {% from "probation/case-search/macro.njk" import caseSearch %}
 
 {% set mainClasses = "app-container govuk-body" %}
@@ -37,7 +37,10 @@
     items: [
       {
         heading: {
-            html: 'My upcoming appointments' + ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a' if appointments.length else '')
+            html: 'My upcoming appointments' if appointments.length else ''
+        },
+        afterHeading: {
+          html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">My upcoming appointments</span><a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a>'
         },
         content: {
             html: appointmentsTable
@@ -56,7 +59,10 @@
     items: [
       {
         heading: {
-            html: 'Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '') + ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>' if outcomes.length else '')
+            html: 'Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '') 
+        },
+         afterHeading: {
+          html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Outcomes to log' + (' (' + totalOutcomes + ')' if outcomes.length else '') + ' </span>' +  ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>' if outcomes.length else '')
         },
         content: {
             html: outcomesTable

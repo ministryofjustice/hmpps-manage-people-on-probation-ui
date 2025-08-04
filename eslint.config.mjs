@@ -3,12 +3,18 @@ import typescriptEslint from '@typescript-eslint/eslint-plugin'
 import tsParser from '@typescript-eslint/parser'
 
 export default [
+  {
+    ignores: [
+      'playwright-report/**',
+      '.zap/**',
+      'instrumented/**',
+      'server/views/_components/govuk/accordion-mpop/accordion.bundle.js',
+    ],
+  },
   ...hmppsConfig({
-    extraIgnorePaths: ['playwright-report/**', '.zap/**', 'instrumented/**'],
     extraPathsAllowingDevDependencies: ['e2e_tests/**', 'playwright.config.ts'],
     extraFrontendGlobals: { $: 'readonly', MOJFrontend: 'readonly' },
   }),
-
   {
     name: 'overrides',
     files: ['**/*.ts'],
