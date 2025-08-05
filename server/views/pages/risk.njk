@@ -120,6 +120,11 @@
             <h3 class="govuk-heading-m score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
           RSR (risk of serious recidivism)
         </h3>
+            {{ govukDetails({
+                          classes: 'govuk-!-margin-top-3 govuk-!-margin-bottom-3',
+                          summaryText: 'Help with RSR score bands',
+                          html: '<p class="govuk-body">Risk level:</p><ul class="govuk-list govuk-list--bullet"><li>Low (0% - 3%)</li><li>Medium (3% - 6.9%)</li><li>High (6.9% - 25% and above)</li></ul>'
+                      }) }}
             <div aria-hidden="true">
               {{ predictorScore(predictorScores.scores.RSR) }}
             </div>
@@ -159,6 +164,11 @@
             <h4 class="govuk-heading-s score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP/I score">
           OSP/I (internet-related offences) or OSP/IIC (internet-involved child offences)
         </h4>
+            {{ govukDetails({
+                          classes: 'govuk-!-margin-top-3 govuk-!-margin-bottom-3',
+                          summaryText: 'Help with OSP score bands',
+                          html: '<p class="govuk-body">Risk level:</p><ul class="govuk-list govuk-list--bullet"><li>Low (0% - 3%)</li><li>Medium (3% - 6.9%)</li><li>High (6.9% - 25% and above)</li></ul>'
+                      }) }}
             <div aria-hidden="true">
               {{ predictorScore(predictorScores.scores.OSPI) }}
             </div>
@@ -169,6 +179,11 @@
             <h4 class="govuk-heading-s score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP/C score">
           OSP/C (contact-related sexual reoffending) or OSP/DC (direct contact)
         </h4>
+            {{ govukDetails({
+                          classes: 'govuk-!-margin-top-3 govuk-!-margin-bottom-3',
+                          summaryText: 'Help with OSP/C score bands',
+                          html: '<p class="govuk-body">Risk level:</p><ul class="govuk-list govuk-list--bullet"><li>Low (0% - 3%)</li><li>Medium (3% - 6.9%)</li><li>High (6.9% - 25% and above)</li></ul>'
+                      }) }}
             <div aria-hidden="true">
               {{ predictorScore(predictorScores.scores.OSPC) }}
             </div>
