@@ -226,8 +226,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .flex--center {
   justify-content: center;
 }
+
 .visibility-hidden {
   visibility: hidden;
+}
 
 [aria-sort] button {
   &::before,
@@ -235,6 +237,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
     display: none;
   }
 }
+
 [data-module='moj-backend-sortable-table'],
 [data-module='moj-mpop-sortable-table'] {
   & [aria-sort] button::before,
