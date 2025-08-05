@@ -70,13 +70,27 @@ $govuk-page-width: $moj-page-width;
       padding-left: 15px !important;
       padding-right: 15px !important;
       padding-bottom: 5px !important;
-
       .govuk-accordion__section-heading-text {
         flex-grow: 1;
       }
     }
   }
-
+  .govuk-accordion__section-header {
+    position: relative;
+  }
+  .govuk-accordion__section-heading {
+    font-size: 1.5rem;
+    line-height: 1.25;
+    font-weight: 700;
+  }
+  .govuk-accordion__after-heading {
+    position: absolute;
+    left: 15px;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+  }
   .govuk-accordion__section-content {
     padding-bottom: 0 !important;
     padding-top: 0 !important;
@@ -211,4 +225,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .flex--center {
   justify-content: center;
+}
+.visibility-hidden {
+  visibility: hidden;
 }
