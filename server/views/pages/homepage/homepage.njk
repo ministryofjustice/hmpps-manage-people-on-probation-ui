@@ -37,10 +37,10 @@
     items: [
       {
         heading: {
-            html: 'My upcoming appointments' if appointments.length else ''
+            html: 'My upcoming appointments'
         },
         afterHeading: {
-          html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">My upcoming appointments</span><a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a>'
+          html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">My upcoming appointments</span><a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/upcoming">View all upcoming appointments</a>'  if appointments.length else ''
         },
         content: {
             html: appointmentsTable
