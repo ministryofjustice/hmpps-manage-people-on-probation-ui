@@ -105,5 +105,6 @@ export interface LocalParams {
   crn: string
   id: string
   errors?: Errors
-  minDate?: string
+  _minDate?: string
+  _maxDate?: string
 }

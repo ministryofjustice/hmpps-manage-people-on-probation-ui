@@ -591,8 +591,8 @@ describe('controllers/arrangeAppointment', () => {
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/date-time`, {
         crn,
         id: uuid,
-        minDate: '1/7/2025',
-        maxDate: '31/12/2199',
+        _minDate: '1/7/2025',
+        _maxDate: '31/12/2199',
         change: undefined,
         showValidation: false,
       })

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Route } from '../../@types'
 import { getDataValue } from '../../utils'
 import { appointmentsValidation } from '../../properties'
@@ -54,8 +55,8 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateDateTime = (): void => {
     if (req.url.includes('/date-time')) {
-      // eslint-disable-next-line no-underscore-dangle
-      localParams.minDate = req.body._minDate
+      localParams._minDate = req.body._minDate
+      localParams._maxDate = req.body._maxDate
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({

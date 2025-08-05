@@ -81,6 +81,7 @@ describe('/middleware/autoStoreSessionData', () => {
           },
         },
         _minDate: '12/03/2025',
+        _maxDate: '31/12/2199',
       },
     })
     beforeEach(() => {

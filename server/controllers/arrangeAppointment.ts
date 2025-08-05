@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { ResponseError } from 'superagent'
@@ -191,13 +192,13 @@ const arrangeAppointmentController: Controller<typeof routes> = {
         }
       }
       const today = new Date()
-      const minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
-      const maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
+      const _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+      const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
       return res.render(`pages/arrange-appointment/date-time`, {
         crn,
         id,
-        minDate,
-        maxDate,
+        _minDate,
+        _maxDate,
         change,
         showValidation,
       })
