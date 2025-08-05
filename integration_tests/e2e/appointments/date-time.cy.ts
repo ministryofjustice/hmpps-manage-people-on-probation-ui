@@ -203,11 +203,11 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      dateTimePage.checkErrorSummaryBox(['Date must not be later than 31/12/2199'])
+      dateTimePage.checkErrorSummaryBox(['The date must not be later than 31/12/2199'])
     })
     it('should display the error messages', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
-        expect($error.text().trim()).to.include('Date must not be later than 31/12/2199')
+        expect($error.text().trim()).to.include('The date must not be later than 31/12/2199')
       })
     })
   })

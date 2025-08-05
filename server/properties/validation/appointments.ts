@@ -86,8 +86,8 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
         {
           validator: isNotEarlierThan,
-          msg: 'Date must not be later than 31/12/2199',
-          log: 'Date must not be later than 31/12/2199',
+          msg: 'The date must not be later than 31/12/2199',
+          log: 'The date must not be later than 31/12/2199',
           crossField: `_maxDate`,
         },
       ],

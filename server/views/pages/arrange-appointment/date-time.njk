@@ -113,8 +113,8 @@
     hint: {
       text: "For example, 17/5/2024."
     },
-    minDate: minDate,
-    maxDate: maxDate
+    minDate: _minDate,
+    maxDate: _maxDate
   } | decorateFormAttributes(['appointments', crn, id, 'date'])) }}
 
   {{ govukSelect({
@@ -133,6 +133,6 @@
   items: endTimeOptions
   } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
 
-  <input type="hidden" name="_minDate" value="{{minDate}}">
-  <input type="hidden" name="_maxDate" value="{{maxDate}}">
+  <input type="hidden" name="_minDate" value="{{_minDate}}">
+  <input type="hidden" name="_maxDate" value="{{_maxDate}}">
 {% endblock %}
