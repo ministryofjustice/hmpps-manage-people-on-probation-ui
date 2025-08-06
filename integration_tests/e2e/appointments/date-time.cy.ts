@@ -91,13 +91,12 @@ describe('Enter the date and time of the appointment', () => {
   describe('Continue is clicked selecting a start time which is in the past', () => {
     beforeEach(() => {
       const newDate = DateTime.now().set({
-        hour: 9,
+        hour: 10,
         minute: 30,
         second: 0,
         millisecond: 0,
       })
       loadPage(newDate)
-      // cy.clock(newDate.toMillis())
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
