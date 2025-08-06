@@ -226,6 +226,68 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .flex--center {
   justify-content: center;
 }
+
 .visibility-hidden {
   visibility: hidden;
+}
+
+[aria-sort] button {
+  &::before,
+  &::after {
+    display: none;
+  }
+}
+
+[data-module='moj-backend-sortable-table'],
+[data-module='moj-mpop-sortable-table'] {
+  & [aria-sort] button::before,
+  & [aria-sort] button::after {
+    display: none;
+  }
+  & [aria-sort] button .sort-icon {
+    &::before,
+    &::after {
+      display: block;
+    }
+  }
+  & [aria-sort] button .sort-icon {
+    &::before {
+      content: ' \25bc';
+      position: absolute;
+      top: 9px;
+      right: -1px;
+      font-size: 0.5em;
+    }
+    &::after {
+      content: ' \25b2';
+      position: absolute;
+      top: 1px;
+      right: -1px;
+      font-size: 0.5em;
+    }
+  }
+  & [aria-sort='ascending'] button .sort-icon {
+    &::before {
+      display: none;
+    }
+    &::after {
+      content: ' \25b2';
+      position: absolute;
+      top: 2px;
+      right: -5px;
+      font-size: 0.8em;
+    }
+  }
+  & [aria-sort='descending'] button .sort-icon {
+    &::before {
+      display: none;
+    }
+    &::after {
+      content: ' \25bc';
+      position: absolute;
+      top: 2px;
+      right: -5px;
+      font-size: 0.8em;
+    }
+  }
 }
