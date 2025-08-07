@@ -459,7 +459,7 @@
             "didTheyComply": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
             "location": {
               "buildingName": "The Building",
               "buildingNumber": "77",

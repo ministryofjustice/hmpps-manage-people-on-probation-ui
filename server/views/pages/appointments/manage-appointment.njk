@@ -1,0 +1,221 @@
+{% extends "../../partials/layout.njk" %}
+{% set appointment = personAppointment.appointment %}
+{% set notes = '' %}
+{% set alert = '' %}
+{# {% set hasNote = appointment.appointmentNote and appointment.hasOutcome == false %} #}
+{% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% if not appointment.hasOutcome and not hasNotes %}
+    {% set alert = "You must log an outcome and should add notes to this appointment." %}
+{% endif %}
+{% if appointment.hasOutcome and not hasNotes %}
+    {% set alert = "You should add notes to this appointment." %}
+{% endif %}
+{% if not appointment.hasOutcome and hasNotes %}
+    {% set alert = "You must log an outcome for this appointment." %}
+{% endif %}
+{% if hasNotes %}
+    {% for appointmentNote in appointment.appointmentNotes %}
+        {% if appointmentNote.note %}
+            {% set notes = notes.concat(appointmentNote.note) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% block content %}
+    {% if not hidePageHeader %}
+        {% include "../../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+    {% endif %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-m govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
+            {% if alert %}
+                {{ mojAlert({
+  variant: "information",
+  showTitleAsHeading: true,
+  dismissible: false,
+  text: alert
+}) }}
+            {% endif %}
+            <section data-qa="appointmentActions">
+                <h3 class="govuk-heading-s">Appointment actions</h3>
+                {{ govukInsetText({
+  html: 'You must <a href="" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
+}) }}
+                {{ govukTaskList({
+  idPrefix: "company-details",
+  items: [
+    {
+      title: {
+        text: "Log attended and complied appointment"
+      },
+       hint: {
+        text: "You cannot log an attended and complied outcome until the appointment has happened."
+      } if not canLogOutcome,
+      href: "#" if canLogOutcome,
+      status: {
+        tag: {
+          text: "Complied" if appointment.didTheyComply else 'Not started' ,
+          classes: "govuk-tag--" + ("grey" if appointment.didTheyComply else "blue")
+        }
+      }
+    },
+    {
+      title: {
+        text: "Add appointment notes"
+      },
+      href: "#",
+      status: {
+        tag: {
+          text: "Not started",
+          classes: "govuk-tag--blue"
+        } if not hasNotes,
+        text: 'Completed' if hasNotes
+      } 
+    },
+    {
+      title: {
+        text: "Arrange next appointment"
+      },
+      hint: {
+        text: "You do not have any other appointments arranged with Stuart."
+      },
+      href: "#",
+      status: {
+        tag: {
+          text: "Not started",
+          classes: "govuk-tag--blue"
+        }
+      }
+    }
+    ]
+}) }}
+            </section>
+            <section data-qa="appointmentDetails">
+                <h3 class="govuk-heading-s">Appointment details</h3>
+                <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
+                {{ govukSummaryList({
+  rows: [
+    {
+      key: {
+        text: "Date and time"
+      },
+      value: {
+        text: appointment.startDateTime | dateWithYear + ' at ' + appointment.startDateTime | govukTime + (' to ' + appointment.endDateTime | govukTime if appointment.endDateTime else '')
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Location"
+      },
+      value: {
+        html: '<span data-qa="locationValue">' + addressToList(appointment.location).join('<br>') | safe + '</span>' 
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)"
+          }
+        ]
+      }
+    } if appointment.location,
+    {
+      key: {
+        text: "Attending"
+      },
+      value: {
+        text: appointment.officerName | fullName
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)"
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "RAR activity"
+      },
+      value: {
+        text: appointment.rarCategory if appointment.rarCategory else 'Not provided'
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)"
+          }
+        ]
+      }
+    } if appointment.isRarRelated,
+    {
+      key: {
+        text: "VISOR report"
+      },
+      value: {
+        text: 'No'
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change",
+            visuallyHiddenText: ""
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Appointment notes"
+      },
+     value: { html: '<span data-qa="notesValue">' + notes + '</span>' if notes else 'No notes' },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Add to notes" if hasNotes else "Change",
+            visuallyHiddenText: ""
+          }
+        ]
+      }
+    },
+    {
+      key: {
+        text: "Sensitive"
+      },
+      value: {
+        text: 'Yes' if appointment.isSensitive else 'No'
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change",
+            visuallyHiddenText: ""
+          }
+        ]
+      }
+    }
+  ]
+}) }}
+                <p class="govuk-body-s">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
+            </section>
+        </div>
+    </div>
+{% endblock %}

@@ -1,6 +1,7 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import { Request } from 'express'
+import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
@@ -17,6 +18,7 @@ const routes = [
   'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
+  'getManageAppointment',
 ] as const
 
 const appointmentsController: Controller<typeof routes> = {
@@ -86,6 +88,25 @@ const appointmentsController: Controller<typeof routes> = {
       res.render('pages/appointments/appointment', {
         personAppointment,
         crn,
+      })
+    }
+  },
+  getManageAppointment: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      const { contactId } = req.params
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      const { appointment } = personAppointment
+      const apptDate = DateTime.fromISO(appointment.startDateTime)
+      const isInPast = apptDate.diffNow().milliseconds < 0
+      console.log({ isInPast, hasOutcome: appointment.hasOutcome })
+      const canLogOutcome = isInPast && !appointment.hasOutcome
+      return res.render('pages/appointments/manage-appointment', {
+        personAppointment,
+        crn,
+        canLogOutcome,
       })
     }
   },

@@ -26,6 +26,9 @@
 {% from "moj/components/banner/macro.njk" import mojBanner %}
 {% from "govuk/components/error-summary/macro.njk"       import govukErrorSummary %}
 {% from "_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/task-list/macro.njk" import govukTaskList %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
 {% block head %}
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
