@@ -251,7 +251,7 @@
       {{ roshWidget(risksWidget) }}
       {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
       <div class="govuk-body predictor-timeline__heading">
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h2>
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h3>
         {% if predictorScores.error and caseSummary.roshHistory.error %}
           <p class='govuk-body' data-qa='timeline-missing'>RoSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
         {% elseif predictorScores.error %}
