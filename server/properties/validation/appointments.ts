@@ -169,5 +169,15 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    outcomeRecorded: {
+      optional: page !== 'record-an-outcome',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if they attended and complied',
+          log: 'Attended and complied not selected',
+        },
+      ],
+    },
   }
 }

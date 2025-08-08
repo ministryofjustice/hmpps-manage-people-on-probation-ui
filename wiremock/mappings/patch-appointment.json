@@ -1,0 +1,68 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/appointment",
+        "method": "PATCH"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": 4,
+          "type": "Phone call",
+          "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
+          "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+          "rarToolKit": "Choices and Changes",
+          "isSensitive": false,
+          "isInitial": true,
+          "didTheyComply": false,
+          "nonComplianceReason": "Some reason",
+          "acceptableAbsenceReason": "Some absence reason",
+          "wasAcceptableAbsence": true,
+          "enforcementAction": "Enforcement Action",
+          "repeating": true,
+          "rarCategory": "Choices and Changes",
+          "hasOutcome": true,
+          "outcome": "User-generated free text content",
+          "wasAbsent": true,
+          "acceptableAbsence": true,
+          "appointmentNotes": [
+            {
+              "id": 0,
+              "note": "Some notes"
+            }
+          ],
+          "officerName": {
+            "forename": "Steve",
+            "surname": "Bruce"
+          },
+          "lastUpdated": "2023-03-20",
+          "lastUpdatedBy": {
+            "forename": "Paul",
+            "surname": "Smith"
+          },
+          "documents": [
+            {
+              "id": "83fdbf8a-a2f2-43b4-93ef-67e71c04fc58",
+              "name": "Eula-Schmeler-X000001-UPW.pdf",
+              "lastUpdated": "2023-04-06T11:06:25.672587+01:00"
+            },
+            {
+              "id": "c2650260-9568-476e-a293-0b168027a5f1",
+              "name": "Eula-Schmeler-X000001-UPW.pdf",
+              "lastUpdated": "2023-04-06T11:09:45.860739+01:00"
+            },
+            {
+              "id": "b82e444b-c77c-4d44-bf99-4ce4dc426ff4",
+              "name": "Eula-Schmeler-X000001-UPW.pdf",
+              "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

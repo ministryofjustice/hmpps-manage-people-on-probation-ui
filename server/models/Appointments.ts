@@ -88,6 +88,14 @@ export interface CheckAppointment {
   end: Date
 }
 
+export interface AppointmentPatch {
+  id: number
+  outcomeRecorded: boolean
+  notes?: string
+  visorReport?: boolean
+  sensitive?: boolean
+}
+
 export interface AppointmentChecks {
   [index: string]: AppointmentCheck | string
   nonWorkingDayName?: string

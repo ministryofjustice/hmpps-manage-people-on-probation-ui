@@ -1,24 +1,27 @@
-{% extends "../_form.njk" %}
+{% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
-{% set headerPersonName = personSummary.name.forename + ' ' + personSummary.name.surname %}
-{% set hideButton = true %}
-{% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
-{% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
+{% block content %}
+    {% if errorMessages %}
+        {% set errorList = errorMessages | toErrorList %}
+        {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
+        {% endif %}
     {% endif %}
-  {% endif %}
-
-  {{ govukCheckboxes({
-    idPrefix: 'outcomeRecorded',
-    name: 'outcomeRecorded',
+    {% if not hidePageHeader %}
+        {% include "../../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+    {% endif %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <form method="post" action="">
+                {{ govukCheckboxes({
+    idPrefix: 'outcome',
+    name: 'outcome',
     classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
@@ -42,13 +45,16 @@
     ],
     errorMessage: {
     text: "Select if they attended and complied"
-  } if errorMessages.outcomeRecorded
+  } if errorMessages.outcome
   }) }}
-  <div class="govuk-button-group">
-    {{ govukButton({
+                <div class="govuk-button-group">
+                    {{ govukButton({
     text: "Continue"
   }) }}
-    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{contactId}}/manage">Cancel and go back</a>
-  </div>
-
+                    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{contactId}}/manage">Cancel and go back</a>
+                </div>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            </form>
+        </div>
+    </div>
 {% endblock %}

@@ -27,7 +27,7 @@
     {% endif %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-two-thirds">
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
             {% if alert %}
                 {{ mojAlert({
   variant: "information",
@@ -37,7 +37,7 @@
 }) }}
             {% endif %}
             <section data-qa="appointmentActions">
-                <h3 class="govuk-heading-s">Appointment actions</h3>
+                <h3 class="govuk-heading-m">Appointment actions</h3>
                 {{ govukInsetText({
   html: 'You must <a href="" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
 }) }}
@@ -91,7 +91,7 @@
 }) }}
             </section>
             <section data-qa="appointmentDetails">
-                <h3 class="govuk-heading-s">Appointment details</h3>
+                <h3 class="govuk-heading-m">Appointment details</h3>
                 <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
                 {{ govukSummaryList({
   rows: [
