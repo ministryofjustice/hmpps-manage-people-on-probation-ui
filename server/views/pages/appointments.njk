@@ -8,8 +8,8 @@
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
-{% set upcomingAppointments = sortAppointmentsDescending(upcomingAppointments.appointments) %}
-{% set pastAppointments = sortAppointmentsDescending(pastAppointments.appointments, 10) %}
+{% set upcomingAppointments = upcomingAppointments.userSchedule.appointments %}
+{% set pastAppointments = pastAppointments.userSchedule.appointments %}
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
@@ -176,7 +176,6 @@
     <div class="govuk-grid-column-full">
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
         <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
-        <p>All links to manage appointments open in new tabs on NDelius.</p>
         {% if upcomingAppointments.length == 0 %}
           <p>There are no upcoming appointments.</p>
         {% else %}
@@ -190,20 +189,17 @@
               head: [
                 {
                   text: "Appointment type",
-                  classes: "govuk-!-width-one-half govuk-action--bottom",
-                  attributes: { "aria-sort": "none" }
+                  classes: "govuk-!-width-one-half non-sortable__sortable-table-header govuk-action--bottom"
                 },
                 {
                   text: "Date",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom ",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom ",
+                  format: "numeric"
                 },
                 {
                   text: "Time",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom ",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom ",
+                  format: "numeric"
                 },
                 {
                   html: 'Action<span class="govuk-visually-hidden"> (links open in new tab)</span>',
@@ -226,25 +222,21 @@
               attributes: {
                 'data-module': 'moj-mpop-sortable-table'
               },
-              caption: 'Column headers with buttons are sortable',
               captionClasses: 'govuk-visually-hidden',
               head: [
                 {
                   text: "Appointment type",
-                  classes: "govuk-!-width-one-half govuk-action--bottom",
-                  attributes: { "aria-sort": "none" }
+                  classes: "govuk-!-width-one-half non-sortable__sortable-table-header govuk-action--bottom"
                 },
                 {
                   text: "Date",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
+                  format: "numeric"
                 },
                 {
                   text: "Time",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
+                  format: "numeric"
                 },
                 {
                   html: "Action",
