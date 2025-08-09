@@ -1,47 +1,70 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
+{% set personSummary = personAppointment.personSummary %}
 {% set notes = '' %}
 {% set alert = '' %}
+{% set notesStatus = 'Not started' %}
+{% set outcomeStatus = 'Not started' %}
+{% set outcomeTagColour = 'blue' %}
+{% set notesTagColour = 'blue' %}
 {# {% set hasNote = appointment.appointmentNote and appointment.hasOutcome == false %} #}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% if appointment.hasOutcome and appointment.didTheyComply == true %}
+  {% set outcomeStatus = 'Complied' %}
+  {% set outcomeStatusColour = 'grey' %}
+{% endif %}
+{# {% if appointment.hasOutcome and appointment.acceptableAbsence == false %}
+  {% set outcomeStatus = 'Unacceptable absence' %}
+  {% set outcomeTagColour = 'red' %}
+{% endif %}
+{% if appointment.hasOutcome and appointment.acceptableAbsence == true %}
+  {% set outcomeStatus = 'Acceptable absence' %}
+  {% set outcomeTagColour = 'red' %}
+{% endif %} #}
 {% if not appointment.hasOutcome and not hasNotes %}
-    {% set alert = "You must log an outcome and should add notes to this appointment." %}
+  {% if appointment.hasOutcome and hasNotes %}
+    {% set notesStatus = 'Completed' %}
+    {% set notesTagColour = '' %}
+  {% endif %}
+  {% set alert = "You must log an outcome and should add notes to this appointment." %}
 {% endif %}
 {% if appointment.hasOutcome and not hasNotes %}
-    {% set alert = "You should add notes to this appointment." %}
+  {% set alert = "You should add notes to this appointment." %}
 {% endif %}
 {% if not appointment.hasOutcome and hasNotes %}
-    {% set alert = "You must log an outcome for this appointment." %}
+  {% set alert = "You must log an outcome for this appointment." %}
+  {% set notesStatus = 'In progress' %}
+  {% set notesTagColour = 'yellow' %}
 {% endif %}
 {% if hasNotes %}
-    {% for appointmentNote in appointment.appointmentNotes %}
-        {% if appointmentNote.note %}
-            {% set notes = notes.concat(appointmentNote.note) %}
-        {% endif %}
-    {% endfor %}
+  {% for appointmentNote in appointment.appointmentNotes %}
+    {% if appointmentNote.note %}
+      {% set notes = notes.concat(appointmentNote.note) %}
+    {% endif %}
+  {% endfor %}
 {% endif %}
 {% block content %}
-    {% if not hidePageHeader %}
-        {% include "../../partials/pop-header.njk" %}
-        <hr class="govuk-section-break--l">
-    {% endif %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds">
-            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
-            {% if alert %}
-                {{ mojAlert({
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
+      {% if alert %}
+        {{ mojAlert({
   variant: "information",
   showTitleAsHeading: true,
   dismissible: false,
   text: alert
 }) }}
-            {% endif %}
-            <section data-qa="appointmentActions">
-                <h3 class="govuk-heading-m">Appointment actions</h3>
-                {{ govukInsetText({
+      {% endif %}
+      <section data-qa="appointmentActions">
+        <h3 class="govuk-heading-m">Appointment actions</h3>
+        {{ govukInsetText({
   html: 'You must <a href="" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
 }) }}
-                {{ govukTaskList({
+        {{ govukTaskList({
   idPrefix: "company-details",
   items: [
     {
@@ -54,8 +77,8 @@
       href: "#" if canLogOutcome,
       status: {
         tag: {
-          text: "Complied" if appointment.didTheyComply else 'Not started' ,
-          classes: "govuk-tag--" + ("grey" if appointment.didTheyComply else "blue")
+          text: outcomeStatus,
+          classes: "govuk-tag--" + outcomeTagColour
         }
       }
     },
@@ -66,10 +89,10 @@
       href: "#",
       status: {
         tag: {
-          text: "Not started",
-          classes: "govuk-tag--blue"
-        } if not hasNotes,
-        text: 'Completed' if hasNotes
+          text: notesStatus,
+          classes: "govuk-tag--" + notesTagColour
+        } if not hasNotes or (hasNotes and not appointment.hasOutcome),
+        text: 'Completed' if hasNotes and appointment.hasOutcome
       } 
     },
     {
@@ -77,23 +100,24 @@
         text: "Arrange next appointment"
       },
       hint: {
-        text: "You do not have any other appointments arranged with Stuart."
+        text: appointment.type + " arranged with " + personSummary.name.forename + " at " + nextAppointment.location.officeName + " on " + nextAppointment.startDateTime | dateWithYear + "." if nextAppointment else "You do not have any other appointments arranged with " + personSummary.name.forename + "."
       },
-      href: "#",
+      href: "#" if not nextAppointment,
       status: {
         tag: {
           text: "Not started",
           classes: "govuk-tag--blue"
-        }
+        } if not nextAppointment,
+        text: 'Completed' if nextAppointment
       }
     }
     ]
 }) }}
-            </section>
-            <section data-qa="appointmentDetails">
-                <h3 class="govuk-heading-m">Appointment details</h3>
-                <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
-                {{ govukSummaryList({
+      </section>
+      <section data-qa="appointmentDetails">
+        <h3 class="govuk-heading-m">Appointment details</h3>
+        <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
+        {{ govukSummaryList({
   rows: [
     {
       key: {
@@ -214,8 +238,8 @@
     }
   ]
 }) }}
-                <p class="govuk-body-s">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
-            </section>
-        </div>
+        <p class="govuk-body-s">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
+      </section>
     </div>
+  </div>
 {% endblock %}
