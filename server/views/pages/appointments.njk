@@ -8,8 +8,8 @@
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
-{% set upcomingAppointments = upcomingAppointments.userSchedule.appointments %}
-{% set pastAppointments = pastAppointments.userSchedule.appointments %}
+{% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
+{% set pastAppointments = pastAppointments.personSchedule.appointments %}
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
@@ -31,25 +31,12 @@
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
     {% set actionsButton %}
-    {% if setActionButtons === "true" %}
-      {{ mojButtonMenu({
-        "button": {
-          "text": "Actions",
-          classes: "govuk-button--secondary"
-        },
-        "items": [
-          {
-            "text": "Log outcome"
-          },
-          {
-            "text": "Manage appointment",
-            "href": "./appointments/appointment/" + appointment.id
-          }
-        ]
-      }) }}
-    {% else %}
-      <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-    {% endif %}
+      {% if not appointment.deliusManaged %}
+        {#TODO new manage page#}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+      {% else %}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+      {% endif %}
     {% endset %}
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
@@ -85,25 +72,11 @@
   {% for appointment in pastAppointments %}
 
     {% set actionsButton %}
-    {% if setActionButtons === "true" %}
-      {{  mojButtonMenu({
-          "button": {
-            "text": "Actions",
-            classes: "govuk-button--secondary"
-          },
-          "items": [
-            {
-              "text": "Log outcome"
-            },
-            {
-              "text": "Manage appointment",
-              "href": "./appointments/appointment/" + appointment.id
-            }
-          ]
-        }) }}
-    {% else %}
-      <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-    {% endif %}
+      {% if not appointment.deliusManaged %}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+      {% else %}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+      {% endif %}
     {% endset %}
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
@@ -209,6 +182,8 @@
               ],
               rows: upcomingAppointmentRows
             }) }}
+
+          <p><a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
         {% endif %}
       </section>
 
@@ -250,8 +225,7 @@
       </section>
       <section data-qa="appointmentHistory">
         <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
-        <p>
-          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
+        <p><a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
       </section>
     </div>
   </div>

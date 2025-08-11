@@ -35,6 +35,7 @@ const appointmentsController: Controller<typeof routes> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+
       const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors] = await Promise.all([
         masClient.getPersonSchedule(crn, 'upcoming'),
         masClient.getPersonSchedule(crn, 'previous'),
@@ -44,6 +45,7 @@ const appointmentsController: Controller<typeof routes> = {
       ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
+
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,

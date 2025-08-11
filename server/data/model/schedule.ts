@@ -3,10 +3,10 @@ import { Note } from './note'
 
 export interface Schedule {
   personSummary: PersonSummary
-  userSchedule: UserSchedule
+  personSchedule: PersonSchedule
 }
 
-export interface UserSchedule {
+export interface PersonSchedule {
   size: number
   page: number
   totalResults: number
@@ -51,7 +51,7 @@ export interface Activity {
   isPhoneCallToPop?: boolean
   lastUpdated?: string
   lastUpdatedBy?: Name
-  mPoPManaged?: boolean
+  deliusManaged?: boolean
 }
 
 export interface PersonAppointment {

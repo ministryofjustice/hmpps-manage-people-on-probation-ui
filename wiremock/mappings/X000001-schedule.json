@@ -16,7 +16,7 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
-          "userSchedule": {
+          "personSchedule": {
             "size": 10,
             "page": 0,
             "totalResults": 2,
@@ -88,34 +88,12 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
-          "userSchedule": {
+          "personSchedule": {
             "size": 10,
             "page": 0,
             "totalResults": 4,
             "totalPages": 1,
             "appointments": [
-              {
-                "id": 3,
-                "type": "Video call",
-                "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
-                "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
-                "rarToolKit": "Choices and Changes",
-                "isSensitive": false,
-                "hasOutcome": false,
-                "wasAbsent": true,
-                "absentWaitingEvidence": true,
-                "notes": "Some notes",
-                "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Paulie",
-                  "surname": "Walnuts"
-                },
-                "lastUpdatedBy": {
-                  "forename": "Paul",
-                  "surname": "Smith"
-                },
-                "deliusManaged": true
-              },
               {
                 "id": 4,
                 "type": "Phone call",
@@ -176,6 +154,28 @@
                 "officerName": {
                   "forename": "Terry",
                   "surname": "Jones"
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 3,
+                "type": "Video call",
+                "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
+                "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": false,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "notes": "Some notes",
+                "lastUpdated": "2023-03-20",
+                "officerName": {
+                  "forename": "Paulie",
+                  "surname": "Walnuts"
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
