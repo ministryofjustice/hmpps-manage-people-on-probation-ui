@@ -6,3 +6,5 @@ peter.pilgrim    ttys002      10 Aug 16:18
 peter.pilgrim
 peter.pilgrim
 peter.pilgrim
+Many pages make a thick book, except for pocket Bibles which are on very
+very thin paper.
