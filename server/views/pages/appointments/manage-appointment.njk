@@ -3,6 +3,37 @@
 {% set personSummary = personAppointment.personSummary %}
 {% set notes = '' %}
 {% set alert = '' %}
+{% set documents = [] %}
+{% if appointment.documents.length > 0 %}
+  {% for document in appointment.documents %}
+    {% set documents = (documents.push([
+      {
+        html: '<a href="#">' + document.name + '</a>'
+      },
+      {
+        text: document.level if document.level else ""
+      },
+      {
+        text: document.type if document.type else ""
+      },
+      {
+        text: document.dateCreated | dateWithYear if document.dateCreated else "",
+        format: "numeric",
+        attributes: {
+          "data-sort-value": document.dateCreated | dateToTimestamp
+        } if document.dateCreated
+      },
+      {
+        text: document.lastUpdated | dateWithYear if document.lastUpdated else "",
+        format: "numeric",
+        attributes: {
+          "data-sort-value": document.lastUpdated | dateToTimestamp
+        } if document.lastUpdated
+      }
+    ]), documents) %}
+  {% endfor %}
+{% endif %}
+
 {% set notesStatus = 'Not started' %}
 {% set outcomeStatus = 'Not started' %}
 {% set outcomeTagColour = 'blue' %}
@@ -73,8 +104,8 @@
       },
        hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
-      } if not canLogOutcome,
-      href: "#" if canLogOutcome,
+      } if not appointment.isInPast,
+      href: "#" if appointment.isInPast and not appointment.hasOutcome,
       status: {
         tag: {
           text: outcomeStatus,
@@ -238,8 +269,55 @@
     }
   ]
 }) }}
-        <p class="govuk-body-s">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
       </section>
+      {% if appointment.documents.length > 0 %}
+        <section data-qa="associationDocuments">
+          <h3 class="govuk-heading-m">Associated documents</h3>
+          <p class="govuk-body">Documents associated with this appointment</p>
+          {{ govukTable({
+  attributes: {
+    "data-module": "moj-sortable-table"
+  },
+  head: [
+    {
+      text: "Name",
+      attributes: {
+        "aria-sort": "ascending"
+      }
+    },
+    {
+      text: "Level",
+      attributes: {
+        "aria-sort": "none"
+      }
+    },
+    {
+      text: "Type",
+      attributes: {
+        "aria-sort": "none"
+      }
+    },
+    {
+      text: "Date created",
+      attributes: {
+        "aria-sort": "none"
+      },
+      format: "numeric"
+    },
+    {
+      text: "Date modified",
+      attributes: {
+        "aria-sort": "none"
+      },
+      format: "numeric"
+    }
+  ],
+  rows: documents
+}) }}
+          {{ appointment.documents.length }}
+        </section>
+      {% endif %}
+      <p class="govuk-body-s">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
     </div>
   </div>
 {% endblock %}
