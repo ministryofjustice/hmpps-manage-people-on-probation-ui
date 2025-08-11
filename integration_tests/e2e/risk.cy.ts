@@ -177,7 +177,7 @@ context('Risk', () => {
       .getElementData('noOasysRiskBanner')
       .should('exist')
       .find('h3')
-      .should('contain.text', 'There is no OASys Layer 3 risk assessment for Alton Berge')
+      .should('contain.text', 'There is no OASys Layer 3 risk assessment')
 
     cy.get('[data-qa="noOasysRiskBanner"]')
       .find('.govuk-notification-banner__content')
