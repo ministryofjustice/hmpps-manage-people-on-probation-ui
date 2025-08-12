@@ -1,5 +1,7 @@
+/* eslint-disable import/no-cycle */
 import { Note } from './note'
 import { Validateable } from '../../models/Errors'
+import { Contact } from './professionalContact'
 
 export interface Name {
   forename: string
@@ -73,6 +75,7 @@ export interface PersonalDetails {
   sexualOrientation?: string
   documents: Document[]
   addressTypes: AddressType[]
+  staffContacts: Contact[]
 }
 
 export interface PersonalDetailsMainAddress {

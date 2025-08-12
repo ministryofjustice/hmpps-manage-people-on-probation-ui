@@ -1,16 +1,11 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { Request } from 'express'
-import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn } from '../utils'
-import logger from '../../logger'
-import { ErrorMessages } from '../data/model/caseload'
+import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress } from '../utils'
 import { renderError } from '../middleware'
-import { AppResponse } from '../models/Locals'
 import { AppointmentPatch } from '../models/Appointments'
 
 const routes = [
@@ -97,22 +92,23 @@ const appointmentsController: Controller<typeof routes> = {
       const { crn, contactId } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const [personAppointment, upcomingAppointments] = await Promise.all([
+      const { username } = res.locals.user
+      const [personAppointment, nextComAppointment, appointmentTypes] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
-        masClient.getPersonSchedule(crn, 'upcoming'),
+        masClient.getNextComAppointment(username, crn, contactId),
+        masClient.getAppointmentTypes(),
       ])
-      // console.dir(upcomingAppointments, { depth: null })
       const { appointment } = personAppointment
-      console.dir(appointment, { depth: null })
-      const apptDate = DateTime.fromISO(appointment.startDateTime)
-      const isInPast = apptDate.diffNow().milliseconds < 0
-      const canLogOutcome = isInPast && appointment?.didTheyComply === false
-      const nextAppointment = upcomingAppointments.appointments.find(appt => appt.id !== contactId)
+      const deliusManaged =
+        (appointment?.hasOutcome && appointment?.acceptableAbsence === false) ||
+        appointmentTypes.appointmentTypes.every(type => type.description !== appointment.type)
+      const appointmentIsAtHome = isMatchingAddress(res.locals.case.mainAddress, appointment.location)
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
-        canLogOutcome,
-        nextAppointment,
+        nextComAppointment,
+        deliusManaged,
+        appointmentIsAtHome,
       })
     }
   },

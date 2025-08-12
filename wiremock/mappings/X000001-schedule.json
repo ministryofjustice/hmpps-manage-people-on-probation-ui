@@ -451,7 +451,7 @@
           },
           "appointment": {
             "id": 6,
-            "type": "Other call",
+            "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
