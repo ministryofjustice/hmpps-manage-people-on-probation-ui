@@ -1,25 +1,26 @@
 {% extends "../_form.njk" %}
 {% set headerPersonName = schedule.personSummary.name.forename + ' ' + schedule.personSummary.name.surname %}
-{% set title = "Which appointment are you recording an outcome for?" if actionType == "outcome" else "Which appointment?" %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Record an outcome", "Outcome"] }) %}
+{% set title = "Which appointment are you recording an outcome for?" if actionType == "outcome" else 
+  "Which appointment?" %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Record an outcome", "Outcome"]
+}) %}
 {% set action = '/case/' + crn + '/record-an-outcome/' + actionType %}
 {% set backLink = '/case/' + crn %}
 {% block form %}
-    {% set errorList = [{ text: errorMessages.appointment.text, href: "#appointment-id" } if errorMessages.appointment else None ] | reject("undefined") %}
-        {% if errorList | length > 0 %}
-          {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-          {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
-        {% endif %}
-    {% set appointmentRadioItems = [] %}
-
-    {% for appointment in getAppointmentsToAction(schedule.appointments, actionType) %}
-        {% set appointmentRadioItems = (appointmentRadioItems.push({
-          html: '<strong>' + appointment.type + '</strong><br />' + appointment.startDateTime | dateWithDayAndWithoutYear +
-                  ' from ' + timeFromTo(appointment.startDateTime, appointment.endDateTime),
-          value: appointment.id
-        }), appointmentRadioItems) %}
-    {% endfor %}
-    {{ govukRadios({
+  {% set errorList = [{ text: errorMessages.appointment.text, href: "#appointment-id" } if errorMessages.appointment else None ] | reject("undefined") %}
+  {% if errorList | length > 0 %}
+    {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+    {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+  {% endif %}
+  {% set appointmentRadioItems = [] %}
+  {% for appointment in getAppointmentsToAction(schedule.personSchedule.appointments, actionType) %}
+    {% set appointmentRadioItems = (appointmentRadioItems.push({
+      html: '<strong>' + appointment.type + '</strong><br />' + appointment.startDateTime | dateWithDayAndWithoutYear + ' from ' + timeFromTo(appointment.startDateTime, appointment.endDateTime),
+      value: appointment.id
+    }), appointmentRadioItems) %}
+  {% endfor %}
+  {{ govukRadios({
            name: "appointment-id",
            fieldset: {},
            items: appointmentRadioItems
