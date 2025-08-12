@@ -8,8 +8,8 @@
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
-{% set upcomingAppointments = sortAppointmentsDescending(upcomingAppointments.appointments) %}
-{% set pastAppointments = sortAppointmentsDescending(pastAppointments.appointments, 10) %}
+{% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
+{% set pastAppointments = pastAppointments.personSchedule.appointments %}
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
@@ -31,50 +31,32 @@
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
     {% set actionsButton %}
-    {% if setActionButtons === "true" %}
-      {{ mojButtonMenu({
-        "button": {
-          "text": "Actions",
-          classes: "govuk-button--secondary"
-        },
-        "items": [
-          {
-            "text": "Log outcome"
-          },
-          {
-            "text": "Manage appointment",
-            "href": "./appointments/appointment/" + appointment.id
-          }
-        ]
-      }) }}
-    {% else %}
-      <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-    {% endif %}
+      {% if not appointment.deliusManaged %}
+        {#TODO new manage page check url is correct#}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+      {% else %}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+      {% endif %}
     {% endset %}
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
       {
         html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
-        classes: "vertical-align--middle",
         attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
-
       },
       {
         text: appointment.startDateTime | dateWithYear,
         format: "numeric",
-        classes: "vertical-align--middle",
-        attributes: { "data-sort-value": appointment.startDateTime | dateForSort, "data-qa":"upcomingAppointmentDate"+loop.index }
+        attributes: { "data-qa":"upcomingAppointmentDate"+loop.index }
       },
       {
         text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
         format: "numeric",
-        classes: "vertical-align--middle",
-        attributes: { "data-sort-value": appointment.startDateTime | timeForSort, "data-qa":"upcomingAppointmentTime"+loop.index }
+        attributes: { "data-qa":"upcomingAppointmentTime"+loop.index }
       },
       {
         html: actionsButton,
         format: "numeric",
-        classes: "vertical-align--middle",
         attributes: {"data-qa": "upcomingAppointmentAction" + loop.index }
       }
     ]), upcomingAppointmentRows) %}
@@ -85,49 +67,31 @@
   {% for appointment in pastAppointments %}
 
     {% set actionsButton %}
-    {% if setActionButtons === "true" %}
-      {{  mojButtonMenu({
-          "button": {
-            "text": "Actions",
-            classes: "govuk-button--secondary"
-          },
-          "items": [
-            {
-              "text": "Log outcome"
-            },
-            {
-              "text": "Manage appointment",
-              "href": "./appointments/appointment/" + appointment.id
-            }
-          ]
-        }) }}
-    {% else %}
-      <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-    {% endif %}
+      {% if not appointment.deliusManaged %}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+      {% else %}
+        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+      {% endif %}
     {% endset %}
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
       {
         html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
-        classes: "vertical-align--middle",
         attributes: { "data-qa":"pastAppointmentType"+loop.index }
       },
       {
         text: appointment.startDateTime | dateWithYear,
         format: "numeric",
-        classes: "vertical-align--middle",
-        attributes: { "data-sort-value": appointment.startDateTime | dateForSort, "data-qa":"pastAppointmentDate"+loop.index }
+        attributes: { "data-qa":"pastAppointmentDate"+loop.index }
       },
       {
         text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
         format: "numeric",
-        classes: "vertical-align--middle",
-        attributes: { "data-sort-value": appointment.startDateTime | timeForSort, "data-qa":"pastAppointmentTime"+loop.index }
+        attributes: { "data-qa":"pastAppointmentTime"+loop.index }
       },
       {
         html: actionsButton,
-        format: "numeric",
-        classes: "non-sortable__sortable-table-header vertical-align--middle"
+        format: "numeric"
       }
     ]), pastAppointmentRows) %}
   {% endfor %}
@@ -176,43 +140,39 @@
     <div class="govuk-grid-column-full">
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
         <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
-        <p>All links to manage appointments open in new tabs on NDelius.</p>
         {% if upcomingAppointments.length == 0 %}
           <p>There are no upcoming appointments.</p>
         {% else %}
           {{ govukTable({
               firstCellIsHeader: false,
-              attributes: {
-                'data-module': 'moj-mpop-sortable-table'
-              },
-              caption: 'Column headers with buttons are sortable',
               captionClasses: 'govuk-visually-hidden',
               head: [
                 {
                   text: "Appointment type",
-                  classes: "govuk-!-width-one-half govuk-action--bottom",
-                  attributes: { "aria-sort": "none" }
+                  classes: "vertical-align--middle"
                 },
                 {
                   text: "Date",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom ",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  classes: "vertical-align--middle",
+                  format: "numeric"
                 },
                 {
                   text: "Time",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom ",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  classes: "vertical-align--middle",
+                  format: "numeric"
                 },
                 {
-                  html: 'Action<span class="govuk-visually-hidden"> (links open in new tab)</span>',
-                  classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
+                  html: "Action",
+                  classes: "vertical-align--middle",
                   format: "numeric"
                 }
               ],
               rows: upcomingAppointmentRows
             }) }}
+
+          {% if upcomingAppointments.length > 10 %}
+            <p><a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
+          {% endif %}
         {% endif %}
       </section>
 
@@ -223,32 +183,21 @@
         {% else %}
           {{ govukTable({
               firstCellIsHeader: false,
-              attributes: {
-                'data-module': 'moj-mpop-sortable-table'
-              },
-              caption: 'Column headers with buttons are sortable',
               captionClasses: 'govuk-visually-hidden',
               head: [
                 {
-                  text: "Appointment type",
-                  classes: "govuk-!-width-one-half govuk-action--bottom",
-                  attributes: { "aria-sort": "none" }
+                  text: "Appointment type"
                 },
                 {
                   text: "Date",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  format: "numeric"
                 },
                 {
                   text: "Time",
-                  classes: "govuk-!-width-one-sixth govuk-action--bottom",
-                  format: "numeric",
-                  attributes: { "aria-sort": "none" }
+                  format: "numeric"
                 },
                 {
                   html: "Action",
-                  classes: "govuk-!-width-one-sixth non-sortable__sortable-table-header govuk-action--bottom",
                   format: "numeric"
                 }
               ],
@@ -258,8 +207,7 @@
       </section>
       <section data-qa="appointmentHistory">
         <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
-        <p>
-          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
+        <p><a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
       </section>
     </div>
   </div>
