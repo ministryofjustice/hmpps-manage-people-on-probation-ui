@@ -13,6 +13,7 @@ import { AppResponse } from '../models/Locals'
 
 const routes = [
   'getAppointments',
+  'getAllUpcomingAppointments',
   'postAppointments',
   'getAppointmentDetails',
   'getRecordAnOutcome',
@@ -49,6 +50,40 @@ const appointmentsController: Controller<typeof routes> = {
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,
+        crn,
+        tierCalculation,
+        risksWidget,
+        predictorScores,
+      })
+    }
+  },
+  getAllUpcomingAppointments: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params as Record<string, string>
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const arnsClient = new ArnsApiClient(token)
+      const masClient = new MasApiClient(token)
+      const tierClient = new TierApiClient(token)
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_APPOINTMENTS',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+
+      const [upcomingAppointments, risks, tierCalculation, predictors] = await Promise.all([
+        masClient.getPersonSchedule(crn, 'upcoming'),
+        arnsClient.getRisks(crn),
+        tierClient.getCalculationDetails(crn),
+        arnsClient.getPredictorsAll(crn),
+      ])
+      const risksWidget = toRoshWidget(risks)
+      const predictorScores = toPredictors(predictors)
+
+      return res.render('pages/upcoming-appointments', {
+        upcomingAppointments,
         crn,
         tierCalculation,
         risksWidget,

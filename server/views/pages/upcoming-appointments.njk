@@ -1,0 +1,161 @@
+{% extends "../partials/case.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
+{% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
+{% set currentNavSection = 'appointments' %}
+{% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
+{% set headerCRN = upcomingAppointments.personSummary.crn %}
+{% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
+{% set offenderId = upcomingAppointments.personSummary.offenderId %}
+{% set headerGender = upcomingAppointments.personSummary.gender %}
+{% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
+{% set pastAppointments = pastAppointments.personSchedule.appointments %}
+{% set upcomingAppointmentRows = [] %}
+{% set pastAppointmentRows = [] %}
+{% set setActionButtons = "false" %}
+{% set headerActions %}
+    <div class="moj-button-group moj-button-group--inline">
+        {% if flags.enableAppointmentCreate === true %}
+            <form method="POST" action="">
+                <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0 govuk-!-static-margin-right-0"
+                        data-module="govuk-button" data-qa="arrange-appointment-btn">
+                    Arrange an appointment
+                </button>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            </form>
+        {% else %}
+            <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an
+                appointment on NDelius</a>
+        {% endif %}
+    </div>
+{% endset %}
+
+{% if upcomingAppointments.length > 0 %}
+    {% for appointment in upcomingAppointments %}
+        {% set actionsButton %}
+            {% if not appointment.deliusManaged %}
+                {# TODO new manage page check url is correct #}
+                <a class="govuk-link govuk-link--no-visited-state" target="_blank"
+                   href="/manage/appointment/{{ appointment.id }}"
+                   aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+            {% else %}
+                <a class="govuk-link govuk-link--no-visited-state" target="_blank"
+                   href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
+                   aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span
+                            class="govuk-visually-hidden"> (opens in new tab)</span></a>
+            {% endif %}
+        {% endset %}
+
+        {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
+            {
+                html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
+                attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
+            },
+            {
+                text: appointment.startDateTime | dateWithYear,
+                format: "numeric",
+                attributes: { "data-qa":"upcomingAppointmentDate"+loop.index }
+            },
+            {
+                text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
+                format: "numeric",
+                attributes: { "data-qa":"upcomingAppointmentTime"+loop.index }
+            },
+            {
+                html: actionsButton,
+                format: "numeric",
+                attributes: {"data-qa": "upcomingAppointmentAction" + loop.index }
+            }
+        ]), upcomingAppointmentRows) %}
+    {% endfor %}
+{% endif %}
+
+{% block beforeContent %}
+    {{ govukBreadcrumbs({
+        items: [
+            {
+                text: "Cases",
+                href: "/case"
+            },
+            {
+                text: headerPersonName,
+                href: "/case/" + crn,
+                attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+            },
+            {
+                text: "Appointments"
+            }
+        ]
+    }) }}
+{% endblock %}
+
+{% set popHeaderActions %}
+    <span>An action!!</span>
+{% endset %}
+
+{% block headerActions %}
+    <div class="moj-button-group moj-button-group--inline">
+        {% if flags.enableAppointmentCreate === true %}
+            <form method="POST" action="">
+                <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0 govuk-!-static-margin-right-0"
+                        data-module="govuk-button" data-qa="arrange-appointment-btn">
+                    Arrange an appointment
+                </button>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            </form>
+        {% else %}
+            <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an
+                appointment on NDelius</a>
+        {% endif %}
+    </div>
+{% endblock %}
+
+{% block pageContent %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
+                <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
+                {% if upcomingAppointments.length == 0 %}
+                    <p>There are no upcoming appointments.</p>
+                {% else %}
+                    {{ govukTable({
+                        firstCellIsHeader: false,
+                        attributes: {
+                            'data-module': 'moj-backend-sortable-table'
+                        },
+                        caption: 'Column headers with buttons are sortable',
+                        captionClasses: 'govuk-visually-hidden',
+                        head: [
+                            {
+                                text: "Appointment type",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": "none" }
+                            },
+                            {
+                                text: "Date",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": "none" },
+                                format: "numeric"
+                            },
+                            {
+                                text: "Time",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": "none" },
+                                format: "numeric"
+                            },
+                            {
+                                html: "Action",
+                                classes: "vertical-align--middle",
+                                format: "numeric"
+                            }
+                        ],
+                        rows: upcomingAppointmentRows
+                    }) }}
+
+                {% endif %}
+            </section>
+
+        </div>
+    </div>
+
+{% endblock %}
