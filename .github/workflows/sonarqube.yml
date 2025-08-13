@@ -20,4 +20,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Needed to get PR information, if any
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_SCANNER_OPTS: '-Dproject.settings=./sonar-project.properties'
           # SONAR_SCANNER_OPTS: '-Dsonar.exclusions=server/views/_components/govuk/**'
