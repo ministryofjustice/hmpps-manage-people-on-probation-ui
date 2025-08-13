@@ -9,10 +9,6 @@ export const getStaffRisk = (data: RiskFlag[]): RiskFlag => {
   if (staffFlag.length === 0) {
     return null
   }
-  if (staffFlag.length >= 2) {
-    logger.error("Multiple 'Risk to Staff' flags exist for this single case")
-    return null
-  }
 
   return staffFlag[0]
 }
