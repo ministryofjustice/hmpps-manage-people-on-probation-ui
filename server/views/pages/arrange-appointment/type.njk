@@ -26,7 +26,7 @@
   {% endif %}
 
   {# Main Appointment details heading #}
-  <h1 class="govuk-heading-m" data-qa="pageHeading">{{ title }}</h1>
+  <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
 
   {# Inset text for NDelius info #}
   {{ govukInsetText({
@@ -54,35 +54,36 @@
     items: types
   } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
 
-  {# ViSOR section #}
-  {{ govukRadios({
-    classes: "govuk-radios--inline",
-    fieldset: {
-      legend: {
-        text: 'Include appointment in ViSOR report?',
-        isPageHeading: false,
-        classes: "govuk-fieldset__legend--m"
-      }
-    },
-    formGroup: {
-      attributes: {
-        'data-qa': 'visorReport'
-      }
-    },
-    hint: {
-      text: 'This will add the appointment to their record on the ViSOR secure national database.'
-    },
-    items: [
-      {
-        text: "Yes",
-        value: "yes"
+  {# ViSOR section (only if appointment.meta.isVisor is true) #}
+  {% if appointment.meta.isVisor %}
+    {{ govukRadios({
+      classes: "govuk-radios--inline",
+      fieldset: {
+        legend: {
+          text: 'Include appointment in ViSOR report?',
+          isPageHeading: false,
+          classes: "govuk-fieldset__legend--m"
+        }
       },
-      {
-        text: "No",
-        value: "no"
-      }
-    ]
-  } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
-
-  <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
+      formGroup: {
+        attributes: {
+          'data-qa': 'visorReport'
+        }
+      },
+      hint: {
+        text: 'This will add the appointment to their record on the ViSOR secure national database.'
+      },
+      items: [
+        {
+          text: "Yes",
+          value: "yes"
+        },
+        {
+          text: "No",
+          value: "no"
+        }
+      ]
+    } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
+    <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
+  {% endif %}
 {% endblock %}
