@@ -102,13 +102,16 @@ const appointmentsController: Controller<typeof routes> = {
       const deliusManaged =
         (appointment?.hasOutcome && appointment?.acceptableAbsence === false) ||
         appointmentTypes.appointmentTypes.every(type => type.description !== appointment.type)
-      const appointmentIsAtHome = isMatchingAddress(res.locals.case.mainAddress, appointment.location)
+      const nextAppointmentIsAtHome = isMatchingAddress(
+        res.locals.case.mainAddress,
+        nextComAppointment?.appointment?.location,
+      )
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
         nextComAppointment,
         deliusManaged,
-        appointmentIsAtHome,
+        nextAppointmentIsAtHome,
       })
     }
   },

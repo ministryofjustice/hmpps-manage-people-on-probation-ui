@@ -1,3 +1,4 @@
+{% from "_components/note/macro.njk" import appNote %}
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
@@ -5,9 +6,9 @@
 {% set alert = '' %}
 {% set documents = [] %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
-{% if nextComAppointment.appointment and nextComAppointment.loggedInUserIsCOM %}
+{% if nextComAppointment.appointment %}
   {% set nextAppointmentHint = nextComAppointment.appointment.type + " arranged with " + personSummary.name.forename + " at " + (
-  'their home' if appointmentIsAtHome else 
+  'their home' if nextAppointmentIsAtHome else 
     addressToList(nextComAppointment.appointment.location)[0]) + " on " + nextComAppointment.appointment.startDateTime | dateWithYear + "." %}
 {% endif %}
 {% if not nextComAppointment.appointment and not nextComAppointment.loggedInUserIsCOM %}
@@ -51,7 +52,7 @@
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% if appointment.hasOutcome and appointment.didTheyComply == true %}
   {% set outcomeStatus = 'Complied' %}
-  {% set outcomeStatusColour = 'grey' %}
+  {% set outcomeTagColour = 'green' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.acceptableAbsence == false %}
   {% set outcomeStatus = 'Unacceptable absence' %}
@@ -77,11 +78,13 @@
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
-      {% set notes = notes.concat(appointmentNote.note) %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+      {# {% set notes = notes.concat(appointmentNote.note) %} #}
     {% endif %}
   {% endfor %}
 {% endif %}
 {% block content %}
+
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
@@ -104,7 +107,7 @@
         <section data-qa="appointmentActions">
           <h3 class="govuk-heading-m">Appointment actions</h3>
           {{ govukInsetText({
-  html: 'You must <a href="" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
+  html: 'You must <a href="#" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
 }) }}
           {{ govukTaskList({
   idPrefix: "appointment-actions",
@@ -137,8 +140,8 @@
         tag: {
           text: notesStatus,
           classes: "govuk-tag--" + notesTagColour
-        } if not hasNotes or (hasNotes and not appointment.hasOutcome),
-        text: 'Completed' if hasNotes and appointment.hasOutcome
+        } if not hasNotes or (hasNotes and not appointment.isInPast),
+        text: 'Completed' if hasNotes and appointment.isInPast
       } 
     },
     {
@@ -153,7 +156,7 @@
         tag: {
           text: "Not started",
           classes: "govuk-tag--blue"
-        } if not nextAppointment,
+        } if not nextComAppointment.appointment,
         text: 'Completed' if nextComAppointment.appointment
       }
     }
@@ -181,7 +184,7 @@
           classes: "govuk-tag--" + outcomeTagColour
         })
       }
-    },
+    } if deliusManaged and appointment.hasOutcome,
     {
       key: {
         text: "Date and time"
@@ -194,7 +197,11 @@
           {
             href: "#",
             text: "Change on NDelius",
-            visuallyHiddenText: "(opens in new tab)"
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
           }
         ]
       } if not deliusManaged
@@ -211,7 +218,11 @@
           {
             href: "#",
             text: "Change on NDelius",
-            visuallyHiddenText: "(opens in new tab)"
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
           }
         ]
       } if not deliusManaged
@@ -228,7 +239,11 @@
           {
             href: "#",
             text: "Change on NDelius",
-            visuallyHiddenText: "(opens in new tab)"
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
           }
         ]
       } if not deliusManaged
@@ -239,17 +254,8 @@
       },
       value: {
         text: appointment.rarCategory if appointment.rarCategory else 'Not provided'
-      },
-      actions: {
-        items: [
-          {
-            href: "#",
-            text: "Change on NDelius",
-            visuallyHiddenText: "(opens in new tab)"
-          }
-        ]
-      } if not deliusManaged
-    } if appointment.isRarRelated,
+      }
+    } if appointment.acceptableAbsence == false,
     {
       key: {
         text: "VISOR report"
