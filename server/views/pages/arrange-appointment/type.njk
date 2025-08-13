@@ -1,7 +1,8 @@
 {% extends "../_form.njk" %}
-{% set title = 'What appointment are you arranging?' %}
-{% set backLink = change if change else 
-  '/case/' + crn + '/appointments' %}
+{% set title = 'Appointment details' %}
+{% set backLink = change if change else '/case/' + crn + '/appointments' %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
 {% set types = [] %}
 {% for appointmentType in appointmentTypes %}
   {% set types = (types.push({
@@ -9,50 +10,63 @@
     value: appointmentType.code
   }), types) %}
 {% endfor %}
+
 {% block heading %}{% endblock %}
+
 {% block form %}
   {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
     {% if errorList.length > 0 %}
       {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
+        titleText: "There is a problem",
+        errorList: errorList,
+        attributes: { "data-qa": "errorList" }
+      }) }}
     {% endif %}
   {% endif %}
+
+  {# Main Appointment details heading #}
+  <h1 class="govuk-heading-m" data-qa="pageHeading">{{ title }}</h1>
+
+  {# Inset text for NDelius info #}
+  {{ govukInsetText({
+    html: 'Use <a href="' + deliusDeepLinkUrl('ContactList', crn, entry.id) + '" target="_blank" rel="external noopener noreferrer">NDelius (opens in new tab)</a> to arrange:
+      <ul class="govuk-list govuk-list--bullet">
+        <li>any other type of appointment not listed below</li>
+        <li>appointments that require document templates</li>
+        <li>appointments for RAR toolkits or NSIs (non-statutory interventions)</li>
+      </ul>'
+  }) }}
+
+  {# Appointment type radios #}
   {{ govukRadios({
     formGroup: {
-      attributes: {
-      'data-qa': 'type'
-      }
-    },
-    fieldset: {
-      legend: {
-        html: '<span data-qa="pageHeading">' + title + '</span>',
-        classes: "govuk-fieldset__legend--l"
-      },
       attributes: {
         'data-qa': 'type'
       }
     },
-    items: types
- } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
-  <p class="govuk-!-margin-bottom-7">
-    <a href="{{ deliusDeepLinkUrl('ContactList', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" data-qa="ndeliusAppointmentsLink">Create all other appointments on NDelius (opens in new tab)</a>.</p>
-  {% if appointment.meta.isVisor %}
-    {{ govukRadios({
-  classes: "govuk-radios--inline",
     fieldset: {
       legend: {
-        text: 'Include appointment in VISOR report?',
+        text: "What appointment are you arranging?",
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: types
+  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
+
+  {# ViSOR section #}
+  {{ govukRadios({
+    classes: "govuk-radios--inline",
+    fieldset: {
+      legend: {
+        text: 'Include appointment in ViSOR report?',
         isPageHeading: false,
-        classes: "govuk-fieldset__legend--l"
+        classes: "govuk-fieldset__legend--m"
       }
     },
     formGroup: {
       attributes: {
-      'data-qa': 'visorReport'
+        'data-qa': 'visorReport'
       }
     },
     hint: {
@@ -60,13 +74,15 @@
     },
     items: [
       {
-        text: "Yes"
+        text: "Yes",
+        value: "yes"
       },
       {
-        text: "No"
+        text: "No",
+        value: "no"
       }
     ]
   } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
-    <input type="hidden" name="visor" id="visor" value="{{appointment.meta.isVisor}}">
-  {% endif %}
+
+  <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
 {% endblock %}
