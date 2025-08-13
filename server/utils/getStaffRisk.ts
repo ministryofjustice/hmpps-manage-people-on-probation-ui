@@ -1,5 +1,4 @@
 import { RiskFlag } from '../data/model/risk'
-import logger from '../../logger'
 
 export const getStaffRisk = (data: RiskFlag[]): RiskFlag => {
   if (!data) {
