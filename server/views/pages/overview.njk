@@ -1,5 +1,6 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
@@ -13,6 +14,7 @@
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
+{% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
@@ -120,6 +122,18 @@
 {% endblock %}
 
 {% block pageContent %}
+  {% if riskToStaff.level == 'HIGH' or riskToStaff.level == 'MEDIUM' %}
+    {% set html %}
+    <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
+    {% endset %}
+    {{ mojAlert({
+      variant: "warning",
+      title: overview.personalDetails.name.forename + " is " + riskLevelLabel(riskToStaff.level).toLowerCase() + " risk to staff ",
+      showTitleAsHeading: true,
+      dismissible: false,
+      html: html
+    }) }}
+  {% endif %}
   {% if appointmentsWithoutAnOutcomeCount > 0 or waitingForEvidenceCount > 0 %}
     {% set html %}
     <h2 class="govuk-heading-m">You have appointments that need attention</h2>

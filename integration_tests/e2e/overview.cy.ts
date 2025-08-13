@@ -95,7 +95,7 @@ context('Overview', () => {
       .eq(0)
       .should('contain.text', 'High')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
-    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(0).should('contain.text', 'Restraining Order')
+    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(0).should('contain.text', 'Risk to Staff')
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(1)
       .should('contain.text', 'Medium')
