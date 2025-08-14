@@ -1,6 +1,8 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import { Request } from 'express'
+import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
+import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
@@ -60,6 +62,7 @@ const appointmentsController: Controller<typeof routes> = {
   getAllUpcomingAppointments: hmppsAuthClient => {
     return async (req, res) => {
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.desc'
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
       const sortField = sortedBy === 'time' ? 'date' : sortedBy
 
       const { crn } = req.params as Record<string, string>
@@ -77,13 +80,21 @@ const appointmentsController: Controller<typeof routes> = {
       })
 
       const [upcomingAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming', '0', sortField),
+        masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortField),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
       ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
+
+      const pagination: Pagination = getPaginationLinks(
+        req.query.page ? pageNum : 1,
+        upcomingAppointments.personSchedule?.totalPages || 0,
+        upcomingAppointments.personSchedule?.totalResults || 0,
+        page => addParameters(req, { page: page.toString() }),
+        upcomingAppointments.personSchedule?.size || 10,
+      )
 
       return res.render('pages/upcoming-appointments', {
         upcomingAppointments,
@@ -92,6 +103,7 @@ const appointmentsController: Controller<typeof routes> = {
         risksWidget,
         predictorScores,
         sortedBy,
+        pagination,
       })
     }
   },

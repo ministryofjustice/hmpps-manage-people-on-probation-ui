@@ -8,6 +8,7 @@
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
+{% set totalUpcomingAppointments = upcomingAppointments.personSchedule.totalResults %}
 {% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
 {% set pastAppointments = pastAppointments.personSchedule.appointments %}
 {% set upcomingAppointmentRows = [] %}
@@ -170,7 +171,7 @@
               rows: upcomingAppointmentRows
             }) }}
 
-          {% if upcomingAppointments.length > 10 %}
+          {% if totalUpcomingAppointments > 10 %}
             <p><a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
           {% endif %}
         {% endif %}
