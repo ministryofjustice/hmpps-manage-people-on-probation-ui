@@ -506,6 +506,27 @@
     },
     {
       "request": {
+        "urlPattern": "/mas/personal-details/X777916/summary",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "name": {
+            "forename": "Eula",
+            "surname": "Schmeler"
+          },
+          "crn": "X000001",
+          "dateOfBirth": "1979-08-18",
+          "pnc": "PNC/12345"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/mas/personal-details/X777916/circumstances",
         "method": "GET"
       },
@@ -517,7 +538,7 @@
               "forename": "Eula",
               "surname": "Schmeler"
             },
-            "crn": "X000001",
+            "crn": "X777916",
             "dateOfBirth": "1979-08-18"
           },
           "circumstances": [
