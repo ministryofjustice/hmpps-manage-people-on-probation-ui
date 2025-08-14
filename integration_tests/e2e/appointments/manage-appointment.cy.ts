@@ -225,6 +225,7 @@ describe('Manage an appointment', () => {
   })
   it('should render the page', () => {
     manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with Terry Jones')
+    manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
   })
   describe('Alert banner', () => {
     describe('Appointment is in the future', () => {
@@ -259,6 +260,17 @@ describe('Manage an appointment', () => {
           manageAppointmentPage.getAlertBanner().should('contain.text', 'You should add notes to this appointment.')
         })
       })
+    })
+  })
+
+  describe('Appointment with no documents', () => {
+    beforeEach(() => {
+      cy.task('stubFutureAppointmentManagedTypeWithNotes')
+      loadPage()
+      manageAppointmentPage = new ManageAppointmentPage()
+    })
+    it('should render the page without associated documents', () => {
+      manageAppointmentPage.getAssociatedDocuments().should('not.exist')
     })
   })
 
@@ -315,7 +327,10 @@ describe('Manage an appointment', () => {
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to log the outcome', () => {
-          manageAppointmentPage.getTaskLink(1).should('contain.text', name).should('have.attr', 'href', '#')
+          manageAppointmentPage
+            .getTaskLink(1)
+            .should('contain.text', name)
+            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/record-an-outcome')
         })
         it(`should display the status as 'Not started'`, () => {
           manageAppointmentPage
@@ -709,12 +724,6 @@ describe('Manage an appointment', () => {
     it('should display the section title', () => {
       manageAppointmentPage.getAppointmentDetails().find('h3').should('contain.text', 'Appointment details')
     })
-    // it('should display the text', () => {
-    //   manageAppointmentPage
-    //     .getAppointmentDetails()
-    //     .find('.govuk-body')
-    //     .should('contain.text', 'All links to change appointment details on NDelius open in a new tab.')
-    // })
     describe('MPOP managed appointment', () => {
       checkAppointmentDetails()
     })
@@ -759,5 +768,33 @@ describe('Manage an appointment', () => {
     })
   })
 
-  // describe('Associated documents', () => {})
+  describe('Associated documents', () => {
+    beforeEach(() => {
+      cy.task('stubFutureAppointmentManagedTypeWithDocs')
+      loadPage()
+      manageAppointmentPage = new ManageAppointmentPage()
+    })
+    it('should display the associated documents section', () => {
+      manageAppointmentPage.getAssociatedDocuments().find('h3').should('contain.text', 'Associated documents')
+      manageAppointmentPage
+        .getAssociatedDocuments()
+        .find('p.govuk-body')
+        .should('contain.text', 'Documents associated with this appointment')
+      manageAppointmentPage.getAssociatedDocumentsTableColumnHeading(1).should('contain.text', 'Name')
+      manageAppointmentPage.getAssociatedDocumentsTableColumnHeading(2).should('contain.text', 'Level')
+      manageAppointmentPage.getAssociatedDocumentsTableColumnHeading(3).should('contain.text', 'Type')
+      manageAppointmentPage.getAssociatedDocumentsTableColumnHeading(4).should('contain.text', 'Date created')
+      manageAppointmentPage.getAssociatedDocumentsTableColumnHeading(5).should('contain.text', 'Date modified')
+      manageAppointmentPage.getAssociatedDocumentsTableRows().should('have.length', 3)
+      manageAppointmentPage
+        .getAssociatedDocumentsTableRowCell(1, 1)
+        .find('a')
+        .should('contain.text', 'Document-1.pdf')
+        .should('have.attr', 'href', 'personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download')
+      manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 2).should('contain.text', 'Contact')
+      manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 3).should('contain.text', '3 Way Meeting (NS)')
+      manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 4).should('contain.text', '6 April 2023')
+      manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 5).should('contain.text', '6 April 2023')
+    })
+  })
 })

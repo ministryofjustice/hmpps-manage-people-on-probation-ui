@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import superagent, { SuperAgentRequest } from 'superagent'
 import { WiremockMapping } from '../../integration_tests/utils'
 
@@ -85,10 +84,6 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
   }
   if (isFuture) {
-    // const startTime = DateTime.now().plus({ days: 1 }).toISO()
-    // const endTime = DateTime.now().plus({ days: 1, hours: 1 }).toISO()
-    // mapping.response.jsonBody.appointment.startDateTime = startTime
-    // mapping.response.jsonBody.appointment.endDateTime = endTime
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
   }
@@ -108,18 +103,21 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.documents = [
       {
         id: '83fdbf8a-a2f2-43b4-93ef-67e71c04fc58',
-        name: 'Eula-Schmeler-X000001-UPW.pdf',
+        name: 'Document-1.pdf',
         lastUpdated: '2023-04-06T11:06:25.672587+01:00',
+        dateCreated: '2023-04-06T11:06:25.672587+01:00',
       },
       {
         id: 'c2650260-9568-476e-a293-0b168027a5f1',
-        name: 'Eula-Schmeler-X000001-UPW.pdf',
+        name: 'Document-2.pdf',
         lastUpdated: '2023-04-06T11:09:45.860739+01:00',
+        dateCreated: '2023-04-06T11:09:45.860739+01:00',
       },
       {
         id: 'b82e444b-c77c-4d44-bf99-4ce4dc426ff4',
-        name: 'Eula-Schmeler-X000001-UPW.pdf',
+        name: 'Document-3.pdf',
         lastUpdated: '2023-04-06T11:21:17.06356+01:00',
+        dateCreated: '2023-04-06T11:21:17.06356+01:00',
       },
     ]
   }
@@ -247,6 +245,10 @@ const stubFutureAppointmentManagedTypeNoNotes = (): SuperAgentRequest => {
 }
 const stubFutureAppointmentManagedTypeWithNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubFutureAppointmentManagedTypeWithDocs = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ documents: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubFutureAppointmentManagedTypeNoNextAppt = (): SuperAgentRequest => {
@@ -394,6 +396,7 @@ export default {
   stubFutureAppointmentManagedTypeNoNotes,
   stubFutureAppointmentManagedTypeWithNotes,
   stubFutureAppointmentManagedTypeNoNextAppt,
+  stubFutureAppointmentManagedTypeWithDocs,
   stubPastAppointmentNoOutcomeNoNotes,
   stubPastAppointmentOutcomeNoNotes,
   stubPastAppointmentWithNotes,

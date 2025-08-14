@@ -18,7 +18,7 @@
   {% for document in appointment.documents %}
     {% set documents = (documents.push([
       {
-        html: '<a href="#">' + document.name + '</a>'
+        html: '<a href="personal-details/documents/' + document.id + '/download" download="' + document.name +'">' + document.name + '</a>'
       },
       {
         text: document.level if document.level else "Contact"
@@ -30,7 +30,7 @@
         text: document.dateCreated | dateWithYear if document.dateCreated else "",
         format: "numeric",
         attributes: {
-          "data-sort-value": document.dateCreated | dateToTimestamp
+          "data-sort-value": document.dateCreated | dateToTimestamp if document.dateCreated else "1"
         } if document.dateCreated
       },
       {
@@ -79,7 +79,6 @@
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
       {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
-      {# {% set notes = notes.concat(appointmentNote.note) %} #}
     {% endif %}
   {% endfor %}
 {% endif %}
@@ -122,7 +121,7 @@
        hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
       } if not appointment.isInPast,
-      href: "#" if appointment.isInPast and not appointment.hasOutcome,
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/record-an-outcome' if appointment.isInPast and not appointment.hasOutcome,
       
       status: {
         tag: {
@@ -309,7 +308,7 @@
 }) }}
       </section>
       {% if appointment.documents.length > 0 %}
-        <section data-qa="associationDocuments">
+        <section data-qa="associatedDocuments">
           <h3 class="govuk-heading-m">Associated documents</h3>
           <p class="govuk-body">Documents associated with this appointment</p>
           {{ govukTable({
@@ -354,7 +353,7 @@
 }) }}
         </section>
       {% endif %}
-      <p class="govuk-body-s">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
+      <p class="govuk-body-s" data-qa="lastUpdated">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
     </div>
   </div>
 {% endblock %}
