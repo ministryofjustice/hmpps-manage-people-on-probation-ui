@@ -8,28 +8,56 @@ interface Args {
   deliusManagedType?: boolean
   notCompliedAbsence?: boolean
   hasComplied?: boolean
+  task?: string
+  withNotesTask?: string
+  noNotesTask?: string
 }
 
 const checkAppointmentDetails = (
-  { deliusManagedType = false, notCompliedAbsence = false, hasComplied = false }: Args = {} as Args,
+  {
+    task,
+    withNotesTask,
+    noNotesTask,
+    deliusManagedType = false,
+    notCompliedAbsence = false,
+    hasComplied = false,
+  }: Args = {} as Args,
 ) => {
   let page: ManageAppointmentPage
   const manageAppointmentPage = new ManageAppointmentPage()
   const deliusManaged = deliusManagedType || notCompliedAbsence
   const hasOutcome = notCompliedAbsence || hasComplied
-  const outcomeStatus = hasComplied ? 'Complied' : 'Unacceptable Absence'
+  const outcomeStatus = hasComplied ? 'Complied' : 'Unacceptable absence'
   const tagColour = hasComplied ? 'green' : 'red'
+  if (!deliusManaged) {
+    it('should display the NDelius change links text for MPOP managed appointments', () => {
+      manageAppointmentPage
+        .getAppointmentDetails()
+        .find('.govuk-body')
+        .should('contain.text', 'All links to change appointment details on NDelius open in a new tab.')
+    })
+  } else {
+    it('should display the manage appointment on NDelius link', () => {
+      manageAppointmentPage
+        .getAppointmentDetails()
+        .find('.govuk-body a')
+        .should('contain.text', 'Manage this appointment on NDelius (opens in a new tab)')
+        .should('have.attr', 'target', '_blank')
+        .should('have.attr', 'href', '#')
+    })
+  }
   if (deliusManaged && hasOutcome) {
     it('should display the outcome', () => {
       manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Outcome')
       manageAppointmentPage
         .getAppointmentDetailsListItem(1, 'value')
-        .should('contain.html', `<strong class="govuk-tag govuk-tag--${tagColour}">${outcomeStatus}</strong>`)
+        .should('contain.html', `<strong class="govuk-tag govuk-tag--${tagColour}`)
+        .should('contain.text', outcomeStatus)
       manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
     })
   }
   it('should display the date and time', () => {
-    const index = !deliusManaged ? 1 : 2
+    const index = !deliusManaged || (deliusManaged && !hasOutcome) ? 1 : 2
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
     manageAppointmentPage
       .getAppointmentDetailsListItem(index, 'value')
@@ -45,7 +73,7 @@ const checkAppointmentDetails = (
     }
   })
   it('should display the location', () => {
-    const index = !deliusManaged ? 2 : 3
+    const index = !deliusManaged || (deliusManaged && !hasOutcome) ? 2 : 3
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Location')
     manageAppointmentPage
       .getAppointmentDetailsListItem(index, 'value')
@@ -61,7 +89,7 @@ const checkAppointmentDetails = (
     }
   })
   it('should display the attending officer', () => {
-    const index = !deliusManaged ? 3 : 4
+    const index = !deliusManaged || (deliusManaged && !hasOutcome) ? 3 : 4
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Attending')
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Terry Jones')
     if (!deliusManaged) {
@@ -75,10 +103,16 @@ const checkAppointmentDetails = (
     }
   })
   if (notCompliedAbsence) {
-    it('should display the RAR activity', () => {
+    it(`should display the RAR activity as 'Not provided'`, () => {
       manageAppointmentPage.getAppointmentDetailsListItem(5, 'key').should('contain.text', 'RAR activity')
-      manageAppointmentPage.getAppointmentDetailsListItem(5, 'value').should('contain.text', 'RAR activity')
+      manageAppointmentPage.getAppointmentDetailsListItem(5, 'value').should('contain.text', 'Not provided')
       manageAppointmentPage.getAppointmentDetailsListItem(5, 'actions').should('not.exist')
+    })
+    it(`should display the RAR activity`, () => {
+      cy.task('stubAppointmentUnacceptableAbsenceWithRAR')
+      loadPage()
+      page = new ManageAppointmentPage()
+      manageAppointmentPage.getAppointmentDetailsListItem(5, 'value').should('contain.text', 'Stepping Stones')
     })
   }
   it('should display the VISOR report', () => {
@@ -97,77 +131,88 @@ const checkAppointmentDetails = (
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
   })
+  if (!notCompliedAbsence) {
+    it('should display the correct values if notes added to appointment', () => {
+      let index = 5
+      if (hasComplied) index = 6
+      if (notCompliedAbsence) index = 7
+      cy.task(withNotesTask ?? 'stubFutureAppointmentManagedTypeWithNotes')
+      loadPage()
+      page = new ManageAppointmentPage()
+      page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Appointment notes')
+      page
+        .getAppointmentDetailsListItem(index, 'value')
+        .find('.app-note')
+        .eq(0)
+        .find('p')
+        .eq(0)
+        .should('contain.text', 'Some notes')
+      page
+        .getAppointmentDetailsListItem(index, 'value')
+        .find('.app-note')
+        .eq(0)
+        .find('p')
+        .eq(1)
+        .should('contain.text', 'Comment added by Terry Jones on 6 April 2023')
+      page
+        .getAppointmentDetailsListItem(index, 'value')
+        .find('.app-note')
+        .eq(1)
+        .find('p')
+        .eq(0)
+        .should('contain.text', 'Some more notes')
+      page
+        .getAppointmentDetailsListItem(index, 'value')
+        .find('.app-note')
+        .eq(1)
+        .find('p')
+        .eq(1)
+        .should('contain.text', 'Comment added by Terry Jones on 7 April 2023')
+      if (!deliusManaged) {
+        page
+          .getAppointmentDetailsListItem(index, 'actions')
+          .find('a')
+          .should('contain.text', 'Add to notes')
+          .should('have.attr', 'href', '#')
+      }
+    })
 
-  it('should display the correct values if notes added to appointment', () => {
-    let index = 5
-    if (hasComplied) index = 6
-    if (notCompliedAbsence) index = 7
-    cy.task('stubFutureAppointmentManagedTypeWithNotes')
-    loadPage()
-    page = new ManageAppointmentPage()
-    page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Appointment notes')
-    page
-      .getAppointmentDetailsListItem(index, 'value')
-      .find('.app-note')
-      .eq(0)
-      .find('p')
-      .eq(0)
-      .should('contain.text', 'Some notes')
-    page
-      .getAppointmentDetailsListItem(index, 'value')
-      .find('.app-note')
-      .eq(0)
-      .find('p')
-      .eq(1)
-      .should('contain.text', 'Comment added by Terry Jones on 6 April 2023')
-    page
-      .getAppointmentDetailsListItem(index, 'value')
-      .find('.app-note')
-      .eq(1)
-      .find('p')
-      .eq(0)
-      .should('contain.text', 'Some more notes')
-    page
-      .getAppointmentDetailsListItem(index, 'value')
-      .find('.app-note')
-      .eq(1)
-      .find('p')
-      .eq(1)
-      .should('contain.text', 'Comment added by Terry Jones on 7 April 2023')
-    page
-      .getAppointmentDetailsListItem(index, 'actions')
-      .find('a')
-      .should('contain.text', 'Add to notes')
-      .should('have.attr', 'href', '#')
-  })
+    it('should display the correct values if no notes added to appointment', () => {
+      let index = 5
+      if (hasComplied) index = 6
+      if (notCompliedAbsence) index = 7
+      cy.task(noNotesTask ?? 'stubFutureAppointmentManagedTypeNoNotes')
+      loadPage()
+      page = new ManageAppointmentPage()
+      page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No notes')
+      if (!deliusManaged) {
+        page
+          .getAppointmentDetailsListItem(index, 'actions')
+          .find('a')
+          .should('contain.text', 'Change')
+          .should('have.attr', 'href', '#')
+      }
+    })
+  }
 
-  it('should display the correct values if no notes added to appointment', () => {
-    let index = 5
-    if (hasComplied) index = 6
-    if (notCompliedAbsence) index = 7
-    cy.task('stubPastAppointmentOutcomeNoNotes')
-    loadPage()
-    page = new ManageAppointmentPage()
-    page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No notes')
-    page
-      .getAppointmentDetailsListItem(index, 'actions')
-      .find('a')
-      .should('contain.text', 'Change')
-      .should('have.attr', 'href', '#')
-  })
   it('should display sensitive', () => {
     let index = 6
     if (hasComplied) index = 7
     if (notCompliedAbsence) index = 8
+    if (task) {
+      cy.task(task)
+    }
     loadPage()
     page = new ManageAppointmentPage()
     page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Sensitive')
     page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No')
-    page
-      .getAppointmentDetailsListItem(index, 'actions')
-      .find('a')
-      .should('contain.text', 'Change')
-      .should('have.attr', 'href', '#')
+    if (!deliusManaged) {
+      page
+        .getAppointmentDetailsListItem(index, 'actions')
+        .find('a')
+        .should('contain.text', 'Change')
+        .should('have.attr', 'href', '#')
+    }
   })
 }
 
@@ -664,12 +709,12 @@ describe('Manage an appointment', () => {
     it('should display the section title', () => {
       manageAppointmentPage.getAppointmentDetails().find('h3').should('contain.text', 'Appointment details')
     })
-    it('should display the text', () => {
-      manageAppointmentPage
-        .getAppointmentDetails()
-        .find('.govuk-body')
-        .should('contain.text', 'All links to change appointment details on NDelius open in a new tab.')
-    })
+    // it('should display the text', () => {
+    //   manageAppointmentPage
+    //     .getAppointmentDetails()
+    //     .find('.govuk-body')
+    //     .should('contain.text', 'All links to change appointment details on NDelius open in a new tab.')
+    // })
     describe('MPOP managed appointment', () => {
       checkAppointmentDetails()
     })
@@ -678,18 +723,38 @@ describe('Manage an appointment', () => {
         cy.task('stubAppointmentNDeliusManagedType')
         loadPage()
       })
-      checkAppointmentDetails({ deliusManagedType: true })
+      checkAppointmentDetails({
+        task: 'stubAppointmentNDeliusManagedType',
+        noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesNoOutcome',
+        withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesNoOutcome',
+        deliusManagedType: true,
+      })
     })
     describe('Delius managed appointment type, complied', () => {
       beforeEach(() => {
-        cy.task('stubAppointmentNDeliusManagedType')
+        cy.task('stubAppointmentNDeliusManagedTypeComplied')
         loadPage()
+      })
+      checkAppointmentDetails({
+        task: 'stubAppointmentNDeliusManagedTypeComplied',
+        noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesHasOutcome',
+        withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesHasOutcome',
+        deliusManagedType: true,
+        hasComplied: true,
       })
     })
     describe('Delius managed appointment, unacceptable absence', () => {
       beforeEach(() => {
-        cy.task('stubAppointmentNDeliusManagedType')
+        cy.task('stubAppointmentUnacceptableAbsenceNoNotes')
         loadPage()
+      })
+      checkAppointmentDetails({
+        task: 'stubAppointmentUnacceptableAbsenceNoNotes',
+        noNotesTask: 'stubAppointmentUnacceptableAbsenceNoNotes',
+        withNotesTask: 'stubAppointmentUnacceptableAbsenceWithNotes',
+        deliusManagedType: true,
+        hasComplied: false,
+        notCompliedAbsence: true,
       })
     })
   })

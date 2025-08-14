@@ -54,13 +54,13 @@
   {% set outcomeStatus = 'Complied' %}
   {% set outcomeTagColour = 'green' %}
 {% endif %}
-{% if appointment.hasOutcome and appointment.acceptableAbsence == false %}
+{% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == false %}
   {% set outcomeStatus = 'Unacceptable absence' %}
   {% set outcomeTagColour = 'red' %}
 {% endif %}
-{% if appointment.hasOutcome and appointment.acceptableAbsence == true %}
+{% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == true %}
   {% set outcomeStatus = 'Acceptable absence' %}
-  {% set outcomeTagColour = 'red' %}
+  {% set outcomeTagColour = 'green' %}
 {% endif %}
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
   {% set alert = "You must log an outcome and should add notes to this appointment." %}
@@ -184,7 +184,7 @@
           classes: "govuk-tag--" + outcomeTagColour
         })
       }
-    } if deliusManaged and appointment.hasOutcome,
+    } if (deliusManaged and appointment.hasOutcome) or appointment.acceptableAbsence == false,
     {
       key: {
         text: "Date and time"

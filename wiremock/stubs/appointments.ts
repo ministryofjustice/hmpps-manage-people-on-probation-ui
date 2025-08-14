@@ -8,7 +8,8 @@ interface Args {
   documents?: boolean
   notes?: boolean
   complied?: boolean
-  unacceptableAbsence?: boolean
+  acceptableAbsence?: boolean
+  rar?: boolean
 }
 
 const getAppointmentStub = (
@@ -18,7 +19,8 @@ const getAppointmentStub = (
     documents = false,
     notes = false,
     complied,
-    unacceptableAbsence,
+    acceptableAbsence,
+    rar = false,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -83,23 +85,12 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
   }
   if (isFuture) {
-    const startTime = DateTime.now().plus({ days: 1 }).toISO()
-    const endTime = DateTime.now().plus({ days: 1, hours: 1 }).toISO()
-    mapping.response.jsonBody.appointment.startDateTime = startTime
-    mapping.response.jsonBody.appointment.endDateTime = endTime
+    // const startTime = DateTime.now().plus({ days: 1 }).toISO()
+    // const endTime = DateTime.now().plus({ days: 1, hours: 1 }).toISO()
+    // mapping.response.jsonBody.appointment.startDateTime = startTime
+    // mapping.response.jsonBody.appointment.endDateTime = endTime
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
-  }
-  if (complied) {
-    mapping.response.jsonBody.appointment.hasOutcome = true
-    mapping.response.jsonBody.appointment.didTheyComply = true
-    mapping.response.jsonBody.appointment.wasAbsent = false
-  }
-  if (unacceptableAbsence) {
-    mapping.response.jsonBody.appointment.hasOutcome = true
-    mapping.response.jsonBody.appointment.didTheyComply = false
-    mapping.response.jsonBody.appointment.wasAbsent = true
-    mapping.response.jsonBody.appointment.acceptableAbsence = true
   }
   if (notes) {
     mapping.response.jsonBody.appointment.appointmentNotes = [
@@ -132,6 +123,23 @@ const getAppointmentStub = (
       },
     ]
   }
+  if (complied) {
+    mapping.response.jsonBody.appointment.isInPast = true
+    mapping.response.jsonBody.appointment.didTheyComply = true
+    mapping.response.jsonBody.appointment.hasOutcome = true
+  }
+  if (acceptableAbsence === false) {
+    mapping.response.jsonBody.appointment.isInPast = true
+    mapping.response.jsonBody.appointment.didTheyComply = false
+    mapping.response.jsonBody.appointment.wasAbsent = true
+    mapping.response.jsonBody.appointment.wasAbsent = true
+    mapping.response.jsonBody.appointment.acceptableAbsence = false
+    mapping.response.jsonBody.appointment.hasOutcome = true
+  }
+  if (rar === true) {
+    mapping.response.jsonBody.appointment.rarCategory = 'Stepping Stones'
+  }
+  console.dir(mapping, { depth: null })
   return mapping
 }
 
@@ -261,6 +269,56 @@ const stubAppointmentNDeliusManagedType = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ managedType: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubAppointmentNDeliusManagedTypeComplied = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: false, complied: true, isFuture: false })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNDeliusManagedTypeWithNotesHasOutcome = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: false, complied: true, isFuture: false, notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNDeliusManagedTypeWithNotesNoOutcome = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: false, isFuture: false, notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNDeliusManagedTypeNoNotesHasOutcome = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: false, complied: true, isFuture: false, notes: false })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNDeliusManagedTypeNoNotesNoOutcome = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: false, isFuture: false, notes: false })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentUnacceptableAbsenceWithRAR = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    managedType: false,
+    isFuture: false,
+    notes: false,
+    rar: true,
+    acceptableAbsence: false,
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentUnacceptableAbsenceNoNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    managedType: true,
+    complied: false,
+    isFuture: false,
+    acceptableAbsence: false,
+    notes: false,
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentUnacceptableAbsenceWithNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    managedType: true,
+    complied: false,
+    isFuture: false,
+    acceptableAbsence: false,
+    notes: true,
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubNotComNoNextAppointment = (): SuperAgentRequest => {
   const stub = getNextAppointmentWithComStub({ appointment: false, loggedInUserIsCOM: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -340,6 +398,14 @@ export default {
   stubPastAppointmentOutcomeNoNotes,
   stubPastAppointmentWithNotes,
   stubAppointmentNDeliusManagedType,
+  stubAppointmentNDeliusManagedTypeComplied,
+  stubAppointmentNDeliusManagedTypeWithNotesNoOutcome,
+  stubAppointmentNDeliusManagedTypeWithNotesHasOutcome,
+  stubAppointmentNDeliusManagedTypeNoNotesNoOutcome,
+  stubAppointmentNDeliusManagedTypeNoNotesHasOutcome,
+  stubAppointmentUnacceptableAbsenceWithNotes,
+  stubAppointmentUnacceptableAbsenceNoNotes,
+  stubAppointmentUnacceptableAbsenceWithRAR,
   stubNotComNoNextAppointment,
   stubNotComNextAppointment,
   stubNotComNoNextAppointmentAtHome,
