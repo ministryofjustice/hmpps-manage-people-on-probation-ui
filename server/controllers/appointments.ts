@@ -36,13 +36,15 @@ const appointmentsController: Controller<typeof routes> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming'),
-        masClient.getPersonSchedule(crn, 'previous'),
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
+      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, personRisks] =
+        await Promise.all([
+          masClient.getPersonSchedule(crn, 'upcoming'),
+          masClient.getPersonSchedule(crn, 'previous'),
+          arnsClient.getRisks(crn),
+          tierClient.getCalculationDetails(crn),
+          arnsClient.getPredictorsAll(crn),
+          masClient.getPersonRiskFlags(crn),
+        ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
 
@@ -53,6 +55,7 @@ const appointmentsController: Controller<typeof routes> = {
         tierCalculation,
         risksWidget,
         predictorScores,
+        personRisks,
       })
     }
   },

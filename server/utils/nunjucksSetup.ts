@@ -54,6 +54,7 @@ import {
   isNotNull,
   decorateFormAttributes,
   groupByLevel,
+  getStaffRisk,
   hasValue,
   riskLevelLabel,
   toErrorList,
@@ -141,6 +142,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
 
   njkEnv.addFilter('dateWithYearShortMonthAndTime', dateWithYearShortMonthAndTime)
   njkEnv.addGlobal('groupByLevel', groupByLevel)
+  njkEnv.addGlobal('getStaffRisk', getStaffRisk)
   njkEnv.addGlobal('getComplianceStatus', getComplianceStatus)
   njkEnv.addGlobal('timeFromTo', timeFromTo)
   njkEnv.addGlobal('getRisksWithScore', getRisksWithScore)

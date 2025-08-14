@@ -185,7 +185,7 @@
             },
             {
               "id": 3,
-              "description": "Risk to Known Adult",
+              "description": "Risk to Staff",
               "level": "LOW",
               "notes": "Some notes",
               "nextReviewDate": "2025-08-18",
@@ -376,7 +376,7 @@
           },
           "riskFlag": {
             "id": 3,
-            "description": "Risk to Known Adult",
+            "description": "Risk to Staff",
             "notes": "Some notes",
             "nextReviewDate": "2025-08-18",
             "mostRecentReviewDate": "2023-12-18",
