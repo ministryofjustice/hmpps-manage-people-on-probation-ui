@@ -129,18 +129,18 @@
                             {
                                 text: "Appointment type",
                                 classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": "none" }
+                                attributes: { "aria-sort": setSortOrder('appointment', sortedBy) , 'col-name': 'appointment', 'data-qa': 'appointmentHeader', 'data-sort-name': 'appointment', 'data-sort-action': 'upcoming-appointments' }
                             },
                             {
                                 text: "Date",
                                 classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": "none" },
+                                attributes: { "aria-sort": setSortOrder('date', sortedBy) , 'col-name': 'date', 'data-qa': 'appointmentHeader', 'data-sort-name': 'date', 'data-sort-action': 'upcoming-appointments' },
                                 format: "numeric"
                             },
                             {
                                 text: "Time",
                                 classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": "none" },
+                                attributes: { "aria-sort": setSortOrder('time', sortedBy) , 'col-name': 'time', 'data-qa': 'appointmentHeader', 'data-sort-name': 'time', 'data-sort-action': 'upcoming-appointments' },
                                 format: "numeric"
                             },
                             {

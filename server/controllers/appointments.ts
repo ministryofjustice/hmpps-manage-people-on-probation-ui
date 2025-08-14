@@ -38,8 +38,8 @@ const appointmentsController: Controller<typeof routes> = {
       })
 
       const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming'),
-        masClient.getPersonSchedule(crn, 'previous'),
+        masClient.getPersonSchedule(crn, 'upcoming', '0'),
+        masClient.getPersonSchedule(crn, 'previous', '0'),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
@@ -59,13 +59,16 @@ const appointmentsController: Controller<typeof routes> = {
   },
   getAllUpcomingAppointments: hmppsAuthClient => {
     return async (req, res) => {
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.desc'
+      const sortField = sortedBy === 'time' ? 'date' : sortedBy
+
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_APPOINTMENTS',
+        action: 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
@@ -74,7 +77,7 @@ const appointmentsController: Controller<typeof routes> = {
       })
 
       const [upcomingAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming'),
+        masClient.getPersonSchedule(crn, 'upcoming', '0', sortField),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
@@ -88,6 +91,7 @@ const appointmentsController: Controller<typeof routes> = {
         tierCalculation,
         risksWidget,
         predictorScores,
+        sortedBy,
       })
     }
   },
@@ -134,7 +138,7 @@ const appointmentsController: Controller<typeof routes> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const schedule = await masClient.getPersonSchedule(crn, 'previous')
+      const schedule = await masClient.getPersonSchedule(crn, 'previous', '0')
       res.render('pages/appointments/record-an-outcome', {
         schedule,
         crn,
@@ -152,7 +156,7 @@ const appointmentsController: Controller<typeof routes> = {
       if (appointmentId == null) {
         logger.info('Appointment not selected')
         errorMessages.appointment = { text: 'Please select an appointment' }
-        const schedule = await masClient.getPersonSchedule(crn, 'previous')
+        const schedule = await masClient.getPersonSchedule(crn, 'previous', '0')
         res.render('pages/appointments/record-an-outcome', {
           errorMessages,
           schedule,

@@ -114,8 +114,8 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENTS', uuidv4(), crn, 'CRN')
     it('should request previous and upcoming appointments from the api', () => {
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming')
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
     it('should request risks from the api', () => {
       expect(getRisksSpy).toHaveBeenCalledWith(crn)
@@ -186,7 +186,7 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
     it('should request previous appointments from the api', () => {
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
@@ -218,7 +218,7 @@ describe('controllers/appointments', () => {
         expect(loggerSpy).toHaveBeenCalledWith('Appointment not selected')
       })
       it('should request previous appointments from the api', () => {
-        expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+        expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
       })
       it('should render the record an outcome page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
