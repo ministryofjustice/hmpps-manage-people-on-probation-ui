@@ -107,7 +107,12 @@ context('Appointment', () => {
     )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url(2))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url(4))
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 5, 1, '/manage/appointment/5')
+    page.assertAnchorElementAtIndexWithin(
+      '[class="govuk-table__row"]',
+      5,
+      1,
+      '/case/X000001/appointments/appointment/5',
+    )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
 
