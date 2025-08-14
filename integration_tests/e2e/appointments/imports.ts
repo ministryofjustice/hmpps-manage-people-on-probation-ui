@@ -376,6 +376,11 @@ export const checkAppointmentDetails = (
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
+        .should(
+          'have.attr',
+          'href',
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
+        )
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
@@ -392,6 +397,11 @@ export const checkAppointmentDetails = (
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
+        .should(
+          'have.attr',
+          'href',
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
+        )
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
@@ -406,6 +416,11 @@ export const checkAppointmentDetails = (
         .find('a')
         .should('contain.text', 'Change on NDelius')
         .should('have.attr', 'target', '_blank')
+        .should(
+          'have.attr',
+          'href',
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
+        )
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }

@@ -1,8 +1,11 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkAppointmentDetails } from './imports'
 
+const crn = 'X778160'
+const appointmentId = '6'
+
 const loadPage = () => {
-  cy.visit('/case/X778160/appointments/appointment/6/manage')
+  cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
 }
 
 describe('Manage an appointment', () => {
@@ -78,7 +81,11 @@ describe('Manage an appointment', () => {
         .find('.govuk-inset-text a')
         .should('contain.text', 'use NDelius to log non-attendance or non-compliance (opens in new tab)')
         .should('have.attr', 'target', '_blank')
-        .should('have.attr', 'href', '#')
+        .should(
+          'have.attr',
+          'href',
+          `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=${crn}&contactID=${appointmentId}`,
+        )
     })
 
     describe('Log attended and complied appointment', () => {
@@ -119,7 +126,7 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getTaskLink(1)
             .should('contain.text', name)
-            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/record-an-outcome')
+            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/record-an-outcome`)
         })
         it(`should display the status as 'Not started'`, () => {
           manageAppointmentPage

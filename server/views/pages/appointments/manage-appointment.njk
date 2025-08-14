@@ -106,7 +106,7 @@
         <section data-qa="appointmentActions">
           <h3 class="govuk-heading-m">Appointment actions</h3>
           {{ govukInsetText({
-  html: 'You must <a href="#" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
+  html: 'You must <a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
 }) }}
           {{ govukTaskList({
   idPrefix: "appointment-actions",
@@ -194,7 +194,7 @@
       actions: {
         items: [
           {
-            href: "#",
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
             text: "Change on NDelius",
             visuallyHiddenText: "(opens in new tab)",
             attributes: {
@@ -215,7 +215,7 @@
       actions: {
         items: [
           {
-            href: "#",
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
             text: "Change on NDelius",
             visuallyHiddenText: "(opens in new tab)",
             attributes: {
@@ -236,7 +236,7 @@
       actions: {
         items: [
           {
-            href: "#",
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
             text: "Change on NDelius",
             visuallyHiddenText: "(opens in new tab)",
             attributes: {
