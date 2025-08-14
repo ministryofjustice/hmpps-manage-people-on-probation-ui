@@ -33,8 +33,7 @@ context('Interventions', () => {
   })
 
   it('Interventions page is rendered with no results', () => {
-    cy.task('stubNoInterventions')
-    cy.visit('/case/X000001/interventions')
+    cy.visit('/case/X777916/interventions')
     cy.get('h2').should('contain.text', 'Interventions')
     cy.get('p').should('contain.text', 'There may be interventions in place but we cannot yet display them.')
     cy.get('p')
@@ -43,7 +42,22 @@ context('Interventions', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000001',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X777916',
+      )
+      .should('have.attr', 'target', '_blank')
+  })
+
+  it('Interventions page is rendered with error results', () => {
+    cy.visit('/case/X000002/interventions')
+    cy.get('h2').should('contain.text', 'Interventions')
+    cy.get('p').should('contain.text', 'There may be interventions in place but we cannot yet display them.')
+    cy.get('p')
+      .find('a')
+      .should('contain.text', 'Search the contact log on NDelius (opens in new tab)')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X000002',
       )
       .should('have.attr', 'target', '_blank')
   })
