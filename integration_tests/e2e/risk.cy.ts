@@ -161,7 +161,7 @@ context('Risk', () => {
   it('Risk Detail page is rendered with expired review date', () => {
     cy.visit('/case/X000001/risk/flag/1')
     const page = new RiskDetailPage()
-    page.setPageTitle('Restraining Order')
+    page.setPageTitle('Risk to Staff')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
   })
   it('Risk page is rendered with create a risk assessment on OASys link', () => {

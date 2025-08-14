@@ -84,7 +84,7 @@ describe('Arrange an appointment', () => {
       it('should render the page', () => {
         cy.task('stubOverviewVisorRegistration')
         loadPage()
-        cy.get('[data-qa="visorReport"] legend').should('contain.text', 'Include appointment in VISOR report?')
+        cy.get('[data-qa="visorReport"] legend').should('contain.text', 'Include appointment in ViSOR report?')
         cy.get('[data-qa="visorReport"] .govuk-hint').should(
           'contain.text',
           'This will add the appointment to their record on the ViSOR secure national database.',

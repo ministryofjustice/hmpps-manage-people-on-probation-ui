@@ -1,14 +1,17 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
 {% set currentNavSection = 'appointments' %}
 {% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
+{% set personForename = upcomingAppointments.personSummary.name.forename %}
 {% set headerCRN = upcomingAppointments.personSummary.crn %}
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
 {% set totalUpcomingAppointments = upcomingAppointments.personSchedule.totalResults %}
+{% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
 {% set pastAppointments = pastAppointments.personSchedule.appointments %}
 {% set upcomingAppointmentRows = [] %}
@@ -136,6 +139,18 @@
 {% endblock %}
 
 {% block pageContent %}
+  {% if riskToStaff.level == 'HIGH' or riskToStaff.level == 'MEDIUM' %}
+    {% set html %}
+    <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ personForename }}&apos;s risk to staff flag</a>
+    {% endset %}
+    {{ mojAlert({
+      variant: "warning",
+      title: personForename + " is " + riskLevelLabel(riskToStaff.level).toLowerCase() + " risk to staff ",
+      showTitleAsHeading: true,
+      dismissible: false,
+      html: html
+    }) }}
+  {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
