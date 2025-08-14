@@ -40,6 +40,8 @@ context('Appointment', () => {
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
 
+    page.getAlert().should('contain.text', 'high')
+
     page
       .upcomingAppointmentAction(1)
       .find('a')
@@ -67,6 +69,8 @@ context('Appointment', () => {
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')
     page.assertRiskTags()
+
+    page.getAlert().should('contain.text', 'high')
 
     cy.get('[data-qa="upcomingAppointments"] th').eq(0).should('contain.text', 'Appointment type')
     cy.get('[data-qa="upcomingAppointments"] th').eq(1).should('contain.text', 'Date')

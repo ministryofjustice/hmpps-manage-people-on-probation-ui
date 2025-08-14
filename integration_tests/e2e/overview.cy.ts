@@ -114,6 +114,8 @@ context('Overview', () => {
 
     page.getElementData('overallRiskValue').should('contain.text', 'VERY HIGH RISK OF SERIOUS HARM')
 
+    page.getAlert().should('contain.text', 'high')
+
     const expected =
       '{"name":"Wolff,Caroline","crn":"X000001","dob":"9 January 2002","age":"22","tierScore":"B2","sentence":"12 month Community order"}'
 
