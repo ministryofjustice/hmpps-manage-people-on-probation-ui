@@ -114,18 +114,22 @@
   {% if appointment.type.isPersonLevelContact %}
     {% set allSentences = (allSentences.push(
     {
-    text: appointment.meta.forename,
-    value: 'PERSON_LEVEL_CONTACT',
-    attributes: {
-    'data-qa': 'personLevelContact',
-    'data-sentence': 'true',
-    'data-reset-conditional-radios': ''
-    },
-    label: {
-      attributes: {
-'data-qa': 'personLevelContactLabel'
-      }
-    }
+        text: appointment.meta.forename,
+        value: 'PERSON_LEVEL_CONTACT',
+        attributes: {
+            'data-qa': 'personLevelContact',
+            'data-sentence': 'true',
+            'data-reset-conditional-radios': ''
+        },
+        label: {
+            classes: 'govuk-!-font-weight-bold',
+            attributes: {
+                'data-qa': 'personLevelContactLabel'
+            }
+        },
+        hint: {
+            text: 'Relates to the person.'
+        }
     }), allSentences) %}
   {% endif %}
   {{ govukRadios({
