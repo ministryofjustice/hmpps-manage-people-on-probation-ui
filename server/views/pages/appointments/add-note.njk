@@ -1,0 +1,85 @@
+{% extends "../_form.njk" %}
+
+{% set title = 'Add a note (optional)' %}
+{% set multipartForm = true %}
+{% set backLink = change if change else 
+    '/case/' + crn + '/appointments/appointment/' + id + '/manage/' + back %}
+{% block form %}
+    <h2 class="govuk-heading-m" data-qa="pageHeading">Add a note</h2>
+    <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
+    {{ govukTextarea({
+    id: "notes",
+    name: "notes",
+    formGroup: {
+        attributes: { "data-qa": "notes"}
+    }
+} | decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
+
+    {% set uploadHtml %}
+    <div class="govuk-grid-row govuk-body">
+        <div class="govuk-grid-column-full">
+
+            {{ govukFileUpload({
+                            id: "file-upload-1",
+                            name: "fileName",
+                            classes: 'moj-multi-file-upload__input',
+                            label: {
+                                text: "Upload or drag and drop documents",
+                                classes: 'govuk-label--m'
+                            },
+                            attributes: { multiple: '' },
+                            errorMessage: {
+                                text: "Please select a file"
+                            } 
+                        }) }}
+
+            {{ govukButton({
+                            text: 'Upload file',
+                            classes: 'govuk-button--secondary moj-multi-file-upload__button'
+                        }) }}
+        </div>
+    </div>
+    {% endset %}
+
+    {{ mojMultiFileUpload({
+                        id: "file-upload-1",
+                        name: "fileName",
+                        label: { text: "Upload or drag and drop documents" },
+                        uploadedFiles: {
+                            heading: { text: 'Documents added' },
+                            items: uploadedFiles
+                        },
+                        uploadHtml: uploadHtml,
+                        errorMessage: {
+                            text: "Please select a file"
+                        } 
+                    }) }}
+
+    {{ govukRadios({
+    fieldset: {
+        legend: {
+            text: 'Does this appointment include sensitive information?',
+            classes: "govuk-fieldset__legend--l",
+            isPageHeading: false
+        }
+    },
+    formGroup: {
+        attributes: {
+            'data-qa': 'sensitiveInformation'
+        }
+    },
+    hint: {
+        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+    },
+    items: [
+        {
+            value: 'Yes',
+            text: "Yes, it includes sensitive information"
+        },
+        {
+            value: 'No',
+            text: "No, it is not sensitive"
+        }
+    ]
+} | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
+{% endblock %}

@@ -14,6 +14,8 @@ const routes = [
   'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
+  'getAddNote',
+  'postAddNote',
   'getManageAppointment',
 ] as const
 
@@ -90,6 +92,14 @@ const appointmentsController: Controller<typeof routes> = {
   getManageAppointment: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId } = req.params
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MANAGE_APPOINTMENT',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -115,11 +125,11 @@ const appointmentsController: Controller<typeof routes> = {
       })
     }
   },
-  getRecordAnOutcome: hmppsAuthClient => {
+  getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        action: 'UPDATE_APPOINTMENT_OUTCOME',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
@@ -142,6 +152,40 @@ const appointmentsController: Controller<typeof routes> = {
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
         outcomeRecorded: true,
+      }
+      await masClient.patchAppointment(body)
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+    }
+  },
+  getAddNote: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      await auditService.sendAuditMessage({
+        action: 'ADD_APPOINTMENT_NOTES',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      return res.render('pages/appointments/add-note', {
+        crn,
+      })
+    }
+  },
+  postAddNote: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, contactId: id } = req.params
+      if (!isValidCrn(crn) || !isNumericString(id)) {
+        return renderError(404)(req, res)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const body: AppointmentPatch = {
+        id: parseInt(id, 10),
+        notes: '',
+        files: [],
+        sensitive: false,
       }
       await masClient.patchAppointment(body)
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)

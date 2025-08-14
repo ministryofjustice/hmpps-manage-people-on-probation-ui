@@ -23,7 +23,7 @@
             </h2>
           {% endif %}
         {% endblock %}
-        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}">
+        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %}>
           <input type="hidden" name="_csrf" value="{{ csrfToken }}">
           {% block form %}{% endblock %}
           {% if not hideButton %}

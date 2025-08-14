@@ -28,7 +28,9 @@
 {% from "_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 {% from "govuk/components/task-list/macro.njk" import govukTaskList %}
-{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "moj/components/multi-file-upload/macro.njk" import mojMultiFileUpload -%}
 
 {% block head %}
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>

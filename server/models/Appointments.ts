@@ -97,9 +97,10 @@ export interface CheckAppointment {
 
 export interface AppointmentPatch {
   id: number
-  outcomeRecorded: boolean
-  notes?: string
+  outcomeRecorded?: boolean
   visorReport?: boolean
+  notes?: string
+  files?: string[]
   sensitive?: boolean
 }
 
