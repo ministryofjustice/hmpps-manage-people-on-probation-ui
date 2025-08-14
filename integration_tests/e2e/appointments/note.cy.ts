@@ -55,4 +55,10 @@ describe('Add a note', () => {
     const checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
     checkYourAnswersPage.checkOnPage()
   })
+  it('should check for correct text', () => {
+    cy.get('[data-qa="visorReport"]').should(
+      'contain.text',
+      'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.',
+    )
+  })
 })
