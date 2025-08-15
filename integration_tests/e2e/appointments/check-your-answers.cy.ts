@@ -87,13 +87,13 @@ describe('Check your answers then confirm the appointment', () => {
     cy.get('[data-qa="appointmentNsi"]').should('contain.text', 'BRE description')
   })
 
-  // it('should render the page with personal contact', () => {
-  //   loadPage({ hasVisor: false, typeOptionIndex: 5, sentenceOptionIndex: 4 })
-  //   cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
-  //   cy.get('[data-qa="appointmentSentence"]').should('not.exist')
-  //   cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
-  //   cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
-  // })
+  it('should render the page with personal contact', () => {
+    loadPage({ hasVisor: false, typeOptionIndex: 5, sentenceOptionIndex: 4 })
+    cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
+    cy.get('[data-qa="appointmentSentence"]').should('not.exist')
+    cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
+    cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
+  })
 
   it('should render the page when repeating appointment featureflag is toggled off', () => {
     cy.task('stubNoRepeats')
