@@ -2,7 +2,7 @@
 {% from "_components/compliance-tag/macro.njk" import appComplianceTag %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
-{% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
+{% set pageTitle = makePageTitle({pageHeading: "Upcoming appointments"}) %}
 {% set currentNavSection = 'appointments' %}
 {% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
 {% set headerCRN = upcomingAppointments.personSummary.crn %}
@@ -70,7 +70,7 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
-                <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
+                <h2 class="govuk-heading-m" id="section1">All upcoming appointments</h2>
                 {% if upcomingAppointments.length == 0 %}
                     <p>There are no upcoming appointments.</p>
                 {% else %}

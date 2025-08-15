@@ -13,7 +13,7 @@ context('All Upcoming Appointment', () => {
     page.headerName().should('contain.text', 'Eula Schmeler')
     page.assertRiskTags()
 
-    page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'Upcoming appointments')
+    page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'All upcoming appointments')
     page.upcomingAppointmentDate(1).should('contain.text', '22 December 2044')
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
