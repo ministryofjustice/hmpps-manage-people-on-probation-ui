@@ -28,22 +28,7 @@ export const getUuid = () => {
   })
 }
 
-export const completeTypePage = (
-  index = 1,
-  query = '',
-  hasVisor = false,
-  crnOverride = '',
-  dateOverride?: DateTime<true>,
-) => {
-  const tomorrow = DateTime.now().plus({ days: 1 }).set({
-    hour: 9,
-    minute: 30,
-    second: 0,
-    millisecond: 0,
-  })
-  const setDate = dateOverride ?? tomorrow
-  cy.clock(setDate.toMillis())
-  cy.visit(`/case/${crnOverride || crn}/arrange-appointment/${uuid}/type${query}`, { failOnStatusCode: false })
+export const completeTypePage = (index = 1, hasVisor = false) => {
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', index).click()
   if (hasVisor) {
@@ -52,7 +37,16 @@ export const completeTypePage = (
   typePage.getSubmitBtn().click()
 }
 
-export const completeSentencePage = (eventIndex = 1, crnOverride = '') => {
+export const completeSentencePage = (eventIndex = 1, query = '', crnOverride = '', dateOverride?: DateTime<true>) => {
+  const tomorrow = DateTime.now().plus({ days: 1 }).set({
+    hour: 9,
+    minute: 30,
+    second: 0,
+    millisecond: 0,
+  })
+  const setDate = dateOverride ?? tomorrow
+  cy.clock(setDate.toMillis())
+  cy.visit(`/case/${crnOverride || crn}/arrange-appointment/${uuid}/sentence${query}`, { failOnStatusCode: false })
   const sentencePage = new AppointmentSentencePage()
   const suffix = eventIndex !== 1 ? `-${eventIndex}` : ''
   sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-eventId${suffix}`).click()

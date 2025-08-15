@@ -21,9 +21,9 @@ const id = 'this-appointment'
 const repeatId = 'repeat-appointments'
 
 const loadPage = (repeat = 2) => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type`)
-  completeTypePage()
+  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()

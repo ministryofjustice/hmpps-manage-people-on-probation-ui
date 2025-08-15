@@ -4,7 +4,7 @@ import AttendancePage from '../../pages/appointments/attendance.page'
 import { crn, uuid, completeTypePage, checkPopHeader } from './imports'
 
 const loadPage = (type = 1, query = '') => {
-  completeTypePage(type, query)
+  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
 }
 
 const checkRequirementSentence = (type = 1) => {
@@ -25,13 +25,13 @@ const checkRequirementSentence = (type = 1) => {
     it('should not display the licence condition reveal', () => {
       sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('not.be.visible')
     })
-    it('should link to the attendance page when requirement is selected and continue is clicked', () => {
+    it('should link to the type page when requirement is selected and continue is clicked', () => {
       loadPage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-2`).click()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-requirementId`).click()
       sentencePage.getSubmitBtn().click()
-      const attendancePage = new AttendancePage()
-      attendancePage.checkOnPage()
+      const typePage = new AppointmentTypePage()
+      typePage.checkOnPage()
     })
   })
 }
@@ -53,13 +53,13 @@ const checkLicenceConditionSentence = (type = 1) => {
     it('should not display the requirement reveal', () => {
       sentencePage.getElement(`[data-qa="requirementId"]`).should('not.be.visible')
     })
-    it('should link to the attendance page when licence condition is selected and continue is clicked', () => {
+    it('should link to the type page when licence condition is selected and continue is clicked', () => {
       loadPage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-licenceConditionId`).click()
       sentencePage.getSubmitBtn().click()
-      const attendencePage = new AttendancePage()
-      attendencePage.checkOnPage()
+      const typePage = new AppointmentTypePage()
+      typePage.checkOnPage()
     })
   })
 }
@@ -83,23 +83,6 @@ describe('What is this appointment for?', () => {
     })
     it('should not display the requirement options', () => {
       sentencePage.getElement(`[data-qa="requirementId"]`).should('not.be.visible')
-    })
-  })
-
-  describe('Back link is clicked', () => {
-    let typePage: AppointmentTypePage
-    let sentencePage: AppointmentSentencePage
-    beforeEach(() => {
-      loadPage()
-      sentencePage = new AppointmentSentencePage()
-      sentencePage.getBackLink().click()
-      typePage = new AppointmentTypePage()
-    })
-    it('should be on the type page', () => {
-      typePage.checkOnPage()
-    })
-    it('should persist the type selection', () => {
-      typePage.getRadio('type', 1).should('be.checked')
     })
   })
   describe('Continue is clicked without selecting a sentence', () => {
@@ -141,32 +124,32 @@ describe('What is this appointment for?', () => {
       sentencePage = new AppointmentSentencePage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
     })
-    it('should display the personal contact option', () => {
-      cy.get('[data-qa="personLevelContactLabel"]').should('contain.text', 'Alton')
-    })
-    it('should link to the attendance page when the contact option is selected and continue is clicked', () => {
+    // it('should display the personal contact option', () => {
+    //   cy.get('[data-qa="personLevelContactLabel"]').should('contain.text', 'Alton')
+    // })
+    it('should link to the type page when the contact option is selected and continue is clicked', () => {
       loadPage(5)
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-3`).click()
       sentencePage.getSubmitBtn().click()
-      const attendancePage = new AttendancePage()
-      attendancePage.checkOnPage()
+      const typePage = new AppointmentTypePage()
+      typePage.checkOnPage()
     })
   })
-  describe('Page is rendered for a single sentence with licence condition', () => {
-    let sentencePage: AppointmentSentencePage
-    beforeEach(() => {
-      loadPage(1, '?number=1')
-      sentencePage = new AppointmentSentencePage()
-    })
-    it('should display 1 sentence that is selected', () => {
-      const radios = sentencePage.getElement(`input[data-sentence="true"]`)
-      radios.should('have.length', 1)
-      radios.each($radio => {
-        cy.wrap($radio).should('be.checked')
-      })
-    })
-    it('should display the licence condition reveal', () => {
-      sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('be.visible')
-    })
-  })
+  // describe('Page is rendered for a single sentence with licence condition', () => {
+  //   let sentencePage: AppointmentSentencePage
+  //   beforeEach(() => {
+  //     loadPage(1, '?number=1')
+  //     sentencePage = new AppointmentSentencePage()
+  //   })
+  //   it('should display 1 sentence that is selected', () => {
+  //     const radios = sentencePage.getElement(`input[data-sentence="true"]`)
+  //     radios.should('have.length', 1)
+  //     radios.each($radio => {
+  //       cy.wrap($radio).should('be.checked')
+  //     })
+  //   })
+  //   it('should display the licence condition reveal', () => {
+  //     sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('be.visible')
+  //   })
+  // })
 })

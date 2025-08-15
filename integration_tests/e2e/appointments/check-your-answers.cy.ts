@@ -29,8 +29,8 @@ const loadPage = ({
   repeatAppointments = true,
   notes = true,
 } = {}) => {
-  completeTypePage(typeOptionIndex, '', hasVisor)
-  completeSentencePage(sentenceOptionIndex)
+  completeSentencePage(sentenceOptionIndex, '')
+  completeTypePage(typeOptionIndex, hasVisor)
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
