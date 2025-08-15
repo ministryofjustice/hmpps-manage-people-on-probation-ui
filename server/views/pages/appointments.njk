@@ -1,4 +1,5 @@
 {% extends "../partials/case.njk" %}
+{% from "_components/compliance-tag/macro.njk" import appComplianceTag %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
@@ -34,6 +35,12 @@
 
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
+    {% set appointmentDetails %}
+      <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+        {{ appointment.type }}
+        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      </a>
+    {% endset %}
     {% set actionsButton %}
       {% if not appointment.deliusManaged %}
         <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
@@ -44,7 +51,7 @@
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
       {
-        html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
+        html: appointmentDetails,
         attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
       },
       {
@@ -69,6 +76,13 @@
 {% if pastAppointments.length > 0 %}
   {% for appointment in pastAppointments %}
 
+    {% set appointmentDetails %}
+      <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+        {{ appointment.type }}
+        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      </a>
+    {% endset %}
+
     {% set actionsButton %}
       {% if not appointment.deliusManaged %}
         <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
@@ -79,7 +93,7 @@
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
       {
-        html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
+        html: appointmentDetails,
         attributes: { "data-qa":"pastAppointmentType"+loop.index }
       },
       {
