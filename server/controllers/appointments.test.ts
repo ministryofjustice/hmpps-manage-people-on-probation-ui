@@ -138,6 +138,43 @@ describe('controllers/appointments', () => {
     })
   })
 
+  describe('get upcoming appointments', () => {
+    beforeEach(async () => {
+      await controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS', uuidv4(), crn, 'CRN')
+    it('should request previous and upcoming appointments from the api', () => {
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', '&sortBy=date&ascending=true')
+    })
+    it('should request risks from the api', () => {
+      expect(getRisksSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request tier calculation details from the api', () => {
+      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request predictors from the api', () => {
+      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should render the appointments page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
+        upcomingAppointments: mockPersonSchedule,
+        crn,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+        sortedBy: 'date.asc',
+        pagination: {
+          from: '1',
+          items: [],
+          next: undefined,
+          prev: undefined,
+          to: '0',
+          total: '0',
+        },
+      })
+    })
+  })
+
   describe('post appointments', () => {
     beforeEach(() => {
       jest.clearAllMocks()
