@@ -65,15 +65,18 @@ const appointmentsController: Controller<typeof routes> = {
   },
   getAllUpcomingAppointments: hmppsAuthClient => {
     return async (req, res) => {
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.desc'
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
+      const [sortName, sortDirection] = sortedBy.split('.')
+      const isAscending: boolean = sortDirection === 'asc'
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-      const sortField = sortedBy === 'time' ? 'date' : sortedBy
-
+      const sortQuery =
+        sortName === 'time' ? `&sortBy=date&ascending=${isAscending}` : `&sortBy=${sortName}&ascending=${isAscending}`
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
+
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS',
         who: res.locals.user.username,
@@ -84,7 +87,7 @@ const appointmentsController: Controller<typeof routes> = {
       })
 
       const [upcomingAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortField),
+        masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortQuery),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),

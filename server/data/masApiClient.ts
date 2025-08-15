@@ -193,9 +193,9 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/personal-details/${crn}/document/${documentId}`, raw: true, responseType: 'arrayBuffer' })
   }
 
-  async getPersonSchedule(crn: string, type: string, page: string, sortBy?: string): Promise<Schedule> {
-    const pageQuery = `?${sortBy ? new URLSearchParams({ size: '10', page, sortBy }).toString() : new URLSearchParams({ size: '10', page }).toString()}`
-    return this.get({ path: `/schedule/${crn}/${type}${pageQuery}`, handle404: false })
+  async getPersonSchedule(crn: string, type: string, page: string, sortQuery?: string): Promise<Schedule> {
+    const queryParameters = `?${new URLSearchParams({ size: '10', page }).toString()}${sortQuery ?? ''}`
+    return this.get({ path: `/schedule/${crn}/${type}${queryParameters}`, handle404: false })
   }
 
   async getPersonAppointment(crn: string, appointmentId: string): Promise<PersonAppointment | null> {
