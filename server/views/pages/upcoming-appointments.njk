@@ -1,0 +1,114 @@
+{% extends "../partials/case.njk" %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+{% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
+{% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
+{% set currentNavSection = 'appointments' %}
+{% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
+{% set headerCRN = upcomingAppointments.personSummary.crn %}
+{% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
+{% set offenderId = upcomingAppointments.personSummary.offenderId %}
+{% set headerGender = upcomingAppointments.personSummary.gender %}
+{% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
+{% set pastAppointments = pastAppointments.personSchedule.appointments %}
+{% set upcomingAppointmentRows = [] %}
+{% set pastAppointmentRows = [] %}
+{% set hidePageHeader = true %}
+
+{% if upcomingAppointments.length > 0 %}
+    {% for appointment in upcomingAppointments %}
+        {% set actionsButton %}
+            {% if not appointment.deliusManaged %}
+                <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+            {% else %}
+                <a class="govuk-link govuk-link--no-visited-state" target="_blank"
+                   href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
+                   aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span
+                            class="govuk-visually-hidden"> (opens in new tab)</span></a>
+            {% endif %}
+        {% endset %}
+
+        {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
+            {
+                html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
+                attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
+            },
+            {
+                text: appointment.startDateTime | dateWithYear,
+                format: "numeric",
+                attributes: { "data-qa":"upcomingAppointmentDate"+loop.index }
+            },
+            {
+                text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
+                format: "numeric",
+                attributes: { "data-qa":"upcomingAppointmentTime"+loop.index }
+            },
+            {
+                html: actionsButton,
+                format: "numeric",
+                attributes: {"data-qa": "upcomingAppointmentAction" + loop.index }
+            }
+        ]), upcomingAppointmentRows) %}
+    {% endfor %}
+{% endif %}
+
+{% block beforeContent %}
+    {{ govukBackLink({
+        href: ('/case/' + crn + '/appointments')
+    }) }}
+{% endblock %}
+
+{% block pageContent %}
+    {% include "../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
+                <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
+                {% if upcomingAppointments.length == 0 %}
+                    <p>There are no upcoming appointments.</p>
+                {% else %}
+                    {{ govukTable({
+                        firstCellIsHeader: false,
+                        attributes: {
+                            'data-module': 'moj-backend-sortable-table'
+                        },
+                        caption: 'Column headers with buttons are sortable',
+                        captionClasses: 'govuk-visually-hidden',
+                        head: [
+                            {
+                                text: "Appointment type",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": setSortOrder('appointment', sortedBy) , 'col-name': 'appointment', 'data-qa': 'appointmentHeader', 'data-sort-name': 'appointment', 'data-sort-action': 'upcoming-appointments' }
+                            },
+                            {
+                                text: "Date",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": setSortOrder('date', sortedBy) , 'col-name': 'date', 'data-qa': 'appointmentHeader', 'data-sort-name': 'date', 'data-sort-action': 'upcoming-appointments' },
+                                format: "numeric"
+                            },
+                            {
+                                text: "Time",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": setSortOrder('time', sortedBy) , 'col-name': 'time', 'data-qa': 'appointmentHeader', 'data-sort-name': 'time', 'data-sort-action': 'upcoming-appointments' },
+                                format: "numeric"
+                            },
+                            {
+                                html: "Action",
+                                classes: "vertical-align--middle",
+                                format: "numeric"
+                            }
+                        ],
+                        rows: upcomingAppointmentRows
+                    }) }}
+
+                    {% if pagination.items | length > 1 %}
+                        {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
+                    {% endif %}
+
+                {% endif %}
+            </section>
+
+        </div>
+    </div>
+
+{% endblock %}

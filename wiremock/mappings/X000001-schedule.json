@@ -2,7 +2,15 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/schedule/.*/upcoming",
+        "urlPathPattern": "/mas/schedule/.*/upcoming",
+        "queryParameters": {
+          "size": {
+            "equalTo": "10"
+          },
+          "page": {
+            "equalTo": "0"
+          }
+        },
         "method": "GET"
       },
       "response": {
@@ -19,7 +27,7 @@
           "personSchedule": {
             "size": 10,
             "page": 0,
-            "totalResults": 2,
+            "totalResults": 12,
             "totalPages": 1,
             "appointments": [
               {
@@ -74,7 +82,15 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/.*/previous",
+        "urlPathPattern": "/mas/schedule/.*/previous",
+        "queryParameters": {
+          "size": {
+            "equalTo": "10"
+          },
+          "page": {
+            "equalTo": "0"
+          }
+        },
         "method": "GET"
       },
       "response": {

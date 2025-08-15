@@ -10,6 +10,7 @@
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
+{% set totalUpcomingAppointments = upcomingAppointments.personSchedule.totalResults %}
 {% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
 {% set pastAppointments = pastAppointments.personSchedule.appointments %}
@@ -35,8 +36,7 @@
   {% for appointment in upcomingAppointments %}
     {% set actionsButton %}
       {% if not appointment.deliusManaged %}
-        {#TODO new manage page check url is correct#}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+        <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
       {% else %}
         <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
@@ -71,7 +71,7 @@
 
     {% set actionsButton %}
       {% if not appointment.deliusManaged %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+        <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
       {% else %}
         <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
@@ -118,10 +118,6 @@
       ]
     }) }}
 {% endblock %}
-
-{% set popHeaderActions %}
-<span>An action!!</span>
-{% endset %}
 
 {% block headerActions %}
   <div class="moj-button-group moj-button-group--inline">
@@ -185,7 +181,7 @@
               rows: upcomingAppointmentRows
             }) }}
 
-          {% if upcomingAppointments.length > 10 %}
+          {% if totalUpcomingAppointments > 10 %}
             <p><a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
           {% endif %}
         {% endif %}
