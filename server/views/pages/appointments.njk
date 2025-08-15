@@ -1,4 +1,5 @@
 {% extends "../partials/case.njk" %}
+{% from "_components/compliance-tag/macro.njk" import appComplianceTag %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
@@ -10,6 +11,7 @@
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
 {% set headerGender = upcomingAppointments.personSummary.gender %}
+{% set totalUpcomingAppointments = upcomingAppointments.personSchedule.totalResults %}
 {% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set upcomingAppointments = upcomingAppointments.personSchedule.appointments %}
 {% set pastAppointments = pastAppointments.personSchedule.appointments %}
@@ -33,10 +35,15 @@
 
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
+    {% set appointmentDetails %}
+      <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+        {{ appointment.type }}
+        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      </a>
+    {% endset %}
     {% set actionsButton %}
       {% if not appointment.deliusManaged %}
-        {#TODO new manage page check url is correct#}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+        <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
       {% else %}
         <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
@@ -44,7 +51,7 @@
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
       {
-        html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
+        html: appointmentDetails,
         attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
       },
       {
@@ -69,9 +76,16 @@
 {% if pastAppointments.length > 0 %}
   {% for appointment in pastAppointments %}
 
+    {% set appointmentDetails %}
+      <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+        {{ appointment.type }}
+        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      </a>
+    {% endset %}
+
     {% set actionsButton %}
       {% if not appointment.deliusManaged %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="/manage/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+        <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
       {% else %}
         <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
       {% endif %}
@@ -79,7 +93,7 @@
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
       {
-        html: "<a class='govuk-link' href='/case/" + crn + "/appointments/appointment/" +  + appointment.id + "'>" + appointment.type + "</a>",
+        html: appointmentDetails,
         attributes: { "data-qa":"pastAppointmentType"+loop.index }
       },
       {
@@ -118,10 +132,6 @@
       ]
     }) }}
 {% endblock %}
-
-{% set popHeaderActions %}
-<span>An action!!</span>
-{% endset %}
 
 {% block headerActions %}
   <div class="moj-button-group moj-button-group--inline">
@@ -185,7 +195,7 @@
               rows: upcomingAppointmentRows
             }) }}
 
-          {% if upcomingAppointments.length > 10 %}
+          {% if totalUpcomingAppointments > 10 %}
             <p><a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
           {% endif %}
         {% endif %}

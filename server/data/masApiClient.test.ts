@@ -145,7 +145,11 @@ describe('masApiClient', () => {
         'get',
         true,
       ],
-      ['getPersonSchedule', '/schedule/X000001/1', () => masApiClient.getPersonSchedule('X000001', '1')],
+      [
+        'getPersonSchedule',
+        '/schedule/X000001/1?size=10&page=0',
+        () => masApiClient.getPersonSchedule('X000001', '1', '0'),
+      ],
       [
         'getPersonAppointment',
         '/schedule/X000001/appointment/1',
