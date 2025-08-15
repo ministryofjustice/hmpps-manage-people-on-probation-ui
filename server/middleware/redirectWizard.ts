@@ -11,6 +11,10 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
       const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
       const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
       const value = getDataValue(data, ['appointments', crn, id, ...path])
+      // const logvalue = getDataValue(data, ['appointments', crn, id])
+      // console.log(logvalue)
+      // console.log(requiredValue)
+      // console.log(value)
       const makeRedirect =
         (repeatAppointmentsEnabled && requiredValue === 'repeating' && !value) ||
         (requiredValue !== 'repeating' && !value)
@@ -18,7 +22,7 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
         if (!isValidCrn(crn) || !isValidUUID(id)) {
           return renderError(404)(req, res)
         }
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
       }
     }
     return next()
