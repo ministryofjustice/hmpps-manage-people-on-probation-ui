@@ -24,7 +24,7 @@
             </a>
         {% endset %}
         {% set actionsButton %}
-            {% if not appointment.deliusManaged %}
+            {% if appointment.deliusManaged %}
                 <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
             {% else %}
                 <a class="govuk-link govuk-link--no-visited-state" target="_blank"
