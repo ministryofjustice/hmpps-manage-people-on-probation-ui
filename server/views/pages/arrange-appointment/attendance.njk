@@ -1,7 +1,7 @@
 {% extends "../_form.njk" %}
 
 {% set title = 'Who will attend the appointment?' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type' %}
 
 {% block form %}
     <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">

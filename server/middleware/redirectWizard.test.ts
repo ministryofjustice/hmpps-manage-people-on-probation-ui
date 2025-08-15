@@ -87,7 +87,7 @@ describe('/middleware/redirectWizard', () => {
       redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
@@ -101,7 +101,7 @@ describe('/middleware/redirectWizard', () => {
       redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
@@ -137,7 +137,7 @@ describe('/middleware/redirectWizard', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
-      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()

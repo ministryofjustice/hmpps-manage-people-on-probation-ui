@@ -72,41 +72,42 @@
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-9',
         rows: [
-        {
-          key: { text: "Appointment type" },
-          value: { text: appointment.type.description },
-          actions: {
-            items: [
-              {
-                href: changePath + "/type?change=" + url,
-                text: "Change",
-                visuallyHiddenText: "type of appointment"
-              }
-            ]
-          } if showAction
-        },
-        {
-        key: { text: "VISOR report"},
-        value: { text: appointment.visorReport },
-        actions: {
-    items: [ {
-    href: changePath + "/type?change=" + url,
-    text: "Change",
-    visuallyHiddenText: "type of appointment"
-     } 
-     ] 
-     } if showAction
-        } if appointment.meta.isVisor,
-    { key: { text: "Appointment for" },
-    value: { html: sentenceHtml | safe },
-    actions: {
-    items: [ { 
-    href: changePath + "/sentence?change=" + url, 
-    text: "Change", 
-    visuallyHiddenText: "sentence"
-     } 
-     ] 
-     } if showAction }, 
+            { key: { text: "Appointment for" },
+            value: { html: sentenceHtml | safe },
+            actions: {
+            items: [ { 
+            href: changePath + "/sentence?change=" + url, 
+            text: "Change", 
+            visuallyHiddenText: "sentence"
+            } 
+            ] 
+            } if showAction }, 
+            {
+            key: { text: "Appointment type" },
+            value: { text: appointment.type.description },
+            actions: {
+                items: [
+                {
+                    href: changePath + "/type?change=" + url,
+                    text: "Change",
+                    visuallyHiddenText: "type of appointment"
+                }
+                ]
+            } if showAction
+            },
+            {
+                key: { text: "VISOR report"},
+                value: { text: appointment.visorReport },
+                actions: {
+                    items: [ 
+                        {
+                            href: changePath + "/type?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "type of appointment"
+                        } 
+                    ] 
+                } if showAction
+            } if appointment.meta.isVisor,
     { key: { text: "Attending" },
     value: { html: attendingHtml | safe },
     actions: {

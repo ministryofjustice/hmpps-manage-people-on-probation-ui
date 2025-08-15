@@ -24,8 +24,8 @@ import {
 } from './imports'
 
 const loadPage = () => {
-  completeTypePage()
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()

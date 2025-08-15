@@ -13,8 +13,8 @@ import {
 } from './imports'
 
 const loadPage = (date?: DateTime<true>) => {
-  completeTypePage(1, '', false, '', date)
-  completeSentencePage()
+  completeSentencePage(1, '', '', date)
+  completeTypePage(1, false)
   completeAttendancePage()
   completeLocationPage()
 }

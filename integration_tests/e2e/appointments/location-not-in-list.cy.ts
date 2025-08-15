@@ -11,8 +11,8 @@ import {
 } from './imports'
 
 const loadPage = (locations = true) => {
-  completeTypePage()
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   if (locations) {
     completeLocationPage(4)

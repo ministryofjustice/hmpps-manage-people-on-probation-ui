@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type' %}
+{% set backLink = change if change else '/case/' + crn + '/appointments' %}
 
 {% block heading %}{% endblock %}
 {% block form %}
@@ -111,27 +111,24 @@
     }), allSentences) %}
     {% endif %}
   {% endfor %}
-  {% if appointment.type.isPersonLevelContact %}
-    {% set allSentences = (allSentences.push(
-    {
-        text: appointment.meta.forename,
-        value: 'PERSON_LEVEL_CONTACT',
+  {% set allSentences = (allSentences.push({
+      text: appointment.meta.forename,
+      value: 'PERSON_LEVEL_CONTACT',
+      label: {
+        classes: 'govuk-!-font-weight-bold',
         attributes: {
-            'data-qa': 'personLevelContact',
-            'data-sentence': 'true',
-            'data-reset-conditional-radios': ''
-        },
-        label: {
-            classes: 'govuk-!-font-weight-bold',
-            attributes: {
-                'data-qa': 'personLevelContactLabel'
-            }
-        },
-        hint: {
-            text: 'Relates to the person.'
+          'data-qa': 'personLevelContactLabel'
         }
-    }), allSentences) %}
-  {% endif %}
+      },
+      hint: {
+        text: 'Relates to the person'
+      },
+      attributes: {
+          'data-qa': 'personLevelContact',
+          'data-sentence': 'true',
+          'data-reset-conditional-radios': ''
+      }
+  }), allSentences) %}
   {{ govukRadios({
     fieldset: {
       legend: {
