@@ -3,7 +3,7 @@ import AppointmentTypePage from '../../pages/appointments/type.page'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import { crn, uuid, completeTypePage, checkPopHeader } from './imports'
 
-const loadPage = (type = 1, query = '') => {
+const loadPage = () => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
 }
 
@@ -68,12 +68,12 @@ describe('What is this appointment for?', () => {
   describe('Page is rendered', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
-      loadPage(1)
+      loadPage()
       sentencePage = new AppointmentSentencePage()
     })
-    it('should display 3 sentences that are not selected', () => {
+    it('should display 4 sentences that are not selected', () => {
       const radios = sentencePage.getElement(`input[data-sentence="true"]`)
-      radios.should('have.length', 3)
+      radios.should('have.length', 4)
       radios.each($radio => {
         cy.wrap($radio).should('not.be.checked')
       })
@@ -120,15 +120,15 @@ describe('What is this appointment for?', () => {
   describe('Personal contact is selected', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
-      loadPage(5)
+      loadPage()
       sentencePage = new AppointmentSentencePage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId`).click()
     })
-    // it('should display the personal contact option', () => {
-    //   cy.get('[data-qa="personLevelContactLabel"]').should('contain.text', 'Alton')
-    // })
+    it('should display the personal contact option', () => {
+      cy.get('[data-qa="personLevelContactLabel"]').should('contain.text', 'Alton')
+    })
     it('should link to the type page when the contact option is selected and continue is clicked', () => {
-      loadPage(5)
+      loadPage()
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-3`).click()
       sentencePage.getSubmitBtn().click()
       const typePage = new AppointmentTypePage()
