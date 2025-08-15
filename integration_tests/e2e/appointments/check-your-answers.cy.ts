@@ -116,11 +116,11 @@ describe('Check your answers then confirm the appointment', () => {
       loadPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
     })
-    it('should update the type when value is changed', () => {
-      checkUpdateType(cyaPage)
-    })
     it('should update the sentence when value is changed', () => {
       checkUpdateSentence(cyaPage)
+    })
+    it('should update the type when value is changed', () => {
+      checkUpdateType(cyaPage)
     })
     it('should update the location when value is changed', () => {
       checkUpdateLocation(cyaPage)
