@@ -129,6 +129,8 @@ export const completeCYAPage = () => {
   cyaPage.getSubmitBtn().click()
 }
 export const checkPopHeader = (name = 'Caroline Wolff', appointments = false) => {
+  const time = DateTime.now().toMillis()
+  cy.clock(time)
   cy.get('h1').should('contain.text', name)
   cy.get('[data-qa="crn"]').should('contain.text', 'X000001')
   cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')
