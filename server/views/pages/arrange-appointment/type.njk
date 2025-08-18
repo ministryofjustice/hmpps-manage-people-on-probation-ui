@@ -4,6 +4,9 @@
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set types = [] %}
+{% if personLevel %}
+  {% set appointmentTypes = getPersonLevelTypes(appointmentTypes) %}
+{% endif %}
 {% for appointmentType in appointmentTypes %}
   {% set types = (types.push({
     text: appointmentType.description | toSentenceCase(['(NS)']),

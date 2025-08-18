@@ -151,9 +151,19 @@ describe('Arrange an appointment', () => {
       it('should be on the sentence page', () => {
         sentencePage.checkOnPage()
       })
-      // it('should persist the sentence selection', () => {
-      //   sentencePage.getRadio('eventId', 1).should('be.checked')
-      // })
+      it('should persist the sentence selection', () => {
+        sentencePage.getRadio('sentences', 1).should('be.checked')
+      })
+    })
+    describe('Person level contact was selected', () => {
+      beforeEach(() => {
+        cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+        completeSentencePage(4)
+        typePage = new AppointmentTypePage()
+      })
+      it('should have limited set of appointmentTypes', () => {
+        cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
+      })
     })
   })
 })

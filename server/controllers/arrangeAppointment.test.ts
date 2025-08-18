@@ -308,6 +308,8 @@ describe('controllers/arrangeAppointment', () => {
           crn,
           id: uuid,
           change: undefined,
+          errors: undefined,
+          personLevel: false
         })
       })
     })

@@ -78,18 +78,16 @@ const arrangeAppointmentController: Controller<typeof routes> = {
       const { crn, id } = req.params
       const { change } = req.query
       const { data } = req.session
-      const requiredValues = ['eventId']
-      for (const requiredValue of requiredValues) {
-        const value = getDataValue(data, ['appointments', crn, id, requiredValue])
-        if (!value) {
-          if (isValidCrn(crn) && isValidUUID(id)) {
-            return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
-          }
-          return renderError(404)(req, res)
-        }
-      }
 
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
+      const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
+      if (!eventId) {
+        if (isValidCrn(crn) && isValidUUID(id)) {
+          return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
+        }
+        return renderError(404)(req, res)
+      }
+      const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel })
     }
   },
   postType: () => {

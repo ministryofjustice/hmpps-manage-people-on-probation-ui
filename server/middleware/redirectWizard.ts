@@ -13,8 +13,8 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
       const value = getDataValue(data, ['appointments', crn, id, ...path])
       // const logvalue = getDataValue(data, ['appointments', crn, id])
       // console.log(logvalue)
-      // console.log(requiredValue)
-      // console.log(value)
+      console.log(requiredValue)
+      console.log(value)
       const makeRedirect =
         (repeatAppointmentsEnabled && requiredValue === 'repeating' && !value) ||
         (requiredValue !== 'repeating' && !value)

@@ -58,6 +58,7 @@ export * from './setDataValue'
 // eslint-disable-next-line import/no-cycle
 export * from './decorateFormAttributes'
 export * from './getSearchParamsString'
+export * from './getPersonLevelTypes'
 export * from './groupByLevel'
 export * from './getStaffRisk'
 export * from './toSentenceCase'
