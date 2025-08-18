@@ -31,7 +31,7 @@ const routes = [
   'getCircumstancesNote',
 ] as const
 
-const personalDetailsController: Controller<typeof routes> = {
+const personalDetailsController: Controller<typeof routes, void> = {
   getPersonalDetails: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params

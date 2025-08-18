@@ -22,7 +22,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   )
 
   router.all(
-    '/case/:crn/appointments/appointment/:contactId/*path',
+    '/case/:crn/appointments/appointment/:contactId/record-an-outcome',
     getPersonalDetails(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),
   )
@@ -35,16 +35,6 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     '/case/:crn/appointments/appointment/:contactId/record-an-outcome',
     validate.appointments,
     controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
-  )
-
-  router.get(
-    '/case/:crn/appointments/appointment/:contactId/add-note',
-    controllers.appointments.getAddNote(hmppsAuthClient),
-  )
-
-  router.post(
-    '/case/:crn/appointments/appointment/:contactId/add-note',
-    controllers.appointments.postAddNote(hmppsAuthClient),
   )
 
   router.get(

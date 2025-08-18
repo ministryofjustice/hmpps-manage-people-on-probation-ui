@@ -1,4 +1,4 @@
-import express, { Express } from 'express'
+import express, { Express, Router } from 'express'
 import cookieSession from 'cookie-session'
 import { NotFound } from 'http-errors'
 
@@ -51,7 +51,8 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   })
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
-  app.use(routes(services))
+  const router = Router()
+  app.use(routes(router, services))
   app.use(setUpAuthentication())
   app.use((_req, _res, next) => next(new NotFound()))
   app.use(errorHandler(production))

@@ -81,7 +81,9 @@
   <script src="/assets/moj/all.js"></script>
   <script src="/assets/js/jquery.min.js"></script>
   <script type="module" src="/assets/js/app.js"></script>
-
+  <script nonce="{{ cspNonce }}">
+    window.csrfToken = "{{ csrfToken }}";
+  </script>
   <script nonce="{{ cspNonce }}">
     document.addEventListener('DOMContentLoaded', function () {
       document.initialiseTelemetry('{{ applicationInsightsConnectionString | default(' ') }}', '{{ applicationInsightsRoleName }}', '{{ user.username }}')

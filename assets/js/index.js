@@ -113,12 +113,16 @@ if (search) {
   })
 }
 
-if (typeof MOJFrontend.MultiFileUpload !== 'undefined') {
+const multiUpload = document.querySelector('.moj-multi-file-upload')
+if (typeof MOJFrontend.MultiFileUpload !== 'undefined' && multiUpload) {
   new MOJFrontend.MultiFileUpload({
     container: $('.moj-multi-file-upload'),
-    uploadUrl: '/nominal/documents/uploadItem',
-    deleteUrl: '/nominal/documents/deleteItem',
-    dropzoneHintText: 'Drag and drop your files here.',
+    uploadUrl: '/appointments/file/upload',
+    deleteUrl: '/appointments/file/delete',
+    dropzoneHintText: 'Drag and drop files here or ',
+    headers: {
+      'CSRF-Token': window.csrfToken,
+    },
     uploadFileExitHook: uploadExit,
     fileDeleteHook: deleteExit,
     uploadFileErrorHook: errorHook,
@@ -151,6 +155,7 @@ if (typeof MOJFrontend.MultiFileUpload !== 'undefined') {
 
   function uploadExit(_handle, _file, response) {
     // const $actions = $('.moj-multi-file-upload__actions')
+
     if (isAllFinished()) {
       continueButtonEnabled(true)
     } else if ($('.moj-multi-file-upload__list')) {

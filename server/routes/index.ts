@@ -17,8 +17,7 @@ import interventionsRoutes from './interventions'
 import arrangeAppointmentRoutes from './arrangeAppointment'
 import documentsRoutes from './documents'
 
-export default function routes(services: Services): Router {
-  const router = Router()
+export default function routes(router: Router, services: Services): Router {
   home(router, services)
   searchRoutes(router, services)
   caseRoutes(router, services)

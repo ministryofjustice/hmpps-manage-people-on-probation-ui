@@ -24,7 +24,7 @@ export const getQueryString = (params: Record<string, string>): string[] => {
   return queryParams
 }
 
-const activityLogController: Controller<typeof routes> = {
+const activityLogController: Controller<typeof routes, void> = {
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { query, body, params } = req

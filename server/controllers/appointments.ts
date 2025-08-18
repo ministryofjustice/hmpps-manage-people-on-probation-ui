@@ -19,7 +19,7 @@ const routes = [
   'getManageAppointment',
 ] as const
 
-const appointmentsController: Controller<typeof routes> = {
+const appointmentsController: Controller<typeof routes, void> = {
   getAppointments: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params as Record<string, string>
