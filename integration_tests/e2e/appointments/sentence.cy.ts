@@ -135,21 +135,4 @@ describe('What is this appointment for?', () => {
       typePage.checkOnPage()
     })
   })
-  // describe('Page is rendered for a single sentence with licence condition', () => {
-  //   let sentencePage: AppointmentSentencePage
-  //   beforeEach(() => {
-  //     loadPage(1, '?number=1')
-  //     sentencePage = new AppointmentSentencePage()
-  //   })
-  //   it('should display 1 sentence that is selected', () => {
-  //     const radios = sentencePage.getElement(`input[data-sentence="true"]`)
-  //     radios.should('have.length', 1)
-  //     radios.each($radio => {
-  //       cy.wrap($radio).should('be.checked')
-  //     })
-  //   })
-  //   it('should display the licence condition reveal', () => {
-  //     sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('be.visible')
-  //   })
-  // })
 })
