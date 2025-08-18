@@ -88,7 +88,7 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   it('should render the page with personal contact', () => {
-    loadPage({ hasVisor: false, typeOptionIndex: 5, sentenceOptionIndex: 4 })
+    loadPage({ hasVisor: false, typeOptionIndex: 2, sentenceOptionIndex: 4 })
     cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
     cy.get('[data-qa="appointmentSentence"]').should('not.exist')
     cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
