@@ -107,8 +107,7 @@
   }) }}
   {{ mojDatePicker({
     label: {
-        text: "Date",
-        classes: "govuk-label--s"
+        text: "Date"
     },
     hint: {
       text: "For example, 17/5/2024."
@@ -119,16 +118,14 @@
 
   {{ govukSelect({
    label: {
-      text: "Start time",
-      classes: "govuk-label--s"
+      text: "Start time"
     },
   items: timeOptions
   } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
 
   {{ govukSelect({
    label: {
-      text: "End time",
-      classes: "govuk-label--s"
+      text: "End time"
     },
   items: endTimeOptions
   } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
