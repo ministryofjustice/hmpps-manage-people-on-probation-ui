@@ -20,6 +20,7 @@ const routes = [
   'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
+  'getNextAppointment',
 ] as const
 
 const appointmentsController: Controller<typeof routes> = {
@@ -190,6 +191,26 @@ const appointmentsController: Controller<typeof routes> = {
           res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
         }
       }
+    }
+  },
+  getNextAppointment: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, contactId } = req.params
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      res.render('pages/appointments/next-appointment', {
+        personAppointment,
+        crn,
+      })
     }
   },
 }
