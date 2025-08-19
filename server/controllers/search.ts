@@ -2,7 +2,7 @@ import { Controller } from '../@types'
 
 const routes = ['getSearch'] as const
 
-const searchController: Controller<typeof routes> = {
+const searchController: Controller<typeof routes, void> = {
   getSearch: () => {
     return async (req, res) => {
       req.session.backLink = '/search'

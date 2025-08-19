@@ -3,14 +3,6 @@
     {
       "request": {
         "urlPathPattern": "/mas/schedule/.*/upcoming",
-        "queryParameters": {
-          "size": {
-            "equalTo": "10"
-          },
-          "page": {
-            "equalTo": "0"
-          }
-        },
         "method": "GET"
       },
       "response": {
@@ -86,14 +78,6 @@
     {
       "request": {
         "urlPathPattern": "/mas/schedule/.*/previous",
-        "queryParameters": {
-          "size": {
-            "equalTo": "10"
-          },
-          "page": {
-            "equalTo": "0"
-          }
-        },
         "method": "GET"
       },
       "response": {

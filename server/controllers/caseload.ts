@@ -38,7 +38,7 @@ interface Args {
   filter: CaseSearchFilter
 }
 
-const caseloadController: Controller<typeof routes, Args> = {
+const caseloadController: Controller<typeof routes, void, Args> = {
   showCaseload: hmppsAuthClient => {
     return async (req, res, _next, args) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

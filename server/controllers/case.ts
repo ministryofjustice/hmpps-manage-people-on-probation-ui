@@ -8,7 +8,7 @@ import { toRoshWidget, toPredictors } from '../utils'
 
 const routes = ['getCase'] as const
 
-const caseController: Controller<typeof routes> = {
+const caseController: Controller<typeof routes, void> = {
   getCase: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
