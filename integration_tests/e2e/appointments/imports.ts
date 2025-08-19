@@ -202,23 +202,23 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
 }
 
 export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(1).find('.govuk-link').click()
+  page.getSummaryListRow(2).find('.govuk-link').click()
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', 2).click()
   typePage.getSubmitBtn().click()
-  page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
 }
 
 export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
-    page.getSummaryListRow(2).find('.govuk-link').click()
+    page.getSummaryListRow(1).find('.govuk-link').click()
     const sentencePage = new AppointmentSentencePage()
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-eventId-2`).click()
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-requirementId`).click()
     sentencePage.getSubmitBtn().click()
     page.checkOnPage()
     page
-      .getSummaryListRow(2)
+      .getSummaryListRow(1)
       .find('.govuk-summary-list__value')
       .should('contain.text', 'ORA Community Order')
       .should('contain.text', '12 days RAR, 1 completed')
