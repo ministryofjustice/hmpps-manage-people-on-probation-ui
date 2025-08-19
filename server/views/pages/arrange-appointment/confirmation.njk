@@ -64,16 +64,18 @@
 
     </div>
   </div>
-  <form method="post" autocomplete="off" action="{{ paths.current }}">
+<form method="post" autocomplete="off" action="{{ paths.current }}">
+  <div class="govuk-button-group">
     {{ govukButton({
       html: buttonText,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-  </form>
-  <p>
-    <a href="/case/{{ crn }}/appointments" data-qa="finishLink">Finish a return to Appointments</a>
-  </p>
+    <a class="govuk-link" href="/case/{{ crn }}/appointments" data-qa="finishLink">
+      Finish and return to appointments
+    </a>
+  </div>
+  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+</form>
 {% endblock %}
