@@ -88,6 +88,7 @@ interface Locals {
   version: string
   backLink: string
   personAppointment?: PersonAppointment
+  fileErrorStatus?: number
 }
 
 export interface AppResponse extends Response {

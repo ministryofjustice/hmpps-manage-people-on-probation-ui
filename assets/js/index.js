@@ -1,5 +1,5 @@
 /* eslint-disable no-new */
-/* eslint-disable prefer-template */
+
 /* eslint-disable no-restricted-globals */
 
 import * as govukFrontend from 'govuk-frontend'
@@ -153,7 +153,7 @@ if (typeof MOJFrontend.MultiFileUpload !== 'undefined' && multiUpload) {
     return finished
   }
 
-  function uploadExit(_handle, _file, response) {
+  function uploadExit(_handle, _file, _response) {
     // const $actions = $('.moj-multi-file-upload__actions')
 
     if (isAllFinished()) {
@@ -172,10 +172,22 @@ if (typeof MOJFrontend.MultiFileUpload !== 'undefined' && multiUpload) {
   }
 
   function errorHook(handle, file, jqXHR, textStatus, errorThrown) {
-    const message = file.name + ':' + (jqXHR.status === 413 ? 'File is over 100MB' : errorThrown || textStatus)
+    let message = ''
+    switch (jqXHR.status) {
+      case 413:
+        message = `${file.name}: File size must be 5mb or under`
+        break
+      case 415:
+        message = `${file.name}: file type must be pdf or word`
+        break
+      default:
+        message = `${file.name}: ${textStatus || errorThrown}`
+    }
     const item = $(handle.getFileRowHtml(file))
     item.find('.moj-multi-file-upload__message').html(handle.getErrorHtml({ message }))
-    handle.status.html(message)
     item.find('.moj-multi-file-upload__actions').append(handle.getDeleteButtonHtml({ filename: file.name }))
+    const $row = handle.feedbackContainer.find(`.moj-multi-file-upload__row:contains("${file.name}")`)
+    $row.replaceWith(item.prop('outerHTML'))
+    handle.status.html(message)
   }
 }

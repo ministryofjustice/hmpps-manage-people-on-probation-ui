@@ -188,4 +188,14 @@ export default {
     { name: 'start', dateField: 'date' },
     { name: 'end', dateField: 'date' },
   ],
+  validMimeTypes: [
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'application/vnd.ms-excel',
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-powerpoint',
+    'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  ],
+  maxFileSize: 5 * 1024 * 1024, // 5mb
 }

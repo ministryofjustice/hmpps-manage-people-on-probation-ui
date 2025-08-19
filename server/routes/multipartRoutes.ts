@@ -3,6 +3,7 @@ import { type Router } from 'express'
 import controllers from '../controllers'
 import { Services } from '../services'
 import { getPersonalDetails, getPersonAppointment } from '../middleware'
+import validate from '../middleware/validation/index'
 
 export default function multipartRoutes(router: Router, { hmppsAuthClient }: Services) {
   const upload = multer()
@@ -23,6 +24,7 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/appointments/file/upload',
     upload.array('documents'),
+    validate.fileUpload,
     controllers.fileUpload.postUploadFile(hmppsAuthClient),
   )
   router.post(
