@@ -154,15 +154,12 @@ export const completeConfirmationPage = () => {
 }
 
 export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
-  page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
-  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
-  page
-    .getSummaryListRow(2)
-    .find('.govuk-summary-list__value')
-    .should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)')
+  page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
+  page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
   page
     .getSummaryListRow(3)
@@ -198,30 +195,30 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
     .getSummaryListRow(6)
     .find('.govuk-summary-list__value')
     .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
-  page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Appointment notes')
+  page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Supporting information')
   page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
   page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
   page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
 }
 
 export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(1).find('.govuk-link').click()
+  page.getSummaryListRow(2).find('.govuk-link').click()
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', 2).click()
   typePage.getSubmitBtn().click()
-  page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
 }
 
 export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
-    page.getSummaryListRow(2).find('.govuk-link').click()
+    page.getSummaryListRow(1).find('.govuk-link').click()
     const sentencePage = new AppointmentSentencePage()
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-eventId-2`).click()
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-requirementId`).click()
     sentencePage.getSubmitBtn().click()
     page.checkOnPage()
     page
-      .getSummaryListRow(2)
+      .getSummaryListRow(1)
       .find('.govuk-summary-list__value')
       .should('contain.text', 'ORA Community Order')
       .should('contain.text', '12 days RAR, 1 completed')
