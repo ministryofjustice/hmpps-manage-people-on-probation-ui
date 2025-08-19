@@ -23,6 +23,7 @@ const routes = [
   'postRecordAnOutcome',
   'getNextAppointment',
   'getManageAppointment',
+  'getNextAppointment',
 ] as const
 
 const appointmentsController: Controller<typeof routes, void> = {
