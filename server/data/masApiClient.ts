@@ -362,4 +362,10 @@ export default class MasApiClient extends RestClient {
   async getAppointmentTypes(): Promise<AppointmentTypeResponse> {
     return this.get({ path: `/appointment/types`, handle404: false })
   }
+
+  // async getAppointment(crn: string): Promise<any> {
+  //   return this.get({
+  //     path: `/appointment/${crn}`,
+  //   })
+  // }
 }

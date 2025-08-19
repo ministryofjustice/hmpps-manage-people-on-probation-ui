@@ -7,11 +7,12 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn } from '../utils'
+import { fullName, toRoshWidget, toPredictors, isNumericString, isValidCrn, setDataValue, getDataValue } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
-import { renderError } from '../middleware'
+import { renderError, getAppointment } from '../middleware'
 import { AppResponse } from '../models/Locals'
+import { AppointmentSession } from '../models/Appointments'
 
 const routes = [
   'getAppointments',
@@ -196,6 +197,7 @@ const appointmentsController: Controller<typeof routes> = {
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId } = req.params
+      const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -207,6 +209,29 @@ const appointmentsController: Controller<typeof routes> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      console.log(personAppointment.appointment)
+      const Appt: AppointmentSession = {
+        type: personAppointment.appointment.type,
+        visorReport: res.locals.appointment.meta.isVisor ? 'Yes' : 'No', // how to get
+        date: '',
+        start: '',
+        end: '',
+        until: '',
+        repeatingDates: [] as string[],
+        numberOfAppointments: '1',
+        numberOfRepeatAppointments: '0',
+        repeating: 'No',
+        eventId: '', // how to get
+        username: fullName(personAppointment.appointment.officerName),
+        uuid: contactId,
+        requirementId: '', // how to get
+        licenceConditionId: '', // how to get
+        nsiId: '', // how to get
+        notes: personAppointment.appointment.appointmentNotes[0].note,
+        sensitivity: personAppointment.appointment.isSensitive ? 'Yes' : 'No',
+      }
+      setDataValue(data, ['appointments', crn, contactId], Appt)
+      console.log(getDataValue(data, ['appointments', crn, contactId]))
       res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
@@ -216,3 +241,42 @@ const appointmentsController: Controller<typeof routes> = {
 }
 
 export default appointmentsController
+
+//   id?: string
+//   type?: string
+//   startDateTime?: string
+//   endDateTime?: string
+//   rarToolKit?: string
+//   appointmentNotes?: Note[]
+//   appointmentNote?: Note
+//   isSensitive?: boolean
+//   hasOutcome?: boolean
+//   wasAbsent?: boolean
+//   officerName?: Name
+//   isInitial?: boolean
+//   isNationalStandard?: boolean
+//   rescheduled?: boolean
+//   rescheduledStaff?: boolean
+//   rescheduledPop?: boolean
+//   didTheyComply?: boolean
+//   absentWaitingEvidence?: boolean
+//   rearrangeOrCancelReason?: string
+//   rescheduledBy?: Name
+//   repeating?: boolean
+//   nonComplianceReason?: string
+//   documents?: Document[]
+//   rarCategory?: string
+//   acceptableAbsence?: boolean
+//   acceptableAbsenceReason?: string
+//   location?: Address
+//   action?: string
+//   isSystemContact?: boolean
+//   isAppointment?: boolean
+//   isCommunication?: boolean
+//   isEmailOrTextFromPop?: boolean
+//   isPhoneCallFromPop?: boolean
+//   isEmailOrTextToPop?: boolean
+//   isPhoneCallToPop?: boolean
+//   lastUpdated?: string
+//   lastUpdatedBy?: Name
+//   deliusManaged?: boolean

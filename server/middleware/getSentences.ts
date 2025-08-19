@@ -24,6 +24,7 @@ export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<vo
       sentences = req.session.data.sentences[crn]
     }
     res.locals.sentences = sentences
+    console.log(sentences)
     return next()
   }
 }

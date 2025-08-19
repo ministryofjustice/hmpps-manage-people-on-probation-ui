@@ -138,6 +138,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
     }
     res.locals.appointment = appointment
+    console.log(appointment)
     return next()
   }
 }
