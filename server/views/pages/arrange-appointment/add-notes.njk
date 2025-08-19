@@ -1,11 +1,11 @@
 {% extends "../_form.njk" %}
 
-{% set title = 'Add a note (optional)' %}
+{% set title = 'Add supporting information (optional)' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
 {% block form %}
 {{ govukTextarea({
     hint: {
-        text: "Use paragraphs to make your notes easy to read."
+        text: "You can add any details that may help you with the appointment. Use paragraphs to make your notes easy to read."
     },
     id: "notes",
     name: "notes",
@@ -18,7 +18,7 @@
     fieldset: {
         legend: {
             text: 'Does this appointment include sensitive information?',
-            classes: "govuk-fieldset__legend--l",
+            classes: "govuk-fieldset__legend--m",
             isPageHeading: false
         }
     },
