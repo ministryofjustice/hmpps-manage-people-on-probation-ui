@@ -269,6 +269,7 @@
           },
           "appointment": {
             "id": 2,
+            "eventNumber": 46,
             "type": "Video call",
             "startDateTime": "2025-03-22T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2025-03-22T10:30:00.382936Z[Europe/London]",
@@ -285,6 +286,26 @@
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
+            },
+            "appointmentNotes": [
+              {
+                "id": 0,
+                "note": "Some notes"
+              }
+            ],
+            "location": {
+              "buildingName": "The Building",
+              "buildingNumber": "77",
+              "streetName": "Some Street",
+              "district": "Some City Centre",
+              "town": "London",
+              "county": "Essex",
+              "postcode": "NW10 1EP",
+              "lastUpdated": "2023-03-14",
+              "lastUpdatedBy": {
+                "forename": "Jiminy",
+                "surname": "Cricket"
+              }
             }
           }
         },

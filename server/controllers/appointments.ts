@@ -209,8 +209,16 @@ const appointmentsController: Controller<typeof routes> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      console.log(personAppointment.appointment)
+      console.log(data)
+      // const locations = await masClient.getOfficeLocationsByTeamAndProvider(providerCode, teamCode) //might need to get location codes
+      console.log(personAppointment)
       const Appt: AppointmentSession = {
+        user: {
+          providerCode: '',
+          teamCode: '',
+          username: '',
+          locationCode: personAppointment.appointment.location ? 'MAP' : '', // how to map from Address object to location code
+        },
         type: personAppointment.appointment.type,
         visorReport: res.locals.appointment.meta.isVisor ? 'Yes' : 'No', // how to get
         date: '',
@@ -221,16 +229,18 @@ const appointmentsController: Controller<typeof routes> = {
         numberOfAppointments: '1',
         numberOfRepeatAppointments: '0',
         repeating: 'No',
-        eventId: '', // how to get
+        eventId: personAppointment.appointment.eventNumber ? personAppointment.appointment.eventNumber : '',
         username: fullName(personAppointment.appointment.officerName),
         uuid: contactId,
         requirementId: '', // how to get
         licenceConditionId: '', // how to get
         nsiId: '', // how to get
-        notes: personAppointment.appointment.appointmentNotes[0].note,
+        notes: personAppointment.appointment.appointmentNotes[0].note, // notes, appointmentNotes or appointmentNote? - need schema access
         sensitivity: personAppointment.appointment.isSensitive ? 'Yes' : 'No',
       }
+      // what will always exist. What may not?
       setDataValue(data, ['appointments', crn, contactId], Appt)
+      setDataValue(data, ['return-dest'], { crn, contactID: contactId })
       console.log(getDataValue(data, ['appointments', crn, contactId]))
       res.render('pages/appointments/next-appointment', {
         personAppointment,
@@ -280,3 +290,9 @@ export default appointmentsController
 //   lastUpdated?: string
 //   lastUpdatedBy?: Name
 //   deliusManaged?: boolean
+
+// From getAppointment
+// const location: Location | string =
+//   locationCode && locationCode !== noLocationValue && loggedInUsername
+//     ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
+//     : 'Not needed'

@@ -15,6 +15,7 @@ export interface PersonSchedule {
 }
 export interface Activity {
   id?: string
+  eventNumber?: string
   type?: string
   startDateTime?: string
   endDateTime?: string
