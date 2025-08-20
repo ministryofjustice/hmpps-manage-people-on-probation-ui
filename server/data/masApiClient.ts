@@ -37,6 +37,7 @@ import {
   CheckAppointment,
   AppointmentTypeResponse,
   NextComAppointmentResponse,
+  AppointmentPatch,
 } from '../models/Appointments'
 
 interface GetUserScheduleProps {
@@ -285,6 +286,13 @@ export default class MasApiClient extends RestClient {
       path: `/appointment/${crn}/check`,
       handle404: true,
       handle500: true,
+    })
+  }
+
+  async patchAppointment(body: AppointmentPatch): Promise<PersonAppointment> {
+    return this.patch({
+      data: body,
+      path: `/appointment`,
     })
   }
 

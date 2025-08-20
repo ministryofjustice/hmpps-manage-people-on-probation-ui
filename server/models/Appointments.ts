@@ -111,6 +111,15 @@ export interface AppointmentChecks {
   overlapsWithMeetingWith?: AppointmentCheck
 }
 
+export interface AppointmentPatch {
+  id: number
+  outcomeRecorded?: boolean
+  visorReport?: boolean
+  notes?: string
+  files?: string[]
+  sensitive?: boolean
+}
+
 export interface AppointmentCheck {
   isCurrentUser: boolean
   appointmentIsWith: Name
