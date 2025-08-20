@@ -7,6 +7,7 @@ import {
   initialiseName,
   yearsSince,
   dateWithYear,
+  dateToTimestamp,
   dateWithDayAndWithoutYear,
   addressToList,
   dateForSort,
@@ -108,6 +109,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   )
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('dateWithYear', dateWithYear)
+  njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
   njkEnv.addFilter('yearsSince', yearsSince)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)

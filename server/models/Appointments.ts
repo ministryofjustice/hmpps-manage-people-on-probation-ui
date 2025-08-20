@@ -1,4 +1,5 @@
-import { Name } from '../data/model/personalDetails'
+import { Name, PersonSummary } from '../data/model/personalDetails'
+import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
 
 export interface AppointmentSession {
@@ -38,6 +39,12 @@ export interface AppointmentType {
 
 export interface AppointmentTypeResponse {
   appointmentTypes: AppointmentType[]
+}
+
+export interface NextComAppointmentResponse {
+  appointment: Activity
+  loggedInUserIsCOM: boolean
+  com: Name
 }
 
 export interface AppointmentLocationRequest {
@@ -86,6 +93,15 @@ export interface AppointmentRequestBody {
 export interface CheckAppointment {
   start: Date
   end: Date
+}
+
+export interface AppointmentPatch {
+  id: number
+  outcomeRecorded?: boolean
+  visorReport?: boolean
+  notes?: string
+  files?: string[]
+  sensitive?: boolean
 }
 
 export interface AppointmentChecks {

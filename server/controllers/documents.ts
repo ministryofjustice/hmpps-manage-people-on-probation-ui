@@ -15,7 +15,7 @@ import { highlightText } from '../utils/highlightText'
 
 const routes = ['getDocuments'] as const
 
-const documentController: Controller<typeof routes> = {
+const documentController: Controller<typeof routes, void> = {
   getDocuments: hmppsAuthClient => {
     return async (req, res) => {
       const errors = validateWithSpec(req?.body ?? {}, documentSearchValidation())
