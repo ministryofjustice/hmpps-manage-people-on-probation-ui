@@ -14,10 +14,10 @@ export interface PersonSchedule {
   appointments: Activity[]
 }
 export interface Activity {
-  id?: string
+  id: string
   eventNumber?: string
-  type?: string
-  startDateTime?: string
+  type: string
+  startDateTime: string
   endDateTime?: string
   rarToolKit?: string
   appointmentNotes?: Note[]
@@ -26,33 +26,39 @@ export interface Activity {
   hasOutcome?: boolean
   wasAbsent?: boolean
   officerName?: Name
-  isInitial?: boolean
-  isNationalStandard?: boolean
-  rescheduled?: boolean
-  rescheduledStaff?: boolean
-  rescheduledPop?: boolean
+  isInitial: boolean
+  isNationalStandard: boolean
+  location?: Address
+  rescheduled: boolean
+  rescheduledStaff: boolean
+  rescheduledPop: boolean
   didTheyComply?: boolean
   absentWaitingEvidence?: boolean
   rearrangeOrCancelReason?: string
   rescheduledBy?: Name
   repeating?: boolean
   nonComplianceReason?: string
-  documents?: Document[]
+  documents: Document[]
+  isRarRelated?: boolean
   rarCategory?: string
   acceptableAbsence?: boolean
   acceptableAbsenceReason?: string
-  location?: Address
+  isAppointment: boolean
+  isCommunication: boolean
   action?: string
   isSystemContact?: boolean
-  isAppointment?: boolean
-  isCommunication?: boolean
   isEmailOrTextFromPop?: boolean
   isPhoneCallFromPop?: boolean
   isEmailOrTextToPop?: boolean
   isPhoneCallToPop?: boolean
+  isInPast: boolean
+  isPastAppointment: boolean
+  countsTowardsRAR?: boolean
   lastUpdated?: string
   lastUpdatedBy?: Name
   deliusManaged?: boolean
+  description?: string
+  outcome?: string
 }
 
 export interface PersonAppointment {

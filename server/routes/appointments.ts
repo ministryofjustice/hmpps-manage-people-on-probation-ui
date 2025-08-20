@@ -4,6 +4,8 @@ import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import { getPersonalDetails, autoStoreSessionData, getAppointment } from '../middleware'
+import validate from '../middleware/validation/index'
+import { getPersonAppointment } from '../middleware/getPersonAppointment'
 
 export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -41,5 +43,11 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     getPersonalDetails(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     controllers.appointments.getNextAppointment(hmppsAuthClient),
+  )
+  
+  router.get(
+    '/case/:crn/appointments/appointment/:contactId/manage',
+    getPersonalDetails(hmppsAuthClient),
+    controllers.appointments.getManageAppointment(hmppsAuthClient),
   )
 }

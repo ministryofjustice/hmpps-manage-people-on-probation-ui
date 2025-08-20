@@ -36,6 +36,7 @@ import {
   AppointmentRequestBody,
   CheckAppointment,
   AppointmentTypeResponse,
+  NextComAppointmentResponse,
 } from '../models/Appointments'
 
 interface GetUserScheduleProps {
@@ -363,9 +364,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/appointment/types`, handle404: false })
   }
 
-  // async getAppointment(crn: string): Promise<any> {
-  //   return this.get({
-  //     path: `/appointment/${crn}`,
-  //   })
-  // }
+  async getNextComAppointment(username: string, crn: string, contactId: string): Promise<NextComAppointmentResponse> {
+    return this.get({ path: `/schedule/${crn}/next-com-appointment?username=${username}&contactId=${contactId}` })
+  }
 }

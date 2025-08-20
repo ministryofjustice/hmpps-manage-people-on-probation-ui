@@ -7,7 +7,7 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { fullName, toRoshWidget, toPredictors, isNumericString, isValidCrn, setDataValue, getDataValue } from '../utils'
+import { fullName, toRoshWidget, toPredictors, isNumericString, isValidCrn, setDataValue, getDataValue, isMatchingAddress } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
 import { renderError, getAppointment } from '../middleware'
@@ -22,9 +22,10 @@ const routes = [
   'getRecordAnOutcome',
   'postRecordAnOutcome',
   'getNextAppointment',
+  'getManageAppointment',
 ] as const
 
-const appointmentsController: Controller<typeof routes> = {
+const appointmentsController: Controller<typeof routes, void> = {
   getAppointments: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params as Record<string, string>
@@ -143,6 +144,42 @@ const appointmentsController: Controller<typeof routes> = {
       res.render('pages/appointments/appointment', {
         personAppointment,
         crn,
+      })
+    }
+  },
+  getManageAppointment: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, contactId } = req.params
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MANAGE_APPOINTMENT',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const { username } = res.locals.user
+      const [personAppointment, nextComAppointment, appointmentTypes] = await Promise.all([
+        masClient.getPersonAppointment(crn, contactId),
+        masClient.getNextComAppointment(username, crn, contactId),
+        masClient.getAppointmentTypes(),
+      ])
+      const { appointment } = personAppointment
+      const deliusManaged =
+        (appointment?.hasOutcome && appointment?.acceptableAbsence === false) ||
+        appointmentTypes.appointmentTypes.every(type => type.description !== appointment.type)
+      const nextAppointmentIsAtHome = isMatchingAddress(
+        res.locals.case.mainAddress,
+        nextComAppointment?.appointment?.location,
+      )
+      return res.render('pages/appointments/manage-appointment', {
+        personAppointment,
+        crn,
+        nextComAppointment,
+        deliusManaged,
+        nextAppointmentIsAtHome,
       })
     }
   },
