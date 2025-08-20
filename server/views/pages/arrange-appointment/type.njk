@@ -11,16 +11,6 @@
 {% endfor %}
 {% block heading %}{% endblock %}
 {% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
-    {% endif %}
-  {% endif %}
   {{ govukRadios({
     formGroup: {
       attributes: {
