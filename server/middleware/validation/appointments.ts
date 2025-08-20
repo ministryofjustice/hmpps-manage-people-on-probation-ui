@@ -117,13 +117,31 @@ const appointments: Route<void> = (req, res, next) => {
     const { contactId } = req.params
     if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
       render = `pages/appointments/record-an-outcome`
-      console.log('validate record an outcome')
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           page: 'record-an-outcome',
+        }),
+      )
+    }
+  }
+
+  const validateAddNote = () => {
+    const { contactId } = req.params
+    // console.dir(req.files, { depth: null })
+    if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
+      console.log(req.body)
+      // const files = req.files as Express.Multer.File[]
+      // console.dir(files, { depth: null })
+      render = `pages/appointments/add-note`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'add-note',
         }),
       )
     }
@@ -137,9 +155,9 @@ const appointments: Route<void> = (req, res, next) => {
   validateRepeating()
   validateSensitivity()
   validateRecordAnOutcome()
+  validateAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    console.dir(errorMessages, { depth: null })
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

@@ -5,15 +5,27 @@
 {% set backLink = change if change else 
     '/case/' + crn + '/appointments/appointment/' + id + '/manage/' + back %}
 {% block form %}
-    <h2 class="govuk-heading-m" data-qa="pageHeading">Add a note</h2>
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
+    {{ govukDetails({
+                          classes: 'govuk-!-margin-bottom-6',
+                          summaryText: 'Take notes using CRISS',
+                          html: 'some html'
+                      }) }}
+    {{ govukButton({
+    text: "Show CRISS headers",
+    classes: "govuk-button--secondary",
+    attributes: {
+        'data-qa': 'crissLink'
+    }
+    }) }}
     {{ govukTextarea({
     id: "notes",
     name: "notes",
+    rows: '10',
     formGroup: {
         attributes: { "data-qa": "notes"}
     }
-} | decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
+}) }}
 
     {% set uploadHtml %}
     <div class="govuk-grid-row govuk-body">
@@ -24,13 +36,10 @@
                             name: "file",
                             classes: 'moj-multi-file-upload__input',
                             label: {
-                                text: "Upload or drag and drop documents",
+                                text: "Upload files",
                                 classes: 'govuk-label--m'
                             },
-                            attributes: { multiple: '' },
-                            errorMessage: {
-                                text: "Please select a file"
-                            } 
+                            attributes: { multiple: '' }
                         }) }}
 
             {{ govukButton({
@@ -46,20 +55,19 @@
                         name: "fileName",
                         label: { text: "Upload or drag and drop documents" },
                         uploadedFiles: {
-                            heading: { text: 'Documents added' },
+                            heading: { text: 'Files added' },
                             items: uploadedFiles
                         },
-                        uploadHtml: uploadHtml,
-                        errorMessage: {
-                            text: "Please select a file"
-                        } 
+                        uploadHtml: uploadHtml
                     }) }}
 
     {{ govukRadios({
+        name: 'sensitive',
+        id: 'sensitive',
     fieldset: {
         legend: {
             text: 'Does this appointment include sensitive information?',
-            classes: "govuk-fieldset__legend--l",
+            classes: "govuk-fieldset__legend--m",
             isPageHeading: false
         }
     },
@@ -80,6 +88,9 @@
             value: 'No',
             text: "No, it is not sensitive"
         }
-    ]
-} | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
+    ],
+    errorMessage: {
+        text: "Please select an option" if errorMessages.sensitive
+    } 
+}) }}
 {% endblock %}

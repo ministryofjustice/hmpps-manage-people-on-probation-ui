@@ -169,6 +169,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    sensitive: {
+      optional: page !== 'add-note',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not the appointment note contains sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
     outcomeRecorded: {
       optional: page !== 'record-an-outcome',
       checks: [

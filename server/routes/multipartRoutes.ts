@@ -19,6 +19,8 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
   )
   router.post(
     '/case/:crn/appointments/appointment/:contactId/add-note',
+    upload.array('documents'),
+    validate.appointments,
     controllers.appointments.postAddNote(hmppsAuthClient),
   )
   router.post(
