@@ -186,8 +186,8 @@ describe('controllers/appointments', () => {
         controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
       })
 
-      it('should redirect to the arrange appointment type page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/type`)
+      it('should redirect to the arrange appointment sentence page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence`)
       })
     })
     describe('CRN request parameter is invalid', () => {

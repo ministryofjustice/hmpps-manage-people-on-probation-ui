@@ -29,8 +29,8 @@ const loadPage = ({
   repeatAppointments = true,
   notes = true,
 } = {}) => {
-  completeTypePage(typeOptionIndex, '', hasVisor)
-  completeSentencePage(sentenceOptionIndex)
+  completeSentencePage(sentenceOptionIndex, '')
+  completeTypePage(typeOptionIndex, hasVisor)
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
@@ -88,7 +88,7 @@ describe('Check your answers then confirm the appointment', () => {
   })
 
   it('should render the page with personal contact', () => {
-    loadPage({ hasVisor: false, typeOptionIndex: 5, sentenceOptionIndex: 4 })
+    loadPage({ hasVisor: false, typeOptionIndex: 2, sentenceOptionIndex: 4 })
     cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
     cy.get('[data-qa="appointmentSentence"]').should('not.exist')
     cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
@@ -116,11 +116,11 @@ describe('Check your answers then confirm the appointment', () => {
       loadPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
     })
-    it('should update the type when value is changed', () => {
-      checkUpdateType(cyaPage)
-    })
     it('should update the sentence when value is changed', () => {
       checkUpdateSentence(cyaPage)
+    })
+    it('should update the type when value is changed', () => {
+      checkUpdateType(cyaPage)
     })
     it('should update the location when value is changed', () => {
       checkUpdateLocation(cyaPage)

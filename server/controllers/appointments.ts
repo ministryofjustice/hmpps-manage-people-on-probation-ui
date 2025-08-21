@@ -122,7 +122,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/arrange-appointment/type`)
+      return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
     }
   },
   getAppointmentDetails: hmppsAuthClient => {

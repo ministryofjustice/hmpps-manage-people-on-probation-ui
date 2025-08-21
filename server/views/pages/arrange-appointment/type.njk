@@ -1,9 +1,12 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment details' %}
-{% set backLink = change if change else '/case/' + crn + '/appointments' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set types = [] %}
+{% if personLevel %}
+  {% set appointmentTypes = getPersonLevelTypes(appointmentTypes) %}
+{% endif %}
 {% for appointmentType in appointmentTypes %}
   {% set types = (types.push({
     text: appointmentType.description | toSentenceCase(['(NS)']),
@@ -26,7 +29,7 @@
   {% endif %}
 
   {# Main Appointment details heading #}
-  <h1 class="govuk-heading-m" data-qa="pageHeading">{{ title }}</h1>
+  <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
 
   {# Inset text for NDelius info #}
   {{ govukInsetText({
