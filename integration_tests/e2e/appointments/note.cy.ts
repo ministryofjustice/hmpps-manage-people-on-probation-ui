@@ -20,7 +20,7 @@ const loadPage = () => {
   completeDateTimePage()
 }
 
-describe('Add a note', () => {
+describe('Add supporting information (optional)', () => {
   let appointmentNotePage: AppointmentNotePage
   beforeEach(() => {
     cy.task('stubNoRepeats')
@@ -30,7 +30,7 @@ describe('Add a note', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })
-  it('should be on add note page', () => {
+  it('should be on Add supporting information (optional) page', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {

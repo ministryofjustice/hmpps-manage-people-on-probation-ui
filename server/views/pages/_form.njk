@@ -1,9 +1,11 @@
 {% extends "../partials/layout.njk" %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% block beforeContent %}
-  {{ govukBackLink({
+  {% if backLink %}
+    {{ govukBackLink({
     href: backLink + ("?change=" + change if change else '')
   }) }}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
@@ -15,20 +17,24 @@
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         {% block heading %}
-          <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
-            {{ title }}
-          </h2>
+          {% if title %}
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+              {{ title }}
+            </h2>
+          {% endif %}
         {% endblock %}
-        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %}>
+          {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
           {% block form %}{% endblock %}
-          {{ govukButton({
+          {% if not hideButton %}
+            {{ govukButton({
             html: buttonText if buttonText else 'Continue',
             isStartButton: buttonText === 'Start now',
             attributes: {
               'data-qa': 'submit-btn'
             }
           }) }}
+          {% endif %}
         </form>
       </div>
     </div>

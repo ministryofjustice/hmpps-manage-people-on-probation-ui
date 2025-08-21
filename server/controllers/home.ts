@@ -4,7 +4,7 @@ import config from '../config'
 
 const routes = ['getHome'] as const
 
-const homeController: Controller<typeof routes> = {
+const homeController: Controller<typeof routes, void> = {
   getHome: hmppsAuthClient => {
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

@@ -117,7 +117,18 @@
     visuallyHiddenText: "attendance"
      } 
      ] 
-     } if showAction }, 
+     } if showAction },
+     { key: { text: "VISOR report"},
+      value: { text: appointment.visorReport },
+      actions: {
+      items: [ {
+     href: changePath + "/type?change=" + url,
+     text: "Change",
+     visuallyHiddenText: "type of appointment"
+     }
+     ]
+     } if showAction
+     } if appointment.meta.isVisor,
      { key: { text: "Location" }, 
      value: { text: locationAddress | safe if appointment.location else appointment.location }, 
      actions: { items: [ { href: changePath + "/location?change=" + url, 
@@ -135,7 +146,7 @@
             key: { html: '<span data-qa="repeatingAppointmentLabel">Repeating appointment</span>' },
       value: { html: '<span data-qa="repeatingAppointmentValue">' + ('Yes' if appointment.repeating === 'Yes' else 'No') + '</span>' },
       actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
-       { key: { text: "Appointment notes" },
+       { key: { text: "Supporting information" },
     value: { html: "Not entered" if anotherAppointment and not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 

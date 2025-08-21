@@ -6,6 +6,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
+import { Document } from '../data/model/personalDetails'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -36,10 +37,18 @@ const mockPersonActivityResponse = {
       isSensitive: false,
       hasOutcome: false,
       wasAbsent: true,
+      isInitial: false,
+      isNationalStandard: false,
+      rescheduled: false,
+      rescheduledStaff: false,
+      rescheduledPop: false,
       notes: '',
-
       isCommunication: true,
       isPhoneCallFromPop: true,
+      documents: [] as Document[],
+      isPastAppointment: false,
+      isInPast: false,
+      isAppointment: true,
       officerName: {
         forename: 'Terry',
         surname: 'Jones',
