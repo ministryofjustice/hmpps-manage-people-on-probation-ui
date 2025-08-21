@@ -1,7 +1,17 @@
 {% extends "../_form.njk" %}
-
+{% from "_components/note/macro.njk" import appNote %}
 {% set title = 'Add a note (optional)' %}
+{% set appointment = personAppointment.appointment %}
 {% set multipartForm = true %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% set notes = '' %}
+{% if hasNotes %}
+    {% for appointmentNote in appointment.appointmentNotes %}
+        {% if appointmentNote.note %}
+            {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 {% set backLink = change if change else 
     '/case/' + crn + '/appointments/appointment/' + id + '/manage/' + back %}
 {% block form %}
@@ -11,12 +21,22 @@
                           summaryText: 'Take notes using CRISS',
                           html: 'some html'
                       }) }}
+    {% if hasNotes %}
+        <section data-qa="previousNotes">
+            <h3 class="govuk-heading-m">Previous notes</h3>
+            {{ govukInsetText({
+  html: notes
+}) }}
+        </section>
+    {% endif %}
     {{ govukButton({
     text: "Show CRISS headers",
     classes: "govuk-button--secondary",
+    id: "crissButton",
     attributes: {
-        'data-qa': 'crissLink'
-    }
+        'data-qa': 'crissButton'
+    },
+    type: 'button'
     }) }}
     {{ govukTextarea({
     id: "notes",
@@ -26,6 +46,7 @@
         attributes: { "data-qa": "notes"}
     }
 }) }}
+    <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
 
     {% set uploadHtml %}
     <div class="govuk-grid-row govuk-body">
