@@ -83,7 +83,7 @@
      ]
      } if showAction },
      { key: { text: "Appointment type" },
-     value: { text: appointment.type.description },
+     value: { text: 'Not entered' if anotherAppointment and appointment.type.code === '' else appointment.type.description },
      actions: {
      items: [{
      href: changePath + "/type?change=" + url,

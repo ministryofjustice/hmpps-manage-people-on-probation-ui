@@ -884,6 +884,7 @@ describe('controllers/arrangeAppointment', () => {
         teamCode: '',
         providerCode: '',
       },
+      type: '...',
       date: '2025/7/2',
       start: '9:00am',
       end: '9:30am',
@@ -961,6 +962,7 @@ describe('controllers/arrangeAppointment', () => {
           url,
         },
         appointmentSession: {
+          type: 'type',
           date: '',
           start: '',
           end: '',
@@ -975,7 +977,9 @@ describe('controllers/arrangeAppointment', () => {
       )
     })
     it('should redirect to the confirmation page if date value is in appointment session', async () => {
-      const mockReq = createMockRequest({ appointmentSession: { date: '2025/7/2', start: '9:00am', end: '9:30am' } })
+      const mockReq = createMockRequest({
+        appointmentSession: { type: 'type', date: '2025/7/2', start: '9:00am', end: '9:30am' },
+      })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)

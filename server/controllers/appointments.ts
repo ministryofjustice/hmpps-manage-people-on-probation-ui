@@ -20,7 +20,7 @@ import {
 } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
-import { renderError, getAppointment } from '../middleware'
+import { renderError, getAppointment, getAppointmentTypes } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentSession } from '../models/Appointments'
 
@@ -31,7 +31,6 @@ const routes = [
   'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
-  'oldGetNextAppointment',
   'getManageAppointment',
   'getNextAppointment',
   'postNextAppointment',
@@ -243,65 +242,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
     }
   },
-  oldGetNextAppointment: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, contactId } = req.params
-      const { data } = req.session
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      const locations = res.locals.userLocations
-      // const locations = await masClient.getOfficeLocationsByTeamAndProvider(providerCode, teamCode) //might need to get location codes
-      let locationCode = ''
-      for (const location of locations) {
-        if (isMatchingAddress(location.address, personAppointment.appointment.location)) {
-          locationCode = location.code
-        }
-      }
-      const Appt: AppointmentSession = {
-        user: {
-          providerCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'providerCode']),
-          teamCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'teamCode']),
-          username: res.locals.user.username,
-          locationCode, // how to map from Address object to location code
-        },
-        type: personAppointment.appointment.type,
-        visorReport: res.locals.appointment.meta.isVisor ? 'Yes' : 'No', // how to get
-        date: '',
-        start: '',
-        end: '',
-        until: '',
-        repeatingDates: [] as string[],
-        numberOfAppointments: '1',
-        numberOfRepeatAppointments: '0',
-        repeating: 'No',
-        eventId: personAppointment.appointment.eventNumber ? personAppointment.appointment.eventNumber : '',
-        username: fullName(personAppointment.appointment.officerName),
-        uuid: contactId,
-        requirementId: '', // how to get
-        licenceConditionId: '', // how to get
-        nsiId: '', // how to get
-        notes: personAppointment.appointment.appointmentNotes[0].note, // notes, appointmentNotes or appointmentNote? - need schema access
-        sensitivity: personAppointment.appointment.isSensitive ? 'Yes' : 'No',
-      }
-      // what will always exist. What may not?
-      setDataValue(data, ['appointments', crn, contactId], Appt)
-      setDataValue(data, 'return-dest', { crn, contactID: contactId })
-
-      res.render('pages/appointments/next-appointment', {
-        personAppointment,
-        crn,
-      })
-    }
-  },
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
@@ -318,7 +258,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      setDataValue(data, 'return-dest', { crn, contactID: contactId })
+      setDataValue(data, 'return-dest', { crn, contactId })
       res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
@@ -366,12 +306,12 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const Appt: AppointmentSession = {
         user: {
-          providerCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'providerCode']),
-          teamCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'teamCode']),
+          providerCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'providerCode']), // where are these set in the arrange appointment flow
+          teamCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'teamCode']), // where are these set in the arrange appointment flow
           username: res.locals.user.username,
-          locationCode, // how to map from Address object to location code
+          locationCode,
         },
-        type: option === 'keepType' ? personAppointment.appointment.type : '', // need as an ID instead
+        type: option === 'keepType' ? personAppointment.appointment.type : '', // need as an code instead - matching res.locals.appointmentTypes
         visorReport: res.locals.appointment.meta.isVisor ? 'Yes' : 'No', // how to get
         date: '',
         start: '',

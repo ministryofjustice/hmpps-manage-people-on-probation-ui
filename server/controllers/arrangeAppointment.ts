@@ -367,7 +367,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getConfirmation: () => {
     return async (req, res) => {
       const { crn } = req.params
-      return res.render(`pages/arrange-appointment/confirmation`, { crn })
+      const { data } = req.session
+      const returnDest = getDataValue(data, ['return-dest'])
+      console.log(returnDest)
+      return res.render(`pages/arrange-appointment/confirmation`, { crn, returnDest })
     }
   },
   postConfirmation: () => {
@@ -407,6 +410,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+      const type = getDataValue(data, ['appointments', crn, id, 'type'])
+      if (!type) {
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type?change=${req.url}`)
       }
       const date = getDataValue(data, ['appointments', crn, id, 'date'])
       if (!date) {

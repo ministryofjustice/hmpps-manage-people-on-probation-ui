@@ -8,6 +8,7 @@ import {
   autoStoreSessionData,
   getAppointment,
   getOfficeLocationsByTeamAndProvider,
+  getAppointmentTypes,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
@@ -52,6 +53,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     autoStoreSessionData(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
+    getAppointmentTypes(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
