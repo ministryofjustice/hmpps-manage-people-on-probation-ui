@@ -180,7 +180,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getRecordAnOutcome: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn, contactId } = req.params
       await auditService.sendAuditMessage({
         action: 'UPDATE_APPOINTMENT_OUTCOME',
         who: res.locals.user.username,
@@ -189,8 +189,15 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const { username } = res.locals.user
+      const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
+
       return res.render('pages/appointments/record-an-outcome', {
+        personAppointment,
         crn,
+        contactId,
       })
     }
   },
