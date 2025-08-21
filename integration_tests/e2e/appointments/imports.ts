@@ -208,15 +208,6 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
   page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
 }
 
-export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(2).find('.govuk-link').click()
-  const typePage = new AppointmentTypePage()
-  typePage.getRadio('type', 2).click()
-  typePage.getSubmitBtn().click()
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
-}
-
-
 export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
     page.getSummaryListRow(1).find('.govuk-link').click()

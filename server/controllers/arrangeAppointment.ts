@@ -34,7 +34,7 @@ const routes = [
   'postArrangeAnotherAppointment',
 ] as const
 
-const arrangeAppointmentController: Controller<typeof routes> = {
+const arrangeAppointmentController: Controller<typeof routes, void> = {
   redirectToSentence: () => {
     return async (req, res) => {
       const uuid = uuidv4()
