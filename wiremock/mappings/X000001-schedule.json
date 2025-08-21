@@ -278,18 +278,11 @@
               }
             ],
             "location": {
-              "buildingName": "The Building",
-              "buildingNumber": "77",
-              "streetName": "Some Street",
-              "district": "Some City Centre",
+              "buildingNumber": "102",
+              "streetName": "Petty France",
+              "district": "Westminster",
               "town": "London",
-              "county": "Essex",
-              "postcode": "NW10 1EP",
-              "lastUpdated": "2023-03-14",
-              "lastUpdatedBy": {
-                "forename": "Jiminy",
-                "surname": "Cricket"
-              }
+              "postcode": "SW1H 9EA"
             }
           }
         },

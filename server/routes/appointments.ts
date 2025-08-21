@@ -3,7 +3,12 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
-import { getPersonalDetails, autoStoreSessionData, getAppointment } from '../middleware'
+import {
+  getPersonalDetails,
+  autoStoreSessionData,
+  getAppointment,
+  getOfficeLocationsByTeamAndProvider,
+} from '../middleware'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
 import MasApiClient from '../data/masApiClient'
@@ -36,14 +41,19 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
   )
 
-  router.post('/case/:crn/appointments/appointment/:contactId/next-appointment', [
-    autoStoreSessionData(hmppsAuthClient),
-  ])
   router.get(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
     getPersonalDetails(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     controllers.appointments.getNextAppointment(hmppsAuthClient),
+  )
+  router.post(
+    '/case/:crn/appointments/appointment/:contactId/next-appointment',
+    autoStoreSessionData(hmppsAuthClient),
+    getPersonalDetails(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
 
   router.get(
@@ -51,5 +61,4 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     getPersonalDetails(hmppsAuthClient),
     controllers.appointments.getManageAppointment(hmppsAuthClient),
   )
-
 }

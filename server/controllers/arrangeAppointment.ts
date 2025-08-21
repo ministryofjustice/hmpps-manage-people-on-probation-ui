@@ -412,8 +412,9 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!date) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/date-time?validation=true&change=${req.url}`)
       }
+      // may also need to validate type as potentially reset
       await postAppointments(hmppsAuthClient)(req, res)
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`) // and then redirect based on redirect-id
     }
   },
 }
