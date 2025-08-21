@@ -1,0 +1,26 @@
+{% macro manageAppointmentLink(flag, appointment, crn) %}
+    {% if flag.enableManageAppointments %}
+        {% if not appointment.deliusManaged %}
+            <a class="govuk-link govuk-link--no-visited-state"
+               target="_blank"
+               href="/manage/appointment/{{ appointment.id }}"
+               aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">
+                Manage
+            </a>
+        {% else %}
+            <a class="govuk-link govuk-link--no-visited-state"
+               target="_blank"
+               href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
+               aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
+                Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
+            </a>
+        {% endif %}
+    {% else %}
+        <a class="govuk-link govuk-link--no-visited-state"
+           target="_blank"
+           href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
+           aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
+            Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
+        </a>
+    {% endif %}
+{% endmacro %}
