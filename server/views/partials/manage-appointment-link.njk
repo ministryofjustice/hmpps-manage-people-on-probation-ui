@@ -1,5 +1,5 @@
-{% macro manageAppointmentLink(flag, appointment, crn) %}
-    {% if flag.enableManageAppointments %}
+{% macro manageAppointmentLink(flags, appointment, crn) %}
+    {% if flags.enableManageAppointments %}
         {% if not appointment.deliusManaged %}
             <a class="govuk-link govuk-link--no-visited-state"
                target="_blank"

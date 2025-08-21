@@ -43,7 +43,7 @@
       </a>
     {% endset %}
       {% set actionsButton %}
-          {{ manageAppointmentLink(flag, appointment, crn) }}
+          {{ manageAppointmentLink(flags, appointment, crn) }}
       {% endset %}
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
@@ -81,7 +81,7 @@
     {% endset %}
 
       {% set actionsButton %}
-          {{ manageAppointmentLink(flag, appointment, crn) }}
+          {{ manageAppointmentLink(flags, appointment, crn) }}
       {% endset %}
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
