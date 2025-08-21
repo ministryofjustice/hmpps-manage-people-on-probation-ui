@@ -274,6 +274,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const errorMessages: ErrorMessages = {}
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      console.log(data)
       // messy
       let opt
       try {
@@ -293,7 +294,7 @@ const appointmentsController: Controller<typeof routes, void> = {
           errorMessages,
         })
       }
-      const locations = res.locals.userLocations
+      const locations = res.locals.userLocations // this is made from getOfficeLocationsByTeamAndProvider so realistically need them first (maybe during Get rather than Set)
       const uuid = v4()
       if (option === 'no') {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
@@ -306,8 +307,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const Appt: AppointmentSession = {
         user: {
-          providerCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'providerCode']), // where are these set in the arrange appointment flow
-          teamCode: getDataValue(data, ['appointments', crn, contactId, 'user', 'teamCode']), // where are these set in the arrange appointment flow
+          providerCode: '', // how to get
+          teamCode: '', // how to get
           username: res.locals.user.username,
           locationCode,
         },
