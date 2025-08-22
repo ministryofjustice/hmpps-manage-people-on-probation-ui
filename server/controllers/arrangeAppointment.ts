@@ -78,15 +78,12 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
-      
       const showValidation = validation === 'true'
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
         }
       }
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, showValidation })
-
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -95,7 +92,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel })
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel, showValidation })
     }
   },
   postType: () => {

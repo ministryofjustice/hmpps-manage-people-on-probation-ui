@@ -192,7 +192,7 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         change: undefined,
-        showValidation: false,
+        errors: undefined,
       })
     })
   })
@@ -289,6 +289,7 @@ describe('controllers/arrangeAppointment', () => {
           change: undefined,
           errors: undefined,
           personLevel: false,
+          showValidation: false,
         })
       })
     })

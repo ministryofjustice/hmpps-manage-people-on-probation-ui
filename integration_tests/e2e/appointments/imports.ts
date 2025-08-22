@@ -249,14 +249,6 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
   })
 }
 
-export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(2).find('.govuk-link').click()
-  const typePage = new AppointmentTypePage()
-  typePage.getRadio('type', 2).click()
-  typePage.getSubmitBtn().click()
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
-}
-
 export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   page.getSummaryListRow(4).find('.govuk-link').click()
   const locationPage = new AppointmentLocationPage()
