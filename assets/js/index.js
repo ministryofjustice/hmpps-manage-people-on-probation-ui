@@ -111,6 +111,13 @@ const homeSearch = () => {
 }
 
 const multiFileUpload = () => {
+  const originalFetch = window.fetch
+  window.fetch = (url, options = {}) => {
+    return originalFetch(url, {
+      credentials: 'same-origin', // 👈 ensures cookies go with request
+      ...options, // user-specified options still apply
+    })
+  }
   MOJFrontend.MultiFileUpload.prototype.getSuccessHtml = (success, status = 'Uploaded', color = 'grey') => {
     return `<span class="moj-multi-file-upload__success"><span class="moj-multi-file-upload__message-text moj-multi-file-upload__message-text--with-icon"><svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25"><path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"/></svg>${success.messageHtml}</span><strong class="moj-multi-file-upload__message-status"><string class="govuk-tag govuk-tag--${color}">${status}</strong></span>`
   }

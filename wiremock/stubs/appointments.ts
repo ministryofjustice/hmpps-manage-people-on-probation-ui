@@ -137,7 +137,6 @@ const getAppointmentStub = (
   if (rar === true) {
     mapping.response.jsonBody.appointment.rarCategory = 'Stepping Stones'
   }
-  console.dir(mapping, { depth: null })
   return mapping
 }
 

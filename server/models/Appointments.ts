@@ -1,4 +1,4 @@
-import { Name, PersonSummary } from '../data/model/personalDetails'
+import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
 
@@ -123,4 +123,5 @@ export interface LocalParams {
   errors?: Errors
   _minDate?: string
   _maxDate?: string
+  uploadedFiles?: any
 }

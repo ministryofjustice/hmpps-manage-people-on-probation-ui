@@ -77,7 +77,10 @@
                         label: { text: "Upload or drag and drop documents" },
                         uploadedFiles: {
                             heading: { text: 'Files added' },
-                            items: uploadedFiles
+                            items: [
+      { name: "document1.pdf", href: "/remove-file/0" },
+      { name: "evidence.png", href: "/remove-file/1" }
+    ]
                         },
                         uploadHtml: uploadHtml
                     }) }}

@@ -1,29 +1,25 @@
-import { Controller } from '../@types'
-import { AppResponse } from '../models/Locals'
+import { Controller, FileCache, FileUploadResponse } from '../@types'
 
 const routes = ['postUploadFile', 'postDeleteFile'] as const
 
-interface FileUploadResponse {
-  file: {
-    id: string
-    name: string
-    size: number
-  }
-  success?: {
-    messageText: string
-    messageHtml: string
-  }
-  error?: {
-    message: string
-  }
-}
-
-const fileUploadController: Controller<typeof routes, AppResponse> = {
+const fileUploadController: Controller<typeof routes, any> = {
   postUploadFile: _hmppsAuthClient => {
     return async (req, res) => {
       let status = 200
-      const file = (req.files as Express.Multer.File[])[0]
+      const files = req.files as Express.Multer.File[]
+      const file = files[0]
       const { originalname: name, size } = file
+      const { id } = req.params
+
+      const errors = {
+        type: 'The selected file must be a PDF or Word document',
+        size: 'The selected file must be 5mb or under',
+      }
+
+      const fileCache: FileCache = {
+        id,
+        name,
+      }
       const response: FileUploadResponse = {
         file: {
           id: '1',
@@ -36,13 +32,26 @@ const fileUploadController: Controller<typeof routes, AppResponse> = {
         response.error = {
           message: 'ERROR!',
         }
+        fileCache.error = status === 415 ? errors.type : errors.size
       } else {
+        // post the file to alfresco here
+
+        // update the session with success
         response.success = {
           messageHtml: name,
           messageText: name,
         }
+        fileCache.uploaded = true
       }
-      return res.status(status).json(response)
+
+      const cachedFiles: FileCache[] = [...(req?.session?.cache?.uploadedFiles ?? []), fileCache]
+      req.session.cache = {
+        ...(req?.session?.cache ?? {}),
+        uploadedFiles: cachedFiles,
+      }
+      req.session.save(() => {
+        return res.status(status).json(response)
+      })
     }
   },
   postDeleteFile: _hmppsAuthClient => {
