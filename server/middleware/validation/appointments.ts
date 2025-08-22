@@ -9,7 +9,7 @@ const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req
   const { crn, id } = params
   const localParams: LocalParams = { crn, id }
-  const render = `pages/${[
+  let render = `pages/${[
     url
       .split('?')[0]
       .split('/')
@@ -100,6 +100,21 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateRecordAnOutcome = () => {
+    const { contactId } = req.params
+    if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
+      render = `pages/appointments/record-an-outcome`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'record-an-outcome',
+        }),
+      )
+    }
+  }
+
   const validateSensitivity = () => {
     if (req.url.includes('/add-notes')) {
       errorMessages = validateWithSpec(
@@ -119,6 +134,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateLocation()
   validateDateTime()
   validateRepeating()
+  validateRecordAnOutcome()
   validateSensitivity()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
