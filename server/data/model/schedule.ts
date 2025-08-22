@@ -57,6 +57,7 @@ export interface Activity {
   lastUpdated?: string
   lastUpdatedBy?: Name
   deliusManaged?: boolean
+  isVisor?: boolean
   description?: string
   outcome?: string
 }

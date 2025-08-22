@@ -191,7 +191,8 @@ describe('controllers/arrangeAppointment', () => {
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,
-        errors: mockReq.session.data.errors,
+        change: undefined,
+        errors: undefined,
       })
     })
   })
@@ -288,6 +289,7 @@ describe('controllers/arrangeAppointment', () => {
           change: undefined,
           errors: undefined,
           personLevel: false,
+          showValidation: false,
         })
       })
     })
@@ -409,7 +411,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/location`, {
         crn,
         id: uuid,
-        errors: mockReq.session.data.errors,
+        errors: null,
         change: mockReq.query.change,
       })
     })
@@ -864,6 +866,7 @@ describe('controllers/arrangeAppointment', () => {
         teamCode: '',
         providerCode: '',
       },
+      type: '...',
       date: '2025/7/2',
       start: '9:00am',
       end: '9:30am',
@@ -935,12 +938,33 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
+    it('if no type has been decided for the appointment, it should redirect to the type page and display validation errors', async () => {
+      const mockReq = createMockRequest({
+        request: {
+          url,
+        },
+        appointmentSession: {
+          type: '',
+          date: '',
+          start: '',
+          end: '',
+          until: '',
+        },
+      })
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `/case/${crn}/arrange-appointment/${uuid}/type?validation=true&change=${url}`,
+      )
+    })
     it('if no date has been submitted for the appointment, it should redirect to the date/time page and display validation errors', async () => {
       const mockReq = createMockRequest({
         request: {
           url,
         },
         appointmentSession: {
+          type: 'type',
           date: '',
           start: '',
           end: '',
@@ -954,8 +978,10 @@ describe('controllers/arrangeAppointment', () => {
         `/case/${crn}/arrange-appointment/${uuid}/date-time?validation=true&change=${url}`,
       )
     })
-    it('should redirect to the confirmation page if date value is in appointment session', async () => {
-      const mockReq = createMockRequest({ appointmentSession: { date: '2025/7/2', start: '9:00am', end: '9:30am' } })
+    it('should redirect to the confirmation page if all required values are present in appointment session', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: { type: 'type', date: '2025/7/2', start: '9:00am', end: '9:30am' },
+      })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
