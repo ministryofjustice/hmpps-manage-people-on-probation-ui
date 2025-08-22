@@ -274,7 +274,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const errorMessages: ErrorMessages = {}
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      console.log(data)
       // messy
       let opt
       try {
@@ -333,7 +332,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         sensitivity: personAppointment.appointment.isSensitive ? 'Yes' : 'No',
       }
       setDataValue(data, ['appointments', crn, uuid], Appt)
-      console.log(getDataValue(data, ['appointments', crn, uuid]))
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
     }
   },
