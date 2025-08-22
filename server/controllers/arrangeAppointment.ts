@@ -54,7 +54,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const showValidation = validation === 'true'
-      console.log(showValidation)
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
@@ -376,7 +375,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn } = req.params
       const { data } = req.session
       const returnDest = getDataValue(data, ['return-dest'])
-      console.log(returnDest)
       return res.render(`pages/arrange-appointment/confirmation`, { crn, returnDest })
     }
   },
