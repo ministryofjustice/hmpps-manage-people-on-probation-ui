@@ -10,11 +10,11 @@ import { AppointmentSession } from '../models/Appointments'
 import { StatusErrorCode } from '../properties'
 
 const routes = [
-  'redirectToType',
-  'getType',
-  'postType',
+  'redirectToSentence',
   'getSentence',
   'postSentence',
+  'getType',
+  'postType',
   'getWhoWillAttend',
   'postWhoWillAttend',
   'getLocation',
@@ -35,62 +35,25 @@ const routes = [
 ] as const
 
 const arrangeAppointmentController: Controller<typeof routes, void> = {
-  redirectToType: () => {
+  redirectToSentence: () => {
     return async (req, res) => {
       const uuid = uuidv4()
       const { crn } = req.params
       if (!isValidCrn(crn) || !isValidUUID(uuid)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     }
   },
-  getType: () => {
+  getSentence: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
       if (errors) {
         delete req.session.data.errors
       }
-      const { crn, id } = req.params
-      const { change, validation } = req.query
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
-        }
-      }
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, showValidation })
-    }
-  },
-  postType: () => {
-    return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const change = req?.query?.change as string
-      const { number } = req.query as Record<string, string>
-      const query = number ? `?number=${number}` : ''
-      if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
-        return renderError(404)(req, res)
-      }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/sentence${query}`
-      return res.redirect(redirect)
-    }
-  },
-  getSentence: () => {
-    return async (req, res) => {
-      const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
-      const requiredValues = ['type']
-      for (const requiredValue of requiredValues) {
-        const value = getDataValue(data, ['appointments', crn, id, requiredValue])
-        if (!value) {
-          if (isValidCrn(crn) && isValidUUID(id)) {
-            return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
-          }
-          return renderError(404)(req, res)
-        }
-      }
       const { change } = req.query
-      return res.render(`pages/arrange-appointment/sentence`, { crn, id, change })
+      return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors })
     }
   },
   postSentence: () => {
@@ -105,7 +68,46 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
       const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
+      return res.redirect(redirect)
+    }
+  },
+  getType: () => {
+    return async (req, res) => {
+      const errors = req?.session?.data?.errors
+      const { crn, id } = req.params
+      const { change, validation } = req.query
+      const { data } = req.session
+      
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
+        }
+      }
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, showValidation })
+
+      const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
+      if (!eventId) {
+        if (isValidCrn(crn) && isValidUUID(id)) {
+          return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
+        }
+        return renderError(404)(req, res)
+      }
+      const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel })
+    }
+  },
+  postType: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const change = req?.query?.change as string
+      const { number } = req.query as Record<string, string>
+      const query = number ? `?number=${number}` : ''
+      if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
+        return renderError(404)(req, res)
+      }
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance${query}`
       return res.redirect(redirect)
     }
   },

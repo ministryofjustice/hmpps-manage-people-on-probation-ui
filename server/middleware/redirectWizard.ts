@@ -18,7 +18,7 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
         if (!isValidCrn(crn) || !isValidUUID(id)) {
           return renderError(404)(req, res)
         }
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
       }
     }
     return next()

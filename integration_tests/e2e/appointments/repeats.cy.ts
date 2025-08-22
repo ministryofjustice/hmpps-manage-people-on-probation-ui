@@ -16,8 +16,8 @@ import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your
 import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = () => {
-  completeTypePage()
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()

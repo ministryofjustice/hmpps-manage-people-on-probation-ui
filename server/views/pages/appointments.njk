@@ -3,6 +3,7 @@
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
 {% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
 {% set currentNavSection = 'appointments' %}
 {% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
@@ -41,13 +42,9 @@
         {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
       </a>
     {% endset %}
-    {% set actionsButton %}
-      {% if appointment.deliusManaged %}
-        <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
-      {% else %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-      {% endif %}
-    {% endset %}
+      {% set actionsButton %}
+          {{ manageAppointmentLink(flags, appointment, crn) }}
+      {% endset %}
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
       {
@@ -83,13 +80,9 @@
       </a>
     {% endset %}
 
-    {% set actionsButton %}
-      {% if appointment.deliusManaged %}
-        <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
-      {% else %}
-        <a class="govuk-link govuk-link--no-visited-state" target="_blank" href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-      {% endif %}
-    {% endset %}
+      {% set actionsButton %}
+          {{ manageAppointmentLink(flags, appointment, crn) }}
+      {% endset %}
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
       {

@@ -24,8 +24,8 @@ const regex: RegExp =
   /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2}[ap]m)\sto\s(\d{1,2}:\d{2}[ap]m)$/
 
 const loadPage = (crnOverride = '') => {
-  completeTypePage(1, '', false, crnOverride)
-  completeSentencePage(1, crnOverride)
+  completeSentencePage(1, '', crnOverride)
+  completeTypePage(1, false)
   completeAttendancePage()
   completeLocationPage(1, crnOverride)
   completeDateTimePage(crnOverride)
