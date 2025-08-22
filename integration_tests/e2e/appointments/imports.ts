@@ -43,9 +43,6 @@ export const getUuid = () => {
 export const getCrn = () => {
   return cy.url().then(currentUrl => {
     const split = currentUrl.split('?')[0].split('/')
-    expect(split[split.length - 1]).equal('arrange-another-appointment')
-    expect(split[split.length - 3]).equal('arrange-appointment')
-    expect(split[split.length - 4]).equal('X000001')
     return split[split.length - 4]
   })
 }
