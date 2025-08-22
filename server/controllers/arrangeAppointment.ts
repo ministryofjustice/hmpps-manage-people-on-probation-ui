@@ -52,8 +52,15 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params
-      const { change } = req.query
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
+      const { change, validation } = req.query
+      const showValidation = validation === 'true'
+      console.log(showValidation)
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
+        }
+      }
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, showValidation })
     }
   },
   postType: () => {
@@ -413,7 +420,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       const type = getDataValue(data, ['appointments', crn, id, 'type'])
       if (!type) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type?change=${req.url}`)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type?validation=true&change=${req.url}`)
       }
       const date = getDataValue(data, ['appointments', crn, id, 'date'])
       if (!date) {

@@ -294,7 +294,7 @@ const appointmentsController: Controller<typeof routes, void> = {
           errorMessages,
         })
       }
-      const locations = res.locals.userLocations // this is made from getOfficeLocationsByTeamAndProvider so realistically need them first (maybe during Get rather than Set)
+      const locations = res.locals.userLocations // this is made from getOfficeLocationsByTeamAndProvider so realistically need them first (maybe during Get rather than Post)
       const uuid = v4()
       if (option === 'no') {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
@@ -335,54 +335,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       setDataValue(data, ['appointments', crn, uuid], Appt)
       console.log(getDataValue(data, ['appointments', crn, uuid]))
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
-      // type never appears atm
     }
   },
 }
 
 export default appointmentsController
-
-//   id?: string
-//   type?: string
-//   startDateTime?: string
-//   endDateTime?: string
-//   rarToolKit?: string
-//   appointmentNotes?: Note[]
-//   appointmentNote?: Note
-//   isSensitive?: boolean
-//   hasOutcome?: boolean
-//   wasAbsent?: boolean
-//   officerName?: Name
-//   isInitial?: boolean
-//   isNationalStandard?: boolean
-//   rescheduled?: boolean
-//   rescheduledStaff?: boolean
-//   rescheduledPop?: boolean
-//   didTheyComply?: boolean
-//   absentWaitingEvidence?: boolean
-//   rearrangeOrCancelReason?: string
-//   rescheduledBy?: Name
-//   repeating?: boolean
-//   nonComplianceReason?: string
-//   documents?: Document[]
-//   rarCategory?: string
-//   acceptableAbsence?: boolean
-//   acceptableAbsenceReason?: string
-//   location?: Address
-//   action?: string
-//   isSystemContact?: boolean
-//   isAppointment?: boolean
-//   isCommunication?: boolean
-//   isEmailOrTextFromPop?: boolean
-//   isPhoneCallFromPop?: boolean
-//   isEmailOrTextToPop?: boolean
-//   isPhoneCallToPop?: boolean
-//   lastUpdated?: string
-//   lastUpdatedBy?: Name
-//   deliusManaged?: boolean
-
-// From getAppointment
-// const location: Location | string =
-//   locationCode && locationCode !== noLocationValue && loggedInUsername
-//     ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
-//     : 'Not needed'

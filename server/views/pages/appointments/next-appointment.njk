@@ -7,9 +7,14 @@
 
 {% block form %}
   {% set errorList = [{ text: errorMessages.error.text } if errorMessages.error else None ] | reject("undefined") %}
-  {% if errorList | length > 0 %}
+  {% if errorList.length > 0 %}
     {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-    {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+    {{ govukErrorSummary({ 
+        titleText: "There is a problem", 
+        errorList: errorList, 
+        attributes: { "data-qa": "errorList" } 
+        }) 
+    }}
   {% endif %}
 
   {{ govukRadios({

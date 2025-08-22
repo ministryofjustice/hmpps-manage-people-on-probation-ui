@@ -2,6 +2,7 @@ import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import AppointmentsPage from '../../pages/appointments'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
+import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import {
   completeAttendancePage,
   completeCYAPage,
@@ -15,6 +16,8 @@ import {
   endTime,
   startTime,
   checkPopHeader,
+  completeNextAppointmentPage,
+  completeArrangeAnotherPage,
 } from './imports'
 
 const regex: RegExp =
@@ -73,12 +76,6 @@ describe('Confirmation page', () => {
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     arrangeAnotherAppointmentPage.checkOnPage()
   })
-  it('should link to the appointment page when practitioner click finish', () => {
-    loadPage()
-    cy.get('[data-qa="finishLink"]').click()
-    const appointmentsPage = new AppointmentsPage()
-    appointmentsPage.checkOnPage()
-  })
 
   it('should render the page with pop telephone number', () => {
     cy.task('stubPersonalDetailsNoMobileNumber')
@@ -91,5 +88,31 @@ describe('Confirmation page', () => {
     loadPage('X000001')
     confirmPage = new AppointmentConfirmationPage()
     confirmPage.getPopContactNumber().should('not.exist')
+  })
+
+  it('should link to the appointment page when practitioner click finish and no return-dest', () => {
+    loadPage()
+    cy.get('[data-qa="finishLink"]').click()
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
+  })
+})
+describe('Confirmation page (accessed from NextAppointment)', () => {
+  let confirmPage: AppointmentConfirmationPage
+  const crn = 'X000001'
+  const appointmentId = '2'
+  beforeEach(() => {
+    cy.task('resetMocks')
+    cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/next-appointment`)
+    completeNextAppointmentPage()
+    completeArrangeAnotherPage()
+    confirmPage = new AppointmentConfirmationPage()
+  })
+  it('should link to the appropriate manage page when practitioner click finish and return-dest given', () => {
+    confirmPage.checkOnPage()
+    cy.get('[data-qa="finishLink"]').click()
+    const manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.setPageTitle('Manage Video call with William Philips')
+    manageAppointmentPage.checkOnPage()
   })
 })

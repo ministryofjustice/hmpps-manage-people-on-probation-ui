@@ -55,7 +55,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     getPersonalDetails(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
-    getWhoAttends(hmppsAuthClient),
+    // getWhoAttends(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
