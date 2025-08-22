@@ -406,6 +406,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { url } = req
       const { crn, id } = req.params as Record<string, string>
+      const { data } = req.session
       return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id })
     }
   },

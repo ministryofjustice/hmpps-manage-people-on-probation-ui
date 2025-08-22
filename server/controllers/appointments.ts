@@ -20,9 +20,10 @@ import {
 } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
-import { renderError, getAppointment, getAppointmentTypes } from '../middleware'
+import { renderError, getAppointment, getAppointmentTypes, getSentences } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentSession } from '../models/Appointments'
+import { getSentenceId } from '../utils/getSentenceId'
 
 const routes = [
   'getAppointments',
@@ -274,7 +275,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const errorMessages: ErrorMessages = {}
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      // messy
+      // check selected option
       let opt
       try {
         getDataValue(data, ['appointments', crn])
@@ -283,7 +284,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         opt = { option: null }
       }
       const { option } = opt || { option: null }
-      //
+      // error if no selection made
       if (!option) {
         logger.info('Option not selected')
         errorMessages.error = { text: 'Select whether or not you wanted to arrange the next appointment' }
@@ -293,17 +294,23 @@ const appointmentsController: Controller<typeof routes, void> = {
           errorMessages,
         })
       }
-      const locations = res.locals.userLocations // this is made from getOfficeLocationsByTeamAndProvider so realistically need them first (maybe during Get rather than Post)
-      const uuid = v4()
+      // backtrack if 'no' is selected
       if (option === 'no') {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
       }
+      // find locationCode
+      const locations = res.locals.userLocations // this is made from getOfficeLocationsByTeamAndProvider so realistically need them first (maybe during Get rather than Post)
       let locationCode = ''
       for (const location of locations) {
         if (isMatchingAddress(location.address, personAppointment.appointment.location)) {
           locationCode = location.code
         }
       }
+      // find eventId
+      const sentences = await masClient.getSentences(crn)
+      const eventId = getSentenceId(personAppointment.appointment.eventNumber, sentences)
+      // create session for new appointment
+      const uuid = v4()
       const Appt: AppointmentSession = {
         user: {
           providerCode: '', // how to get
@@ -312,7 +319,7 @@ const appointmentsController: Controller<typeof routes, void> = {
           locationCode,
         },
         type: option === 'keepType' ? personAppointment.appointment.type : '', // need as an code instead - matching res.locals.appointmentTypes
-        visorReport: res.locals.appointment.meta.isVisor ? 'Yes' : 'No', // how to get
+        visorReport: personAppointment.appointment.isVisor ? 'Yes' : 'No',
         date: '',
         start: '',
         end: '',
@@ -321,9 +328,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         numberOfAppointments: '1',
         numberOfRepeatAppointments: '0',
         repeating: 'No',
-        eventId: personAppointment.appointment.eventNumber ? personAppointment.appointment.eventNumber : '',
-        username: res.locals.user.username,
-        // fullName(personAppointment.appointment.officerName),
+        eventId,
         uuid,
         requirementId: '', // how to get
         licenceConditionId: '', // how to get
