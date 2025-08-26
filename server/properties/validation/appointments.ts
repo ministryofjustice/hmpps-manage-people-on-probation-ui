@@ -169,16 +169,15 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    // // {% set action='/case/' + crn + "/appointments/appointment/"+ contactId + "/record-an-outcome"  %}
-    // [`[appointments][${crn}][${id}][]`]: {
-    //   optional: page !== 'add-notes',
-    //   checks: [
-    //     {
-    //       validator: isNotEmpty,
-    //       msg: 'Select if appointment includes sensitive information',
-    //       log: 'Sensitivity not selected',
-    //     },
-    //   ],
-    // },
+    outcomeRecorded: {
+      optional: page !== 'record-an-outcome',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if they attended and complied',
+          log: 'Attended and complied not selected',
+        },
+      ],
+    },
   }
 }
