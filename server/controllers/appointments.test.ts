@@ -229,7 +229,6 @@ describe('controllers/appointments', () => {
     it('should render the record an outcome page', () => {
       // expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment/1234/record-an-outcome', {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
-        personAppointment: mockPersonAppointment,
         crn,
         contactId: '1234',
       })

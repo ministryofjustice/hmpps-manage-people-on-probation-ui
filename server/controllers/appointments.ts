@@ -189,12 +189,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
 
       return res.render('pages/appointments/record-an-outcome', {
-        personAppointment,
         crn,
         contactId,
       })
@@ -206,9 +202,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
-      console.log('*****')
-      console.log(req.params)
-      console.log('*****')
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {

@@ -4,7 +4,6 @@
 {% set headerPersonName = personSummary.name.forename + ' ' + personSummary.name.surname %}
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
-{% set action='/case/' + crn + "/appointments/appointment/"+ contactId + "/record-an-outcome"  %}
 {% block form %}
 
   {{ govukCheckboxes({
@@ -36,13 +35,11 @@
   } if errorMessages.outcomeRecorded
   }) }}
 
-  <form method="post" action="{{ action }}" >
    <div class="govuk-button-group">
      {{ govukButton({
      text: "Continue"
    }) }}
      <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{contactId}}/manage">Cancel and go back</a>
    </div>
-  </form>
 
 {% endblock %}
