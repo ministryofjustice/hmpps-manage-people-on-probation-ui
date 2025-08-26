@@ -191,7 +191,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { username } = res.locals.user
       const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
 
       return res.render('pages/appointments/record-an-outcome', {
@@ -207,6 +206,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
+      console.log('*****')
+      console.log(req.params)
+      console.log('*****')
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {
