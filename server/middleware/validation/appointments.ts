@@ -103,12 +103,13 @@ const appointments: Route<void> = (req, res, next) => {
   const validateRecordAnOutcome = () => {
     const { contactId } = req.params
     if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
-      render = `pages/appointments/record-an-outcome` // can't assign to `const` variable!
+      render = `pages/appointments/record-an-outcome`
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
+          contactId,
           page: 'record-an-outcome',
         }),
       )

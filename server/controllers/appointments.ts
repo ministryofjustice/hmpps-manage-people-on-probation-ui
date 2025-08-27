@@ -198,18 +198,18 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postRecordAnOutcome: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId: id } = req.params
-      if (!isValidCrn(crn) || !isNumericString(id)) {
+      const { crn, contactId } = req.params
+      if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {
-        id: parseInt(id, 10),
+        id: parseInt(contactId, 10),
         outcomeRecorded: true,
       }
       await masClient.patchAppointment(body)
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
     }
   },
 }

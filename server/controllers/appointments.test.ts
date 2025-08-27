@@ -227,7 +227,6 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'UPDATE_APPOINTMENT_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
-      // expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment/1234/record-an-outcome', {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
         crn,
         contactId: '1234',

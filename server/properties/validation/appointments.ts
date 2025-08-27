@@ -16,10 +16,11 @@ export interface AppointmentsValidationArgs {
   page: string
   repeatingValue?: 'Yes' | 'No'
   visor?: boolean
+  contactId?: string
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue } = args
+  const { crn, id, page, visor, repeatingValue, contactId } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
