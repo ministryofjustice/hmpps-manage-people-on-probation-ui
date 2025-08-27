@@ -1,23 +1,26 @@
 {% extends "../_form.njk" %}
-{% set title = 'Do you want to arrange the next appointment with ' + personAppointment.personSummary.name.forename + ' ?'%}
-{% set backLink = change if change else '/case/'+ crn + '/appointments/appointment/' + contactId + '/manage/' %}
+{% set title = 'Do you want to arrange the next appointment with ' + personAppointment.personSummary.name.forename + '?'%}
+{% set backLink = change if change else 
+  '/case/' + crn + '/appointments/appointment/' + contactId + '/manage/' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% block heading %}{% endblock %}
 
 {% block form %}
-  {% set errorList = [{ text: errorMessages.error.text } if errorMessages.error else None ] | reject("undefined") %}
-  {% if errorList.length > 0 %}
-    {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-    {{ govukErrorSummary({ 
-        titleText: "There is a problem", 
-        errorList: errorList, 
-        attributes: { "data-qa": "errorList" } 
-        }) 
-    }}
+  {% if errorMessages %}
+    {% set errorList = errorMessages | toErrorList %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+    {% endif %}
   {% endif %}
 
   {{ govukRadios({
+    name: "nextAppointment",
+    id: "nextAppointment",
     formGroup: {
       attributes: {
         'data-qa': 'option'
@@ -25,23 +28,29 @@
     },
     fieldset: {
       legend: {
-        text: title,
+        html: '<span data-qa="pageHeading">' + title + '</span>',
         classes: "govuk-fieldset__legend--l"
       }
     },
+    errorMessage: {
+    text: "Select whether or not you wanted to arrange the next appointment"
+  } if errorMessages.nextAppointment,
     items: [
     {
         text: "Yes - another " + personAppointment.appointment.type,
-        value: "keepType"
+        value: "keepType",
+        checked: body.nextAppointment == "keepType"
     },
-        {
+    {
         text: "Yes - another appointment type",
-        value: "changeType"
+        value: "changeType",
+       checked: body.nextAppointment == "changeType"
     },
         {
         text: "No",
-        value: "no"
+        value: "no",
+        checked: body.nextAppointment == "no"
     }] 
-  } | decorateFormAttributes(['appointments', crn, 'option'])) }}
+  }) }}
 
 {% endblock %}

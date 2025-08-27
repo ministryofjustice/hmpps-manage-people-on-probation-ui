@@ -7,23 +7,11 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import {
-  fullName,
-  toRoshWidget,
-  toPredictors,
-  isNumericString,
-  isValidCrn,
-  setDataValue,
-  getDataValue,
-  isMatchingAddress,
-  isValidUUID,
-} from '../utils'
+import { toRoshWidget, toPredictors, isNumericString, isValidCrn, setDataValue, isMatchingAddress } from '../utils'
 import logger from '../../logger'
 import { ErrorMessages } from '../data/model/caseload'
-import { renderError, getAppointment, getAppointmentTypes, getSentences } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppResponse } from '../models/Locals'
-import { AppointmentSession } from '../models/Appointments'
-import { getSentenceId } from '../utils/getSentenceId'
 
 const routes = [
   'getAppointments',
@@ -267,77 +255,18 @@ const appointmentsController: Controller<typeof routes, void> = {
     }
   },
 
-  postNextAppointment: hmppsAuthClient => {
+  postNextAppointment: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params as Record<string, string>
-      const { data } = req.session
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const errorMessages: ErrorMessages = {}
-      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      // check selected option
-      let opt
-      try {
-        getDataValue(data, ['appointments', crn])
-        opt = getDataValue(data, ['appointments', crn])
-      } catch (e) {
-        opt = { option: null }
+      const {
+        params: { crn, contactId },
+        body: { nextAppointment },
+      } = req
+      const { nextAppointmentSession } = res.locals
+      const clearType = nextAppointment === 'changeType'
+      if (nextAppointment !== 'no') {
+        return cloneAppointmentAndRedirect(nextAppointmentSession, { clearType })(req, res)
       }
-      const { option } = opt || { option: null }
-      // error if no selection made
-      if (!option) {
-        logger.info('Option not selected')
-        errorMessages.error = { text: 'Select whether or not you wanted to arrange the next appointment' }
-        return res.render('pages/appointments/next-appointment', {
-          personAppointment,
-          crn,
-          errorMessages,
-        })
-      }
-      // backtrack if 'no' is selected
-      if (option === 'no') {
-        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
-      }
-      // find locationCode
-      const locations = res.locals.userLocations // this is made from getOfficeLocationsByTeamAndProvider so realistically need them first (maybe during Get rather than Post)
-      let locationCode = ''
-      for (const location of locations) {
-        if (isMatchingAddress(location.address, personAppointment.appointment.location)) {
-          locationCode = location.code
-        }
-      }
-      // find eventId
-      const sentences = await masClient.getSentences(crn)
-      const eventId = getSentenceId(personAppointment.appointment.eventNumber, sentences)
-      // create session for new appointment
-      const uuid = v4()
-      const Appt: AppointmentSession = {
-        user: {
-          providerCode: '', // how to get
-          teamCode: '', // how to get
-          username: res.locals.user.username,
-          locationCode,
-        },
-        type: option === 'keepType' ? personAppointment.appointment.type : '', // need as an code instead - matching res.locals.appointmentTypes
-        visorReport: personAppointment.appointment.isVisor ? 'Yes' : 'No',
-        date: '',
-        start: '',
-        end: '',
-        until: '',
-        repeatingDates: [] as string[],
-        numberOfAppointments: '1',
-        numberOfRepeatAppointments: '0',
-        repeating: 'No',
-        eventId,
-        uuid,
-        requirementId: '', // how to get
-        licenceConditionId: '', // how to get
-        nsiId: '', // how to get
-        notes: personAppointment.appointment.appointmentNotes[0].note, // notes, appointmentNotes or appointmentNote? - need schema access
-        sensitivity: personAppointment.appointment.isSensitive ? 'Yes' : 'No',
-      }
-      setDataValue(data, ['appointments', crn, uuid], Appt)
-      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
+      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
   },
 }

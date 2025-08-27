@@ -6,10 +6,10 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params } = req
+  const { url, params, body } = req
   const { crn, id } = params
-  const localParams: LocalParams = { crn, id }
-  const render = `pages/${[
+  const localParams: LocalParams = { crn, id, body }
+  let render = `pages/${[
     url
       .split('?')[0]
       .split('/')
@@ -113,6 +113,20 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateNextAppointment = () => {
+    if (req.url.includes('/next-appointment')) {
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'next-appointment',
+        }),
+      )
+      render = 'pages/appointments/next-appointment'
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
@@ -120,6 +134,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateDateTime()
   validateRepeating()
   validateSensitivity()
+  validateNextAppointment()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
