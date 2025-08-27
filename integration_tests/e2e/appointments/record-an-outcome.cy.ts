@@ -48,4 +48,12 @@ describe('Record an outcome', () => {
       expect($error.text().trim()).to.include('Select if they attended and complied')
     })
   })
+
+  it('should navigate to management appointment if the user submits after selecting the checkbox', () => {
+    cy.get('#outcomeRecorded').click()
+
+    recordAnOutcomePage.getSubmitBtn().click()
+
+    manageAppointmentPage = new ManageAppointmentPage()
+  })
 })
