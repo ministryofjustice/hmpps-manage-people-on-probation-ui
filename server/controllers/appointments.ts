@@ -1,6 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { Controller } from '../@types'
+import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -168,8 +168,20 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      let uploadedFiles: FileCache[] = []
+      let errorMessages = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
+      }
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
       return res.render('pages/appointments/add-note', {
         crn,
+        errorMessages,
+        uploadedFiles,
       })
     }
   },

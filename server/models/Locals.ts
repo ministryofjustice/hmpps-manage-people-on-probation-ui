@@ -13,6 +13,7 @@ import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment } from '../data/model/schedule'
+import { FileCache } from '../@types'
 
 export interface AppointmentLocals {
   meta: {
@@ -89,6 +90,7 @@ interface Locals {
   backLink: string
   personAppointment?: PersonAppointment
   fileErrorStatus?: number
+  uploadedFiles?: FileCache[]
 }
 
 export interface AppResponse extends Response {

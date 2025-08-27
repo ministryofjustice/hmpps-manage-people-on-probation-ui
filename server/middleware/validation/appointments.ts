@@ -6,12 +6,11 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params, session } = req
+  const { url, params } = req
+  let isAddNotePage = false
   const { crn, id } = params
-  const {
-    cache: { uploadedFiles },
-  } = session
-  const localParams: LocalParams = { crn, id, uploadedFiles }
+
+  const localParams: LocalParams = { crn, id }
   let render = `pages/${[
     url
       .split('?')[0]
@@ -134,6 +133,7 @@ const appointments: Route<void> = (req, res, next) => {
   const validateAddNote = () => {
     const { contactId } = req.params
     if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
+      isAddNotePage = true
       render = `pages/appointments/add-note`
       errorMessages = validateWithSpec(
         req.body,
@@ -157,6 +157,10 @@ const appointments: Route<void> = (req, res, next) => {
   validateAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+    if (isAddNotePage) {
+      req.session.errorMessages = errorMessages
+      return res.redirect(req.url)
+    }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

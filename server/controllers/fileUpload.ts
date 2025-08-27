@@ -1,57 +1,53 @@
 import { Controller, FileCache, FileUploadResponse } from '../@types'
+import MasApiClient from '../data/masApiClient'
 
 const routes = ['postUploadFile', 'postDeleteFile'] as const
 
 const fileUploadController: Controller<typeof routes, any> = {
-  postUploadFile: _hmppsAuthClient => {
+  postUploadFile: hmppsAuthClient => {
     return async (req, res) => {
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
       let status = 200
       const files = req.files as Express.Multer.File[]
       const file = files[0]
-      const { originalname: name, size } = file
-      const { id } = req.params
-
+      const { id, crn } = req.body
+      const { originalname: originalName, size } = file
       const errors = {
         type: 'The selected file must be a PDF or Word document',
         size: 'The selected file must be 5mb or under',
       }
 
-      const fileCache: FileCache = {
-        id,
-        name,
+      const setErrorMessage = (message = '') => {
+        response.error = {
+          message,
+        }
       }
+
       const response: FileUploadResponse = {
         file: {
-          id: '1',
-          name,
+          id,
+          name: originalName,
           size,
         },
       }
       if (res.locals.fileErrorStatus) {
         status = res.locals.fileErrorStatus
-        response.error = {
-          message: 'ERROR!',
-        }
-        fileCache.error = status === 415 ? errors.type : errors.size
+        setErrorMessage(status === 415 ? errors.type : errors.size)
       } else {
-        // post the file to alfresco here
-
-        // update the session with success
-        response.success = {
-          messageHtml: name,
-          messageText: name,
+        try {
+          // post the file to alfresco
+          await masClient.patchDocuments(crn, id, file.buffer)
+          response.success = {
+            messageHtml: originalName,
+            messageText: originalName,
+          }
+        } catch (error) {
+          const err = error as Error
+          setErrorMessage(err?.message ?? '')
         }
-        fileCache.uploaded = true
       }
-
-      const cachedFiles: FileCache[] = [...(req?.session?.cache?.uploadedFiles ?? []), fileCache]
-      req.session.cache = {
-        ...(req?.session?.cache ?? {}),
-        uploadedFiles: cachedFiles,
-      }
-      req.session.save(() => {
-        return res.status(status).json(response)
-      })
+      return res.status(status).json(response)
     }
   },
   postDeleteFile: _hmppsAuthClient => {

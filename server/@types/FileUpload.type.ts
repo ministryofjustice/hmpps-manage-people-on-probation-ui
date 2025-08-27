@@ -15,7 +15,13 @@ export interface FileUploadResponse {
 
 export interface FileCache {
   id: string
-  name: string
-  uploaded?: boolean
-  error?: string
+  fileName: string
+  originalName: string
+  message?: {
+    text?: string
+    html?: string
+  }
+  deleteButton: {
+    text: string
+  }
 }

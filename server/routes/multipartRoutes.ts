@@ -4,6 +4,7 @@ import controllers from '../controllers'
 import { Services } from '../services'
 import { getPersonalDetails, getPersonAppointment } from '../middleware'
 import validate from '../middleware/validation/index'
+import { cacheUploadedFiles } from '../middleware/cacheUploadedFiles'
 
 export default function multipartRoutes(router: Router, { hmppsAuthClient }: Services) {
   const upload = multer()
@@ -20,6 +21,7 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/appointments/appointment/:contactId/add-note',
     upload.array('documents'),
+    cacheUploadedFiles,
     validate.appointments,
     controllers.appointments.postAddNote(hmppsAuthClient),
   )
