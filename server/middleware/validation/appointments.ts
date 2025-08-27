@@ -7,8 +7,8 @@ import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req
-  const { crn, id } = params
-  const localParams: LocalParams = { crn, id }
+  const { crn, id, contactId } = params
+  const localParams: LocalParams = { crn, id, contactId }
   let render = `pages/${[
     url
       .split('?')[0]
@@ -101,7 +101,6 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateRecordAnOutcome = () => {
-    const { contactId } = req.params
     if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
       render = `pages/appointments/record-an-outcome`
       errorMessages = validateWithSpec(

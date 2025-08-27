@@ -6,13 +6,24 @@
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
 {% block form %}
 
+  {% if errorMessages %}
+    {% set errorList = errorMessages | toErrorList %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+    {% endif %}
+  {% endif %}
+
   {{ govukCheckboxes({
     idPrefix: 'outcomeRecorded',
     name: 'outcomeRecorded',
     classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
-        text: 'Confirm ' + personSummary.name.forename + ' attended and complied',
+        html: '<span data-qa="pageHeading">Confirm ' + personSummary.name.forename + ' attended and complied</span>',
         classes: 'govuk-fieldset__legend--l'
       }
     },
@@ -37,7 +48,10 @@
 
    <div class="govuk-button-group">
      {{ govukButton({
-     text: "Continue"
+     text: "Continue",
+       attributes: {
+         'data-qa': 'submit-btn'
+       }
    }) }}
      <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{contactId}}/manage">Cancel and go back</a>
    </div>
