@@ -1,6 +1,7 @@
 import Page from '../pages/page'
 import AppointmentPage from '../pages/appointment'
 import AppointmentsPage from '../pages/appointments'
+import { crn } from './appointments/imports'
 
 const url = (contactId: number, component = 'UpdateContact') =>
   `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
@@ -46,7 +47,7 @@ context('Appointment', () => {
       .upcomingAppointmentAction(1)
       .find('a')
       .should('contain.text', 'Manage')
-      .should('have.attr', 'href', '/manage/appointment/1')
+      .should('have.attr', 'href', `/case/X000001/appointments/appointment/1/manage`)
   })
   it('Appointment page with no outcome recorded is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/3')
@@ -102,10 +103,20 @@ context('Appointment', () => {
     page.pastAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
     page.pastAppointmentType(2).should('contain.text', 'Phone call')
 
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 1, 1, '/manage/appointment/1')
+    page.assertAnchorElementAtIndexWithin(
+      '[class="govuk-table__row"]',
+      1,
+      1,
+      `/case/X000001/appointments/appointment/1/manage`,
+    )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url(2))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url(4))
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 5, 1, '/manage/appointment/5')
+    page.assertAnchorElementAtIndexWithin(
+      '[class="govuk-table__row"]',
+      5,
+      1,
+      `/case/X000001/appointments/appointment/5/manage`,
+    )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
 
