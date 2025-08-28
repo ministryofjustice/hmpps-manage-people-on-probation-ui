@@ -160,10 +160,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { username } = res.locals.user
-      const [personAppointment, nextComAppointment, appointmentTypes] = await Promise.all([
+      const { nextComAppointment } = res.locals
+      const [personAppointment, appointmentTypes] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
-        masClient.getNextComAppointment(username, crn, contactId),
         masClient.getAppointmentTypes(),
       ])
       const { appointment } = personAppointment
@@ -215,26 +214,27 @@ const appointmentsController: Controller<typeof routes, void> = {
         logger.info('Appointment not selected')
         errorMessages.appointment = { text: 'Please select an appointment' }
         const schedule = await masClient.getPersonSchedule(crn, 'previous', '0')
-        res.render('pages/appointments/record-an-outcome', {
+        return res.render('pages/appointments/record-an-outcome', {
           errorMessages,
           schedule,
           crn,
           actionType,
         })
-      } else {
-        // eslint-disable-next-line no-lonely-if
-        if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
-          renderError(404)(req, res)
-        } else {
-          res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
-        }
       }
+      if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
     }
   },
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
+      const { nextComAppointment } = res.locals
       const { crn, contactId } = req.params
+      if (nextComAppointment?.appointment) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
+      }
       const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -248,7 +248,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
       setDataValue(data, 'return-dest', { crn, contactId })
-      res.render('pages/appointments/next-appointment', {
+      return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
       })

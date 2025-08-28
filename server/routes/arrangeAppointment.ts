@@ -12,7 +12,6 @@ import {
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
-import { postAppointments } from '../middleware/postAppointments'
 import { getTimeOptions } from '../middleware/getTimeOptions'
 import type { Route } from '../@types'
 import controllers from '../controllers'
@@ -86,7 +85,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/date-time',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
+    redirectWizard(['eventId', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getDateTime(),
   )
 
@@ -141,6 +140,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     redirectWizard(['eventId', ['user', 'locationCode'], 'repeating']),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
   router.post(

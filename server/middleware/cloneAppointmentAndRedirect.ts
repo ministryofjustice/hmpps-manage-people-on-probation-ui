@@ -9,9 +9,9 @@ interface Params {
   clearType?: boolean
 }
 
-export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession, params?: Params) => {
+export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession, params: Params = {}) => {
   return (req: Request, res: AppResponse): void => {
-    const { clearDate = false, clearType = false } = params
+    const { clearDate = true, clearType = false } = params
     const uuid = uuidv4()
     const { data } = req.session
     const { crn } = req.params

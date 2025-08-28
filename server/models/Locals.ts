@@ -6,7 +6,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { AppointmentSession, AppointmentType } from './Appointments'
+import { AppointmentSession, AppointmentType, NextComAppointmentResponse } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
@@ -89,6 +89,7 @@ interface Locals {
   backLink: string
   personAppointment?: PersonAppointment
   nextAppointmentSession?: AppointmentSession
+  nextComAppointment?: NextComAppointmentResponse
 }
 
 export interface AppResponse extends Response {

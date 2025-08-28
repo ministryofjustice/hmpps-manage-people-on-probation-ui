@@ -85,12 +85,12 @@
             } if showAction }, 
             {
             key: { text: "Appointment type" },
-            value: { text: appointment.type.description },
+            value: { text: 'Not entered' if anotherAppointment and not appointment.type else appointment.type.description },
             actions: {
                 items: [
                 {
                     href: changePath + "/type?change=" + url,
-                    text: "Change",
+                    text: "Choose type" if anotherAppointment and not appointment.type else "Change",
                     visuallyHiddenText: "type of appointment"
                 }
                 ]

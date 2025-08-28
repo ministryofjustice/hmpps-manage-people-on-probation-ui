@@ -7,6 +7,7 @@ export interface Name {
   forename: string
   middleName?: string
   surname: string
+  username?: string
 }
 export interface PersonalCircumstance {
   subType: string
@@ -115,6 +116,9 @@ export interface PersonalContact {
 }
 
 export interface Address {
+  code?: string
+  providerCode?: string
+  teamCode?: string
   officeName?: string
   buildingName?: string
   buildingNumber?: string

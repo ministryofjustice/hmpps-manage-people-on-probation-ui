@@ -468,6 +468,10 @@
           },
           "appointment": {
             "id": 6,
+            "eventNumber": "12345",
+            "requirementId": 80,
+            "licenceConditionId": null,
+            "nsiId": null,
             "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
@@ -478,13 +482,13 @@
             "wasAbsent": true,
             "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
             "location": {
-              "buildingName": "The Building",
-              "buildingNumber": "77",
-              "streetName": "Some Street",
-              "district": "Some City Centre",
-              "town": "London",
-              "county": "Essex",
-              "postcode": "NW10 1EP",
+              "code": "N56NTMC",
+              "officeName": "HMP Wakefield",
+              "buildingNumber": "5",
+              "streetName": "Love Lane",
+              "town": "Wakefield",
+              "county": "West Yorkshire",
+              "postcode": "WF2 9AG",
               "lastUpdated": "2023-03-14",
               "lastUpdatedBy": {
                 "forename": "Jiminy",
@@ -510,6 +514,7 @@
             ],
             "lastUpdated": "2023-03-20",
             "officerName": {
+              "username": "USER1",
               "forename": "Terry",
               "surname": "Jones"
             },

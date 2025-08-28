@@ -14,7 +14,7 @@
           "sentences": [
             {
               "id": 2501192724,
-              "eventNumber": 12345,
+              "eventNumber": "12345",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831"
