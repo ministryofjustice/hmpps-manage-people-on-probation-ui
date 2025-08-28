@@ -6,8 +6,8 @@ import AppointmentLocationNotInListPage from '../../pages/appointments/location-
 import Page from '../../pages/page'
 
 const loadPage = (typeOptionIndex = 1) => {
-  completeTypePage(typeOptionIndex)
   completeSentencePage()
+  completeTypePage(typeOptionIndex)
   completeAttendancePage()
 }
 

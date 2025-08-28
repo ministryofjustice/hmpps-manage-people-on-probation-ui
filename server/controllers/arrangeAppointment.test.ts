@@ -143,35 +143,35 @@ describe('controllers/arrangeAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  describe('redirectToType', () => {
+  describe('redirectToSentence', () => {
     mockedUuidv4.mockReturnValueOnce(uuid)
     const mockReq = createMockRequest({})
     describe('CRN and UUID are valid in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.redirectToType()(mockReq, res)
+        await controllers.arrangeAppointments.redirectToSentence()(mockReq, res)
       })
-      it('should redirect to the type page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      it('should redirect to the sentence page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
       })
     })
     describe('if CRN or UUID are invalid format in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(false)
         mockedIsValidUUID.mockReturnValue(false)
-        await controllers.arrangeAppointments.redirectToType()(mockReq, res)
+        await controllers.arrangeAppointments.redirectToSentence()(mockReq, res)
       })
       it('should return a status of 404 and render the error page', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
-      it('should not redirect to the type page', () => {
+      it('should not redirect to the sentence page', () => {
         expect(redirectSpy).not.toHaveBeenCalled()
       })
     })
   })
-  describe('getType', () => {
+  describe('getSentence', () => {
     const mockReq = createMockRequest({
       dataSession: {
         errors: {
@@ -183,19 +183,19 @@ describe('controllers/arrangeAppointment', () => {
       },
     })
     it('should delete the session errors', async () => {
-      await controllers.arrangeAppointments.getType()(mockReq, res)
+      await controllers.arrangeAppointments.getSentence()(mockReq, res)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
-    it('should render the type page', async () => {
-      await controllers.arrangeAppointments.getType()(mockReq, res)
-      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type`, {
+    it('should render the sentence page', async () => {
+      await controllers.arrangeAppointments.getSentence()(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,
         errors: mockReq.session.data.errors,
       })
     })
   })
-  describe('postType', () => {
+  describe('postSentence', () => {
     describe('CRN and UUID are valid in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(true)
@@ -205,29 +205,20 @@ describe('controllers/arrangeAppointment', () => {
       describe('If change url not in query', () => {
         const mockReq = createMockRequest({})
         beforeEach(async () => {
-          await controllers.arrangeAppointments.postType()(mockReq, res)
+          await controllers.arrangeAppointments.postSentence()(mockReq, res)
         })
-        it('should redirect to the sentences page', () => {
-          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence?number=${number}`)
-        })
-      })
-      describe('If change url in query', () => {
-        beforeEach(async () => {
-          const mockReq = { ...req, query: { change } } as httpMocks.MockRequest<any>
-          await controllers.arrangeAppointments.postType()(mockReq, res)
-        })
-        it('should redirect to the change url', () => {
-          expect(redirectSpy).toHaveBeenCalledWith(change)
+        it('should redirect to the types page', () => {
+          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`) // ?number=1234
         })
       })
     })
     describe('If no number in query', () => {
       beforeEach(async () => {
         const mockReq = { ...req, query: {} } as httpMocks.MockRequest<any>
-        await controllers.arrangeAppointments.postType()(mockReq, res)
+        await controllers.arrangeAppointments.postSentence()(mockReq, res)
       })
-      it('should redirect to the sentence page with no number query parameter in url', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+      it('should redirect to the types page with no number query parameter in url', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
       })
     })
     describe('if CRN is invalid format in request params', () => {
@@ -236,7 +227,7 @@ describe('controllers/arrangeAppointment', () => {
         mockedIsValidCrn.mockReturnValue(false)
         mockedIsValidUUID.mockReturnValue(true)
         mockedIsNumberString.mockReturnValue(true)
-        await controllers.arrangeAppointments.postType()(mockReq, res)
+        await controllers.arrangeAppointments.postSentence()(mockReq, res)
       })
       it('should return a status of 404 and render the error page', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -248,81 +239,70 @@ describe('controllers/arrangeAppointment', () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(false)
         mockedIsNumberString.mockReturnValue(true)
-        await controllers.arrangeAppointments.postType()(req, res)
+        await controllers.arrangeAppointments.postSentence()(req, res)
       })
       it('should return a status of 404 and render the error page', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
     })
-    describe('if number is invalid format in request params', () => {
-      const mockReq = createMockRequest({})
-      beforeEach(async () => {
-        mockedIsValidCrn.mockReturnValue(true)
-        mockedIsValidUUID.mockReturnValue(true)
-        mockedIsNumberString.mockReturnValue(false)
-        await controllers.arrangeAppointments.postType()(mockReq, res)
-      })
-      it('should return a status of 404 and render the error page', () => {
-        expect(mockRenderError).toHaveBeenCalledWith(404)
-        expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
-      })
-    })
   })
-  describe('getSentence', () => {
-    describe('If type page has not been completed', () => {
-      const appointmentSession: Record<string, string> = { type: null }
+  describe('getType', () => {
+    describe('If sentence page has not been completed', () => {
+      const appointmentSession: Record<string, string> = { eventId: null }
       const mockReq = createMockRequest({ appointmentSession })
 
       it('if crn and uuid are valid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.getSentence()(mockReq, res)
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+        await controllers.arrangeAppointments.getType()(mockReq, res)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
       })
       it('if crn is invalid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(false)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.getSentence()(mockReq, res)
+        await controllers.arrangeAppointments.getType()(mockReq, res)
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
       it('if uuid is invalid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(false)
-        await controllers.arrangeAppointments.getSentence()(mockReq, res)
+        await controllers.arrangeAppointments.getType()(mockReq, res)
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
     })
-    describe('If type page has been completed', () => {
+    describe('If sentence page has been completed', () => {
       beforeEach(async () => {
-        const appointmentSession: Record<string, string> = { type: 'appointment type' }
+        const appointmentSession: Record<string, string> = { eventId: '49' }
         const mockReq = createMockRequest({ appointmentSession })
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.getSentence()(mockReq, res)
+        await controllers.arrangeAppointments.getType()(mockReq, res)
       })
-      it('should render the sentence page', () => {
-        expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
+      it('should render the type page', () => {
+        expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type`, {
           crn,
           id: uuid,
           change: undefined,
+          errors: undefined,
+          personLevel: false,
         })
       })
     })
   })
 
-  describe('postSentence', () => {
+  describe('postType', () => {
     it('should redirect to the change url if found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })
-      await controllers.arrangeAppointments.postSentence()(mockReq, res)
+      await controllers.arrangeAppointments.postType()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
     it('should return a 404 and render the error page if CRN or UUId is invalid in request params', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
-      await controllers.arrangeAppointments.postSentence()(req, res)
+      await controllers.arrangeAppointments.postType()(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       expect(redirectSpy).not.toHaveBeenCalled()
