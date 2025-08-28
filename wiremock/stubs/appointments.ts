@@ -145,7 +145,7 @@ const getAppointmentStub = (
 const getNextAppointmentWithComStub = ({ appointment = true, loggedInUserIsCOM = true, homeAddress = false } = {}) => {
   const mapping: WiremockMapping = {
     request: {
-      urlPathPattern: '/mas/schedule/.*/next-com-appointment',
+      urlPathPattern: '/mas/schedule/.*/next-appointment',
       method: 'GET',
       queryParameters: {
         username: {

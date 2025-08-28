@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas/schedule/.*/next-com-appointment",
+        "urlPathPattern": "/mas/schedule/.*/next-appointment",
         "method": "GET",
         "queryParameters": {
           "username": {
