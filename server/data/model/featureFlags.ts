@@ -4,4 +4,5 @@ export class FeatureFlags {
   enableDocumentTextSearch?: boolean = undefined
   enableAppointmentCreate?: boolean = undefined
   enableRepeatAppointments?: boolean = undefined
+  enableDeleteAppointmentFile?: boolean = undefined
 }

@@ -21,7 +21,7 @@ export interface FileCache {
     text?: string
     html?: string
   }
-  deleteButton: {
+  deleteButton?: {
     text: string
   }
 }

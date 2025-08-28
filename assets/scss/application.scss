@@ -287,6 +287,12 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   .moj-multi-file-upload__success & {
     margin-right: 20px;
   }
+  &--no-margin {
+    .moj-multi-file-upload__error &,
+    .moj-multi-file-upload__success & {
+      margin-right: 0px;
+    }
+  }
 }
 
 .visibility-hidden {
@@ -417,4 +423,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .govuk-tag {
   white-space: nowrap;
+}
+
+body.feature-disabled {
+  .moj-multi-file-upload__delete {
+    display: none;
+  }
 }

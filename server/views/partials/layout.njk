@@ -88,4 +88,7 @@
       document.initialiseTelemetry('{{ applicationInsightsConnectionString | default(' ') }}', '{{ applicationInsightsRoleName }}', '{{ user.username }}')
     })
   </script>
+  <script nonce="{{ cspNonce }}">
+    window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile }}
+  </script>
 {% endblock %}

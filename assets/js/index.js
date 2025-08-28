@@ -111,6 +111,8 @@ const homeSearch = () => {
 }
 
 const multiFileUpload = () => {
+  const enableDelete = window.enableDeleteAppointmentFile
+
   MOJFrontend.MultiFileUpload.prototype.uploadFile = function (file) {
     const item = $(this.getFileRowHtml(file))
     const formData = new FormData()
@@ -132,7 +134,9 @@ const multiFileUpload = () => {
           item.find('.moj-multi-file-upload__message').html(this.getSuccessHtml(response.success, response.file.name))
           this.status.html(response.success.messageText)
         }
-        item.find('.moj-multi-file-upload__actions').append(this.getDeleteButtonHtml(response.file))
+        if (enableDelete) {
+          item.find('.moj-multi-file-upload__actions').append(this.getDeleteButtonHtml(response.file))
+        }
         this.params.uploadFileExitHook(this, file, response)
       }, this),
       error: $.proxy((jqXHR, textStatus, errorThrown) => {
@@ -162,7 +166,7 @@ const multiFileUpload = () => {
     status = 'Uploaded',
     color = 'grey',
   ) => {
-    return `<span class="moj-multi-file-upload__success"><span class="moj-multi-file-upload__message-text moj-multi-file-upload__message-text--with-icon"><svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25"><path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"/></svg>${success.messageHtml}</span><strong class="moj-multi-file-upload__message-status"><string class="govuk-tag govuk-tag--${color}">${status}</strong></span>
+    return `<span class="moj-multi-file-upload__success"><span class="moj-multi-file-upload__message-text moj-multi-file-upload__message-text--with-icon"><svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25"><path d="M25,6.2L8.7,23.2L0,14.1l4-4.2l4.7,4.9L21,2L25,6.2z"/></svg>${success.messageHtml}</span><strong class="moj-multi-file-upload__message-status${!enableDelete ? ' moj-multi-file-upload__message-status--no-margin' : ''}"><string class="govuk-tag govuk-tag--${color}">${status}</strong></span>
      <input type="hidden" name="filesAdded_filename" value="${filename}">
      <input type="hidden" name="filesAdded_message" value="">
     <input type="hidden" name="filesAdded_error" value="false">`
@@ -174,7 +178,7 @@ const multiFileUpload = () => {
     status = 'Upload failed',
     color = 'red',
   ) => {
-    return `<span class="moj-multi-file-upload__error"><span class="moj-multi-file-upload__message-text moj-multi-file-upload__message-text--with-icon"><svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25"><path d="M13.6,15.4h-2.3v-4.5h2.3V15.4z M13.6,19.8h-2.3v-2.2h2.3V19.8z M0,23.2h25L12.5,2L0,23.2z"/></svg>${error.message}</span><strong class="moj-multi-file-upload__message-status"><string class="govuk-tag govuk-tag--${color}">${status}</strong></span>
+    return `<span class="moj-multi-file-upload__error"><span class="moj-multi-file-upload__message-text moj-multi-file-upload__message-text--with-icon"><svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25"><path d="M13.6,15.4h-2.3v-4.5h2.3V15.4z M13.6,19.8h-2.3v-2.2h2.3V19.8z M0,23.2h25L12.5,2L0,23.2z"/></svg>${error.message}</span><strong class="moj-multi-file-upload__message-status${!enableDelete ? ' moj-multi-file-upload__message-status--no-margin' : ''}"><string class="govuk-tag govuk-tag--${color}">${status}</strong></span>
     <input type="hidden" name="filesAdded_filename" value="${filename}">
     <input type="hidden" name="filesAdded_message" value="${error.message}">
     <input type="hidden" name="filesAdded_error" value="true">`
@@ -197,6 +201,9 @@ const multiFileUpload = () => {
 
   const multiUpload = document.querySelector('.moj-multi-file-upload')
   if (typeof MOJFrontend.MultiFileUpload !== 'undefined' && multiUpload) {
+    if (!enableDelete) {
+      document.body.classList.add('feature-disabled')
+    }
     new MOJFrontend.MultiFileUpload({
       container: $('.moj-multi-file-upload'),
       uploadUrl: '/appointments/file/upload',
@@ -277,9 +284,11 @@ const multiFileUpload = () => {
       item
         .find('.moj-multi-file-upload__message')
         .html(handle.getErrorHtml({ message }, file.name, 'Upload failed', 'red'))
-      item
-        .find('.moj-multi-file-upload__actions')
-        .append(handle.getDeleteButtonHtml({ filename: file.name }, 'Upload failed', 'red'))
+      if (enableDelete) {
+        item
+          .find('.moj-multi-file-upload__actions')
+          .append(handle.getDeleteButtonHtml({ filename: file.name }, 'Upload failed', 'red'))
+      }
       const $row = handle.feedbackContainer.find(`.moj-multi-file-upload__row:contains("${file.name}")`)
       $row.replaceWith(item.prop('outerHTML'))
       handle.status.html(message)

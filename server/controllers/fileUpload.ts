@@ -6,6 +6,11 @@ const routes = ['postUploadFile', 'postDeleteFile'] as const
 const fileUploadController: Controller<typeof routes, any> = {
   postUploadFile: hmppsAuthClient => {
     return async (req, res) => {
+      const sleep = (ms: number) => {
+        return new Promise(resolve => {
+          setTimeout(resolve, ms)
+        })
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       let status = 200
@@ -17,13 +22,11 @@ const fileUploadController: Controller<typeof routes, any> = {
         type: 'The selected file must be a PDF or Word document',
         size: 'The selected file must be 5mb or under',
       }
-
       const setErrorMessage = (message = '') => {
         response.error = {
           message,
         }
       }
-
       const response: FileUploadResponse = {
         file: {
           id,
@@ -36,8 +39,8 @@ const fileUploadController: Controller<typeof routes, any> = {
         setErrorMessage(status === 415 ? errors.type : errors.size)
       } else {
         try {
-          // post the file to alfresco
           await masClient.patchDocuments(crn, id, file.buffer)
+          await sleep(4000)
           response.success = {
             messageHtml: originalName,
             messageText: originalName,
