@@ -260,6 +260,9 @@ describe('controllers/appointments', () => {
       it('should not redirect', () => {
         expect(redirectSpy).not.toHaveBeenCalled()
       })
+      it('should NOT send the patch request to the api', () => {
+        expect(patchAppointmentSpy).not.toHaveBeenCalled()
+      })
     })
     describe('If CRN request param is valid', () => {
       beforeEach(async () => {
