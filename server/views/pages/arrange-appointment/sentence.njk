@@ -91,6 +91,10 @@
       {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
+      {% set hintText = '' %}
+      {% if sentence.order.startDate %}
+        {% set hintText = 'Sentence start date: ' + (sentence.order.startDate | dateWithYear) + '.' %}
+      {% endif %}
       {% set allSentences = (allSentences.push({
       text: sentence.order.description,
       value: sentence.id,
@@ -98,7 +102,7 @@
         classes: 'govuk-!-font-weight-bold'
       },
       hint: {
-        text: 'Sentence start date: ' + sentence.order.startDate | dateWithYear if sentence.order.startDate else ''
+        text: hintText
       },
       checked: sentences.length == 1,
       attributes: {
@@ -121,7 +125,7 @@
         }
       },
       hint: {
-        text: 'Relates to the person'
+        text: 'Relates to the person.'
       },
       attributes: {
           'data-qa': 'personLevelContact',

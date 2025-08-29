@@ -158,7 +158,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { username } = res.locals.user
       const [personAppointment, nextComAppointment, appointmentTypes] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
-        masClient.getNextComAppointment(username, crn, contactId),
+        masClient.getNextAppointment(username, crn, contactId),
         masClient.getAppointmentTypes(),
       ])
       const { appointment } = personAppointment
