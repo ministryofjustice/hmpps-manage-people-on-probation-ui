@@ -205,6 +205,7 @@
     "cookie-session": "^2.1.0",
     "cpy-cli": "^5.0.0",
     "cypress": "^14.4.1",
+    "cypress-file-upload": "^5.0.8",
     "cypress-multi-reporters": "^2.0.5",
     "cypress-plugin-tab": "^1.0.5",
     "esbuild": "^0.25.5",

@@ -8,7 +8,8 @@ const fileUpload: Route<void> = (req, res, next) => {
   let status = null
 
   const validateMimeType = (file: Express.Multer.File) => {
-    if (!config.validMimeTypes.includes(file.mimetype)) {
+    const validMimeTypes = Object.entries(config.validMimeTypes).map(([_key, mimetype]) => mimetype)
+    if (!validMimeTypes.includes(file.mimetype)) {
       isValid = false
       status = 415
     }

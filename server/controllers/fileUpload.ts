@@ -40,7 +40,7 @@ const fileUploadController: Controller<typeof routes, any> = {
       } else {
         try {
           await masClient.patchDocuments(crn, id, file.buffer)
-          await sleep(4000)
+          await sleep(500)
           response.success = {
             messageHtml: originalName,
             messageText: originalName,
