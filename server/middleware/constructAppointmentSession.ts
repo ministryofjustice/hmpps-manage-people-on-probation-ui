@@ -12,10 +12,10 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     : ''
   const nextAppointment: AppointmentSession = {
     user: {
-      providerCode: 'N07', // ? requires API update
-      teamCode: 'N07CHT', // ? requires API update
-      username: 'tony-pan', // ? requires API update
-      locationCode: 'N56NTMC', // ? requires API update
+      providerCode: appointment.officer.providerCode,
+      teamCode: appointment.officer.teamCode,
+      username: appointment.officer.username,
+      locationCode: appointment.location.code,
     },
     type: type || '',
     visorReport: appointment?.isVisor ? 'Yes' : 'No',
@@ -34,11 +34,11 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     notes,
     sensitivity: appointment?.isSensitive ? 'Yes' : 'No',
   }
-  if (appointment?.requirementId) {
-    nextAppointment.requirementId = appointment.requirementId.toString()
+  if (appointment?.component.type === 'REQUIREMENT') {
+    nextAppointment.requirementId = appointment.component.id.toString()
   }
-  if (appointment?.licenceConditionId) {
-    nextAppointment.licenceConditionId = appointment.licenceConditionId.toString()
+  if (appointment?.component.type === 'LICENCE_CONDITION') {
+    nextAppointment.licenceConditionId = appointment.component.id.toString()
   }
   if (appointment?.nsiId) {
     nextAppointment.nsiId = appointment.nsiId.toString()

@@ -5,7 +5,7 @@ import { Route } from '../@types'
 export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { appointment } = res.locals.personAppointment
-    const { username } = res.locals.user // this setup may differ based on where called
+    const { username } = res.locals.user
     const { providerCode, teamCode } = appointment.location
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)

@@ -6,6 +6,20 @@ export interface Schedule {
   personSchedule: PersonSchedule
 }
 
+export interface Officer {
+  code?: string
+  name?: Name
+  teamCode?: string
+  providerCode?: string
+  username?: string
+}
+
+export interface SentenceComponent {
+  id?: number
+  description?: string
+  type?: string
+}
+
 export interface PersonSchedule {
   size: number
   page: number
@@ -16,9 +30,6 @@ export interface PersonSchedule {
 export interface Activity {
   id: string
   eventNumber?: string
-  requirementId?: number
-  licenceConditionId?: number
-  nsiId?: number
   type: string
   startDateTime: string
   endDateTime?: string
@@ -28,7 +39,7 @@ export interface Activity {
   isSensitive?: boolean
   hasOutcome?: boolean
   wasAbsent?: boolean
-  officerName?: Name
+  officer?: Officer
   isInitial: boolean
   isNationalStandard: boolean
   location?: Address
@@ -63,6 +74,9 @@ export interface Activity {
   isVisor?: boolean
   description?: string
   outcome?: string
+  eventID?: number
+  component?: SentenceComponent
+  nsiId?: number
 }
 
 export interface PersonAppointment {

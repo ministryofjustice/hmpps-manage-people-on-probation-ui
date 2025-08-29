@@ -469,8 +469,6 @@
           "appointment": {
             "id": 6,
             "eventNumber": "12345",
-            "requirementId": 80,
-            "licenceConditionId": null,
             "nsiId": null,
             "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
@@ -481,6 +479,16 @@
             "hasOutcome": false,
             "wasAbsent": true,
             "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "username": "tony-pan",
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
+            },
             "location": {
               "code": "N56NTME",
               "buildingName": "The Building",
@@ -489,12 +497,7 @@
               "district": "Some City Centre",
               "town": "London",
               "county": "Essex",
-              "postcode": "NW10 1EP",
-              "lastUpdated": "2023-03-14",
-              "lastUpdatedBy": {
-                "forename": "Jiminy",
-                "surname": "Cricket"
-              }
+              "postcode": "NW10 1EP"
             },
             "documents": [
               {
@@ -514,14 +517,16 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "username": "USER1",
-              "forename": "Terry",
-              "surname": "Jones"
-            },
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
+            },
+            "deliusManaged": false,
+            "isVisor": true,
+            "eventId": 2501192724,
+            "component": {
+              "id": 80,
+              "type": "LICENCE_CONDITION"
             }
           }
         },
