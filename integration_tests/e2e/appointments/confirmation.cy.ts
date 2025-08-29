@@ -112,7 +112,7 @@ describe('Confirmation page (accessed from NextAppointment)', () => {
     confirmPage.checkOnPage()
     cy.get('[data-qa="finishLink"]').click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Video call with William Philips')
+    manageAppointmentPage.setPageTitle('Manage Planned Video Contact (NS) with William Philips')
     manageAppointmentPage.checkOnPage()
   })
 })

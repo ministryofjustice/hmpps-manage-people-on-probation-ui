@@ -22,7 +22,7 @@ describe('Create next appointment', () => {
     checkPopHeader('Caroline Wolff', false)
   })
   it('should display the options', () => {
-    nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another Video call')
+    nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another Planned Video Contact (NS)')
     nextAppointmentPage.getRadioLabel('option', 2).should('contain.text', 'Yes - another appointment type')
     nextAppointmentPage.getRadioLabel('option', 3).should('contain.text', 'No')
   })
@@ -52,7 +52,7 @@ describe('Create next appointment', () => {
     nextAppointmentPage.getRadio('option', 3).click()
     nextAppointmentPage.getSubmitBtn().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Video call with William Philips')
+    manageAppointmentPage.setPageTitle('Manage Planned Video Contact (NS) with William Philips')
     manageAppointmentPage.checkOnPage()
   })
 })

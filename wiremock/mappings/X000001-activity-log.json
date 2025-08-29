@@ -31,7 +31,7 @@
           "activities": [
             {
               "id": 12,
-              "type": "Video call",
+              "type": "Planned Video Contact (NS)",
               "action": "Warning letter sent",
               "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
               "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
@@ -357,7 +357,7 @@
             },
             {
               "id": 13,
-              "type": "Video call",
+              "type": "Planned Video Contact (NS)",
               "startDateTime": "2023-02-12T10:15:00.382936Z[Europe/London]",
               "endDateTime": "2023-02-12T10:30:00.382936Z[Europe/London]",
               "rarToolKit": "Choices and Changes",
@@ -1020,7 +1020,7 @@
           },
           "appointment": {
             "id": 12,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "description": "",
             "action": "Warning letter sent",
             "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
@@ -1064,7 +1064,7 @@
           },
           "appointment": {
             "id": 13,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "description": "User-generated free text content",
             "startDateTime": "2023-02-12T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2023-02-12T10:30:00.382936Z[Europe/London]",

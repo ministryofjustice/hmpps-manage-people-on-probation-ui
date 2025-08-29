@@ -48,7 +48,7 @@
               },
               {
                 "id": 2,
-                "type": "Video call",
+                "type": "Planned Video Contact (NS)",
                 "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
                 "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
                 "rarToolKit": "Choices and Changes",
@@ -166,7 +166,7 @@
               },
               {
                 "id": 3,
-                "type": "Video call",
+                "type": "Planned Video Contact (NS)",
                 "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
                 "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
                 "rarToolKit": "Choices and Changes",
@@ -254,7 +254,7 @@
           "appointment": {
             "id": 2,
             "eventNumber": "1234567",
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "startDateTime": "2025-03-22T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2025-03-22T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
@@ -309,7 +309,7 @@
           },
           "appointment": {
             "id": 3,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
@@ -482,13 +482,14 @@
             "wasAbsent": true,
             "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
             "location": {
-              "code": "N56NTMC",
-              "officeName": "HMP Wakefield",
-              "buildingNumber": "5",
-              "streetName": "Love Lane",
-              "town": "Wakefield",
-              "county": "West Yorkshire",
-              "postcode": "WF2 9AG",
+              "code": "N56NTME",
+              "buildingName": "The Building",
+              "buildingNumber": "77",
+              "streetName": "Some Street",
+              "district": "Some City Centre",
+              "town": "London",
+              "county": "Essex",
+              "postcode": "NW10 1EP",
               "lastUpdated": "2023-03-14",
               "lastUpdatedBy": {
                 "forename": "Jiminy",

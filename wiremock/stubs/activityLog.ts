@@ -19,7 +19,7 @@ const stubAppointmentNoOutcomeWithNote = (): SuperAgentRequest =>
         },
         appointment: {
           id: 13,
-          type: 'Video call',
+          type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
@@ -80,7 +80,7 @@ const stubAppointmentOutcomeWithNote = (): SuperAgentRequest =>
         },
         appointment: {
           id: 13,
-          type: 'Video call',
+          type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
@@ -141,7 +141,7 @@ const stubAppointmentOutcomeWithNoNotes = (): SuperAgentRequest =>
         },
         appointment: {
           id: 13,
-          type: 'Video call',
+          type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
