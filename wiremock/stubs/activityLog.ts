@@ -45,9 +45,11 @@ const stubAppointmentNoOutcomeWithNote = (): SuperAgentRequest =>
             },
           ],
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Paulie',
-            surname: 'Walnuts',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
           },
           lastUpdatedBy: {
             forename: 'Paul',
@@ -106,9 +108,11 @@ const stubAppointmentOutcomeWithNote = (): SuperAgentRequest =>
             },
           ],
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Paulie',
-            surname: 'Walnuts',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
           },
           lastUpdatedBy: {
             forename: 'Paul',
@@ -156,9 +160,11 @@ const stubAppointmentOutcomeWithNoNotes = (): SuperAgentRequest =>
           isNationalStandard: true,
           appointmentNotes: [],
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Paulie',
-            surname: 'Walnuts',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
           },
           lastUpdatedBy: {
             forename: 'Paul',

@@ -99,8 +99,8 @@ describe('Confirmation page', () => {
 })
 describe('Confirmation page (accessed from NextAppointment)', () => {
   let confirmPage: AppointmentConfirmationPage
-  const crn = 'X000001'
-  const appointmentId = '2'
+  const crn = 'X778160'
+  const appointmentId = '6'
   beforeEach(() => {
     cy.task('resetMocks')
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/next-appointment`)
@@ -112,7 +112,7 @@ describe('Confirmation page (accessed from NextAppointment)', () => {
     confirmPage.checkOnPage()
     cy.get('[data-qa="finishLink"]').click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Planned Video Contact (NS) with William Philips')
+    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with Terry Jones')
     manageAppointmentPage.checkOnPage()
   })
 })

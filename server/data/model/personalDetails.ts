@@ -156,6 +156,7 @@ export interface Document {
   id: string
   name: string
   lastUpdated?: string
+  createdAt?: string
 }
 
 export interface ProvisionOverview {

@@ -70,11 +70,11 @@ export interface Activity {
   countsTowardsRAR?: boolean
   lastUpdated?: string
   lastUpdatedBy?: Name
-  deliusManaged?: boolean
-  isVisor?: boolean
   description?: string
   outcome?: string
-  eventID?: number
+  deliusManaged?: boolean
+  isVisor?: boolean
+  eventId?: number
   component?: SentenceComponent
   nsiId?: number
 }
