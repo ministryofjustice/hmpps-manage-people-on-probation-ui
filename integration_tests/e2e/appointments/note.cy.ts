@@ -12,15 +12,15 @@ import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your
 import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = () => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type`)
-  completeTypePage()
+  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
 }
 
-describe('Add a note', () => {
+describe('Add supporting information (optional)', () => {
   let appointmentNotePage: AppointmentNotePage
   beforeEach(() => {
     cy.task('stubNoRepeats')
@@ -30,7 +30,7 @@ describe('Add a note', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })
-  it('should be on add note page', () => {
+  it('should be on Add supporting information (optional) page', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {
@@ -54,5 +54,11 @@ describe('Add a note', () => {
     appointmentNotePage.getSubmitBtn().click()
     const checkYourAnswersPage = new AppointmentCheckYourAnswersPage()
     checkYourAnswersPage.checkOnPage()
+  })
+  it('should check for correct text', () => {
+    cy.get('[data-qa="visorReport"]').should(
+      'contain.text',
+      'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.',
+    )
   })
 })

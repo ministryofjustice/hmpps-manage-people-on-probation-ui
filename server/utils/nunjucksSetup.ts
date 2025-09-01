@@ -65,6 +65,7 @@ import {
   concat,
   shortTime,
   convertToTitleCase,
+  getPersonLevelTypes,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -144,6 +145,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
 
   njkEnv.addFilter('dateWithYearShortMonthAndTime', dateWithYearShortMonthAndTime)
   njkEnv.addGlobal('groupByLevel', groupByLevel)
+  njkEnv.addGlobal('getPersonLevelTypes', getPersonLevelTypes)
   njkEnv.addGlobal('getStaffRisk', getStaffRisk)
   njkEnv.addGlobal('getComplianceStatus', getComplianceStatus)
   njkEnv.addGlobal('timeFromTo', timeFromTo)

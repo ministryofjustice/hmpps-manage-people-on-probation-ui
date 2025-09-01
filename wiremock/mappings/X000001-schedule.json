@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/schedule/.*/upcoming",
+        "urlPathPattern": "/mas/schedule/.*/upcoming",
         "method": "GET"
       },
       "response": {
@@ -19,7 +19,7 @@
           "personSchedule": {
             "size": 10,
             "page": 0,
-            "totalResults": 2,
+            "totalResults": 12,
             "totalPages": 1,
             "appointments": [
               {
@@ -29,6 +29,9 @@
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
+                "acceptableAbsence": false,
+                "nonComplianceReason": "Was very argumentative and left the appointment",
+                "didTheyComply": false,
                 "isEmailOrTextFromPop": true,
                 "wasAbsent": true,
                 "notes": "Some notes",
@@ -74,7 +77,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/.*/previous",
+        "urlPathPattern": "/mas/schedule/.*/previous",
         "method": "GET"
       },
       "response": {

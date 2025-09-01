@@ -45,7 +45,7 @@ describe('Manage appointment - add a note', () => {
     })
   }
 
-  beforeEach(() => {
+  afterEach(() => {
     cy.task('resetMocks')
   })
 

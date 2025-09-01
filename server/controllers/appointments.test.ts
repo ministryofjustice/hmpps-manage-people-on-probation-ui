@@ -118,8 +118,8 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENTS', uuidv4(), crn, 'CRN')
     it('should request previous and upcoming appointments from the api', () => {
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming')
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
     it('should request risks from the api', () => {
       expect(getRisksSpy).toHaveBeenCalledWith(crn)
@@ -142,6 +142,43 @@ describe('controllers/appointments', () => {
     })
   })
 
+  describe('get upcoming appointments', () => {
+    beforeEach(async () => {
+      await controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS', uuidv4(), crn, 'CRN')
+    it('should request previous and upcoming appointments from the api', () => {
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', '&sortBy=date&ascending=true')
+    })
+    it('should request risks from the api', () => {
+      expect(getRisksSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request tier calculation details from the api', () => {
+      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request predictors from the api', () => {
+      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should render the appointments page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
+        upcomingAppointments: mockPersonSchedule,
+        crn,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+        sortedBy: 'date.asc',
+        pagination: {
+          from: '1',
+          items: [],
+          next: undefined,
+          prev: undefined,
+          to: '0',
+          total: '0',
+        },
+      })
+    })
+  })
+
   describe('post appointments', () => {
     beforeEach(() => {
       jest.clearAllMocks()
@@ -153,8 +190,8 @@ describe('controllers/appointments', () => {
         controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
       })
 
-      it('should redirect to the arrange appointment type page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/type`)
+      it('should redirect to the arrange appointment sentence page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence`)
       })
     })
     describe('CRN request parameter is invalid', () => {
@@ -188,7 +225,7 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage(res, 'UPDATE_APPOINTMENT_OUTCOME', uuidv4(), crn, 'CRN')
+    checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
         crn,

@@ -33,6 +33,9 @@
 
 {% block head %}
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
+  {% if flags.enableDeleteAppointmentFile %}
+    <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
+  {% endif %}
 {% endblock %}
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}
@@ -89,6 +92,6 @@
     })
   </script>
   <script nonce="{{ cspNonce }}">
-    window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile }}
+    window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile if  flags.enableDeleteAppointmentFile !== undefined else false }}
   </script>
 {% endblock %}

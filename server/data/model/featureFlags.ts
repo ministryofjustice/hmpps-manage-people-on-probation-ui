@@ -5,4 +5,5 @@ export class FeatureFlags {
   enableAppointmentCreate?: boolean = undefined
   enableRepeatAppointments?: boolean = undefined
   enableDeleteAppointmentFile?: boolean = undefined
+  enableManageAppointments?: boolean = undefined
 }
