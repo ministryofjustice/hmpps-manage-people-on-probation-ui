@@ -224,6 +224,7 @@
           },
           "appointment": {
             "id": 1,
+            "eventNumber": "12345",
             "type": "Phone call",
             "startDateTime": "2024-12-22T09:15:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
@@ -285,6 +286,7 @@
                 "forename": "William",
                 "surname": "Philips"
               },
+              "username": "tony-pan",
               "teamCode": "N07CHT",
               "providerCode": "N07"
             },
@@ -328,6 +330,7 @@
           },
           "appointment": {
             "id": 3,
+            "eventNumber": "12345",
             "type": "Planned Video Contact (NS)",
             "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
@@ -379,6 +382,7 @@
           },
           "appointment": {
             "id": 4,
+            "eventNumber": "12345",
             "type": "Planned Telephone Contact (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
@@ -403,6 +407,7 @@
                 "forename": "Steve",
                 "surname": "Bruce"
               },
+              "username": "tony-pan",
               "teamCode": "N07CHT",
               "providerCode": "N07"
             },

@@ -7,15 +7,18 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   const { appointmentTypes, sentences } = res.locals
   const type = appointmentTypes.find(t => t.description === appointment.type)?.code
   const eventId = sentences.find(sentence => sentence.eventNumber === appointment.eventNumber)?.id
-  const notes = appointment?.appointmentNotes
-    ? appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
-    : ''
+  let notes = ''
+  if (appointment?.appointmentNotes) {
+    notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
+  } else if (appointment?.appointmentNote) {
+    notes = appointment.appointmentNote.note
+  }
   const nextAppointment: AppointmentSession = {
     user: {
       providerCode: appointment.officer.providerCode,
       teamCode: appointment.officer.teamCode,
       username: appointment.officer.username,
-      locationCode: appointment.location.code,
+      locationCode: appointment.location ? appointment.location.code : 'I do not need to pick a location',
     },
     type: type || '',
     visorReport: appointment?.isVisor ? 'Yes' : 'No',

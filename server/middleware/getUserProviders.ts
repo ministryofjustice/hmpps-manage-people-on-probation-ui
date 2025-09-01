@@ -7,6 +7,8 @@ export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const { appointment } = res.locals.personAppointment
     const { username } = res.locals.user
     const { providerCode, teamCode } = appointment.location
+      ? appointment.location
+      : res.locals.nextAppointmentSession.user
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(
