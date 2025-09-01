@@ -12,7 +12,6 @@ export interface Params {
 export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession, params: Params = {}) => {
   return (req: Request, res: AppResponse): void => {
     const { clearDate = true, clearType = false } = params
-    console.log(clearType)
     const uuid = uuidv4()
     const { data } = req.session
     const { crn } = req.params
