@@ -5,9 +5,17 @@ import { Services } from '../services'
 import { getPersonalDetails, getPersonAppointment } from '../middleware'
 import validate from '../middleware/validation/index'
 import { cacheUploadedFiles } from '../middleware/cacheUploadedFiles'
+import config from '../config'
 
 export default function multipartRoutes(router: Router, { hmppsAuthClient }: Services) {
-  const upload = multer()
+  const upload = multer({
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: config.maxFileSize,
+      fieldSize: 1 * 1024 * 1024, // 1 MB max per field
+      files: 5,
+    },
+  })
 
   router.all(
     '/case/:crn/appointments/appointment/:contactId/add-note',
@@ -36,6 +44,5 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
     upload.single('file'),
     controllers.fileUpload.postDeleteFile(hmppsAuthClient),
   )
-
   return router
 }
