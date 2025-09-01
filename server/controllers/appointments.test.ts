@@ -274,4 +274,86 @@ describe('controllers/appointments', () => {
       })
     })
   })
+  describe('get add note', () => {
+    const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
+    const errorMessages = {
+      notes: 'Notes error',
+      sensitivity: 'Sensitivity error',
+    }
+    const mockReq = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+        contactId,
+        actionType,
+      },
+      session: {
+        cache: {
+          uploadedFiles,
+        },
+        errorMessages,
+      },
+    })
+    beforeEach(async () => {
+      await controllers.appointments.getAddNote(hmppsAuthClient)(mockReq, res)
+    })
+    checkAuditMessage(res, 'ADD_APPOINTMENT_NOTES', uuidv4(), crn, 'CRN')
+    it('should delete uploadedFiles session value if it exists', () => {
+      expect(mockReq.session.cache.uploadedFiles).toBeUndefined()
+    })
+    it('should delete errorMessages session value if it exists', () => {
+      expect(mockReq.session.errorMessages).toBeUndefined()
+    })
+    it('should render the add note page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
+        crn,
+        errorMessages: null,
+        uploadedFiles: [],
+      })
+    })
+  })
+  describe('post add note', () => {
+    describe('If CRN request param is invalid', () => {
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsNumericString.mockReturnValue(false)
+
+        await controllers.appointments.postAddNote(hmppsAuthClient)(req, res)
+      })
+      it('should return a 404 status and render the error page', () => {
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+      it('should not redirect', () => {
+        expect(redirectSpy).not.toHaveBeenCalled()
+      })
+    })
+    describe('If CRN request param is valid', () => {
+      const mockReq = httpMocks.createRequest({
+        body: {
+          notes: 'some mock notes',
+          sensitive: 'Yes',
+        },
+        params: {
+          contactId: id,
+          crn,
+        },
+      })
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
+        await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+      })
+      it('should send the patch request to the api', () => {
+        expect(patchAppointmentSpy).toHaveBeenCalledWith({
+          id: parseInt(mockReq.params.contactId, 10),
+          notes: mockReq.body.notes,
+          sensitive: true,
+        })
+      })
+      it('should redirect to the manage appointment page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+      })
+    })
+  })
 })

@@ -13,4 +13,5 @@ export const mockAppResponse = (locals?: Record<string, any>) =>
     set: jest.fn().mockReturnThis(),
     send: jest.fn().mockReturnThis(),
     status: jest.fn().mockReturnThis(),
+    json: jest.fn().mockReturnThis(),
   }) as unknown as AppResponse

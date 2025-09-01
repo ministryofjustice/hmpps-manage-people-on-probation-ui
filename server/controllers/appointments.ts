@@ -243,16 +243,17 @@ const appointmentsController: Controller<typeof routes, void> = {
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId: id } = req.params
+
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
+      const { notes, sensitive } = req.body
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
-        notes: '',
-        files: [],
-        sensitive: false,
+        notes,
+        sensitive: sensitive === 'Yes',
       }
       await masClient.patchAppointment(body)
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
