@@ -11,8 +11,9 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
+      fileSize: config.maxFileSize * config.fileUploadLimit,
       fieldSize: 1 * 1024 * 1024, // 1 MB max per field
-      files: 5,
+      files: config.fileUploadLimit,
     },
   })
 

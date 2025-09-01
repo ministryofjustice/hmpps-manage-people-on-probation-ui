@@ -198,4 +198,5 @@ export default {
     pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
+  fileUploadLimit: 5,
 }
