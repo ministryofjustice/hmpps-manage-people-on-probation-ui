@@ -165,7 +165,7 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
     .find('.govuk-summary-list__value')
     .should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)')
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned Office Visit (NS)')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
   page
@@ -229,7 +229,7 @@ export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeA
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', 2).click()
   typePage.getSubmitBtn().click()
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Home Visit to Case (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned Telephone Contact (NS)')
 }
 
 export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {

@@ -7,9 +7,11 @@ import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req
+  let isAddNotePage = false
   const { crn, id } = params
+
   const localParams: LocalParams = { crn, id }
-  const render = `pages/${[
+  let render = `pages/${[
     url
       .split('?')[0]
       .split('/')
@@ -113,6 +115,37 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateRecordAnOutcome = () => {
+    const { contactId } = req.params
+    if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
+      render = `pages/appointments/record-an-outcome`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'record-an-outcome',
+        }),
+      )
+    }
+  }
+
+  const validateAddNote = () => {
+    const { contactId } = req.params
+    if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
+      isAddNotePage = true
+      render = `pages/appointments/add-note`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'add-note',
+        }),
+      )
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
@@ -120,8 +153,14 @@ const appointments: Route<void> = (req, res, next) => {
   validateDateTime()
   validateRepeating()
   validateSensitivity()
+  validateRecordAnOutcome()
+  validateAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+    if (isAddNotePage) {
+      req.session.errorMessages = errorMessages
+      return res.redirect(req.url)
+    }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

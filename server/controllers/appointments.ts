@@ -1,18 +1,14 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { Request } from 'express'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { Controller } from '../@types'
+import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress } from '../utils'
-
-import logger from '../../logger'
-import { ErrorMessages } from '../data/model/caseload'
 import { renderError } from '../middleware'
-import { AppResponse } from '../models/Locals'
+import { AppointmentPatch } from '../models/Appointments'
 
 const routes = [
   'getAppointments',
@@ -21,6 +17,8 @@ const routes = [
   'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
+  'getAddNote',
+  'postAddNote',
   'getManageAppointment',
 ] as const
 
@@ -182,52 +180,83 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-  getRecordAnOutcome: hmppsAuthClient => {
+  getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, actionType } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
+      const { crn } = req.params
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        action: 'VIEW_MANAGE_APPOINTMENT',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const schedule = await masClient.getPersonSchedule(crn, 'previous', '0')
       res.render('pages/appointments/record-an-outcome', {
-        schedule,
         crn,
-        actionType,
       })
     }
   },
   postRecordAnOutcome: hmppsAuthClient => {
-    return async (req: Request, res: AppResponse) => {
-      const { crn, actionType } = req.params
+    return async (req, res) => {
+      const { crn, contactId: id } = req.params
+      if (!isValidCrn(crn) || !isNumericString(id)) {
+        return renderError(404)(req, res)
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const errorMessages: ErrorMessages = {}
-      const appointmentId = req?.body?.['appointment-id'] as string
-      if (appointmentId == null) {
-        logger.info('Appointment not selected')
-        errorMessages.appointment = { text: 'Please select an appointment' }
-        const schedule = await masClient.getPersonSchedule(crn, 'previous', '0')
-        res.render('pages/appointments/record-an-outcome', {
-          errorMessages,
-          schedule,
-          crn,
-          actionType,
-        })
-      } else {
-        // eslint-disable-next-line no-lonely-if
-        if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
-          renderError(404)(req, res)
-        } else {
-          res.redirect(`/case/${crn}/appointments/appointment/${req.body['appointment-id']}`)
-        }
+      const body: AppointmentPatch = {
+        id: parseInt(id, 10),
+        outcomeRecorded: true,
       }
+      await masClient.patchAppointment(body)
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+    }
+  },
+  getAddNote: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      await auditService.sendAuditMessage({
+        action: 'ADD_APPOINTMENT_NOTES',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      let uploadedFiles: FileCache[] = []
+      let errorMessages = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
+      }
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
+      return res.render('pages/appointments/add-note', {
+        crn,
+        errorMessages,
+        uploadedFiles,
+      })
+    }
+  },
+  postAddNote: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, contactId: id } = req.params
+
+      if (!isValidCrn(crn) || !isNumericString(id)) {
+        return renderError(404)(req, res)
+      }
+      const { notes, sensitive } = req.body
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const body: AppointmentPatch = {
+        id: parseInt(id, 10),
+        notes,
+        sensitive: sensitive === 'Yes',
+      }
+      await masClient.patchAppointment(body)
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
 }

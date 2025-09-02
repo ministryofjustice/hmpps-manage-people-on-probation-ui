@@ -36,6 +36,7 @@ import {
   AppointmentRequestBody,
   CheckAppointment,
   AppointmentTypeResponse,
+  AppointmentPatch,
   NextComAppointmentResponse,
 } from '../models/Appointments'
 
@@ -236,6 +237,15 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/documents/${crn}${pageQuery}`, handle404: true })
   }
 
+  async patchDocuments(crn: string, id: string, data: Buffer) {
+    return this.patch({
+      path: `documents/${crn}/update/contact/${id}`,
+      data: data.buffer,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
   async textSearchDocuments(
     crn: string,
     page: string,
@@ -285,6 +295,13 @@ export default class MasApiClient extends RestClient {
       path: `/appointment/${crn}/check`,
       handle404: true,
       handle500: true,
+    })
+  }
+
+  async patchAppointment(body: AppointmentPatch): Promise<PersonAppointment> {
+    return this.patch({
+      data: body,
+      path: `/appointment`,
     })
   }
 
