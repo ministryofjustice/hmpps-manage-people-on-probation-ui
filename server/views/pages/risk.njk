@@ -8,7 +8,8 @@
 
 {% set pageTitle = makePageTitle({pageHeading: "Risk"}) %}
 {% set currentNavSection = 'risk' %}
-{% set currentSectionName = 'Risk' %}
+{% set currentSectionName = 'Risk' if not sanIndicator else 'Risk and plan'  %}
+
 {% set headerPersonName = personRisk.personSummary.name | fullName %}
 {% set headerCRN = crn %}
 {% set headerDob = personRisk.personSummary.dateOfBirth %}
