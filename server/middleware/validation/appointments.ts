@@ -114,7 +114,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-
   const validateNextAppointment = () => {
     if (req.url.includes('/next-appointment')) {
       errorMessages = validateWithSpec(

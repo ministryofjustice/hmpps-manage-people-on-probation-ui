@@ -256,7 +256,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
-        outcomeRecorded: true,
+        notes,
+        sensitive: sensitive === 'Yes',
       }
       await masClient.patchAppointment(body)
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
