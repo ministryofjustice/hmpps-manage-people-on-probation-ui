@@ -9,7 +9,7 @@ export const getNextComAppointment = (hmppsAuthClient: HmppsAuthClient) => {
     const { username } = res.locals.user
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    const response = await masClient.getNextComAppointment(username, crn, contactId)
+    const response = await masClient.getNextAppointment(username, crn, contactId)
     res.locals.nextComAppointment = response
     return next()
   }
