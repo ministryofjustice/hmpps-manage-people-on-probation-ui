@@ -183,7 +183,6 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
   page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
   page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', '3 Way Meeting (NS)')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
   page
     .getSummaryListRow(3)

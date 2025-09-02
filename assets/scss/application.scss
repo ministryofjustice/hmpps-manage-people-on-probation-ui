@@ -226,6 +226,74 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 .flex--center {
   justify-content: center;
 }
+.govuk-summary-list.moj-multi-file-upload__list {
+  display: flex;
+  flex-wrap: wrap;
+}
+.govuk-summary-list__row.moj-multi-file-upload__row {
+  display: flex;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  @include govuk-media-query($until: 1200px) {
+    flex-direction: column;
+  }
+}
+.govuk-summary-list__value.moj-multi-file-upload__message {
+  flex: 1;
+  display: block;
+  padding-right: 0;
+  display: flex;
+}
+.govuk-summary-list__actions.moj-multi-file-upload__actions {
+  flex-shrink: 0;
+  display: block;
+  width: auto;
+  @include govuk-media-query($until: 1200px) {
+    text-align: left;
+  }
+}
+.moj-multi-file-upload__error,
+.moj-multi-file-upload__success {
+  display: flex;
+  align-content: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
+  flex-grow: 1;
+  @include govuk-media-query($until: 1200px) {
+    flex-direction: column;
+  }
+}
+.moj-multi-file-upload__message-text {
+  flex: 1;
+  flex-shrink: 0;
+  position: relative;
+  &--with-icon {
+    padding-left: 30px;
+  }
+  .moj-banner__icon {
+    float: none;
+    margin: 0;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 22px;
+    height: 22px;
+  }
+}
+
+.moj-multi-file-upload__message-status {
+  flex-shrink: 0;
+  .moj-multi-file-upload__error &,
+  .moj-multi-file-upload__success & {
+    margin-right: 20px;
+  }
+  &--no-margin {
+    .moj-multi-file-upload__error &,
+    .moj-multi-file-upload__success & {
+      margin-right: 0px;
+    }
+  }
+}
 
 .visibility-hidden {
   visibility: hidden;
@@ -355,4 +423,10 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 
 .govuk-tag {
   white-space: nowrap;
+}
+
+body.feature-disabled {
+  .moj-multi-file-upload__delete {
+    display: none;
+  }
 }

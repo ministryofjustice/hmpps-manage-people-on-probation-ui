@@ -175,7 +175,27 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         {
           validator: isNotEmpty,
           msg: 'Select whether or not you wanted to arrange the next appointment',
-          log: 'Nex appointment type not selected',
+          log: 'Next appointment type not selected',
+        },
+      ],
+    },
+    sensitive: {
+      optional: page !== 'add-note',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not the appointment note contains sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    outcomeRecorded: {
+      optional: page !== 'record-an-outcome',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if they attended and complied',
+          log: 'Attended and complied not selected',
         },
       ],
     },

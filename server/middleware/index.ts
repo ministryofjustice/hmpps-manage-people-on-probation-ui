@@ -15,3 +15,5 @@ export * from './cloneAppointmentAndRedirect'
 export * from './constructAppointmentSession'
 export * from './getUserProviders'
 export * from './getNextComAppointment'
+export * from './cacheUploadedFiles'
+
