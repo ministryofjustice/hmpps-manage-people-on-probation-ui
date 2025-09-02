@@ -40,8 +40,6 @@ const riskController: Controller<typeof routes, void> = {
         arnsClient.getNeeds(crn),
         arnsClient.getSanIndicator(crn),
       ])
-      console.log(needs)
-      console.log(sanIndicatorResponse)
       let timeline: TimelineItem[] = []
       let predictorScores
       if (Array.isArray(predictors)) {
@@ -52,8 +50,6 @@ const riskController: Controller<typeof routes, void> = {
       }
       const risksWidget = toRoshWidget(risks)
       const oasysLink = config.oaSys.link
-      console.log('****************')
-      console.log(sanIndicatorResponse.sanIndicator)
       return res.render('pages/risk', {
         personRisk,
         risks,

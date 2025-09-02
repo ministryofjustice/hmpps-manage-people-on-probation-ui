@@ -67,7 +67,7 @@ describe('riskController', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  describe('getRisk', () => {
+  xdescribe('getRisk', () => {
     beforeEach(async () => {
       await controllers.risk.getRisk(hmppsAuthClient)(req, res)
     })

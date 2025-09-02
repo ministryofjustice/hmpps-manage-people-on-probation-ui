@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/san-indicator/crn/.*",
+        "urlPathPattern": "/arns/san-indicator/crn/.*",
         "method": "GET"
       },
       "response": {
