@@ -16,6 +16,16 @@
   {% else %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
         {% block heading %}
           {% if title %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">

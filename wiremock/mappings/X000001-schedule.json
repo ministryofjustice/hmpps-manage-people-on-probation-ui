@@ -463,7 +463,7 @@
             "hasOutcome": false,
             "isInPast": true,
             "wasAbsent": true,
-            "appointmentNotes": [{ "id": 1, "createdBy": "", "notes": "Some notes", "hasNoteBeenTruncated": false }],
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
             "location": {
               "buildingName": "The Building",
               "buildingNumber": "77",

@@ -10,44 +10,8 @@
         "jsonBody": {
           "appointmentTypes": [
             {
-              "code": "C084",
-              "description": "3 Way Meeting (NS)",
-              "isPersonLevelContact": false,
-              "isLocationRequired": true
-            },
-            {
-              "code": "CHVS",
-              "description": "Home Visit to Case (NS)",
-              "isPersonLevelContact": false,
-              "isLocationRequired": false
-            },
-            {
-              "code": "COAI",
-              "description": "Initial Appointment - In office (NS)",
-              "isPersonLevelContact": false,
-              "isLocationRequired": true
-            },
-            {
               "code": "COAP",
               "description": "Planned Office Visit (NS)",
-              "isPersonLevelContact": false,
-              "isLocationRequired": true
-            },
-            {
-              "code": "CODC",
-              "description": "Planned Doorstep Contact (NS)",
-              "isPersonLevelContact": true,
-              "isLocationRequired": true
-            },
-            {
-              "code": "COHV",
-              "description": "Initial Appointment - Home Visit (NS)",
-              "isPersonLevelContact": false,
-              "isLocationRequired": true
-            },
-            {
-              "code": "COOO",
-              "description": "Planned Contact - other than office (NS)",
               "isPersonLevelContact": false,
               "isLocationRequired": true
             },
@@ -61,6 +25,42 @@
               "code": "COVC",
               "description": "Planned Video Contact (NS)",
               "isPersonLevelContact": true,
+              "isLocationRequired": true
+            },
+            {
+              "code": "COOO",
+              "description": "Planned Contact - other than office (NS)",
+              "isPersonLevelContact": false,
+              "isLocationRequired": true
+            },
+            {
+              "code": "COAI",
+              "description": "Initial Appointment - In office (NS)",
+              "isPersonLevelContact": false,
+              "isLocationRequired": true
+            },
+            {
+              "code": "CHVS",
+              "description": "Home Visit to Case (NS)",
+              "isPersonLevelContact": false,
+              "isLocationRequired": false
+            },
+            {
+              "code": "C084",
+              "description": "3 Way Meeting (NS)",
+              "isPersonLevelContact": false,
+              "isLocationRequired": true
+            },
+            {
+              "code": "CODC",
+              "description": "Planned Doorstep Contact (NS)",
+              "isPersonLevelContact": true,
+              "isLocationRequired": true
+            },
+            {
+              "code": "COSR",
+              "description": "Interview for Report / Other",
+              "isPersonLevelContact": false,
               "isLocationRequired": true
             }
           ]

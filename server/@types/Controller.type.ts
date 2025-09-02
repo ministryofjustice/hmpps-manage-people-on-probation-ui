@@ -1,5 +1,5 @@
+// eslint-disable-next-line import/no-cycle
 import { HmppsAuthClient } from '../data'
-import { AppResponse } from '../models/Locals'
 import { Route } from './Route.type'
 
 export type Controller<T extends readonly string[], TResponse, TArgs = any> = {

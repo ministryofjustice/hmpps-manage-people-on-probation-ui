@@ -178,7 +178,10 @@ describe('Manage an appointment', () => {
         manageAppointmentPage = new ManageAppointmentPage()
       })
       it('should display a link to add appointment notes', () => {
-        manageAppointmentPage.getTaskLink(2).should('contain.text', name).should('have.attr', 'href', '#')
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
       })
       it(`should display the status tag as 'Not started'`, () => {
         manageAppointmentPage
@@ -194,7 +197,10 @@ describe('Manage an appointment', () => {
         manageAppointmentPage = new ManageAppointmentPage()
       })
       it('should display a link to add appointment notes', () => {
-        manageAppointmentPage.getTaskLink(2).should('contain.text', name).should('have.attr', 'href', '#')
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
       })
       it(`should display the status tag as 'In progress'`, () => {
         manageAppointmentPage
@@ -210,7 +216,10 @@ describe('Manage an appointment', () => {
         manageAppointmentPage = new ManageAppointmentPage()
       })
       it('should display a link to add appointment notes', () => {
-        manageAppointmentPage.getTaskLink(2).should('contain.text', name).should('have.attr', 'href', '#')
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
       })
       it(`should display the status tag as 'Not started'`, () => {
         manageAppointmentPage
@@ -226,7 +235,10 @@ describe('Manage an appointment', () => {
         manageAppointmentPage = new ManageAppointmentPage()
       })
       it('should display a link to add appointment notes', () => {
-        manageAppointmentPage.getTaskLink(2).should('contain.text', name).should('have.attr', 'href', '#')
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
       })
       it(`should display the status as 'Completed'`, () => {
         manageAppointmentPage

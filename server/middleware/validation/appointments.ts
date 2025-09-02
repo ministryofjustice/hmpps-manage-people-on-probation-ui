@@ -7,6 +7,7 @@ import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params } = req
+  let isAddNotePage = false
   const { crn, id, contactId } = params
   const localParams: LocalParams = { crn, id, contactId }
   let render = `pages/${[
@@ -128,6 +129,21 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateAddNote = () => {
+    if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
+      isAddNotePage = true
+      render = `pages/appointments/add-note`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'add-note',
+        }),
+      )
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
@@ -136,8 +152,14 @@ const appointments: Route<void> = (req, res, next) => {
   validateRepeating()
   validateRecordAnOutcome()
   validateSensitivity()
+  validateRecordAnOutcome()
+  validateAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+    if (isAddNotePage) {
+      req.session.errorMessages = errorMessages
+      return res.redirect(req.url)
+    }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

@@ -17,16 +17,6 @@
 {% block heading %}{% endblock %}
 
 {% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
-        titleText: "There is a problem",
-        errorList: errorList,
-        attributes: { "data-qa": "errorList" }
-      }) }}
-    {% endif %}
-  {% endif %}
 
   {# Main Appointment details heading #}
   <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
@@ -59,7 +49,7 @@
 
   {# ViSOR section (only if appointment.meta.isVisor is true) #}
   {% if appointment.meta.isVisor %}
-  {{ govukRadios({
+    {{ govukRadios({
     classes: "govuk-radios--inline",
     fieldset: {
       legend: {
@@ -87,6 +77,6 @@
       }
     ]
   } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
-  <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
+    <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
   {% endif %}
 {% endblock %}

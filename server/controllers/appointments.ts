@@ -2,7 +2,7 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { Controller } from '../@types'
+import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -17,6 +17,8 @@ const routes = [
   'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
+  'getAddNote',
+  'postAddNote',
   'getManageAppointment',
 ] as const
 
@@ -178,38 +180,83 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-  getRecordAnOutcome: hmppsAuthClient => {
+  getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn } = req.params
       await auditService.sendAuditMessage({
-        action: 'UPDATE_APPOINTMENT_OUTCOME',
+        action: 'VIEW_MANAGE_APPOINTMENT',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-
-      return res.render('pages/appointments/record-an-outcome', {
+      res.render('pages/appointments/record-an-outcome', {
         crn,
-        contactId,
       })
     }
   },
   postRecordAnOutcome: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
-      if (!isValidCrn(crn) || !isNumericString(contactId)) {
+      const { crn, contactId: id } = req.params
+      if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {
-        id: parseInt(contactId, 10),
+        id: parseInt(id, 10),
         outcomeRecorded: true,
       }
       await masClient.patchAppointment(body)
-      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+    }
+  },
+  getAddNote: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      await auditService.sendAuditMessage({
+        action: 'ADD_APPOINTMENT_NOTES',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      let uploadedFiles: FileCache[] = []
+      let errorMessages = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
+      }
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
+      return res.render('pages/appointments/add-note', {
+        crn,
+        errorMessages,
+        uploadedFiles,
+      })
+    }
+  },
+  postAddNote: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, contactId: id } = req.params
+
+      if (!isValidCrn(crn) || !isNumericString(id)) {
+        return renderError(404)(req, res)
+      }
+      const { notes, sensitive } = req.body
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const body: AppointmentPatch = {
+        id: parseInt(id, 10),
+        notes,
+        sensitive: sensitive === 'Yes',
+      }
+      await masClient.patchAppointment(body)
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
 }

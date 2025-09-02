@@ -40,7 +40,7 @@ describe('Confirmation page', () => {
 
   it('should render the page', () => {
     checkPopHeader('Alton Berge', true)
-    confirmPage.getPanel().find('strong').should('contain.text', '3 Way Meeting (NS)')
+    confirmPage.getPanel().find('strong').should('contain.text', 'Planned Office Visit (NS)')
     confirmPage
       .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
       .invoke('text')
