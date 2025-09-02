@@ -18,6 +18,10 @@ context('All Upcoming Appointment', () => {
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
 
-    page.upcomingAppointmentAction(1).find('a').should('contain.text', 'Manage').should('have.attr', 'href', url(1))
+    page
+      .upcomingAppointmentAction(1)
+      .find('a')
+      .should('contain.text', 'Manage')
+      .should('have.attr', 'href', '/case/X000001/appointments/appointment/1')
   })
 })
