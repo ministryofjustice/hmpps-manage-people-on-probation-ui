@@ -10,7 +10,7 @@ export default class AppointmentDateTimePage extends Page {
     return cy.get('.govuk-details__summary span')
   }
 
-  getElement = (name: string) => {
+  getPersonalCircumstance = (name: string) => {
     return cy.get(`[data-qa="${name}"]`)
   }
 
