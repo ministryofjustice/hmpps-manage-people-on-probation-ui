@@ -45,6 +45,7 @@ export interface NextAppointmentResponse {
   appointment: Activity
   usernameIsCom: boolean
   personManager: {
+    code: string
     name: Name
   }
 }

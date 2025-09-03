@@ -158,15 +158,11 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
-      const [personAppointment, nextAppointment, appointmentTypes] = await Promise.all([
+      const [personAppointment, nextAppointment] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
         masClient.getNextAppointment(username, crn, contactId),
-        masClient.getAppointmentTypes(),
       ])
-      const { appointment } = personAppointment
-      const deliusManaged =
-        (appointment?.hasOutcome && appointment?.acceptableAbsence === false) ||
-        appointmentTypes.appointmentTypes.every(type => type.description !== appointment.type)
+
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
@@ -175,7 +171,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         personAppointment,
         crn,
         nextAppointment,
-        deliusManaged,
         nextAppointmentIsAtHome,
       })
     }
@@ -184,7 +179,7 @@ const appointmentsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn } = req.params
       await auditService.sendAuditMessage({
-        action: 'VIEW_MANAGE_APPOINTMENT',
+        action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
