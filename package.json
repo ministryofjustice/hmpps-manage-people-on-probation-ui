@@ -119,7 +119,7 @@
   },
   "dependencies": {
     "@flipt-io/flipt-client": "^0.14.0",
-    "@microsoft/applicationinsights-clickanalytics-js": "^3.3.8",
+    "@microsoft/applicationinsights-clickanalytics-js": "^3.3.9",
     "@microsoft/applicationinsights-web": "^3.3.9",
     "@ministryofjustice/frontend": "^3.7.0",
     "@ministryofjustice/hmpps-audit-client": "^1.1.1",
