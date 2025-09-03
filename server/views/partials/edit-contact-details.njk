@@ -6,13 +6,12 @@
 {% set headerGender = personalDetails.preferredGender %}
 {% set dateWarning = 'An end date will change this to a previous address and you will need to add a new main address.' %}
 
-
 {% block beforeContent %}
 
     {% set bannerHtml %}
-        <h2 class="govuk-heading-m govuk-!-font-weight-regular">{{ dateWarning }}</h2>
+    <h2 class="govuk-heading-m govuk-!-font-weight-regular">{{ dateWarning }}</h2>
     {% endset %}
- 
+
     {{ govukBreadcrumbs({
         items: [
             {
@@ -39,7 +38,7 @@
     }) if personalDetails.mainAddress.to }}
 
     {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
+        {% set errorList = errorMessages | toErrorList %}
         {% if errorList.length > 0 %}
             {{ govukErrorSummary({
                 titleText: "There is a problem",
@@ -52,23 +51,25 @@
 {% endblock %}
 
 {% block pageContent %}
-<h1 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7" data-qa="pageHeading">{{title}}</h1>
+    {% include "../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+    <h2 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7" data-qa="pageHeading">{{title}}</h2>
     <div class="govuk-!-width-one-half">
         <form method="post" autocomplete="off" action="{{ paths.current }}">
-           
+
             {% if personalDetails.mainAddress.to %}
                 <input type="hidden" name="endDateWarningDisplayed" value="true">
             {% endif %}
- {% block editForm %}{% endblock %}
- <div class="govuk-button-group">
-            {{ govukButton({
+            {% block editForm %}{% endblock %}
+            <div class="govuk-button-group">
+                {{ govukButton({
                 html: "Save changes",
                 attributes: {
                     'data-qa': 'submitBtn'
                 }
             }) }}
-             <a class="govuk-link" href="{{backLink}}" data-qa="cancelBtn">Cancel and go back</a>
-             </div>
+                <a class="govuk-link" href="{{backLink}}" data-qa="cancelBtn">Cancel and go back</a>
+            </div>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         </form>
     </div>

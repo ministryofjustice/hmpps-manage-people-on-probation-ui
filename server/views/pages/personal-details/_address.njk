@@ -5,12 +5,12 @@
   {% else %}
     {{ address.status }} address – Since {{ address.from | dateWithYearShortMonth }}
   {% endif %}
-  </span>
+</span>
 {% endset %}
 
 {% set actions = {} %}
 {% if addressType === 'address' %}
-{% 
+  {% 
 set actions = {
         items: [
           {
@@ -22,25 +22,25 @@ set actions = {
 {% endif %}
 
 {% set addressHtml %}
-  {% set fullAddress %}
-    {% if address.noFixedAddress %}
+{% set fullAddress %}
+{% if address.noFixedAddress %}
       No fixed address
     {% else %}
-      {{ addressToList(address).join('<br>') | safe }}
-    {% endif %}
-  {% endset %}
+  {{ addressToList(address).join('<br>') | safe }}
+{% endif %}
+{% endset %}
 
-  {% set notes = '' %}
-  {% set hasNote = address.addressNote %}
-  {% if address.addressNotes  %}
-    {% for addressNote in address.addressNotes %}
-      {% set notes = notes.concat(appNote(addressNote, '/case/' + crn + '/personal-details/addresses/' + address.id + '/note/' + addressNote.id)) %}
-    {% endfor  %}
-  {% elseif address.addressNote %}
-    {% set note = address.addressNote.note %}
-  {% endif %}
+{% set notes = '' %}
+{% set hasNote = address.addressNote %}
+{% if address.addressNotes %}
+  {% for addressNote in address.addressNotes %}
+    {% set notes = notes.concat(appNote(addressNote, '/case/' + crn + '/personal-details/addresses/' + address.id + '/note/' + addressNote.id)) %}
+  {% endfor %}
+{% elseif address.addressNote %}
+  {% set note = address.addressNote.note %}
+{% endif %}
 
-  {{ govukSummaryList({
+{{ govukSummaryList({
     rows: [
       {
         key: { html: '<span data-qa="' + addressType + 'StatusLabel' + loopIndex +'">Status</span>' },
@@ -85,14 +85,14 @@ set actions = {
     ]
   }) }}
 
-  <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
-    <span data-qa="{{addressType}}LastUpdatedByValue{{loopIndex}}">{{ lastUpdatedBy(address.lastUpdated, address.lastUpdatedBy)}}</span>
-  </p>
+<p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
+  <span data-qa="{{addressType}}LastUpdatedByValue{{loopIndex}}">{{ lastUpdatedBy(address.lastUpdated, address.lastUpdatedBy)}}</span>
+</p>
 {% endset %}
 
 {{ appSummaryCard({
     titleHtml: addressTitle,
-    headingLevel: 3,
+    headingLevel: 4,
     classes: 'govuk-!-margin-bottom-6',
     html: addressHtml,
     actions: actions

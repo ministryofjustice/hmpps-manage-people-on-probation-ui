@@ -240,7 +240,7 @@ context('Sentence', () => {
     cy.visit('/case/X000001/sentence?activeSentence=false')
     const page = Page.verifyOnPage(SentencePage)
     page.activeSideNavItem().should('contain.text', 'No active sentence')
-    page.noActiveSentence().find('h3').should('contain.text', 'No active sentence')
+    page.noActiveSentence().find('h4').should('contain.text', 'No active sentence')
     page.noActiveSentence().find('p').should('contain.text', 'This person does not have any active sentences.')
     cy.get('[data-qa="sentenceCard"]').should('not.exist')
     cy.get('[data-qa="convictionCard"]').should('not.exist')

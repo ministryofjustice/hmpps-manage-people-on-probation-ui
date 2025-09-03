@@ -8,6 +8,7 @@ import RiskDetailPage from '../pages/riskDetail'
 import mockRiskData from '../../wiremock/mappings/X000001-risk.json'
 import { RiskFlag } from '../../server/data/model/risk'
 import { dateWithYear, toSentenceCase } from '../../server/utils'
+import { checkPopHeader } from './appointments/imports'
 
 const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
@@ -20,7 +21,8 @@ context('Risk', () => {
     page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
-    page.getElementData('mappa-heading').should('contain.text', 'Cat 0/Level 2')
+    page.getElementData('mappa-heading').should('contain.text', 'Cat 0/').should('contain.text', 'Level 2')
+
     page.getCardHeader('riskFlags').should('contain.text', 'NDelius risk flags')
     page
       .getElementData('addRiskFlagLink')
@@ -159,7 +161,7 @@ context('Risk', () => {
   it('Risk Detail page is rendered with expired review date', () => {
     cy.visit('/case/X000001/risk/flag/1')
     const page = new RiskDetailPage()
-    page.setPageTitle('Restraining Order')
+    page.setPageTitle('Risk to Staff')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
   })
   it('Risk page is rendered with create a risk assessment on OASys link', () => {
@@ -174,8 +176,8 @@ context('Risk', () => {
     page
       .getElementData('noOasysRiskBanner')
       .should('exist')
-      .find('h2')
-      .should('contain.text', 'There is no OASys Layer 3 risk assessment for Alton Berge')
+      .find('h3')
+      .should('contain.text', 'There is no OASys Layer 3 risk assessment')
 
     cy.get('[data-qa="noOasysRiskBanner"]')
       .find('.govuk-notification-banner__content')
@@ -229,5 +231,13 @@ context('Risk', () => {
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dt', 0, 'Notes')
     page.assertPageElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 'dd', 0, 'Risk Notes')
     page.assertAnchorElementAtIndexWithin('[data-qa=riskFlagCard]', 0, 1, '/case/X000001/risk/flag/3/note/0')
+  })
+  it('should display the pop header on the removed risk flags page', () => {
+    cy.visit('/case/X000001/risk/removed-risk-flags')
+    checkPopHeader()
+  })
+  it('should display the pop header on the individual risk flag page', () => {
+    cy.visit('/case/X000001/risk/flag/4')
+    checkPopHeader()
   })
 })

@@ -1,11 +1,13 @@
 import Page from '../../pages/page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import { appointmentTypes } from '../../../server/properties'
 import 'cypress-plugin-tab'
 import mockResponse from '../../../wiremock/mappings/appointment-types.json'
 import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
+import { checkPopHeader, completeSentencePage } from './imports'
+import { toSentenceCase } from '../../../server/utils'
+import AttendancePage from '../../pages/appointments/attendance.page'
 
 const mockData = mockResponse as Wiremock
 
@@ -14,12 +16,13 @@ const crn = 'X778160'
 const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 
 const loadPage = () => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/type`)
+  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+  completeSentencePage()
 }
 
 describe('Arrange an appointment', () => {
   let typePage: AppointmentTypePage
-  let sentencePage: AppointmentSentencePage
+  let attendancePage: AttendancePage
   afterEach(() => {
     cy.task('resetMocks')
   })
@@ -27,14 +30,17 @@ describe('Arrange an appointment', () => {
     describe('No VISOR registration', () => {
       it('should render the page', () => {
         loadPage()
+        checkPopHeader('Alton Berge', true)
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')
         })
-        typePage.getBackLink().should('have.attr', 'href', '/')
+        typePage.getBackLink().should('have.attr', 'href', `/case/${crn}/arrange-appointment/${uuid}/sentence`)
         cy.get('[data-qa="type"] legend').should('contain.text', 'What appointment are you arranging?')
         for (let i = 1; i < mockAppointmentTypes.length; i += 1) {
-          typePage.getRadioLabel('type', i).should('contain.text', mockAppointmentTypes[i - 1].description)
+          typePage
+            .getRadioLabel('type', i)
+            .should('contain.text', toSentenceCase(mockAppointmentTypes[i - 1].description, ['(NS)']))
           typePage.getRadio('type', i).should('not.be.checked')
         }
 
@@ -70,9 +76,9 @@ describe('Arrange an appointment', () => {
           typePage.getElement(`#appointments-${crn}-${uuid}-type`).click()
           typePage.getSubmitBtn().click()
         })
-        it('should redirect to the sentence page', () => {
-          sentencePage = new AppointmentSentencePage()
-          sentencePage.checkOnPage()
+        it('should redirect to the attendance page', () => {
+          attendancePage = new AttendancePage()
+          attendancePage.checkOnPage()
         })
       })
     })
@@ -80,7 +86,7 @@ describe('Arrange an appointment', () => {
       it('should render the page', () => {
         cy.task('stubOverviewVisorRegistration')
         loadPage()
-        cy.get('[data-qa="visorReport"] legend').should('contain.text', 'Include appointment in VISOR report?')
+        cy.get('[data-qa="visorReport"] legend').should('contain.text', 'Include appointment in ViSOR report?')
         cy.get('[data-qa="visorReport"] .govuk-hint').should(
           'contain.text',
           'This will add the appointment to their record on the ViSOR secure national database.',
@@ -127,11 +133,36 @@ describe('Arrange an appointment', () => {
             typePage.getElement(`#appointments-${crn}-${uuid}-visorReport`).click()
             typePage.getSubmitBtn().click()
           })
-          it('should redirect to the sentence page', () => {
-            sentencePage = new AppointmentSentencePage()
-            sentencePage.checkOnPage()
+          it('should redirect to the attendance page', () => {
+            attendancePage = new AttendancePage()
+            attendancePage.checkOnPage()
           })
         })
+      })
+    })
+    describe('Back link is clicked', () => {
+      let sentencePage: AppointmentSentencePage
+      beforeEach(() => {
+        loadPage()
+        typePage = new AppointmentTypePage()
+        typePage.getBackLink().click()
+        sentencePage = new AppointmentSentencePage()
+      })
+      it('should be on the sentence page', () => {
+        sentencePage.checkOnPage()
+      })
+      it('should persist the sentence selection', () => {
+        sentencePage.getRadio('sentences', 1).should('be.checked')
+      })
+    })
+    describe('Person level contact was selected', () => {
+      beforeEach(() => {
+        cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+        completeSentencePage(4)
+        typePage = new AppointmentTypePage()
+      })
+      it('should have limited set of appointmentTypes', () => {
+        cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
       })
     })
   })

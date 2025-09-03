@@ -6,6 +6,7 @@ import {
   timeIsNotLaterThan,
   timeIsNowOrInFuture,
   isTodayOrLater,
+  isNotEarlierThan,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -83,6 +84,12 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           msg: 'Date must be today or in the future',
           log: 'Date must be today or in the future',
         },
+        {
+          validator: isNotEarlierThan,
+          msg: 'The date must not be later than 31/12/2199',
+          log: 'The date must not be later than 31/12/2199',
+          crossField: `_maxDate`,
+        },
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
@@ -159,6 +166,26 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select if appointment includes sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    sensitive: {
+      optional: page !== 'add-note',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not the appointment note contains sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    outcomeRecorded: {
+      optional: page !== 'record-an-outcome',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if they attended and complied',
+          log: 'Attended and complied not selected',
         },
       ],
     },

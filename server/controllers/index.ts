@@ -12,6 +12,7 @@ import arrangeAppointmentController from './arrangeAppointment'
 import documentController from './documents'
 import accessibilityController from './accessibility'
 import searchController from './search'
+import fileUploadController from './fileUpload'
 
 export default {
   caseload: caseloadController,
@@ -28,4 +29,5 @@ export default {
   document: documentController,
   accessibility: accessibilityController,
   search: searchController,
+  fileUpload: fileUploadController,
 }

@@ -16,7 +16,7 @@ const routes = [
   'getRemovedRiskFlags',
 ] as const
 
-const riskController: Controller<typeof routes> = {
+const riskController: Controller<typeof routes, void> = {
   getRisk: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params

@@ -59,7 +59,9 @@ MOJFrontend.BackendSortableTable.prototype.setNaturalOrder = function () {
 
 MOJFrontend.BackendSortableTable.prototype.createHeadingButton = function (heading, i) {
   const text = heading.text()
-  const button = $(`<button type="button" data-index="${i}">${text}</button>`)
+  const button = $(
+    `<button type="button" data-index="${i}">${text}<span class="sort-icon" aria-hidden="true"></span></button>`,
+  )
   heading.text('')
   heading.append(button)
 }

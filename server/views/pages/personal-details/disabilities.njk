@@ -1,9 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = "Disabilities" %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal details"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Personal details"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -25,21 +27,23 @@
 }) }}
 {% endblock %}
 
-
 {% block content %}
-<h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>
-<p>
-  <a href="{{ deliusDeepLinkUrl('EqualityMonitoring', crn) }}" target="_blank">Change disability information on NDelius (opens in new tab)</a>
-</p>
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <h2 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h2>
+  <p>
+    <a href="{{ deliusDeepLinkUrl('EqualityMonitoring', crn) }}" target="_blank">Change disability information on NDelius (opens in new tab)</a>
+  </p>
 
+  {% for disability in disabilities.disabilities %}
+    {% set notes = '' %}
+    {% for disabilityNote in disability.disabilityNotes %}
+      {% set notes = notes.concat(appNote(disabilityNote, "/case/" + crn + "/personal-details/disability/" + disability.disabilityId + "/note/" + disabilityNote.id)) %}
+    {% endfor %}
 
-{% for disability in disabilities.disabilities %}
-  {% set notes = '' %}
-  {% for disabilityNote in disability.disabilityNotes %}
-    {% set notes = notes.concat(appNote(disabilityNote, "/case/" + crn + "/personal-details/disability/" + disability.disabilityId + "/note/" + disabilityNote.id)) %}
-  {% endfor  %}
-
-  {% set disabilitiesHtml %}
+    {% set disabilitiesHtml %}
     {{ govukSummaryList({
       rows: [
         {
@@ -62,16 +66,17 @@
     }) }}
 
     <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
-        {{ lastUpdatedBy(disability.lastUpdated, disability.lastUpdatedBy)}}
+      {{ lastUpdatedBy(disability.lastUpdated, disability.lastUpdatedBy)}}
     </p>
-  {% endset %}
+    {% endset %}
 
-  {{ appSummaryCard({
+    {{ appSummaryCard({
     titleText: disability.description,
+    headingLevel: '3',
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: disabilitiesHtml,
     actions: {}
   }) }}
-{% endfor %}
+  {% endfor %}
 
 {% endblock %}

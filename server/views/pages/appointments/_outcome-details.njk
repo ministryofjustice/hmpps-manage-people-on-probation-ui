@@ -1,7 +1,7 @@
 {% set complianceText %}
-  {%- if (appointment.didTheyComply === true) or (appointment.didTheyComply === false) -%}
-    {{ appointment.didTheyComply | toYesNo }}
-  {%- elif appointment.wasAbsent === true and appointment.acceptableAbsence === true -%}
+{%- if (appointment.didTheyComply === true) or (appointment.didTheyComply === false) -%}
+  {{ appointment.didTheyComply | toYesNo }}
+{%- elif appointment.wasAbsent === true and appointment.acceptableAbsence === true -%}
     Acceptable absence
   {%- elif appointment.wasAbsent === true and appointment.acceptableAbsence === false -%}
     Unacceptable absence
@@ -11,22 +11,24 @@
 {% endset %}
 
 {% set documents %}
-  <ul class="govuk-list">
-    {% for document in appointment.documents %}
-      <li {% if loop.last %}class="govuk-!-margin-bottom-0"{% endif %}><a href="/case/{{ crn }}/personal-details/documents/{{ document.id }}/download" download="{{ doc.name }}">{{ document.name }}</a></li>
-    {% endfor %}
-    </ul>
+<ul class="govuk-list">
+  {% for document in appointment.documents %}
+    <li {% if loop.last %}class="govuk-!-margin-bottom-0"{% endif %}>
+      <a href="/case/{{ crn }}/personal-details/documents/{{ document.id }}/download" download="{{ doc.name }}">{{ document.name }}</a>
+    </li>
+  {% endfor %}
+</ul>
 {% endset %}
 
 {% set notes = '' %}
-{% set hasNote = appointment.appointmentNote %}
-{% set hasNotes = appointment.appointmentNotes.length > 0 %}
-{% if hasNotes  %}
+{% set hasNote = appointment.appointmentNote and appointment.hasOutcome %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome %}
+{% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
       {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
     {% endif %}
-  {% endfor  %}
+  {% endfor %}
 {% endif %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
@@ -102,18 +104,18 @@
     {
       key: { html: '<span data-qa="noteAddedByLabel">Note added by</span>' },
       value: { html: '<span data-qa="noteAddedByValue">' + appointment.appointmentNote.createdBy + '</span>' }
-    } if appointment.appointmentNote.createdBy,
+    } if appointment.appointmentNote.createdBy and hasNote,
     {
       key: { html: '<span data-qa="dateAddedLabel">Date added</span>' },
       value: { html: '<span data-qa="dateAddedValue">' + appointment.appointmentNote.createdByDate | dateWithYear + '</span>' }
-    } if appointment.appointmentNote.createdByDate,
+    } if appointment.appointmentNote.createdByDate and hasNote,
     {
       key: { html: '<span data-qa="notesLabel">Notes</span>' },
-      value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
-    } if not hasNote,
+      value: { html: '<span data-qa="notesValue">' + notes + '</span>' }
+    } if hasNotes and not hasNote,
     {
-      key: { html: '<span data-qa="notesLabel">Note</span>' },
-      value: { html: '<span class="govuk-body line-break">' + appointment.appointmentNote.note + '</span>' if appointment.appointmentNote.note else 'No note' }
+      key: { html: '<span data-qa="noteLabel">Note</span>' },
+      value: { html: '<span class="govuk-body line-break" data-qa="noteValue">' + appointment.appointmentNote.note + '</span>'  }
     } if hasNote
   ]
   }) }}

@@ -5,16 +5,6 @@
 
 {% block heading %}{% endblock %}
 {% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
-    {% endif %}
-  {% endif %}
   {% set locationItems = [] %}
   {% for location in userLocations %}
     {% set locationItems = (locationItems.push({
@@ -38,7 +28,7 @@
       legend: {
         html: '<span data-qa="pageHeading">' + title | safe + '</span>',
         classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6",
-        isPageHeading: true
+        isPageHeading: false
       },
       attributes: {
         'data-qa': 'locationCode'

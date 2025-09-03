@@ -96,9 +96,11 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
             ? req.session.data.teams[loggedInUsername].find(t => t.code === teamCode)?.description
             : null
       }
+
       const selectedUser =
         staffId && req?.session?.data?.staff?.[loggedInUsername]
-          ? req.session.data.staff[loggedInUsername].find(s => s.username === staffId)?.nameAndRole
+          ? req.session.data.staff[loggedInUsername].find(s => s.username.toLowerCase() === staffId.toLowerCase())
+              ?.nameAndRole
           : null
       const noLocationValue = 'I do not need to pick a location'
       const location: Location | string =

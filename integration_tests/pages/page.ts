@@ -30,6 +30,8 @@ export default abstract class Page {
 
   pageHeading = (): PageElement => cy.get('[data-qa=pageHeading]')
 
+  getAlert = (): PageElement => cy.get('[data-module="moj-alert"]')
+
   getNavigationLink = (index: number): PageElement => cy.get(`.moj-primary-navigation__list li:nth-of-type(${index}) a`)
 
   getTab = (tabName: string): PageElement => cy.get(`[data-qa=${tabName}Tab]`)

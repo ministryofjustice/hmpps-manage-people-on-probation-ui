@@ -1,32 +1,50 @@
 {% extends "../partials/layout.njk" %}
-
+{% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% block beforeContent %}
-  {{ govukBackLink({
+  {% if backLink %}
+    {{ govukBackLink({
     href: backLink + ("?change=" + change if change else '')
   }) }}
+  {% endif %}
 {% endblock %}
 
 {% block content %}
+  {% include "../partials/pop-header.njk" %}
+  <hr class="govuk-section-break--l">
   {% if notStandardForm %}
     {% block primary %}{% endblock %}
   {% else %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
         {% block heading %}
-          <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
-            {{ title }}
-          </h1>
+          {% if title %}
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+              {{ title }}
+            </h2>
+          {% endif %}
         {% endblock %}
-        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}">
-          <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %}>
+          {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
           {% block form %}{% endblock %}
-          {{ govukButton({
+          {% if not hideButton %}
+            {{ govukButton({
             html: buttonText if buttonText else 'Continue',
             isStartButton: buttonText === 'Start now',
             attributes: {
               'data-qa': 'submit-btn'
             }
           }) }}
+          {% endif %}
         </form>
       </div>
     </div>

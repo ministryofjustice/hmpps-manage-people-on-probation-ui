@@ -1,10 +1,10 @@
 {% extends "../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: "Interventions" }) %}
+{% set pageTitle = makePageTitle({pageHeading: "Interventions"}) %}
 {% set currentNavSection = 'interventions' %}
 {% set currentSectionName = 'Interventions' %}
 {% set headerPersonName = personSummary.name.forename + ' ' + personSummary.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = personSummary.dateOfBirth  %}
+{% set headerDob = personSummary.dateOfBirth %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -26,23 +26,23 @@
 {% endblock %}
 
 {% block pageContent %}
-{% if interventions.length === 0 %}
-<p>There may be interventions in place but we cannot yet display them. <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" rel="external noopener noreferrer">Search the contact log on NDelius (opens in new tab)</a>.</p>
-{% else %}
-    <h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-8 govuk-!-margin-bottom-5">CRS referrals</h2>
+    {% if (interventions[0] === undefined) or (interventions.length === 0) %}
+        <p>There may be interventions in place but we cannot yet display them. <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" rel="external noopener noreferrer">Search the contact log on NDelius (opens in new tab)</a>.</p>
+    {% else %}
+        <h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-8 govuk-!-margin-bottom-5">CRS referrals</h2>
 
-    {% set rows = [] %}
-    {% for intervention in interventions %}
-        {% if intervention.isDraft === false %}
-            {% set status %}
+        {% set rows = [] %}
+        {% for intervention in interventions %}
+            {% if intervention.isDraft === false %}
+                {% set status %}
                 {% if intervention.referralConcludedAt %}
-                   <span class="govuk-tag govuk-tag--green" align="center">Completed</span>
+                    <span class="govuk-tag govuk-tag--green" align="center">Completed</span>
                 {% else %}
-                   <span class="govuk-tag govuk-tag--yellow" align="center">Open</span>
+                    <span class="govuk-tag govuk-tag--yellow" align="center">Open</span>
                 {% endif %}
-            {% endset %}
+                {% endset %}
 
-            {% set rows = (rows.push(
+                {% set rows = (rows.push(
               [
                 {
                     html: '<span data-qa = "referralSentAt' + loop.index + 'Value">' + intervention.referralSentAt | dateWithYear + '</span>',
@@ -74,14 +74,16 @@
                 }
               ]
             ), rows) %}
-        {% endif %}
-    {% endfor %}
+            {% endif %}
+        {% endfor %}
 
-    {{ govukTable({
+        {{ govukTable({
      attributes: {
-       'data-module': 'moj-sortable-table',
+       'data-module': 'moj-mpop-sortable-table',
        'data-qa': 'interventionsCard'
      },
+     caption: 'Column headers with buttons are sortable',
+     captionClasses: 'govuk-visually-hidden',
      head: [
         {
             text: "Date Sent",
@@ -126,5 +128,5 @@
      ],
      rows: rows
    }) }}
-{% endif %}
+    {% endif %}
 {% endblock %}

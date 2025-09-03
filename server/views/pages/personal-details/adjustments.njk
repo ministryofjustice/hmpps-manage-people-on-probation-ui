@@ -1,10 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = 'Adjustments' %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal details"] }) %}
-
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Personal details"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -27,23 +28,27 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>
-
-<p>
-  <a href="{{ deliusDeepLinkUrl('EqualityMonitoring', crn) }}" target="_blank">Change adjustments on NDelius (opens in new tab)</a>
-</p>
-
-{% for adjustment in adjustments.provisions %}
-
-  {% set notes = '' %}
-  {% set hasNotes = adjustment.provisionNotes.length > 0 %}
-  {% if hasNotes  %}
-    {% for adjustmentNote in adjustment.provisionNotes %}
-      {% set notes = notes.concat(appNote(adjustmentNote, '/case/' + crn + '/personal-details/adjustments/' + adjustment.id + '/note/' + adjustmentNote.id)) %}
-    {% endfor  %}
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
   {% endif %}
+  <h2 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h2>
 
-  {% set adjustmentsHtml %}
+  <p>
+    <a href="{{ deliusDeepLinkUrl('EqualityMonitoring', crn) }}" target="_blank">Change adjustments on NDelius (opens in new tab)</a>
+  </p>
+
+  {% for adjustment in adjustments.provisions %}
+
+    {% set notes = '' %}
+    {% set hasNotes = adjustment.provisionNotes.length > 0 %}
+    {% if hasNotes %}
+      {% for adjustmentNote in adjustment.provisionNotes %}
+        {% set notes = notes.concat(appNote(adjustmentNote, '/case/' + crn + '/personal-details/adjustments/' + adjustment.id + '/note/' + adjustmentNote.id)) %}
+      {% endfor %}
+    {% endif %}
+
+    {% set adjustmentsHtml %}
     {{ govukSummaryList({
       rows: [
         {
@@ -67,16 +72,17 @@
     }) }}
 
     <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
-        {{ lastUpdatedBy(adjustment.lastUpdated, adjustment.lastUpdatedBy)}}
+      {{ lastUpdatedBy(adjustment.lastUpdated, adjustment.lastUpdatedBy)}}
     </p>
-  {% endset %}
+    {% endset %}
 
-  {{ appSummaryCard({
+    {{ appSummaryCard({
     titleText: adjustment.description,
+    headingLevel: '3',
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: adjustmentsHtml,
     actions: {}
   }) }}
-{% endfor %}
+  {% endfor %}
 
 {% endblock %}
