@@ -95,7 +95,7 @@ context('Overview', () => {
       .eq(0)
       .should('contain.text', 'High')
       .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
-    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(0).should('contain.text', 'Restraining Order')
+    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(0).should('contain.text', 'Risk to Staff')
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(1)
       .should('contain.text', 'Medium')
@@ -113,6 +113,8 @@ context('Overview', () => {
     cy.get('[data-qa="riskFlagsValue"] dt').eq(3).should('contain.text', 'Information only')
 
     page.getElementData('overallRiskValue').should('contain.text', 'VERY HIGH RISK OF SERIOUS HARM')
+
+    page.getAlert().should('contain.text', 'high')
 
     const expected =
       '{"name":"Wolff,Caroline","crn":"X000001","dob":"9 January 2002","age":"22","tierScore":"B2","sentence":"12 month Community order"}'

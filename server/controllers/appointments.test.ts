@@ -93,6 +93,10 @@ const getPersonAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointment')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
 
+const patchAppointmentSpy = jest
+  .spyOn(MasApiClient.prototype, 'patchAppointment')
+  .mockImplementation(() => Promise.resolve(mockPersonAppointment))
+
 const getCalculationDetailsSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
@@ -114,8 +118,8 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_MAS_APPOINTMENTS', uuidv4(), crn, 'CRN')
     it('should request previous and upcoming appointments from the api', () => {
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming')
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
     it('should request risks from the api', () => {
       expect(getRisksSpy).toHaveBeenCalledWith(crn)
@@ -138,6 +142,43 @@ describe('controllers/appointments', () => {
     })
   })
 
+  describe('get upcoming appointments', () => {
+    beforeEach(async () => {
+      await controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS', uuidv4(), crn, 'CRN')
+    it('should request previous and upcoming appointments from the api', () => {
+      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', '&sortBy=date&ascending=true')
+    })
+    it('should request risks from the api', () => {
+      expect(getRisksSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request tier calculation details from the api', () => {
+      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should request predictors from the api', () => {
+      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
+    })
+    it('should render the appointments page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
+        upcomingAppointments: mockPersonSchedule,
+        crn,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+        sortedBy: 'date.asc',
+        pagination: {
+          from: '1',
+          items: [],
+          next: undefined,
+          prev: undefined,
+          to: '0',
+          total: '0',
+        },
+      })
+    })
+  })
+
   describe('post appointments', () => {
     beforeEach(() => {
       jest.clearAllMocks()
@@ -149,8 +190,8 @@ describe('controllers/appointments', () => {
         controllers.appointments.postAppointments(hmppsAuthClient)(req, res)
       })
 
-      it('should redirect to the arrange appointment type page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/type`)
+      it('should redirect to the arrange appointment sentence page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence`)
       })
     })
     describe('CRN request parameter is invalid', () => {
@@ -184,90 +225,27 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
-    it('should request previous appointments from the api', () => {
-      expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
-    })
+    checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
-        schedule: mockPersonSchedule,
         crn,
-        actionType,
       })
     })
   })
 
   describe('post record an outcome', () => {
-    describe('If appointment id is null in request body', () => {
-      beforeEach(async () => {
-        const mockReq = httpMocks.createRequest({
-          params: {
-            crn,
-            id,
-            contactId,
-            actionType,
-          },
-          query: { page: '', view: 'default', category: 'mock-category' },
-          body: {
-            'appointment-id': null,
-          },
-        })
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
-      })
-      it('should log appointment has not been selected', () => {
-        expect(loggerSpy).toHaveBeenCalledWith('Appointment not selected')
-      })
-      it('should request previous appointments from the api', () => {
-        expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous')
-      })
-      it('should render the record an outcome page', () => {
-        expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
-          errorMessages: {
-            appointment: { text: 'Please select an appointment' },
-          },
-          schedule: mockPersonSchedule,
-          crn,
-          actionType,
-        })
-      })
-    })
-    describe('If appointment id in request body', () => {
-      const appointmentId = '1234'
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        const mockReq = httpMocks.createRequest({
-          params: {
-            crn,
-            id,
-            contactId,
-            actionType,
-          },
-          query: { page: '', view: 'default', category: 'mock-category' },
-          body: {
-            'appointment-id': appointmentId,
-          },
-        })
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
-      })
-      it('should redirect to the appointment details page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${appointmentId}`)
-      })
+    const mockReq = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+        contactId,
+        actionType,
+      },
+      body: {
+        outcomeRecorded: 'yes',
+      },
     })
     describe('If CRN request param is invalid', () => {
-      const appointmentId = '1234'
-      const mockReq = httpMocks.createRequest({
-        params: {
-          crn,
-          id,
-          contactId,
-          actionType,
-        },
-        query: { page: '', view: 'default', category: 'mock-category' },
-        body: {
-          'appointment-id': appointmentId,
-        },
-      })
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(false)
         mockIsNumericString.mockReturnValue(false)
@@ -280,6 +258,101 @@ describe('controllers/appointments', () => {
       })
       it('should not redirect', () => {
         expect(redirectSpy).not.toHaveBeenCalled()
+      })
+    })
+    describe('If CRN request param is valid', () => {
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
+        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+      })
+      it('should send the patch request to the api', () => {
+        expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
+      })
+      it('should redirect to the manage appointment page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+      })
+    })
+  })
+  describe('get add note', () => {
+    const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
+    const errorMessages = {
+      notes: 'Notes error',
+      sensitivity: 'Sensitivity error',
+    }
+    const mockReq = httpMocks.createRequest({
+      params: {
+        crn,
+        id,
+        contactId,
+        actionType,
+      },
+      session: {
+        cache: {
+          uploadedFiles,
+        },
+        errorMessages,
+      },
+    })
+    beforeEach(async () => {
+      await controllers.appointments.getAddNote(hmppsAuthClient)(mockReq, res)
+    })
+    checkAuditMessage(res, 'ADD_APPOINTMENT_NOTES', uuidv4(), crn, 'CRN')
+    it('should delete uploadedFiles session value if it exists', () => {
+      expect(mockReq.session.cache.uploadedFiles).toBeUndefined()
+    })
+    it('should delete errorMessages session value if it exists', () => {
+      expect(mockReq.session.errorMessages).toBeUndefined()
+    })
+    it('should render the add note page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
+        crn,
+        errorMessages: null,
+        uploadedFiles: [],
+      })
+    })
+  })
+  describe('post add note', () => {
+    describe('If CRN request param is invalid', () => {
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsNumericString.mockReturnValue(false)
+
+        await controllers.appointments.postAddNote(hmppsAuthClient)(req, res)
+      })
+      it('should return a 404 status and render the error page', () => {
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+      it('should not redirect', () => {
+        expect(redirectSpy).not.toHaveBeenCalled()
+      })
+    })
+    describe('If CRN request param is valid', () => {
+      const mockReq = httpMocks.createRequest({
+        body: {
+          notes: 'some mock notes',
+          sensitive: 'Yes',
+        },
+        params: {
+          contactId: id,
+          crn,
+        },
+      })
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
+        await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+      })
+      it('should send the patch request to the api', () => {
+        expect(patchAppointmentSpy).toHaveBeenCalledWith({
+          id: parseInt(mockReq.params.contactId, 10),
+          notes: mockReq.body.notes,
+          sensitive: true,
+        })
+      })
+      it('should redirect to the manage appointment page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
       })
     })
   })

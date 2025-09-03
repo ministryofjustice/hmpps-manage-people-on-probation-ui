@@ -72,41 +72,42 @@
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-9',
         rows: [
-        {
-          key: { text: "Appointment type" },
-          value: { text: appointment.type.description },
-          actions: {
-            items: [
-              {
-                href: changePath + "/type?change=" + url,
-                text: "Change",
-                visuallyHiddenText: "type of appointment"
-              }
-            ]
-          } if showAction
-        },
-        {
-        key: { text: "VISOR report"},
-        value: { text: appointment.visorReport },
-        actions: {
-    items: [ {
-    href: changePath + "/type?change=" + url,
-    text: "Change",
-    visuallyHiddenText: "type of appointment"
-     } 
-     ] 
-     } if showAction
-        } if appointment.meta.isVisor,
-    { key: { text: "Appointment for" },
-    value: { html: sentenceHtml | safe },
-    actions: {
-    items: [ { 
-    href: changePath + "/sentence?change=" + url, 
-    text: "Change", 
-    visuallyHiddenText: "sentence"
-     } 
-     ] 
-     } if showAction }, 
+            { key: { text: "Appointment for" },
+            value: { html: sentenceHtml | safe },
+            actions: {
+            items: [ { 
+            href: changePath + "/sentence?change=" + url, 
+            text: "Change", 
+            visuallyHiddenText: "sentence"
+            } 
+            ] 
+            } if showAction }, 
+            {
+            key: { text: "Appointment type" },
+            value: { text: appointment.type.description },
+            actions: {
+                items: [
+                {
+                    href: changePath + "/type?change=" + url,
+                    text: "Change",
+                    visuallyHiddenText: "type of appointment"
+                }
+                ]
+            } if showAction
+            },
+            {
+                key: { text: "VISOR report"},
+                value: { text: appointment.visorReport },
+                actions: {
+                    items: [ 
+                        {
+                            href: changePath + "/type?change=" + url,
+                            text: "Change",
+                            visuallyHiddenText: "type of appointment"
+                        } 
+                    ] 
+                } if showAction
+            } if appointment.meta.isVisor,
     { key: { text: "Attending" },
     value: { html: attendingHtml | safe },
     actions: {
@@ -116,7 +117,18 @@
     visuallyHiddenText: "attendance"
      } 
      ] 
-     } if showAction }, 
+     } if showAction },
+     { key: { text: "VISOR report"},
+      value: { text: appointment.visorReport },
+      actions: {
+      items: [ {
+     href: changePath + "/type?change=" + url,
+     text: "Change",
+     visuallyHiddenText: "type of appointment"
+     }
+     ]
+     } if showAction
+     } if appointment.meta.isVisor,
      { key: { text: "Location" }, 
      value: { text: locationAddress | safe if appointment.location else appointment.location }, 
      actions: { items: [ { href: changePath + "/location?change=" + url, 
@@ -130,10 +142,11 @@
       actions: { items: [ { href: changePath + "/date-time?change=" + url,
       text: "Choose date and time" if anotherAppointment and appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
-         { key: { text: "Repeating appointment" },
-      value: { text: 'Yes' if appointment.repeating === 'Yes' else 'No' },
+         { 
+            key: { html: '<span data-qa="repeatingAppointmentLabel">Repeating appointment</span>' },
+      value: { html: '<span data-qa="repeatingAppointmentValue">' + ('Yes' if appointment.repeating === 'Yes' else 'No') + '</span>' },
       actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
-       { key: { text: "Appointment notes" },
+       { key: { text: "Supporting information" },
     value: { html: "Not entered" if anotherAppointment and not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 

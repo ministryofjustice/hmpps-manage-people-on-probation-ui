@@ -1,40 +1,46 @@
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import AppointmentsPage from '../../pages/appointments'
+import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import {
   completeAttendancePage,
   completeCYAPage,
   completeDateTimePage,
   completeLocationPage,
-  completePreviewPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
+  completeNotePage,
   date,
   endTime,
   startTime,
+  checkPopHeader,
 } from './imports'
 
 const regex: RegExp =
   /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2}[ap]m)\sto\s(\d{1,2}:\d{2}[ap]m)$/
 
-const loadPage = () => {
-  completeTypePage()
-  completeSentencePage()
+const loadPage = (crnOverride = '') => {
+  completeSentencePage(1, '', crnOverride)
+  completeTypePage(1, false)
   completeAttendancePage()
-  completeLocationPage()
-  completeDateTimePage()
-  completeRepeatingPage()
-  completePreviewPage()
+  completeLocationPage(1, crnOverride)
+  completeDateTimePage(crnOverride)
+  completeRepeatingPage(2, crnOverride)
+  completeNotePage(true, crnOverride)
   completeCYAPage()
 }
-describe('Appointments arranged', () => {
+describe('Confirmation page', () => {
   let confirmPage: AppointmentConfirmationPage
   beforeEach(() => {
+    cy.task('resetMocks')
     loadPage()
     confirmPage = new AppointmentConfirmationPage()
   })
+
   it('should render the page', () => {
-    confirmPage.getPanel().find('strong').should('contain.text', '3 Way Meeting (NS)')
+    checkPopHeader('Alton Berge', true)
+    confirmPage.getPanel().find('strong').should('contain.text', 'Planned Office Visit (NS)')
     confirmPage
       .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
       .invoke('text')
@@ -59,13 +65,31 @@ describe('Appointments arranged', () => {
       .invoke('text')
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`Alton’s phone number is 0123456999.`)
+        expect(normalizedText).to.include(`Alton’s phone number is 071838893`)
       })
 
-    confirmPage.getSubmitBtn().should('contain.text', 'Finish')
+    confirmPage.getSubmitBtn().should('contain.text', 'Arrange next appointment')
     confirmPage.getSubmitBtn().click()
-    cy.location().should(location => {
-      expect(location.href).to.eq('http://localhost:3007/')
-    })
+    const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+    arrangeAnotherAppointmentPage.checkOnPage()
+  })
+  it('should link to the appointment page when practitioner click finish', () => {
+    loadPage()
+    cy.get('[data-qa="finishLink"]').click()
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
+  })
+
+  it('should render the page with pop telephone number', () => {
+    cy.task('stubPersonalDetailsNoMobileNumber')
+    loadPage('X000001')
+    confirmPage = new AppointmentConfirmationPage()
+    confirmPage.getPopTelephone().should('contain.text', `0123456999`)
+  })
+  it('should render the page with no contact numbers', () => {
+    cy.task('stubPersonalDetailsNoTelephoneNumbers')
+    loadPage('X000001')
+    confirmPage = new AppointmentConfirmationPage()
+    confirmPage.getPopContactNumber().should('not.exist')
   })
 })

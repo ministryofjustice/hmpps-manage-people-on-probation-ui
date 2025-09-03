@@ -1,8 +1,9 @@
 {% extends "../../../partials/layout.njk" %}
 {% set headerPersonName = previousOrderDetail.name.forename + ' ' + previousOrderDetail.name.surname %}
-{% set title =  previousOrderDetail.title %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Previous orders", "Sentence"] }) %}
-
+{% set title = previousOrderDetail.title %}
+{% set pageTitle = makePageTitle({
+    pageHeading: [title, "Previous orders", "Sentence"]
+}) %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -28,10 +29,14 @@
     }) }}
 {% endblock %}
 {% block content %}
-<h1 class="govuk-heading-l" data-qa="pageHeading">
-  <span class="govuk-caption-l">Previous orders</span>
-  {{ title }}
-</h1>
+    {% if not hidePageHeader %}
+        {% include "../../../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+    {% endif %}
+    <h2 class="govuk-heading-l" data-qa="pageHeading">
+        <span class="govuk-caption-l">Previous orders</span>
+        {{ title }}
+    </h2>
     {% set sentence = previousOrderDetail.sentence %}
     {% if sentence %}
         {% include '../_sentence-offence.njk' %}

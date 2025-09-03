@@ -1,43 +1,43 @@
-<h2 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-8 govuk-!-margin-bottom-5">Previous orders</h2>
+<h3 class="govuk-heading-m govuk-!-font-size-27 govuk-!-margin-top-8 govuk-!-margin-bottom-5">Previous orders</h3>
 {% if personCompliance.previousOrders.count > 0 %}
-    <p>{{ personCompliance.previousOrders.count }} previous orders ({{ personCompliance.previousOrders.breaches}} breaches on previous orders)<br />Last ended on {{ personCompliance.previousOrders.lastEndedDate | dateWithYear }}.</p>
-    {% if personCompliance.previousOrders.orders.length > 0 %}
-        <h3 class="govuk-heading-s">Previous orders ending within the last 2 years</h3>
-        {% for order in personCompliance.previousOrders.orders %}
-            {% set breachesOnPreviousOrder %}
-                {% if order.breaches > 0 %}
-                    {{ order.breaches }}
-                {% else %}
+  <p>{{ personCompliance.previousOrders.count }} previous orders ({{ personCompliance.previousOrders.breaches}} breaches on previous orders)<br/>Last ended on {{ personCompliance.previousOrders.lastEndedDate | dateWithYear }}.</p>
+  {% if personCompliance.previousOrders.orders.length > 0 %}
+    <h3 class="govuk-heading-s">Previous orders ending within the last 2 years</h3>
+    {% for order in personCompliance.previousOrders.orders %}
+      {% set breachesOnPreviousOrder %}
+      {% if order.breaches > 0 %}
+        {{ order.breaches }}
+      {% else %}
                     No breaches on previous order
                 {% endif %}
-            {% endset %}
+      {% endset %}
 
-  {% set statusOnPreviousOrder %}
-   {% if order.status %}
-    {{ order.status }}
-   {% else %}
+      {% set statusOnPreviousOrder %}
+      {% if order.status %}
+        {{ order.status }}
+      {% else %}
     No status on previous order
    {% endif %}
-  {% endset %}
+      {% endset %}
 
-  {% set startDateOnPreviousOrder %}
-    {% if order.startDate %}
-      {{ order.startDate | dateWithYear }}
-    {% else %}
+      {% set startDateOnPreviousOrder %}
+      {% if order.startDate %}
+        {{ order.startDate | dateWithYear }}
+      {% else %}
       No start date on previous order
     {% endif %}
-  {% endset %}
+      {% endset %}
 
-  {% set endDateOnPreviousOrder %}
-    {% if order.endDate %}
-      {{ order.endDate | dateWithYear }}
-    {% else %}
+      {% set endDateOnPreviousOrder %}
+      {% if order.endDate %}
+        {{ order.endDate | dateWithYear }}
+      {% else %}
       No end date on previous order
     {% endif %}
-  {% endset %}
+      {% endset %}
 
-            {% set previousOrder %}
-              {{ govukSummaryList({
+      {% set previousOrder %}
+      {{ govukSummaryList({
                 rows: [
                   {
                     key: {
@@ -81,11 +81,12 @@
                   }
                 ]
               }) }}
-            {% endset %}
+      {% endset %}
 
-            {{ appSummaryCard({
+      {{ appSummaryCard({
               attributes: {'data-qa': 'previousOrder' + loop.index + 'Card'},
-              classes: 'govuk-!-margin-bottom-6',
+              classes: 'app-summary-card--large-title govuk-!-margin-bottom-6',
+              headingLevel: 3,
               titleText: order.description + ' (Ended ' + order.endDate | dateWithYear + ')',
               html: previousOrder,
               actions: {
@@ -98,14 +99,15 @@
                 ]
               }
             }) }}
-        {% endfor %}
-        <p><a href="/case/{{ crn }}/sentence/previous-orders">View all previous orders</a></p>
-    {% else %}
-        <h3 class="govuk-heading-s">Previous orders ending within the last 2 years</h3>
-    {% endif %}
+    {% endfor %}
+    <p>
+      <a href="/case/{{ crn }}/sentence/previous-orders">View all previous orders</a>
+    </p>
+  {% else %}
+    <h3 class="govuk-heading-s">Previous orders ending within the last 2 years</h3>
+  {% endif %}
 {% else %}
 
-<p>There are no previous orders.</p>
+  <p>There are no previous orders.</p>
 
 {% endif %}
-

@@ -6,6 +6,7 @@ import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../config'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
+// eslint-disable-next-line import/no-cycle
 import { escapeForLog, isValidHost, isValidPath } from '../utils'
 
 interface Request {

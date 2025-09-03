@@ -7,30 +7,39 @@
 {% from "govuk/components/breadcrumbs/macro.njk" import govukBreadcrumbs %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/warning-text/macro.njk"        import govukWarningText %}
-{% from "govuk/components/tag/macro.njk"                 import govukTag %}
-{% from "govuk/components/button/macro.njk"              import govukButton %}
-{% from "govuk/components/details/macro.njk"             import govukDetails %}
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "_components/compliance-tag/macro.njk"           import appComplianceTag %}
-{% from "_components/pagination/macro.njk"           import appPagination %}
-{% from "_components/note/macro.njk"                    import appNote %}
-{% from "_components/search/macro.njk"                    import appSearch %}
-{% from "govuk/components/radios/macro.njk"             import govukRadios %}
-{% from "moj/components/pagination/macro.njk"           import mojPagination %}
-{% from "govuk/components/pagination/macro.njk"         import govukPagination %}
-{% from "govuk/components/input/macro.njk"               import govukInput %}
-{% from "govuk/components/select/macro.njk"              import govukSelect %}
-{% from "govuk/components/checkboxes/macro.njk"          import govukCheckboxes %}
-{% from "govuk/components/panel/macro.njk"               import govukPanel %}
+{% from "_components/pagination/macro.njk" import appPagination %}
+{% from "_components/note/macro.njk" import appNote %}
+{% from "_components/search/macro.njk" import appSearch %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "moj/components/pagination/macro.njk" import mojPagination %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+{% from "govuk/components/input/macro.njk" import govukInput %}
+{% from "govuk/components/select/macro.njk" import govukSelect %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/panel/macro.njk" import govukPanel %}
 {% from "moj/components/date-picker/macro.njk"           import mojDatePicker %}
-{% from "govuk/components/textarea/macro.njk"            import govukTextarea %}
-{% from "moj/components/banner/macro.njk"                import mojBanner %}
-{% from "govuk/components/error-summary/macro.njk"       import govukErrorSummary %}
+{% from "govuk/components/textarea/macro.njk" import govukTextarea %}
+{% from "moj/components/banner/macro.njk" import mojBanner %}
+{% from "_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+{% from "govuk/components/task-list/macro.njk" import govukTaskList %}
+{% from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "govuk/components/file-upload/macro.njk" import govukFileUpload %}
+{% from "moj/components/multi-file-upload/macro.njk" import mojMultiFileUpload -%}
 
 {% block head %}
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
+  {% if flags.enableDeleteAppointmentFile %}
+    <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
+  {% endif %}
 {% endblock %}
 
-{% block pageTitle %}{{pageTitle | default(applicationName)}}{% endblock %}
+{% block pageTitle %}{{pageTitle | default(applicationName)}}
+{% endblock %}
 
 {% block header %}
   {% include "./header.njk" %}
@@ -38,8 +47,7 @@
 
 {% endblock %}
 
-{% block bodyStart %}
-{% endblock %}
+{% block bodyStart %}{% endblock %}
 {% block footer %}
   {{ govukFooter({
         meta: {
@@ -55,7 +63,7 @@
 {% block bodyEnd %}
   {% if sentry and sentry.loaderScriptId %}
     <script nonce="{{ cspNonce }}">
-      window.sentryOnLoad = function() {
+      window.sentryOnLoad = function () {
         Sentry.init({
           release: "hmpps-manage-people-on-probation-ui@{{ version }}",
           environment: "{{ sentry.environment }}",
@@ -63,8 +71,10 @@
           replaysSessionSampleRate: {{ sentry.replaySampleRate }},
           replaysOnErrorSampleRate: {{ sentry.replayOnErrorSampleRate }},
           initialScope: {
-            user: { username: "{{ user.username }}" },
-          },
+            user: {
+              username: "{{ user.username }}"
+            }
+          }
         });
       };
     </script>
@@ -72,15 +82,16 @@
   {% endif %}
   <script src="/assets/moj/all.js"></script>
   <script src="/assets/js/jquery.min.js"></script>
-    <script type="module" src="/assets/js/app.js"></script>
-
- <script nonce="{{ cspNonce }}">
+  <script type="module" src="/assets/js/app.js"></script>
+  <script nonce="{{ cspNonce }}">
+    window.csrfToken = "{{ csrfToken }}";
+  </script>
+  <script nonce="{{ cspNonce }}">
     document.addEventListener('DOMContentLoaded', function () {
-      document.initialiseTelemetry(
-        '{{ applicationInsightsConnectionString | default('') }}',
-        '{{ applicationInsightsRoleName }}',
-        '{{ user.username }}'
-      )
+      document.initialiseTelemetry('{{ applicationInsightsConnectionString | default(' ') }}', '{{ applicationInsightsRoleName }}', '{{ user.username }}')
     })
+  </script>
+  <script nonce="{{ cspNonce }}">
+    window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile if  flags.enableDeleteAppointmentFile !== undefined else false }}
   </script>
 {% endblock %}

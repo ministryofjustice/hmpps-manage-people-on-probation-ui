@@ -1,23 +1,30 @@
 {% extends "../../partials/edit-contact-details.njk" %}
 {% set title = 'Edit main address for ' + personalDetails.name.forename %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Edit contact details", "Contact"] }) %}
+{% set pageTitle = makePageTitle({
+    pageHeading: ["Edit contact details", "Contact"]
+}) %}
 {% set addressTypeSelectItems = [] %}
-{% set addressTypeSelectItems = [{text: "Select address type", value: null }] %}
-  {% for addressType in personalDetails.addressTypes|sort(attribute='description') %}
-      {% set addressTypeSelectItems = (addressTypeSelectItems.push({
-          selected: personalDetails.mainAddress.typeCode === addressType.code,
-          text: addressType.description,
-          value: addressType.code
-      }), addressTypeSelectItems) %}
-  {% endfor %}
+{% set addressTypeSelectItems = [
+    {
+        text: "Select address type",
+        value: null
+    }
+] %}
+{% for addressType in personalDetails.addressTypes | sort(attribute = 'description') %}
+    {% set addressTypeSelectItems = (addressTypeSelectItems.push({
+        selected: personalDetails.mainAddress.typeCode === addressType.code,
+        text: addressType.description,
+        value: addressType.code
+    }), addressTypeSelectItems) %}
+{% endfor %}
 
 {% block editForm %}
- <h2 class="govuk-label--s">Main address</h2>
+    <h3 class="govuk-label--s">Main address</h3>
 
-<div data-qa="noFixedAddressGroup">
-            <p class="govuk-label--s">Select if they have no fixed main address</p>
+    <div data-qa="noFixedAddressGroup">
+        <p class="govuk-label--s">Select if they have no fixed main address</p>
 
-            {{ govukCheckboxes ({
+        {{ govukCheckboxes ({
                 id: 'noFixedAddress',
                 name: 'noFixedAddress',
                 items: [
@@ -29,9 +36,9 @@
                     }
                 ]
             }) }}
-</div>
-            <div fixed-address-section>
-                {{ govukInput({
+    </div>
+    <div fixed-address-section>
+        {{ govukInput({
                     value: personalDetails.mainAddress.buildingName if personalDetails.mainAddress.buildingName,
                     label: {
                         text: "Building name (optional)",
@@ -53,7 +60,7 @@
                     } if errorMessages.buildingName
                 }) }}
 
-                {{ govukInput({
+        {{ govukInput({
                     value: personalDetails.mainAddress.buildingNumber if personalDetails.mainAddress.buildingNumber,
                     label: {
                         text: "House number (optional)",
@@ -75,7 +82,7 @@
                     } if errorMessages.buildingNumber
                 }) }}
 
-                {{ govukInput({
+        {{ govukInput({
                     value: personalDetails.mainAddress.streetName if personalDetails.mainAddress.streetName,
                     label: {
                         text: "Street name (optional)",
@@ -97,7 +104,7 @@
                     } if errorMessages.streetName
                 }) }}
 
-                {{ govukInput({
+        {{ govukInput({
                     value: personalDetails.mainAddress.district if personalDetails.mainAddress.district,
                     label: {
                         text: "District (optional)",
@@ -119,7 +126,7 @@
                     } if errorMessages.district
                 }) }}
 
-                {{ govukInput({
+        {{ govukInput({
                     value: personalDetails.mainAddress.town if personalDetails.mainAddress.town,
                     label: {
                         text: "Town or city (optional)",
@@ -141,7 +148,7 @@
                     } if errorMessages.town
                 }) }}
 
-                {{ govukInput({
+        {{ govukInput({
                     value: personalDetails.mainAddress.county if personalDetails.mainAddress.county,
                     label: {
                         text: "County (optional)",
@@ -163,8 +170,7 @@
                     } if errorMessages.county
                 }) }}
 
-
-                {{ govukInput({
+        {{ govukInput({
                     value: personalDetails.mainAddress.postcode if personalDetails.mainAddress.postcode,
                     label: {
                         text: "Postcode (optional)",
@@ -185,8 +191,8 @@
                         }
                     } if errorMessages.postcode
                 }) }}
-            </div>
-            {{ govukSelect({
+    </div>
+    {{ govukSelect({
                 label: {
                     text: "Type",
                     classes: "govuk-label--s govuk-!-font-weight-bold"
@@ -208,7 +214,7 @@
                 } if errorMessages.addressTypeCode
             }) }}
 
-            {{ govukRadios({
+    {{ govukRadios({
                 classes: "govuk-radios--inline",
                 fieldset: {
                     legend: {
@@ -242,7 +248,7 @@
                 } if errorMessages.verified
             }) }}
 
-            {{ mojDatePicker({
+    {{ mojDatePicker({
                 value: fromIsoDateToPicker(personalDetails.mainAddress.from),
                 id: "startDate",
                 name: "startDate",
@@ -266,7 +272,7 @@
                 } if errorMessages.startDate
             }) }}
 
-            {{ mojDatePicker({
+    {{ mojDatePicker({
                 value:  fromIsoDateToPicker(personalDetails.mainAddress.to),
                 id: "endDate",
                 name: "endDate",
@@ -289,19 +295,19 @@
                     }
                 } if errorMessages.endDate
             }) }}
-            {% if personalDetails.mainAddress.addressNotes %}
-            <section class="govuk-!-margin-bottom-4" data-qa="addressNotes">
+    {% if personalDetails.mainAddress.addressNotes %}
+        <section class="govuk-!-margin-bottom-4" data-qa="addressNotes">
             <p class="govuk-label--s govuk-!-margin-bottom-1">Previous notes</p>
-          {% if personalDetails.mainAddress.addressNotes.length %}                  
-            {% for addressNote in personalDetails.mainAddress.addressNotes %}
- {{ appNote(addressNote, "/case/" + crn + "/personal-details/main-address/note/" + addressNote.id) }}
-            {% endfor %}
+            {% if personalDetails.mainAddress.addressNotes.length %}
+                {% for addressNote in personalDetails.mainAddress.addressNotes %}
+                    {{ appNote(addressNote, "/case/" + crn + "/personal-details/main-address/note/" + addressNote.id) }}
+                {% endfor %}
             {% else %}
-            <p>No notes</p>
+                <p>No notes</p>
             {% endif %}
-            </section>
-            {% endif %}
-            {{ govukTextarea({
+        </section>
+    {% endif %}
+    {{ govukTextarea({
                 id: "notes",
                 name: "notes",
                 formGroup: {

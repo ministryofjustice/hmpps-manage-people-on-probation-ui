@@ -47,16 +47,16 @@
 ] %}
 
 <section data-qa="homepage-services-section">
-  <h1 class="govuk-heading-m">Other services</h1>
+  <h2 class="govuk-heading-m">Other services</h2>
 
   <div class="hmpps-services">
     {% for link in links %}
       <div class="hmpps-service-item">
         <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-static-margin-top-0">
         <div class="hmpps-service-item__header">
-          <p>
+          <h3 class="govuk-heading-s">
             <a href="{{ link.href }}" class="govuk-link govuk-!-font-weight-bold govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer">{{ link.heading }}</a>
-          </p>
+          </h3>
         </div>
         <p class="govuk-!-static-margin-top-3 govuk-!-static-margin-bottom-0">{{ link.description }}</p>
       </div>

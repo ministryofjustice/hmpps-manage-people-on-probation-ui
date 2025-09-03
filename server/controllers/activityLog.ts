@@ -24,18 +24,20 @@ export const getQueryString = (params: Record<string, string>): string[] => {
   return queryParams
 }
 
-const activityLogController: Controller<typeof routes> = {
+const activityLogController: Controller<typeof routes, void> = {
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { query, body, params } = req
       const { crn } = params
       const { page = '0', view = '' } = query
-      if (req?.query?.view || req?.body?.view === 'compact') {
+      let currentView = view ?? req?.body?.view
+      if (req?.query?.view === 'compact' || req?.body?.view === 'compact') {
         res.locals.compactView = true
+        currentView = 'compact'
       } else {
         res.locals.defaultView = true
       }
-      const currentView = view ?? body?.view
+
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

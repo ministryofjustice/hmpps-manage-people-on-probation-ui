@@ -2,9 +2,11 @@
 {% set title = personRiskFlag.riskFlag.description %}
 {% set removed = personRiskFlag.riskFlag.removed %}
 {% set flag = personRiskFlag.riskFlag %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Risk flags", "Risk"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Risk flags", "Risk"]
+}) %}
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -30,32 +32,36 @@
 {% endblock %}
 
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
-      <span class="govuk-caption-l">{{ 'Removed risk flag' if removed else 'Risk flag' }}</span>
-      {{ title }}
-    </h1>
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+        <span class="govuk-caption-l">{{ 'Removed risk flag' if removed else 'Risk flag' }}</span>
+        {{ title }}
+      </h2>
+    </div>
   </div>
-</div>
 
-<!-- {{ govukButton({
+  <!-- {{ govukButton({
   text: 'Review or amend flag',
   href: '#'
 }) }} -->
-{% for removal in flag.removalHistory %}
+  {% for removal in flag.removalHistory %}
 
-{% set removedFlagSummaryList %}
-  {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
-  {% set removalNotes = '' %}
-  {% if hasRemovalNotes  %}
-    {% for removalNote in removal.riskRemovalNotes %}
-      {% if removalNote.note %}
-        {% set removalNotes = removalNotes.concat(appNote(removalNote, '/case/' + crn + '/risk/flag/' + flag.id + '/risk-removal-note/' + removalNote.id)) %}
-      {% endif %}
-    {% endfor  %}
-  {% endif %}
-  {{ govukSummaryList({
+    {% set removedFlagSummaryList %}
+    {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
+    {% set removalNotes = '' %}
+    {% if hasRemovalNotes %}
+      {% for removalNote in removal.riskRemovalNotes %}
+        {% if removalNote.note %}
+          {% set removalNotes = removalNotes.concat(appNote(removalNote, '/case/' + crn + '/risk/flag/' + flag.id + '/risk-removal-note/' + removalNote.id)) %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+    {{ govukSummaryList({
     rows: [
       {
         key: {
@@ -87,39 +93,39 @@
       } if removal.riskRemovalNote.note
     ]
   }) }}
-{% endset %}
+    {% endset %}
 
-{% if removed %}
-  {{ appSummaryCard({
+    {% if removed %}
+      {{ appSummaryCard({
     attributes: {'data-qa': 'riskFlagRemovedCard'},
     titleText: "Flag removed",
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: removedFlagSummaryList
   }) }}
-{% endif %}
+    {% endif %}
 
-{% endfor %}
+  {% endfor %}
 
-{% set nextReviewDate %}
+  {% set nextReviewDate %}
   <span data-qa="nextReviewDateValue">
     {{ flag.nextReviewDate | dateWithYear }}
-    {% if(isInThePast(flag.nextReviewDate)) %}
-        <strong class="govuk-tag app-compliance-tag govuk-tag--red govuk-!-margin-left-2">
+    {% if (isInThePast(flag.nextReviewDate)) %}
+      <strong class="govuk-tag app-compliance-tag govuk-tag--red govuk-!-margin-left-2">
           Overdue
         </strong>
     {% endif %}
   </span>
-{% endset %}
+  {% endset %}
 
-{% set aboutThisFlagSummaryList %}
+  {% set aboutThisFlagSummaryList %}
   {% set hasNotes = personRiskFlag.riskFlag.riskNotes.length > 0 %}
   {% set notes = '' %}
-  {% if hasNotes  %}
+  {% if hasNotes %}
     {% for riskNote in personRiskFlag.riskFlag.riskNotes %}
       {% if riskNote.note %}
         {% set notes = notes.concat(appNote(riskNote, '/case/' + crn + '/risk/flag/' + flag.id + '/note/' + riskNote.id)) %}
       {% endif %}
-    {% endfor  %}
+    {% endfor %}
   {% endif %}
   {{ govukSummaryList({
     rows: [
@@ -169,17 +175,19 @@
       }
     ]
   }) }}
-{% endset %}
+  {% endset %}
 
-
-{{ appSummaryCard({
+  {{ appSummaryCard({
   attributes: {'data-qa': 'riskFlagCard'},
   titleText: "Before it was removed" if removed else "About this flag",
+  headingLevel: '3',
   classes: 'govuk-!-margin-bottom-8 app-summary-card--large-title',
   html: aboutThisFlagSummaryList,
   actionsHtml: '<a href="' + deliusDeepLinkUrl('RegisterSummary', crn) + '" rel="external noopener noreferrer" target="_blank">Edit risk details on NDelius (opens in a new tab)</a>' if not removed
 }) }}
 
-  <p data-qa="riskFlagGuidanceLink"><a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="https://justiceuk.sharepoint.com/sites/HMPPS-HQ-NDST-ATW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=iEFxub&CID=82b28f43%2Dc021%2D465a%2Dbce3%2D11c8eb64c791&FolderCTID=0x012000789EB5A24184864D90305EEA82661286&id=%2Fsites%2FHMPPS%2DHQ%2DNDST%2DATW%2FShared%20Documents%2FNational%20Delius%20Guidance%2FNational%20Delius%20Case%20Recording%20Instructions%2FCRI019%20Registrations&sortField=Modified&isAscending=false&viewid=330f3b0b%2D9b57%2D4427%2Dad3f%2D8d5cffdc3885">
-      View guidance on risk flags in the NDelius SharePoint (opens in new tab)</a></p>
+  <p data-qa="riskFlagGuidanceLink">
+    <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="https://justiceuk.sharepoint.com/sites/HMPPS-HQ-NDST-ATW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=iEFxub&CID=82b28f43%2Dc021%2D465a%2Dbce3%2D11c8eb64c791&FolderCTID=0x012000789EB5A24184864D90305EEA82661286&id=%2Fsites%2FHMPPS%2DHQ%2DNDST%2DATW%2FShared%20Documents%2FNational%20Delius%20Guidance%2FNational%20Delius%20Case%20Recording%20Instructions%2FCRI019%20Registrations&sortField=Modified&isAscending=false&viewid=330f3b0b%2D9b57%2D4427%2Dad3f%2D8d5cffdc3885">
+      View guidance on risk flags in the NDelius SharePoint (opens in new tab)</a>
+  </p>
 {% endblock %}
