@@ -16,6 +16,7 @@ import {
   mockPersonRiskFlag,
   mockPredictors,
   mockNeeds,
+  mockSanIndicatorResponse,
 } from './mocks'
 import config from '../config'
 
@@ -56,7 +57,12 @@ const tierCalculationSpy = jest
 const predictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
+const sanIndicatorSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
+  .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
+
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -67,7 +73,7 @@ describe('riskController', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  xdescribe('getRisk', () => {
+  describe('getRisk', () => {
     beforeEach(async () => {
       await controllers.risk.getRisk(hmppsAuthClient)(req, res)
     })
@@ -78,6 +84,7 @@ describe('riskController', () => {
       expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
       expect(predictorsSpy).toHaveBeenCalledWith(crn)
       expect(needsSpy).toHaveBeenCalledWith(crn)
+      expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the risk page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/risk', {
@@ -90,6 +97,7 @@ describe('riskController', () => {
         timeline: [],
         needs: mockNeeds,
         oasysLink: config.oaSys.link,
+        sanIndicator: mockSanIndicatorResponse.sanIndicator,
       })
     })
   })
