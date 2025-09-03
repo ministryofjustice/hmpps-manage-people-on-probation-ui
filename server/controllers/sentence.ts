@@ -21,7 +21,7 @@ interface QueryParams {
   number?: string
 }
 
-const sentenceController: Controller<typeof routes> = {
+const sentenceController: Controller<typeof routes, void> = {
   getSentence: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params

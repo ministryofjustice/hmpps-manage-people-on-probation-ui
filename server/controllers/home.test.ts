@@ -28,14 +28,14 @@ const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
-const req = httpMocks.createRequest({
-  params: {
-    crn,
-  },
-})
-
 describe('homeController', () => {
   describe('getHome', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      host: 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
+    })
     const originalEnv = process.env.NODE_ENV
     const { totalAppointments, totalOutcomes, appointments, outcomes } = mockUserAppointments
     let spy: jest.SpyInstance
@@ -79,6 +79,12 @@ describe('homeController', () => {
       })
     })
     describe('production', () => {
+      const mockReq = httpMocks.createRequest({
+        params: {
+          crn,
+        },
+        host: 'manage-people-on-probation.hmpps.service.justice.gov.uk',
+      })
       beforeEach(async () => {
         process.env.NODE_ENV = 'production'
         spy = jest
@@ -86,7 +92,7 @@ describe('homeController', () => {
           .mockImplementation(() => Promise.resolve(mockUserAppointments))
       })
       it('should render the page with no esupervision link', async () => {
-        await controllers.home.getHome(hmppsAuthClient)(req, res)
+        await controllers.home.getHome(hmppsAuthClient)(mockReq, res)
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           totalAppointments,
           totalOutcomes,

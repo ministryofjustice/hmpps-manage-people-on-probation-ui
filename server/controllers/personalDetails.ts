@@ -31,7 +31,7 @@ const routes = [
   'getCircumstancesNote',
 ] as const
 
-const personalDetailsController: Controller<typeof routes> = {
+const personalDetailsController: Controller<typeof routes, void> = {
   getPersonalDetails: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
@@ -97,7 +97,7 @@ const personalDetailsController: Controller<typeof routes> = {
   postEditDetails: hmppsAuthClient => {
     return async (req, res) => {
       const editingMainAddress = req.path.includes('personal-details/edit-main-address')
-      const errorMessages = validateWithSpec(req.body, personDetailsValidation(editingMainAddress))
+      const errorMessages = validateWithSpec(req.body, personDetailsValidation({ ...req.body, editingMainAddress }))
       res.locals.errorMessages = errorMessages
       const updateFn = editingMainAddress ? 'updatePersonalDetailsAddress' : 'updatePersonalDetailsContact'
       let request: PersonalDetailsUpdateRequest = {

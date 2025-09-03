@@ -10,13 +10,14 @@ import {
   completeAttendancePage,
   completeLocationPage,
   completeDateTimePage,
+  checkPopHeader,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = () => {
-  completeTypePage()
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
@@ -48,6 +49,9 @@ describe('Will the appointment repeat?', () => {
   })
   it('should be on the repeating page', () => {
     repeatingPage.checkOnPage()
+  })
+  it('should render the pop header', () => {
+    checkPopHeader('Alton Berge', true)
   })
   it('should display the error summary box', () => {
     repeatingPage.getSubmitBtn().click()

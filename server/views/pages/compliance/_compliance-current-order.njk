@@ -1,72 +1,73 @@
 {% for sentence in personCompliance.currentSentences %}
-    {% set failureToComplyCount = sentence.compliance.failureToComplyCount %}
-    {% set unacceptableAbsenceCount = sentence.activity.unacceptableAbsenceCount %}
-    {% set attendedButDidNotComplyCount = sentence.activity.attendedButDidNotComplyCount  %}
-    {% set outcomeNotRecordedCount = sentence.activity.outcomeNotRecordedCount %}
-    {% set waitingForEvidenceCount = sentence.activity.waitingForEvidenceCount  %}
-    {% set rescheduledCount = sentence.activity.rescheduledCount %}
-    {% set absentCount = sentence.activity.absentCount %}
-    {% set rescheduledByStaffCount = sentence.activity.rescheduledByStaffCount %}
-    {% set rescheduledByPersonOnProbationCount = sentence.activity.rescheduledByPersonOnProbationCount %}
-    {% set lettersCount = sentence.activity.lettersCount %}
-    {% set nationalStandardAppointmentsCount = sentence.activity.nationalStandardAppointmentsCount %}
-    {% set compliedAppointmentsCount = sentence.activity.compliedAppointmentsCount %}
+  {% set failureToComplyCount = sentence.compliance.failureToComplyCount %}
+  {% set unacceptableAbsenceCount = sentence.activity.unacceptableAbsenceCount %}
+  {% set attendedButDidNotComplyCount = sentence.activity.attendedButDidNotComplyCount %}
+  {% set outcomeNotRecordedCount = sentence.activity.outcomeNotRecordedCount %}
+  {% set waitingForEvidenceCount = sentence.activity.waitingForEvidenceCount %}
+  {% set rescheduledCount = sentence.activity.rescheduledCount %}
+  {% set absentCount = sentence.activity.absentCount %}
+  {% set rescheduledByStaffCount = sentence.activity.rescheduledByStaffCount %}
+  {% set rescheduledByPersonOnProbationCount = sentence.activity.rescheduledByPersonOnProbationCount %}
+  {% set lettersCount = sentence.activity.lettersCount %}
+  {% set nationalStandardAppointmentsCount = sentence.activity.nationalStandardAppointmentsCount %}
+  {% set compliedAppointmentsCount = sentence.activity.compliedAppointmentsCount %}
 
-    {% set complianceStatus = getComplianceStatus(failureToComplyCount, sentence.compliance.breachStarted) %}
+  {% set complianceStatus = getComplianceStatus(failureToComplyCount, sentence.compliance.breachStarted) %}
 
-    {% if sentence.rarDescription and sentence.rarCategory %}
-        {% set queryParams = '?requirement=' + sentence.rarCategory | toSlug %}
-        {% set requirements %}
-            {{ sentence.rarDescription }}
-        {% endset %}
-    {% else %}
-        {% set requirements = false %}
-    {% endif %}
+  {% if sentence.rarDescription and sentence.rarCategory %}
+    {% set queryParams = '?requirement=' + sentence.rarCategory | toSlug %}
+    {% set requirements %}
+    {{ sentence.rarDescription }}
+    {% endset %}
+  {% else %}
+    {% set requirements = false %}
+  {% endif %}
 
+  {% if not sentence.activeBreach and not sentence.rarCategory %}
+    {% set lastSentence = "govuk-!-margin-bottom-6 app-summary-card--large-title"  %}
+  {% else %}
+    {% set lastSentence = "app-summary-card--compliance app-summary-card--large-title"  %}
+  {% endif %}
 
-    {% if not sentence.activeBreach and not sentence.rarCategory %}
-        {% set lastSentence = "govuk-!-margin-bottom-6 app-summary-card--large-title"  %}
-    {% else %}
-        {% set lastSentence = "app-summary-card--compliance app-summary-card--large-title"  %}
-    {% endif %}
+  {% if sentence.activeBreach and not sentence.rarCategory %}
+    {% set lastBreach = "govuk-!-margin-bottom-6 app-summary-card--large-title"  %}
+  {% else %}
+    {% set lastBreach = "app-summary-card--compliance app-summary-card--large-title"  %}
+  {% endif %}
 
-    {% if sentence.activeBreach and not sentence.rarCategory %}
-        {% set lastBreach = "govuk-!-margin-bottom-6 app-summary-card--large-title"  %}
-    {% else %}
-        {% set lastBreach = "app-summary-card--compliance app-summary-card--large-title"  %}
-    {% endif %}
+  <div class="app-compliance-panel {{ complianceStatus.panelClass }}">
+    <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
+      {{ complianceStatus.text }}
+    </p>
+  </div>
 
-    <div class="app-compliance-panel {{ complianceStatus.panelClass }}">
-      <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold">
-        {{ complianceStatus.text }}
-      </p>
-    </div>
-
-    {% set order %}
-{% if sentence.order.description and sentence.order.startDate %}
-{{ sentence.order.description + ' (' + sentence.order.startDate | monthsOrDaysElapsed + ' elapsed)' }}
-{% else %}
+  {% set order %}
+  {% if sentence.order.description and sentence.order.startDate %}
+    {{ sentence.order.description + ' (' + sentence.order.startDate | monthsOrDaysElapsed + ' elapsed)' }}
+  {% else %}
 No order details
 {% endif %}
-    {% endset %}
+  {% endset %}
 
-{% set startDateOnCurrentOrder %}
+  {% set startDateOnCurrentOrder %}
   {% if sentence.order.startDate %}
-{{ sentence.order.startDate | dateWithYear }}
+    {{ sentence.order.startDate | dateWithYear }}
   {% else %}
 No start date on current order
   {% endif %}
-{% endset %}
+  {% endset %}
 
-    {% set breachesOnCurrentOrder %}
-      <ul class="govuk-list">
-        {% if sentence.compliance.breachStarted %}<li>A breach is in progress</li>{% endif %}
-        <li>{% include './_breaches-on-current-order.njk' %}</li>
-      </ul>
-    {% endset %}
+  {% set breachesOnCurrentOrder %}
+  <ul class="govuk-list">
+    {% if sentence.compliance.breachStarted %}
+      <li>A breach is in progress</li>
+    {% endif %}
+    <li>{% include './_breaches-on-current-order.njk' %}</li>
+  </ul>
+  {% endset %}
 
-    {% set orderDetailsList %}
-      {{ govukSummaryList({
+  {% set orderDetailsList %}
+  {{ govukSummaryList({
         rows: [
           {
             key: {
@@ -102,12 +103,13 @@ No start date on current order
           }
         ]
       }) }}
-    {% endset %}
+  {% endset %}
 
-    {% set sentenceDesription = sentence.order.description | toSentenceDescription %}
-    {{ appSummaryCard({
+  {% set sentenceDesription = sentence.order.description | toSentenceDescription %}
+  {{ appSummaryCard({
       attributes: {'data-qa': 'sentence' + loop.index + 'Card'},
-      classes: lastSentence,
+      classes: lastSentence + " govuk-heading-m",
+      headingLevel: 3,
       titleText: sentenceDesription,
       html: orderDetailsList,
       actions: {
@@ -121,9 +123,9 @@ No start date on current order
       }
     }) }}
 
-    {% if sentence.activeBreach %}
-      {% set breachList %}
-        {{ govukSummaryList({
+  {% if sentence.activeBreach %}
+    {% set breachList %}
+    {{ govukSummaryList({
           rows: [
             {
               key: {
@@ -143,81 +145,82 @@ No start date on current order
             }
           ]
         }) }}
-      {% endset %}
+    {% endset %}
 
-      {{ appSummaryCard({
+    {{ appSummaryCard({
         attributes: {'data-qa': 'breach' + loop.index + 'Card'},
-        classes: 'app-summary-card--compliance ' + lastBreach + ' app-summary-card--large-title',
+        headingLevel: 3,
+        classes: 'govuk-heading-m app-summary-card--compliance ' + lastBreach + ' app-summary-card--large-title',
         titleText: "Breach details",
         html: breachList
       }) }}
-    {% endif %}
+  {% endif %}
 
-    {% set failureToComplyHtml %}
-      {% if failureToComplyCount == 0 %}
+  {% set failureToComplyHtml %}
+  {% if failureToComplyCount == 0 %}
         None
       {% elseif attendedButDidNotComplyCount == 0 %}
-          {% if unacceptableAbsenceCount == 1 %}1 unacceptable absence{% else %}{{ unacceptableAbsenceCount }} unacceptable absences{% endif %}
-      {% elseif unacceptableAbsenceCount == 0 %}
-          {% if attendedButDidNotComplyCount == 1 %}1 failure{% else %}{{ attendedButDidNotComplyCount }} failures{% endif %} to comply because of behaviour
+    {% if unacceptableAbsenceCount == 1 %}1 unacceptable absence{% else %}{{ unacceptableAbsenceCount }} unacceptable absences{% endif %}
+  {% elseif unacceptableAbsenceCount == 0 %}
+    {% if attendedButDidNotComplyCount == 1 %}1 failure{% else %}{{ attendedButDidNotComplyCount }} failures{% endif %} to comply because of behaviour
       {% else %}
-        <p>{{ failureToComplyCount }} failures to comply:</p>
-        <ul class="govuk-list govuk-!-margin-top-2">
-          <li>{{ unacceptableAbsenceCount }} unacceptable absence</li>
-          <li>{{ attendedButDidNotComplyCount }} failure to comply because of behaviour</li>
-        </ul>
-      {% endif %}
-    {% endset %}
+    <p>{{ failureToComplyCount }} failures to comply:</p>
+    <ul class="govuk-list govuk-!-margin-top-2">
+      <li>{{ unacceptableAbsenceCount }} unacceptable absence</li>
+      <li>{{ attendedButDidNotComplyCount }} failure to comply because of behaviour</li>
+    </ul>
+  {% endif %}
+  {% endset %}
 
-    {% set acceptableAbsencesHtml %}
+  {% set acceptableAbsencesHtml %}
 
-      {% if absentCount > 0 %}
-        {{ absentCount }} acceptable absences
+  {% if absentCount > 0 %}
+    {{ absentCount }} acceptable absences
       {% else %}
         None
       {% endif %}
-    {% endset %}
+  {% endset %}
 
-    {% set waitingForEvidenceHtml %}
-      {% if waitingForEvidenceCount > 0 %}
-        {{ waitingForEvidenceCount }} absence waiting for evidence
+  {% set waitingForEvidenceHtml %}
+  {% if waitingForEvidenceCount > 0 %}
+    {{ waitingForEvidenceCount }} absence waiting for evidence
       {% elseif waitingForEvidenceCount > 0 %}
-        {{ waitingForEvidenceCount }} absences waiting for evidence
+    {{ waitingForEvidenceCount }} absences waiting for evidence
       {% else %}
         None
       {% endif %}
-    {% endset %}
+  {% endset %}
 
-    {% set rescheduledHtml %}
-      {% if rescheduledCount == 0 %}
+  {% set rescheduledHtml %}
+  {% if rescheduledCount == 0 %}
         None
       {% elseif rescheduledByStaffCount == 0 %}
-          {{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}
-      {% elseif rescheduledByPersonOnProbationCount == 0 %}
-          {{ rescheduledByStaffCount }} requested by staff
+    {{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}
+  {% elseif rescheduledByPersonOnProbationCount == 0 %}
+    {{ rescheduledByStaffCount }} requested by staff
       {% else %}
-        <p>{{ rescheduledCount }} rescheduled:</p>
-        <ul class="govuk-list govuk-!-margin-top-2">
-          <li>{{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}</li>
-          <li>{{ rescheduledByStaffCount }} requested  by staff</li>
-        </ul>
-      {% endif %}
-    {% endset %}
+    <p>{{ rescheduledCount }} rescheduled:</p>
+    <ul class="govuk-list govuk-!-margin-top-2">
+      <li>{{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}</li>
+      <li>{{ rescheduledByStaffCount }} requested  by staff</li>
+    </ul>
+  {% endif %}
+  {% endset %}
 
-    {% set warningLettersHtml %}
+  {% set warningLettersHtml %}
 
-      {% if lettersCount === 1 %}
+  {% if lettersCount === 1 %}
         First warning letter sent
       {% elif lettersCount > 1 %}
-        {{ lettersCount }} letters sent
+    {{ lettersCount }} letters sent
       {% else %}
         None
       {% endif %}
-    {% endset %}
+  {% endset %}
 
-    {% if requirements %}
-        {% set rarList %}
-          {{ govukSummaryList({
+  {% if requirements %}
+    {% set rarList %}
+    {{ govukSummaryList({
             rows: [
               {
                 key: {
@@ -285,13 +288,14 @@ No start date on current order
               }
             ]
           }) }}
-        {% endset %}
+    {% endset %}
 
-        {{ appSummaryCard({
+    {{ appSummaryCard({
           attributes: {'data-qa': 'activity' + loop.index + 'Card'},
-          classes: 'govuk-!-margin-bottom-6 app-summary-card--compliance-last app-summary-card--large-title',
+          headingLevel: 3,
+          classes: 'govuk-heading-m govuk-!-margin-bottom-6 app-summary-card--compliance-last app-summary-card--large-title',
           titleHtml: '<span class="govuk-!-font-size-19 govuk-!-font-weight-regular">Requirement</span><br />' + requirements,
           html: rarList
         }) }}
-    {% endif %}
+  {% endif %}
 {% endfor %}

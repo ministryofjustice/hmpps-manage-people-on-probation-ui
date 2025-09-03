@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import RestClient from './restClient'
 import config from '../config'
 

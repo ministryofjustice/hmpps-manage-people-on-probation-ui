@@ -8,7 +8,7 @@ import { toRoshWidget, toPredictors } from '../utils'
 
 const routes = ['getCompliance'] as const
 
-const complianceController: Controller<typeof routes> = {
+const complianceController: Controller<typeof routes, void> = {
   getCompliance: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params

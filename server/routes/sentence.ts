@@ -3,6 +3,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
+import { getPersonalDetails } from '../middleware'
 
 export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -11,9 +12,17 @@ export default function sentenceRoutes(router: Router, { hmppsAuthClient }: Serv
 
   get('/case/:crn/sentence/probation-history', controllers.sentence.getProbationHistory(hmppsAuthClient))
 
-  get('/case/:crn/sentence/previous-orders', controllers.sentence.getPreviousOrders(hmppsAuthClient))
+  router.get(
+    '/case/:crn/sentence/previous-orders',
+    getPersonalDetails(hmppsAuthClient),
+    controllers.sentence.getPreviousOrders(hmppsAuthClient),
+  )
 
-  get('/case/:crn/sentence/previous-orders/:eventNumber', controllers.sentence.getPreviousOrderDetails(hmppsAuthClient))
+  router.get(
+    '/case/:crn/sentence/previous-orders/:eventNumber',
+    getPersonalDetails(hmppsAuthClient),
+    controllers.sentence.getPreviousOrderDetails(hmppsAuthClient),
+  )
 
   get('/case/:crn/sentence/offences/:eventNumber', controllers.sentence.getOffenceDetails(hmppsAuthClient))
 

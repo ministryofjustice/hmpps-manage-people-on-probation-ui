@@ -188,4 +188,11 @@ export default {
     { name: 'start', dateField: 'date' },
     { name: 'end', dateField: 'date' },
   ],
+  validMimeTypes: {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
+  maxFileSize: 5 * 1024 * 1024, // 5mb
+  fileUploadLimit: 5,
 }

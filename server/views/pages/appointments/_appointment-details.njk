@@ -1,14 +1,13 @@
 {% set notes = '' %}
-{% set hasNote = appointment.appointmentNote and not appointment.hasOutcome  %}
-{% set hasNotes = appointment.appointmentNotes.length > 0 and not appointment.hasOutcome %}
-{% if hasNotes  %}
+{% set hasNote = appointment.appointmentNote and appointment.hasOutcome == false %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome == false %}
+{% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
       {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
     {% endif %}
-  {% endfor  %}
+  {% endfor %}
 {% endif %}
-
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
   rows: [
@@ -66,21 +65,21 @@
     {
       key: { html: '<span data-qa="noteAddedByLabel">Note added by</span>' },
       value: { html: '<span data-qa="noteAddedByValue">' + appointment.appointmentNote.createdBy + '</span>' }
-    } if appointment.appointmentNote.createdBy,
+    } if appointment.appointmentNote.createdBy and hasNote,
     {
       key: { html: '<span data-qa="dateAddedLabel">Date added</span>' },
       value: { html: '<span data-qa="dateAddedValue">' + appointment.appointmentNote.createdByDate | dateWithYear + '</span>' }
-    } if appointment.appointmentNote.createdByDate,
+    } if appointment.appointmentNote.createdByDate and hasNote,
     {
       key: { html: '<span data-qa="notesLabel">Appointment notes</span>' },
-      value: { html: '<span data-qa="notesValue">' + (notes if hasNotes else 'No notes') + '</span>' }
-    } if not hasNote,
+      value: { html: '<span data-qa="notesValue">' + notes + '</span>' }
+    } if hasNotes and not hasNote,
     {
-      key: { html: '<span data-qa="notesLabel">Note</span>' },
-      value: { html: '<span class="govuk-body line-break">' + appointment.appointmentNote.note + '</span>' if appointment.appointmentNote.note else 'No note' }
+      key: { html: '<span data-qa="noteLabel">Note</span>' },
+      value: { html: '<span class="govuk-body line-break" data-qa="noteValue">' + appointment.appointmentNote.note + '</span>' }
     } if hasNote,
     {
-      key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>'  },
+      key: { html: '<span data-qa="sensitiveLabel">Sensitive</span>' },
       value: { html: '<span data-qa="sensitiveLabel">' + appointment.isSensitive | toYesNo + '</span>' }
     } if not appointment.hasOutcome
   ]

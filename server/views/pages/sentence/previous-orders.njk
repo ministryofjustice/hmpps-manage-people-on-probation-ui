@@ -1,9 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set headerPersonName = previousOrderHistory.name.forename + ' ' + previousOrderHistory.name.surname %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Sentence", "Probation history", "Previous orders"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Sentence", "Probation history", "Previous orders"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -26,23 +28,27 @@
 {% endblock %}
 
 {% block content %}
-    <div class="govuk-!-margin-bottom-8">
-      <h1 class="govuk-heading-l" data-qa="pageHeading">Previous orders</h1>
-    </div>
-    {% for order in previousOrderHistory.previousOrders %}
-        <p class="govuk-heading-s govuk-!-margin-bottom-0">
-          <a class="govuk-link govuk-link--no-visited-state" href="/case/{{ crn }}/sentence/previous-orders/{{ order.eventNumber }}">
-            {{ order.title }}
-          </a>
-        </p>
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <div class="govuk-!-margin-bottom-8">
+    <h2 class="govuk-heading-l" data-qa="pageHeading">Previous orders</h2>
+  </div>
+  {% for order in previousOrderHistory.previousOrders %}
+    <p class="govuk-heading-s govuk-!-margin-bottom-0">
+      <a class="govuk-link govuk-link--no-visited-state" href="/case/{{ crn }}/sentence/previous-orders/{{ order.eventNumber }}">
+        {{ order.title }}
+      </a>
+    </p>
 
-        <table class="govuk-table app-table govuk-!-margin-top-0 govuk-!-margin-bottom-3">
-          <tbody class="govuk-table__body">
-            <tr class="govuk-table__row">
-              <td class="govuk-table__cell">{{ order.description }}</td>
-              <td class="govuk-table__cell govuk-table__cell--numeric nowrap">Ended on {{ order.terminationDate | dateWithYear }}</td>
-            </tr>
-          </tbody>
-        </table>
-    {% endfor %}
+    <table class="govuk-table app-table govuk-!-margin-top-0 govuk-!-margin-bottom-3">
+      <tbody class="govuk-table__body">
+        <tr class="govuk-table__row">
+          <td class="govuk-table__cell">{{ order.description }}</td>
+          <td class="govuk-table__cell govuk-table__cell--numeric nowrap">Ended on {{ order.terminationDate | dateWithYear }}</td>
+        </tr>
+      </tbody>
+    </table>
+  {% endfor %}
 {% endblock %}

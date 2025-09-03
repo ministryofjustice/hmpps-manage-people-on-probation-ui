@@ -1,0 +1,16 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/documents/.*/update/contact/.*",
+        "method": "PATCH"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

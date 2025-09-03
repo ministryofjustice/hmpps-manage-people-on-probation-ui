@@ -1,0 +1,359 @@
+{% from "_components/note/macro.njk" import appNote %}
+{% extends "../../partials/layout.njk" %}
+{% set appointment = personAppointment.appointment %}
+{% set personSummary = personAppointment.personSummary %}
+{% set notes = '' %}
+{% set alert = '' %}
+{% set documents = [] %}
+{% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
+{% if nextComAppointment.appointment %}
+  {% set nextAppointmentHint = nextComAppointment.appointment.type + " arranged with " + personSummary.name.forename + " at " + (
+  'their home' if nextAppointmentIsAtHome else 
+    addressToList(nextComAppointment.appointment.location)[0]) + " on " + nextComAppointment.appointment.startDateTime | dateWithYear + "." %}
+{% endif %}
+{% if not nextComAppointment.appointment and not nextComAppointment.loggedInUserIsCOM %}
+  {% set nextAppointmentHint = nextComAppointment.com.forename + ' does not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
+{% endif %}
+{% if appointment.documents.length > 0 %}
+  {% for document in appointment.documents %}
+    {% set documents = (documents.push([
+      {
+        html: '<a href="personal-details/documents/' + document.id + '/download" download="' + document.name +'">' + document.name + '</a>'
+      },
+      {
+        text: document.level if document.level else "Contact"
+      },
+      {
+        text: document.type if document.type else appointment.type
+      },
+      {
+        text: document.dateCreated | dateWithYear if document.dateCreated else "",
+        format: "numeric",
+        attributes: {
+          "data-sort-value": document.dateCreated | dateToTimestamp if document.dateCreated else "1"
+        } if document.dateCreated
+      },
+      {
+        text: document.lastUpdated | dateWithYear if document.lastUpdated else "",
+        format: "numeric",
+        attributes: {
+          "data-sort-value": document.lastUpdated | dateToTimestamp
+        } if document.lastUpdated
+      }
+    ]), documents) %}
+  {% endfor %}
+{% endif %}
+
+{% set notesStatus = 'Not started' %}
+{% set outcomeStatus = 'Not started' %}
+{% set outcomeTagColour = 'blue' %}
+{% set notesTagColour = 'blue' %}
+{# {% set hasNote = appointment.appointmentNote and appointment.hasOutcome == false %} #}
+{% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% if appointment.hasOutcome and appointment.didTheyComply == true %}
+  {% set outcomeStatus = 'Complied' %}
+  {% set outcomeTagColour = 'green' %}
+{% endif %}
+{% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == false %}
+  {% set outcomeStatus = 'Unacceptable absence' %}
+  {% set outcomeTagColour = 'red' %}
+{% endif %}
+{% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == true %}
+  {% set outcomeStatus = 'Acceptable absence' %}
+  {% set outcomeTagColour = 'green' %}
+{% endif %}
+{% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
+  {% set alert = "You must log an outcome and should add notes to this appointment." %}
+{% endif %}
+{% if appointment.isInPast and appointment.hasOutcome and not hasNotes %}
+  {% set alert = "You should add notes to this appointment." %}
+{% endif %}
+{% if appointment.hasOutcome and not hasNotes %}
+  {% set alert = "You should add notes to this appointment." %}
+{% endif %}
+{% if not appointment.isInPast and not appointment.hasOutcome and hasNotes %}
+  {% set notesStatus = 'In progress' %}
+  {% set notesTagColour = 'yellow' %}
+{% endif %}
+{% if hasNotes %}
+  {% for appointmentNote in appointment.appointmentNotes %}
+    {% if appointmentNote.note %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+    {% endif %}
+  {% endfor %}
+{% endif %}
+{% block content %}
+
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
+      {% if alert %}
+        {{ mojAlert({
+  variant: "information",
+  showTitleAsHeading: true,
+  dismissible: false,
+  text: alert,
+  attributes: {
+    'data-qa': 'appointmentAlert'
+  }
+}) }}
+      {% endif %}
+      {% if not deliusManaged %}
+        <section data-qa="appointmentActions">
+          <h3 class="govuk-heading-m">Appointment actions</h3>
+          {{ govukInsetText({
+  html: 'You must <a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="noopener noreferrer">use NDelius to log non-attendance or non-compliance (opens in new tab)</a>.'
+}) }}
+          {{ govukTaskList({
+  idPrefix: "appointment-actions",
+  attributes: {
+        'data-qa': 'appointmentActions'
+      },
+  items: [
+    {
+      title: {
+        html: '<span class="">Log attended and complied appointment</span>'
+      },
+       hint: {
+        text: "You cannot log an attended and complied outcome until the appointment has happened."
+      } if not appointment.isInPast,
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/record-an-outcome' if appointment.isInPast and not appointment.hasOutcome,
+      
+      status: {
+        tag: {
+          text: outcomeStatus,
+          classes: "govuk-tag--" + outcomeTagColour
+        }
+      }
+    },
+    {
+      title: {
+        text: "Add appointment notes"
+      },
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/add-note',
+      status: {
+        tag: {
+          text: notesStatus,
+          classes: "govuk-tag--" + notesTagColour
+        } if not hasNotes or (hasNotes and not appointment.isInPast),
+        text: 'Completed' if hasNotes and appointment.isInPast
+      } 
+    },
+    {
+      title: {
+        text: "Arrange next appointment"
+      },
+      hint: {
+        text: nextAppointmentHint
+      },
+      href: "#" if not nextComAppointment.appointment,
+      status: {
+        tag: {
+          text: "Not started",
+          classes: "govuk-tag--blue"
+        } if not nextComAppointment.appointment,
+        text: 'Completed' if nextComAppointment.appointment
+      }
+    }
+    ]
+}) }}
+        </section>
+      {% endif %}
+      <section data-qa="appointmentDetails">
+        <h3 class="govuk-heading-m">Appointment details</h3>
+        {% if not deliusManaged %}
+          <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
+        {% else %}
+          <p class="govuk-body">
+            <a href="#" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.</p>
+        {% endif %}
+        {{ govukSummaryList({
+  rows: [
+  {
+    key: {
+      text: "Outcome"
+    },
+    value: {
+      html: govukTag({
+          text: outcomeStatus,
+          classes: "govuk-tag--" + outcomeTagColour
+        })
+      }
+    } if (deliusManaged and appointment.hasOutcome) or appointment.acceptableAbsence == false,
+    {
+      key: {
+        text: "Date and time"
+      },
+      value: {
+        text: appointment.startDateTime | dateWithYear + ' at ' + appointment.startDateTime | govukTime + (' to ' + appointment.endDateTime | govukTime if appointment.endDateTime else '')
+      },
+      actions: {
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      } if not deliusManaged
+    },
+    {
+      key: {
+        text: "Location"
+      },
+      value: {
+        html: '<span data-qa="locationValue">' + addressToList(appointment.location).join('<br>') | safe + '</span>' 
+      },
+      actions: {
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      } if not deliusManaged
+    } if appointment.location,
+    {
+      key: {
+        text: "Attending"
+      },
+      value: {
+        text: appointment.officerName | fullName
+      },
+      actions: {
+        items: [
+          {
+            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
+            text: "Change on NDelius",
+            visuallyHiddenText: "(opens in new tab)",
+            attributes: {
+              'target': '_blank',
+              'rel': 'external noopener noreferrer'
+            }
+          }
+        ]
+      } if not deliusManaged
+    },
+    {
+      key: {
+        text: "RAR activity"
+      },
+      value: {
+        text: appointment.rarCategory if appointment.rarCategory else 'Not provided'
+      }
+    } if appointment.acceptableAbsence == false,
+    {
+      key: {
+        text: "VISOR report"
+      },
+      value: {
+        text: 'No'
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change",
+            visuallyHiddenText: ""
+          }
+        ]
+      } if not deliusManaged
+    },
+    {
+      key: {
+        text: "Appointment notes"
+      },
+     value: { html: '<span data-qa="notesValue">' + notes + '</span>' if notes else 'No notes' },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Add to notes" if hasNotes else "Change",
+            visuallyHiddenText: ""
+          }
+        ]
+      } if not deliusManaged
+    },
+    {
+      key: {
+        text: "Sensitive"
+      },
+      value: {
+        text: 'Yes' if appointment.isSensitive else 'No'
+      },
+      actions: {
+        items: [
+          {
+            href: "#",
+            text: "Change",
+            visuallyHiddenText: ""
+          }
+        ]
+      } if not deliusManaged
+    }
+  ]
+}) }}
+      </section>
+      {% if appointment.documents.length > 0 %}
+        <section data-qa="associatedDocuments">
+          <h3 class="govuk-heading-m">Associated documents</h3>
+          <p class="govuk-body">Documents associated with this appointment</p>
+          {{ govukTable({
+  attributes: {
+    "data-module": "moj-sortable-table"
+  },
+  head: [
+    {
+      text: "Name",
+      attributes: {
+        "aria-sort": "ascending"
+      }
+    },
+    {
+      text: "Level",
+      attributes: {
+        "aria-sort": "none"
+      }
+    },
+    {
+      text: "Type",
+      attributes: {
+        "aria-sort": "none"
+      }
+    },
+    {
+      text: "Date created",
+      attributes: {
+        "aria-sort": "none"
+      },
+      format: "numeric"
+    },
+    {
+      text: "Date modified",
+      attributes: {
+        "aria-sort": "none"
+      },
+      format: "numeric"
+    }
+  ],
+  rows: documents
+}) }}
+        </section>
+      {% endif %}
+      <p class="govuk-body-s" data-qa="lastUpdated">Last updated by {{ appointment.lastUpdatedBy | fullName }} on {{  appointment.lastUpdated | dateWithYear }}</p>
+    </div>
+  </div>
+{% endblock %}

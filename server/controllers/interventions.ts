@@ -9,7 +9,7 @@ import { toRoshWidget, toPredictors } from '../utils'
 
 const routes = ['getInterventions'] as const
 
-const interventionsController: Controller<typeof routes> = {
+const interventionsController: Controller<typeof routes, void> = {
   getInterventions: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params

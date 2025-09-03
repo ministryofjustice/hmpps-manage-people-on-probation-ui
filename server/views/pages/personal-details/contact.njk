@@ -1,9 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = "Personal contact" %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Contact", "Personal details"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Contact", "Personal details"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -26,23 +28,27 @@
 {% endblock %}
 
 {% block content %}
-<div class="govuk-grid-row">
-  <div class="govuk-grid-column-two-thirds">
-    <h1 class="govuk-heading-l" data-qa="pageHeading">
-      <span data-qa="contactRelationshipTypeHeaderValue" class="govuk-caption-l">{{ personalContact.relationshipType }}</span>
-      <span data-qa="contactNameHeaderValue">{{ personalContact.name | fullName }}</span>
-    </h1>
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l" data-qa="pageHeading">
+        <span data-qa="contactRelationshipTypeHeaderValue" class="govuk-caption-l">{{ personalContact.relationshipType }}</span>
+        <span data-qa="contactNameHeaderValue">{{ personalContact.name | fullName }}</span>
+      </h2>
 
-    <p>
-      <a href="{{ deliusDeepLinkUrl('PersonalContacts', crn) }}" target="_blank">Change contact details on NDelius (opens in new tab)</a>
-    </p>
+      <p>
+        <a href="{{ deliusDeepLinkUrl('PersonalContacts', crn) }}" target="_blank">Change contact details on NDelius (opens in new tab)</a>
+      </p>
 
-    {% set notes = '' %}
-    {% for contactNote in personalContact.contactNotes %}
-      {% set notes = notes.concat(appNote(contactNote, "/case/" + crn + "/personal-details/personal-contact/" + personalContact.contactId + "/note/" + contactNote.id)) %}
-    {% endfor %}
+      {% set notes = '' %}
+      {% for contactNote in personalContact.contactNotes %}
+        {% set notes = notes.concat(appNote(contactNote, "/case/" + crn + "/personal-details/personal-contact/" + personalContact.contactId + "/note/" + contactNote.id)) %}
+      {% endfor %}
 
-    {{ govukSummaryList({
+      {{ govukSummaryList({
       rows: [
         {
           key: { html: '<span data-qa="contactNameLabel">Name</span>' },
@@ -79,10 +85,9 @@
       ]
     }) }}
 
-
-    <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
-      <span data-qa="lastUpdatedByValue">{{ lastUpdatedBy(personalContact.lastUpdated, personalContact.lastUpdatedBy)}}</span>
-    </p>
+      <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
+        <span data-qa="lastUpdatedByValue">{{ lastUpdatedBy(personalContact.lastUpdated, personalContact.lastUpdatedBy)}}</span>
+      </p>
+    </div>
   </div>
-</div>
 {% endblock %}

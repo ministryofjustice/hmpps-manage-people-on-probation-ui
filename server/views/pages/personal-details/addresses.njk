@@ -1,9 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = 'Addresses' %}
-{% set pageTitle = makePageTitle({ pageHeading: [title, "Personal details"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: [title, "Personal details"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -26,44 +28,49 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
-{% set address = addressOverview.mainAddress %}
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <h2 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h2>
+  {% set address = addressOverview.mainAddress %}
 
-    <h2 class="govuk-heading-m govuk-!-margin-top-8">Main address</h2>
-  
-    <span data-qa="mainAddressSection">
-      {% if addressOverview.mainAddress %}
-        {% set addressType = 'address' %}
-        {% set loopIndex = '' %}
-        {% include './_address.njk' %}
-        {% else %}
-        <p class="govuk-!-margin-bottom-2">There is no main address.</p>
-        <p><a href="/case/{{crn}}/personal-details/edit-main-address">Add main address</a>.</p>
-        {% endif %}
-    </span>
-    {% if addressOverview.otherAddresses.length > 0 %}
-    <h2 class="govuk-heading-m govuk-!-margin-top-8">Other addresses</h2>
+  <h3 class="govuk-heading-m govuk-!-margin-top-8">Main address</h3>
+
+  <span data-qa="mainAddressSection">
+    {% if addressOverview.mainAddress %}
+      {% set addressType = 'address' %}
+      {% set loopIndex = '' %}
+      {% include './_address.njk' %}
+    {% else %}
+      <p class="govuk-!-margin-bottom-2">There is no main address.</p>
+      <p>
+        <a href="/case/{{crn}}/personal-details/edit-main-address">Add main address</a>.</p>
+    {% endif %}
+  </span>
+  {% if addressOverview.otherAddresses.length > 0 %}
+    <h3 class="govuk-heading-m govuk-!-margin-top-8">Other addresses</h3>
     <p>
-        <a href="{{ deliusDeepLinkUrl('AddressandAccommodation', crn) }}" target="_blank">Edit all other addresses on NDelius (opens in new tab)</a>
+      <a href="{{ deliusDeepLinkUrl('AddressandAccommodation', crn) }}" target="_blank">Edit all other addresses on NDelius (opens in new tab)</a>
     </p>
     {% set addressType = 'otherAddress' %}
     {% for address in addressOverview.otherAddresses %}
-        {% set loopIndex = loop.index %}
-        <span data-qa="otherAddress{{loop.index}}Section">
-            {% include './_address.njk' %}
-        </span>
+      {% set loopIndex = loop.index %}
+      <span data-qa="otherAddress{{loop.index}}Section">
+        {% include './_address.njk' %}
+      </span>
     {% endfor %}
-{% endif %}
+  {% endif %}
 
-{% if addressOverview.previousAddresses.length > 0 %}
+  {% if addressOverview.previousAddresses.length > 0 %}
     <h2 class="govuk-heading-m govuk-!-margin-top-8">Previous addresses</h2>
     {% set addressType = 'previousAddress' %}
     {% for address in addressOverview.previousAddresses %}
-        {% set loopIndex = loop.index %}
-        <span data-qa="previousAddress{{loop.index}}Section">
-            {% include './_address.njk' %}
-        </span>
+      {% set loopIndex = loop.index %}
+      <span data-qa="previousAddress{{loop.index}}Section">
+        {% include './_address.njk' %}
+      </span>
     {% endfor %}
-{% endif %}
+  {% endif %}
 
 {% endblock %}

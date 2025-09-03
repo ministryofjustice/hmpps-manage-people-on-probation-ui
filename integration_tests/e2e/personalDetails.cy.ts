@@ -2,6 +2,7 @@ import Page from '../pages/page'
 import PersonalDetailsPage from '../pages/personalDetails'
 import PersonalCircumstancesPage from '../pages/personalCircumstances'
 import AdjustmentsPage from '../pages/adjustments'
+import { checkPopHeader } from './appointments/imports'
 
 context('Personal Details', () => {
   afterEach(() => {
@@ -270,5 +271,33 @@ context('Personal Details', () => {
         'contain.text',
         'Lorem ipsum dolor sit amet, consectetur adipiscing elit.\n      Cras vel ligula non eros porttitor tincidunt non vel ipsum. Quisque turpis erat, eleifend vitae tempus eget, posuere sit amet nunc.\n      Maecenas vestibulum diam nibh, non porttitor magna suscipit sed. Aliquam mollis urna turpis, egestas congue elit vehicula nec.\n      Nulla mattis tortor vel elit faucibus, vel vehicula nunc venenatis. Vivamus tortor dolor, convallis eu pulvinar id, venenatis at lorem. Duis dolor tortor, pretium ac interdum non, egestas vitae ipsum. Morbi vitae mi nec orci laoreet finibus. Vivamus ac bibendum diam. Donec eget vestibulum odio. Morbi rhoncus, turpis sed faucibus dapibus, justo enim feugiat velit, vel faucibus libero purus vel nulla. Maecenas eget purus arcu. Mauris consequat tempus pulvinar. Nulla volutpat vel arcu a tincidunt',
       )
+  })
+  it('should display the pop header on the staff contacts page', () => {
+    cy.visit('/case/X000001/personal-details/staff-contacts')
+    checkPopHeader('Eula Schmeler')
+  })
+  it('should display the pop header on the adjustments page', () => {
+    cy.visit('/case/X000001/personal-details/adjustments')
+    checkPopHeader()
+  })
+  it('should display the pop header on the disabilities page', () => {
+    cy.visit('/case/X000001/personal-details/disabilities')
+    checkPopHeader()
+  })
+  it('should display the pop header on the contacts page', () => {
+    cy.visit('/case/X000001/personal-details/personal-contact/2500233993')
+    checkPopHeader()
+  })
+  it('should display the pop header on the personal circumstances page', () => {
+    cy.visit('/case/X000001/personal-details/circumstances')
+    checkPopHeader()
+  })
+  it('should display the pop header on the personal addresses page', () => {
+    cy.visit('/case/X000001/personal-details/addresses')
+    checkPopHeader()
+  })
+  it('should display the pop header on the edit contact details page', () => {
+    cy.visit('/case/X000001/personal-details/edit-contact-details')
+    checkPopHeader()
   })
 })
