@@ -31,6 +31,7 @@ interface Args {
   withNotesTask?: string
   noNotesTask?: string
   hasRarActivity?: boolean
+  withLocationOfficeNameTask?: string
 }
 
 export const getUuid = () => {
@@ -322,6 +323,7 @@ export const checkAppointmentDetails = (
     task,
     withNotesTask,
     noNotesTask,
+    withLocationOfficeNameTask,
     deliusManaged = false,
     hasOutcome = false,
     acceptableAbsence = false,
@@ -384,7 +386,7 @@ export const checkAppointmentDetails = (
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
   })
-  it('should display the location', () => {
+  it('should display the full location address', () => {
     const index = deliusManaged && hasOutcome ? 3 : 2
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Location')
     manageAppointmentPage
@@ -405,7 +407,21 @@ export const checkAppointmentDetails = (
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
   })
+  if (withLocationOfficeNameTask) {
+    it('should display only the office name for the location', () => {
+      const index = deliusManaged && hasOutcome ? 3 : 2
+      cy.task(withLocationOfficeNameTask)
+      cy.visit('/case/X778160/appointments/appointment/6/manage')
+      page = new ManageAppointmentPage()
+      manageAppointmentPage
+        .getAppointmentDetailsListItem(index, 'value')
+        .should('contain.text', 'Leamington Probation Office')
+    })
+  }
   it('should display the attending officer', () => {
+    if (task) {
+      cy.task(task)
+    }
     const index = deliusManaged && hasOutcome ? 4 : 3
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Attending')
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Terry Jones')

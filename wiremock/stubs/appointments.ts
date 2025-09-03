@@ -8,6 +8,7 @@ interface Args {
   notes?: boolean
   complied?: boolean
   acceptableAbsence?: boolean
+  locationOfficeName?: boolean
   rar?: boolean
 }
 
@@ -20,6 +21,7 @@ const getAppointmentStub = (
     complied,
     acceptableAbsence,
     rar = false,
+    locationOfficeName = false,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -168,6 +170,9 @@ const getAppointmentStub = (
       },
     ]
   }
+  if (locationOfficeName) {
+    mapping.response.jsonBody.appointment.location.officeName = 'Leamington Probation Office'
+  }
   if (complied) {
     mapping.response.jsonBody.appointment.isInPast = true
     mapping.response.jsonBody.appointment.didTheyComply = true
@@ -297,6 +302,10 @@ const getNextAppointmentStub = ({ appointment = true, usernameIsCom = true, home
 
 const stubFutureAppointmentManagedTypeNoNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub()
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentWithLocationOffice = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ locationOfficeName: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubFutureAppointmentManagedTypeWithNotes = (): SuperAgentRequest => {
@@ -470,6 +479,7 @@ const stubAppointmentDuplicate = (): SuperAgentRequest =>
 
 export default {
   stubFutureAppointmentManagedTypeNoNotes,
+  stubAppointmentWithLocationOffice,
   stubFutureAppointmentManagedTypeWithNotes,
   stubFutureAppointmentManagedTypeNoNextAppt,
   stubFutureAppointmentManagedTypeWithDocs,

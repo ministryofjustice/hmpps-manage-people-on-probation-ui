@@ -543,7 +543,7 @@ describe('Manage an appointment', () => {
       manageAppointmentPage.getAppointmentDetails().find('h3').should('contain.text', 'Appointment details')
     })
     describe('MPOP managed appointment', () => {
-      checkAppointmentDetails()
+      checkAppointmentDetails({ withLocationOfficeNameTask: 'stubAppointmentWithLocationOffice' })
     })
     describe('Delius managed appointment type, no outcome', () => {
       beforeEach(() => {
@@ -554,6 +554,7 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentNDeliusManagedType',
         noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesNoOutcome',
         withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesNoOutcome',
+        withLocationOfficeNameTask: '',
         deliusManaged: true,
       })
     })

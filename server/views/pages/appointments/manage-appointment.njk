@@ -5,6 +5,11 @@
 {% set notes = '' %}
 {% set alert = '' %}
 {% set documents = [] %}
+{% set location = addressToList(appointment.location).join('<br>') | safe %}
+{% if appointment.location.officeName %}
+  {% set location = appointment.location.officeName %}
+{% endif %}
+
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = nextAppointment.appointment.type + " arranged with " + personSummary.name.forename + " at " + (
@@ -211,7 +216,7 @@
         text: "Location"
       },
       value: {
-        html: '<span data-qa="locationValue">' + addressToList(appointment.location).join('<br>') | safe + '</span>' 
+        html: '<span data-qa="locationValue">' + location + '</span>' 
       },
       actions: {
         items: [
