@@ -25,40 +25,51 @@ export interface Activity {
   isSensitive?: boolean
   hasOutcome?: boolean
   wasAbsent?: boolean
-  officerName?: Name
-  isInitial: boolean
-  isNationalStandard: boolean
+  officer?: {
+    code: string
+    name: Name
+  }
+  isInitial?: boolean
+  isNationalStandard?: boolean
   location?: Address
-  rescheduled: boolean
-  rescheduledStaff: boolean
-  rescheduledPop: boolean
+  rescheduled?: boolean
+  rescheduledStaff?: boolean
+  rescheduledPop?: boolean
   didTheyComply?: boolean
   absentWaitingEvidence?: boolean
   rearrangeOrCancelReason?: string
   rescheduledBy?: Name
   repeating?: boolean
   nonComplianceReason?: string
-  documents: Document[]
+  documents?: Document[]
   isRarRelated?: boolean
   rarCategory?: string
   acceptableAbsence?: boolean
   acceptableAbsenceReason?: string
-  isAppointment: boolean
-  isCommunication: boolean
+  isAppointment?: boolean
+  isCommunication?: boolean
   action?: string
   isSystemContact?: boolean
   isEmailOrTextFromPop?: boolean
   isPhoneCallFromPop?: boolean
   isEmailOrTextToPop?: boolean
   isPhoneCallToPop?: boolean
-  isInPast: boolean
-  isPastAppointment: boolean
+  isInPast?: boolean
+  isPastAppointment?: boolean
   countsTowardsRAR?: boolean
   lastUpdated?: string
   lastUpdatedBy?: Name
-  deliusManaged?: boolean
   description?: string
   outcome?: string
+  deliusManaged?: boolean
+  isVisor?: boolean
+  eventId?: number
+  component?: {
+    id: number
+    description: string
+    type: string
+  }
+  nsiId?: number
 }
 
 export interface PersonAppointment {

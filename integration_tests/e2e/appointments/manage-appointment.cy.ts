@@ -29,6 +29,15 @@ describe('Manage an appointment', () => {
         manageAppointmentPage.getAlertBanner().should('not.exist')
       })
     })
+    describe('Appointment is NDelius managed', () => {
+      beforeEach(() => {
+        cy.task('stubAppointmentNDeliusManagedTypeNoNotesHasOutcome')
+        loadPage()
+      })
+      it('should not display the alert', () => {
+        manageAppointmentPage.getAlertBanner().should('not.exist')
+      })
+    })
     describe('Appointment is in the past', () => {
       describe('Outcome not logged and no notes', () => {
         beforeEach(() => {
@@ -74,7 +83,7 @@ describe('Manage an appointment', () => {
     it('should display the section title', () => {
       manageAppointmentPage.getAppointmentActions().find('h3').should('contain.text', 'Appointment actions')
     })
-    it('should display the inset text and MDelius link', () => {
+    it('should display the inset text and NDelius link', () => {
       manageAppointmentPage.getAppointmentActions().find('.govuk-inset-text').should('contain.text', 'You must')
       manageAppointmentPage
         .getAppointmentActions()
@@ -545,7 +554,7 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentNDeliusManagedType',
         noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesNoOutcome',
         withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesNoOutcome',
-        deliusManagedType: true,
+        deliusManaged: true,
       })
     })
     describe('Delius managed appointment type, complied', () => {
@@ -557,8 +566,24 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentNDeliusManagedTypeComplied',
         noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesHasOutcome',
         withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesHasOutcome',
-        deliusManagedType: true,
+        deliusManaged: true,
         hasComplied: true,
+        hasOutcome: true,
+      })
+    })
+    describe('Delius managed appointment, acceptable absence', () => {
+      beforeEach(() => {
+        cy.task('stubAppointmentAcceptableAbsenceNoNotes')
+        loadPage()
+      })
+      checkAppointmentDetails({
+        task: 'stubAppointmentAcceptableAbsenceNoNotes',
+        noNotesTask: 'stubAppointmentAcceptableAbsenceNoNotes',
+        withNotesTask: 'stubAppointmentAcceptableAbsenceWithNotes',
+        deliusManaged: true,
+        hasComplied: false,
+        acceptableAbsence: true,
+        hasOutcome: true,
       })
     })
     describe('Delius managed appointment, unacceptable absence', () => {
@@ -570,9 +595,10 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentUnacceptableAbsenceNoNotes',
         noNotesTask: 'stubAppointmentUnacceptableAbsenceNoNotes',
         withNotesTask: 'stubAppointmentUnacceptableAbsenceWithNotes',
-        deliusManagedType: true,
+        deliusManaged: true,
         hasComplied: false,
-        notCompliedAbsence: true,
+        acceptableAbsence: false,
+        hasOutcome: true,
       })
     })
   })

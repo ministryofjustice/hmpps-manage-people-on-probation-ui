@@ -62,10 +62,10 @@
           }
         ]
       }
-    } if appointment.wasAcceptableAbsence === 'Yes',
+    } if appointment.acceptableAbsence,
     {
       key: { html: '<span data-qa="enforcementActionLabel">Enforcement action</span>' },
-      value: { html: '<span data-qa="enforcementActionValue">' + appointment.enforcementAction + '</span>' },
+      value: { html: '<span data-qa="enforcementActionValue">' + appointment.action + '</span>' },
       actions: {
         items: [
           {
@@ -77,7 +77,7 @@
           }
         ]
       }
-    } if appointment.enforcementAction,
+    } if appointment.action,
     {
       key: { html: '<span data-qa="outcomeLabel">Outcome</span>' },
       value: { html: '<span data-qa="outcomeValue">' + (appointment.outcome | nl2br | safe) + '</span>' }

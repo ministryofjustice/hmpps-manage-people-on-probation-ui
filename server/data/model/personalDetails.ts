@@ -115,6 +115,7 @@ export interface PersonalContact {
 }
 
 export interface Address {
+  code?: string
   officeName?: string
   buildingName?: string
   buildingNumber?: string
@@ -124,8 +125,9 @@ export interface Address {
   county?: string
   postcode?: string
   ldu?: string
-  lastUpdated?: string
-  lastUpdatedBy?: Name
+  telephoneNumber?: string
+  providerCode?: string
+  teamCode?: string
 }
 
 export interface AddressType {

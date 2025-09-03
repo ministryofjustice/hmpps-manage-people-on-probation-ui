@@ -41,10 +41,12 @@ export interface AppointmentTypeResponse {
   appointmentTypes: AppointmentType[]
 }
 
-export interface NextComAppointmentResponse {
+export interface NextAppointmentResponse {
   appointment: Activity
-  loggedInUserIsCOM: boolean
-  com: Name
+  usernameIsCom: boolean
+  personManager: {
+    name: Name
+  }
 }
 
 export interface AppointmentLocationRequest {

@@ -16,11 +16,13 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "loggedInUserIsCOM": true,
-          "com": {
-            "forename": "Terry",
-            "surname": "Jones"
+          "personManager": {
+            "name": {
+              "forename": "Terry",
+              "surname": "Jones"
+            }
           },
+          "usernameIsCom": true,
           "appointment": {
             "id": 6,
             "type": "Other call",

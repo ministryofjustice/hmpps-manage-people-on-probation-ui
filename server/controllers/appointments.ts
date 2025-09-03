@@ -158,7 +158,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
-      const [personAppointment, nextComAppointment, appointmentTypes] = await Promise.all([
+      const [personAppointment, nextAppointment, appointmentTypes] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
         masClient.getNextAppointment(username, crn, contactId),
         masClient.getAppointmentTypes(),
@@ -169,12 +169,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         appointmentTypes.appointmentTypes.every(type => type.description !== appointment.type)
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
-        nextComAppointment?.appointment?.location,
+        nextAppointment?.appointment?.location,
       )
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
-        nextComAppointment,
+        nextAppointment,
         deliusManaged,
         nextAppointmentIsAtHome,
       })

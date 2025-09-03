@@ -23,7 +23,9 @@ context('Appointment', () => {
     page.getCardHeader('outcomeDetails').should('contain.text', 'Outcome details')
     page.getRowData('outcomeDetails', 'complied', 'Value').should('contain.text', 'No')
     page.getRowData('outcomeDetails', 'outcome', 'Value').should('contain.text', 'User-generated free text content')
-    page.getRowData('outcomeDetails', 'enforcementAction', 'Value').should('contain.text', 'Enforcement Action')
+    page
+      .getRowData('outcomeDetails', 'enforcementAction', 'Value')
+      .should('contain.text', 'Enforcement action description')
     page.getRowData('outcomeDetails', 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
     page.getRowData('outcomeDetails', 'sensitive', 'Value').should('contain.text', 'No')
     page.getRowData('outcomeDetails', 'notes', 'Value').should('contain.text', 'Some notes')

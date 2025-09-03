@@ -40,16 +40,28 @@ const getAppointmentStub = (
         },
         appointment: {
           id: 6,
-          type: 'Other call',
+          eventNumber: '',
+          type: 'Planned Office Visit (NS)',
           startDateTime: '2024-02-21T10:15:00.382936Z[Europe/London]',
           endDateTime: '2024-02-21T10:30:00.382936Z[Europe/London]',
           rarToolKit: 'Choices and Changes',
+          appointmentNotes: [],
+          appointmentNote: null,
           isSensitive: false,
           hasOutcome: false,
-          isInPast: true,
-          isPastAppointment: true,
-          appointmentNotes: [],
+          wasAbsent: true,
+          officer: {
+            code: '',
+            name: {
+              forename: 'Terry',
+              surname: 'Jones',
+            },
+          },
+          isInitial: true,
+          isNationalStandard: true,
           location: {
+            code: '',
+            officeName: '',
             buildingName: 'The Building',
             buildingNumber: '77',
             streetName: 'Some Street',
@@ -57,22 +69,56 @@ const getAppointmentStub = (
             town: 'London',
             county: 'Essex',
             postcode: 'NW10 1EP',
-            lastUpdated: '2023-03-14',
-            lastUpdatedBy: {
-              forename: 'Jiminy',
-              surname: 'Cricket',
-            },
+            ldu: '',
+            telephoneNumber: '',
+            providerCode: '',
+            teamCode: '',
           },
+          rescheduled: true,
+          rescheduledStaff: true,
+          rescheduledPop: true,
+          didTheyComply: false,
+          absentWaitingEvidence: true,
+          rearrangeOrCancelReason: '',
+          rescheduledBy: {
+            forename: '',
+            middleName: '',
+            surname: '',
+          },
+          repeating: true,
+          nonComplianceReason: '',
           documents: [],
+          isRarRelated: true,
+          rarCategory: '',
+          acceptableAbsence: true,
+          acceptableAbsenceReason: '',
+          isAppointment: true,
+          isCommunication: true,
+          action: '',
+          isSystemContact: true,
+          isEmailOrTextFromPop: true,
+          isPhoneCallFromPop: true,
+          isEmailOrTextToPop: true,
+          isPhoneCallToPop: true,
+          isInPast: true,
+          isPastAppointment: true,
+          countsTowardsRAR: true,
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Terry',
-            surname: 'Jones',
-          },
           lastUpdatedBy: {
             forename: 'Paul',
             surname: 'Smith',
           },
+          description: '',
+          outcome: '',
+          deliusManaged: false,
+          isVisor: true,
+          eventId: 0,
+          component: {
+            id: 0,
+            description: '',
+            type: 'LICENCE_CONDITION',
+          },
+          nsiId: 0,
         },
       },
       headers: {
@@ -83,6 +129,7 @@ const getAppointmentStub = (
   if (managedType) {
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
   }
+  mapping.response.jsonBody.appointment.deliusManaged = !managedType
   if (isFuture) {
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
@@ -124,14 +171,22 @@ const getAppointmentStub = (
   if (complied) {
     mapping.response.jsonBody.appointment.isInPast = true
     mapping.response.jsonBody.appointment.didTheyComply = true
+    mapping.response.jsonBody.appointment.wasAbsent = false
+    mapping.response.jsonBody.appointment.acceptableAbsence = false
     mapping.response.jsonBody.appointment.hasOutcome = true
   }
   if (acceptableAbsence === false) {
     mapping.response.jsonBody.appointment.isInPast = true
     mapping.response.jsonBody.appointment.didTheyComply = false
     mapping.response.jsonBody.appointment.wasAbsent = true
-    mapping.response.jsonBody.appointment.wasAbsent = true
     mapping.response.jsonBody.appointment.acceptableAbsence = false
+    mapping.response.jsonBody.appointment.hasOutcome = true
+  }
+  if (acceptableAbsence === true) {
+    mapping.response.jsonBody.appointment.isInPast = true
+    mapping.response.jsonBody.appointment.didTheyComply = false
+    mapping.response.jsonBody.appointment.wasAbsent = true
+    mapping.response.jsonBody.appointment.acceptableAbsence = true
     mapping.response.jsonBody.appointment.hasOutcome = true
   }
   if (rar === true) {
@@ -140,7 +195,7 @@ const getAppointmentStub = (
   return mapping
 }
 
-const getNextAppointmentWithComStub = ({ appointment = true, loggedInUserIsCOM = true, homeAddress = false } = {}) => {
+const getNextAppointmentStub = ({ appointment = true, usernameIsCom = true, homeAddress = false } = {}) => {
   const mapping: WiremockMapping = {
     request: {
       urlPathPattern: '/mas/schedule/.*/next-appointment',
@@ -157,10 +212,12 @@ const getNextAppointmentWithComStub = ({ appointment = true, loggedInUserIsCOM =
     response: {
       status: 200,
       jsonBody: {
-        loggedInUserIsCOM,
-        com: {
-          forename: 'Terry',
-          surname: 'Jones',
+        usernameIsCom,
+        personManager: {
+          name: {
+            forename: 'Terry',
+            surname: 'Jones',
+          },
         },
         appointment: {
           id: 6,
@@ -302,7 +359,7 @@ const stubAppointmentUnacceptableAbsenceWithRAR = (): SuperAgentRequest => {
 }
 const stubAppointmentUnacceptableAbsenceNoNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({
-    managedType: true,
+    managedType: false,
     complied: false,
     isFuture: false,
     acceptableAbsence: false,
@@ -312,7 +369,7 @@ const stubAppointmentUnacceptableAbsenceNoNotes = (): SuperAgentRequest => {
 }
 const stubAppointmentUnacceptableAbsenceWithNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({
-    managedType: true,
+    managedType: false,
     complied: false,
     isFuture: false,
     acceptableAbsence: false,
@@ -320,32 +377,52 @@ const stubAppointmentUnacceptableAbsenceWithNotes = (): SuperAgentRequest => {
   })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubAppointmentAcceptableAbsenceWithNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    managedType: false,
+    complied: false,
+    isFuture: false,
+    acceptableAbsence: true,
+    notes: true,
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentAcceptableAbsenceNoNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    managedType: false,
+    complied: false,
+    isFuture: false,
+    acceptableAbsence: true,
+    notes: false,
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubNotComNoNextAppointment = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: false, loggedInUserIsCOM: false })
+  const stub = getNextAppointmentStub({ appointment: false, usernameIsCom: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubNotComNextAppointment = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: true, loggedInUserIsCOM: false })
+  const stub = getNextAppointmentStub({ appointment: true, usernameIsCom: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubNotComNoNextAppointmentAtHome = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: false, loggedInUserIsCOM: false, homeAddress: true })
+  const stub = getNextAppointmentStub({ appointment: false, usernameIsCom: false, homeAddress: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubNotComNextAppointmentAtHome = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: true, loggedInUserIsCOM: false, homeAddress: true })
+  const stub = getNextAppointmentStub({ appointment: true, usernameIsCom: false, homeAddress: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubIsComNoNextAppointment = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: false, loggedInUserIsCOM: true })
+  const stub = getNextAppointmentStub({ appointment: false, usernameIsCom: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubIsComNextAppointment = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: true, loggedInUserIsCOM: true })
+  const stub = getNextAppointmentStub({ appointment: true, usernameIsCom: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubIsComNextAppointmentAtHome = (): SuperAgentRequest => {
-  const stub = getNextAppointmentWithComStub({ appointment: true, loggedInUserIsCOM: true, homeAddress: true })
+  const stub = getNextAppointmentStub({ appointment: true, usernameIsCom: true, homeAddress: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 
@@ -408,6 +485,8 @@ export default {
   stubAppointmentUnacceptableAbsenceWithNotes,
   stubAppointmentUnacceptableAbsenceNoNotes,
   stubAppointmentUnacceptableAbsenceWithRAR,
+  stubAppointmentAcceptableAbsenceWithNotes,
+  stubAppointmentAcceptableAbsenceNoNotes,
   stubNotComNoNextAppointment,
   stubNotComNextAppointment,
   stubNotComNoNextAppointmentAtHome,

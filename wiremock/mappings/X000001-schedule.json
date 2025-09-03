@@ -208,26 +208,78 @@
               "surname": "Schmeler"
             },
             "crn": "X000001",
+            "offenderId": 0,
+            "pnc": "",
+            "noms": "",
             "dateOfBirth": "1979-08-18"
           },
           "appointment": {
             "id": 1,
+            "eventNumber": "",
             "type": "Phone call",
             "startDateTime": "2024-12-22T09:15:00.382936Z[Europe/London]",
+            "endDateTime": "2024-12-22T09:15:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [],
+            "appointmentNote": null,
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
+            "isInitial": true,
+            "isNationalStandard": true,
+            "location": null,
+            "rescheduled": true,
+            "rescheduledStaff": true,
+            "rescheduledPop": true,
+            "didTheyComply": true,
+            "absentWaitingEvidence": true,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
+            },
+            "repeating": true,
+            "nonComplianceReason": "",
+            "documents": [],
+            "isRarRelated": true,
+            "rarCategory": "",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "",
+            "isAppointment": true,
+            "isCommunication": true,
+            "action": "",
+            "isSystemContact": true,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isInPast": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "description": "",
+            "outcome": "",
+            "deliusManaged": true,
+            "isVisor": true,
+            "eventId": 0,
+            "component": {
+              "id": 0,
+              "description": "",
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": 0
           }
         },
         "headers": {
@@ -253,23 +305,71 @@
           },
           "appointment": {
             "id": 2,
+            "eventNumber": "",
             "type": "Video call",
             "startDateTime": "2025-03-22T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2025-03-22T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [],
+            "appointmentNote": null,
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "officerName": {
-              "forename": "William",
-              "surname": "Philips"
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "William",
+                "surname": "Philips"
+              }
             },
+            "isInitial": true,
+            "isNationalStandard": true,
+            "location": null,
+            "rescheduled": true,
+            "rescheduledStaff": true,
+            "rescheduledPop": true,
+            "didTheyComply": false,
+            "absentWaitingEvidence": false,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
+            },
+            "repeating": true,
+            "nonComplianceReason": "Some reason",
+            "documents": [],
+            "isRarRelated": true,
+            "rarCategory": "Choices and Changes",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "Some absence reason",
+            "isAppointment": true,
+            "isCommunication": true,
+            "action": "",
+            "isSystemContact": true,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isInPast": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "description": "",
+            "outcome": "",
+            "deliusManaged": true,
+            "isVisor": true,
+            "eventId": 0,
+            "component": {
+              "id": 0,
+              "description": "",
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": 0
           }
         },
         "headers": {
@@ -291,28 +391,78 @@
               "surname": "Schmeler"
             },
             "crn": "X000001",
+            "offenderId": 0,
+            "pnc": "",
+            "noms": "",
             "dateOfBirth": "1979-08-18"
           },
           "appointment": {
             "id": 3,
+            "eventNumber": "",
             "type": "Video call",
             "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [],
+            "appointmentNote": null,
             "isSensitive": false,
             "hasOutcome": false,
-            "absentWaitingEvidence": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Paulie",
-              "surname": "Walnuts"
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "Paulie",
+                "surname": "Walnuts"
+              }
             },
+            "isInitial": false,
+            "isNationalStandard": false,
+            "location": null,
+            "rescheduled": true,
+            "rescheduledStaff": true,
+            "rescheduledPop": true,
+            "didTheyComply": false,
+            "absentWaitingEvidence": false,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
+            },
+            "repeating": true,
+            "nonComplianceReason": "Some reason",
+            "documents": [],
+            "isRarRelated": true,
+            "rarCategory": "Choices and Changes",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "Some absence reason",
+            "isAppointment": false,
+            "isCommunication": false,
+            "action": "",
+            "isSystemContact": false,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isInPast": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
+            "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "description": "",
+            "outcome": "",
+            "deliusManaged": true,
+            "isVisor": true,
+            "eventId": 0,
+            "component": {
+              "id": 0,
+              "description": "",
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": 0
           }
         },
         "headers": {
@@ -334,42 +484,51 @@
               "surname": "Schmeler"
             },
             "crn": "X000001",
+            "offenderId": 0,
+            "pnc": "",
+            "noms": "",
             "dateOfBirth": "1979-08-18"
           },
           "appointment": {
             "id": 4,
+            "eventNumber": "",
             "type": "Phone call",
             "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
-            "isSensitive": false,
-            "isInitial": true,
-            "didTheyComply": false,
-            "nonComplianceReason": "Some reason",
-            "acceptableAbsenceReason": "Some absence reason",
-            "wasAcceptableAbsence": true,
-            "enforcementAction": "Enforcement Action",
-            "repeating": true,
-            "rarCategory": "Choices and Changes",
-            "hasOutcome": true,
-            "outcome": "User-generated free text content",
-            "wasAbsent": true,
-            "acceptableAbsence": true,
             "appointmentNotes": [
               {
                 "id": 0,
                 "note": "Some notes"
               }
             ],
-            "officerName": {
-              "forename": "Steve",
-              "surname": "Bruce"
+            "appointmentNote": null,
+            "isSensitive": false,
+            "hasOutcome": true,
+            "wasAbsent": true,
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "Steve",
+                "surname": "Bruce"
+              }
             },
-            "lastUpdated": "2023-03-20",
-            "lastUpdatedBy": {
-              "forename": "Paul",
-              "surname": "Smith"
+            "isInitial": true,
+            "isNationalStandard": true,
+            "location": null,
+            "rescheduled": false,
+            "rescheduledStaff": false,
+            "rescheduledPop": false,
+            "didTheyComply": false,
+            "absentWaitingEvidence": true,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
             },
+            "repeating": true,
+            "nonComplianceReason": "Some reason",
             "documents": [
               {
                 "id": "83fdbf8a-a2f2-43b4-93ef-67e71c04fc58",
@@ -386,7 +545,38 @@
                 "name": "Eula-Schmeler-X000001-UPW.pdf",
                 "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
               }
-            ]
+            ],
+            "isRarRelated": true,
+            "rarCategory": "Choices and Changes",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "Some absence reason",
+            "isAppointment": true,
+            "isCommunication": true,
+            "action": "Enforcement action description",
+            "isSystemContact": true,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isInPast": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
+            "lastUpdated": "2023-03-20",
+            "lastUpdatedBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "description": "",
+            "outcome": "User-generated free text content",
+            "deliusManaged": true,
+            "isVisor": true,
+            "eventId": 0,
+            "component": {
+              "id": 0,
+              "description": "",
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": 0
           }
         },
         "headers": {
@@ -408,27 +598,77 @@
               "surname": "Schmeler"
             },
             "crn": "X000001",
+            "offenderId": 0,
+            "pnc": "",
+            "noms": "",
             "dateOfBirth": "1979-08-18"
           },
           "appointment": {
             "id": 5,
+            "eventNumber": "",
             "type": "Phone call",
             "startDateTime": "2024-03-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-03-21T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [],
+            "appointmentNote": null,
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
+            "isInitial": true,
+            "location": null,
+            "rescheduled": true,
+            "rescheduledStaff": true,
+            "rescheduledPop": true,
+            "didTheyComply": true,
+            "absentWaitingEvidence": true,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
+            },
+            "repeating": true,
+            "nonComplianceReason": "",
+            "documents": [],
+            "isRarRelated": true,
+            "rarCategory": "",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "",
+            "isAppointment": true,
+            "isCommunication": true,
+            "action": "",
+            "isSystemContact": true,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isInPast": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
+            "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "description": "",
+            "outcome": "",
+            "deliusManaged": true,
+            "isVisor": true,
+            "eventId": 0,
+            "component": {
+              "id": 0,
+              "description": "",
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": 0
           }
         },
         "headers": {
@@ -454,17 +694,29 @@
           },
           "appointment": {
             "id": 6,
+            "eventNumber": "",
             "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "appointmentNote": null,
             "isSensitive": false,
-            "didTheyComply": false,
             "hasOutcome": false,
             "isInPast": true,
             "wasAbsent": true,
-            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
+            },
+            "isInitial": true,
+            "isNationalStandard": true,
             "location": {
+              "code": "",
+              "officeName": "",
               "buildingName": "The Building",
               "buildingNumber": "77",
               "streetName": "Some Street",
@@ -472,12 +724,24 @@
               "town": "London",
               "county": "Essex",
               "postcode": "NW10 1EP",
-              "lastUpdated": "2023-03-14",
-              "lastUpdatedBy": {
-                "forename": "Jiminy",
-                "surname": "Cricket"
-              }
+              "ldu": "",
+              "telephoneNumber": "",
+              "providerCode": "",
+              "teamCode": ""
             },
+            "rescheduled": true,
+            "rescheduledStaff": true,
+            "rescheduledPop": true,
+            "didTheyComply": false,
+            "absentWaitingEvidence": true,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
+            },
+            "repeating": true,
+            "nonComplianceReason": "",
             "documents": [
               {
                 "id": "83fdbf8a-a2f2-43b4-93ef-67e71c04fc58",
@@ -495,15 +759,37 @@
                 "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
               }
             ],
+            "isRarRelated": true,
+            "rarCategory": "",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "",
+            "isAppointment": true,
+            "isCommunication": true,
+            "action": "",
+            "isSystemContact": true,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isInPast": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
-            },
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "description": "",
+            "outcome": "",
+            "deliusManaged": false,
+            "isVisor": true,
+            "eventId": 0,
+            "component": {
+              "id": 0,
+              "description": "",
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": 0
           }
         },
         "headers": {
