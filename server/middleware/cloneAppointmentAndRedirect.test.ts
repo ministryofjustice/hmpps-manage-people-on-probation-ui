@@ -55,29 +55,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-
-  it('should construct the correct session with date and type removed when requested', () => {
-    const { req, res } = setup()
-    const clearType = true
-    cloneAppointmentAndRedirect(mockAppt, { clearType })(req, res)
-    const uuid = Object.keys(getDataValue(req.session.data, ['appointments', req.params.crn]))[0]
-    const result = getDataValue(req.session.data, ['appointments', req.params.crn, uuid])
-    expect(result).toEqual({
-      ...mockAppt,
-      date: '',
-      start: '',
-      end: '',
-      repeatingDates: [] as string[],
-      until: '',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
-      repeating: 'No',
-      type: '',
-      uuid,
-    })
-  })
-
-  it('should construct the correct session with date removed by default', () => {
+  it('should construct the correct session with date removed', () => {
     const { req, res } = setup()
     cloneAppointmentAndRedirect(mockAppt)(req, res)
     const uuid = Object.keys(getDataValue(req.session.data, ['appointments', req.params.crn]))[0]

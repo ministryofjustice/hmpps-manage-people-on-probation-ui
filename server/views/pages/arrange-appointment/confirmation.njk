@@ -28,9 +28,6 @@
     {{ appointment.end }}</span>
 {% endfor %}
 {% set returnLink = "/case/" + crn + "/appointments" %}
-{% if returnDest %}
-  {% set returnLink = "/case/" + returnDest.crn + "/appointments/appointment/" + returnDest.contactId + "/manage" %}
-{% endif %}
 {% endset %}
 
 {% set panelHtml %}

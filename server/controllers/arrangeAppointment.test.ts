@@ -289,7 +289,6 @@ describe('controllers/arrangeAppointment', () => {
           change: undefined,
           errors: undefined,
           personLevel: false,
-          showValidation: false,
         })
       })
     })
@@ -938,26 +937,6 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
-    })
-    it('if no type has been decided for the appointment, it should redirect to the type page and display validation errors', async () => {
-      const mockReq = createMockRequest({
-        request: {
-          url,
-        },
-        appointmentSession: {
-          type: '',
-          date: '',
-          start: '',
-          end: '',
-          until: '',
-        },
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/arrange-appointment/${uuid}/type?validation=true&change=${url}`,
-      )
     })
     it('if no date has been submitted for the appointment, it should redirect to the date/time page and display validation errors', async () => {
       const mockReq = createMockRequest({

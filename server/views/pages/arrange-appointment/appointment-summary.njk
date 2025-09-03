@@ -85,7 +85,7 @@
             } if showAction }, 
             {
             key: { text: "Appointment type" },
-            value: { text: 'Not entered' if anotherAppointment and not appointment.type else appointment.type.description },
+            value: { text: 'Not entered' if anotherAppointment and not appointment.type else appointment.type.description | toSentenceCase(['(NS)']) },
             actions: {
                 items: [
                 {

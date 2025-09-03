@@ -97,22 +97,3 @@ describe('Confirmation page', () => {
     appointmentsPage.checkOnPage()
   })
 })
-describe('Confirmation page (accessed from NextAppointment)', () => {
-  let confirmPage: AppointmentConfirmationPage
-  const crn = 'X778160'
-  const appointmentId = '6'
-  beforeEach(() => {
-    cy.task('resetMocks')
-    cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/next-appointment`)
-    completeNextAppointmentPage()
-    completeArrangeAnotherPage()
-    confirmPage = new AppointmentConfirmationPage()
-  })
-  it('should link to the appropriate manage page when practitioner click finish and return-dest given', () => {
-    confirmPage.checkOnPage()
-    cy.get('[data-qa="finishLink"]').click()
-    const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with Terry Jones')
-    manageAppointmentPage.checkOnPage()
-  })
-})

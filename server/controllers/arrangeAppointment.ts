@@ -76,14 +76,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
       const { crn, id } = req.params
-      const { change, validation } = req.query
+      const { change } = req.query
       const { data } = req.session
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
-        }
-      }
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -92,7 +86,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel, showValidation })
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel })
     }
   },
   postType: () => {
@@ -373,8 +367,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn } = req.params
       const { data } = req.session
-      const returnDest = getDataValue(data, ['return-dest'])
-      return res.render(`pages/arrange-appointment/confirmation`, { crn, returnDest })
+      return res.render(`pages/arrange-appointment/confirmation`, { crn })
     }
   },
   postConfirmation: () => {
@@ -403,15 +396,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const type = getDataValue(data, ['appointments', crn, id, 'type'])
-      if (!type) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type?validation=true&change=${req.url}`)
-      }
       const date = getDataValue(data, ['appointments', crn, id, 'date'])
       if (!date) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/date-time?validation=true&change=${req.url}`)
       }
-      // may also need to validate type as potentially reset
       await postAppointments(hmppsAuthClient)(req, res)
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`) // and then redirect based on redirect-id
     }

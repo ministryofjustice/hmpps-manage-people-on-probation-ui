@@ -271,7 +271,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (nextComAppointment?.appointment) {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
       }
-      const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -283,7 +282,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      setDataValue(data, 'return-dest', { crn, contactId })
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
@@ -298,9 +296,11 @@ const appointmentsController: Controller<typeof routes, void> = {
         body: { nextAppointment },
       } = req
       const { nextAppointmentSession } = res.locals
-      const clearType = nextAppointment === 'changeType'
-      if (nextAppointment !== 'no') {
-        return cloneAppointmentAndRedirect(nextAppointmentSession, { clearType })(req, res)
+      if (nextAppointment === 'keepType') {
+        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
+      }
+      if (nextAppointment === 'changeType') {
+        return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
