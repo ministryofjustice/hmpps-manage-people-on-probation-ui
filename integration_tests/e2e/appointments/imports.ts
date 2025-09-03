@@ -469,12 +469,6 @@ export const checkAppointmentDetails = (
           'href',
           'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
         )
-
-      // manageAppointmentPage
-      //   .getAppointmentDetailsListItem(index, 'actions')
-      //   .find('a')
-      //   .should('contain.text', 'Change')
-      //   .should('have.attr', 'href', '#')
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
