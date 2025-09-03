@@ -1,17 +1,17 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
-{% set pageTitle = makePageTitle({ pageHeading: "Documents" }) %}
+{% set pageTitle = makePageTitle({pageHeading: "Documents"}) %}
 {% set currentNavSection = 'documents' %}
 {% set currentSectionName = 'Documents' %}
 {% set headerPersonName = documents.personSummary.name.forename + ' ' + documents.personSummary.name.surname %}
 {% set headerCRN = documents.personSummary.crn %}
-{% set headerDob = documents.personSummary.dateOfBirth  %}
-{% set offenderId = documents.personSummary.offenderId  %}
-{% set headerGender = documents.personSummary.gender  %}
+{% set headerDob = documents.personSummary.dateOfBirth %}
+{% set offenderId = documents.personSummary.offenderId %}
+{% set headerGender = documents.personSummary.gender %}
 
 {% block beforeContent %}
-    {{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
       items: [
         {
           text: "Cases",
@@ -28,53 +28,53 @@
       ]
     }) }}
 
-    {% if errorMessages %}
-      {% set errorList = errorMessages | toErrorList %}
-      {% if errorList.length > 0 %}
-        {{ govukErrorSummary({
+  {% if errorMessages %}
+    {% set errorList = errorMessages | toErrorList %}
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
           titleText: "There is a problem",
           errorList: errorList,
           classes: "govuk-!-margin-bottom-0",
           attributes: { "data-qa": "errorList"}
         }) }}
-      {% endif %}
     {% endif %}
+  {% endif %}
 
 {% endblock %}
 {% block pageContent %}
 
-<div class="govuk-grid-row govuk-!-margin-top-4">
+  <div class="govuk-grid-row govuk-!-margin-top-4">
 
-  <div class="govuk-grid-column-one-quarter govuk-!-margin-left-0">
-  {% include "./documents/_filters.njk" %}
-  </div>
-  <div class="govuk-grid-column-three-quarters">
+    <div class="govuk-grid-column-one-quarter govuk-!-margin-left-0">
+      {% include "./documents/_filters.njk" %}
+    </div>
+    <div class="govuk-grid-column-three-quarters">
 
-  {% if pagination.total > 0 %}
-    <p class="govuk-!-text-align-right" data-qa="pagination">Showing <b>{{ pagination.from }}</b> to <b>{{ pagination.to }}</b> of <b>{{ pagination.total }}</b> results</p>
-    {% set rows = [] %}
-    {% for document in documents.documents %}
+      {% if pagination.total > 0 %}
+        <p class="govuk-!-text-align-right" data-qa="pagination">Showing <b>{{ pagination.from }}</b> to <b>{{ pagination.to }}</b> of <b>{{ pagination.total }}</b> results</p>
+        {% set rows = [] %}
+        {% for document in documents.documents %}
 
-      {% if document.filenameHighlighted %}
-        {% set displayName = document.filenameHighlighted %}
-      {% else %}
-        {% set displayName = document.name %}
-      {% endif %}
+          {% if document.filenameHighlighted %}
+            {% set displayName = document.filenameHighlighted %}
+          {% else %}
+            {% set displayName = document.name %}
+          {% endif %}
 
-      {% set name = '' %}
-      {% set wipLabel = '' %}
-      {% set sensitiveLabel  = '' %}
-      {% if document.workInProgress === true %}
-        {% set name = displayName  %}
-        {% set wipLabel = '<span data-qa="wipValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--grey">WIP</span>' %}
-      {% else %}
-        {% set name = '<a class="document-link" data-ai-id="documentDownload" href="personal-details/documents/' + document.alfrescoId +'/download" download="' + document.name +'">' + displayName + '</a>' %}
-      {% endif %}
-      {% if document.status === 'Sensitive' %}
-        {% set sensitiveLabel = '<span data-qa="statusValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--orange">' + document.status +'</span>' %}
-      {% endif %}
-      {% set nameHtml = name + '</br>' + wipLabel + sensitiveLabel %}
-      {% set rows = (rows.push(
+          {% set name = '' %}
+          {% set wipLabel = '' %}
+          {% set sensitiveLabel = '' %}
+          {% if document.workInProgress === true %}
+            {% set name = displayName %}
+            {% set wipLabel = '<span data-qa="wipValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--grey">WIP</span>' %}
+          {% else %}
+            {% set name = '<a class="document-link" data-ai-id="documentDownload" href="personal-details/documents/' + document.alfrescoId +'/download" download="' + document.name +'">' + displayName + '</a>' %}
+          {% endif %}
+          {% if document.status === 'Sensitive' %}
+            {% set sensitiveLabel = '<span data-qa="statusValue' + loop.index + '" class="govuk-!-margin-top-1 govuk-!-margin-right-1 govuk-tag govuk-tag--orange">' + document.status +'</span>' %}
+          {% endif %}
+          {% set nameHtml = name + '</br>' + wipLabel + sensitiveLabel %}
+          {% set rows = (rows.push(
         [
           {
             html: nameHtml,
@@ -101,15 +101,17 @@
           }
         ]
       ), rows) %}
-    {% endfor %}
+        {% endfor %}
 
-    {%- from "govuk/components/table/macro.njk" import govukTable -%}
+        {%- from "govuk/components/table/macro.njk" import govukTable -%}
 
-    {{ govukTable({
+        {{ govukTable({
       attributes: {
         'data-module': 'moj-backend-sortable-table',
         'data-qa': 'documentsCard'
       },
+      caption: 'Column headers with buttons are sortable',
+      captionClasses: 'govuk-visually-hidden',
       head: [
         {
           html: "Name",
@@ -138,23 +140,23 @@
       rows: rows
     }) }}
 
-    {% if pagination.items | length > 1 %}
-      {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
-    {% endif %}
+        {% if pagination.items | length > 1 %}
+          {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
+        {% endif %}
 
-  {% else %}
-    <div data-qa="noResults">
-      <h3 class="govuk-heading-s">0 search results found</h3>
-      <p>Improve your search by:</p>
-      <ul class="govuk-list govuk-list--bullet">
-        <li>removing filters</li>
-        <li>double-checking the spelling</li>
-        <li>removing special characters like asterisks and accent letters</li>
-        <li>using keywords, for example "Risk" or "PSR"</li>
-      </ul>
+      {% else %}
+        <div data-qa="noResults">
+          <h3 class="govuk-heading-s">0 search results found</h3>
+          <p>Improve your search by:</p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>removing filters</li>
+            <li>double-checking the spelling</li>
+            <li>removing special characters like asterisks and accent letters</li>
+            <li>using keywords, for example "Risk" or "PSR"</li>
+          </ul>
+        </div>
+      {% endif %}
+
     </div>
-  {% endif %}
-
   </div>
-</div>
 {% endblock %}

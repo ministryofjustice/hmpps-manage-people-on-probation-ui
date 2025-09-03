@@ -9,11 +9,12 @@ import {
   completeTypePage,
   crn,
   uuid,
+  checkPopHeader,
 } from './imports'
 
-const loadPage = () => {
-  completeTypePage()
-  completeSentencePage()
+const loadPage = (date?: DateTime<true>) => {
+  completeSentencePage(1, '', '', date)
+  completeTypePage(1, false)
   completeAttendancePage()
   completeLocationPage()
 }
@@ -30,21 +31,41 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage = new AppointmentDateTimePage()
       dateTimePage.getSummaryLink().click()
     })
+    it('should render the pop header', () => {
+      checkPopHeader('Alton Berge', true)
+    })
     it('should display the circumstances link', () => {
       dateTimePage.getSummaryLink().should('contain.text', `Alton’s circumstances`)
     })
     it('should display the circumstances', () => {
       dateTimePage.getSummaryLink().click()
-      dateTimePage.getDisability().find('dt').should('contain.text', 'Disability')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Hearing Disabilities')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Learning Disability')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Mental Health related disabilities')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Mobility related Disabilities')
-      dateTimePage.getReasonableAdjustments().find('dt').should('contain.text', 'Reasonable adjustments')
-      dateTimePage.getReasonableAdjustments().find('dd').should('contain.text', 'Handrails')
-      dateTimePage.getReasonableAdjustments().find('dd').should('contain.text', 'Behavioural responses/Body language')
-      dateTimePage.getDependents().find('dt').should('contain.text', 'Dependents')
-      dateTimePage.getDependents().find('dd').should('contain.text', 'None known')
+      dateTimePage.getPersonalCircumstance('disability').find('dt').should('contain.text', 'Disability')
+      dateTimePage
+        .getPersonalCircumstance('disability')
+        .find('dd')
+        .should('contain.text', 'Hearing Disabilities')
+        .should('contain.text', 'Learning Disability')
+        .should('contain.text', 'Mental Health related disabilities')
+        .should('contain.text', 'Mobility related Disabilities')
+      dateTimePage.getPersonalCircumstance('provisions').find('dt').should('contain.text', 'Reasonable adjustments')
+      dateTimePage
+        .getPersonalCircumstance('provisions')
+        .find('dd')
+        .should('contain.text', 'Handrails')
+        .should('contain.text', 'Behavioural responses/Body language')
+      dateTimePage.getPersonalCircumstance('dependents').find('dt').should('contain.text', 'Dependents')
+      dateTimePage.getPersonalCircumstance('dependents').find('dd').should('contain.text', 'Has Dependents')
+      dateTimePage.getPersonalCircumstance('employment').find('dt').should('contain.text', 'Employment')
+      dateTimePage
+        .getPersonalCircumstance('employment')
+        .find('dd')
+        .should('contain.text', 'Volunteering')
+        .should('contain.text', 'Full Time Employed')
+      dateTimePage.getPersonalCircumstance('relationship').find('dt').should('contain.text', 'Relationship')
+      dateTimePage
+        .getPersonalCircumstance('relationship')
+        .find('dd')
+        .should('contain.text', 'Married / Civil partnership')
     })
   })
 
@@ -86,8 +107,13 @@ describe('Enter the date and time of the appointment', () => {
 
   describe('Continue is clicked selecting a start time which is in the past', () => {
     beforeEach(() => {
-      loadPage()
-      cy.clock(new Date(2025, 6, 3, 9, 30, 0).getTime())
+      const newDate = DateTime.now().set({
+        hour: 10,
+        minute: 30,
+        second: 0,
+        millisecond: 0,
+      })
+      loadPage(newDate)
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
@@ -126,9 +152,9 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -145,9 +171,9 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box again', () => {
@@ -165,9 +191,9 @@ describe('Enter the date and time of the appointment', () => {
       cy.task('stubAppointmentClash')
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('11:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -184,12 +210,30 @@ describe('Enter the date and time of the appointment', () => {
     })
   })
 
+  describe('Continue is clicked entering a date which is later than 31/12/2199', () => {
+    beforeEach(() => {
+      loadPage()
+      dateTimePage.getDatePickerInput().type('1/1/2200')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:00am')
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox(['The date must not be later than 31/12/2199'])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
+        expect($error.text().trim()).to.include('The date must not be later than 31/12/2199')
+      })
+    })
+  })
+
   describe('Date is selected', () => {
     const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getNextDayButton().click()
+      dateTimePage.getActiveDayButton().click()
     })
     it('should display the date value in the field', () => {
       dateTimePage.getDatePickerInput().should('have.value', value)
@@ -201,7 +245,7 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
       dateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')

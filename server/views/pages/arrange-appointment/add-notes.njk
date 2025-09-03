@@ -1,11 +1,11 @@
 {% extends "../_form.njk" %}
 
-{% set title = 'Add a note (optional)' %}
+{% set title = 'Add supporting information (optional)' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
 {% block form %}
 {{ govukTextarea({
     hint: {
-        text: "Use paragraphs to make your notes easy to read."
+        text: "You can add any details that may help you with the appointment. Use paragraphs to make your notes easy to read."
     },
     id: "notes",
     name: "notes",
@@ -17,8 +17,8 @@
 {{ govukRadios({
     fieldset: {
         legend: {
-            text: 'Does this appointment include sensitive information?',
-            classes: "govuk-fieldset__legend--l",
+            text: 'Does this contact include sensitive information?',
+            classes: "govuk-fieldset__legend--m",
             isPageHeading: false
         }
     },
@@ -28,7 +28,7 @@
         }
     },
     hint: {
-        text: 'This is information that would cause harm or undermine the investigation of a crime if it were disclosed to a person on probation, For example, a victim’s personal details.'
+        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
     },
     items: [
         {

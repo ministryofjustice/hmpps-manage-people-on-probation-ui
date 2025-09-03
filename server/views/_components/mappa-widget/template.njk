@@ -1,13 +1,18 @@
 <div class="mappa-widget">
-    {% if hasValue(params.mappa) and params.mappa.error == null %}
-        <h2 class="govuk-heading-m text-uppercase" data-qa='mappa-heading'>
-            <strong>{% if isNotNull(params.mappa.category) %}Cat {{ params.mappa.category }}/{% endif %}{% if isNotNull(params.mappa.level) %}Level {{ params.mappa.level }}{% else %}No{% endif %}</strong> MAPPA</h2>
+    {% if hasValue(params.mappa)and params.mappa.error == null %}
+        <h3 class="govuk-heading-m text-uppercase" data-qa='mappa-heading'>
+            <strong>
+                {% if isNotNull(params.mappa.category) %}Cat {{ params.mappa.category }}/{% endif %}
+                {% if isNotNull(params.mappa.level) %}Level {{ params.mappa.level }}
+                {% else %}No{% endif %}
+            </strong> MAPPA</h3>
         <p class="govuk-body-m govuk-!-margin-bottom-2">Multi-agency public protection arrangements</p>
         {% if params.mappa.level and params.lastUpdatedDate %}
             <p class="text-secondary govuk-!-margin-bottom-0 govuk-hint">Last updated (NDelius): {{ params.lastUpdatedDate }}</p>
         {% endif %}
     {% else %}
-        <h2 class="govuk-heading-m text-uppercase"><strong>Unknown</strong> MAPPA</h2>
+        <h3 class="govuk-heading-m text-uppercase">
+            <strong>Unknown</strong> MAPPA</h3>
         <p class="govuk-body-m govuk-!-margin-bottom-2">Multi-agency public protection arrangements</p>
         <p class="govuk-body-m govuk-!-margin-bottom-0">
             No MAPPA data found in NDelius.<br>

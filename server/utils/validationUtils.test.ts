@@ -232,7 +232,14 @@ describe('validates edit personal contact details request with spec', () => {
     mobileNumber: 'Enter a mobile number in the correct format.',
     phoneNumber: 'Enter a phone number in the correct format.',
   }
-  it.each([['empty string', testRequest, personDetailsValidation(false), expectedResult]])(
+  it.each([
+    [
+      'empty string',
+      testRequest,
+      personDetailsValidation({ ...testRequest, editingMainAddress: false }),
+      expectedResult,
+    ],
+  ])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
       expect(validateWithSpec(a, b)).toEqual(expected)
@@ -255,7 +262,14 @@ describe('validates edit main address request with spec', () => {
     startDate: 'Enter or select a start date.',
     verified: 'Select yes if the address is verified.',
   }
-  it.each([['empty string', testRequest, personDetailsValidation(true), expectedResult]])(
+  it.each([
+    [
+      'empty string',
+      testRequest,
+      personDetailsValidation({ ...testRequest, editingMainAddress: true }),
+      expectedResult,
+    ],
+  ])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
       expect(validateWithSpec(a, b)).toEqual(expected)

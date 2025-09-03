@@ -1,14 +1,18 @@
 {% extends "../partials/layout.njk" %}
 {% set title = 'Staff contacts' %}
 {% if isSentenceJourney %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Staff contacts",  "Probation history", "Sentence"] }) %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Staff contacts", "Probation history", "Sentence"]
+  }) %}
 {% else %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Staff contacts", "Personal details"] }) %}
+  {% set pageTitle = makePageTitle({
+    pageHeading: ["Staff contacts", "Personal details"]
+  }) %}
 {% endif %}
 {% set headerPersonName = professionalContact.name.forename + ' ' + professionalContact.name.surname %}
 
 {% block beforeContent %}
-{% set breadcrumbItems = [
+  {% set breadcrumbItems = [
    {
       text: "Cases",
       href: "/case"
@@ -19,8 +23,8 @@
       attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
     }
 ] %}
-{% if isSentenceJourney %}
- {% set breadcrumbItems = (breadcrumbItems.push({
+  {% if isSentenceJourney %}
+    {% set breadcrumbItems = (breadcrumbItems.push({
     text: "Sentence",
     href: "/case/" + crn + "/sentence"
   },
@@ -29,32 +33,34 @@
       href: "/case/" + crn + "/sentence/probation-history"
    }
   ), breadcrumbItems) %}
-{% else %}
- {% set breadcrumbItems = (breadcrumbItems.push({
+  {% else %}
+    {% set breadcrumbItems = (breadcrumbItems.push({
       text: "Personal details",
       href: "/case/" + crn + "/personal-details"
     }
   ), breadcrumbItems) %}
-{% endif %}
- {% set breadcrumbItems = (breadcrumbItems.push({
-      text: "Staff contacts"
-    }
-  ), breadcrumbItems) %}
-{{ govukBreadcrumbs({
+  {% endif %}
+  {% set breadcrumbItems = (breadcrumbItems.push({text: "Staff contacts"}), breadcrumbItems) %}
+  {{ govukBreadcrumbs({
   items: breadcrumbItems
 }) }}
 {% endblock %}
 
 {% block content %}
-    <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
+  {% if not hidePageHeader %}
+    {% include "../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <h2 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h2>
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
       {% if currentContacts.length %}
-      <h2 class="govuk-heading-m">Current contacts</h2>
-       {% for contact in currentContacts %}
-          <div class="govuk-!-margin-bottom-0">
-            <h3 class="govuk-heading-s">{{ contact.name }}</h3>
-            {{ govukSummaryList({
+        <section data-qa="currentContacts">
+          <h3 class="govuk-heading-m">Current contacts</h3>
+          {% for contact in currentContacts %}
+            <div class="govuk-!-margin-bottom-0">
+              <h4 class="govuk-heading-s">{{ contact.name }}</h4>
+              {{ govukSummaryList({
               classes: 'govuk-summary-list--no-border',
               rows: [
                 {
@@ -87,19 +93,21 @@
                 } if contact.allocationDate
               ]
             }) }}
-          </div>
-         
-            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4 {% if loop.index == currentContacts.length %}govuk-!-margin-bottom-8{% endif %}">
-        {% endfor %}
-        {% endif %}
-        {% if previousContacts.length %}
-        <h2 class="govuk-heading-m" id="previous">Previous contacts</h2>
-        {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">') %}
+            </div>
 
-        {% for contact in previousContacts %}
-          <div class="govuk-!-margin-bottom-0">
-            <h3 class="govuk-heading-s">{{ contact.name }}</h3>
-            {{ govukSummaryList({
+            <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4 {% if loop.index == currentContacts.length %}govuk-!-margin-bottom-8{% endif %}">
+          {% endfor %}
+        </section>
+      {% endif %}
+      {% if previousContacts.length %}
+        <section data-qa="previousContacts">
+          <h3 class="govuk-heading-m" id="previous">Previous contacts</h3>
+          {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">') %}
+
+          {% for contact in previousContacts %}
+            <div class="govuk-!-margin-bottom-0">
+              <h4 class="govuk-heading-s">{{ contact.name }}</h4>
+              {{ govukSummaryList({
               classes: 'govuk-summary-list--no-border',
               rows: [
                 {
@@ -133,11 +141,11 @@
                 } if contact.allocatedUntil
               ]
             }) }}
-          </div>
+            </div>
             <hr class="govuk-section-break govuk-section-break--l govuk-section-break--visible govuk-!-margin-top-4">
-        {% endfor %}
-{% endif %}
-      </div>
+          {% endfor %}
+        </section>
+      {% endif %}
     </div>
+  </div>
 {% endblock %}
-

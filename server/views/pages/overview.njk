@@ -1,112 +1,114 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-{% set pageTitle = makePageTitle({ pageHeading: "Overview" }) %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set appointmentsWithoutAnOutcomeCount = overview.appointmentsWithoutOutcome %}
-{% set waitingForEvidenceCount = overview.absencesWithoutEvidence  %}
+{% set waitingForEvidenceCount = overview.absencesWithoutEvidence %}
 {% set headerPersonName = overview.personalDetails.name.forename + ' ' + overview.personalDetails.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = overview.personalDetails.dateOfBirth  %}
-{% set headerGender = overview.personalDetails.preferredGender  %}
+{% set headerDob = overview.personalDetails.dateOfBirth %}
+{% set headerGender = overview.personalDetails.preferredGender %}
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
+{% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
-<dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-{% if severeScoring.length > 0 %}
-  <dt class="govuk-!-font-weight-bold">Severe</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list">
-  {% for need in severeScoring %}
-<li>{{ need.name }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-{% endif %}
-{% if standardScoring.length > 0 %}
-  <dt class="govuk-!-font-weight-bold">Standard</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list">
-  {% for need in standardScoring %}
-<li>{{ need.name }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-{% endif %}
-{% if withoutScore.length %}
-  <dt class="govuk-!-font-weight-bold">Areas without a need score</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list govuk-!-margin-bottom-0">
-  {% for need in withoutScore %}
-<li>{{ need.name }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-{% endif %}
+  <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+    {% if severeScoring.length > 0 %}
+      <dt class="govuk-!-font-weight-bold">Severe</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for need in severeScoring %}
+            <li>{{ need.name }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
+    {% if standardScoring.length > 0 %}
+      <dt class="govuk-!-font-weight-bold">Standard</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for need in standardScoring %}
+            <li>{{ need.name }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
+    {% if withoutScore.length %}
+      <dt class="govuk-!-font-weight-bold">Areas without a need score</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list govuk-!-margin-bottom-0">
+          {% for need in withoutScore %}
+            <li>{{ need.name }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
   </dl>
-  {% else %}
+{% else %}
   {{'There is no OASys risk assessment.'}}
-  {% endif %}
+{% endif %}
 {% endset %}
 
 {% set riskFlagsHtml %}
 {% if personRisks.riskFlags.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
-  {% if highRiskLevel.length %}
-<dt class="govuk-!-font-weight-bold rosh--high">High</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list">
-  {% for risk in highRiskLevel %}
-<li>{{ risk.description }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-  {% endif %}
+    {% if highRiskLevel.length %}
+      <dt class="govuk-!-font-weight-bold rosh--high">High</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in highRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
     {% if mediumRiskLevel.length %}
-<dt class="govuk-!-font-weight-bold rosh--medium">Medium</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list">
-  {% for risk in mediumRiskLevel %}
-<li>{{ risk.description }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-  {% endif %}
-      {% if lowRiskLevel.length %}
-<dt class="govuk-!-font-weight-bold rosh--low">Low</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list">
-  {% for risk in lowRiskLevel %}
-<li>{{ risk.description }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-  {% endif %}
-      {% if infoOnlyRiskLevel.length %}
-<dt class="govuk-!-font-weight-bold">Information only</dt>
-  <dd class="govuk-!-margin-left-0">
-  <ul class="govuk-list govuk-!-margin-bottom-0">
-  {% for risk in infoOnlyRiskLevel %}
-<li>{{ risk.description }}</li>
-  {% endfor %}
-  </ul>
-  </dd>
-  {% endif %}
+      <dt class="govuk-!-font-weight-bold rosh--medium">Medium</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in mediumRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
+    {% if lowRiskLevel.length %}
+      <dt class="govuk-!-font-weight-bold rosh--low">Low</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in lowRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
+    {% if infoOnlyRiskLevel.length %}
+      <dt class="govuk-!-font-weight-bold">Information only</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list govuk-!-margin-bottom-0">
+          {% for risk in infoOnlyRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
   </dl>
-  {% else %}
-{{ 'There are no active risk flags.' }}
-  {% endif %}
+{% else %}
+  {{ 'There are no active risk flags.' }}
+{% endif %}
 {% endset %}
 
 {% block beforeContent %}
-    {{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
       items: [
         {
           text: "Cases",
@@ -120,34 +122,48 @@
 {% endblock %}
 
 {% block pageContent %}
-    {% if appointmentsWithoutAnOutcomeCount > 0 or waitingForEvidenceCount > 0 %}
-        {% set html %}
-            <h2 class="govuk-heading-m">You have appointments that need attention</h2>
-            <ul class="govuk-list govuk-!-margin-bottom-0">
-            {% if appointmentsWithoutAnOutcomeCount > 0 %}
-                <li>
-                    <a href="/case/{{ crn }}/record-an-outcome/outcome">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }} {{ 'appointment' if appointmentsWithoutAnOutcomeCount == 1 else 'appointments' }}</a>
-                </li>
-            {% endif %}
-            {% if waitingForEvidenceCount > 0 %}
-                <li>
-                    <a href="/case/{{ crn }}/record-an-outcome/evidence">You have {{ waitingForEvidenceCount }} {{ 'absence that is' if waitingForEvidenceCount == 1 else 'absences that are' }} waiting for evidence</a>
-                </li>
-            {% endif %}
-            </ul>
-        {% endset %}
-        {{ govukNotificationBanner({ html: html }) }}
-    {% endif %}
-    {% set schedule %}
-        {% set nextApp = overview.schedule.nextAppointment %}
-            {% set nextAppointmentText %}
-                {% if nextApp %}
-                    {{ nextApp['date'] | dateWithDayAndWithoutYear }} at {{ nextApp['date'] | govukTime }} ({{ nextApp['description'] }})
+  {% if riskToStaff.level == 'HIGH' or riskToStaff.level == 'MEDIUM' %}
+    {% set html %}
+    <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
+    {% endset %}
+    {{ mojAlert({
+      variant: "warning",
+      title: overview.personalDetails.name.forename + " is " + riskLevelLabel(riskToStaff.level).toLowerCase() + " risk to staff ",
+      showTitleAsHeading: true,
+      dismissible: false,
+      html: html
+    }) }}
+  {% endif %}
+  {% if appointmentsWithoutAnOutcomeCount > 0 or waitingForEvidenceCount > 0 %}
+    {% set html %}
+    <h2 class="govuk-heading-m">You have appointments that need attention</h2>
+    <ul class="govuk-list govuk-!-margin-bottom-0">
+      {% if appointmentsWithoutAnOutcomeCount > 0 %}
+        <li>
+          <a href="/case/{{ crn }}/record-an-outcome/outcome">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }}
+            {{ 'appointment' if appointmentsWithoutAnOutcomeCount == 1 else 'appointments' }}</a>
+        </li>
+      {% endif %}
+      {% if waitingForEvidenceCount > 0 %}
+        <li>
+          <a href="/case/{{ crn }}/record-an-outcome/evidence">You have {{ waitingForEvidenceCount }}
+            {{ 'absence that is' if waitingForEvidenceCount == 1 else 'absences that are' }} waiting for evidence</a>
+        </li>
+      {% endif %}
+    </ul>
+    {% endset %}
+    {{ govukNotificationBanner({ html: html }) }}
+  {% endif %}
+  {% set schedule %}
+  {% set nextApp = overview.schedule.nextAppointment %}
+  {% set nextAppointmentText %}
+  {% if nextApp %}
+    {{ nextApp['date'] | dateWithDayAndWithoutYear }} at {{ nextApp['date'] | govukTime }} ({{ nextApp['description'] }})
                 {% else %}
                     No appointments scheduled
                 {% endif %}
-        {% endset %}
-        {{ govukSummaryList({
+  {% endset %}
+  {{ govukSummaryList({
             rows: [
               {
                 key: { html: '<span data-qa="nextAppointmentLabel">Next appointment</span>'},
@@ -155,10 +171,11 @@
               }
             ]
             }) }}
-    {% endset %}
+  {% endset %}
 
-    {{ appSummaryCard({
+  {{ appSummaryCard({
       titleText: 'Appointments',
+      headingLevel: 3,
       classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
       attributes: {'data-qa': 'scheduleCard'},
       html: schedule,
@@ -172,63 +189,63 @@
       }
     }) }}
 
-    {% set personalDetails %}
-        {% set dateOfBirthAndAge %}
-            {{ overview.personalDetails.dateOfBirth | dateWithYear }} ({{ overview.personalDetails.dateOfBirth | yearsSince }} years old)
+  {% set personalDetails %}
+  {% set dateOfBirthAndAge %}
+  {{ overview.personalDetails.dateOfBirth | dateWithYear }} ({{ overview.personalDetails.dateOfBirth | yearsSince }} years old)
             {% set contactNumber %}
-                {% if overview.personalDetails.telephoneNumber  %}
-                    {{ overview.personalDetails.telephoneNumber }}<br />
-                {% endif %}
-                {% if overview.personalDetails.mobileNumber  %}
-                    {{ overview.personalDetails.mobileNumber }}<br />
-                {% endif %}
-                {% if not overview.personalDetails.mobileNumber|length and not overview.personalDetails.mobileNumber|length  %}
+  {% if overview.personalDetails.telephoneNumber %}
+    {{ overview.personalDetails.telephoneNumber }}<br/>
+  {% endif %}
+  {% if overview.personalDetails.mobileNumber %}
+    {{ overview.personalDetails.mobileNumber }}<br/>
+  {% endif %}
+  {% if not overview.personalDetails.mobileNumber | length and not overview.personalDetails.mobileNumber | length %}
                     No contact number
                 {% endif %}
-            {% endset %}
-        {% endset %}
-        {% set circumstances %}
-            {% if overview.personalDetails.personalCircumstances.length > 0 %}
-                <ul class="govuk-list">
-                {% for circumstance in overview.personalDetails.personalCircumstances %}
-                    <li>
-                        {{ circumstance.type }}: {{ circumstance.subType }}
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
+  {% endset %}
+  {% endset %}
+  {% set circumstances %}
+  {% if overview.personalDetails.personalCircumstances.length > 0 %}
+    <ul class="govuk-list">
+      {% for circumstance in overview.personalDetails.personalCircumstances %}
+        <li>
+          {{ circumstance.type }}: {{ circumstance.subType }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
                 None
             {% endif %}
-        {% endset %}
+  {% endset %}
 
-        {% set disabilities %}
-            {% if overview.personalDetails.disabilities.length > 0 %}
-                <ul class="govuk-list">
-                {% for adjustment in overview.personalDetails.disabilities %}
-                    <li>
-                        {{ adjustment.description }}
-                    </li>
-                {% endfor %}
-                </ul>
-            {% else %}
+  {% set disabilities %}
+  {% if overview.personalDetails.disabilities.length > 0 %}
+    <ul class="govuk-list">
+      {% for adjustment in overview.personalDetails.disabilities %}
+        <li>
+          {{ adjustment.description }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
                 No disabilities
             {% endif %}
-        {% endset %}
-        {% set adjustments %}
-            {% if overview.personalDetails.provisions.length > 0 %}
-                <ul class="govuk-list">
-                    {% for provisions in overview.personalDetails.provisions %}
-                    <li>
-                        {{ provisions.description }}
-                    </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
+  {% endset %}
+  {% set adjustments %}
+  {% if overview.personalDetails.provisions.length > 0 %}
+    <ul class="govuk-list">
+      {% for provisions in overview.personalDetails.provisions %}
+        <li>
+          {{ provisions.description }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
                 No adjustments
             {% endif %}
-        {% endset %}
+  {% endset %}
 
-        {{ govukSummaryList({
+  {{ govukSummaryList({
         rows: [
           {
             key: { html: '<span data-qa="nameLabel">Name</span>'},
@@ -265,10 +282,11 @@
 
         ]
       }) }}
-    {% endset %}
+  {% endset %}
 
-    {{ appSummaryCard({
+  {{ appSummaryCard({
       titleText: 'Personal details',
+      headingLevel: 3,
       attributes: {'data-qa': 'personalDetailsCard'},
       classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
       html: personalDetails,
@@ -282,91 +300,92 @@
       }
     }) }}
 
-    {% set hasRiskAssessment = risks.assessedOn %}
-    {% set risk %}
-      {% set riskToThemselves %}
-        {% set currentRisksToThemselves = getCurrentRisksToThemselves(risks.riskToSelf) %}
-        {% set previousRisksToThemselves = getPreviousRisksToThemselves(risks.riskToSelf) %}
+  {% set hasRiskAssessment = risks.assessedOn %}
+  {% set risk %}
+  {% set riskToThemselves %}
+  {% set currentRisksToThemselves = getCurrentRisksToThemselves(risks.riskToSelf) %}
+  {% set previousRisksToThemselves = getPreviousRisksToThemselves(risks.riskToSelf) %}
 
-        {% if currentRisksToThemselves.length == 1 %}
-          <p>Immediate concerns about {{ currentRisksToThemselves[0] }}</p>
-        {% elseif currentRisksToThemselves.length > 0 %}
-          <p>Immediate concerns about:</p>
-          <ul class="govuk-list govuk-list--bullet">
-            {% for risk in currentRisksToThemselves %}
-              <li>{{ risk }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
+  {% if currentRisksToThemselves.length == 1 %}
+    <p>Immediate concerns about {{ currentRisksToThemselves[0] }}</p>
+  {% elseif currentRisksToThemselves.length > 0 %}
+    <p>Immediate concerns about:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      {% for risk in currentRisksToThemselves %}
+        <li>{{ risk }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-        {% if previousRisksToThemselves.length == 1 %}
-          <p>Previous concerns about {{ previousRisksToThemselves[0] }}</p>
-        {% elseif previousRisksToThemselves.length > 0 %}
-          <p>Previous concerns about:</p>
-          <ul class="govuk-list govuk-list--bullet">
-            {% for risk in previousRisksToThemselves %}
-              <li>{{ risk }}</li>
-            {% endfor %}
-          </ul>
-        {% endif %}
+  {% if previousRisksToThemselves.length == 1 %}
+    <p>Previous concerns about {{ previousRisksToThemselves[0] }}</p>
+  {% elseif previousRisksToThemselves.length > 0 %}
+    <p>Previous concerns about:</p>
+    <ul class="govuk-list govuk-list--bullet">
+      {% for risk in previousRisksToThemselves %}
+        <li>{{ risk }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-        {% if currentRisksToThemselves.length == 0 and previousRisksToThemselves.length == 0 %}
-          <p>No concerns</p>
-        {% endif %}
-      {% endset %}
-      {% set riskFlags %}
-        {% set riskFlagList = overview.registrations %}
-        {% if riskFlagList.length > 0 %}
-            <ul class="govuk-list">
-                {% for risk in riskFlagList %}
-                  <li>{{ risk }}</li>
-                {% endfor %}
-            </ul>
-        {% else %}
+  {% if currentRisksToThemselves.length == 0 and previousRisksToThemselves.length == 0 %}
+    <p>No concerns</p>
+  {% endif %}
+  {% endset %}
+  {% set riskFlags %}
+  {% set riskFlagList = overview.registrations %}
+  {% if riskFlagList.length > 0 %}
+    <ul class="govuk-list">
+      {% for risk in riskFlagList %}
+        <li>{{ risk }}</li>
+      {% endfor %}
+    </ul>
+  {% else %}
           No risk flags
         {% endif %}
-      {% endset %}
-      {% set riskLastUpdated %}
-        {% if hasRiskAssessment %}
-          <br />
-          <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
+  {% endset %}
+  {% set riskLastUpdated %}
+  {% if hasRiskAssessment %}
+    <br/>
+    <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
             Last updated {{ risks.assessedOn | dateWithYear }}
-          </span>
-        {% endif %}
-      {% endset %}
-      {% set mappaLastUpdated %}
-      {% if overview.mappa %}
-          <br />
-          <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
+    </span>
+  {% endif %}
+  {% endset %}
+  {% set mappaLastUpdated %}
+  {% if overview.mappa %}
+    <br/>
+    <span class="govuk-body-s secondary-text govuk-!-font-weight-regular">
             Last updated (NDelius): {{ overview.mappa.lastUpdated | dateWithYear }}
-          </span>
-          {% endif %}
-      {% endset %}
-      {% if not overview.mappa %}
-{% set mappaValue = 'No MAPPA data found in NDelius.' %}
-      {% else %}
-      {% set mappaCat = '' %}
-      {% set mappaLevel = '' %}
-      {% if overview.mappa.category %}
+    </span>
+  {% endif %}
+  {% endset %}
+  {% if not overview.mappa %}
+    {% set mappaValue = 'No MAPPA data found in NDelius.' %}
+  {% else %}
+    {% set mappaCat = '' %}
+    {% set mappaLevel = '' %}
+    {% if overview.mappa.category %}
       {% set mappaCat = 'Cat ' + overview.mappa.category %}
-      {% endif %}
-      {% if overview.mappa.level %}
+    {% endif %}
+    {% if overview.mappa.level %}
       {% set mappaLevel = ('/' if mappaCat) + 'Level ' + overview.mappa.level %}
-      {% endif %}
-      {% set mappaValue =  '<span class="govuk-!-font-weight-bold">' + mappaCat + mappaLevel + '</span>' %}
-      {% endif %}
-      {% set roshText = risks.summary.overallRiskLevel | replace("_"," ") %}
-      {% set overallRosh %}
-      {% if hasRiskAssessment and risks.summary.overallRiskLevel %}
-      <table><tr>
-      <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
+    {% endif %}
+    {% set mappaValue =  '<span class="govuk-!-font-weight-bold">' + mappaCat + mappaLevel + '</span>' %}
+  {% endif %}
+  {% set roshText = risks.summary.overallRiskLevel | replace("_", " ") %}
+  {% set overallRosh %}
+  {% if hasRiskAssessment and risks.summary.overallRiskLevel %}
+    <table>
+      <tr>
+        <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
       </table>
-      {% else %}
+    {% else %}
       {{'There is no RoSH summary.'}}
-      {% endif %}
-      {% endset %}
+    {% endif %}
+    {% endset %}
 
-      {{ govukSummaryList({
+    {{ govukSummaryList({
         rows: [
           {
             key: { html: '<span data-qa="roshLabel">Risk of serious harm (ROSH) in the community' + riskLastUpdated + '</span>' },
@@ -390,6 +409,7 @@
 
     {{ appSummaryCard({
       titleText: 'Risk',
+      headingLevel: 3,
       attributes: {'data-qa': 'riskCard'},
       classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
       html: risk,
@@ -403,45 +423,44 @@
       }
     }) }}
 
-
     {% set numberOfSentences = overview.sentences.length %}
     {% if numberOfSentences > 0 %}
-    {% for sentence in overview.sentences %}
+      {% for sentence in overview.sentences %}
         {% set sentenceHtml %}
-            {% set order %}
-                {% if sentence.order  %}
-                    {% if loop.first %}
-                        <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
-                    {% endif %}
-                    {{ sentence.order.description }}<br />
-                    From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br />
-                    {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
+        {% set order %}
+        {% if sentence.order %}
+          {% if loop.first %}
+            <input type="hidden" id="sentence" name="sentence" value="{{ sentence.order.description }}">
+          {% endif %}
+          {{ sentence.order.description }}<br/>
+                    From {{ sentence.order.startDate | dateWithNoDay }} to {{ sentence.order.endDate | dateWithNoDay }}<br/>
+          {{  sentence.order.startDate | monthsOrDaysElapsed }} elapsed
                     {% else %}
                     No order details
                 {% endif %}
-            {% endset %}
-            {% set requirements %}
-                {% if sentence.rarDescription %}
-                {{ sentence.rarDescription }}
-                {% else %}
+        {% endset %}
+        {% set requirements %}
+        {% if sentence.rarDescription %}
+          {{ sentence.rarDescription }}
+        {% else %}
                 No requirements details
                 {% endif %}
-            {% endset %}
-            {% set mainOffence %}
-                {% if loop.first %}
-                    <input type="hidden" id="mainOffence" name="mainOffence" value="{{ sentence.mainOffence.description }}">
-                {% endif %}
-                {{ sentence.mainOffence.description }}
-                {%- if sentence.additionalOffences.length > 0 %}
-                    {%- switch sentence.additionalOffences.length -%}
-                        {%- case 1 -%}
-                            <br/>1 additional offence
+        {% endset %}
+        {% set mainOffence %}
+        {% if loop.first %}
+          <input type="hidden" id="mainOffence" name="mainOffence" value="{{ sentence.mainOffence.description }}">
+        {% endif %}
+        {{ sentence.mainOffence.description }}
+        {%- if sentence.additionalOffences.length > 0 %}
+          {%- switch sentence.additionalOffences.length -%}
+          {%- case 1 -%}
+            <br/>1 additional offence
                         {%- default -%}
-                            <br/>{{ sentence.additionalOffences.length }} additional offences
+            <br/>{{ sentence.additionalOffences.length }} additional offences
                     {%- endswitch -%}
-                {% endif %}
-            {% endset %}
-            {{ govukSummaryList({
+          {% endif %}
+          {% endset %}
+          {{ govukSummaryList({
             rows: [
               {
                 key: { html: '<span data-qa="mainOffenceLabel">Main offence</span>'},
@@ -457,11 +476,12 @@
               }
             ]
           }) }}
-        {% endset %}
+          {% endset %}
 
-        {% set sentenceDesription = sentence.order.description | toSentenceDescription %}
-        {{ appSummaryCard({
+          {% set sentenceDesription = sentence.order.description | toSentenceDescription %}
+          {{ appSummaryCard({
             titleText: sentenceDesription,
+            headingLevel: 3,
             classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
             attributes: {'data-qa': 'sentence' + sentence.eventNumber + 'Card'},
             html: sentenceHtml,
@@ -474,10 +494,10 @@
               ]
             }
         }) }}
-    {%- endfor %}
-    {% else %}
-    {% set sentenceHtml %}
-{{ govukSummaryList({
+        {%- endfor %}
+      {% else %}
+        {% set sentenceHtml %}
+        {{ govukSummaryList({
             rows: [
               {
                 key: { html: '<span data-qa="orderLabel">Order</span>'},
@@ -485,75 +505,76 @@
               } 
             ]
           }) }}
-    {%- endset %}
-   {{ appSummaryCard({
+        {%- endset %}
+        {{ appSummaryCard({
             titleText: 'Sentence',
+            headingLevel: 3,
             classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
             attributes: {'data-qa': 'sentenceCard'},
             html: sentenceHtml
         }) }}
-{%- endif %}
-    {% set activityAndCompliance %}
-        {% set previousOrders %}
-            {% if overview.previousOrders %}
-                {% set total%}
-                {%- switch overview.previousOrders.count -%}
-                    {%- case 0 -%}
+      {%- endif %}
+      {% set activityAndCompliance %}
+      {% set previousOrders %}
+      {% if overview.previousOrders %}
+        {% set total%}
+        {%- switch overview.previousOrders.count -%}
+        {%- case 0 -%}
                         No previous orders
                     {%- default -%}
-                        {{ overview.previousOrders.count }} previous orders
+          {{ overview.previousOrders.count }} previous orders
                 {%- endswitch -%}
-                {% endset %}
-                {% set breaches %}
-                {%- switch overview.previousOrders.breaches -%}
-                    {%- case 0 -%}
+          {% endset %}
+          {% set breaches %}
+          {%- switch overview.previousOrders.breaches -%}
+          {%- case 0 -%}
                         No breaches on previous orders
                     {%- default -%}
-                        {{ overview.previousOrders.breaches }} breaches on previous orders
+            {{ overview.previousOrders.breaches }} breaches on previous orders
                 {%- endswitch -%}
-                {% endset %}
-                {{ total}} ({{ breaches }})
+            {% endset %}
+            {{ total}} ({{ breaches }})
             {% endif %}
-        {% endset %}
-        {% set compliance %}
-            {% if overview.compliance.breachStarted %}
-              {%- switch overview.compliance.priorBreachesOnCurrentOrderCount -%}
-                {%- case 0 -%}
+          {% endset %}
+          {% set compliance %}
+          {% if overview.compliance.breachStarted %}
+            {%- switch overview.compliance.priorBreachesOnCurrentOrderCount -%}
+            {%- case 0 -%}
                   No prior breaches on current order
                 {%- case 1 -%}
                   1 prior breach on current order
                 {%- default -%}
-                  {{ overview.compliance.priorBreachesOnCurrentOrderCount }} prior breaches on current order
+                {{ overview.compliance.priorBreachesOnCurrentOrderCount }} prior breaches on current order
               {%- endswitch -%}
-            {% else %}
-              {%- switch overview.compliance.breachesOnCurrentOrderCount -%}
+              {% else %}
+                {%- switch overview.compliance.breachesOnCurrentOrderCount -%}
                 {%- case 0 -%}
                   No breaches on current order
                 {%- case 1 -%}
                   1 breach on current order
                 {%- default -%}
-                  {{ overview.compliance.breachesOnCurrentOrderCount }} breaches on current order
+                    {{ overview.compliance.breachesOnCurrentOrderCount }} breaches on current order
               {%- endswitch -%}
-            {% endif %}
-            <p>
-                <a href={{crn}}/compliance>View all compliance details</a>
-            </p>
-        {% endset %}
-        {% set activity %}
-            {% if overview.activity %}
-                {{ overview.activity.nationalStandardAppointmentsCount }} national standard appointments <br/>
-                {{ overview.activity.outcomeNotRecordedCount }} without a recorded outcome <br/>
-                {{ overview.activity.compliedAppointmentsCount }} compiled <br/>
-                {{ overview.activity.acceptableAbsenceCount }} acceptable absences <br/>
-                {{ overview.activity.rescheduledCount }} rescheduled<br/>
-                <p>
-                    <a href={{crn}}/activity-log>View all activity details</a>
-                </p>
-            {% else %}
+                  {% endif %}
+                  <p>
+                    <a href={{crn}}/compliance>View all compliance details</a>
+                  </p>
+                  {% endset %}
+                  {% set activity %}
+                  {% if overview.activity %}
+                    {{ overview.activity.nationalStandardAppointmentsCount }} national standard appointments <br/>
+                    {{ overview.activity.outcomeNotRecordedCount }} without a recorded outcome <br/>
+                    {{ overview.activity.compliedAppointmentsCount }} compiled <br/>
+                    {{ overview.activity.acceptableAbsenceCount }} acceptable absences <br/>
+                    {{ overview.activity.rescheduledCount }} rescheduled<br/>
+                    <p>
+                      <a href={{crn}}/activity-log>View all activity details</a>
+                    </p>
+                  {% else %}
                 None
             {% endif %}
-        {% endset %}
-        {{ govukSummaryList({
+                  {% endset %}
+                  {{ govukSummaryList({
         rows: [
           {
             key: { html: '<span data-qa="previousOrdersLabel">Previous orders</span>'},
@@ -569,56 +590,74 @@
           }
         ]
       }) }}
-    {% endset %}
-    {{ appSummaryCard({
+                  {% endset %}
+                  {{ appSummaryCard({
       titleText: 'Activity and compliance',
+      headingLevel: 3,
       attributes: {'data-qa': 'activityAndComplianceCard'},
       classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
       html: activityAndCompliance
     }) }}
 
-    <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">
-    <input type="hidden" id="name" name="name" value="{{ overview.personalDetails.name.surname }}, {{ overview.personalDetails.name.forename }}">
-    <input type="hidden" id="dob" name="dob" value="{{ headerDob | dateWithYear }}">
-    <input type="hidden" id="age" name="age" value="{{ headerDob | yearsSince }}">
-    <input type="hidden" id="tier" name="age" value="{{ tierCalculation.tierScore }}">
-    <input type="hidden" id="numberOfAdditionalSentences" name="numberOfSentences" value="{{ numberOfSentences - 1 }}">
+                  <input type="hidden" id="caseCrn" name="crn" value="{{ crn }}">
+                  <input type="hidden" id="name" name="name" value="{{ overview.personalDetails.name.surname }}, {{ overview.personalDetails.name.forename }}">
+                  <input type="hidden" id="dob" name="dob" value="{{ headerDob | dateWithYear }}">
+                  <input type="hidden" id="age" name="age" value="{{ headerDob | yearsSince }}">
+                  <input type="hidden" id="tier" name="age" value="{{ tierCalculation.tierScore }}">
+                  <input type="hidden" id="numberOfAdditionalSentences" name="numberOfSentences" value="{{ numberOfSentences - 1 }}">
 
+                  <script nonce="{{ cspNonce }}">
+                    const crn = document
+                      .getElementById("caseCrn")
+                      .value
+                    const name = document
+                      .getElementById("name")
+                      .value
+                    const dob = document
+                      .getElementById("dob")
+                      .value
+                    const age = document
+                      .getElementById("age")
+                      .value
+                    const tier = document
+                      .getElementById("tier")
+                      .value
+                    const sentence = document.getElementById("sentence")
+                      ? document
+                        .getElementById("sentence")
+                        .value
+                      : document.getElementById("mainOffence")
+                        ? "Pre-sentence"
+                        : "No active sentence"
+                    const numberOfAdditionalSentences = document
+                      .getElementById("numberOfAdditionalSentences")
+                      .value
 
-    <script nonce="{{ cspNonce }}">
-        const crn = document.getElementById("caseCrn").value
-        const name = document.getElementById("name").value
-        const dob = document.getElementById("dob").value
-        const age = document.getElementById("age").value
-        const tier = document.getElementById("tier").value
-        const sentence = document.getElementById("sentence") ? document.getElementById("sentence").value : document.getElementById("mainOffence") ? "Pre-sentence" : "No active sentence"
-        const numberOfAdditionalSentences = document.getElementById("numberOfAdditionalSentences").value
+                    let recentCases = []
+                    let recentCase
 
-        let recentCases = []
-        let recentCase
+                    if (localStorage.getItem("recentCases") != null) {
+                      recentCases = JSON.parse(localStorage.getItem('recentCases'))
 
-        if (localStorage.getItem("recentCases") != null) {
-            recentCases = JSON.parse(localStorage.getItem('recentCases'))
+                      recentCase = recentCases.findIndex(obj => obj.crn === crn)
 
-            recentCase = recentCases.findIndex(obj => obj.crn === crn)
+                      if (recentCase !== -1) {
+                        recentCases.splice(recentCase, 1);
+                      }
+                    }
 
-            if (recentCase !== -1) {
-                recentCases.splice(recentCase, 1);
-            }
-        }
+                    recentCase = {
+                      name: name,
+                      crn: crn,
+                      dob: dob,
+                      age: age,
+                      tierScore: tier,
+                      sentence: sentence,
+                      numberOfAdditionalSentences: numberOfAdditionalSentences
+                    };
 
-        recentCase = {
-            name: name,
-            crn: crn,
-            dob: dob,
-            age: age,
-            tierScore: tier,
-            sentence: sentence,
-            numberOfAdditionalSentences: numberOfAdditionalSentences
-        };
-
-        recentCases.unshift(recentCase)
-        recentCases.splice(25)
-        localStorage.setItem('recentCases', JSON.stringify(recentCases))
-    </script>
-{% endblock %}
+                    recentCases.unshift(recentCase)
+                    recentCases.splice(25)
+                    localStorage.setItem('recentCases', JSON.stringify(recentCases))
+                  </script>
+                {% endblock %}
