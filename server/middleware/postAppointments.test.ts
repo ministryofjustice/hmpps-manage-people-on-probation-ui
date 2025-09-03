@@ -7,6 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
+import { AppointmentSession } from '../models/Appointments'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -76,45 +77,51 @@ const mockSentences = [
   },
 ] as Sentence[]
 
-const req = httpMocks.createRequest({
-  params: {
-    crn,
-    id,
+const mockAppointment: AppointmentSession = {
+  user: {
+    locationCode: 'HMP',
+    teamCode: 'TEA',
+    username,
   },
-  session: {
-    data: {
-      locations: {
-        [username]: mockUserLocations,
-      },
-      sentences: {
-        [crn]: mockSentences,
-      },
-      appointments: {
-        [crn]: {
-          [id]: {
-            user: {
-              locationCode: 'HMP',
-              teamCode: 'TEA',
-            },
-            username,
-            team: 'TEA',
-            type: 'C084',
-            date: '2025-03-12',
-            start: '9:00am',
-            end: '9:30pm',
-            interval: 'WEEK',
-            numberOfAppointments: '2',
-            eventId: 2501138253,
-            requirementId: 1,
-            licenceConditionId: 2500686668,
-            notes: 'Some notes',
-            sensitivity: false,
+  type: 'C084',
+  date: '2025-03-12',
+  start: '9:00am',
+  end: '9:30pm',
+  until: '2025-03-19',
+  interval: 'WEEK',
+  numberOfAppointments: '2',
+  eventId: '250113825',
+  requirementId: '1',
+  licenceConditionId: '2500686668',
+  notes: 'Some notes',
+  sensitivity: 'Yes',
+}
+
+const createMockReq = (appointment: AppointmentSession) => {
+  return httpMocks.createRequest({
+    params: {
+      crn,
+      id,
+    },
+    session: {
+      data: {
+        locations: {
+          [username]: mockUserLocations,
+        },
+        sentences: {
+          [crn]: mockSentences,
+        },
+        appointments: {
+          [crn]: {
+            [id]: appointment,
           },
         },
       },
     },
-  },
-})
+  })
+}
+
+const req = createMockReq(mockAppointment)
 
 const nextSpy = jest.fn()
 
@@ -131,81 +138,64 @@ describe('/middleware/postAppointments', () => {
     licenceConditionId,
   } = req.session.data.appointments[crn][id]
 
-  const expectedBody = {
-    user: {
-      username,
-      locationCode,
-      teamCode,
-    },
-    type,
-    start: dateTime(date, startTime),
-    end: dateTime(date, endTime),
-    interval,
-    numberOfAppointments: parseInt(repeatCount, 10),
-    createOverlappingAppointment: true,
-    requirementId: 1,
-    nsiId: undefined as number,
-    licenceConditionId,
-    eventId,
-    uuid: id,
-    notes: 'Some notes',
-    sensitive: false,
-  }
-  let spy: jest.SpyInstance
-  beforeEach(async () => {
-    spy = jest.spyOn(MasApiClient.prototype, 'postAppointments').mockImplementation(() => Promise.resolve(''))
-    await postAppointments(hmppsAuthClient)(req, res, nextSpy)
-  })
-  it('should post the correct request body', () => {
-    expect(spy).toHaveBeenCalledWith(crn, expectedBody)
-  })
-  it('should call next()', () => {
-    expect(nextSpy).toHaveBeenCalled()
-  })
-})
+  // let spy: jest.SpyInstance
 
-describe('/middleware/postAppointments', () => {
-  const {
-    user: { locationCode, teamCode },
-    date,
-    start: startTime,
-    end: endTime,
-    type,
-    interval,
-    eventId,
-    numberOfAppointments: repeatCount,
-    licenceConditionId,
-  } = req.session.data.appointments[crn][id]
+  const spy = jest.spyOn(MasApiClient.prototype, 'postAppointments').mockImplementation(() => Promise.resolve(''))
 
-  const expectedBody = {
-    user: {
-      username,
-      locationCode,
-      teamCode,
-    },
-    type,
-    start: dateTime(date, startTime),
-    end: dateTime(date, endTime),
-    interval,
-    numberOfAppointments: parseInt(repeatCount, 10),
-    createOverlappingAppointment: true,
-    requirementId: 1,
-    nsiId: undefined as number,
-    licenceConditionId,
-    eventId,
-    uuid: id,
-    notes: 'Some notes',
-    sensitive: false,
-  }
-  let spy: jest.SpyInstance
-  beforeEach(async () => {
-    spy = jest.spyOn(MasApiClient.prototype, 'postAppointments').mockImplementation(() => Promise.resolve(''))
+  it('should post the correct request body', async () => {
+    const expectedBody = {
+      user: {
+        username,
+        locationCode,
+        teamCode,
+      },
+      type,
+      start: dateTime(date, startTime),
+      end: dateTime(date, endTime),
+      interval,
+      numberOfAppointments: parseInt(repeatCount, 10),
+      createOverlappingAppointment: true,
+      requirementId: 1,
+      licenceConditionId: parseInt(licenceConditionId, 10),
+      eventId: parseInt(eventId, 10),
+      uuid: id,
+      until: dateTime('2025-03-19', endTime),
+      notes: 'Some notes',
+      sensitive: true,
+      visorReport: false,
+    }
     await postAppointments(hmppsAuthClient)(req, res, nextSpy)
-  })
-  it('should post the correct request body', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
+    expect(nextSpy).not.toHaveBeenCalled()
   })
-  it('should call next()', () => {
-    expect(nextSpy).toHaveBeenCalled()
+
+  it('should not include the eventId in the request if PERSON_LEVEL_CONTACT', async () => {
+    const appointment = {
+      ...mockAppointment,
+      eventId: 'PERSON_LEVEL_CONTACT',
+    }
+    const mockReq = createMockReq(appointment)
+    const expectedBody = {
+      user: {
+        username,
+        locationCode,
+        teamCode,
+      },
+      type,
+      start: dateTime(date, startTime),
+      end: dateTime(date, endTime),
+      interval,
+      numberOfAppointments: parseInt(repeatCount, 10),
+      createOverlappingAppointment: true,
+      requirementId: 1,
+      licenceConditionId: parseInt(licenceConditionId, 10),
+      uuid: id,
+      until: dateTime('2025-03-19', endTime),
+      notes: 'Some notes',
+      sensitive: true,
+      visorReport: false,
+    }
+    await postAppointments(hmppsAuthClient)(mockReq, res, nextSpy)
+    expect(spy).toHaveBeenCalledWith(crn, expectedBody)
   })
 })

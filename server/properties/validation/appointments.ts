@@ -4,8 +4,9 @@ import {
   isValidDateFormat,
   isStringNumber,
   timeIsNotLaterThan,
-  timeIsNotEarlierThan,
+  timeIsNowOrInFuture,
   isTodayOrLater,
+  isNotEarlierThan,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -83,6 +84,12 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           msg: 'Date must be today or in the future',
           log: 'Date must be today or in the future',
         },
+        {
+          validator: isNotEarlierThan,
+          msg: 'The date must not be later than 31/12/2199',
+          log: 'The date must not be later than 31/12/2199',
+          crossField: `_maxDate`,
+        },
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
@@ -94,10 +101,10 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Appointment start time not selected or entered',
         },
         {
-          validator: timeIsNotEarlierThan,
-          msg: 'The end time must be after the start time',
-          log: 'The end time must be after the start time',
-          crossField: `[appointments][${crn}][${id}][end]`,
+          validator: timeIsNowOrInFuture,
+          msg: 'The start time must be now or in the future',
+          log: 'The start time must be now or in the future',
+          crossField: `[appointments][${crn}][${id}][date]`,
         },
       ],
     },
@@ -137,7 +144,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][numberOfAppointments]`]: {
+    [`[appointments][${crn}][${id}][numberOfRepeatAppointments]`]: {
       optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
       checks: [
         {
@@ -149,6 +156,36 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isStringNumber,
           msg: 'Enter a number',
           log: 'Appointment repeat count not entered in correct format',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][sensitivity]`]: {
+      optional: page !== 'add-notes',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if appointment includes sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    sensitive: {
+      optional: page !== 'add-note',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not the appointment note contains sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    outcomeRecorded: {
+      optional: page !== 'record-an-outcome',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if they attended and complied',
+          log: 'Attended and complied not selected',
         },
       ],
     },

@@ -145,7 +145,11 @@ describe('masApiClient', () => {
         'get',
         true,
       ],
-      ['getPersonSchedule', '/schedule/X000001/1', () => masApiClient.getPersonSchedule('X000001', '1')],
+      [
+        'getPersonSchedule',
+        '/schedule/X000001/1?size=10&page=0',
+        () => masApiClient.getPersonSchedule('X000001', '1', '0'),
+      ],
       [
         'getPersonAppointment',
         '/schedule/X000001/appointment/1',
@@ -252,7 +256,11 @@ describe('masApiClient', () => {
 
       ['getUserAppointments', '/user/USER/appointments', () => masApiClient.getUserAppointments('USER')],
       ['getUserTeams', '/caseload/user/USER/teams', () => masApiClient.getUserTeams('USER')],
-      ['getUserLocations', '/user/USER/locations', () => masApiClient.getUserLocations('USER')],
+      [
+        'getOfficeLocationsByTeamAndProvider',
+        '/appointment/location/provider/N56/team/N56N02',
+        () => masApiClient.getOfficeLocationsByTeamAndProvider('N56', 'N56N02'),
+      ],
       [
         'getUserSchedule',
         '/user/USER/schedule/TYPE?size=1&page=1&sortBy=user&ascending=asc',

@@ -10,13 +10,14 @@ import {
   completeAttendancePage,
   completeLocationPage,
   completeDateTimePage,
+  checkPopHeader,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = () => {
-  completeTypePage()
   completeSentencePage()
+  completeTypePage()
   completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
@@ -48,6 +49,9 @@ describe('Will the appointment repeat?', () => {
   })
   it('should be on the repeating page', () => {
     repeatingPage.checkOnPage()
+  })
+  it('should render the pop header', () => {
+    checkPopHeader('Alton Berge', true)
   })
   it('should display the error summary box', () => {
     repeatingPage.getSubmitBtn().click()
@@ -119,7 +123,7 @@ describe('Will the appointment repeat?', () => {
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval-error`).should($error => {
         expect($error.text().trim()).to.include('Select the frequency the appointment will repeat')
       })
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments-error`).should($error => {
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments-error`).should($error => {
         expect($error.text().trim()).to.include('Enter the number of times the appointment will repeat')
       })
     })
@@ -129,7 +133,7 @@ describe('Will the appointment repeat?', () => {
     })
     it('should focus the count field when the second error summary link is clicked', () => {
       repeatingPage.getErrorSummaryLink(1).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).should('be.focused')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).should('be.focused')
     })
   })
   describe('Weekly frequency is selected, the continue is clicked', () => {
@@ -148,7 +152,7 @@ describe('Will the appointment repeat?', () => {
       loadPage()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).type('xx')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).type('xx')
       repeatingPage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -160,7 +164,7 @@ describe('Will the appointment repeat?', () => {
       loadPage()
       cy.intercept(
         'GET',
-        `http://localhost:3007/case/${crn}/arrange-appointment/${uuid}/repeating?interval=WEEK&numberOfAppointments=4`,
+        `http://localhost:3007/case/${crn}/arrange-appointment/${uuid}/repeating?interval=WEEK&numberOfRepeatAppointments=4`,
         {
           statusCode: 200,
           body: `<!DOCTYPE html>
@@ -178,7 +182,7 @@ describe('Will the appointment repeat?', () => {
       )
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
-      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfAppointments`).type('4')
+      repeatingPage.getElement(`#appointments-${crn}-${uuid}-numberOfRepeatAppointments`).type('4')
     })
     it('Should display the last appointment date', () => {
       repeatingPage.getLastAppointment().should('be.visible')

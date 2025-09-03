@@ -1,34 +1,74 @@
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
-import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid } from './imports'
+import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
+import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
+import Page from '../../pages/page'
 
-const loadPage = () => {
-  completeTypePage()
+const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
+  completeTypePage(typeOptionIndex)
   completeAttendancePage()
 }
 
 describe('Pick a location for this appointment', () => {
   let locationPage: AppointmentLocationPage
   let dateTimePage: AppointmentDateTimePage
-
-  describe('Page is rendered', () => {
+  let locationNotInListPage: AppointmentLocationNotInListPage
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
+  describe('Page is rendered with options for an appointment type which requires a location', () => {
     beforeEach(() => {
       loadPage()
       locationPage = new AppointmentLocationPage()
     })
+    it('should render the pop header', () => {
+      checkPopHeader('Alton Berge', true)
+    })
     it('should display the options', () => {
-      locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'HMP Wakefield')
+      locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')
       locationPage.getRadioLabel('locationCode', 2).should('contain.text', '102 Petty France')
       locationPage
         .getRadioLabel('locationCode', 4)
         .should('contain.text', 'The location I’m looking for is not in this list')
-      locationPage.getRadioLabel('locationCode', 5).should('contain.text', 'I do not need to pick a location')
     })
     it('should display the continue button', () => {
       locationPage.getSubmitBtn().should('contain.text', 'Continue')
+    })
+  })
+  describe('Page is rendered with options for an appointment type which does not require a location', () => {
+    beforeEach(() => {
+      const typeOptionIndex = 2
+      loadPage(typeOptionIndex)
+      locationPage = new AppointmentLocationPage()
+    })
+    it('should display the non-mandatory location option', () => {
+      locationPage.getRadioLabel('locationCode', 5).should('contain.text', 'I do not need to pick a location')
+    })
+  })
+
+  describe('Page is rendered with no locations for an appointment type which requires a location', () => {
+    it('should redirect to the location not in list page', () => {
+      cy.task('stubNoUserLocationsFound')
+      loadPage()
+      const page = Page.verifyOnPage(AppointmentLocationNotInListPage)
+    })
+  })
+  describe('Page is rendered with no locations for an appointment type which does not require a location', () => {
+    it('should only display the last 2 radio options', () => {
+      cy.task('stubNoUserLocationsFound')
+      const typeOptionIndex = 2
+      loadPage(typeOptionIndex)
+      locationPage = new AppointmentLocationPage()
+      locationPage
+        .getRadioLabel('locationCode', 1)
+        .should('contain.text', 'The location I’m looking for is not in this list')
+      locationPage.getRadioLabel('locationCode', 2).should('contain.text', 'I do not need to pick a location')
+      cy.get('[data-qa="locationOption"]').should('not.exist')
+    })
+    it('should not display the radio list divider', () => {
+      cy.get('.govuk-radios__divider').should('not.exist')
     })
   })
 

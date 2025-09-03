@@ -18,6 +18,7 @@ import {
   validateWithSpec,
   timeIsNotLaterThan,
   isTodayOrLater,
+  timeIsNowOrInFuture,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -135,6 +136,37 @@ describe('is today or later', () => {
   })
 })
 
+describe('time is now or in future', () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+  it('should return false if date is today, but time is in the past', () => {
+    expect(timeIsNowOrInFuture(['1/7/2025', '8:00am'])).toEqual(false)
+  })
+  it('should return true if today and time is now', () => {
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'])).toEqual(true)
+  })
+  it('should return true if today and time is in the future', () => {
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:15am'])).toEqual(true)
+  })
+  it('should return false if date and time are in the past', () => {
+    expect(timeIsNowOrInFuture(['30/6/2025', '8:00am'])).toEqual(false)
+  })
+  it('should return true if date is invalid', () => {
+    expect(timeIsNowOrInFuture(['XXDFDS', '8:00am'])).toEqual(true)
+  })
+  it('should return false if date is undefined', () => {
+    expect(timeIsNowOrInFuture([undefined, '8:00am'])).toEqual(false)
+  })
+  it('should return true if date and time are in the future', () => {
+    expect(timeIsNowOrInFuture(['2/7/2025', '8:00am'])).toEqual(true)
+  })
+})
+
 describe('date which is not later than date', () => {
   it.each([
     ['empty string', ['', ''], true],
@@ -200,7 +232,14 @@ describe('validates edit personal contact details request with spec', () => {
     mobileNumber: 'Enter a mobile number in the correct format.',
     phoneNumber: 'Enter a phone number in the correct format.',
   }
-  it.each([['empty string', testRequest, personDetailsValidation(false), expectedResult]])(
+  it.each([
+    [
+      'empty string',
+      testRequest,
+      personDetailsValidation({ ...testRequest, editingMainAddress: false }),
+      expectedResult,
+    ],
+  ])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
       expect(validateWithSpec(a, b)).toEqual(expected)
@@ -223,7 +262,14 @@ describe('validates edit main address request with spec', () => {
     startDate: 'Enter or select a start date.',
     verified: 'Select yes if the address is verified.',
   }
-  it.each([['empty string', testRequest, personDetailsValidation(true), expectedResult]])(
+  it.each([
+    [
+      'empty string',
+      testRequest,
+      personDetailsValidation({ ...testRequest, editingMainAddress: true }),
+      expectedResult,
+    ],
+  ])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
       expect(validateWithSpec(a, b)).toEqual(expected)
@@ -277,7 +323,7 @@ describe(`validates appointment repeat request with spec when no repeating optio
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
     [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-numberOfAppointments`]: 'Enter the number of times the appointment will repeat',
+    [`appointments-${crn}-${id}-numberOfRepeatAppointments`]: 'Enter the number of times the appointment will repeat',
   }
   const args: AppointmentsValidationArgs = {
     crn,
@@ -306,7 +352,7 @@ describe(`validates appointment repeat request with spec when no repeating optio
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
     [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-numberOfAppointments`]: 'Enter the number of times the appointment will repeat',
+    [`appointments-${crn}-${id}-numberOfRepeatAppointments`]: 'Enter the number of times the appointment will repeat',
   }
   const args: AppointmentsValidationArgs = {
     crn,

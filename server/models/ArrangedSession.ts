@@ -33,8 +33,9 @@ export class ArrangedSession {
     period: 'week' | 'month' = 'week',
     increment = 1,
   ): AppointmentSession[] {
-    const hasRepeatAppointments = appointment.repeating === 'Yes' && appointment.numberOfAppointments
-    const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment.numberOfAppointments, 10) : 0
+    const hasRepeatAppointments =
+      appointment.repeating === 'Yes' && parseInt(appointment.numberOfRepeatAppointments, 10) > 0
+    const numberOfRepeatedAppts = hasRepeatAppointments ? parseInt(appointment.numberOfRepeatAppointments, 10) : 0
     return Array.from(Array(numberOfRepeatedAppts)).map((_, i) => {
       if (period === 'week') {
         return this.generateRepeatWeeklyAppointment({ appointment, weeksInFuture: (i + 1) * increment })

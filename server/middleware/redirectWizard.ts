@@ -9,12 +9,16 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
     const { data } = req.session
     for (const requiredValue of requiredValues) {
       const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
+      const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
       const value = getDataValue(data, ['appointments', crn, id, ...path])
-      if (!value) {
+      const makeRedirect =
+        (repeatAppointmentsEnabled && requiredValue === 'repeating' && !value) ||
+        (requiredValue !== 'repeating' && !value)
+      if (makeRedirect) {
         if (!isValidCrn(crn) || !isValidUUID(id)) {
           return renderError(404)(req, res)
         }
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/type`)
+        return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
       }
     }
     return next()

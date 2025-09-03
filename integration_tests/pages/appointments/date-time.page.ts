@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import Page from '../page'
 
 export default class AppointmentDateTimePage extends Page {
@@ -30,7 +31,12 @@ export default class AppointmentDateTimePage extends Page {
   }
 
   getActiveDayButton = () => {
-    return cy.get('.moj-datepicker__button--today')
+    return cy.get('.moj-datepicker__button--current')
+  }
+
+  getNextDayButton = () => {
+    const nextDay = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
+    return cy.get(`[data-testid="${nextDay}"]`)
   }
 
   getDatePickerInput = () => {

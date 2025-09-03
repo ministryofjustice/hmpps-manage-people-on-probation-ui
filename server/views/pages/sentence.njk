@@ -1,11 +1,13 @@
 {% extends "../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: [sentenceDetails.sentence.order.description, "Sentence"] }) %}
+{% set pageTitle = makePageTitle({
+    pageHeading: [sentenceDetails.sentence.order.description, "Sentence"]
+}) %}
 {% set currentNavSection = 'sentence' %}
 {% set currentSectionName = 'Sentence' %}
 {% set headerPersonName = sentenceDetails.personSummary.name.forename + ' ' + sentenceDetails.personSummary.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = sentenceDetails.personSummary.dateOfBirth  %}
-{% set headerGender = sentenceDetails.personSummary.gender  %}
+{% set headerDob = sentenceDetails.personSummary.dateOfBirth %}
+{% set headerGender = sentenceDetails.personSummary.gender %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -29,86 +31,78 @@
 {% block pageContent %}
     {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
     <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
-      {% set items = [] %}
-      {% set eventNumber = sentenceDetails.sentence.offenceDetails.eventNumber %}
-      {% if sentenceDetails.sentenceSummaryList.length > 0 %}
-          {% for sentence in sentenceDetails.sentenceSummaryList %}
-            {% set isActive = sentence.eventNumber === eventNumber %}
-            {% set items = items.concat(
-                    {
+        <div class="govuk-grid-column-one-quarter">
+            {% set items = [] %}
+            {% set eventNumber = sentenceDetails.sentence.offenceDetails.eventNumber %}
+            {% if sentenceDetails.sentenceSummaryList.length > 0 %}
+                {% for sentence in sentenceDetails.sentenceSummaryList %}
+                    {% set isActive = sentence.eventNumber === eventNumber %}
+                    {% set items = items.concat({
                         "text": sentence.description,
                         href: "/case/" + crn + "/sentence?number=" + sentence.eventNumber,
                         active: isActive
-                    }
-                )
-            %}
-          {% endfor %}
-      {% else %}
-           {% set items = items.concat(
-                    {
-                        "text": 'No active sentence',
-                        href: "",
-                        active: true
-                    }
-                )
-            %}
-      {% endif %}
-      {% set items = items.concat({"text": "Probation history", href: "/case/" + crn + "/sentence/probation-history"}) %}
+                    })
+ %}
+                {% endfor %}
+            {% else %}
+                {% set items = items.concat({"text": 'No active sentence', href: "", active: true})
+ %}
+            {% endif %}
+            {% set items = items.concat({"text": "Probation history", href: "/case/" + crn + "/sentence/probation-history"}) %}
 
-      {{ mojSideNavigation({
+            {{ mojSideNavigation({
           label: 'Side navigation',
           items: items,
           classes: 'govuk-!-padding-top-0'
         }) }}
-  </div>
-      <div class="govuk-grid-column-three-quarters">
-          {% set sentence = sentenceDetails.sentence %}
-          {% if sentence %}
-            <h2 class="govuk-heading-m govuk-!-margin-bottom-2"  data-qa="pageHeading">
-                {% if sentence.order.description %}
-                    {{ sentence.order.description }}
-                {% else %}
+        </div>
+        <div class="govuk-grid-column-three-quarters">
+            {% set sentence = sentenceDetails.sentence %}
+            {% if sentence %}
+                <h3 class="govuk-heading-m govuk-!-margin-bottom-2"  data-qa="pageHeading">
+                    {% if sentence.order.description %}
+                        {{ sentence.order.description }}
+                    {% else %}
                     Pre-Sentence
                 {% endif %}
-            </h2>
+                </h3>
 
-            {% set hasAdditionalOffences = sentence.offenceDetails.additionalOffences and sentence.offenceDetails.additionalOffences.length > 0 %}
-              {% set additionalOffences %}
-                  {% if hasAdditionalOffences %}
-                      <ol class="govuk-list{% if sentence.offenceDetails.additionalOffences > 1 %} govuk-list--number{% endif %}">
-                          {% for additionalOffence in sentence.offenceDetails.additionalOffences %}
-                              <li>{{ additionalOffence.description }} ({{ additionalOffence.count }} count)</li>
-                          {% endfor %}
-                      </ol>
+                {% set hasAdditionalOffences = sentence.offenceDetails.additionalOffences and sentence.offenceDetails.additionalOffences.length > 0 %}
+                {% set additionalOffences %}
+                {% if hasAdditionalOffences %}
+                    <ol class="govuk-list{% if sentence.offenceDetails.additionalOffences > 1 %} govuk-list--number{% endif %}">
+                        {% for additionalOffence in sentence.offenceDetails.additionalOffences %}
+                            <li>{{ additionalOffence.description }} ({{ additionalOffence.count }} count)</li>
+                        {% endfor %}
+                    </ol>
 
-                      <a href="/case/{{ crn }}/sentence/offences/{{ sentence.offenceDetails.eventNumber }}">View additional offence details</a>
-                  {% endif %}
-            {% endset %}
+                    <a href="/case/{{ crn }}/sentence/offences/{{ sentence.offenceDetails.eventNumber }}">View additional offence details</a>
+                {% endif %}
+                {% endset %}
 
-            {% set hasCourtDocuments = sentence.courtDocuments and sentence.courtDocuments.length > 0 %}
-              {% set courtDocuments %}
-                  <ul class="govuk-list govuk-!-margin-top-0">
-                      {% for doc in sentence.courtDocuments %}
-                          <li>
-                              <a href="personal-details/documents/{{ doc.id }}/download" download="{{ doc.documentName }}">{{ doc.documentName }}</a><br>
-                              <span class="govuk-!-font-size-16">
-                        {% if doc.lastSaved %}
+                {% set hasCourtDocuments = sentence.courtDocuments and sentence.courtDocuments.length > 0 %}
+                {% set courtDocuments %}
+                <ul class="govuk-list govuk-!-margin-top-0">
+                    {% for doc in sentence.courtDocuments %}
+                        <li>
+                            <a href="personal-details/documents/{{ doc.id }}/download" download="{{ doc.documentName }}">{{ doc.documentName }}</a><br>
+                            <span class="govuk-!-font-size-16">
+                                {% if doc.lastSaved %}
                             Last updated {{ doc.lastSaved | dateWithYearShortMonth }}
-                        {% else %}
+                                {% else %}
                             Unavailable
                         {% endif %}
-                    </span>
-                          </li>
-                      {% endfor %}
-                  </ul>
-            {% endset %}
+                            </span>
+                        </li>
+                    {% endfor %}
+                </ul>
+                {% endset %}
 
-            {% set hasAdditionalSentences = sentence.conviction.additionalSentences and sentence.conviction.additionalSentences.length > 0 %}
-              {% set additionalSentences %}
-                  {% for additionalSentence in sentence.conviction.additionalSentences %}
-                      {% set detailsHtml %}
-                          {{ govukSummaryList({
+                {% set hasAdditionalSentences = sentence.conviction.additionalSentences and sentence.conviction.additionalSentences.length > 0 %}
+                {% set additionalSentences %}
+                {% for additionalSentence in sentence.conviction.additionalSentences %}
+                    {% set detailsHtml %}
+                    {{ govukSummaryList({
                               rows: [
                                   {
                                       key: { text: 'Sentence' },
@@ -128,25 +122,25 @@
                                   }
                               ]
                           }) }}
-                      {% endset %}
-                      {{ govukDetails({
+                    {% endset %}
+                    {{ govukDetails({
                           classes: 'govuk-!-margin-bottom-1',
                           summaryText: additionalSentence.description,
                           html: detailsHtml
                       }) }}
-                  {% endfor %}
-            {% endset %}
+                {% endfor %}
+                {% endset %}
 
-            {% set hasLicenceConditions = sentence.licenceConditions and sentence.licenceConditions.length > 0 %}
-              {% set notes = '' %}
-              {% set licenceConditions %}
-                  {% for licenceCondition in sentence.licenceConditions %}
-                      {% set notes = '' %}
-                      {% for lcNote in licenceCondition.licenceConditionNotes %}
-                          {% set notes = notes.concat(appNote(lcNote, "/case/" + crn + "/sentence/licence-condition/" + licenceCondition.id + "/note/" + lcNote.id)) %}
-                      {% endfor %}
-                      {% set licenceHtml %}
-                          {{ govukSummaryList({
+                {% set hasLicenceConditions = sentence.licenceConditions and sentence.licenceConditions.length > 0 %}
+                {% set notes = '' %}
+                {% set licenceConditions %}
+                {% for licenceCondition in sentence.licenceConditions %}
+                    {% set notes = '' %}
+                    {% for lcNote in licenceCondition.licenceConditionNotes %}
+                        {% set notes = notes.concat(appNote(lcNote, "/case/" + crn + "/sentence/licence-condition/" + licenceCondition.id + "/note/" + lcNote.id)) %}
+                    {% endfor %}
+                    {% set licenceHtml %}
+                    {{ govukSummaryList({
                               rows: [
                                   {
                                       key: { text: 'Subtype' },
@@ -166,27 +160,26 @@
                                   }
                               ]
                           }) }}
-                      {% endset %}
-                      {{ govukDetails({
+                    {% endset %}
+                    {{ govukDetails({
                           classes: 'govuk-!-margin-bottom-1',
                           summaryText: licenceCondition.mainDescription,
                           html: licenceHtml
                       }) }}
-                  {% endfor %}
-            {% endset %}
+                {% endfor %}
+                {% endset %}
 
-
-            {% set hasRequirements = sentence.requirements and sentence.requirements.length > 0 %}
-              {% set requirements %}
-                  {% for requirement in sentence.requirements %}
-                  {% set reqSummary = requirement.description %}
-                   {% set reqNotes = '' %}
-                      {% for reqNote in requirement.requirementNotes %}
-                          {% set reqNotes = reqNotes.concat(appNote(reqNote, "/case/" + crn + "/sentence/requirement/" + requirement.id + "/note/" + reqNote.id)) %}
-                      {% endfor %}
-                      {% set completedRar = requirement.rar.completed + requirement.rar.nsiCompleted  %}
-                      {% set requirementHtml %}
-                          {{ govukSummaryList({
+                {% set hasRequirements = sentence.requirements and sentence.requirements.length > 0 %}
+                {% set requirements %}
+                {% for requirement in sentence.requirements %}
+                    {% set reqSummary = requirement.description %}
+                    {% set reqNotes = '' %}
+                    {% for reqNote in requirement.requirementNotes %}
+                        {% set reqNotes = reqNotes.concat(appNote(reqNote, "/case/" + crn + "/sentence/requirement/" + requirement.id + "/note/" + reqNote.id)) %}
+                    {% endfor %}
+                    {% set completedRar = requirement.rar.completed + requirement.rar.nsiCompleted %}
+                    {% set requirementHtml %}
+                    {{ govukSummaryList({
                               rows: [
                                   {
                                       key: { text: 'Length' },
@@ -226,17 +219,17 @@
                                   }
                               ]
                           }) }}
-                      {% endset %}
-                      {{ govukDetails({
+                    {% endset %}
+                    {{ govukDetails({
                           classes: 'govuk-!-margin-bottom-1',
                           summaryText: reqSummary,
                           html: requirementHtml
                       }) }}
-                  {% endfor %}
-            {% endset %}
+                {% endfor %}
+                {% endset %}
 
-            {% set offence %}
-                  {{ govukSummaryList({
+                {% set offence %}
+                {{ govukSummaryList({
                       rows: [
                           {
                               key: { html: '<span data-qa="mainOffenceLabel">Main offence</span>' },
@@ -256,10 +249,10 @@
                           }
                       ]
                   }) }}
-            {% endset %}
+                {% endset %}
 
-            {% set conviction %}
-                  {{ govukSummaryList({
+                {% set conviction %}
+                {{ govukSummaryList({
                       rows: [
                           {
                               key: { html: '<span data-qa="sentencingCourtLabel">Sentencing court</span>' },
@@ -279,10 +272,10 @@
                           }
                       ]
                   }) }}
-            {% endset %}
+                {% endset %}
 
-            {% set sentence %}
-                  {{ govukSummaryList({
+                {% set sentence %}
+                {{ govukSummaryList({
                       rows: [
                           {
                               key: { html: '<span data-qa="orderDescriptionLabel">Order</span>' },
@@ -326,37 +319,37 @@
                           }
                       ]
                   }) }}
-            {% endset %}
+                {% endset %}
 
-            {{ appSummaryCard({
+                {{ appSummaryCard({
                   attributes: {'data-qa': 'offenceCard'},
                   titleText: 'Offence',
+                  headingLevel: 4,
                   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
                   html: offence
             }) }}
 
-            {{ appSummaryCard({
+                {{ appSummaryCard({
                   attributes: {'data-qa': 'convictionCard'},
                   titleText: 'Conviction',
+                  headingLevel: 4,
                   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
                   html: conviction
             }) }}
 
-            {{ appSummaryCard({
+                {{ appSummaryCard({
                   attributes: {'data-qa': 'sentenceCard'},
                   titleText: 'Sentence',
+                  headingLevel: 4,
                   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
                   html: sentence
             }) }}
-          </div>
-          {% else %}
-          <div data-qa="no-active-sentence">
-          <h3 class="govuk-heading-m govuk-!-margin-top-0">No active sentence</h3>
-          <p>This person does not have any active sentences.</p>
-          </div>
-          {% endif %}
+            </div>
+        {% else %}
+            <div data-qa="no-active-sentence">
+                <h4 class="govuk-heading-m govuk-!-margin-top-0">No active sentence</h4>
+                <p>This person does not have any active sentences.</p>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
-
-
-

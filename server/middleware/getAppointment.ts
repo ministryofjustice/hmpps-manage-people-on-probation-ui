@@ -4,23 +4,29 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
-import { getDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
-import { Location } from '../data/model/caseload'
+import { Location, Team } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn, id } = req.params
-    const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+    const { username: loggedInUsername = '' } = res.locals.user
+    const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
     const masClient = new MasApiClient(token)
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
+    let userIsAttending = null
+    if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
+      userIsAttending = req.session.data.appointments[crn][id].user.username === loggedInUsername
+    }
     let appointment: AppointmentLocals = {
       meta: {
         isVisor: currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
         forename,
         change: (req?.query?.change as string) || null,
+        userIsAttending,
       },
     }
     const appointmentSession: AppointmentSession = getDataValue(data, ['appointments', crn, id]) as Record<
@@ -29,7 +35,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     >
     if (appointmentSession) {
       const {
-        user: { username, locationCode, teamCode },
+        user: { username: staffId = null, locationCode = null, providerCode = null, teamCode = null } = {},
         type: typeId,
         visorReport,
         eventId,
@@ -52,41 +58,74 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      if (eventId) {
+
+      if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
-          sentenceRequirement = sentenceObj.requirements.find(
+          sentenceRequirement = sentenceObj?.requirements?.find(
             requirement => requirement.id === parseInt(requirementId, 10),
           )
         }
         if (licenceConditionId) {
-          sentenceLicenceCondition = sentenceObj.licenceConditions.find(
+          sentenceLicenceCondition = sentenceObj?.licenceConditions?.find(
             lc => lc.id === parseInt(licenceConditionId, 10),
           )
         }
         if (nsiId) {
-          sentenceNsi = sentenceObj.nsis.find(n => n.id === parseInt(nsiId, 10))
+          sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
-      const location: Location =
-        locationCode && username
-          ? req.session.data.locations[username].find(l => l.id === parseInt(locationCode, 10))
+      const selectedRegion =
+        providerCode && req?.session?.data?.providers?.[loggedInUsername]
+          ? req.session.data.providers[loggedInUsername].find(r => r.code === providerCode)?.name
           : null
+
+      // The region and team data in the drop-downs on attendance screen are dynamically updated
+      // If the region is updated on the attendance page, but the team is not, and back is selected,
+      // the team code in the session is not updated.  This is because the back link does not invoke
+      // a post.  The logic below will handle this scenario.
+      let selectedTeam: string
+      if (teamCode && providerCode?.substring(0, 3) !== teamCode?.substring(0, 3)) {
+        const team = req?.session?.data.teams?.[loggedInUsername] ? req.session.data.teams[loggedInUsername][0] : null
+        selectedTeam = team.description
+        setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], team.code)
+      } else {
+        selectedTeam =
+          teamCode && req?.session?.data.teams?.[loggedInUsername]
+            ? req.session.data.teams[loggedInUsername].find(t => t.code === teamCode)?.description
+            : null
+      }
+
+      const selectedUser =
+        staffId && req?.session?.data?.staff?.[loggedInUsername]
+          ? req.session.data.staff[loggedInUsername].find(s => s.username.toLowerCase() === staffId.toLowerCase())
+              ?.nameAndRole
+          : null
+      const noLocationValue = 'I do not need to pick a location'
+      const location: Location | string =
+        locationCode && locationCode !== noLocationValue && loggedInUsername
+          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
+          : 'Not needed'
       appointment = {
         ...appointment,
+        meta: {
+          ...appointment.meta,
+          hasLocation: locationCode !== noLocationValue,
+        },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {
-          sentence: sentence || null,
+          sentence: parseInt(eventId, 10) !== 0 ? sentence : null,
           requirement: sentenceRequirement?.description || null,
           licenceCondition: sentenceLicenceCondition?.mainDescription || null,
           nsi: sentenceNsi?.description || null,
+          forename: eventId === 'PERSON_LEVEL_CONTACT' ? forename : null,
         },
         attending: {
-          name: '',
-          team: '',
-          region: '',
+          name: selectedUser,
+          team: selectedTeam,
+          region: selectedRegion,
         },
         location,
         date,
@@ -94,7 +133,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         repeating,
         repeatingDates,
-        notes: notes || null,
+        notes: notes || 'None',
         sensitivity: sensitivity || 'No',
       }
     }

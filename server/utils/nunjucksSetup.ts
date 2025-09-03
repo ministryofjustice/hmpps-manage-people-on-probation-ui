@@ -7,6 +7,7 @@ import {
   initialiseName,
   yearsSince,
   dateWithYear,
+  dateToTimestamp,
   dateWithDayAndWithoutYear,
   addressToList,
   dateForSort,
@@ -54,6 +55,7 @@ import {
   isNotNull,
   decorateFormAttributes,
   groupByLevel,
+  getStaffRisk,
   hasValue,
   riskLevelLabel,
   toErrorList,
@@ -62,6 +64,8 @@ import {
   toSentenceDescription,
   concat,
   shortTime,
+  convertToTitleCase,
+  getPersonLevelTypes,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -106,6 +110,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   )
   njkEnv.addFilter('initialiseName', initialiseName)
   njkEnv.addFilter('dateWithYear', dateWithYear)
+  njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
   njkEnv.addFilter('yearsSince', yearsSince)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)
@@ -131,6 +136,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('shortTime', shortTime)
+  njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
@@ -139,6 +145,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
 
   njkEnv.addFilter('dateWithYearShortMonthAndTime', dateWithYearShortMonthAndTime)
   njkEnv.addGlobal('groupByLevel', groupByLevel)
+  njkEnv.addGlobal('getPersonLevelTypes', getPersonLevelTypes)
+  njkEnv.addGlobal('getStaffRisk', getStaffRisk)
   njkEnv.addGlobal('getComplianceStatus', getComplianceStatus)
   njkEnv.addGlobal('timeFromTo', timeFromTo)
   njkEnv.addGlobal('getRisksWithScore', getRisksWithScore)

@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/no-cycle
 import { Name } from './personalDetails'
 
 export interface ProfessionalContact {

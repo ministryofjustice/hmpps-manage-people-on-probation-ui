@@ -8,9 +8,10 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Caroline",
-            "surname": "Wolff"
+          "defaultUserDetails": {
+            "username": "PETER-PARKER",
+            "homeArea": "London",
+            "team": "Automated Allocation Team"
           },
           "providers": [
             {
@@ -28,26 +29,30 @@
           ],
           "teams": [
             {
-              "description": "A P Central Admissions Unit",
-              "code": "N50CAU"
+              "description": "Automated Allocation Team",
+              "code": "N07AAT"
             },
             {
-              "description": "Ascot House Approved Premises",
-              "code": "N50AHA"
+              "description": "Automation SPG",
+              "code": "N07CHT"
             },
             {
-              "description": "Atherton Court",
-              "code": "N50ACT"
+              "description": "Homelessness Prevention Team,",
+              "code": "N07HPT"
             }
           ],
           "users": [
+            {
+              "username": "andy-best",
+              "nameAndRole": "andy best (PS-PSO)"
+            },
             {
               "username": "peter-parker",
               "nameAndRole": "peter parker (PS-PSO)"
             },
             {
-              "username": "jon-smith",
-              "nameAndRole": "jon smith (PS-PSO)"
+              "username": "tony-pan",
+              "nameAndRole": "tony pan (PS-PSO)"
             }
           ]
         },
@@ -69,9 +74,10 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Caroline",
-            "surname": "Wolff"
+          "defaultUserDetails": {
+            "username": "peter-parker",
+            "homeArea": "London",
+            "team": "Automated Allocation Team"
           },
           "providers": [
             {
@@ -103,8 +109,8 @@
           ],
           "users": [
             {
-              "username": "peter-parker",
-              "nameAndRole": "peter parker (PS-PSO)"
+              "username": "max-parker",
+              "nameAndRole": "max parker (PS-PSO)"
             },
             {
               "username": "jon-smith",
@@ -133,9 +139,10 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Caroline",
-            "surname": "Wolff"
+          "defaultUserDetails": {
+            "username": "PETER-PARKER",
+            "homeArea": "London",
+            "team": "Automated Allocation Team"
           },
           "providers": [
             {
@@ -194,9 +201,10 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Caroline",
-            "surname": "Wolff"
+          "defaultUserDetails": {
+            "username": "PETER-PARKER",
+            "homeArea": "London",
+            "team": "Automated Allocation Team"
           },
           "providers": [
             {
@@ -228,8 +236,12 @@
           ],
           "users": [
             {
-              "username": "max-cool",
-              "nameAndRole": "max parker (PS-PSO)"
+              "username": "andy-best",
+              "nameAndRole": "andy best (PS-PSO)"
+            },
+            {
+              "username": "peter-parker",
+              "nameAndRole": "peter parker (PS-PSO)"
             },
             {
               "username": "tony-pan",
@@ -255,9 +267,10 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "name": {
-            "forename": "Caroline",
-            "surname": "Wolff"
+          "defaultUserDetails": {
+            "username": "PETER-PARKER",
+            "homeArea": "London",
+            "team": "Automated Allocation Team"
           },
           "providers": [
             {

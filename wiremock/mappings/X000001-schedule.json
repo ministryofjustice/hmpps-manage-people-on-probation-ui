@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/upcoming",
+        "urlPathPattern": "/mas/schedule/.*/upcoming",
         "method": "GET"
       },
       "response": {
@@ -16,48 +16,59 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
-          "appointments": [
-            {
-              "id": 1,
-              "type": "Phone call",
-              "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
-              "rarToolKit": "Choices and Changes",
-              "isSensitive": false,
-              "hasOutcome": false,
-              "isEmailOrTextFromPop": true,
-              "wasAbsent": true,
-              "notes": "Some notes",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+          "personSchedule": {
+            "size": 10,
+            "page": 0,
+            "totalResults": 12,
+            "totalPages": 1,
+            "appointments": [
+              {
+                "id": 1,
+                "type": "Phone call",
+                "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": false,
+                "acceptableAbsence": false,
+                "nonComplianceReason": "Was very argumentative and left the appointment",
+                "didTheyComply": false,
+                "isEmailOrTextFromPop": true,
+                "wasAbsent": true,
+                "notes": "Some notes",
+                "officerName": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                },
+                "lastUpdated": "2023-03-20",
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": false
               },
-              "lastUpdated": "2023-03-20",
-              "lastUpdatedBy": {
-                "forename": "Paul",
-                "surname": "Smith"
+              {
+                "id": 2,
+                "type": "Video call",
+                "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
+                "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": false,
+                "wasAbsent": true,
+                "notes": "Some notes",
+                "officerName": {
+                  "forename": "William",
+                  "surname": "Philips"
+                },
+                "lastUpdated": "2023-03-20",
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
               }
-            },
-            {
-              "id": 2,
-              "type": "Video call",
-              "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
-              "rarToolKit": "Choices and Changes",
-              "isSensitive": false,
-              "hasOutcome": false,
-              "wasAbsent": true,
-              "notes": "Some notes",
-              "officerName": {
-                "forename": "William",
-                "surname": "Philips"
-              },
-              "lastUpdated": "2023-03-20",
-              "lastUpdatedBy": {
-                "forename": "Paul",
-                "surname": "Smith"
-              }
-            }
-          ]
+            ]
+          }
         },
         "headers": {
           "Content-Type": "application/json"
@@ -66,7 +77,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/previous",
+        "urlPathPattern": "/mas/schedule/.*/previous",
         "method": "GET"
       },
       "response": {
@@ -80,93 +91,103 @@
             "crn": "X000001",
             "dateOfBirth": "1979-08-18"
           },
-          "appointments": [
-            {
-              "id": 3,
-              "type": "Video call",
-              "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
-              "rarToolKit": "Choices and Changes",
-              "isSensitive": false,
-              "hasOutcome": false,
-              "wasAbsent": true,
-              "absentWaitingEvidence": true,
-              "notes": "Some notes",
-              "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Paulie",
-                "surname": "Walnuts"
+          "personSchedule": {
+            "size": 10,
+            "page": 0,
+            "totalResults": 4,
+            "totalPages": 1,
+            "appointments": [
+              {
+                "id": 4,
+                "type": "Phone call",
+                "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
+                "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": true,
+                "outcome": "User-generated free text content",
+                "wasAbsent": true,
+                "notes": "Some notes",
+                "isAppointment": true,
+                "acceptableAbsence": true,
+                "isNationalStandard": true,
+                "officerName": {
+                  "forename": "Steve",
+                  "surname": "Bruce"
+                },
+                "lastUpdated": "2023-03-20",
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
               },
-              "lastUpdatedBy": {
-                "forename": "Paul",
-                "surname": "Smith"
-              }
-            },
-            {
-              "id": 4,
-              "type": "Phone call",
-              "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
-              "rarToolKit": "Choices and Changes",
-              "isSensitive": false,
-              "hasOutcome": true,
-              "outcome": "User-generated free text content",
-              "wasAbsent": true,
-              "notes": "Some notes",
-              "isAppointment": true,
-              "acceptableAbsence": true,
-              "isNationalStandard": true,
-              "officerName": {
-                "forename": "Steve",
-                "surname": "Bruce"
+              {
+                "id": 5,
+                "type": "Phone call",
+                "startDateTime": "2024-03-21T10:15:00.382936Z[Europe/London]",
+                "endDateTime": "2024-03-21T10:30:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": false,
+                "wasAbsent": true,
+                "notes": "Some notes",
+                "lastUpdated": "2023-03-20",
+                "officerName": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": false
               },
-              "lastUpdated": "2023-03-20",
-              "lastUpdatedBy": {
-                "forename": "Paul",
-                "surname": "Smith"
-              }
-            },
-            {
-              "id": 5,
-              "type": "Phone call",
-              "startDateTime": "2024-03-21T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-03-21T10:30:00.382936Z[Europe/London]",
-              "rarToolKit": "Choices and Changes",
-              "isSensitive": false,
-              "hasOutcome": false,
-              "wasAbsent": true,
-              "notes": "Some notes",
-              "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              {
+                "id": 6,
+                "type": "Other call",
+                "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
+                "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": false,
+                "wasAbsent": true,
+                "notes": "Some notes",
+                "lastUpdated": "2023-03-20",
+                "officerName": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
               },
-              "lastUpdatedBy": {
-                "forename": "Paul",
-                "surname": "Smith"
+              {
+                "id": 3,
+                "type": "Video call",
+                "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
+                "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": false,
+                "hasOutcome": false,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "notes": "Some notes",
+                "lastUpdated": "2023-03-20",
+                "officerName": {
+                  "forename": "Paulie",
+                  "surname": "Walnuts"
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
               }
-            },
-            {
-              "id": 6,
-              "type": "Other call",
-              "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
-              "rarToolKit": "Choices and Changes",
-              "isSensitive": false,
-              "hasOutcome": false,
-              "wasAbsent": true,
-              "notes": "Some notes",
-              "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
-              },
-              "lastUpdatedBy": {
-                "forename": "Paul",
-                "surname": "Smith"
-              }
-            }
-          ]
+            ]
+          }
         },
         "headers": {
           "Content-Type": "application/json"
@@ -175,7 +196,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/1",
+        "urlPattern": "/mas/schedule/.*/appointment/1",
         "method": "GET"
       },
       "response": {
@@ -258,7 +279,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/3",
+        "urlPattern": "/mas/schedule/.*/appointment/3",
         "method": "GET"
       },
       "response": {
@@ -301,7 +322,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/4",
+        "urlPattern": "/mas/schedule/.*/appointment/4",
         "method": "GET"
       },
       "response": {
@@ -375,7 +396,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/5",
+        "urlPattern": "/mas/schedule/.*/appointment/5",
         "method": "GET"
       },
       "response": {
@@ -417,7 +438,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/6",
+        "urlPattern": "/mas/schedule/.*/appointment/6",
         "method": "GET"
       },
       "response": {
@@ -433,7 +454,7 @@
           },
           "appointment": {
             "id": 6,
-            "type": "Other call",
+            "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
@@ -441,7 +462,7 @@
             "didTheyComply": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
             "location": {
               "buildingName": "The Building",
               "buildingNumber": "77",

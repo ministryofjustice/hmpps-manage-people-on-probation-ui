@@ -1,19 +1,9 @@
 {% extends "../_form.njk" %}
 {% set title = 'Will the appointment repeat?' %}
 {% block heading %}{% endblock %}
-{% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/date-time' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/date-time' %}
 
 {% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
-    {% endif %}
-  {% endif %}
 
   {% set repeatingReveal %}
   {{ govukRadios({
@@ -57,11 +47,11 @@
       },
       formGroup: {
         attributes: {
-          'data-numberOfAppointments': ''
+          'data-numberOfRepeatAppointments': ''
         }
       },
       classes: "govuk-input--width-3"
-    } | decorateFormAttributes(['appointments', crn, id, 'numberOfAppointments'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'numberOfRepeatAppointments'])) }}
 
   <div class="form-group" data-last-appointment="data-last-appointment">
     {% if lastAppointmentDate %}
@@ -80,7 +70,7 @@
       legend: {
         html: '<span data-qa="pageHeading">' + title + '</span>',
         classes: "govuk-fieldset__legend--l",
-        isPageHeading: true
+        isPageHeading: false
       }
     },
     items: [

@@ -1,14 +1,16 @@
 {% extends "../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Probation history", "Sentence"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Probation history", "Sentence"]
+}) %}
 {% set currentNavSection = 'sentence' %}
 {% set currentSectionName = 'Sentence' %}
 {% set headerPersonName = sentenceDetails.personSummary.name.forename + ' ' + sentenceDetails.personSummary.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = sentenceDetails.personSummary.dateOfBirth  %}
-{% set headerGender = sentenceDetails.personSummary.gender  %}
+{% set headerDob = sentenceDetails.personSummary.dateOfBirth %}
+{% set headerGender = sentenceDetails.personSummary.gender %}
 
 {% block beforeContent %}
-    {{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
       items: [
         {
           text: "Cases",
@@ -31,34 +33,30 @@
 {% endblock %}
 
 {% block pageContent %}
-    {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-one-quarter">
-          {% set items = [] %}
-          {% set eventNumber = sentenceDetails.sentence.offenceDetails.eventNumber %}
+  {%- from "moj/components/side-navigation/macro.njk" import mojSideNavigation -%}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-one-quarter">
+      {% set items = [] %}
+      {% set eventNumber = sentenceDetails.sentence.offenceDetails.eventNumber %}
 
-          {% if sentenceDetails.sentenceSummaryList.length > 0 %}
-              {% for sentence in sentenceDetails.sentenceSummaryList %}
-                {% set items = items.concat(
-                        {
-                            "text": sentence.description,
-                            href: "/case/" + crn + "/sentence?number=" + sentence.eventNumber
-                        }
-                    )
-                %}
-              {% endfor %}
-          {% else %}
-              {% set items = items.concat(
-                  {
-                      "text": 'No active sentence',
-                      href: "/case/" + crn + "/sentence",
-                      active: false
-                  }
-              )
-              %}
-          {% endif %}
+      {% if sentenceDetails.sentenceSummaryList.length > 0 %}
+        {% for sentence in sentenceDetails.sentenceSummaryList %}
+          {% set items = items.concat({
+            "text": sentence.description,
+            href: "/case/" + crn + "/sentence?number=" + sentence.eventNumber
+          })
+ %}
+        {% endfor %}
+      {% else %}
+        {% set items = items.concat({
+          "text": 'No active sentence',
+          href: "/case/" + crn + "/sentence",
+          active: false
+        })
+ %}
+      {% endif %}
 
-          {% set items = items.concat(
+      {% set items = items.concat(
               {
                   "text": "Probation History",
                   href: "/case/" + crn + "/sentence/probation-history",
@@ -67,38 +65,39 @@
             )
           %}
 
-          {{ mojSideNavigation({
+      {{ mojSideNavigation({
               label: 'Side navigation',
               items: items,
               classes: 'govuk-!-padding-top-0'
             }) }}
-      </div>
-      <div class="govuk-grid-column-three-quarters">
-        {% set sentence = sentenceDetails.sentence %}
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-2" id="probation-history" data-qa="pageHeading">Probation history</h2>
-        {% set history %}
-            {% set previousOrders %}
-                {% if sentenceDetails.probationHistory.numberOfTerminatedEvents == 1 %}
-                  <a href="/case/{{ crn }}/sentence/previous-orders">1 previous order</a><br />
+    </div>
+    <div class="govuk-grid-column-three-quarters">
+      {% set sentence = sentenceDetails.sentence %}
+      <h3 class="govuk-heading-m govuk-!-margin-bottom-2" id="probation-history" data-qa="pageHeading">Probation history</h3>
+      {% set history %}
+      {% set previousOrders %}
+      {% if sentenceDetails.probationHistory.numberOfTerminatedEvents == 1 %}
+        <a href="/case/{{ crn }}/sentence/previous-orders">1 previous order</a><br/>
                   Last ended on {{ sentenceDetails.probationHistory.dateOfMostRecentTerminatedEvent | dateWithYearShortMonth }}
-                {% elseif sentenceDetails.probationHistory.numberOfTerminatedEvents > 1 %}
-                  <a href="/case/{{ crn }}/sentence/previous-orders">{{ sentenceDetails.probationHistory.numberOfTerminatedEvents }} previous orders</a><br />
+      {% elseif sentenceDetails.probationHistory.numberOfTerminatedEvents > 1 %}
+        <a href="/case/{{ crn }}/sentence/previous-orders">{{ sentenceDetails.probationHistory.numberOfTerminatedEvents }} previous orders</a><br/>
                   Last ended on {{ sentenceDetails.probationHistory.dateOfMostRecentTerminatedEvent | dateWithYearShortMonth }}
-                {% else %}
+      {% else %}
                   No previous orders
                 {% endif %}
-            {% endset %}
+      {% endset %}
 
-            {% set previousProfessionalContacts %}
-                {% if sentenceDetails.probationHistory.numberOfProfessionalContacts > 0 %}
-                 <a href="/case/{{ crn }}/sentence/probation-history/staff-contacts/#previous">{{ sentenceDetails.probationHistory.numberOfProfessionalContacts }} previous contact{% if sentenceDetails.probationHistory.numberOfProfessionalContacts != 1 %}s{% endif %}</a>
-                {% else %}
+      {% set previousProfessionalContacts %}
+      {% if sentenceDetails.probationHistory.numberOfProfessionalContacts > 0 %}
+        <a href="/case/{{ crn }}/sentence/probation-history/staff-contacts/#previous">{{ sentenceDetails.probationHistory.numberOfProfessionalContacts }} previous contact{% if sentenceDetails.probationHistory.numberOfProfessionalContacts != 1 %}s{% endif %}
+        </a>
+      {% else %}
                   No previous staff contacts
                 {% endif %}
-            {% endset %}
+      {% endset %}
 
-            {% set probationHistory %}
-                {{ govukSummaryList({
+      {% set probationHistory %}
+      {{ govukSummaryList({
                     rows: [
                       {
                         key: { text: "Previous orders" },
@@ -115,18 +114,16 @@
                     ]
                 }) }}
 
-            {% endset %}
-        {% endset %}
+      {% endset %}
+      {% endset %}
 
-        {{ appSummaryCard({
+      {{ appSummaryCard({
             attributes: {'data-qa': 'probationHistoryCard'},
+            headingLevel: 4,
             titleText: 'Previous probation details',
             classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
             html: probationHistory
          }) }}
-      </div>
     </div>
+  </div>
 {% endblock %}
-
-
-

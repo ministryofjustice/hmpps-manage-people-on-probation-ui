@@ -42,6 +42,7 @@ export const isTodayOrLater = (args: any[]) => {
   if (!date.isValid) {
     return false
   }
+
   return date.startOf('day') >= DateTime.now().startOf('day')
 }
 
@@ -56,6 +57,25 @@ export const timeIsNotEarlierThan = (args: any[]) => {
     return true
   }
   return notEarlierThanTime > date
+}
+
+export const timeIsNowOrInFuture = (args: any[]) => {
+  if (!args[0] || !args[1]) {
+    return false
+  }
+  const [dateStr, timeStr] = args
+  const date = DateTime.fromFormat(dateStr, 'd/M/yyyy')
+  if (date.isValid) {
+    const time = DateTime.fromFormat(timeStr.toUpperCase(), 'h:mma')
+    const dateAndTime = date.set({
+      hour: time.hour,
+      minute: time.minute,
+      second: 0,
+      millisecond: 0,
+    })
+    return dateAndTime >= DateTime.now()
+  }
+  return true
 }
 
 export const isNotEarlierThan = (args: any[]) => {
@@ -150,12 +170,12 @@ function setArgs(fieldName: string, check: ErrorCheck, request: Validateable) {
   }
   let args: any[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
-    args = isObjectFieldName(check?.crossField)
-      ? [
-          getNestedValue(request, check?.crossField.slice(1, -1).split('][')),
-          getNestedValue(request, fieldName.slice(1, -1).split('][')),
-        ]
-      : [request[check.crossField], request[fieldName]]
+    args = [
+      isObjectFieldName(check?.crossField)
+        ? getNestedValue(request, check?.crossField.slice(1, -1).split(']['))
+        : request[check.crossField],
+      isObjectFieldName(fieldName) ? getNestedValue(request, fieldName.slice(1, -1).split('][')) : request[fieldName],
+    ]
   }
   return args
 }

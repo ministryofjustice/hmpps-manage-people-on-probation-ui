@@ -9,6 +9,8 @@ import personalDetails from './personalDetails'
 import flags from './flags'
 import appointments from './appointments'
 import overview from './overview'
+import userLocations from './userLocations'
+import activityLog from './activityLog'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -22,4 +24,6 @@ export default {
   ...flags,
   ...appointments,
   ...overview,
+  ...userLocations,
+  ...activityLog,
 }

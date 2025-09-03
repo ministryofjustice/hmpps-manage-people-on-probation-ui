@@ -101,6 +101,11 @@ export default {
   caval: {
     link: get('CAVAL_LINK', 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk', requiredInProduction),
   },
+  esupervision: {
+    link: get('ESUPERVISION_LINK', 'https://esupervision-dev.hmpps.service.justice.gov.uk/', {
+      requireInProduction: false,
+    }),
+  },
   epf2: {
     link: get('EPF2_LINK', 'https://epf.linkspace.uk', requiredInProduction),
   },
@@ -183,4 +188,11 @@ export default {
     { name: 'start', dateField: 'date' },
     { name: 'end', dateField: 'date' },
   ],
+  validMimeTypes: {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
+  maxFileSize: 5 * 1024 * 1024, // 5mb
+  fileUploadLimit: 5,
 }

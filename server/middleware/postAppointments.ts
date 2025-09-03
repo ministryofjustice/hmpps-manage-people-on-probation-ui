@@ -1,19 +1,19 @@
+/* eslint-disable import/no-extraneous-dependencies */
+import { Response } from 'supertest'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
-import { AppointmentRequestBody } from '../models/Appointments'
+import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
 
-export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<Response>> => {
+  return async (req, res) => {
     const { crn, id: uuid } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const { data } = req.session
     const {
-      user: { locationCode },
-      username,
-      team,
+      user: { username, locationCode, teamCode },
       type,
       date,
       start,
@@ -21,33 +21,45 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       interval,
       numberOfAppointments,
       eventId,
-      requirementId,
-      licenceConditionId,
-      nsiId,
+      requirementId = '',
+      licenceConditionId = '',
+      nsiId = '',
       notes,
-      sensitvity,
-    } = getDataValue(data, ['appointments', crn, uuid])
+      sensitivity,
+      until: untilDate,
+      visorReport,
+    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const body: AppointmentRequestBody = {
       user: {
         username,
-        teamCode: team,
-        locationCode,
+        teamCode,
+        locationCode: locationCode !== 'I do not need to pick a location' ? locationCode : '',
       },
       type,
       start: dateTime(date, start),
       end: dateTime(date, end),
       interval,
       numberOfAppointments: parseInt(numberOfAppointments, 10),
-      eventId,
       uuid,
       createOverlappingAppointment: true,
-      requirementId,
-      licenceConditionId,
-      nsiId,
+      until: dateTime(untilDate, end),
       notes,
-      sensitive: sensitvity === 'Yes',
+      sensitive: sensitivity === 'Yes',
+      visorReport: visorReport === 'Yes',
     }
-    await masClient.postAppointments(crn, body)
-    return next()
+    if (eventId !== 'PERSON_LEVEL_CONTACT') {
+      body.eventId = parseInt(eventId, 10)
+    }
+    if (requirementId) {
+      body.requirementId = parseInt(requirementId as string, 10)
+    }
+    if (licenceConditionId) {
+      body.licenceConditionId = parseInt(licenceConditionId as string, 10)
+    }
+    if (nsiId) {
+      body.nsiId = parseInt(nsiId as string, 10)
+    }
+    const response = await masClient.postAppointments(crn, body)
+    return response
   }
 }

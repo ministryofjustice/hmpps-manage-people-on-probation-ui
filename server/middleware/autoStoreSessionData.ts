@@ -1,21 +1,43 @@
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
-import { AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
+import { Data } from '../models/Data'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 
 export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, _res, next) => {
-    const newSessionData = req?.session?.data ?? {}
+    const newSessionData: Data = req?.session?.data ?? {}
     const { crn, id } = req.params
     const inputs: Record<string, any> = req.body ?? {}
 
-    const resetValues = (keys: Record<string, string | string[]>): void => {
-      Object.entries(keys).forEach(([key, value]) => {
+    const deleteValues = (keys: string[]): void => {
+      keys.forEach(key => {
         if ((req?.session?.data?.appointments as any)?.[crn]?.[id]?.[key]) {
-          setDataValue(newSessionData, ['appointments', crn, id, key], value)
+          delete newSessionData.appointments[crn][id][key as keyof AppointmentSession]
         }
       })
+    }
+
+    const resetSentenceSession = () => {
+      if (req.url.includes('/sentence')) {
+        if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
+          deleteValues(['requirementId', 'nsiId'])
+        }
+        if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
+          deleteValues(['licenceConditionId', 'nsiId'])
+        }
+        if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
+          deleteValues(['licenceConditionId', 'requirementId'])
+        }
+        if (
+          !req?.body?.appointments?.[crn]?.[id]?.licenceConditionId &&
+          !req?.body?.appointments?.[crn]?.[id]?.requirementId &&
+          !req?.body?.appointments?.[crn]?.[id]?.nsiId
+        ) {
+          deleteValues(['licenceConditionId', 'requirementId', 'nsiId'])
+        }
+      }
     }
 
     Object.entries(inputs).forEach(([key, _]: [string, any]) => {
@@ -37,18 +59,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
             const setPath = id ? [key, crn, id, valueKey] : [key, crn, valueKey]
             setDataValue(newSessionData, setPath, newValue)
           })
-          if (req?.body?.appointments?.[crn]?.[id]?.repeating === 'No') {
-            resetValues({ numberOfAppointments: '', interval: '', repeatingDates: [] })
-          }
-          if (req?.body?.appointments?.[crn]?.[id]?.licenceConditionId) {
-            resetValues({ requirementId: '', nsiId: '' })
-          }
-          if (req?.body?.appointments?.[crn]?.[id]?.requirementId) {
-            resetValues({ licenceConditionId: '', nsiId: '' })
-          }
-          if (req?.body?.appointments?.[crn]?.[id]?.nsiId) {
-            resetValues({ licenceConditionId: '', requirementId: '' })
-          }
+          resetSentenceSession()
         }
       }
     })

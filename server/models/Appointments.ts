@@ -1,22 +1,25 @@
 import { Name } from '../data/model/personalDetails'
+import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
 
 export interface AppointmentSession {
-  region?: string
-  team?: string
   user?: {
-    username: string
-    teamCode: string
-    locationCode: string
+    providerCode?: string
+    teamCode?: string
+    username?: string
+    locationCode?: string
   }
   type?: string
   visorReport?: 'Yes' | 'No'
   date?: string
   start?: string
   end?: string
-  interval?: string
+  until?: string
+  interval?: AppointmentInterval
   numberOfAppointments?: string
+  numberOfRepeatAppointments?: string
   eventId?: string
+  username?: string
   uuid?: string
   requirementId?: string
   licenceConditionId?: string
@@ -36,6 +39,12 @@ export interface AppointmentType {
 
 export interface AppointmentTypeResponse {
   appointmentTypes: AppointmentType[]
+}
+
+export interface NextComAppointmentResponse {
+  appointment: Activity
+  loggedInUserIsCOM: boolean
+  com: Name
 }
 
 export interface AppointmentLocationRequest {
@@ -69,20 +78,30 @@ export interface AppointmentRequestBody {
   end: Date
   interval: AppointmentInterval
   numberOfAppointments: number
-  eventId: number
+  eventId?: number
   uuid: string
   createOverlappingAppointment: true
-  requirementId: number
-  licenceConditionId: number
-  nsiId: number
-  until?: string
+  requirementId?: number
+  licenceConditionId?: number
+  nsiId?: number
+  until?: Date
   notes?: string
   sensitive?: boolean
+  visorReport?: boolean
 }
 
 export interface CheckAppointment {
   start: Date
   end: Date
+}
+
+export interface AppointmentPatch {
+  id: number
+  outcomeRecorded?: boolean
+  visorReport?: boolean
+  notes?: string
+  files?: string[]
+  sensitive?: boolean
 }
 
 export interface AppointmentChecks {
@@ -102,5 +121,7 @@ export interface LocalParams {
   crn: string
   id: string
   errors?: Errors
-  minDate?: string
+  _minDate?: string
+  _maxDate?: string
+  uploadedFiles?: any
 }

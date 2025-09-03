@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
@@ -8,11 +9,12 @@ import {
   completeTypePage,
   crn,
   uuid,
+  checkPopHeader,
 } from './imports'
 
-const loadPage = () => {
-  completeTypePage()
-  completeSentencePage()
+const loadPage = (date?: DateTime<true>) => {
+  completeSentencePage(1, '', '', date)
+  completeTypePage(1, false)
   completeAttendancePage()
   completeLocationPage()
 }
@@ -28,6 +30,9 @@ describe('Enter the date and time of the appointment', () => {
       loadPage()
       dateTimePage = new AppointmentDateTimePage()
       dateTimePage.getSummaryLink().click()
+    })
+    it('should render the pop header', () => {
+      checkPopHeader('Alton Berge', true)
     })
     it('should display the circumstances link', () => {
       dateTimePage.getSummaryLink().should('contain.text', `Alton’s circumstances`)
@@ -83,25 +88,62 @@ describe('Enter the date and time of the appointment', () => {
     })
   })
 
+  describe('Continue is clicked selecting a start time which is in the past', () => {
+    beforeEach(() => {
+      const newDate = DateTime.now().set({
+        hour: 10,
+        minute: 30,
+        second: 0,
+        millisecond: 0,
+      })
+      loadPage(newDate)
+      dateTimePage.getDatePickerToggle().click()
+      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
+        expect($error.text().trim()).to.include('The start time must be now or in the future')
+      })
+    })
+  })
+
+  describe('Continue is clicked entering a date which is invalid', () => {
+    beforeEach(() => {
+      loadPage()
+      dateTimePage.getDatePickerInput().clear().type('xxxxxxxx')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:00am')
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox(['Enter a date in the correct format, for example 17/5/2024'])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
+        expect($error.text().trim()).to.include('Enter a date in the correct format, for example 17/5/2024')
+      })
+    })
+  })
+
   describe('Continue is clicked selecting an end time the same as the start time', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      dateTimePage.checkErrorSummaryBox([
-        'The end time must be after the start time',
-        'The end time must be after the start time',
-      ])
+      dateTimePage.checkErrorSummaryBox(['The end time must be after the start time'])
     })
     it('should display the error messages', () => {
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include('The end time must be after the start time')
-      })
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
@@ -114,19 +156,13 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:00am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box again', () => {
-      dateTimePage.checkErrorSummaryBox([
-        'The end time must be after the start time',
-        'The end time must be after the start time',
-      ])
+      dateTimePage.checkErrorSummaryBox(['The end time must be after the start time'])
     })
     it('should display the error messages again', () => {
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include('The end time must be after the start time')
-      })
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
@@ -140,7 +176,7 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('11:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:15am')
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -157,9 +193,26 @@ describe('Enter the date and time of the appointment', () => {
     })
   })
 
+  describe('Continue is clicked entering a date which is later than 31/12/2199', () => {
+    beforeEach(() => {
+      loadPage()
+      dateTimePage.getDatePickerInput().type('1/1/2200')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('10:00am')
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('11:00am')
+      dateTimePage.getSubmitBtn().click()
+    })
+    it('should display the error summary box', () => {
+      dateTimePage.checkErrorSummaryBox(['The date must not be later than 31/12/2199'])
+    })
+    it('should display the error messages', () => {
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
+        expect($error.text().trim()).to.include('The date must not be later than 31/12/2199')
+      })
+    })
+  })
+
   describe('Date is selected', () => {
-    const now = new Date()
-    const value = `${now.getDate()}/${now.getMonth() + 1}/${now.getFullYear()}`
+    const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
@@ -173,9 +226,9 @@ describe('Enter the date and time of the appointment', () => {
     beforeEach(() => {
       loadPage()
       dateTimePage.getDatePickerToggle().click()
-      dateTimePage.getActiveDayButton().click()
+      dateTimePage.getNextDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
-      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am').tab()
+      dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
       dateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')

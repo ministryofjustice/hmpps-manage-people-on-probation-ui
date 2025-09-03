@@ -1,22 +1,12 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type' %}
+{% set backLink = change if change else '/case/' + crn + '/appointments' %}
 
 {% block heading %}{% endblock %}
 {% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
-    {% endif %}
-  {% endif %}
   {% set allSentences = [] %}
-  {% set sentenceReveal = '' %}
   {% for sentence in sentences %}
+    {% set sentenceReveal = '' %}
     {% set reveal = '' %}
     {% if sentence.requirements.length %}
       {% set requirements = [] %}
@@ -91,6 +81,10 @@
       {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
+      {% set hintText = '' %}
+      {% if sentence.order.startDate %}
+        {% set hintText = 'Sentence start date: ' + (sentence.order.startDate | dateWithYear) + '.' %}
+      {% endif %}
       {% set allSentences = (allSentences.push({
       text: sentence.order.description,
       value: sentence.id,
@@ -98,7 +92,7 @@
         classes: 'govuk-!-font-weight-bold'
       },
       hint: {
-        text: 'Sentence start date: ' + sentence.order.startDate | dateWithYear if sentence.order.startDate else ''
+        text: hintText
       },
       checked: sentences.length == 1,
       attributes: {
@@ -111,35 +105,35 @@
     }), allSentences) %}
     {% endif %}
   {% endfor %}
-  {% if appointment.type.isPersonLevelContact %}
-    {% set allSentences = (allSentences.push(
-    {
-    text: appointment.meta.forename,
-    value: '1',
-    attributes: {
-    'data-qa': 'personLevelContact'
-    },
-    label: {
+  {% set allSentences = (allSentences.push({
+      text: appointment.meta.forename,
+      value: 'PERSON_LEVEL_CONTACT',
+      label: {
+        classes: 'govuk-!-font-weight-bold',
+        attributes: {
+          'data-qa': 'personLevelContactLabel'
+        }
+      },
+      hint: {
+        text: 'Relates to the person.'
+      },
       attributes: {
-'data-qa': 'personLevelContactLabel'
+          'data-qa': 'personLevelContact',
+          'data-sentence': 'true',
+          'data-reset-conditional-radios': ''
       }
-    }
-    }), allSentences) %}
-  {% endif %}
+  }), allSentences) %}
   {{ govukRadios({
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title + '</span>',
-        isPageHeading: true,
-        classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6"
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--l"
       },
       attributes: {
         'data-qa': 'sentences'
       }
     },
-    hint: {
-        text: "Select all that apply."
-      },
     items: allSentences
 } | decorateFormAttributes(['appointments', crn, id, 'eventId'])) }}
 

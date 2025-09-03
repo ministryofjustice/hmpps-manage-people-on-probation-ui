@@ -1,5 +1,5 @@
+/* eslint-disable import/no-cycle */
 import { Response } from 'express'
-
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
@@ -9,12 +9,19 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentType } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
+import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { TierCalculation } from '../data/tierApiClient'
+import { ErrorSummary } from '../data/model/common'
+import { PersonAppointment } from '../data/model/schedule'
+import { FileCache } from '../@types'
 
 export interface AppointmentLocals {
   meta: {
     isVisor: boolean
     forename: string
     change: string
+    userIsAttending: boolean
+    hasLocation?: boolean
   }
   type?: AppointmentType
   visorReport?: string
@@ -23,13 +30,14 @@ export interface AppointmentLocals {
     requirement: string
     licenceCondition: string
     nsi: string
+    forename: string
   }
   attending?: {
     name: string
     team: string
     region: string
   }
-  location?: Location
+  location?: Location | string
   start?: string
   end?: string
   date?: string
@@ -49,6 +57,12 @@ interface Locals {
   requirement?: string
   appointment?: AppointmentLocals
   case?: PersonalDetails
+  headerPersonName?: string
+  headerCRN?: string
+  headerDob?: string
+  risksWidget?: RoshRiskWidgetDto
+  tierCalculation?: TierCalculation | ErrorSummary
+  predictorScores?: TimelineItem
   message?: string
   title?: string
   status?: number
@@ -74,6 +88,9 @@ interface Locals {
   lastAppointmentDate?: string
   version: string
   backLink: string
+  personAppointment?: PersonAppointment
+  fileErrorStatus?: number
+  uploadedFiles?: FileCache[]
 }
 
 export interface AppResponse extends Response {

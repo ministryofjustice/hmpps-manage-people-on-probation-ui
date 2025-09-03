@@ -36,8 +36,8 @@ import {
   AppointmentRequestBody,
   CheckAppointment,
   AppointmentTypeResponse,
-  AppointmentLocationResponse,
-  AppointmentLocationRequest,
+  AppointmentPatch,
+  NextComAppointmentResponse,
 } from '../models/Appointments'
 
 interface GetUserScheduleProps {
@@ -195,8 +195,9 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/personal-details/${crn}/document/${documentId}`, raw: true, responseType: 'arrayBuffer' })
   }
 
-  async getPersonSchedule(crn: string, type: string): Promise<Schedule> {
-    return this.get({ path: `/schedule/${crn}/${type}`, handle404: false })
+  async getPersonSchedule(crn: string, type: string, page: string, sortQuery?: string): Promise<Schedule> {
+    const queryParameters = `?${new URLSearchParams({ size: '10', page }).toString()}${sortQuery ?? ''}`
+    return this.get({ path: `/schedule/${crn}/${type}${queryParameters}`, handle404: false })
   }
 
   async getPersonAppointment(crn: string, appointmentId: string): Promise<PersonAppointment | null> {
@@ -236,6 +237,15 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/documents/${crn}${pageQuery}`, handle404: true })
   }
 
+  async patchDocuments(crn: string, id: string, data: Buffer) {
+    return this.patch({
+      path: `documents/${crn}/update/contact/${id}`,
+      data: data.buffer,
+      handle404: true,
+      handle500: true,
+    })
+  }
+
   async textSearchDocuments(
     crn: string,
     page: string,
@@ -272,12 +282,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/compliance/${crn}`, handle404: false })
   }
 
-  async postAppointments(crn: string, body: AppointmentRequestBody) {
+  async postAppointments(crn: string, body: AppointmentRequestBody): Promise<any> {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,
-      handle404: true,
-      handle500: true,
     })
   }
 
@@ -287,6 +295,13 @@ export default class MasApiClient extends RestClient {
       path: `/appointment/${crn}/check`,
       handle404: true,
       handle500: true,
+    })
+  }
+
+  async patchAppointment(body: AppointmentPatch): Promise<PersonAppointment> {
+    return this.patch({
+      data: body,
+      path: `/appointment`,
     })
   }
 
@@ -316,6 +331,11 @@ export default class MasApiClient extends RestClient {
 
   async getUserLocations(username: string): Promise<UserLocations> {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
+  }
+
+  async getOfficeLocationsByTeamAndProvider(providerCode: string, teamCode: string): Promise<UserLocations> {
+    const query = `?${new URLSearchParams({ providerCode, teamCode }).toString()}`
+    return this.get({ path: `/appointment/location/provider/${providerCode}/team/${teamCode}`, handle404: true })
   }
 
   async getUserSchedule({
@@ -359,5 +379,9 @@ export default class MasApiClient extends RestClient {
 
   async getAppointmentTypes(): Promise<AppointmentTypeResponse> {
     return this.get({ path: `/appointment/types`, handle404: false })
+  }
+
+  async getNextAppointment(username: string, crn: string, contactId: string): Promise<NextComAppointmentResponse> {
+    return this.get({ path: `/schedule/${crn}/next-appointment?username=${username}&contactId=${contactId}` })
   }
 }

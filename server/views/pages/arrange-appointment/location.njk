@@ -1,35 +1,34 @@
 {% extends "../_form.njk" %}
 {% set title = "Pick a location for this appointment" %}
 
-{% set backLink = appointment.change if appointment.change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance?back=attendance' %}
 
 {% block heading %}{% endblock %}
 {% block form %}
-  {% if errorMessages %}
-    {% set errorList = errorMessages | toErrorList %}
-    {% if errorList.length > 0 %}
-      {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
-    {% endif %}
-  {% endif %}
   {% set locationItems = [] %}
   {% for location in userLocations %}
-    {% set locationItems = (locationItems.push({text: location.description, value: location.id}), locationItems) %}
+    {% set locationItems = (locationItems.push({
+      text: location.description | convertToTitleCase,
+      value: location.code,
+      attributes: {
+        'data-qa': 'locationOption'
+      }
+    }), locationItems) %}
   {% endfor %}
-  {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
+  {% if userLocations.length > 0 %}
+    {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
+  {% endif %}
   {% set locationItems = (locationItems.push({text: 'The location I’m looking for is not in this list'}), locationItems) %}
-
-  {% set locationItems = (locationItems.push({text: 'I do not need to pick a location'}), locationItems) %}
+  {% if not appointment.type.isLocationRequired %}
+    {% set locationItems = (locationItems.push({text: 'I do not need to pick a location'}), locationItems) %}
+  {% endif %}
 
   {{ govukRadios({
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">' + title | safe + '</span>',
         classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6",
-        isPageHeading: true
+        isPageHeading: false
       },
       attributes: {
         'data-qa': 'locationCode'

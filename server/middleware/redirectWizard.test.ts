@@ -38,10 +38,10 @@ const mockAppointment: AppointmentSession = {
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  repeating: 'Yes',
-  interval: '',
-  numberOfAppointments: '',
-  uuid,
+  repeating: 'No',
+  interval: 'DAY',
+  numberOfAppointments: '1',
+  numberOfRepeatAppointments: '0',
 }
 
 const req = httpMocks.createRequest({
@@ -87,7 +87,7 @@ describe('/middleware/redirectWizard', () => {
       redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
@@ -101,7 +101,7 @@ describe('/middleware/redirectWizard', () => {
       redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
@@ -137,7 +137,7 @@ describe('/middleware/redirectWizard', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
-      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
