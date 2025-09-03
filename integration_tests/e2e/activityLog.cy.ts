@@ -30,6 +30,10 @@ const checkCompactViewPersists = () => {
   cy.get('.toggle-menu__list-item:nth-of-type(2) span').should('contain.text', 'Compact view')
 }
 
+const checkDefaultViewPersists = () => {
+  cy.get('.toggle-menu__list-item:nth-of-type(1) span').should('contain.text', 'Default view')
+}
+
 context('Activity log', () => {
   const today = new Date()
   const day = today.getDate()
@@ -598,5 +602,13 @@ context('Activity log', () => {
     checkCompactViewPersists()
     page.getPaginationLink(2).click()
     checkCompactViewPersists()
+  })
+  it('should persist the selected default view', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getDateToInput().type('11/1/2025')
+    cy.get('[data-qa="timeline1Card"] a').click()
+    cy.get('.govuk-breadcrumbs__list-item:nth-of-type(3) a').click()
+    checkDefaultViewPersists()
   })
 })

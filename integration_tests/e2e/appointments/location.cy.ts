@@ -1,13 +1,13 @@
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
-import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid } from './imports'
+import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import Page from '../../pages/page'
 
 const loadPage = (typeOptionIndex = 1) => {
-  completeTypePage(typeOptionIndex)
   completeSentencePage()
+  completeTypePage(typeOptionIndex)
   completeAttendancePage()
 }
 
@@ -22,6 +22,9 @@ describe('Pick a location for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationPage = new AppointmentLocationPage()
+    })
+    it('should render the pop header', () => {
+      checkPopHeader('Alton Berge', true)
     })
     it('should display the options', () => {
       locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')

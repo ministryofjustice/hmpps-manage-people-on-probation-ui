@@ -6,6 +6,15 @@ import { Data } from '../../models/Data'
 
 export default {}
 
+declare global {
+  namespace Express {
+    interface Request {
+      file?: Multer.File
+      files?: Multer.File[] | { [fieldname: string]: Multer.File[] }
+    }
+  }
+}
+
 declare module 'express-session' {
   // Declare that the session will potentially contain these additional fields
   interface SessionData {
@@ -23,7 +32,8 @@ declare module 'express-session' {
     errors?: Errors
     errorMessages?: Record<string, string>
     cache?: {
-      activityLog: ActivityLogCache
+      activityLog?: ActivityLogCache
+      uploadedFiles?: FileCache[]
     }
   }
 

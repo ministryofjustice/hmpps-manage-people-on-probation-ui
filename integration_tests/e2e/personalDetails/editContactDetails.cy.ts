@@ -98,7 +98,15 @@ context('Edit contact details', () => {
     page.getErrorSummaryLink(0).should('contain.text', expectedError)
     page.getElement('emailAddressError').should('be.visible').should('contain.text', expectedError)
   })
-
+  it('Submitting phone number, mobile number and email address with no values should post successfully', () => {
+    cy.visit('/case/X000001/personal-details/edit-contact-details')
+    const page = Page.verifyOnPage(EditContactDetails)
+    page.getElementInput('phoneNumber').clear()
+    page.getElementInput('mobileNumber').clear()
+    page.getElementInput('emailAddress').clear()
+    page.getElement('submitBtn').click()
+    page.getElement('updateBanner').should('contain.text', 'Contact details saved')
+  })
   it('Submitting successfully should redirect to Personal details screen with update banner', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = Page.verifyOnPage(EditContactDetails)

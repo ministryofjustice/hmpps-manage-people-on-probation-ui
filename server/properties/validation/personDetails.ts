@@ -10,14 +10,22 @@ import {
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
-export const personDetailsValidation = (editingMainAddress: boolean): ValidationSpec => ({
+interface Props {
+  phoneNumber?: string
+  mobileNumber?: string
+  emailAddress?: string
+  editingMainAddress: boolean
+}
+
+export const personDetailsValidation = ({
+  phoneNumber = '',
+  mobileNumber = '',
+  emailAddress = '',
+  editingMainAddress,
+}: Props): ValidationSpec => ({
   phoneNumber: {
-    optional: editingMainAddress,
+    optional: editingMainAddress === false || !phoneNumber,
     checks: [
-      {
-        validator: isNotEmpty,
-        msg: 'Enter a phone number.',
-      },
       {
         validator: isNumeric,
         msg: 'Enter a phone number in the correct format.',
@@ -30,12 +38,8 @@ export const personDetailsValidation = (editingMainAddress: boolean): Validation
     ],
   },
   mobileNumber: {
-    optional: editingMainAddress,
+    optional: editingMainAddress === false || !mobileNumber,
     checks: [
-      {
-        validator: isNotEmpty,
-        msg: 'Enter a mobile number.',
-      },
       {
         validator: isNumeric,
         msg: 'Enter a mobile number in the correct format.',
@@ -48,12 +52,8 @@ export const personDetailsValidation = (editingMainAddress: boolean): Validation
     ],
   },
   emailAddress: {
-    optional: editingMainAddress,
+    optional: editingMainAddress === false || !emailAddress,
     checks: [
-      {
-        validator: isNotEmpty,
-        msg: 'Enter an email address.',
-      },
       {
         validator: isEmail,
         msg: 'Enter an email address in the correct format.',

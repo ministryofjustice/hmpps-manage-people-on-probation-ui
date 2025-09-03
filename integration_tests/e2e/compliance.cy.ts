@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import CompliancePage from '../pages/compliance'
+import { checkPopHeader } from './appointments/imports'
 
 context('Compliance', () => {
   it('Compliance page is rendered', () => {
@@ -85,5 +86,13 @@ context('Compliance', () => {
       'contain.html',
       'There are multiple breach NSIs in progress.<br>Check and correct any issues in NDelius.',
     )
+  })
+  it('should display the PoP details header on the previous orders page', () => {
+    cy.visit('/case/X000001/sentence/previous-orders')
+    checkPopHeader()
+  })
+  it('should display the PoP details header on the previous order page', () => {
+    cy.visit('/case/X000001/sentence/previous-orders/3')
+    checkPopHeader()
   })
 })

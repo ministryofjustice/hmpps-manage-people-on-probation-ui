@@ -659,6 +659,22 @@
               {
                 "subType": "Language/Communication Concerns",
                 "type": "Adjourned - Other Report"
+              },
+              {
+                "subType": "Married / Civil partnership",
+                "type": "Relationship"
+              },
+              {
+                "subType": "Volunteering",
+                "type": "Employment"
+              },
+              {
+                "subType": "Has Dependents",
+                "type": "Dependents"
+              },
+              {
+                "subType": "Full Time Employed",
+                "type": "Employment"
               }
             ],
             "lastUpdated": "2023-04-06"

@@ -1,0 +1,117 @@
+{% extends "../_form.njk" %}
+{% from "_components/note/macro.njk" import appNote %}
+{% set title = 'Add a note (optional)' %}
+{% set appointment = personAppointment.appointment %}
+{% set multipartForm = true %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% set notes = '' %}
+{% if hasNotes %}
+    {% for appointmentNote in appointment.appointmentNotes %}
+        {% if appointmentNote.note %}
+            {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% set backLink = change if change else 
+    '/case/' + crn + '/appointments/appointment/' + id + '/manage/' + back %}
+{% block form %}
+    <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
+    {{ govukDetails({
+                          classes: 'govuk-!-margin-bottom-6',
+                          summaryText: 'Take notes using CRISS',
+                          html: 'some html'
+                      }) }}
+    {% if hasNotes %}
+        <section data-qa="previousNotes">
+            <h3 class="govuk-heading-m">Previous notes</h3>
+            {{ govukInsetText({
+  html: notes
+}) }}
+        </section>
+    {% endif %}
+    {{ govukButton({
+    text: "Show CRISS headers",
+    classes: "govuk-button--secondary",
+    id: "crissButton",
+    attributes: {
+        'data-qa': 'crissButton'
+    },
+    type: 'button'
+    }) }}
+    {{ govukTextarea({
+    id: "notes",
+    name: "notes",
+    rows: '10',
+    formGroup: {
+        attributes: { "data-qa": "notes"}
+    }
+}) }}
+    <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
+
+    {% set uploadHtml %}
+    <div class="govuk-grid-row govuk-body">
+        <div class="govuk-grid-column-full">
+
+            {{ govukFileUpload({
+                            id: "file-upload-1",
+                            name: "file",
+                            classes: 'moj-multi-file-upload__input',
+                            label: {
+                                text: "Upload files",
+                                classes: 'govuk-label--m'
+                            },
+                            attributes: { multiple: '' }
+                        }) }}
+
+            {{ govukButton({
+                            text: 'Upload file',
+                            classes: 'govuk-button--secondary moj-multi-file-upload__button'
+                        }) }}
+        </div>
+    </div>
+    {% endset %}
+
+    {{ mojMultiFileUpload({
+                        id: "file-upload-1",
+                        name: "fileName",
+                        label: { text: "Upload or drag and drop documents" },
+                        uploadedFiles: {
+                            heading: { text: 'Files added' },
+                            items: uploadedFiles
+                        },
+                        uploadHtml: uploadHtml
+                    }) }}
+
+    {{ govukRadios({
+        name: 'sensitive',
+        id: 'sensitive',
+    fieldset: {
+        legend: {
+            text: 'Does this appointment include sensitive information?',
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+        }
+    },
+    formGroup: {
+        attributes: {
+            'data-qa': 'sensitiveInformation'
+        }
+    },
+    hint: {
+        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+    },
+    items: [
+        {
+            value: 'Yes',
+            text: "Yes, it includes sensitive information"
+        },
+        {
+            value: 'No',
+            text: "No, it is not sensitive"
+        }
+    ],
+    errorMessage: {
+        text: "Please select an option"
+    }  if errorMessages.sensitive 
+}) }}
+{% endblock %}

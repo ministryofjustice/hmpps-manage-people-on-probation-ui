@@ -1,9 +1,11 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = 'Personal circumstances' %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Personal circumstances", "Personal details"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Personal circumstances", "Personal details"]
+}) %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
@@ -26,25 +28,29 @@
 {% endblock %}
 
 {% block content %}
-<h1 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h1>
+  {% if not hidePageHeader %}
+    {% include "../../partials/pop-header.njk" %}
+    <hr class="govuk-section-break--l">
+  {% endif %}
+  <h2 class="govuk-heading-l" data-qa="pageHeading">{{title}}</h2>
 
-{% if circumstances.circumstances.length > 0 %}
-  <h2 class="govuk-heading-m" data-qa="currentCircumstancesTitle">Current circumstances</h2>
-{% endif %}
-
-{% for circumstance in circumstances.circumstances %}
-
-  {% set notes = '' %}
-  {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
-  {% if hasNotes  %}
-    {% for circumstanceNote in circumstance.circumstanceNotes %}
-    {% if circumstanceNote.note %}
-      {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
-    {% endif %}
-    {% endfor  %}
+  {% if circumstances.circumstances.length > 0 %}
+    <h3 class="govuk-heading-m" data-qa="currentCircumstancesTitle">Current circumstances</h3>
   {% endif %}
 
-  {% set circumstanceHtml %}
+  {% for circumstance in circumstances.circumstances %}
+
+    {% set notes = '' %}
+    {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
+    {% if hasNotes %}
+      {% for circumstanceNote in circumstance.circumstanceNotes %}
+        {% if circumstanceNote.note %}
+          {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% set circumstanceHtml %}
     {{ govukSummaryList({
       rows: [
         {
@@ -77,34 +83,35 @@
     <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s" data-qa="lastUpdatedBy">
       {{ lastUpdatedBy(circumstance.lastUpdated, circumstance.lastUpdatedBy)}}
     </p>
-  {% endset %}
+    {% endset %}
 
-  {{ appSummaryCard({
+    {{ appSummaryCard({
     titleHtml: '<span class="govuk-!-font-weight-regular govuk-!-font-size-19">' + circumstance.type + '</span><br />' + circumstance.subType,
+    headingLevel: '4',
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: circumstanceHtml,
     attributes: {'data-qa': 'personalCircumstances'+ loop.index +'Card'},
     actions: {}
   }) }}
-{% endfor %}
+  {% endfor %}
 
-{% if circumstances.previousCircumstances.length > 0 %}
-  <h2 class="govuk-heading-m" data-qa="previousCircumstancesTitle">Previous circumstances</h2>
-{% endif %}
-
-{% for circumstance in circumstances.previousCircumstances %}
-
-  {% set notes = '' %}
-  {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
-  {% if hasNotes  %}
-    {% for circumstanceNote in circumstance.circumstanceNotes %}
-      {% if circumstanceNote.note %}
-        {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
-      {% endif %}
-    {% endfor  %}
+  {% if circumstances.previousCircumstances.length > 0 %}
+    <h3 class="govuk-heading-m" data-qa="previousCircumstancesTitle">Previous circumstances</h3>
   {% endif %}
 
-  {% set circumstanceHtml %}
+  {% for circumstance in circumstances.previousCircumstances %}
+
+    {% set notes = '' %}
+    {% set hasNotes = circumstance.circumstanceNotes.length > 0 %}
+    {% if hasNotes %}
+      {% for circumstanceNote in circumstance.circumstanceNotes %}
+        {% if circumstanceNote.note %}
+          {% set notes = notes.concat(appNote(circumstanceNote, '/case/' + crn + '/personal-details/circumstances/' + circumstance.id + '/note/' + circumstanceNote.id)) %}
+        {% endif %}
+      {% endfor %}
+    {% endif %}
+
+    {% set circumstanceHtml %}
     {{ govukSummaryList({
       rows: [
         {
@@ -137,15 +144,16 @@
     <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s" data-qa="lastUpdatedBy">
       {{ lastUpdatedBy(circumstance.lastUpdated, circumstance.lastUpdatedBy)}}
     </p>
-  {% endset %}
+    {% endset %}
 
-  {{ appSummaryCard({
+    {{ appSummaryCard({
     titleHtml: '<span class="govuk-!-font-weight-regular govuk-!-font-size-19">' + circumstance.type + '</span><br />' + circumstance.subType,
+     headingLevel: '4',
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
     html: circumstanceHtml,
     attributes: {'data-qa': 'previousCircumstances'+ loop.index +'Card'},
     actions: {}
   }) }}
-{% endfor %}
+  {% endfor %}
 
 {% endblock %}

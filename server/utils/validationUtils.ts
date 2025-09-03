@@ -170,12 +170,12 @@ function setArgs(fieldName: string, check: ErrorCheck, request: Validateable) {
   }
   let args: any[] = check?.length ? [check.length, value] : [value]
   if (check?.crossField) {
-    args = isObjectFieldName(check?.crossField)
-      ? [
-          getNestedValue(request, check?.crossField.slice(1, -1).split('][')),
-          getNestedValue(request, fieldName.slice(1, -1).split('][')),
-        ]
-      : [request[check.crossField], request[fieldName]]
+    args = [
+      isObjectFieldName(check?.crossField)
+        ? getNestedValue(request, check?.crossField.slice(1, -1).split(']['))
+        : request[check.crossField],
+      isObjectFieldName(fieldName) ? getNestedValue(request, fieldName.slice(1, -1).split('][')) : request[fieldName],
+    ]
   }
   return args
 }
