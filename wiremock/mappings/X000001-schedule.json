@@ -461,6 +461,7 @@
             "isSensitive": false,
             "didTheyComply": false,
             "hasOutcome": false,
+            "isInPast": true,
             "wasAbsent": true,
             "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
             "location": {

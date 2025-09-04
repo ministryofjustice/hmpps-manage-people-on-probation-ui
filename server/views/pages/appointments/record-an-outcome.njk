@@ -12,7 +12,7 @@
     classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
-        text: 'Confirm ' + personSummary.name.forename + ' attended and complied',
+        html: '<span data-qa="pageHeading">Confirm ' + personSummary.name.forename + ' attended and complied</span>',
         classes: 'govuk-fieldset__legend--l'
       }
     },
@@ -34,10 +34,14 @@
     text: "Select if they attended and complied"
   } if errorMessages.outcomeRecorded
   }) }}
+
   <div class="govuk-button-group">
     {{ govukButton({
-    text: "Continue"
-  }) }}
+     text: "Continue",
+       attributes: {
+         'data-qa': 'submit-btn'
+       }
+   }) }}
     <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{contactId}}/manage">Cancel and go back</a>
   </div>
 

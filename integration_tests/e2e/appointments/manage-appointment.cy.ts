@@ -91,6 +91,7 @@ describe('Manage an appointment', () => {
     describe('Log attended and complied appointment', () => {
       const name = 'Log attended and complied appointment'
       beforeEach(() => {
+        cy.task('stubFutureAppointmentManagedTypeNoNotes')
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })

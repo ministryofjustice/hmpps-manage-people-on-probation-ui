@@ -123,5 +123,6 @@ export interface LocalParams {
   errors?: Errors
   _minDate?: string
   _maxDate?: string
+  contactId?: string
   uploadedFiles?: any
 }
