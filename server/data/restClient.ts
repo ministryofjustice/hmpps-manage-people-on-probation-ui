@@ -19,6 +19,7 @@ interface Request {
   handle500?: boolean
   handle401?: boolean
   errorMessageFor500?: string
+  isMultipart?: boolean
 }
 
 interface RequestWithBody extends Request {
@@ -118,14 +119,15 @@ export default class RestClient {
       raw = false,
       retry = false,
       handle404 = false,
+      isMultipart = false,
     }: RequestWithBody,
   ): Promise<Response> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
 
     try {
-      const result = await superagent[method](`${this.apiUrl()}${path}`)
+      const req = superagent[method](`${this.apiUrl()}${path}`)
         .query(query)
-        .send(data)
+        // .send(data)
         .agent(this.agent)
         .use(restClientMetricsMiddleware)
         .retry(2, (err, _) => {
@@ -140,6 +142,22 @@ export default class RestClient {
         .responseType(responseType)
         .timeout(this.timeoutConfig())
 
+      if (isMultipart && data) {
+        // Expect data to be { fields?: Record<string, string>, files?: { fieldName: string, buffer: Buffer, filename: string }[] }
+        if (data.fields) {
+          for (const [key, value] of Object.entries(data.fields)) {
+            req.field(key, value as any)
+          }
+        }
+        if (data.files) {
+          for (const file of data.files) {
+            req.attach(file.fieldName, file.buffer, { filename: file.filename })
+          }
+        }
+      } else {
+        req.send(data)
+      }
+      const result = await req
       return raw ? (result as Response) : result.body
     } catch (error) {
       if (handle404 && error.response?.status === 404) return null
