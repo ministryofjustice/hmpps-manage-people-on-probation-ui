@@ -2,39 +2,62 @@ name: Veracode Static Analysis Scan
 
 on:
   workflow_call:
+    inputs:
+      veracode_app:
+        description: "Veracode application profile name"
+        type: string
+        required: false
+        default: "hmpps-manage-people-on-probation"
+      use_sandbox:
+        description: "Send scan to a Veracode sandbox (true for branches/PRs)"
+        type: boolean
+        required: false
+        default: false
+      sandbox_name:
+        description: "Explicit sandbox name when use_sandbox=true"
+        type: string
+        required: false
+      concurrency_group:
+        description: "Override queue key; leave blank to queue by app"
+        type: string
+        required: false
     secrets:
       VERACODE_API_ID:
         required: true
       VERACODE_API_KEY:
         required: true
 
+# Queue entire runs of this reusable workflow by app (safe default).
+concurrency:
+  group: ${{ inputs.concurrency_group != '' && inputs.concurrency_group || format('veracode-scan-{0}', inputs.veracode_app) }}
+  cancel-in-progress: false
+
 jobs:
   veracode_static_scan:
     name: Upload and Scan with Veracode Static Analysis
     runs-on: ubuntu-latest
-
-    concurrency:
-      group: veracode-scan-hmpps-manage-people-on-probation
-      cancel-in-progress: false
+    timeout-minutes: 90
 
     steps:
       - name: Checkout source code
         uses: actions/checkout@v4
 
+      # Package only tracked files (keeps artifact small & fast)
       - name: Package build output
         run: |
-          mkdir -p veracode-package
-          rsync -av --exclude 'veracode-package' ./ veracode-package/
-          cd veracode-package
-          zip -r ../veracode-artifact.zip .
+          # Safely capture tracked files (handles spaces/newlines)
+            mapfile -d '' -t files < <(git ls-files -z)
+            zip -r veracode-artifact.zip "${files[@]}"
         shell: bash
 
       - name: Upload and Scan with Veracode Static Analysis
         uses: veracode/veracode-uploadandscan-action@0.2.8
         with:
-          appname: hmpps-manage-people-on-probation
+          appname: ${{ inputs.veracode_app }}
           createprofile: true
           filepath: veracode-artifact.zip
           version: ${{ github.run_number }}
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
+          # When sandboxing, use explicit name or fall back to a unique branch/run id
+          sandboxname: ${{ inputs.use_sandbox && (inputs.sandbox_name != '' && inputs.sandbox_name || format('{0}-{1}', github.ref_name, github.run_id)) || '' }}
