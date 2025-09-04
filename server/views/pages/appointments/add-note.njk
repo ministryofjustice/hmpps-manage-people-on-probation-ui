@@ -5,6 +5,7 @@
 {% set multipartForm = true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% set notes = '' %}
+{% set submitButtonId = 'continueButton' %}
 {% if hasNotes %}
     {% for appointmentNote in appointment.appointmentNotes %}
         {% if appointmentNote.note %}
