@@ -45,7 +45,9 @@ jobs:
       # Package only tracked files (keeps artifact small & fast)
       - name: Package build output
         run: |
-          zip -r veracode-artifact.zip $(git ls-files)
+          # Safely capture tracked files (handles spaces/newlines)
+            mapfile -d '' -t files < <(git ls-files -z)
+            zip -r veracode-artifact.zip "${files[@]}"
         shell: bash
 
       - name: Upload and Scan with Veracode Static Analysis
