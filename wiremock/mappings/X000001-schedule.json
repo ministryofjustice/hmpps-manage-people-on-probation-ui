@@ -25,7 +25,7 @@
               {
                 "id": 1,
                 "type": "Phone call",
-                "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
+                "startDateTime": "2044-12-22T09:15:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
@@ -34,10 +34,12 @@
                 "didTheyComply": false,
                 "isEmailOrTextFromPop": true,
                 "wasAbsent": true,
-                "notes": "Some notes",
-                "officerName": {
-                  "forename": "Terry",
-                  "surname": "Jones"
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "officer": {
+                  "name": {
+                    "forename": "Terry",
+                    "surname": "Jones"
+                  }
                 },
                 "lastUpdated": "2023-03-20",
                 "lastUpdatedBy": {
@@ -48,17 +50,19 @@
               },
               {
                 "id": 2,
-                "type": "Video call",
-                "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
-                "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
+                "type": "Planned Video Contact (NS)",
+                "startDateTime": "2045-03-22T10:15:00.382936Z",
+                "endDateTime": "2045-03-22T10:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
-                "notes": "Some notes",
-                "officerName": {
-                  "forename": "William",
-                  "surname": "Philips"
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "officer": {
+                  "name": {
+                    "forename": "William",
+                    "surname": "Philips"
+                  }
                 },
                 "lastUpdated": "2023-03-20",
                 "lastUpdatedBy": {
@@ -100,20 +104,22 @@
               {
                 "id": 4,
                 "type": "Phone call",
-                "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
-                "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+                "startDateTime": "2024-03-22T08:15:00.382936Z",
+                "endDateTime": "2024-03-22T08:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": true,
                 "outcome": "User-generated free text content",
                 "wasAbsent": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "isAppointment": true,
                 "acceptableAbsence": true,
                 "isNationalStandard": true,
-                "officerName": {
-                  "forename": "Steve",
-                  "surname": "Bruce"
+                "officer": {
+                  "name": {
+                    "forename": "Steve",
+                    "surname": "Bruce"
+                  }
                 },
                 "lastUpdated": "2023-03-20",
                 "lastUpdatedBy": {
@@ -125,17 +131,19 @@
               {
                 "id": 5,
                 "type": "Phone call",
-                "startDateTime": "2024-03-21T10:15:00.382936Z[Europe/London]",
-                "endDateTime": "2024-03-21T10:30:00.382936Z[Europe/London]",
+                "startDateTime": "2024-03-21T10:15:00.382936Z",
+                "endDateTime": "2024-03-21T10:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Terry",
-                  "surname": "Jones"
+                "officer": {
+                  "name": {
+                    "forename": "Terry",
+                    "surname": "Jones"
+                  }
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
@@ -146,17 +154,19 @@
               {
                 "id": 6,
                 "type": "Other call",
-                "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
-                "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
+                "startDateTime": "2024-02-21T10:15:00.382936Z",
+                "endDateTime": "2024-02-21T10:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Terry",
-                  "surname": "Jones"
+                "officer": {
+                  "name": {
+                    "forename": "Terry",
+                    "surname": "Jones"
+                  }
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
@@ -166,19 +176,21 @@
               },
               {
                 "id": 3,
-                "type": "Video call",
-                "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
-                "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
+                "type": "Planned Video Contact (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
                 "absentWaitingEvidence": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Paulie",
-                  "surname": "Walnuts"
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
@@ -215,10 +227,10 @@
           },
           "appointment": {
             "id": 1,
-            "eventNumber": "",
+            "eventNumber": "12345",
             "type": "Phone call",
-            "startDateTime": "2024-12-22T09:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-12-22T09:15:00.382936Z[Europe/London]",
+            "startDateTime": "2024-12-22T09:15:00.382936Z",
+            "endDateTime": "2024-12-22T09:15:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [],
             "appointmentNote": null,
@@ -230,7 +242,10 @@
               "name": {
                 "forename": "Terry",
                 "surname": "Jones"
-              }
+              },
+              "teamCode": "1234",
+              "providerCode": "1234",
+              "username": "TerryJones"
             },
             "isInitial": true,
             "isNationalStandard": true,
@@ -289,7 +304,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/2",
+        "urlPattern": "/mas/schedule/.*/appointment/2",
         "method": "GET"
       },
       "response": {
@@ -305,10 +320,10 @@
           },
           "appointment": {
             "id": 2,
-            "eventNumber": "",
-            "type": "Video call",
-            "startDateTime": "2025-03-22T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2025-03-22T10:30:00.382936Z[Europe/London]",
+            "eventNumber": "12345",
+            "type": "Planned Office Visit (NS)",
+            "startDateTime": "2025-03-22T10:15:00.382936Z",
+            "endDateTime": "2025-03-22T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [],
             "appointmentNote": null,
@@ -318,13 +333,15 @@
             "officer": {
               "code": "",
               "name": {
-                "forename": "William",
-                "surname": "Philips"
-              }
+                "forename": "George",
+                "surname": "Parker"
+              },
+              "teamCode": "1234",
+              "providerCode": "N54",
+              "username": "george-parker"
             },
             "isInitial": true,
             "isNationalStandard": true,
-            "location": null,
             "rescheduled": true,
             "rescheduledStaff": true,
             "rescheduledPop": true,
@@ -363,7 +380,7 @@
             "outcome": "",
             "deliusManaged": true,
             "isVisor": true,
-            "eventId": 0,
+            "eventId": 49,
             "component": {
               "id": 0,
               "description": "",
@@ -400,8 +417,8 @@
             "id": 3,
             "eventNumber": "",
             "type": "Video call",
-            "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-02-12T10:15:00.382936Z",
+            "endDateTime": "2024-02-12T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [],
             "appointmentNote": null,
@@ -413,7 +430,10 @@
               "name": {
                 "forename": "Paulie",
                 "surname": "Walnuts"
-              }
+              },
+              "teamCode": "1234",
+              "providerCode": "1234",
+              "username": "PaulieWalnuts"
             },
             "isInitial": false,
             "isNationalStandard": false,
@@ -492,9 +512,9 @@
           "appointment": {
             "id": 4,
             "eventNumber": "",
-            "type": "Phone call",
-            "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+            "type": "Planned Telephone Contact (NS)",
+            "startDateTime": "2024-02-21T10:15:28.517Z",
+            "endDateTime": "2024-02-21T10:30:28.517Z",
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [
               {
@@ -511,7 +531,10 @@
               "name": {
                 "forename": "Steve",
                 "surname": "Bruce"
-              }
+              },
+              "teamCode": "1234",
+              "providerCode": "1234",
+              "username": "SteveBruce"
             },
             "isInitial": true,
             "isNationalStandard": true,
@@ -607,8 +630,8 @@
             "id": 5,
             "eventNumber": "",
             "type": "Phone call",
-            "startDateTime": "2024-03-21T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-21T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-03-21T10:15:00.382936Z",
+            "endDateTime": "2024-03-21T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [],
             "appointmentNote": null,
@@ -620,7 +643,10 @@
               "name": {
                 "forename": "Terry",
                 "surname": "Jones"
-              }
+              },
+              "teamCode": "1234",
+              "providerCode": "1234",
+              "username": "TerryJones"
             },
             "isInitial": true,
             "location": null,
@@ -694,10 +720,10 @@
           },
           "appointment": {
             "id": 6,
-            "eventNumber": "",
+            "eventNumber": "123456",
             "type": "Planned Office Visit (NS)",
-            "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-02-21T10:15:00.382936Z",
+            "endDateTime": "2024-02-21T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
             "appointmentNote": null,
@@ -710,7 +736,10 @@
               "name": {
                 "forename": "Terry",
                 "surname": "Jones"
-              }
+              },
+              "teamCode": "1234",
+              "providerCode": "1234",
+              "username": "TerryJones"
             },
             "isInitial": true,
             "isNationalStandard": true,
@@ -771,7 +800,6 @@
             "isPhoneCallFromPop": true,
             "isEmailOrTextToPop": true,
             "isPhoneCallToPop": true,
-            "isInPast": true,
             "isPastAppointment": true,
             "countsTowardsRAR": true,
             "lastUpdated": "2023-03-20",

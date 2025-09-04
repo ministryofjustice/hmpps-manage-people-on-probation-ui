@@ -15,7 +15,7 @@ const loadPage = (locations = true) => {
   completeTypePage()
   completeAttendancePage()
   if (locations) {
-    completeLocationPage(4)
+    completeLocationPage(5)
   }
 }
 describe('Arrange an appointment in another location', () => {

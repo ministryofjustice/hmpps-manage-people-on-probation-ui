@@ -243,7 +243,7 @@ context('Activity log', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getSelectedFiltersBox().should('not.exist')
     page.getKeywordsInput().should('have.value', '')
-    page.getCardHeader('timeline1').should('contain.text', 'Video call')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
   })
   it('should display the filter tag and filter the list if a date from and date to are submitted', () => {
     cy.visit('/case/X000001/activity-log')
@@ -276,7 +276,7 @@ context('Activity log', () => {
     page.getSelectedFiltersBox().should('not.exist')
     page.getDateFromInput().should('have.value', '')
     page.getDateToInput().should('have.value', '')
-    page.getCardHeader('timeline1').should('contain.text', 'Video call')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
@@ -370,7 +370,7 @@ context('Activity log', () => {
     page.getComplianceFilter(1).should('not.be.checked')
     page.getComplianceFilter(2).should('not.be.checked')
     page.getComplianceFilter(3).should('not.be.checked')
-    page.getCardHeader('timeline1').should('contain.text', 'Video call')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
@@ -383,7 +383,7 @@ context('Activity log', () => {
       'contain.text',
       'All links to log outcomes open in new tabs on NDelius.',
     )
-    page.getCardHeader('timeline1').should('contain.text', 'Video call')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
     page.getRowData('timeline1', 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
     page.getCardHeader('timeline2').should('contain.text', 'Phone call from Eula Schmeler')
     page.getRowData('timeline2', 'rarActivity', 'Value').should('contain.text', 'Stepping Stones')
@@ -410,7 +410,7 @@ context('Activity log', () => {
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
-    page.getCardHeader('timeline10').should('contain.text', 'Video call at 10:15am')
+    page.getCardHeader('timeline10').should('contain.text', 'Planned Video Contact (NS) at 10:15am')
   })
   it('should display the pagination navigation', () => {
     cy.visit('/case/X000001/activity-log')
@@ -531,7 +531,7 @@ context('Activity log', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
-    page.getActivity('1').should('contain.text', 'Video call')
+    page.getActivity('1').should('contain.text', 'Planned Video Contact (NS)')
     page.getActivity('2').should('contain.text', 'Phone call from Eula Schmeler')
     page.getActivity('3').should('contain.text', 'Planned appointment')
     page.getActivity('4').should('contain.text', 'Initial appointment')
@@ -540,7 +540,7 @@ context('Activity log', () => {
     page.getActivity('7').should('contain.text', 'Office appointment')
     page.getActivity('8').should('contain.text', 'Initial appointment')
     page.getActivity('9').should('contain.text', 'Initial appointment')
-    page.getActivity('10').should('contain.text', 'Video call')
+    page.getActivity('10').should('contain.text', 'Planned Video Contact (NS)')
   })
   it('should display the no results message when no results are returned', () => {
     cy.visit('/case/X000001/activity-log')

@@ -80,6 +80,64 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/schedule/X778160/next-appointment",
+        "method": "GET",
+        "queryParameters": {
+          "username": {
+            "matches": ".*"
+          },
+          "contactId": {
+            "matches": ".*"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "usernameIsCom": true,
+          "com": {
+            "forename": "Terry",
+            "surname": "Jones"
+          },
+          "appointment": null
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/schedule/X000001/next-appointment",
+        "method": "GET",
+        "queryParameters": {
+          "username": {
+            "matches": ".*"
+          },
+          "contactId": {
+            "matches": ".*"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "loggedInUserIsCOM": true,
+          "personManager": {
+            "name": {
+              "forename": "Terry",
+              "surname": "Jones"
+            }
+          },
+          "appointment": null
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }

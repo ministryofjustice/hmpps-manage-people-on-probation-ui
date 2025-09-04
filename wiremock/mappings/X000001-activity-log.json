@@ -31,18 +31,20 @@
           "activities": [
             {
               "id": 12,
-              "type": "Video call",
+              "type": "Planned Video Contact (NS)",
               "action": "Warning letter sent",
-              "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2045-03-22T10:15:00.382936Z",
+              "endDateTime": "2045-03-22T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": false,
               "wasAbsent": true,
               "appointmentNotes": [],
-              "officerName": {
-                "forename": "William",
-                "surname": "Philips"
+              "officer": {
+                "name": {
+                  "forename": "William",
+                  "surname": "Philips"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -53,8 +55,8 @@
             {
               "id": 11,
               "type": "Phone call",
-              "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2044-12-22T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2044-12-22T09:15:00.382936Z",
+              "endDateTime": "2044-12-22T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -76,9 +78,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -89,8 +93,8 @@
             {
               "id": 17,
               "type": "Planned appointment",
-              "startDateTime": "2024-03-26T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-03-26T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-03-26T10:15:00.382936Z",
+              "endDateTime": "2024-03-26T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": true,
@@ -101,9 +105,11 @@
               "absentWaitingEvidence": true,
               "appointmentNotes": [],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -114,8 +120,8 @@
               "id": 18,
               "type": "Initial appointment",
               "isInitial": true,
-              "startDateTime": "2024-03-25T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-03-25T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-03-25T10:15:00.382936Z",
+              "endDateTime": "2024-03-25T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": true,
@@ -154,9 +160,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -166,8 +174,8 @@
             {
               "id": 15,
               "type": "Office appointment",
-              "startDateTime": "2024-03-22T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-03-22T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-03-22T10:15:00.382936Z",
+              "endDateTime": "2024-03-22T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": true,
@@ -182,9 +190,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -194,8 +204,8 @@
             {
               "id": 14,
               "type": "Phone call",
-              "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-03-22T08:15:00.382936Z",
+              "endDateTime": "2024-03-22T08:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": false,
@@ -210,9 +220,11 @@
               "acceptableAbsence": true,
               "acceptableAbsenceReason": "Trains were on strike and lost phone",
               "isNationalStandard": true,
-              "officerName": {
-                "forename": "Steve",
-                "surname": "Bruce"
+              "officer": {
+                "name": {
+                  "forename": "Steve",
+                  "surname": "Bruce"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -223,8 +235,8 @@
             {
               "id": 16,
               "type": "Office appointment",
-              "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-02-21T10:15:00.382936Z",
+              "endDateTime": "2024-02-21T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": false,
@@ -240,9 +252,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -253,8 +267,8 @@
               "id": 19,
               "type": "Initial appointment",
               "isInitial": true,
-              "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-02-12T10:15:00.382936Z",
+              "endDateTime": "2024-02-12T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": true,
@@ -293,9 +307,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -306,8 +322,8 @@
               "id": 20,
               "type": "Initial appointment",
               "isInitial": true,
-              "startDateTime": "2024-02-11T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2024-02-11T10:30:00.382936Z[Europe/London]",
+              "startDateTime": "2024-02-11T10:15:00.382936Z",
+              "endDateTime": "2024-02-11T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": true,
@@ -346,9 +362,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -357,9 +375,9 @@
             },
             {
               "id": 13,
-              "type": "Video call",
-              "startDateTime": "2023-02-12T10:15:00.382936Z[Europe/London]",
-              "endDateTime": "2023-02-12T10:30:00.382936Z[Europe/London]",
+              "type": "Planned Video Contact (NS)",
+              "startDateTime": "2023-02-12T10:15:00.382936Z",
+              "endDateTime": "2023-02-12T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "isSensitive": false,
               "hasOutcome": true,
@@ -376,9 +394,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Paulie",
-                "surname": "Walnuts"
+              "officer": {
+                "name": {
+                  "forename": "Paulie",
+                  "surname": "Walnuts"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -453,8 +473,8 @@
             {
               "id": 11,
               "type": "Phone call",
-              "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2044-12-22T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2044-12-22T09:15:00.382936Z",
+              "endDateTime": "2044-12-22T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -469,9 +489,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -515,8 +537,8 @@
             {
               "id": 11,
               "type": "Phone call",
-              "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2044-12-22T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2044-12-22T09:15:00.382936Z",
+              "endDateTime": "2044-12-22T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -531,9 +553,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -577,8 +601,8 @@
             {
               "id": 11,
               "type": "Office appointment",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -593,9 +617,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -639,8 +665,8 @@
             {
               "id": 11,
               "type": "AP PA - Attitudes, thinking & behaviours",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -655,9 +681,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -668,8 +696,8 @@
             {
               "id": 12,
               "type": "Pre-Intervention Session 1",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -686,9 +714,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -699,8 +729,8 @@
             {
               "id": 13,
               "type": "Initial Appointment - Home Visit (NS)",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -719,9 +749,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -765,8 +797,8 @@
             {
               "id": 11,
               "type": "AP PA - Attitudes, thinking & behaviours",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -781,9 +813,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -794,8 +828,8 @@
             {
               "id": 12,
               "type": "Pre-Intervention Session 1",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -812,9 +846,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -858,8 +894,8 @@
             {
               "id": 11,
               "type": "AP PA - Attitudes, thinking & behaviours",
-              "startDateTime": "2025-01-25T09:15:00.382936Z[Europe/London]",
-              "endDateTime": "2025-01-25T09:30:00.382936Z[Europe/London]",
+              "startDateTime": "2025-01-25T09:15:00.382936Z",
+              "endDateTime": "2025-01-25T09:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
               "rarCategory": "Stepping Stones",
               "isSensitive": false,
@@ -874,9 +910,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -911,12 +949,13 @@
             "id": 11,
             "type": "Phone call",
             "description": "",
-            "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
-            "endDateTime": "2044-12-22T09:30:00.382936Z[Europe/London]",
+            "startDateTime": "2044-12-22T09:15:00.382936Z",
+            "endDateTime": "2044-12-22T09:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "rarCategory": "Stepping Stones",
             "isSensitive": false,
             "hasOutcome": false,
+            "isInPast": true,
             "wasAbsent": true,
             "appointmentNotes": [
               {
@@ -934,9 +973,11 @@
             "isAppointment": false,
             "isCommunication": true,
             "isPhoneCallFromPop": true,
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -970,12 +1011,13 @@
             "id": 11,
             "type": "Phone call",
             "description": "",
-            "startDateTime": "2044-12-22T09:15:00.382936Z[Europe/London]",
-            "endDateTime": "2044-12-22T09:30:00.382936Z[Europe/London]",
+            "startDateTime": "2044-12-22T09:15:00.382936Z",
+            "endDateTime": "2044-12-22T09:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "rarCategory": "Stepping Stones",
             "isSensitive": false,
             "hasOutcome": false,
+            "isInPast": true,
             "wasAbsent": true,
             "appointmentNote": {
               "id": 1,
@@ -986,9 +1028,11 @@
             "isAppointment": false,
             "isCommunication": true,
             "isPhoneCallFromPop": true,
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -1020,19 +1064,21 @@
           },
           "appointment": {
             "id": 12,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "description": "",
             "action": "Warning letter sent",
-            "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2045-03-22T10:15:00.382936Z",
+            "endDateTime": "2045-03-22T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
             "appointmentNotes": [],
-            "officerName": {
-              "forename": "William",
-              "surname": "Philips"
+            "officer": {
+              "name": {
+                "forename": "William",
+                "surname": "Philips"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -1064,10 +1110,10 @@
           },
           "appointment": {
             "id": 13,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "description": "User-generated free text content",
-            "startDateTime": "2023-02-12T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2023-02-12T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2023-02-12T10:15:00.382936Z",
+            "endDateTime": "2023-02-12T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": true,
@@ -1084,9 +1130,11 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Paulie",
-              "surname": "Walnuts"
+            "officer": {
+              "name": {
+                "forename": "Paulie",
+                "surname": "Walnuts"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",
@@ -1119,8 +1167,8 @@
             "id": 14,
             "type": "Phone call",
             "description": "",
-            "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-03-22T08:15:00.382936Z",
+            "endDateTime": "2024-03-22T08:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": false,
@@ -1135,9 +1183,11 @@
             "acceptableAbsence": true,
             "acceptableAbsenceReason": "Trains were on strike and lost phone",
             "isNationalStandard": true,
-            "officerName": {
-              "forename": "Steve",
-              "surname": "Bruce"
+            "officer": {
+              "name": {
+                "forename": "Steve",
+                "surname": "Bruce"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -1171,11 +1221,12 @@
             "id": 15,
             "type": "Office appointment",
             "description": "User-generated free text content",
-            "startDateTime": "2024-03-22T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-22T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-03-22T10:15:00.382936Z",
+            "endDateTime": "2024-03-22T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": true,
+            "isInPast": true,
             "outcome": "User-generated free text content",
             "isAppointment": true,
             "didTheyComply": true,
@@ -1238,8 +1289,8 @@
             "id": 15,
             "type": "Office appointment",
             "description": "User-generated free text content",
-            "startDateTime": "2024-03-22T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-22T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-03-22T10:15:00.382936Z",
+            "endDateTime": "2024-03-22T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": true,
@@ -1292,12 +1343,13 @@
             "id": 16,
             "type": "Office appointment",
             "description": "",
-            "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-02-21T10:15:00.382936Z",
+            "endDateTime": "2024-02-21T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
+            "isInPast": true,
             "nonComplianceReason": "Was very argumentative and left the appointment",
             "didTheyComply": false,
             "isAppointment": true,
@@ -1347,11 +1399,12 @@
             "id": 17,
             "type": "Planned appointment",
             "description": "",
-            "startDateTime": "2024-03-26T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-26T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-03-26T10:15:00.382936Z",
+            "endDateTime": "2024-03-26T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": true,
+            "isInPast": true,
             "outcome": "User-generated free text content",
             "wasAbsent": true,
             "isAppointment": true,
@@ -1398,11 +1451,12 @@
             "type": "Initial appointment",
             "description": "User-generated free text content",
             "isInitial": true,
-            "startDateTime": "2024-03-25T10:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-25T10:30:00.382936Z[Europe/London]",
+            "startDateTime": "2024-03-25T10:15:00.382936Z",
+            "endDateTime": "2024-03-25T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": true,
+            "isInPast": true,
             "outcome": "User-generated free text content",
             "wasAbsent": false,
             "isAppointment": true,

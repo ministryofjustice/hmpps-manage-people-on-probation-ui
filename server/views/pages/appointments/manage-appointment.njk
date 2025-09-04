@@ -156,7 +156,7 @@
       hint: {
         text: nextAppointmentHint
       },
-      href: "#" if not nextAppointment.appointment,
+      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment" if not nextAppointment.appointment,
       status: {
         tag: {
           text: "Not started",

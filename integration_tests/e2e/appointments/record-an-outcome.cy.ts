@@ -1,6 +1,5 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RecordAnOutcomePage from '../../pages/appointments/record-an-outcome.page'
-import { checkAppointmentDetails, uuid } from './imports'
 
 const crn = 'X778160'
 const appointmentId = '6'

@@ -2,6 +2,7 @@ export const toSentenceCase = (
   value: string | null | undefined,
   preserveWords: string[] = [],
   ignoreSeparators: string[] = [],
+  leadingCaps: boolean = true,
 ): string => {
   if (!value) return ''
   const words = value.split(' ')
@@ -31,5 +32,5 @@ export const toSentenceCase = (
       return formatWord(word)
     })
     .join(' ')
-  return `${formatted.charAt(0).toUpperCase()}${formatted.substring(1)}`
+  return leadingCaps ? `${formatted.charAt(0).toUpperCase()}${formatted.substring(1)}` : `${formatted}`
 }

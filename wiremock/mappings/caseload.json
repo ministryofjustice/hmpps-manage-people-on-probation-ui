@@ -801,6 +801,47 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/caseload/user/tony-pan/teams",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "provider": "London",
+          "teams": [
+            {
+              "description": "OMU A",
+              "code": "N07T01"
+            },
+            {
+              "description": "Application Support",
+              "code": "N03N03"
+            },
+            {
+              "description": "NPS - Wrexham - Team 1",
+              "code": "N03F01"
+            },
+            {
+              "description": "Automated Allocation Team",
+              "code": "N07AAT"
+            },
+            {
+              "description": "Automated Allocation Team",
+              "code": "N59AAT"
+            },
+            {
+              "description": "Homelessness Prevention Team,",
+              "code": "N07HPT"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }

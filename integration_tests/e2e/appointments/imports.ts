@@ -13,6 +13,7 @@ import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-anot
 import { dateWithYear } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
+import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -38,6 +39,13 @@ export const getUuid = () => {
   return cy.url().then(currentUrl => {
     const split = currentUrl.split('?')[0].split('/')
     return split[split.length - 2]
+  })
+}
+
+export const getCrn = () => {
+  return cy.url().then(currentUrl => {
+    const split = currentUrl.split('?')[0].split('/')
+    return split[split.length - 4]
   })
 }
 
@@ -159,16 +167,24 @@ export const completeConfirmationPage = () => {
   confirmationPage.getSubmitBtn().click()
 }
 
+export const completeArrangeAnotherPage = () => {
+  const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+  checkUpdateDateTime(arrangeAnotherAppointmentPage)
+  arrangeAnotherAppointmentPage.getSubmitBtn().click()
+}
+
+export const completeNextAppointmentPage = (index = 1) => {
+  const nextAppointmentPage = new NextAppointmentPage()
+  nextAppointmentPage.getRadio('option', index).click()
+  nextAppointmentPage.getSubmitBtn().click()
+}
+
 export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned office visit (NS)')
+  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
   page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
   page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
-  page
-    .getSummaryListRow(1)
-    .find('.govuk-summary-list__value')
-    .should('contain.text', 'Alcohol Monitoring (Electronic Monitoring)')
-  page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned Office Visit (NS)')
-  page.getSummaryListRow(3).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
   page
     .getSummaryListRow(3)
@@ -210,6 +226,14 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
   page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
 }
 
+export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+  page.getSummaryListRow(2).find('.govuk-link').click()
+  const typePage = new AppointmentTypePage()
+  typePage.getRadio('type', 2).click()
+  typePage.getSubmitBtn().click()
+  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned telephone contact (NS)')
+}
+
 export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
     page.getSummaryListRow(1).find('.govuk-link').click()
@@ -226,14 +250,6 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
   })
 }
 
-export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(2).find('.govuk-link').click()
-  const typePage = new AppointmentTypePage()
-  typePage.getRadio('type', 2).click()
-  typePage.getSubmitBtn().click()
-  page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned Telephone Contact (NS)')
-}
-
 export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   page.getSummaryListRow(4).find('.govuk-link').click()
   const locationPage = new AppointmentLocationPage()
@@ -244,34 +260,38 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
 }
 
 export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  getUuid().then(pageUuid => {
-    const newDate = DateTime.now().plus({ days: 2 }).set({
-      hour: 7,
-      minute: 30,
-      second: 0,
-      millisecond: 0,
-    })
-    const changedStart = '9:30am'
-    const changedEnd = '10:30am'
-    page.getSummaryListRow(5).find('.govuk-link').click()
-    const dateTimePage = new AppointmentDateTimePage()
-    dateTimePage.getDatePickerToggle().click()
-    cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
-    dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-start`).select(changedStart)
-    dateTimePage.getElement(`#appointments-${crn}-${pageUuid}-end`).focus().select(changedEnd)
-    // Ignore warnings
-    dateTimePage.getSubmitBtn().click()
-    dateTimePage.getSubmitBtn().click()
-    page.checkOnPage()
-
-    page
-      .getSummaryListRow(5)
-      .find('.govuk-summary-list__value li:nth-child(1)')
-      .invoke('text')
-      .then(text => {
-        const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`)
+  getCrn().then(pageCrn => {
+    getUuid().then(pageUuid => {
+      const newDate = DateTime.now().plus({ days: 2 }).set({
+        hour: 7,
+        minute: 30,
+        second: 0,
+        millisecond: 0,
       })
+      const changedStart = '9:30am'
+      const changedEnd = '10:30am'
+      page.getSummaryListRow(5).find('.govuk-link').click()
+      const dateTimePage = new AppointmentDateTimePage()
+      dateTimePage.getDatePickerToggle().click()
+      cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).select(changedStart)
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).focus().select(changedEnd)
+      // Ignore warnings
+      dateTimePage.getSubmitBtn().click()
+      dateTimePage.getSubmitBtn().click()
+      page.checkOnPage()
+
+      page
+        .getSummaryListRow(5)
+        .find('.govuk-summary-list__value li:nth-child(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`,
+          )
+        })
+    })
   })
 }
 

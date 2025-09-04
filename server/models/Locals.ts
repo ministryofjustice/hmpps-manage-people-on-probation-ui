@@ -6,7 +6,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { AppointmentType } from './Appointments'
+import { AppointmentSession, AppointmentType, NextAppointmentResponse } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
@@ -89,6 +89,8 @@ interface Locals {
   version: string
   backLink: string
   personAppointment?: PersonAppointment
+  nextAppointmentSession?: AppointmentSession
+  nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
 }

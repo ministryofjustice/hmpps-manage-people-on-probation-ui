@@ -21,8 +21,8 @@
 {% endset %}
 
 {% set notes = '' %}
-{% set hasNote = appointment.appointmentNote and appointment.hasOutcome %}
-{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome %}
+{% set hasNote = appointment.appointmentNote %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}

@@ -6,6 +6,20 @@ export interface Schedule {
   personSchedule: PersonSchedule
 }
 
+export interface Officer {
+  code?: string
+  name?: Name
+  teamCode?: string
+  providerCode?: string
+  username?: string
+}
+
+export interface SentenceComponent {
+  id?: number
+  description?: string
+  type?: string
+}
+
 export interface PersonSchedule {
   size: number
   page: number
@@ -25,10 +39,7 @@ export interface Activity {
   isSensitive?: boolean
   hasOutcome?: boolean
   wasAbsent?: boolean
-  officer?: {
-    code: string
-    name: Name
-  }
+  officer?: Officer
   isInitial?: boolean
   isNationalStandard?: boolean
   location?: Address
@@ -64,11 +75,7 @@ export interface Activity {
   deliusManaged?: boolean
   isVisor?: boolean
   eventId?: number
-  component?: {
-    id: number
-    description: string
-    type: string
-  }
+  component?: SentenceComponent
   nsiId?: number
 }
 

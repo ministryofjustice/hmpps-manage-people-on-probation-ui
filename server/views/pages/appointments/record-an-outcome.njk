@@ -17,7 +17,7 @@
       }
     },
     hint: {
-        text: "Appointment: " + appointment.type + " with " + appointment.officerName | fullName + " on " + appointment.startDateTime | dateWithYear + "."
+        text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName + " on " + appointment.startDateTime | dateWithYear + "."
     },
     formGroup: {
       attributes: {
@@ -37,7 +37,10 @@
 
   <div class="govuk-button-group">
     {{ govukButton({
-    text: "Continue"
+    text: "Continue",
+    attributes: {
+      'data-qa': 'submit-btn'
+    }
   }) }}
     <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{appointment.id}}/manage">Cancel and go back</a>
   </div>

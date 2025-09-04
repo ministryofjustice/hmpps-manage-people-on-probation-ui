@@ -32,6 +32,19 @@
                 "town": "London",
                 "postcode": "SW1H 9EA"
               }
+            },
+            {
+              "id": 9101,
+              "code": "N56NTME",
+              "description": "The Building",
+              "address": {
+                "buildingNumber": "77",
+                "streetName": "Some Street",
+                "district": "Some City Centre",
+                "town": "London",
+                "county": "Essex",
+                "postcode": "NW10 1EP"
+              }
             }
           ]
         },
