@@ -124,5 +124,6 @@ export interface LocalParams {
   body?: Record<string, string | string[]>
   _minDate?: string
   _maxDate?: string
+  contactId?: string
   uploadedFiles?: any
 }

@@ -1,0 +1,17 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/appointment",
+        "method": "PATCH"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {},
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

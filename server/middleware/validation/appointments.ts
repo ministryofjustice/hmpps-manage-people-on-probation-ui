@@ -6,10 +6,10 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params, body } = req
-  const { crn, id } = params
-  const localParams: LocalParams = { crn, id, body }
+  const { url, params } = req
   let isAddNotePage = false
+  const { crn, id, contactId } = params
+  const localParams: LocalParams = { crn, id, contactId }
   let render = `pages/${[
     url
       .split('?')[0]
@@ -144,7 +144,6 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateAddNote = () => {
-    const { contactId } = req.params
     if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
       render = `pages/appointments/add-note`
@@ -165,6 +164,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateLocation()
   validateDateTime()
   validateRepeating()
+  validateRecordAnOutcome()
   validateSensitivity()
   validateNextAppointment()
   validateRecordAnOutcome()
