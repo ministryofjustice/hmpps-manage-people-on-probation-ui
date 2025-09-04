@@ -60,4 +60,5 @@ jobs:
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
           # When sandboxing, use explicit name or fall back to a unique branch/run id
+          createsandbox: ${{ inputs.use_sandbox }}
           sandboxname: ${{ inputs.use_sandbox && (inputs.sandbox_name != '' && inputs.sandbox_name || format('{0}-{1}', github.ref_name, github.run_id)) || '' }}
