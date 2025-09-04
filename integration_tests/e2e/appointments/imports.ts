@@ -512,7 +512,7 @@ export const checkAppointmentDetails = (
         .getAppointmentDetailsListItem(index, 'actions')
         .find('a')
         .should('contain.text', 'Add to notes')
-        .should('have.attr', 'href', '#')
+        .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
 
@@ -527,7 +527,7 @@ export const checkAppointmentDetails = (
         .getAppointmentDetailsListItem(index, 'actions')
         .find('a')
         .should('contain.text', 'Change')
-        .should('have.attr', 'href', '#')
+        .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
 
@@ -545,7 +545,7 @@ export const checkAppointmentDetails = (
         .getAppointmentDetailsListItem(index, 'actions')
         .find('a')
         .should('contain.text', 'Change')
-        .should('have.attr', 'href', '#')
+        .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
 }

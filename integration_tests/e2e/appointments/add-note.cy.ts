@@ -51,6 +51,7 @@ describe('Manage appointment - add a note', () => {
 
   it('should render the page', () => {
     loadPage()
+    cy.get('.govuk-back-link').should('have.attr', 'href', `/case/X000001/appointments/appointment/6/manage`)
     cy.get('p.govuk-body')
       .eq(0)
       .should(

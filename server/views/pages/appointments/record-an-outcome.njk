@@ -37,12 +37,9 @@
 
   <div class="govuk-button-group">
     {{ govukButton({
-     text: "Continue",
-       attributes: {
-         'data-qa': 'submit-btn'
-       }
-   }) }}
-    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{contactId}}/manage">Cancel and go back</a>
+    text: "Continue"
+  }) }}
+    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{appointment.id}}/manage">Cancel and go back</a>
   </div>
 
 {% endblock %}
