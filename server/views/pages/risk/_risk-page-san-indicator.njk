@@ -1,0 +1,31 @@
+<div class="govuk-grid-column-two-thirds">
+    {% if hasRiskAssessment %}
+        <div class='govuk-!-margin-bottom-4'>
+            {% include "./_rsr.njk" %}
+            {% include "./_ogrs.njk" %}
+            {% include "./_ovp.njk" %}
+            {% include "./_ogp.njk" %}
+
+
+        </div>
+    {% else %}
+        {% set html %}
+            <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
+            {% include './_no-oasys-risk-assessment.njk' %}
+        {% endset %}
+        {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
+    {% endif %}
+    {% include './_opd.njk' %}
+    {% include './_risk-flags.njk' %}
+</div>
+
+<div class="govuk-grid-column-one-third">
+    {{ roshWidget(risksWidget) }}
+    {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
+    <h4 class="govuk-heading-m">Plan</h4>
+    <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
+        <p class="govuk-body">Last updated: {{ risks.assessedOn | dateWithYear }}</p>
+        <p class="govuk-body"><a href="#" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
+    </div>
+
+</div>
