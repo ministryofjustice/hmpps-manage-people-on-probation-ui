@@ -4,7 +4,7 @@ import controllers from '.'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
-import { postAppointments, renderError } from '../middleware'
+import { postAppointments, renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
@@ -36,6 +36,7 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
   postAppointments: jest.fn(),
+  cloneAppointmentAndRedirect: jest.fn(),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -58,6 +59,7 @@ const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNumericString>
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockedPostAppointments = postAppointments as jest.MockedFunction<typeof postAppointments>
+const mockedCloneAppointment = cloneAppointmentAndRedirect as jest.MockedFunction<typeof cloneAppointmentAndRedirect>
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
@@ -857,8 +859,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, { crn })
     })
   })
-  xdescribe('postConfirmation', () => {
-    // need to fix this
+  describe('postConfirmation', () => {
     const appointmentSession: AppointmentSession = {
       user: {
         username: 'user-1',
@@ -882,35 +883,18 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
+
     it('should clone the current appointment with no date or time set and save it to session', async () => {
       const mockReq = createMockRequest({
         appointmentSession,
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
+      const handler = jest.fn()
+      mockedCloneAppointment.mockReturnValue(handler)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      const expectedClone: AppointmentSession = {
-        ...appointmentSession,
-        date: '',
-        start: '',
-        end: '',
-        until: '',
-        numberOfAppointments: '1',
-        numberOfRepeatAppointments: '0',
-        repeatingDates: [] as string[],
-        repeating: 'No',
-      }
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid2], expectedClone)
-    })
-    it('should redirect to the arrange another appointment page', async () => {
-      mockedUuidv4.mockReturnValueOnce(uuid2)
-      const mockReq = createMockRequest({
-        appointmentSession,
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid2}/arrange-another-appointment`)
+      expect(mockedCloneAppointment).toHaveBeenCalledWith(appointmentSession)
+      expect(handler).toHaveBeenCalledWith(mockReq, res)
     })
   })
   describe('getArrangeAnotherAppointment', () => {
