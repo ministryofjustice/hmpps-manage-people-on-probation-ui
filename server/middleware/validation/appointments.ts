@@ -6,10 +6,10 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params } = req
-  let isAddNotePage = false
+  const { url, params, body } = req
   const { crn, id, contactId } = params
-  const localParams: LocalParams = { crn, id, contactId }
+  const localParams: LocalParams = { crn, id, body }
+  let isAddNotePage = false
   let render = `pages/${[
     url
       .split('?')[0]
@@ -101,6 +101,21 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateRecordAnOutcome = () => {
+    if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
+      render = `pages/appointments/record-an-outcome`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          contactId,
+          page: 'record-an-outcome',
+        }),
+      )
+    }
+  }
+
   const validateSensitivity = () => {
     if (req.url.includes('/add-notes')) {
       errorMessages = validateWithSpec(
@@ -125,21 +140,6 @@ const appointments: Route<void> = (req, res, next) => {
         }),
       )
       render = 'pages/appointments/next-appointment'
-    }
-  }
-
-  const validateRecordAnOutcome = () => {
-    const { contactId } = req.params
-    if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
-      render = `pages/appointments/record-an-outcome`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'record-an-outcome',
-        }),
-      )
     }
   }
 
