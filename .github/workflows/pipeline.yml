@@ -57,9 +57,17 @@ jobs:
     name: Veracode
     needs: [sonarcloud]
     uses: ./.github/workflows/veracode_static_scan.yml
+    with:
+      veracode_app: "hmpps-manage-people-on-probation"
+      # Branches/PRs → sandbox; main → policy scan
+      use_sandbox: ${{ github.ref != 'refs/heads/main' }}
+      # Nice per-branch sandbox name (push events don’t have PR numbers)
+      sandbox_name: ${{ github.ref != 'refs/heads/main' && format('BR-{0}', github.ref_name) || '' }}
+      # Allow branches to run in parallel; leave blank on main so it queues by app
+      concurrency_group: ${{ github.ref != 'refs/heads/main' && format('veracode-scan-{0}-{1}', github.repository, github.ref_name) || '' }}
     secrets:
       VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
-      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
+      VERACODE_API_KEY: ${{ secrets.Veracode_API_KEY }}
   helm_lint:
     strategy:
       matrix:
