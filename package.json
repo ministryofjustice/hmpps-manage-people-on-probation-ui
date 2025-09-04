@@ -171,7 +171,7 @@
     "@faker-js/faker": "^9.8.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
-    "@ministryofjustice/eslint-config-hmpps": "^0.0.1-beta.2",
+    "@ministryofjustice/eslint-config-hmpps": "^0.0.3",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.84.0",
     "@playwright/test": "^1.53.0",
     "@types/bunyan": "^1.8.11",
