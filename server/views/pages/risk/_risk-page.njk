@@ -1,0 +1,85 @@
+<div class="govuk-grid-column-two-thirds">
+    {% if hasRiskAssessment %}
+        <div class='govuk-!-margin-bottom-4'>
+            <h3 class="govuk-heading-m score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
+                Criminogenic needs
+            </h3>
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="highScoringNeedsLabel">High-scoring areas from the assessment</span>' },
+                        value: { html: '<span data-qa="highScoringNeedsValue">' + highScoringNeeds + '</span>' if needs else '<span data-qa="highScoringNeedsValue">Not provided</span>' }
+                    },
+                    {
+                        key: { html: '<span data-qa="lowScoringNeedsLabel">Low-scoring areas from the assessment</span>' },
+                        value: { html: '<span data-qa="lowScoringNeedsValue">' + lowScoringNeeds + '</span>' if needs else '<span data-qa="lowScoringNeedsValue">Not provided</span>' }
+                    },
+                    {
+                        key: { html: '<span data-qa="noScoreNeedsLabel">Areas without a need score</span>' },
+                        value: { html: '<span data-qa="noScoreNeedsValue">' + noScoreNeeds + '</span>' if needs else '<span data-qa="noScoreNeedsValue">Not provided</span>' }
+                    }
+                ]
+            }) }}
+            {% if risks.assessedOn %}
+                <p class="govuk-!-margin-bottom-2">
+                    <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysViewRiskAssessmentLink">
+                        View the full risk assessment on OASys (opens in new tab).
+                    </a>
+                </p>
+            {% endif %}
+
+        </div>
+        <div class='govuk-!-margin-bottom-4'>
+            {% include "./_rsr.njk" %}
+            {% include "./_ogrs.njk" %}
+            {% include "./_osp.njk" %}
+
+            {% if predictorScores.scores.OSPC.score %}
+                <h4 class="govuk-heading-s score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP/C score">
+                    OSP/C (contact-related sexual reoffending) or OSP/DC (direct contact)
+                </h4>
+                <div aria-hidden="true">
+                    {{ predictorScore(predictorScores.scores.OSPC) }}
+                </div>
+                <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPC.score }}%</div>
+            {% endif %}
+
+            {% include "./_ovp.njk" %}
+            {% include "./_ogp.njk" %}
+        </div>
+    {% else %}
+        {% set html %}
+            <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
+            {% include './_no-oasys-risk-assessment.njk' %}
+        {% endset %}
+        {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
+    {% endif %}
+    {% include './_risk-flags.njk' %}
+    {% include './_opd.njk' %}
+</div>
+
+<div class="govuk-grid-column-one-third">
+    {{ roshWidget(risksWidget) }}
+    {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
+    <div class="govuk-body predictor-timeline__heading">
+        <h3 class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h3>
+        {% if predictorScores.error and caseSummary.roshHistory.error %}
+            <p class='govuk-body' data-qa='timeline-missing'>RoSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
+        {% elseif predictorScores.error %}
+            <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
+        {% elseif roshHistory.error %}
+            <p class='govuk-body' data-qa='rosh-history-missing'>Historical RoSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
+        {% endif %}
+        {% if timeline.length %}
+            <div>
+                <button type='button' data-js="predictor-timeline__toggle-all" class="reset-button link-button govuk-link">Open all<span class='govuk-visually-hidden'> scores in timeline</span>
+                </button>
+            </div>
+        {% else %}
+            <p class='govuk-body' data-qa='rosh-history-missing'>No risk scores have been recorded</p>
+        {% endif %}
+    </div>
+    {% if timeline.length %}
+        {{ predictorTimeline(timeline, 'x') }}
+    {% endif %}
+</div>

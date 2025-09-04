@@ -9,7 +9,7 @@
         "status": 200,
         "jsonBody": {
           "crn": "X000001",
-          "sanIndicator": true
+          "sanIndicator": false
         },
         "headers": {
           "Content-Type": "application/json"
