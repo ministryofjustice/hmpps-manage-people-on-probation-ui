@@ -27,6 +27,7 @@
     to
     {{ appointment.end }}</span>
 {% endfor %}
+{% set returnLink = "/case/" + crn + "/appointments" %}
 {% endset %}
 
 {% set panelHtml %}
@@ -72,7 +73,7 @@
         'data-qa': 'submit-btn'
       }
     }) }}
-    <a class="govuk-link" href="/case/{{ crn }}/appointments" data-qa="finishLink">
+    <a class="govuk-link" href={{ returnLink }} data-qa="finishLink">
       Finish and return to appointments
     </a>
   </div>

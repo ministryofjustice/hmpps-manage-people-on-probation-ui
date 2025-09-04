@@ -34,10 +34,12 @@
                 "didTheyComply": false,
                 "isEmailOrTextFromPop": true,
                 "wasAbsent": true,
-                "notes": "Some notes",
-                "officerName": {
-                  "forename": "Terry",
-                  "surname": "Jones"
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "officer": {
+                  "name": {
+                    "forename": "Terry",
+                    "surname": "Jones"
+                  }
                 },
                 "lastUpdated": "2023-03-20",
                 "lastUpdatedBy": {
@@ -48,17 +50,19 @@
               },
               {
                 "id": 2,
-                "type": "Video call",
+                "type": "Planned Video Contact (NS)",
                 "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
                 "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
-                "notes": "Some notes",
-                "officerName": {
-                  "forename": "William",
-                  "surname": "Philips"
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "officer": {
+                  "name": {
+                    "forename": "William",
+                    "surname": "Philips"
+                  }
                 },
                 "lastUpdated": "2023-03-20",
                 "lastUpdatedBy": {
@@ -107,13 +111,15 @@
                 "hasOutcome": true,
                 "outcome": "User-generated free text content",
                 "wasAbsent": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "isAppointment": true,
                 "acceptableAbsence": true,
                 "isNationalStandard": true,
-                "officerName": {
-                  "forename": "Steve",
-                  "surname": "Bruce"
+                "officer": {
+                  "name": {
+                    "forename": "Steve",
+                    "surname": "Bruce"
+                  }
                 },
                 "lastUpdated": "2023-03-20",
                 "lastUpdatedBy": {
@@ -131,11 +137,13 @@
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Terry",
-                  "surname": "Jones"
+                "officer": {
+                  "name": {
+                    "forename": "Terry",
+                    "surname": "Jones"
+                  }
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
@@ -152,11 +160,13 @@
                 "isSensitive": false,
                 "hasOutcome": false,
                 "wasAbsent": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Terry",
-                  "surname": "Jones"
+                "officer": {
+                  "name": {
+                    "forename": "Terry",
+                    "surname": "Jones"
+                  }
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
@@ -166,7 +176,7 @@
               },
               {
                 "id": 3,
-                "type": "Video call",
+                "type": "Planned Video Contact (NS)",
                 "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
                 "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
                 "rarToolKit": "Choices and Changes",
@@ -174,11 +184,13 @@
                 "hasOutcome": false,
                 "wasAbsent": true,
                 "absentWaitingEvidence": true,
-                "notes": "Some notes",
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
                 "lastUpdated": "2023-03-20",
-                "officerName": {
-                  "forename": "Paulie",
-                  "surname": "Walnuts"
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
                 },
                 "lastUpdatedBy": {
                   "forename": "Paul",
@@ -212,16 +224,22 @@
           },
           "appointment": {
             "id": 1,
+            "eventNumber": "12345",
             "type": "Phone call",
             "startDateTime": "2024-12-22T09:15:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -237,7 +255,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/schedule/X000001/appointment/2",
+        "urlPattern": "/mas/schedule/.*/appointment/2",
         "method": "GET"
       },
       "response": {
@@ -253,23 +271,40 @@
           },
           "appointment": {
             "id": 2,
-            "type": "Video call",
+            "eventNumber": "1234567",
+            "type": "Planned Video Contact (NS)",
             "startDateTime": "2025-03-22T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2025-03-22T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "officerName": {
-              "forename": "William",
-              "surname": "Philips"
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "William",
+                "surname": "Philips"
+              },
+              "username": "tony-pan",
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "location": {
+              "code": "N56NTMD",
+              "buildingNumber": "102",
+              "streetName": "Petty France",
+              "district": "Westminster",
+              "town": "London",
+              "postcode": "SW1H 9EA"
+            },
+            "deliusManaged": false,
+            "component": {}
           }
         },
         "headers": {
@@ -295,7 +330,8 @@
           },
           "appointment": {
             "id": 3,
-            "type": "Video call",
+            "eventNumber": "12345",
+            "type": "Planned Video Contact (NS)",
             "startDateTime": "2024-02-12T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-12T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
@@ -303,16 +339,24 @@
             "hasOutcome": false,
             "absentWaitingEvidence": false,
             "wasAbsent": true,
-            "notes": "Some notes",
+            "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Paulie",
-              "surname": "Walnuts"
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "Paulie",
+                "surname": "Walnuts"
+              },
+              "username": "tony-pan",
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
             },
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "deliusManaged": false,
+            "component": {}
           }
         },
         "headers": {
@@ -338,9 +382,10 @@
           },
           "appointment": {
             "id": 4,
-            "type": "Phone call",
-            "startDateTime": "2024-03-22T08:15:00.382936Z[Europe/London]",
-            "endDateTime": "2024-03-22T08:30:00.382936Z[Europe/London]",
+            "eventNumber": "12345",
+            "type": "Planned Telephone Contact (NS)",
+            "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
+            "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "isInitial": true,
@@ -355,20 +400,26 @@
             "outcome": "User-generated free text content",
             "wasAbsent": true,
             "acceptableAbsence": true,
-            "appointmentNotes": [
-              {
-                "id": 0,
-                "note": "Some notes"
-              }
-            ],
-            "officerName": {
-              "forename": "Steve",
-              "surname": "Bruce"
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "Steve",
+                "surname": "Bruce"
+              },
+              "username": "tony-pan",
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
             },
-            "lastUpdated": "2023-03-20",
-            "lastUpdatedBy": {
-              "forename": "Paul",
-              "surname": "Smith"
+            "location": {
+              "code": "N56NTME",
+              "buildingName": "The Building",
+              "buildingNumber": "77",
+              "streetName": "Some Street",
+              "district": "Some City Centre",
+              "town": "London",
+              "county": "Essex",
+              "postcode": "NW10 1EP"
             },
             "documents": [
               {
@@ -386,7 +437,16 @@
                 "name": "Eula-Schmeler-X000001-UPW.pdf",
                 "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
               }
-            ]
+            ],
+            "lastUpdated": "2023-03-20",
+            "lastUpdatedBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "deliusManaged": false,
+            "isVisor": false,
+            "eventId": 2501192724,
+            "component": {}
           }
         },
         "headers": {
@@ -412,23 +472,44 @@
           },
           "appointment": {
             "id": 5,
-            "type": "Phone call",
+            "eventNumber": "12345",
+            "nsiId": null,
+            "type": "Planned Telephone Contact (NS)",
             "startDateTime": "2024-03-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-03-21T10:30:00.382936Z[Europe/London]",
             "rarToolKit": "Choices and Changes",
             "isSensitive": false,
             "hasOutcome": false,
             "wasAbsent": true,
-            "notes": "Some notes",
-            "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "username": "tony-pan",
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
             },
+            "location": {
+              "code": "N56NTME",
+              "buildingName": "The Building",
+              "buildingNumber": "77",
+              "streetName": "Some Street",
+              "district": "Some City Centre",
+              "town": "London",
+              "county": "Essex",
+              "postcode": "NW10 1EP"
+            },
+            "documents": [],
+            "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "deliusManaged": false,
+            "component": {}
           }
         },
         "headers": {
@@ -454,6 +535,7 @@
           },
           "appointment": {
             "id": 6,
+            "eventNumber": "12345",
             "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2024-02-21T10:30:00.382936Z[Europe/London]",
@@ -464,19 +546,25 @@
             "isInPast": true,
             "wasAbsent": true,
             "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "officer": {
+              "code": "12345",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "username": "tony-pan",
+              "teamCode": "N07CHT",
+              "providerCode": "N07"
+            },
             "location": {
+              "code": "N56NTME",
               "buildingName": "The Building",
               "buildingNumber": "77",
               "streetName": "Some Street",
               "district": "Some City Centre",
               "town": "London",
               "county": "Essex",
-              "postcode": "NW10 1EP",
-              "lastUpdated": "2023-03-14",
-              "lastUpdatedBy": {
-                "forename": "Jiminy",
-                "surname": "Cricket"
-              }
+              "postcode": "NW10 1EP"
             },
             "documents": [
               {
@@ -496,14 +584,18 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
-            },
             "lastUpdatedBy": {
               "forename": "Paul",
               "surname": "Smith"
-            }
+            },
+            "deliusManaged": false,
+            "isVisor": true,
+            "eventId": 2501192724,
+            "component": {
+              "id": 80,
+              "type": "LICENCE_CONDITION"
+            },
+            "nsiId": null
           }
         },
         "headers": {

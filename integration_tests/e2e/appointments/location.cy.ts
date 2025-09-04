@@ -29,8 +29,9 @@ describe('Pick a location for this appointment', () => {
     it('should display the options', () => {
       locationPage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')
       locationPage.getRadioLabel('locationCode', 2).should('contain.text', '102 Petty France')
+      locationPage.getRadioLabel('locationCode', 3).should('contain.text', 'The Building')
       locationPage
-        .getRadioLabel('locationCode', 4)
+        .getRadioLabel('locationCode', 5)
         .should('contain.text', 'The location I’m looking for is not in this list')
     })
     it('should display the continue button', () => {
@@ -44,7 +45,7 @@ describe('Pick a location for this appointment', () => {
       locationPage = new AppointmentLocationPage()
     })
     it('should display the non-mandatory location option', () => {
-      locationPage.getRadioLabel('locationCode', 5).should('contain.text', 'I do not need to pick a location')
+      locationPage.getRadioLabel('locationCode', 6).should('contain.text', 'I do not need to pick a location')
     })
   })
 

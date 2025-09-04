@@ -18,9 +18,11 @@ export const mockPersonAppointment = {
     hasOutcome: false,
     wasAbsent: true,
     notes: 'Some notes',
-    officerName: {
-      forename: 'Terry',
-      surname: 'Jones',
+    officer: {
+      name: {
+        forename: 'Terry',
+        surname: 'Jones',
+      },
     },
     lastUpdated: '2023-03-20',
     lastUpdatedBy: {

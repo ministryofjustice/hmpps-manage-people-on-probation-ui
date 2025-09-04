@@ -170,6 +170,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    nextAppointment: {
+      optional: page !== 'next-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not you wanted to arrange the next appointment',
+          log: 'Next appointment type not selected',
+        },
+      ],
+    },
     sensitive: {
       optional: page !== 'add-note',
       checks: [

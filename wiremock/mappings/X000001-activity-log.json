@@ -31,7 +31,7 @@
           "activities": [
             {
               "id": 12,
-              "type": "Video call",
+              "type": "Planned Video Contact (NS)",
               "action": "Warning letter sent",
               "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
               "endDateTime": "2045-03-22T10:30:00.382936Z[Europe/London]",
@@ -40,9 +40,11 @@
               "hasOutcome": false,
               "wasAbsent": true,
               "appointmentNotes": [],
-              "officerName": {
-                "forename": "William",
-                "surname": "Philips"
+              "officer": {
+                "name": {
+                  "forename": "William",
+                  "surname": "Philips"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -76,9 +78,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -101,9 +105,11 @@
               "absentWaitingEvidence": true,
               "appointmentNotes": [],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -154,9 +160,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -182,9 +190,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -210,9 +220,11 @@
               "acceptableAbsence": true,
               "acceptableAbsenceReason": "Trains were on strike and lost phone",
               "isNationalStandard": true,
-              "officerName": {
-                "forename": "Steve",
-                "surname": "Bruce"
+              "officer": {
+                "name": {
+                  "forename": "Steve",
+                  "surname": "Bruce"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -240,9 +252,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -293,9 +307,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -346,9 +362,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -357,7 +375,7 @@
             },
             {
               "id": 13,
-              "type": "Video call",
+              "type": "Planned Video Contact (NS)",
               "startDateTime": "2023-02-12T10:15:00.382936Z[Europe/London]",
               "endDateTime": "2023-02-12T10:30:00.382936Z[Europe/London]",
               "rarToolKit": "Choices and Changes",
@@ -376,9 +394,11 @@
                 }
               ],
               "lastUpdated": "2023-03-20",
-              "officerName": {
-                "forename": "Paulie",
-                "surname": "Walnuts"
+              "officer": {
+                "name": {
+                  "forename": "Paulie",
+                  "surname": "Walnuts"
+                }
               },
               "lastUpdatedBy": {
                 "forename": "Paul",
@@ -469,9 +489,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -531,9 +553,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -593,9 +617,11 @@
               "isAppointment": false,
               "isCommunication": true,
               "isPhoneCallFromPop": true,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -655,9 +681,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -686,9 +714,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -719,9 +749,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -781,9 +813,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -812,9 +846,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -874,9 +910,11 @@
               "isAppointment": true,
               "isCommunication": false,
               "isPhoneCallFromPop": false,
-              "officerName": {
-                "forename": "Terry",
-                "surname": "Jones"
+              "officer": {
+                "name": {
+                  "forename": "Terry",
+                  "surname": "Jones"
+                }
               },
               "lastUpdated": "2023-03-20",
               "lastUpdatedBy": {
@@ -934,9 +972,11 @@
             "isAppointment": false,
             "isCommunication": true,
             "isPhoneCallFromPop": true,
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -986,9 +1026,11 @@
             "isAppointment": false,
             "isCommunication": true,
             "isPhoneCallFromPop": true,
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -1020,7 +1062,7 @@
           },
           "appointment": {
             "id": 12,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "description": "",
             "action": "Warning letter sent",
             "startDateTime": "2045-03-22T10:15:00.382936Z[Europe/London]",
@@ -1030,9 +1072,11 @@
             "hasOutcome": false,
             "wasAbsent": true,
             "appointmentNotes": [],
-            "officerName": {
-              "forename": "William",
-              "surname": "Philips"
+            "officer": {
+              "name": {
+                "forename": "William",
+                "surname": "Philips"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -1064,7 +1108,7 @@
           },
           "appointment": {
             "id": 13,
-            "type": "Video call",
+            "type": "Planned Video Contact (NS)",
             "description": "User-generated free text content",
             "startDateTime": "2023-02-12T10:15:00.382936Z[Europe/London]",
             "endDateTime": "2023-02-12T10:30:00.382936Z[Europe/London]",
@@ -1084,9 +1128,11 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Paulie",
-              "surname": "Walnuts"
+            "officer": {
+              "name": {
+                "forename": "Paulie",
+                "surname": "Walnuts"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",
@@ -1135,9 +1181,11 @@
             "acceptableAbsence": true,
             "acceptableAbsenceReason": "Trains were on strike and lost phone",
             "isNationalStandard": true,
-            "officerName": {
-              "forename": "Steve",
-              "surname": "Bruce"
+            "officer": {
+              "name": {
+                "forename": "Steve",
+                "surname": "Bruce"
+              }
             },
             "lastUpdated": "2023-03-20",
             "lastUpdatedBy": {
@@ -1200,9 +1248,11 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",
@@ -1251,9 +1301,11 @@
               "note": "Appointment Notes created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Main Address(s) unless otherwise authorised by your supervising officer. Main Address created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence Main Address(s) unless otherwise authorised by your supervising officer.Main Address created automatically from the Create and Vary a licence system of\nAllow person(s) as desi"
             },
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",
@@ -1303,9 +1355,11 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",
@@ -1350,9 +1404,11 @@
             "absentWaitingEvidence": true,
             "appointmentNotes": [],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",
@@ -1426,9 +1482,11 @@
               }
             ],
             "lastUpdated": "2023-03-20",
-            "officerName": {
-              "forename": "Terry",
-              "surname": "Jones"
+            "officer": {
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              }
             },
             "lastUpdatedBy": {
               "forename": "Paul",

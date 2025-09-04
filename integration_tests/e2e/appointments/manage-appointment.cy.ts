@@ -259,7 +259,10 @@ describe('Manage an appointment', () => {
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('contain.text', name).should('have.attr', 'href', '#')
+          manageAppointmentPage
+            .getTaskLink(3)
+            .should('contain.text', name)
+            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
         })
         it('should display the hint text', () => {
           manageAppointmentPage
@@ -325,7 +328,10 @@ describe('Manage an appointment', () => {
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('contain.text', name).should('have.attr', 'href', '#')
+          manageAppointmentPage
+            .getTaskLink(3)
+            .should('contain.text', name)
+            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
         })
         it('should display the hint text', () => {
           manageAppointmentPage
@@ -387,7 +393,10 @@ describe('Manage an appointment', () => {
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('contain.text', name).should('have.attr', 'href', '#')
+          manageAppointmentPage
+            .getTaskLink(3)
+            .should('contain.text', name)
+            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
         })
         it('should display the hint text', () => {
           manageAppointmentPage
@@ -459,7 +468,10 @@ describe('Manage an appointment', () => {
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('contain.text', name).should('have.attr', 'href', '#')
+          manageAppointmentPage
+            .getTaskLink(3)
+            .should('contain.text', name)
+            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
         })
         it('should display the hint text', () => {
           manageAppointmentPage
