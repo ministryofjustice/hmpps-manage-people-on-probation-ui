@@ -12,7 +12,7 @@ import {
   checkPopHeader,
 } from './imports'
 
-const loadPage = (date?: DateTime<true>) => {
+const loadPage = (date?: DateTime) => {
   completeSentencePage(1, '', '', date)
   completeTypePage(1, false)
   completeAttendancePage()
@@ -106,12 +106,17 @@ describe('Enter the date and time of the appointment', () => {
   })
 
   describe('Continue is clicked selecting a start time which is in the past', () => {
+    let originalNow: typeof DateTime.now
     beforeEach(() => {
+      originalNow = DateTime.now
       const newDate = DateTime.now().set({
         hour: 10,
         minute: 30,
         second: 0,
         millisecond: 0,
+      })
+      cy.wrap(null).then(() => {
+        DateTime.now = () => newDate as DateTime<true>
       })
       loadPage(newDate)
       dateTimePage.getDatePickerToggle().click()
@@ -119,6 +124,9 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
+    })
+    afterEach(() => {
+      DateTime.now = originalNow
     })
     it('should display the error summary box', () => {
       dateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
