@@ -8,7 +8,7 @@ import { LocalParams } from '../../models/Appointments'
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body } = req
   const { crn, id, contactId } = params
-  const localParams: LocalParams = { crn, id, body }
+  const localParams: LocalParams = { crn, id, body, contactId }
   let isAddNotePage = false
   let render = `pages/${[
     url
@@ -123,6 +123,7 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
+          contactId,
           page: 'add-notes',
         }),
       )
