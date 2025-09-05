@@ -28,33 +28,33 @@
     {% if currentSectionName %}
         {% if lastUpdatedDate %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">{{ currentSectionName }}</h2>
-            {%  if not sanIndicator %}
-             <div class="govuk-inset-text govuk-!-margin-top-0">{{ lastUpdatedDate }}</div>
-            {% endif%}
-        {% else %}
-            <h2 class="govuk-heading-l {% if not currentSectionNameSubText %}govuk-!-margin-bottom-7{% else %}govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
-            {% if currentSectionNameSubText %}
-                <p class="govuk-!-margin-bottom-7" data-qa="currentSectionNameSubText">{{ currentSectionNameSubText }}</p>
+            {% if not sanIndicator %}
+                <div class="govuk-inset-text govuk-!-margin-top-0">{{ lastUpdatedDate }}</div>
+                {% endif%}
+            {% else %}
+                <h2 class="govuk-heading-l {% if not currentSectionNameSubText %}govuk-!-margin-bottom-7{% else %}govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
+                {% if currentSectionNameSubText %}
+                    <p class="govuk-!-margin-bottom-7" data-qa="currentSectionNameSubText">{{ currentSectionNameSubText }}</p>
+                {% endif %}
             {% endif %}
         {% endif %}
-    {% endif %}
 
-    {% if sanIndicator %}
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-3" >Risk</h2>
-    {% endif %}
+        {% if sanIndicator %}
+            <h3 class="govuk-heading-m govuk-!-margin-bottom-3" >Risk</h3>
+        {% endif %}
 
-    {% set errors = [] %}
-    {% if risks.errors.length > 0 %}
-        {% set errors = errors.concat(risks.errors) %}
-    {% endif %}
-    {% if tierCalculation.errors.length > 0 %}
-        {% set errors = errors.concat(tierCalculation.errors) %}
-    {% endif %}
-    {% if interventions.errors.length > 0 %}
-        {% set errors = errors.concat(interventions.errors) %}
-    {% endif %}
-    {% if errors.length > 0 %}
-        <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
-    {% endif %}
-    {% block pageContent %}{% endblock %}
-{% endblock %}
+        {% set errors = [] %}
+        {% if risks.errors.length > 0 %}
+            {% set errors = errors.concat(risks.errors) %}
+        {% endif %}
+        {% if tierCalculation.errors.length > 0 %}
+            {% set errors = errors.concat(tierCalculation.errors) %}
+        {% endif %}
+        {% if interventions.errors.length > 0 %}
+            {% set errors = errors.concat(interventions.errors) %}
+        {% endif %}
+        {% if errors.length > 0 %}
+            <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
+        {% endif %}
+        {% block pageContent %}{% endblock %}
+    {% endblock %}

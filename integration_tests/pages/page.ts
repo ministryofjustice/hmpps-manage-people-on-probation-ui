@@ -15,7 +15,7 @@ export default abstract class Page {
     cy.get('[data-qa=pageHeading]').contains(this.title)
   }
 
-  setPageTitle = (title: string) => {
+  checkPageTitle = (title: string) => {
     this.title = title
     this.checkOnPage()
   }
@@ -184,4 +184,6 @@ export default abstract class Page {
       .eq(1)
       .within(() => cy.get('strong').should('contain.text', 'RSR'))
   }
+
+  getElementByDataQA = (name: string): PageElement => cy.get(`[data-qa="${name}"]`)
 }

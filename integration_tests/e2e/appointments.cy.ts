@@ -10,7 +10,7 @@ context('Appointment', () => {
   it('Appointment page with outcome is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/4')
     const page = new AppointmentPage()
-    page.setPageTitle('Planned Telephone Contact (NS) with Steve Bruce')
+    page.checkPageTitle('Planned Telephone Contact (NS) with Steve Bruce')
     page.appointmentType().should('contain.text', 'Initial appointment')
     page.appointmentTitle().should('contain.text', 'Planned Telephone Contact (NS) with Steve Bruce')
     page.complianceTag().should('contain.text', 'Acceptable absence')
@@ -54,7 +54,7 @@ context('Appointment', () => {
   it('Appointment page with no outcome recorded is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/3')
     const page = new AppointmentPage()
-    page.setPageTitle('Video call with Paulie Walnuts')
+    page.checkPageTitle('Video call with Paulie Walnuts')
     page.appointmentType().should('contain.text', 'Other contact')
     page.appointmentTitle().should('contain.text', 'Video call with Paulie Walnuts')
     cy.get('.note-panel').should('contain.text', 'Outcome not recorded')

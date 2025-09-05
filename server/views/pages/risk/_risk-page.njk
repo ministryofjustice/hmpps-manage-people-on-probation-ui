@@ -1,6 +1,6 @@
 <div class="govuk-grid-column-two-thirds">
     {% if hasRiskAssessment %}
-        <div class='govuk-!-margin-bottom-4'>
+        <div class='govuk-!-margin-bottom-4' data-qa="criminogenicNeeds">
             <h3 class="govuk-heading-m score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
                 Criminogenic needs
             </h3>
@@ -49,8 +49,8 @@
         </div>
     {% else %}
         {% set html %}
-            <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
-            {% include './_no-oasys-risk-assessment.njk' %}
+        <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
+        {% include './_no-oasys-risk-assessment.njk' %}
         {% endset %}
         {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
     {% endif %}

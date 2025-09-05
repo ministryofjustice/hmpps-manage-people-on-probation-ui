@@ -15,7 +15,7 @@ context('Edit contact details', () => {
   it('Edit contact details page is rendered based on non fixed address', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = new EditContactDetails()
-    page.setPageTitle('Edit contact details for Caroline')
+    page.checkPageTitle('Edit contact details for Caroline')
     page.getElement('phoneNumber').should('be.visible')
     page.getElement('phoneNumber').find('label').should('contain.text', 'Phone number')
     page.getElement('phoneNumber').find('.govuk-hint').should('contain.text', 'For example, 01632 960 000')

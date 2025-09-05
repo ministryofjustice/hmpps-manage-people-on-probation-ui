@@ -7,7 +7,7 @@ context('Activity log details', () => {
   it('should render a complied appointment', () => {
     cy.visit('/case/X000001/activity-log/activity/15')
     const page = new ActivityLogDetailsPage()
-    page.setPageTitle('Office appointment with Terry Jones')
+    page.checkPageTitle('Office appointment with Terry Jones')
     cy.get('[data-qa="appointmentType"]').should('contain.text', 'National standard appointment')
     cy.get('[data-qa="complianceTag"]').should('contain.text', 'Complied')
     page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
@@ -68,7 +68,7 @@ context('Activity log details', () => {
   it('should render an appointment without an outcome', () => {
     cy.visit('/case/X000001/activity-log/activity/16')
     const page = new ActivityLogDetailsPage()
-    page.setPageTitle('Office appointment with Terry Jones')
+    page.checkPageTitle('Office appointment with Terry Jones')
     cy.get('[data-qa="appointmentType"]').should('contain.text', 'National standard appointment')
     cy.get('.note-panel').find('.govuk-warning-text__text').should('contain.text', 'Outcome not recorded')
     cy.get('.note-panel')
