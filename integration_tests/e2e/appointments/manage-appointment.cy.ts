@@ -16,6 +16,7 @@ describe('Manage an appointment', () => {
     manageAppointmentPage = new ManageAppointmentPage()
   })
   it('should render the page', () => {
+    manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
   })
