@@ -8,7 +8,8 @@
 
 {% set pageTitle = makePageTitle({pageHeading: "Risk"}) %}
 {% set currentNavSection = 'risk' %}
-{% set currentSectionName = 'Risk' if not sanIndicator else 'Risk and plan'  %}
+{% set currentSectionName = 'Risk' if not sanIndicator else 
+    'Risk and plan' %}
 
 {% set headerPersonName = personRisk.personSummary.name | fullName %}
 {% set headerCRN = crn %}
@@ -23,53 +24,50 @@
 {% endif %}
 
 {% if sanIndicator %}
-  {%  set scoresHeadingLevel='4' %}
-  {%  set scoresSubHeadingLevel='5' %}
-  {%  set scoresHeadingClass='s' %}
+    {% set scoresHeadingLevel = '4' %}
+    {% set scoresSubHeadingLevel = '5' %}
+    {% set scoresHeadingClass = 's' %}
 
 {% endif %}
 
-
-
-
 {% set highScoringNeeds %}
-    {% if highScoring.length > 0 %}
-        <ul class="govuk-list">
-            {% for need in highScoring %}
-                <li>
-                    {{ need.name }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
+{% if highScoring.length > 0 %}
+    <ul class="govuk-list">
+        {% for need in highScoring %}
+            <li>
+                {{ need.name }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
         None
     {% endif %}
 {% endset %}
 
 {% set lowScoringNeeds %}
-    {% if lowScoring.length > 0 %}
-        <ul class="govuk-list">
-            {% for need in lowScoring %}
-                <li>
-                    {{ need.name }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
+{% if lowScoring.length > 0 %}
+    <ul class="govuk-list">
+        {% for need in lowScoring %}
+            <li>
+                {{ need.name }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
         None
     {% endif %}
 {% endset %}
 
 {% set noScoreNeeds %}
-    {% if withoutScore.length > 0 %}
-        <ul class="govuk-list">
-            {% for need in withoutScore %}
-                <li>
-                    {{ need.name }}
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
+{% if withoutScore.length > 0 %}
+    <ul class="govuk-list">
+        {% for need in withoutScore %}
+            <li>
+                {{ need.name }}
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
         None
     {% endif %}
 {% endset %}
@@ -96,9 +94,9 @@
 {% block pageContent %}
     <div class="govuk-grid-row govuk-!-margin-top-4">
         {% if not sanIndicator %}
-        {% include "./risk/_risk-page.njk" %}
+            {% include "./risk/_risk-page.njk" %}
         {% else %}
-        {% include "./risk/_risk-page-san-indicator.njk" %}
+            {% include "./risk/_risk-page-san-indicator.njk" %}
         {% endif %}
     </div>
 {% endblock %}

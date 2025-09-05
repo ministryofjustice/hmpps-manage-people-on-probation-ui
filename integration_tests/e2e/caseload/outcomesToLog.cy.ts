@@ -45,7 +45,7 @@ context('Outcomes to log', () => {
   it('Outcomes to log page is rendered', () => {
     cy.visit('/caseload/appointments/no-outcome')
     const page = new UserAppointments()
-    page.setPageTitle('Outcomes to log')
+    page.checkPageTitle('Outcomes to log')
     checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/no-outcome')
     checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/no-outcome')
     checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/no-outcome')
@@ -102,7 +102,7 @@ context('Outcomes to log', () => {
     cy.task('stubNoOutcomesToLog')
     cy.visit('/caseload/appointments/no-outcome')
     const page = new UserAppointments()
-    page.setPageTitle('Outcomes to log')
+    page.checkPageTitle('Outcomes to log')
     cy.get('p').should('contain.text', 'No outcomes to log.')
     cy.get('table').should('not.exist')
     cy.get('.govuk-pagination').should('not.exist')

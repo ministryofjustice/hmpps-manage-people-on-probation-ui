@@ -14,13 +14,32 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
 ).response.jsonBody.riskFlags
 
-context('Risk', () => {
-  it('Risk overview page is rendered', () => {
-    cy.visit('/case/X000001/risk')
-    const page = Page.verifyOnPage(RiskPage)
+const checkCriminogenicNeeds = (page: RiskPage, sanIndicator = false) => {
+  const headingLevel = !sanIndicator ? '3' : '4'
+  page.getElementByDataQA('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
+  if (!sanIndicator) {
+    page.getElementByDataQA('criminogenicNeeds').find('h3').should('contain.text', 'Criminogenic needs')
     page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
+    page.getInsetText().should('contain.text', 'Last updated (OASys): 24 January 2024')
+  } else {
+    page.getElementByDataQA('criminogenicNeeds').should('not.exist')
+    page.getInsetText().should('not.exist')
+    cy.get('h3').should('contain.text', 'Risk')
+  }
+}
+
+context('Risk', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
+  it('Risk overview page is rendered when san indicator is false', () => {
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    page.checkPageTitle('Risk')
+    checkCriminogenicNeeds(page)
+
     page.getElementData('mappa-heading').should('contain.text', 'Cat 0/').should('contain.text', 'Level 2')
 
     page.getCardHeader('riskFlags').should('contain.text', 'NDelius risk flags')
@@ -100,6 +119,16 @@ context('Risk', () => {
     page.getElementData('ogp-level').should('have.text', 'High')
   })
 
+  it('Risk overview page is rendered when san indicator is true', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    page.checkPageTitle('Risk and plan')
+    const sanIndicator = true
+    checkCriminogenicNeeds(page, sanIndicator)
+    // cy.pause()
+  })
+
   it('Removed risk page is rendered', () => {
     cy.visit('/case/X000001/risk/removed-risk-flags')
     const page = Page.verifyOnPage(RemovedRiskPage)
@@ -124,7 +153,7 @@ context('Risk', () => {
   it('Risk Detail page is rendered', () => {
     cy.visit('/case/X000001/risk/flag/2')
     const page = new RiskDetailPage()
-    page.setPageTitle('Domestic Abuse Perpetrator')
+    page.checkPageTitle('Domestic Abuse Perpetrator')
     cy.get('.govuk-caption-l').should('contain.text', 'Risk flag')
     page.getCardHeader('riskFlag').should('contain.text', 'About this flag')
     page
@@ -161,7 +190,7 @@ context('Risk', () => {
   it('Risk Detail page is rendered with expired review date', () => {
     cy.visit('/case/X000001/risk/flag/1')
     const page = new RiskDetailPage()
-    page.setPageTitle('Risk to Staff')
+    page.checkPageTitle('Risk to Staff')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
   })
   it('Risk page is rendered with create a risk assessment on OASys link', () => {

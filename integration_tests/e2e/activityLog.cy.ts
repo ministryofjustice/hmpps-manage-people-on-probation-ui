@@ -45,7 +45,7 @@ context('Activity log', () => {
   it('should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/activity-log', { failOnStatusCode: false })
     const page = new ErrorPage()
-    page.setPageTitle('Page not found')
+    page.checkPageTitle('Page not found')
   })
   it('should render the activity log results', () => {
     cy.visit('/case/X000001/activity-log')
