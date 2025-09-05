@@ -12,7 +12,7 @@ import {
   checkPopHeader,
 } from './imports'
 
-const loadPage = (date?: DateTime) => {
+const loadPage = (date?: DateTime<true>) => {
   completeSentencePage(1, '', '', date)
   completeTypePage(1, false)
   completeAttendancePage()
