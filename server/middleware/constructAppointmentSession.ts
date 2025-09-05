@@ -6,8 +6,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   const { appointment } = res.locals.personAppointment
   const { appointmentTypes, sentences } = res.locals
   const type = appointmentTypes.find(t => t.description === appointment.type)?.code
-  const eventId =
-    appointment?.eventId || sentences.find(sentence => sentence.eventNumber === appointment.eventNumber)?.id
+  const eventId = appointment?.eventId || ''
   let notes = ''
   if (appointment?.appointmentNotes) {
     notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
@@ -32,7 +31,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     numberOfRepeatAppointments: '0',
     eventId: eventId?.toString() || '',
     username: res.locals.user.username,
-    uuid: '', // this needs assigning when cloned,
+    uuid: '',
     repeating: 'No',
     repeatingDates: [],
     notes,
