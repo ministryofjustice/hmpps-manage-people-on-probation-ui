@@ -4,7 +4,7 @@ import controllers from '.'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
-import { postAppointments, renderError } from '../middleware'
+import { postAppointments, renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
@@ -36,6 +36,7 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
   postAppointments: jest.fn(),
+  cloneAppointmentAndRedirect: jest.fn(),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -58,6 +59,7 @@ const mockedIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNumericString>
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockedPostAppointments = postAppointments as jest.MockedFunction<typeof postAppointments>
+const mockedCloneAppointment = cloneAppointmentAndRedirect as jest.MockedFunction<typeof cloneAppointmentAndRedirect>
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
@@ -191,7 +193,8 @@ describe('controllers/arrangeAppointment', () => {
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,
-        errors: mockReq.session.data.errors,
+        change: undefined,
+        errors: undefined,
       })
     })
   })
@@ -409,7 +412,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/location`, {
         crn,
         id: uuid,
-        errors: mockReq.session.data.errors,
+        errors: null,
         change: mockReq.query.change,
       })
     })
@@ -864,6 +867,7 @@ describe('controllers/arrangeAppointment', () => {
         teamCode: '',
         providerCode: '',
       },
+      type: '...',
       date: '2025/7/2',
       start: '9:00am',
       end: '9:30am',
@@ -879,35 +883,18 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
+
     it('should clone the current appointment with no date or time set and save it to session', async () => {
       const mockReq = createMockRequest({
         appointmentSession,
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
+      const handler = jest.fn()
+      mockedCloneAppointment.mockReturnValue(handler)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      const expectedClone: AppointmentSession = {
-        ...appointmentSession,
-        date: '',
-        start: '',
-        end: '',
-        until: '',
-        numberOfAppointments: '1',
-        numberOfRepeatAppointments: '0',
-        repeatingDates: [] as string[],
-        repeating: 'No',
-      }
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid2], expectedClone)
-    })
-    it('should redirect to the arrange another appointment page', async () => {
-      mockedUuidv4.mockReturnValueOnce(uuid2)
-      const mockReq = createMockRequest({
-        appointmentSession,
-      })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid2}/arrange-another-appointment`)
+      expect(mockedCloneAppointment).toHaveBeenCalledWith(appointmentSession)
+      expect(handler).toHaveBeenCalledWith(mockReq, res)
     })
   })
   describe('getArrangeAnotherAppointment', () => {
@@ -941,6 +928,7 @@ describe('controllers/arrangeAppointment', () => {
           url,
         },
         appointmentSession: {
+          type: 'type',
           date: '',
           start: '',
           end: '',
@@ -954,8 +942,10 @@ describe('controllers/arrangeAppointment', () => {
         `/case/${crn}/arrange-appointment/${uuid}/date-time?validation=true&change=${url}`,
       )
     })
-    it('should redirect to the confirmation page if date value is in appointment session', async () => {
-      const mockReq = createMockRequest({ appointmentSession: { date: '2025/7/2', start: '9:00am', end: '9:30am' } })
+    it('should redirect to the confirmation page if all required values are present in appointment session', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: { type: 'type', date: '2025/7/2', start: '9:00am', end: '9:30am' },
+      })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)

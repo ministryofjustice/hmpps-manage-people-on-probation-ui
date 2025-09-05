@@ -12,7 +12,7 @@ import {
   checkPopHeader,
 } from './imports'
 
-const loadPage = (date?: DateTime<true>) => {
+const loadPage = (date?: DateTime) => {
   completeSentencePage(1, '', '', date)
   completeTypePage(1, false)
   completeAttendancePage()
@@ -39,16 +39,33 @@ describe('Enter the date and time of the appointment', () => {
     })
     it('should display the circumstances', () => {
       dateTimePage.getSummaryLink().click()
-      dateTimePage.getDisability().find('dt').should('contain.text', 'Disability')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Hearing Disabilities')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Learning Disability')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Mental Health related disabilities')
-      dateTimePage.getDisability().find('dd').should('contain.text', 'Mobility related Disabilities')
-      dateTimePage.getReasonableAdjustments().find('dt').should('contain.text', 'Reasonable adjustments')
-      dateTimePage.getReasonableAdjustments().find('dd').should('contain.text', 'Handrails')
-      dateTimePage.getReasonableAdjustments().find('dd').should('contain.text', 'Behavioural responses/Body language')
-      dateTimePage.getDependents().find('dt').should('contain.text', 'Dependents')
-      dateTimePage.getDependents().find('dd').should('contain.text', 'None known')
+      dateTimePage.getPersonalCircumstance('disability').find('dt').should('contain.text', 'Disability')
+      dateTimePage
+        .getPersonalCircumstance('disability')
+        .find('dd')
+        .should('contain.text', 'Hearing Disabilities')
+        .should('contain.text', 'Learning Disability')
+        .should('contain.text', 'Mental Health related disabilities')
+        .should('contain.text', 'Mobility related Disabilities')
+      dateTimePage.getPersonalCircumstance('provisions').find('dt').should('contain.text', 'Reasonable adjustments')
+      dateTimePage
+        .getPersonalCircumstance('provisions')
+        .find('dd')
+        .should('contain.text', 'Handrails')
+        .should('contain.text', 'Behavioural responses/Body language')
+      dateTimePage.getPersonalCircumstance('dependents').find('dt').should('contain.text', 'Dependents')
+      dateTimePage.getPersonalCircumstance('dependents').find('dd').should('contain.text', 'Has Dependents')
+      dateTimePage.getPersonalCircumstance('employment').find('dt').should('contain.text', 'Employment')
+      dateTimePage
+        .getPersonalCircumstance('employment')
+        .find('dd')
+        .should('contain.text', 'Volunteering')
+        .should('contain.text', 'Full Time Employed')
+      dateTimePage.getPersonalCircumstance('relationship').find('dt').should('contain.text', 'Relationship')
+      dateTimePage
+        .getPersonalCircumstance('relationship')
+        .find('dd')
+        .should('contain.text', 'Married / Civil partnership')
     })
   })
 
@@ -89,12 +106,17 @@ describe('Enter the date and time of the appointment', () => {
   })
 
   describe('Continue is clicked selecting a start time which is in the past', () => {
+    let originalNow: typeof DateTime.now
     beforeEach(() => {
+      originalNow = DateTime.now
       const newDate = DateTime.now().set({
         hour: 10,
         minute: 30,
         second: 0,
         millisecond: 0,
+      })
+      cy.wrap(null).then(() => {
+        DateTime.now = () => newDate as DateTime<true>
       })
       loadPage(newDate)
       dateTimePage.getDatePickerToggle().click()
@@ -102,6 +124,9 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
+    })
+    afterEach(() => {
+      DateTime.now = originalNow
     })
     it('should display the error summary box', () => {
       dateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])

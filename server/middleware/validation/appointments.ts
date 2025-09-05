@@ -6,11 +6,10 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params } = req
+  const { url, params, body } = req
+  const { crn, id, contactId } = params
+  const localParams: LocalParams = { crn, id, body, contactId }
   let isAddNotePage = false
-  const { crn, id } = params
-
-  const localParams: LocalParams = { crn, id }
   let render = `pages/${[
     url
       .split('?')[0]
@@ -102,21 +101,7 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateSensitivity = () => {
-    if (req.url.includes('/add-notes')) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'add-notes',
-        }),
-      )
-    }
-  }
-
   const validateRecordAnOutcome = () => {
-    const { contactId } = req.params
     if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
       render = `pages/appointments/record-an-outcome`
       errorMessages = validateWithSpec(
@@ -124,14 +109,42 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
+          contactId,
           page: 'record-an-outcome',
         }),
       )
     }
   }
 
+  const validateSensitivity = () => {
+    if (req.url.includes('/add-notes')) {
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          contactId,
+          page: 'add-notes',
+        }),
+      )
+    }
+  }
+
+  const validateNextAppointment = () => {
+    if (req.url.includes('/next-appointment')) {
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'next-appointment',
+        }),
+      )
+      render = 'pages/appointments/next-appointment'
+    }
+  }
+
   const validateAddNote = () => {
-    const { contactId } = req.params
     if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
       render = `pages/appointments/add-note`
@@ -152,7 +165,9 @@ const appointments: Route<void> = (req, res, next) => {
   validateLocation()
   validateDateTime()
   validateRepeating()
+  validateRecordAnOutcome()
   validateSensitivity()
+  validateNextAppointment()
   validateRecordAnOutcome()
   validateAddNote()
   if (Object.keys(errorMessages).length) {

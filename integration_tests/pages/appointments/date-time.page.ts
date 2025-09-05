@@ -10,16 +10,8 @@ export default class AppointmentDateTimePage extends Page {
     return cy.get('.govuk-details__summary span')
   }
 
-  getDisability = () => {
-    return cy.get('[data-qa="disability"]')
-  }
-
-  getReasonableAdjustments = () => {
-    return cy.get('[data-qa="provisions"]')
-  }
-
-  getDependents = () => {
-    return cy.get('[data-qa="dependents"]')
+  getPersonalCircumstance = (name: string) => {
+    return cy.get(`[data-qa="${name}"]`)
   }
 
   getDatePickerToggle = () => {

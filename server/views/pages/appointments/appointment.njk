@@ -32,7 +32,7 @@
 
 {% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else 
   'Upcoming' %}
-{% set title = appointment.type + ' with ' + appointment.officerName | fullName %}
+{% set title = appointment.type + ' with ' + appointment.officer.name | fullName %}
 {% set isOutcomeRecorded = appointment.hasOutcome %}
 
 {% block content %}

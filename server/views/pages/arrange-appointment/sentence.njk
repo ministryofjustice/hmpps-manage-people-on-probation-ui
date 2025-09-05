@@ -11,7 +11,12 @@
     {% if sentence.requirements.length %}
       {% set requirements = [] %}
       {% for requirement in sentence.requirements %}
-        {% set requirements = (requirements.push({text: requirement.description, value: requirement.id}), requirements) %}
+        {% set licenceTag %}
+        {% if requirement.active === false %}
+          <span class="govuk-tag govuk-tag--grey" align="center">Terminated</span>
+        {% endif %}
+        {% endset %}
+        {% set requirements = (requirements.push({text: requirement.description, hint: {html: licenceTag}, value: requirement.id}), requirements) %}
       {% endfor %}
       {% set sentenceReveal %}
       {{ govukRadios({
@@ -35,7 +40,13 @@
     {% if sentence.licenceConditions.length %}
       {% set licenceConditions = [] %}
       {% for licenceCondition in sentence.licenceConditions %}
-        {% set licenceConditions = (licenceConditions.push({text: licenceCondition.mainDescription, value: licenceCondition.id}), licenceConditions) %}
+        {% set description = licenceCondition.mainDescription %}
+        {% set licenceTag %}
+        {% if licenceCondition.active === false %}
+          <span class="govuk-tag govuk-tag--grey" align="center">Terminated</span>
+        {% endif %}
+        {% endset %}
+        {% set licenceConditions = (licenceConditions.push({text: licenceCondition.mainDescription, hint: {html: licenceTag}, value: licenceCondition.id}), licenceConditions) %}
       {% endfor %}
       {% set sentenceReveal %}
       {{ govukRadios({

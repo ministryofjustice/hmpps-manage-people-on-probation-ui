@@ -25,9 +25,11 @@ export const mockActivity = {
     isNationalStandard: true,
     notes: 'Some notes',
     lastUpdated: '2023-03-20',
-    officerName: {
-      forename: 'Terry',
-      surname: 'Jones',
+    officer: {
+      name: {
+        forename: 'Terry',
+        surname: 'Jones',
+      },
     },
     lastUpdatedBy: {
       forename: 'Paul',

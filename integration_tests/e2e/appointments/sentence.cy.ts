@@ -22,6 +22,11 @@ const checkRequirementSentence = (type = 1) => {
         expect($legend.text().trim()).to.eq('Which requirement is this appointment for? (optional)')
       })
     })
+    it('should display the terminated requirements', () => {
+      const radios = sentencePage.getElement(`[data-qa="requirementId"]`).find('.govuk-radios__item')
+      radios.should('have.length', 3)
+      radios.eq(2).find(`.govuk-hint`).should('contain.text', 'Terminated')
+    })
     it('should not display the licence condition reveal', () => {
       sentencePage.getElement(`[data-qa="licenceConditionId"]`).should('not.be.visible')
     })
@@ -49,6 +54,11 @@ const checkLicenceConditionSentence = (type = 1) => {
       sentencePage.getElement('[data-qa="licenceConditionId"] legend').should($legend => {
         expect($legend.text().trim()).to.eq('Which licence condition is this appointment for? (optional)')
       })
+    })
+    it('should display the terminated licence conditions', () => {
+      const radios = sentencePage.getElement(`[data-qa="licenceConditionId"]`).find('.govuk-radios__item')
+      radios.should('have.length', 4)
+      radios.eq(3).find(`.govuk-hint`).should('contain.text', 'Terminated')
     })
     it('should not display the requirement reveal', () => {
       sentencePage.getElement(`[data-qa="requirementId"]`).should('not.be.visible')

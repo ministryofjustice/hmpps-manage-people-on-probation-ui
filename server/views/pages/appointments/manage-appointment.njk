@@ -90,7 +90,7 @@
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officerName | fullName }}</h2>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officer.name | fullName }}</h2>
       {% if alert %}
         {{ mojAlert({
   variant: "information",
@@ -150,7 +150,7 @@
       hint: {
         text: nextAppointmentHint
       },
-      href: "#" if not nextComAppointment.appointment,
+      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment" if not nextComAppointment.appointment,
       status: {
         tag: {
           text: "Not started",
@@ -231,7 +231,7 @@
         text: "Attending"
       },
       value: {
-        text: appointment.officerName | fullName
+        text: appointment.officer.name | fullName
       },
       actions: {
         items: [

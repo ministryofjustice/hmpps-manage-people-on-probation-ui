@@ -5,7 +5,7 @@ import { ResponseError } from 'superagent'
 import { Controller, Route } from '../@types'
 import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
-import { renderError, postAppointments } from '../middleware'
+import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { StatusErrorCode } from '../properties'
 
@@ -78,7 +78,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change } = req.query
       const { data } = req.session
-
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -367,6 +366,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getConfirmation: () => {
     return async (req, res) => {
       const { crn } = req.params
+      const { data } = req.session
       return res.render(`pages/arrange-appointment/confirmation`, { crn })
     }
   },
@@ -376,28 +376,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const uuid = uuidv4()
       const { data } = req.session
       const currentAppt = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-      const copiedAppt: AppointmentSession = {
-        ...currentAppt,
-        date: '',
-        start: '',
-        end: '',
-        repeatingDates: [] as string[],
-        until: '',
-        numberOfAppointments: '1',
-        numberOfRepeatAppointments: '0',
-        repeating: 'No',
-      }
-      setDataValue(data, ['appointments', crn, uuid], copiedAppt)
-      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
+      return cloneAppointmentAndRedirect(currentAppt)(req, res)
     }
   },
   getArrangeAnotherAppointment: () => {
     return async (req, res) => {
       const { url } = req
       const { crn, id } = req.params as Record<string, string>
+      const { data } = req.session
       return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id })
     }
   },
@@ -413,7 +401,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/date-time?validation=true&change=${req.url}`)
       }
       await postAppointments(hmppsAuthClient)(req, res)
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`) // and then redirect based on redirect-id
     }
   },
 }

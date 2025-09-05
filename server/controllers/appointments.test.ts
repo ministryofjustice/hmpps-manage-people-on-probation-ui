@@ -259,6 +259,22 @@ describe('controllers/appointments', () => {
       it('should not redirect', () => {
         expect(redirectSpy).not.toHaveBeenCalled()
       })
+      it('should NOT send the patch request to the api', () => {
+        expect(patchAppointmentSpy).not.toHaveBeenCalled()
+      })
+    })
+    describe('If CRN request param is valid', () => {
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
+        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+      })
+      it('should send the patch request to the api', () => {
+        expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
+      })
+      it('should redirect to the manage appointment page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+      })
     })
     describe('If CRN request param is valid', () => {
       beforeEach(async () => {
