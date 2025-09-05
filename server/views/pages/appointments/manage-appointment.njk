@@ -9,7 +9,8 @@
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
-
+{% set backLink = change if change else 
+  '/case/' + crn + '/appointments' %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = nextAppointment.appointment.type + " arranged with " + personSummary.name.forename + " at " + (
@@ -88,6 +89,13 @@
     {% endif %}
   {% endfor %}
 {% endif %}
+{% block beforeContent %}
+  {% if backLink %}
+    {{ govukBackLink({
+    href: backLink + ("?change=" + change if change else '')
+  }) }}
+  {% endif %}
+{% endblock %}
 {% block content %}
 
   {% if not hidePageHeader %}
