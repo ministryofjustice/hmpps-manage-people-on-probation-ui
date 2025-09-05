@@ -19,7 +19,7 @@ const stubAppointmentNoOutcomeWithNote = (): SuperAgentRequest =>
         },
         appointment: {
           id: 13,
-          type: 'Video call',
+          type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
@@ -45,9 +45,11 @@ const stubAppointmentNoOutcomeWithNote = (): SuperAgentRequest =>
             },
           ],
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Paulie',
-            surname: 'Walnuts',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
           },
           lastUpdatedBy: {
             forename: 'Paul',
@@ -80,7 +82,7 @@ const stubAppointmentOutcomeWithNote = (): SuperAgentRequest =>
         },
         appointment: {
           id: 13,
-          type: 'Video call',
+          type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
@@ -106,9 +108,11 @@ const stubAppointmentOutcomeWithNote = (): SuperAgentRequest =>
             },
           ],
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Paulie',
-            surname: 'Walnuts',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
           },
           lastUpdatedBy: {
             forename: 'Paul',
@@ -141,7 +145,7 @@ const stubAppointmentOutcomeWithNoNotes = (): SuperAgentRequest =>
         },
         appointment: {
           id: 13,
-          type: 'Video call',
+          type: 'Planned Video Contact (NS)',
           description: 'User-generated free text content',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
@@ -156,9 +160,11 @@ const stubAppointmentOutcomeWithNoNotes = (): SuperAgentRequest =>
           isNationalStandard: true,
           appointmentNotes: [],
           lastUpdated: '2023-03-20',
-          officerName: {
-            forename: 'Paulie',
-            surname: 'Walnuts',
+          officer: {
+            name: {
+              forename: 'Paulie',
+              surname: 'Walnuts',
+            },
           },
           lastUpdatedBy: {
             forename: 'Paul',

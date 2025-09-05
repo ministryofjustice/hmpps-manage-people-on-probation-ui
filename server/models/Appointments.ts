@@ -121,7 +121,9 @@ export interface LocalParams {
   crn: string
   id: string
   errors?: Errors
+  body?: Record<string, string | string[]>
   _minDate?: string
   _maxDate?: string
+  contactId?: string
   uploadedFiles?: any
 }

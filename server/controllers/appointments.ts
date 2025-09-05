@@ -6,8 +6,11 @@ import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress } from '../utils'
-import { renderError } from '../middleware'
+import { toRoshWidget, toPredictors, isNumericString, isValidCrn, setDataValue, isMatchingAddress } from '../utils'
+import logger from '../../logger'
+import { ErrorMessages } from '../data/model/caseload'
+import { renderError, cloneAppointmentAndRedirect } from '../middleware'
+import { AppResponse } from '../models/Locals'
 import { AppointmentPatch } from '../models/Appointments'
 
 const routes = [
@@ -20,6 +23,8 @@ const routes = [
   'getAddNote',
   'postAddNote',
   'getManageAppointment',
+  'getNextAppointment',
+  'postNextAppointment',
 ] as const
 
 const appointmentsController: Controller<typeof routes, void> = {
@@ -157,10 +162,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { username } = res.locals.user
-      const [personAppointment, nextComAppointment, appointmentTypes] = await Promise.all([
+      const { nextComAppointment } = res.locals
+      const [personAppointment, appointmentTypes] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
-        masClient.getNextAppointment(username, crn, contactId),
         masClient.getAppointmentTypes(),
       ])
       const { appointment } = personAppointment
@@ -257,6 +261,48 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       await masClient.patchAppointment(body)
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+    }
+  },
+
+  getNextAppointment: hmppsAuthClient => {
+    return async (req, res) => {
+      const { nextComAppointment } = res.locals
+      const { crn, contactId } = req.params
+      if (nextComAppointment?.appointment) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
+      return res.render('pages/appointments/next-appointment', {
+        personAppointment,
+        crn,
+      })
+    }
+  },
+
+  postNextAppointment: _hmppsAuthClient => {
+    return async (req, res) => {
+      const {
+        params: { crn, contactId },
+        body: { nextAppointment },
+      } = req
+      const { nextAppointmentSession } = res.locals
+      if (nextAppointment === 'keepType') {
+        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
+      }
+      if (nextAppointment === 'changeType') {
+        return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
+      }
+      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
   },
 }

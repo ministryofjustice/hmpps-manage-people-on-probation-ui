@@ -14,7 +14,7 @@
           "sentences": [
             {
               "id": 2501192724,
-              "eventNumber": 12345,
+              "eventNumber": "12345",
               "mainOffence": {
                 "code": "18502",
                 "description": "Breach of Restraining Order (Protection from Harassment Act 1997) - 00831"
@@ -39,7 +39,8 @@
                       "note": "Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer. Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer.Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
                       "hasNoteBeenTruncated": true
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 3003,
@@ -51,7 +52,8 @@
                       "note": "Not to go to a football game.\nmulti-line\n\nnote\n\nthis is the forth line",
                       "hasNoteBeenTruncated": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 2002,
@@ -67,13 +69,15 @@
                       "note": "James must reside at his parent's house in Scotland for the duration of his release on licence.",
                       "hasNoteBeenTruncated": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 1001,
                   "mainDescription": "Licence - Prohibited Activity",
                   "imposedReleasedDate": "2023-09-26",
-                  "licenceConditionNotes": []
+                  "licenceConditionNotes": [],
+                  "active": false
                 }
               ]
             },
@@ -101,7 +105,8 @@
                     "completed": 1,
                     "scheduled": 11,
                     "totalDays": 12
-                  }
+                  },
+                  "active": true
                 },
                 {
                   "id": 5678,
@@ -114,7 +119,8 @@
                   "description": "Curfew (Electronic Monitored)",
                   "length": "10",
                   "lengthUnitValue": "Hours",
-                  "notes": "curfew notes"
+                  "notes": "curfew notes",
+                  "active": true
                 },
                 {
                   "id": 9101,
@@ -123,7 +129,8 @@
                   "description": "Unpaid Work - Regular",
                   "length": 100,
                   "lengthUnitValue": "Hours",
-                  "notes": "unpaid work notes"
+                  "notes": "unpaid work notes",
+                  "active": false
                 }
               ]
             },
@@ -200,7 +207,8 @@
                       "note": "Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer. Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer.Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
                       "hasNoteBeenTruncated": true
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 3003,
@@ -212,7 +220,8 @@
                       "note": "Not to go to a football game.\nmulti-line\n\nnote\n\nthis is the forth line",
                       "hasNoteBeenTruncated": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 2002,
@@ -228,13 +237,15 @@
                       "note": "James must reside at his parent's house in Scotland for the duration of his release on licence.",
                       "hasNoteBeenTruncated": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 1001,
                   "mainDescription": "Licence - Prohibited Activity",
                   "imposedReleasedDate": "2023-09-26",
-                  "licenceConditionNotes": []
+                  "licenceConditionNotes": [],
+                  "active": false
                 }
               ]
             },
@@ -261,7 +272,8 @@
                     "completed": 1,
                     "scheduled": 11,
                     "totalDays": 12
-                  }
+                  },
+                  "active": true
                 },
                 {
                   "id": 5678,
@@ -274,7 +286,8 @@
                   "description": "Curfew (Electronic Monitored)",
                   "length": "10",
                   "lengthUnitValue": "Hours",
-                  "notes": "curfew notes"
+                  "notes": "curfew notes",
+                  "active": true
                 },
                 {
                   "id": 9101,
@@ -283,7 +296,8 @@
                   "description": "Unpaid Work - Regular",
                   "length": 100,
                   "lengthUnitValue": "Hours",
-                  "notes": "unpaid work notes"
+                  "notes": "unpaid work notes",
+                  "active": false
                 }
               ]
             }
@@ -337,7 +351,8 @@
                       "note": "Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer. Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as designated by your supervising officer to install an electronic monitoring tag on you and access to install any associated equipment in your property, and for the purpose of ensuring that equipment is functioning correctly. You must not damage or tamper with these devices and ensure that the tag is charged, and report to your supervising officer and the EM provider immediately if the tag or the associated equipment are not working correctly. This will be for the purpose of monitoring your alcohol abstinence licence condition(s) unless otherwise authorised by your supervising officer.Licence Condition created automatically from the Create and Vary a licence system of\nAllow person(s) as desi",
                       "hasNoteBeenTruncated": true
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 3003,
@@ -349,7 +364,8 @@
                       "note": "Not to go to a football game.\nmulti-line\n\nnote\n\nthis is the forth line",
                       "hasNoteBeenTruncated": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 2002,
@@ -365,13 +381,15 @@
                       "note": "James must reside at his parent's house in Scotland for the duration of his release on licence.",
                       "hasNoteBeenTruncated": false
                     }
-                  ]
+                  ],
+                  "active": true
                 },
                 {
                   "id": 1001,
                   "mainDescription": "Licence - Prohibited Activity",
                   "imposedReleasedDate": "2023-09-26",
-                  "licenceConditionNotes": []
+                  "licenceConditionNotes": [],
+                  "active": false
                 }
               ]
             }

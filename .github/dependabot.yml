@@ -20,7 +20,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "21:00"
+      time: "07:00"
       timezone: "Europe/London"
     groups:
       minor:
@@ -35,7 +35,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "monday"
-      time: "21:00"
+      time: "07:00"
       timezone: "Europe/London"
     groups:
       minor:

@@ -10,14 +10,14 @@ context('Appointment', () => {
   it('Appointment page with outcome is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/4')
     const page = new AppointmentPage()
-    page.setPageTitle('Phone call with Steve Bruce')
+    page.setPageTitle('Planned Telephone Contact (NS) with Steve Bruce')
     page.appointmentType().should('contain.text', 'Initial appointment')
-    page.appointmentTitle().should('contain.text', 'Phone call with Steve Bruce')
+    page.appointmentTitle().should('contain.text', 'Planned Telephone Contact (NS) with Steve Bruce')
     page.complianceTag().should('contain.text', 'Acceptable absence')
     page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
-    page.getRowData('appointmentDetails', 'type', 'Value').should('contain.text', 'Phone call')
-    page.getRowData('appointmentDetails', 'date', 'Value').should('contain.text', 'Friday 22 March')
-    page.getRowData('appointmentDetails', 'time', 'Value').should('contain.text', '8:15am to 8:30am')
+    page.getRowData('appointmentDetails', 'type', 'Value').should('contain.text', 'Planned Telephone Contact (NS)')
+    page.getRowData('appointmentDetails', 'date', 'Value').should('contain.text', 'Wednesday 21 February')
+    page.getRowData('appointmentDetails', 'time', 'Value').should('contain.text', '10:15am to 10:30am')
     page.getRowData('appointmentDetails', 'repeating', 'Value').should('contain.text', 'Yes')
     page.getRowData('appointmentDetails', 'rar', 'Value').should('contain.text', 'Choices and Changes')
     page.getCardHeader('outcomeDetails').should('contain.text', 'Outcome details')
@@ -52,9 +52,9 @@ context('Appointment', () => {
   it('Appointment page with no outcome recorded is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/3')
     const page = new AppointmentPage()
-    page.setPageTitle('Video call with Paulie Walnuts')
+    page.setPageTitle('Planned Video Contact (NS) with Paulie Walnuts')
     page.appointmentType().should('contain.text', 'Other contact')
-    page.appointmentTitle().should('contain.text', 'Video call with Paulie Walnuts')
+    page.appointmentTitle().should('contain.text', 'Planned Video Contact (NS) with Paulie Walnuts')
     cy.get('.note-panel').should('contain.text', 'Outcome not recorded')
     cy.get('.note-panel')
       .find('a')
@@ -84,7 +84,7 @@ context('Appointment', () => {
       .upcomingAppointmentAction(2)
       .find('a')
       .should('contain.text', 'Manage')
-      .should('have.attr', 'aria-label', 'Manage video call appointment on NDelius')
+      .should('have.attr', 'aria-label', 'Manage planned video contact (ns) appointment on NDelius')
       .should(
         'have.attr',
         'href',
@@ -93,7 +93,7 @@ context('Appointment', () => {
 
     page.upcomingAppointmentDate(2).should('contain.text', '22 March 2045')
     page.upcomingAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
-    page.upcomingAppointmentType(2).should('contain.text', 'Video call')
+    page.upcomingAppointmentType(2).should('contain.text', 'Planned Video Contact (NS)')
 
     page.getElement('[data-qa="pastAppointments"]').find('h2').should('contain.text', 'Past appointments')
     page.pastAppointmentDate(1).should('contain.text', '22 March 2024')

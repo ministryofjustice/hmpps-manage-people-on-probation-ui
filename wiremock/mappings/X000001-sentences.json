@@ -50,29 +50,35 @@
               "licenceConditions": [
                 {
                   "id": 166,
-                  "mainDescription": "lic cond main"
+                  "mainDescription": "lic cond main",
+                  "active": true
                 },
                 {
                   "id": 167,
-                  "mainDescription": "lic cond main"
+                  "mainDescription": "lic cond main",
+                  "active": true
                 },
                 {
                   "id": 168,
-                  "mainDescription": "lic cond main"
+                  "mainDescription": "lic cond main",
+                  "active": true
                 },
                 {
                   "id": 169,
-                  "mainDescription": "lic cond main"
+                  "mainDescription": "lic cond main",
+                  "active": false
                 }
               ],
               "requirements": [
                 {
                   "id": 80,
-                  "description": "2 of 12 RAR days completed"
+                  "description": "2 of 12 RAR days completed",
+                  "active": true
                 },
                 {
                   "id": 83,
-                  "description": "Unpaid Work - Intensive"
+                  "description": "Unpaid Work - Intensive",
+                  "active": false
                 }
               ]
             }

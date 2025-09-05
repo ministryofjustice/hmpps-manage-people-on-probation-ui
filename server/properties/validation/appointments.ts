@@ -16,10 +16,11 @@ export interface AppointmentsValidationArgs {
   page: string
   repeatingValue?: 'Yes' | 'No'
   visor?: boolean
+  contactId?: string
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue } = args
+  const { crn, id, page, visor, repeatingValue, contactId } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -166,6 +167,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select if appointment includes sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    nextAppointment: {
+      optional: page !== 'next-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select whether or not you wanted to arrange the next appointment',
+          log: 'Next appointment type not selected',
         },
       ],
     },
