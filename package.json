@@ -163,6 +163,7 @@
     "superagent": "^10.2.2",
     "timepicker": "^1.14.1",
     "url-value-parser": "^2.2.0",
+    "util.inherits": "^1.0.3",
     "uuid": "^11.1.0",
     "webpack": "^5.101.3",
     "wiremock": "^3.13.1"
