@@ -1,25 +1,21 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const stubSanIndicatorFalse = (): SuperAgentRequest =>
+const stubSanIndicatorTrue = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
-    mappings: [
-      {
-        request: {
-          urlPathPattern: '/san-indicator/crn/.*',
-          method: 'GET',
-        },
-        response: {
-          status: 200,
-          jsonBody: {
-            crn: 'X000001',
-            sanIndicator: false,
-          },
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        },
+    request: {
+      urlPattern: '/arns/san-indicator/crn/.*',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        crn: 'X000001',
+        sanIndicator: true,
       },
-    ],
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
   })
 
-export default { stubSanIndicatorFalse }
+export default { stubSanIndicatorTrue }
