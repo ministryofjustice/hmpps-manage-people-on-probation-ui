@@ -46,7 +46,7 @@
         <span class="govuk-caption-l" data-qa="appointmentType">
           {% include './_appointment-prefix.njk' %}</span>
         <span data-qa="appointmentTitle">{{ title }}</span>
-        {% if isInThePast(appointment.startDateTime) %}
+        {% if appointment.isInPast %}
           <div class="govuk-!-margin-top-1" data-qa="complianceTag">
             {{ appComplianceTag({ entry: appointment }) }}
           </div>

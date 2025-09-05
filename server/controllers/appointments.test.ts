@@ -1,13 +1,12 @@
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
-import logger from '../../logger'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString } from '../utils'
+import { toRoshWidget, toPredictors, isValidCrn, isNumericString, isMatchingAddress } from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -18,6 +17,8 @@ import {
 } from './mocks'
 import { checkAuditMessage } from './testutils'
 import { renderError } from '../middleware'
+import { NextAppointmentResponse } from '../models/Appointments'
+import { Activity } from '../data/model/schedule'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -32,6 +33,7 @@ jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
+
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -49,6 +51,7 @@ jest.mock('../utils', () => {
     toPredictors: jest.fn(),
     isValidCrn: jest.fn(),
     isNumericString: jest.fn(),
+    isMatchingAddress: jest.fn(() => true),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -74,15 +77,15 @@ const req = httpMocks.createRequest({
 })
 
 const res = mockAppResponse({
-  filters: {
-    dateFrom: '',
-    dateTo: '',
-    keywords: '',
+  user: {
+    username: 'user-1',
+  },
+  case: {
+    mainAddress: {},
   },
 })
 
 const renderSpy = jest.spyOn(res, 'render')
-const statusSpy = jest.spyOn(res, 'status')
 const redirectSpy = jest.spyOn(res, 'redirect')
 
 const getPersonScheduleSpy = jest
@@ -92,6 +95,21 @@ const getPersonScheduleSpy = jest
 const getPersonAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointment')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
+
+const nextApptResponse: NextAppointmentResponse = {
+  appointment: {} as Activity,
+  usernameIsCom: true,
+  personManager: {
+    code: '',
+    name: {
+      forename: 'Joe',
+      surname: 'Bloggs',
+    },
+  },
+}
+const getNextAppointmentSpy = jest
+  .spyOn(MasApiClient.prototype, 'getNextAppointment')
+  .mockImplementation(() => Promise.resolve(nextApptResponse))
 
 const patchAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'patchAppointment')
@@ -105,8 +123,6 @@ const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplemen
 const getPredictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
-
-const loggerSpy = jest.spyOn(logger, 'info')
 
 describe('controllers/appointments', () => {
   beforeEach(() => {
@@ -221,11 +237,32 @@ describe('controllers/appointments', () => {
     })
   })
 
+  describe('get manage appointment', () => {
+    beforeEach(async () => {
+      await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
+    it('should request the person appointment', () => {
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+    })
+    it('should request the next appointment', () => {
+      expect(getNextAppointmentSpy).toHaveBeenCalledWith('user-1', crn, id)
+    })
+    it('should render the manage appointment page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+        nextAppointment: nextApptResponse,
+        nextAppointmentIsAtHome: true,
+      })
+    })
+  })
+
   describe('get record an outcome', () => {
     beforeEach(async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
+    checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
         crn,

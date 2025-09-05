@@ -430,3 +430,7 @@ body.feature-disabled {
     display: none;
   }
 }
+
+.govuk-summary-list__actions .govuk-link {
+  white-space: nowrap;
+}

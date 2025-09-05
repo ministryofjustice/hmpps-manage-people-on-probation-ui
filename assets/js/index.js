@@ -251,8 +251,6 @@ const multiFileUpload = () => {
     }
 
     function uploadExit(_handle, _file, _response) {
-      // const $actions = $('.moj-multi-file-upload__actions')
-
       if (isAllFinished()) {
         continueButtonEnabled(true)
       } else if ($('.moj-multi-file-upload__list')) {

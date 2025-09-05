@@ -24,7 +24,7 @@ describe('Create next appointment', () => {
     checkPopHeader('Caroline Wolff', false)
   })
   it('should display the options', () => {
-    nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another planned video contact (NS)')
+    nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another planned office visit (NS)')
     nextAppointmentPage.getRadioLabel('option', 2).should('contain.text', 'Yes - another appointment type')
     nextAppointmentPage.getRadioLabel('option', 3).should('contain.text', 'No')
   })
@@ -33,6 +33,7 @@ describe('Create next appointment', () => {
     loadPage()
     nextAppointmentPage.getSubmitBtn().click()
     nextAppointmentPage.getErrorSummaryBox().should('be.visible')
+    // cy.pause()
   })
   it('should go to arrange another appointment page if top option selected', () => {
     nextAppointmentPage.getRadio('option', 1).click()
@@ -52,7 +53,7 @@ describe('Create next appointment', () => {
     nextAppointmentPage.getRadio('option', 3).click()
     nextAppointmentPage.getSubmitBtn().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Planned Video Contact (NS) with William Philips')
+    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with George Parker')
     manageAppointmentPage.checkOnPage()
   })
 })

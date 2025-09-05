@@ -16,6 +16,7 @@ describe('Manage an appointment', () => {
     manageAppointmentPage = new ManageAppointmentPage()
   })
   it('should render the page', () => {
+    manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
   })
@@ -26,6 +27,15 @@ describe('Manage an appointment', () => {
         manageAppointmentPage = new ManageAppointmentPage()
       })
       it('should not show the alert', () => {
+        manageAppointmentPage.getAlertBanner().should('not.exist')
+      })
+    })
+    describe('Appointment is NDelius managed', () => {
+      beforeEach(() => {
+        cy.task('stubAppointmentNDeliusManagedTypeNoNotesHasOutcome')
+        loadPage()
+      })
+      it('should not display the alert', () => {
         manageAppointmentPage.getAlertBanner().should('not.exist')
       })
     })
@@ -74,7 +84,7 @@ describe('Manage an appointment', () => {
     it('should display the section title', () => {
       manageAppointmentPage.getAppointmentActions().find('h3').should('contain.text', 'Appointment actions')
     })
-    it('should display the inset text and MDelius link', () => {
+    it('should display the inset text and NDelius link', () => {
       manageAppointmentPage.getAppointmentActions().find('.govuk-inset-text').should('contain.text', 'You must')
       manageAppointmentPage
         .getAppointmentActions()
@@ -546,7 +556,7 @@ describe('Manage an appointment', () => {
       manageAppointmentPage.getAppointmentDetails().find('h3').should('contain.text', 'Appointment details')
     })
     describe('MPOP managed appointment', () => {
-      checkAppointmentDetails()
+      checkAppointmentDetails({ withLocationOfficeNameTask: 'stubAppointmentWithLocationOffice' })
     })
     describe('Delius managed appointment type, no outcome', () => {
       beforeEach(() => {
@@ -557,7 +567,8 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentNDeliusManagedType',
         noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesNoOutcome',
         withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesNoOutcome',
-        deliusManagedType: true,
+        withLocationOfficeNameTask: '',
+        deliusManaged: true,
       })
     })
     describe('Delius managed appointment type, complied', () => {
@@ -569,8 +580,24 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentNDeliusManagedTypeComplied',
         noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesHasOutcome',
         withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesHasOutcome',
-        deliusManagedType: true,
+        deliusManaged: true,
         hasComplied: true,
+        hasOutcome: true,
+      })
+    })
+    describe('Delius managed appointment, acceptable absence', () => {
+      beforeEach(() => {
+        cy.task('stubAppointmentAcceptableAbsenceNoNotes')
+        loadPage()
+      })
+      checkAppointmentDetails({
+        task: 'stubAppointmentAcceptableAbsenceNoNotes',
+        noNotesTask: 'stubAppointmentAcceptableAbsenceNoNotes',
+        withNotesTask: 'stubAppointmentAcceptableAbsenceWithNotes',
+        deliusManaged: true,
+        hasComplied: false,
+        acceptableAbsence: true,
+        hasOutcome: true,
       })
     })
     describe('Delius managed appointment, unacceptable absence', () => {
@@ -582,9 +609,10 @@ describe('Manage an appointment', () => {
         task: 'stubAppointmentUnacceptableAbsenceNoNotes',
         noNotesTask: 'stubAppointmentUnacceptableAbsenceNoNotes',
         withNotesTask: 'stubAppointmentUnacceptableAbsenceWithNotes',
-        deliusManagedType: true,
+        deliusManaged: true,
         hasComplied: false,
-        notCompliedAbsence: true,
+        acceptableAbsence: false,
+        hasOutcome: true,
       })
     })
   })

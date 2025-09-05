@@ -128,8 +128,7 @@ export interface Address {
   county?: string
   postcode?: string
   ldu?: string
-  lastUpdated?: string
-  lastUpdatedBy?: Name
+  telephoneNumber?: string
 }
 
 export interface AddressType {

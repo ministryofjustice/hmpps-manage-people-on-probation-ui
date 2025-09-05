@@ -23,7 +23,9 @@ context('Appointment', () => {
     page.getCardHeader('outcomeDetails').should('contain.text', 'Outcome details')
     page.getRowData('outcomeDetails', 'complied', 'Value').should('contain.text', 'No')
     page.getRowData('outcomeDetails', 'outcome', 'Value').should('contain.text', 'User-generated free text content')
-    page.getRowData('outcomeDetails', 'enforcementAction', 'Value').should('contain.text', 'Enforcement Action')
+    page
+      .getRowData('outcomeDetails', 'enforcementAction', 'Value')
+      .should('contain.text', 'Enforcement action description')
     page.getRowData('outcomeDetails', 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
     page.getRowData('outcomeDetails', 'sensitive', 'Value').should('contain.text', 'No')
     page.getRowData('outcomeDetails', 'notes', 'Value').should('contain.text', 'Some notes')
@@ -52,9 +54,9 @@ context('Appointment', () => {
   it('Appointment page with no outcome recorded is rendered', () => {
     cy.visit('/case/X000001/appointments/appointment/3')
     const page = new AppointmentPage()
-    page.setPageTitle('Planned Video Contact (NS) with Paulie Walnuts')
+    page.setPageTitle('Video call with Paulie Walnuts')
     page.appointmentType().should('contain.text', 'Other contact')
-    page.appointmentTitle().should('contain.text', 'Planned Video Contact (NS) with Paulie Walnuts')
+    page.appointmentTitle().should('contain.text', 'Video call with Paulie Walnuts')
     cy.get('.note-panel').should('contain.text', 'Outcome not recorded')
     cy.get('.note-panel')
       .find('a')

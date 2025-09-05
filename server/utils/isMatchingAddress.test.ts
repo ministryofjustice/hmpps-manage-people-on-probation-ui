@@ -33,19 +33,9 @@ describe('utils/isMatchingAddress', () => {
   it('should return true if all address values match', () => {
     const address1: Address = {
       ...mockAddress,
-      lastUpdated: '2023-03-14',
-      lastUpdatedBy: {
-        forename: 'Jim',
-        surname: 'Smith',
-      },
     }
     const address2: Address = {
       ...mockAddress,
-      lastUpdated: '2023-04-18',
-      lastUpdatedBy: {
-        forename: 'Jim',
-        surname: 'Smith',
-      },
     }
     expect(isMatchingAddress(address1, address2)).toEqual(true)
   })

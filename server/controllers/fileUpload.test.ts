@@ -100,7 +100,7 @@ describe('fileUpload controller', () => {
         await controllers.fileUpload.postUploadFile(hmppsAuthClient)(req, mockRes)
       })
       it('should upload the document', () => {
-        expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, (req.files as Express.Multer.File[])[0].buffer)
+        expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, (req.files as Express.Multer.File[])[0])
       })
       it('should return the correct response', () => {
         const expectedResponse: FileUploadResponse = {

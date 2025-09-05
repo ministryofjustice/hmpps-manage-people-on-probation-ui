@@ -39,7 +39,7 @@ const fileUploadController: Controller<typeof routes, any> = {
         setErrorMessage(status === 415 ? errors.type : errors.size)
       } else {
         try {
-          await masClient.patchDocuments(crn, id, file.buffer)
+          await masClient.patchDocuments(crn, id, file)
           await sleep(500)
           response.success = {
             messageHtml: originalName,

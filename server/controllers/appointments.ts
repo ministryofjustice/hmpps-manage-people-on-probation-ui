@@ -6,11 +6,8 @@ import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn, setDataValue, isMatchingAddress } from '../utils'
-import logger from '../../logger'
-import { ErrorMessages } from '../data/model/caseload'
+import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress } from '../utils'
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
-import { AppResponse } from '../models/Locals'
 import { AppointmentPatch } from '../models/Appointments'
 
 const routes = [
@@ -162,24 +159,19 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { nextComAppointment } = res.locals
-      const [personAppointment, appointmentTypes] = await Promise.all([
+      const { username } = res.locals.user
+      const [personAppointment, nextAppointment] = await Promise.all([
         masClient.getPersonAppointment(crn, contactId),
-        masClient.getAppointmentTypes(),
+        masClient.getNextAppointment(username, crn, contactId),
       ])
-      const { appointment } = personAppointment
-      const deliusManaged =
-        (appointment?.hasOutcome && appointment?.acceptableAbsence === false) ||
-        appointmentTypes.appointmentTypes.every(type => type.description !== appointment.type)
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
-        nextComAppointment?.appointment?.location,
+        nextAppointment?.appointment?.location,
       )
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
-        nextComAppointment,
-        deliusManaged,
+        nextAppointment,
         nextAppointmentIsAtHome,
       })
     }
@@ -188,7 +180,7 @@ const appointmentsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn } = req.params
       await auditService.sendAuditMessage({
-        action: 'VIEW_MANAGE_APPOINTMENT',
+        action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
@@ -266,9 +258,9 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { nextComAppointment } = res.locals
+      const { nextAppointment } = res.locals
       const { crn, contactId } = req.params
-      if (nextComAppointment?.appointment) {
+      if (nextAppointment?.appointment) {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
