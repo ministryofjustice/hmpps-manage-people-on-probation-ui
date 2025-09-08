@@ -141,9 +141,9 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
       }
     } else if (checks?.optional === false) {
       errors[formattedFieldName] = checks.checks[0].msg
-      // if (checks?.checks?.[0]?.log) {
-      //   logger.info(checks.checks[0].log)
-      // }
+      if (checks?.checks?.[0]?.log) {
+        logger.info(checks.checks[0].log)
+      }
     }
   })
   return errors
@@ -154,9 +154,9 @@ function executeValidator(checks: ErrorCheck[], fieldName: string, request: Vali
     const { log = '' } = check
     const args: any[] = setArgs(fieldName, check, request)
     if (!check.validator(args)) {
-      // if (log) {
-      //   logger.info(check.log)
-      // }
+      if (log) {
+        logger.info(check.log)
+      }
       return check.msg
     }
   }
