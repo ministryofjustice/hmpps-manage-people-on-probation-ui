@@ -62,4 +62,14 @@ describe('Create next appointment', () => {
     manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with George Parker')
     manageAppointmentPage.checkOnPage()
   })
+
+  it('should still work with no component for the appointment', () => {
+    cy.visit(`/case/${crn}/appointments/appointment/7/next-appointment`)
+    nextAppointmentPage = new NextAppointmentPage()
+    nextAppointmentPage.getRadio('option', 3).click()
+    nextAppointmentPage.getSubmitBtn().click()
+    const manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.setPageTitle('Manage with Terry Jones')
+    manageAppointmentPage.checkOnPage()
+  })
 })
