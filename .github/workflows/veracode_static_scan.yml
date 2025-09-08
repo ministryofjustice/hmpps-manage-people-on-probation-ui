@@ -21,6 +21,16 @@ on:
         description: "Override queue key; leave blank to queue by app"
         type: string
         required: false
+      scan_timeout_minutes:
+        description: "Max minutes to wait for platform scan"
+        type: number
+        required: false
+        default: 90
+      scan_poll_seconds:
+        description: "Seconds between status polls"
+        type: number
+        required: false
+        default: 30
     secrets:
       VERACODE_API_ID:
         required: true
@@ -40,15 +50,16 @@ jobs:
 
     steps:
       - name: Checkout source code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v4
 
       # Package only tracked files (keeps artifact small & fast)
       - name: Package build output
-        run: |
-          # Safely capture tracked files (handles spaces/newlines)
-            mapfile -d '' -t files < <(git ls-files -z)
-            zip -r veracode-artifact.zip "${files[@]}"
         shell: bash
+        run: |
+          set -euo pipefail
+          # Safely capture tracked files (handles spaces/newlines)
+          mapfile -d '' -t files < <(git ls-files -z)
+          zip -r veracode-artifact.zip "${files[@]}"
 
       - name: Upload and Scan with Veracode Static Analysis
         uses: veracode/veracode-uploadandscan-action@0.2.8
@@ -59,6 +70,12 @@ jobs:
           version: ${{ github.run_number }}
           vid: ${{ secrets.VERACODE_API_ID }}
           vkey: ${{ secrets.VERACODE_API_KEY }}
-          # When sandboxing, use explicit name or fall back to a unique branch/run id
+
+          # Robustness: clear blocking incomplete builds automatically
+          deleteincompletescan: true
+          scanpollinginterval: ${{ inputs.scan_poll_seconds }}
+          scantimeout: ${{ inputs.scan_timeout_minutes }}
+
+          # Sandbox only when requested (e.g., branches/PRs)
           createsandbox: ${{ inputs.use_sandbox }}
           sandboxname: ${{ inputs.use_sandbox && (inputs.sandbox_name != '' && inputs.sandbox_name || format('{0}-{1}', github.ref_name, github.run_id)) || '' }}
