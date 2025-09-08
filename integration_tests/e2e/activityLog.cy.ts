@@ -1,8 +1,8 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
-import { activityLogValidation } from '../../server/properties'
-import { getErrorMessage } from '../utils'
+import { activityLogValidation } from '../../server/properties/validation/activityLog'
+import { getErrorMessage } from '../utils/index'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'

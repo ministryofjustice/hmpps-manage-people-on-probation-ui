@@ -1,5 +1,5 @@
 import Page from '../pages/page'
-import { statusErrors } from '../../server/properties'
+import { statusErrors } from '../../server/properties/statusErrors'
 import IndexPage from '../pages'
 
 context('Status errors', () => {
