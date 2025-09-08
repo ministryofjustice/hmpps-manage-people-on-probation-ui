@@ -20,7 +20,7 @@ import {
   checkUpdateSentence,
   checkUpdateType,
 } from './imports'
-import { statusErrors } from '../../../server/properties'
+import { statusErrors } from '../../../server/properties/statusErrors'
 
 const loadPage = ({
   hasVisor = false,
