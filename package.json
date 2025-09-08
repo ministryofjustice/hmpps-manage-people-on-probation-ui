@@ -129,6 +129,7 @@
     "@types/cypress__code-coverage": "^3.10.2",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.5",
+    "assert": "^2.1.0",
     "body-parser": "^2.2.0",
     "bunyan": "^1.8.15",
     "bunyan-format": "^0.2.1",
@@ -163,9 +164,11 @@
     "superagent": "^10.2.2",
     "timepicker": "^1.14.1",
     "url-value-parser": "^2.2.0",
+    "util": "^0.10.0",
     "util.inherits": "^1.0.3",
     "uuid": "^11.1.0",
     "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1",
     "wiremock": "^3.13.1"
   },
   "devDependencies": {
