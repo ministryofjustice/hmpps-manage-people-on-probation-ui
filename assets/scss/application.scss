@@ -232,8 +232,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
 }
 .govuk-summary-list__row.moj-multi-file-upload__row {
   display: flex;
-  flex-wrap: wrap;
-  flex-grow: 1;
+  flex: 0 0 100%;
   @include govuk-media-query($until: 1200px) {
     flex-direction: column;
   }

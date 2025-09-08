@@ -140,7 +140,7 @@ const multiFileUpload = () => {
         this.params.uploadFileExitHook(this, file, response)
       }, this),
       error: $.proxy((jqXHR, textStatus, errorThrown) => {
-        this.params.uploadFileErrorHook(this, file, jqXHR, textStatus, errorThrown)
+        this.params.uploadFileErrorHook({ handle: this, file, jqXHR, textStatus, errorThrown })
       }, this),
       xhr: () => {
         const xhr = new XMLHttpRequest()
@@ -158,6 +158,34 @@ const multiFileUpload = () => {
         return xhr
       },
     })
+  }
+
+  MOJFrontend.MultiFileUpload.prototype.setUploadRow = function (file) {
+    const item = $(this.getFileRowHtml(file))
+    this.feedbackContainer.find('.moj-multi-file-upload__list').append(item)
+  }
+
+  MOJFrontend.MultiFileUpload.prototype.uploadFiles = function (files) {
+    const totalFileSizeUploaded = 0
+    const validMimeTypes = window.validMimeTypes.split(',')
+    for (const file of files) {
+      if (!validMimeTypes.includes(file.type)) {
+        this.setUploadRow(file)
+        this.params.uploadFileErrorHook({ handle: this, file, errorMessage: 'file type must be pdf or word' })
+      } else if (file.size > window.maxFileSize) {
+        this.setUploadRow(file)
+        this.params.uploadFileErrorHook({ handle: this, file, errorMessage: 'file size must be 5mb or under' })
+      } else if (file.size + totalFileSizeUploaded > window.maxFileSize * window.fileUploadLimit) {
+        this.setUploadRow(file)
+        this.params.uploadFileErrorHook({
+          handle: this,
+          file,
+          errorMessage: 'total file upload limit of 25mb exceeded',
+        })
+      } else {
+        this.uploadFile(file)
+      }
+    }
   }
 
   MOJFrontend.MultiFileUpload.prototype.getSuccessHtml = (
@@ -266,18 +294,8 @@ const multiFileUpload = () => {
       }
     }
 
-    function errorHook(handle, file, jqXHR, textStatus, errorThrown) {
-      let message = ''
-      switch (jqXHR.status) {
-        case 413:
-          message = `${file.name}: File size must be 5mb or under`
-          break
-        case 415:
-          message = `${file.name}: file type must be pdf or word`
-          break
-        default:
-          message = `${file.name}: ${textStatus || errorThrown}`
-      }
+    function errorHook({ handle, file, errorMessage, textStatus, errorThrown }) {
+      const message = errorMessage || textStatus || errorThrown
       const item = $(handle.getFileRowHtml(file))
       item
         .find('.moj-multi-file-upload__message')
