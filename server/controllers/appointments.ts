@@ -277,6 +277,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
+        contactId,
       })
     }
   },

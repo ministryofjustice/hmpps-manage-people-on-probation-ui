@@ -28,6 +28,12 @@ describe('Create next appointment', () => {
     nextAppointmentPage.getRadioLabel('option', 2).should('contain.text', 'Yes - another appointment type')
     nextAppointmentPage.getRadioLabel('option', 3).should('contain.text', 'No')
   })
+  it('should return to manage page when backLink selected', () => {
+    nextAppointmentPage.getBackLink().click()
+    const manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with George Parker')
+    manageAppointmentPage.checkOnPage()
+  })
 
   it('should give error if no selection made', () => {
     loadPage()
