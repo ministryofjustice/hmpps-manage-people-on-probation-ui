@@ -37,10 +37,10 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     notes,
     sensitivity: appointment?.isSensitive ? 'Yes' : 'No',
   }
-  if (appointment?.component.type === 'REQUIREMENT') {
+  if (appointment?.component?.type === 'REQUIREMENT') {
     nextAppointment.requirementId = appointment.component.id.toString()
   }
-  if (appointment?.component.type === 'LICENCE_CONDITION') {
+  if (appointment?.component?.type === 'LICENCE_CONDITION') {
     nextAppointment.licenceConditionId = appointment.component.id.toString()
   }
   if (appointment?.nsiId) {

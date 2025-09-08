@@ -824,6 +824,123 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/schedule/.*/appointment/7",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Eula",
+              "surname": "Schmeler"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "appointment": {
+            "id": 7,
+            "eventNumber": "123456",
+            "startDateTime": "2024-02-21T10:15:00.382936Z",
+            "endDateTime": "2024-02-21T10:30:00.382936Z",
+            "rarToolKit": "Choices and Changes",
+            "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
+            "appointmentNote": null,
+            "isSensitive": false,
+            "hasOutcome": false,
+            "isInPast": true,
+            "wasAbsent": true,
+            "officer": {
+              "code": "",
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "teamCode": "1234",
+              "providerCode": "1234",
+              "username": "TerryJones"
+            },
+            "isInitial": true,
+            "isNationalStandard": true,
+            "location": {
+              "code": "",
+              "officeName": "",
+              "buildingName": "The Building",
+              "buildingNumber": "77",
+              "streetName": "Some Street",
+              "district": "Some City Centre",
+              "town": "London",
+              "county": "Essex",
+              "postcode": "NW10 1EP",
+              "ldu": "",
+              "telephoneNumber": "",
+              "providerCode": "",
+              "teamCode": ""
+            },
+            "rescheduled": true,
+            "rescheduledStaff": true,
+            "rescheduledPop": true,
+            "didTheyComply": false,
+            "absentWaitingEvidence": true,
+            "rearrangeOrCancelReason": "",
+            "rescheduledBy": {
+              "forename": "",
+              "middleName": "",
+              "surname": ""
+            },
+            "repeating": true,
+            "nonComplianceReason": "",
+            "documents": [
+              {
+                "id": "83fdbf8a-a2f2-43b4-93ef-67e71c04fc58",
+                "name": "Eula-Schmeler-X000001-UPW.pdf",
+                "lastUpdated": "2023-04-06T11:06:25.672587+01:00"
+              },
+              {
+                "id": "c2650260-9568-476e-a293-0b168027a5f1",
+                "name": "Eula-Schmeler-X000001-UPW.pdf",
+                "lastUpdated": "2023-04-06T11:09:45.860739+01:00"
+              },
+              {
+                "id": "b82e444b-c77c-4d44-bf99-4ce4dc426ff4",
+                "name": "Eula-Schmeler-X000001-UPW.pdf",
+                "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
+              }
+            ],
+            "isRarRelated": true,
+            "rarCategory": "",
+            "acceptableAbsence": true,
+            "acceptableAbsenceReason": "",
+            "isAppointment": true,
+            "isCommunication": true,
+            "action": "",
+            "isSystemContact": true,
+            "isEmailOrTextFromPop": true,
+            "isPhoneCallFromPop": true,
+            "isEmailOrTextToPop": true,
+            "isPhoneCallToPop": true,
+            "isPastAppointment": true,
+            "countsTowardsRAR": true,
+            "lastUpdated": "2023-03-20",
+            "lastUpdatedBy": {
+              "forename": "Paul",
+              "surname": "Smith"
+            },
+            "description": "",
+            "outcome": "",
+            "deliusManaged": false,
+            "isVisor": true,
+            "eventId": 0,
+            "nsiId": 0
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }
