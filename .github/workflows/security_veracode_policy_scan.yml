@@ -1,0 +1,27 @@
+name: Veracode Policy Scan (Nightly)
+
+on:
+  schedule:
+    - cron: "30 5 * * 1" # Every Monday
+
+
+permissions:
+  contents: read
+
+# Ensure only one scheduled policy scan at a time
+concurrency:
+  group: veracode-policy-${{ github.repository }}-hmpps-manage-people-on-probation
+  cancel-in-progress: false
+
+jobs:
+  nightly_policy_scan:
+    # Runs against the default branch; guard to main explicitly
+    if: github.ref == 'refs/heads/main'
+    uses: ./.github/workflows/veracode_static_scan.yml
+    with:
+      veracode_app: "hmpps-manage-people-on-probation"
+      use_sandbox: false
+      concurrency_group: ''  # lets the reusable queue by app
+    secrets:
+      VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
+      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
