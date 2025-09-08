@@ -43,13 +43,21 @@
     "lines": 0
   },
   "jest": {
+    "resolver": "<rootDir>/jest-resolver.js",
+    "transformIgnorePatterns": [
+      "node_modules/(?!(uuid|@smithy|@aws-sdk|@ministryofjustice/hmpps-audit-client|@ministryofjustice/probation-search-frontend)/)"
+    ],
+    "moduleNameMapper": {
+      "^uuid$": "<rootDir>/node_modules/uuid/dist/index.js"
+    },
     "transform": {
       "^.+\\.tsx?$": [
         "ts-jest",
         {
           "isolatedModules": true
         }
-      ]
+      ],
+      "^.+\\.js$": "babel-jest"
     },
     "collectCoverageFrom": [
       "server/**/*.{ts,js,jsx,mjs}"
@@ -172,6 +180,8 @@
     "wiremock": "^3.13.1"
   },
   "devDependencies": {
+    "@babel/core": "^7.28.4",
+    "@babel/preset-env": "^7.28.3",
     "@cypress/code-coverage": "^3.14.4",
     "@faker-js/faker": "^10.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
@@ -206,6 +216,7 @@
     "@typescript-eslint/parser": "^8.32.0",
     "audit-ci": "^7.1.0",
     "autoprefixer": "^10.4.21",
+    "babel-jest": "^30.1.2",
     "concurrently": "^9.1.2",
     "cookie-session": "^2.1.0",
     "cpy-cli": "^6.0.0",
