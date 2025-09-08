@@ -1,27 +1,17 @@
-name: Veracode Policy Scan (Nightly)
-
+name: Security veracode policy scan
 on:
+  workflow_dispatch:
   schedule:
-    - cron: "30 5 * * 1" # Every Monday
-
-
-permissions:
-  contents: read
-
-# Ensure only one scheduled policy scan at a time
-concurrency:
-  group: veracode-policy-${{ github.repository }}-hmpps-manage-people-on-probation
-  cancel-in-progress: false
+    - cron: "19 10 * * 1" # Every Monday
 
 jobs:
-  nightly_policy_scan:
-    # Runs against the default branch; guard to main explicitly
-    if: github.ref == 'refs/heads/main'
-    uses: ./.github/workflows/veracode_static_scan.yml
+  security-veracode-policy-check:
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    name: Project security veracode policy scan
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_veracode_policy_scan.yml@v2 # WORKFLOW_VERSION
     with:
-      veracode_app: "hmpps-manage-people-on-probation"
-      use_sandbox: false
-      concurrency_group: ''  # lets the reusable queue by app
-    secrets:
-      VERACODE_API_ID: ${{ secrets.VERACODE_API_ID }}
-      VERACODE_API_KEY: ${{ secrets.VERACODE_API_KEY }}
+      channel_id: ${{ vars.SECURITY_ALERTS_SLACK_CHANNEL_ID || 'NO_SLACK' }}
+    secrets: inherit
