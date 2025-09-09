@@ -166,8 +166,9 @@ const multiFileUpload = () => {
   }
 
   MOJFrontend.MultiFileUpload.prototype.uploadFiles = function (files) {
-    const totalFileSizeUploaded = 0
     const validMimeTypes = window.validMimeTypes.split(',')
+
+    let i = 1
     for (const file of files) {
       if (!validMimeTypes.includes(file.type)) {
         this.setUploadRow(file)
@@ -175,16 +176,17 @@ const multiFileUpload = () => {
       } else if (file.size > window.maxFileSize) {
         this.setUploadRow(file)
         this.params.uploadFileErrorHook({ handle: this, file, errorMessage: 'file size must be 5mb or under' })
-      } else if (file.size + totalFileSizeUploaded > window.maxFileSize * window.fileUploadLimit) {
+      } else if (i > window.fileUploadLimit) {
         this.setUploadRow(file)
         this.params.uploadFileErrorHook({
           handle: this,
           file,
-          errorMessage: 'total file upload limit of 25mb exceeded',
+          errorMessage: `Maximum ${window.fileUploadLimit} file upload exceeded`,
         })
       } else {
         this.uploadFile(file)
       }
+      i += 1
     }
   }
 
