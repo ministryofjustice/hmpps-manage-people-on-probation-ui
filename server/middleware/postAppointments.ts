@@ -33,7 +33,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       user: {
         username,
         teamCode,
-        locationCode: locationCode !== 'I do not need to pick a location' ? locationCode : '',
+        locationCode: locationCode !== 'NO_LOCATION_REQUIRED' ? locationCode : '',
       },
       type,
       start: dateTime(date, start),
