@@ -133,7 +133,7 @@
     "@ministryofjustice/hmpps-audit-client": "^1.1.1",
     "@ministryofjustice/probation-search-frontend": "^2.4.0",
     "@sentry/cli": "^2.46.0",
-    "@sentry/node": "^10.10.0",
+    "@sentry/node": "^10.11.0",
     "@types/cypress__code-coverage": "^3.10.2",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.5",
