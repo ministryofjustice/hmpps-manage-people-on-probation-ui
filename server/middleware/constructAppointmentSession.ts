@@ -4,22 +4,58 @@ import { AppResponse } from '../models/Locals'
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
+  const { crn } = req.params
   const { appointmentTypes } = res.locals
-  const eventId = appointment?.eventId || ''
+  let eventId = appointment?.eventId || ''
+  if (!eventId && appointment?.eventNumber) {
+    const sentences = req?.session?.data?.sentences?.[crn]
+    if (sentences) {
+      eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
+    }
+  }
   let notes = ''
   if (appointment?.appointmentNotes) {
     notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
   } else if (appointment?.appointmentNote?.note) {
     notes = appointment.appointmentNote.note
   }
+  const selectedType = appointmentTypes.find(t => t?.description === appointment?.type)
+  let locationCode = appointment?.location?.code || ''
+  if (!selectedType?.isLocationRequired && !locationCode) {
+    locationCode = 'NO_LOCATION_REQUIRED'
+  }
+
+  let type = appointmentTypes.find(t => t?.description === appointment?.type)?.code || ''
+  let username = appointment?.officer?.username || ''
+  let teamCode = appointment?.officer?.teamCode || ''
+  let providerCode = appointment?.officer?.providerCode || ''
+
+  if (!eventId) {
+    type = ''
+    locationCode = ''
+    providerCode = ''
+    teamCode = ''
+    username = ''
+  }
+
+  if (!type) {
+    locationCode = ''
+    providerCode = ''
+    teamCode = ''
+    username = ''
+  }
+
+  if (!providerCode || !teamCode || !username) {
+    locationCode = ''
+  }
   const nextAppointment: AppointmentSession = {
     user: {
-      providerCode: appointment?.officer?.providerCode || '',
-      teamCode: appointment?.officer?.teamCode || '',
-      username: appointment?.officer?.username || '',
-      locationCode: appointment?.location?.code ? appointment.location.code : 'I do not need to pick a location',
+      providerCode,
+      teamCode,
+      username,
+      locationCode,
     },
-    type: appointmentTypes.find(t => t?.description === appointment?.type)?.code || '',
+    type,
     visorReport: appointment?.isVisor ? 'Yes' : 'No',
     date: appointment?.startDateTime || '',
     start: appointment?.startDateTime || '',
@@ -45,6 +81,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   if (appointment?.nsiId) {
     nextAppointment.nsiId = appointment.nsiId.toString()
   }
+  // console.dir(nextAppointment, { depth: null })
   res.locals.nextAppointmentSession = nextAppointment
   return next()
 }

@@ -6,9 +6,12 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params, body } = req
+  const { url, params, body, session } = req
   const { crn, id, contactId } = params
-  const localParams: LocalParams = { crn, id, body, contactId }
+  const { data } = session
+  const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
+  const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+  const localParams: LocalParams = { crn, id, body, contactId, personLevel }
   let isAddNotePage = false
   let render = `pages/${[
     url
@@ -72,7 +75,6 @@ const appointments: Route<void> = (req, res, next) => {
   const validateRepeating = () => {
     if (req.url.includes('/repeating')) {
       const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
-      const { data } = req.session
       const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
       const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeatingDates'])
       const oneYearFromDate = new Date(appointmentDate)

@@ -102,16 +102,17 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           ? req.session.data.staff[loggedInUsername].find(s => s.username.toLowerCase() === staffId.toLowerCase())
               ?.nameAndRole
           : null
-      const noLocationValue = 'I do not need to pick a location'
-      const location: Location | string =
-        locationCode && locationCode !== noLocationValue && loggedInUsername
-          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
-          : 'Not needed'
+      const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
+      let location: Location | string = locationCode
+      if (hasLocation && loggedInUsername) {
+        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) || ''
+      }
+
       appointment = {
         ...appointment,
         meta: {
           ...appointment.meta,
-          hasLocation: locationCode !== noLocationValue,
+          hasLocation,
         },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
@@ -137,6 +138,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sensitivity: sensitivity || 'No',
       }
     }
+    // console.dir(appointment, { depth: null })
     res.locals.appointment = appointment
     return next()
   }
