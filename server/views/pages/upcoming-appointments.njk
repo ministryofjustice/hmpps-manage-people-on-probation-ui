@@ -2,6 +2,7 @@
 {% from "_components/compliance-tag/macro.njk" import appComplianceTag %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "moj/components/button-menu/macro.njk" import mojButtonMenu %}
+{% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
 {% set pageTitle = makePageTitle({pageHeading: "Upcoming appointments"}) %}
 {% set currentNavSection = 'appointments' %}
 {% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
@@ -25,7 +26,7 @@
         {% endset %}
         {% set actionsButton %}
             {% if not appointment.deliusManaged %}
-                <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ appointment.id }}" aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">Manage</a>
+                {{ manageAppointmentLink(flags, appointment, crn) }}
             {% else %}
                 <a class="govuk-link govuk-link--no-visited-state" target="_blank"
                    href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
