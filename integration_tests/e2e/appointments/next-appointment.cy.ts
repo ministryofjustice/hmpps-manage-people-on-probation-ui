@@ -67,7 +67,7 @@ describe('Create next appointment', () => {
     nextAppointmentPage.getRadio('option', 3).click()
     nextAppointmentPage.getSubmitBtn().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage planned office visit (NS) with George Parker')
+    manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with George Parker')
     manageAppointmentPage.checkOnPage()
   })
 
@@ -77,7 +77,7 @@ describe('Create next appointment', () => {
     nextAppointmentPage.getRadio('option', 3).click()
     nextAppointmentPage.getSubmitBtn().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage with Terry Jones')
+    manageAppointmentPage.checkPageTitle('Manage with Terry Jones')
     manageAppointmentPage.checkOnPage()
   })
 

@@ -1,23 +1,25 @@
 {% if predictorScores.scores.OVP.level %}
-    <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}  class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OVP score">
+    <section data-qa="ovp">
+        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}  class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OVP score">
         OVP (OASys violent predictor score)
     </h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} >
-    <div class="govuk-grid-row  govuk-!-margin-bottom-4">
-        <div class="govuk-grid-column-full">
-            <div class="flex-mobile">
-                <div class='flex__item-one-third-mobile'>
-                    <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h3>
-                    <div class='govuk-body' data-qa='ovp-1yr'>{{ predictorScores.scores.OVP.oneYear }}%</div>
-                </div>
-                <div class='flex__item-one-third-mobile'>
-                    <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h3>
-                    <div class='govuk-body' data-qa='ovp-2yr'>{{ predictorScores.scores.OVP.twoYears }}%</div>
-                </div>
-                <div class='flex__item-one-third-mobile'>
-                    <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h3>
-                    <div class='govuk-body' data-qa='ovp-level'>{{ riskLevelLabel(predictorScores.scores.OVP.level) }}</div>
+        <div class="govuk-grid-row  govuk-!-margin-bottom-4">
+            <div class="govuk-grid-column-full">
+                <div class="flex-mobile">
+                    <div class='flex__item-one-third-mobile'>
+                        <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h3>
+                        <div class='govuk-body' data-qa='ovp-1yr'>{{ predictorScores.scores.OVP.oneYear }}%</div>
+                    </div>
+                    <div class='flex__item-one-third-mobile'>
+                        <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h3>
+                        <div class='govuk-body' data-qa='ovp-2yr'>{{ predictorScores.scores.OVP.twoYears }}%</div>
+                    </div>
+                    <div class='flex__item-one-third-mobile'>
+                        <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h3>
+                        <div class='govuk-body' data-qa='ovp-level'>{{ riskLevelLabel(predictorScores.scores.OVP.level) }}</div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 {% endif %}

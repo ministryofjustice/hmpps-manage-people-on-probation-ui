@@ -33,17 +33,6 @@
             {% include "./_rsr.njk" %}
             {% include "./_ogrs.njk" %}
             {% include "./_osp.njk" %}
-
-            {% if predictorScores.scores.OSPC.score %}
-                <h4 class="govuk-heading-s score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP/C score">
-                    OSP/C (contact-related sexual reoffending) or OSP/DC (direct contact)
-                </h4>
-                <div aria-hidden="true">
-                    {{ predictorScore(predictorScores.scores.OSPC) }}
-                </div>
-                <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPC.score }}%</div>
-            {% endif %}
-
             {% include "./_ovp.njk" %}
             {% include "./_ogp.njk" %}
         </div>
@@ -61,7 +50,7 @@
 <div class="govuk-grid-column-one-third">
     {{ roshWidget(risksWidget) }}
     {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
-    <div class="govuk-body predictor-timeline__heading">
+    <div class="govuk-body predictor-timeline__heading" data-qa="oasysScoreHistory">
         <h3 class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h3>
         {% if predictorScores.error and caseSummary.roshHistory.error %}
             <p class='govuk-body' data-qa='timeline-missing'>RoSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>

@@ -14,19 +14,132 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
 ).response.jsonBody.riskFlags
 
-const checkCriminogenicNeeds = (page: RiskPage, sanIndicator = false) => {
+const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
   const headingLevel = !sanIndicator ? '3' : '4'
-  page.getElementByDataQA('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
+  page.getElementData('rsr').should('exist')
+  page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
+
+  page.getElementData('ogrs').should('exist')
+  page.getElementData('ogrs').get(`h${headingLevel}`).should('contain.text', 'OGRS (offender group reconviction scale)')
+  page.getElementData('ogrs-1yr').should('have.text', '3%')
+  page.getElementData('ogrs-2yr').should('have.text', '6%')
+  page.getElementData('ogrs-level').should('have.text', 'Low')
+
+  page.getElementData('ovp').should('exist')
+  page.getElementData('ovp').get(`h${headingLevel}`).should('contain.text', 'OVP (OASys violent predictor score)')
+  page.getElementData('ovp-1yr').should('have.text', '4%')
+  page.getElementData('ovp-2yr').should('have.text', '10.2%')
+  page.getElementData('ovp-level').should('have.text', 'Medium')
+
+  page.getElementData('ogp').should('exist')
+  page.getElementData('ogp').get(`h${headingLevel}`).should('contain.text', 'OGP (OASys general predictor score)')
+  page.getElementData('ogp-1yr').should('have.text', '5%')
+  page.getElementData('ogp-2yr').should('have.text', '28.8%')
+  page.getElementData('ogp-level').should('have.text', 'High')
+
+  page.getElementData('riskFlagsCard').should('exist')
+  for (let i = 0; i < mockRiskFlags.length; i += 1) {
+    const index = i + 1
+    const { level, description, riskNotes, createdDate, nextReviewDate } = mockRiskFlags[i]
+    page.getRowData('riskFlags', `risk${index}Level`, 'Value').should('contain.text', toSentenceCase(level))
+    const classes = level !== 'INFORMATION_ONLY' ? ` rosh--${level.toLowerCase()}` : ''
+    page
+      .getElementData(`risk${index}LevelValue`)
+      .find('span')
+      .should('have.attr', 'class', `govuk-!-font-weight-bold${classes}`)
+    page.getRowData('riskFlags', `risk${index}Description`, 'Value').should('contain.text', description)
+    page
+      .getElementData(`risk${index}DescriptionValue`)
+      .find('a')
+      .should('have.attr', 'href', `/case/X000001/risk/flag/${index}`)
+    page.getRowData('riskFlags', `risk${index}DateAdded`, 'Value').should('contain.text', dateWithYear(createdDate))
+    page
+      .getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value')
+      .should('contain.text', dateWithYear(nextReviewDate))
+    if (level === 'HIGH') {
+      page.getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value').should('contain.text', 'Overdue')
+    }
+  }
+  page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 2, 'No notes')
+  page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 7, 'Risk Notes 1')
+
+  page
+    .getElementData('viewRemovedRiskFlagsLink')
+    .should('contain.text', 'View removed risk flags (3)')
+    .should('have.attr', 'href', '/case/X000001/risk/removed-risk-flags')
+
+  page.getCardHeader('riskFlags').should('contain.text', 'NDelius risk flags')
+  page
+    .getElementData('addRiskFlagLink')
+    .should('contain.text', 'Add a risk flag in NDelius (opens in new tab)')
+    .parent()
+    .should(
+      'have.attr',
+      'href',
+      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=RegisterSummary&CRN=X000001',
+    )
+
+  page.getElementData('opd').should('exist')
+  page.getElementData('opd').get(`h${headingLevel}`).should('contain.text', 'Offender personality disorder (OPD)')
+
+  page.getElementData('mappa-heading').should('contain.text', 'Cat 0/').should('contain.text', 'Level 2')
+
+  page.getElementData('riskToLabelValue1').should('contain.text', 'Children')
+  page.getElementData('riskToLabelValue2').should('contain.text', 'Staff')
+  page.getElementData('riskToLabelValue3').should('contain.text', 'Known adult')
+  page.getElementData('riskToLabelValue4').should('contain.text', 'Public')
+  page.getElementData('riskToLabelValue5').should('contain.text', 'Prisoners')
+
+  page.getElementData('riskToCommunityValue1').should('contain.text', 'Low')
+  page.getElementData('riskToCommunityValue2').should('contain.text', 'Very high')
+  page.getElementData('riskToCommunityValue3').should('contain.text', 'Medium')
+  page.getElementData('riskToCommunityValue4').should('contain.text', 'High')
+  page.getElementData('riskToCommunityValue5').should('contain.text', 'N/A')
+
+  page.getElementData('riskToCustodyValue1').should('contain.text', 'Low')
+  page.getElementData('riskToCustodyValue2').should('contain.text', 'Low')
+  page.getElementData('riskToCustodyValue3').should('contain.text', 'Low')
+  page.getElementData('riskToCustodyValue4').should('contain.text', 'Very high')
+  page.getElementData('riskToCustodyValue5').should('contain.text', 'Low')
+
   if (!sanIndicator) {
-    page.getElementByDataQA('criminogenicNeeds').find('h3').should('contain.text', 'Criminogenic needs')
+    page.getElementData('criminogenicNeeds').find('h3').should('contain.text', 'Criminogenic needs')
+    page
+      .getElementData('oasysViewRiskAssessmentLink')
+      .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
+      .should('have.attr', 'target', '_blank')
+      .should('have.attr', 'href', 'https://oasys-dummy-url')
     page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
     page.getInsetText().should('contain.text', 'Last updated (OASys): 24 January 2024')
-  } else {
-    page.getElementByDataQA('criminogenicNeeds').should('not.exist')
+    page.getElementData('osp').should('exist')
+    page.getElementData('riskFlagsCard').then($riskFlagsCard => {
+      page.getElementData('opd').then($opd => {
+        // Check risk flags card is before opd
+        expect(Cypress.$($riskFlagsCard).index()).to.be.lessThan(Cypress.$($opd).index())
+      })
+    })
+    page.getElementData('oasysScoreHistory').should('exist')
+    page.getElementData('plan').should('not.exist')
+  }
+  if (sanIndicator) {
+    page.getElementData('criminogenicNeeds').should('not.exist')
     page.getInsetText().should('not.exist')
     cy.get('h3').should('contain.text', 'Risk')
+    page.getElementData('osp').should('not.exist')
+    page.getElementData('riskFlagsCard').then($riskFlagsCard => {
+      page.getElementData('opd').then($opd => {
+        // Check risk flags card is after opd
+        expect(Cypress.$($opd).index()).to.be.lessThan(Cypress.$($riskFlagsCard).index())
+      })
+    })
+    page.getElementData('oasysScoreHistory').should('not.exist')
+    page.getElementData('plan').should('exist')
+    page.getElementData('plan').get('h4').should('contain.text', 'Plan')
+    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 24 January 2024')
+    page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
+    page.getElementData('plan').find('a').should('have.attr', 'href', '#')
   }
 }
 
@@ -38,85 +151,7 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     page.checkPageTitle('Risk')
-    checkCriminogenicNeeds(page)
-
-    page.getElementData('mappa-heading').should('contain.text', 'Cat 0/').should('contain.text', 'Level 2')
-
-    page.getCardHeader('riskFlags').should('contain.text', 'NDelius risk flags')
-    page
-      .getElementData('addRiskFlagLink')
-      .should('contain.text', 'Add a risk flag in NDelius (opens in new tab)')
-      .parent()
-      .should(
-        'have.attr',
-        'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=RegisterSummary&CRN=X000001',
-      )
-
-    page.getElementData('riskToLabelValue1').should('contain.text', 'Children')
-    page.getElementData('riskToLabelValue2').should('contain.text', 'Staff')
-    page.getElementData('riskToLabelValue3').should('contain.text', 'Known adult')
-    page.getElementData('riskToLabelValue4').should('contain.text', 'Public')
-    page.getElementData('riskToLabelValue5').should('contain.text', 'Prisoners')
-
-    page.getElementData('riskToCommunityValue1').should('contain.text', 'Low')
-    page.getElementData('riskToCommunityValue2').should('contain.text', 'Very high')
-    page.getElementData('riskToCommunityValue3').should('contain.text', 'Medium')
-    page.getElementData('riskToCommunityValue4').should('contain.text', 'High')
-    page.getElementData('riskToCommunityValue5').should('contain.text', 'N/A')
-
-    page.getElementData('riskToCustodyValue1').should('contain.text', 'Low')
-    page.getElementData('riskToCustodyValue2').should('contain.text', 'Low')
-    page.getElementData('riskToCustodyValue3').should('contain.text', 'Low')
-    page.getElementData('riskToCustodyValue4').should('contain.text', 'Very high')
-    page.getElementData('riskToCustodyValue5').should('contain.text', 'Low')
-
-    for (let i = 0; i < mockRiskFlags.length; i += 1) {
-      const index = i + 1
-      const { level, description, riskNotes, createdDate, nextReviewDate } = mockRiskFlags[i]
-      page.getRowData('riskFlags', `risk${index}Level`, 'Value').should('contain.text', toSentenceCase(level))
-      const classes = level !== 'INFORMATION_ONLY' ? ` rosh--${level.toLowerCase()}` : ''
-      page
-        .getElementData(`risk${index}LevelValue`)
-        .find('span')
-        .should('have.attr', 'class', `govuk-!-font-weight-bold${classes}`)
-      page.getRowData('riskFlags', `risk${index}Description`, 'Value').should('contain.text', description)
-      page
-        .getElementData(`risk${index}DescriptionValue`)
-        .find('a')
-        .should('have.attr', 'href', `/case/X000001/risk/flag/${index}`)
-      page.getRowData('riskFlags', `risk${index}DateAdded`, 'Value').should('contain.text', dateWithYear(createdDate))
-      page
-        .getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value')
-        .should('contain.text', dateWithYear(nextReviewDate))
-      if (level === 'HIGH') {
-        page.getRowData('riskFlags', `risk${index}NextReviewDate`, 'Value').should('contain.text', 'Overdue')
-      }
-    }
-    page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 2, 'No notes')
-    page.assertPageElementAtIndexWithin('[data-qa=riskFlagsCard]', 0, 'td', 7, 'Risk Notes 1')
-
-    page
-      .getElementData('viewRemovedRiskFlagsLink')
-      .should('contain.text', 'View removed risk flags (3)')
-      .should('have.attr', 'href', '/case/X000001/risk/removed-risk-flags')
-    page
-      .getElementData('oasysViewRiskAssessmentLink')
-      .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
-      .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', 'https://oasys-dummy-url')
-
-    page.getElementData('ogrs-1yr').should('have.text', '3%')
-    page.getElementData('ogrs-2yr').should('have.text', '6%')
-    page.getElementData('ogrs-level').should('have.text', 'Low')
-
-    page.getElementData('ovp-1yr').should('have.text', '4%')
-    page.getElementData('ovp-2yr').should('have.text', '10.2%')
-    page.getElementData('ovp-level').should('have.text', 'Medium')
-
-    page.getElementData('ogp-1yr').should('have.text', '5%')
-    page.getElementData('ogp-2yr').should('have.text', '28.8%')
-    page.getElementData('ogp-level').should('have.text', 'High')
+    checkRiskPageView(page)
   })
 
   it('Risk overview page is rendered when san indicator is true', () => {
@@ -125,8 +160,7 @@ context('Risk', () => {
     const page = new RiskPage()
     page.checkPageTitle('Risk and plan')
     const sanIndicator = true
-    checkCriminogenicNeeds(page, sanIndicator)
-    // cy.pause()
+    checkRiskPageView(page, sanIndicator)
   })
 
   it('Removed risk page is rendered', () => {
