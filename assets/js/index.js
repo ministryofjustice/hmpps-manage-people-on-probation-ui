@@ -181,7 +181,7 @@ const multiFileUpload = () => {
         this.params.uploadFileErrorHook({
           handle: this,
           file,
-          errorMessage: `Maximum ${window.fileUploadLimit} file upload exceeded`,
+          errorMessage: `You can only select up to ${window.fileUploadLimit} files at the same time`,
         })
       } else {
         this.uploadFile(file)
