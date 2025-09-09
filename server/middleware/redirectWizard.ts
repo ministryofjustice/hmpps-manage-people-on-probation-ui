@@ -7,6 +7,10 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { crn, id } = req.params
     const { data } = req.session
+    const { change } = req.query
+    if (change) {
+      return next()
+    }
     for (const requiredValue of requiredValues) {
       const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
       const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true

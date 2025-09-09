@@ -17,6 +17,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
+
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
       userIsAttending = req.session.data.appointments[crn][id].user.username === loggedInUsername
@@ -103,10 +104,15 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
               ?.nameAndRole
           : null
       const noLocationValue = 'I do not need to pick a location'
-      const location: Location | string =
-        locationCode && locationCode !== noLocationValue && loggedInUsername
-          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
-          : 'Not needed'
+      let location: Location | string = null
+      if (locationCode === noLocationValue) {
+        location = 'Not needed'
+      } else {
+        location =
+          locationCode && locationCode !== noLocationValue && loggedInUsername
+            ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
+            : null
+      }
       appointment = {
         ...appointment,
         meta: {

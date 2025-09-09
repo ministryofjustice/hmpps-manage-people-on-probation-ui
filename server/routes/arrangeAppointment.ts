@@ -16,13 +16,17 @@ import { getTimeOptions } from '../middleware/getTimeOptions'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
+import { checkAnswers } from '../middleware/checkAnswers'
+import { HmppsAuthClient } from '../data'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
   router.all('/case/:crn/arrange-appointment/:id/*path', getAppointmentTypes(hmppsAuthClient))
   router.all('/case/:crn/arrange-appointment/:id/*path', getPersonalDetails(hmppsAuthClient))
+  router.all('/case/:crn/arrange-appointment/:id/*path', getOfficeLocationsByTeamAndProvider(hmppsAuthClient))
   router.get('/case/:crn/arrange-appointment/:id/*path', getAppointment(hmppsAuthClient))
+  router.get('/case/:crn/arrange-appointment/:id/*path', checkAnswers)
   router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
   get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
   get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
@@ -85,7 +89,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/date-time',
-    redirectWizard(['eventId', ['user', 'locationCode']]),
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getDateTime(),
   )
 
@@ -122,8 +126,9 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode'], 'repeating']),
+    redirectWizard(['eventId', 'repeating']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointmentTypes(hmppsAuthClient),
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
   router.post(
