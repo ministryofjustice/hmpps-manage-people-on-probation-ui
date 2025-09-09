@@ -4,28 +4,27 @@ import { AppResponse } from '../models/Locals'
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
-  const { appointmentTypes, sentences } = res.locals
-  const type = appointmentTypes.find(t => t.description === appointment.type)?.code
+  const { appointmentTypes } = res.locals
   const eventId = appointment?.eventId || ''
   let notes = ''
   if (appointment?.appointmentNotes) {
     notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
-  } else if (appointment?.appointmentNote) {
+  } else if (appointment?.appointmentNote?.note) {
     notes = appointment.appointmentNote.note
   }
   const nextAppointment: AppointmentSession = {
     user: {
-      providerCode: appointment.officer.providerCode,
-      teamCode: appointment.officer.teamCode,
-      username: appointment.officer.username,
-      locationCode: appointment.location ? appointment.location.code : 'I do not need to pick a location',
+      providerCode: appointment?.officer?.providerCode || '',
+      teamCode: appointment?.officer?.teamCode || '',
+      username: appointment?.officer?.username || '',
+      locationCode: appointment?.location?.code ? appointment.location.code : 'I do not need to pick a location',
     },
-    type: type || '',
+    type: appointmentTypes.find(t => t?.description === appointment?.type)?.code || '',
     visorReport: appointment?.isVisor ? 'Yes' : 'No',
-    date: appointment.startDateTime,
-    start: appointment.startDateTime,
-    end: appointment.endDateTime,
-    until: appointment.endDateTime,
+    date: appointment?.startDateTime || '',
+    start: appointment?.startDateTime || '',
+    end: appointment?.endDateTime || '',
+    until: appointment?.endDateTime || '',
     interval: 'DAY',
     numberOfAppointments: '1',
     numberOfRepeatAppointments: '0',
@@ -38,10 +37,10 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     sensitivity: appointment?.isSensitive ? 'Yes' : 'No',
   }
   if (appointment?.component?.type === 'REQUIREMENT') {
-    nextAppointment.requirementId = appointment.component.id.toString()
+    nextAppointment.requirementId = appointment?.component?.id.toString() || ''
   }
   if (appointment?.component?.type === 'LICENCE_CONDITION') {
-    nextAppointment.licenceConditionId = appointment.component.id.toString()
+    nextAppointment.licenceConditionId = appointment?.component?.id?.toString() || ''
   }
   if (appointment?.nsiId) {
     nextAppointment.nsiId = appointment.nsiId.toString()
