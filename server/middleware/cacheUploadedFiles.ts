@@ -53,6 +53,5 @@ export const cacheUploadedFiles = (req: Request, res: AppResponse, next: NextFun
     ...(req?.session?.cache ?? {}),
     uploadedFiles,
   }
-  console.dir(uploadedFiles, { depth: null })
   return next()
 }
