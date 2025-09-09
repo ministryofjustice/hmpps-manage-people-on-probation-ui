@@ -6,12 +6,11 @@
             {% include "./_ovp.njk" %}
             {% include "./_ogp.njk" %}
 
-
         </div>
     {% else %}
         {% set html %}
-            <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
-            {% include './_no-oasys-risk-assessment.njk' %}
+        <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
+        {% include './_no-oasys-risk-assessment.njk' %}
         {% endset %}
         {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
     {% endif %}
@@ -22,10 +21,13 @@
 <div class="govuk-grid-column-one-third">
     {{ roshWidget(risksWidget) }}
     {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
-    <h4 class="govuk-heading-m">Plan</h4>
-    <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
-        <p class="govuk-body">Last updated: {{ risks.assessedOn | dateWithYear }}</p>
-        <p class="govuk-body"><a href="#" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
-    </div>
+    <section data-qa="plan">
+        <h4 class="govuk-heading-m">Plan</h4>
+        <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
+            <p class="govuk-body">Last updated: {{ risks.assessedOn | dateWithYear }}</p>
+            <p class="govuk-body">
+                <a href="#" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
+        </div>
+    </section>
 
 </div>
