@@ -117,7 +117,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         ...appointment,
         meta: {
           ...appointment.meta,
-          hasLocation: locationCode !== noLocationValue,
+          hasLocation,
         },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
@@ -143,6 +143,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sensitivity: sensitivity || 'No',
       }
     }
+    // console.dir(appointment, { depth: null })
     res.locals.appointment = appointment
     return next()
   }
