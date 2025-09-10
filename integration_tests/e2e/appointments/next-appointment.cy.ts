@@ -2,8 +2,7 @@ import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-anot
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
-import SentencePage from '../../pages/sentence'
-import { checkAppointmentDetails, checkPopHeader } from './imports'
+import { checkPopHeader } from './imports'
 
 const crn = 'X000001'
 const appointmentId = '2'
@@ -39,7 +38,6 @@ describe('Create next appointment', () => {
     loadPage()
     nextAppointmentPage.getSubmitBtn().click()
     nextAppointmentPage.getErrorSummaryBox().should('be.visible')
-    // cy.pause()
   })
   it('should go to arrange another appointment page if top option selected', () => {
     nextAppointmentPage.getRadio('option', 1).click()
