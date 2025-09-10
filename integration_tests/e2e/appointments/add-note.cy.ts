@@ -59,7 +59,10 @@ describe('Manage appointment - add a note', () => {
         'Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.',
       )
     cy.get('.govuk-details__summary-text').should('contain.text', 'Take notes using CRISS').click()
-    cy.get('.govuk-details__text').should('contain.text', 'some html')
+    cy.get('.govuk-details__text').should(
+      'contain.html',
+      '<p class="govuk-body govuk-!-margin-bottom-1">CRISS stands for:</p><ul class="govuk-list govuk-list--bullet"><li>Check in with the person on probation</li><li>Review their progress from the last session</li><li>Intervention - target their criminogenic needs and risk</li><li>Summarise what you discussed in this session</li><li>Set tasks to review in the next session</li></ul>',
+    )
     addNotePage.getPreviousNotes().find('h3').should('contain.text', 'Previous notes')
     addNotePage.getPreviousNotes().find('.app-note').should('have.length', 1)
     addNotePage.getPreviousNotes().find('.app-note p').eq(0).should('contain.text', 'Some notes')
@@ -134,7 +137,7 @@ describe('Manage appointment - add a note', () => {
     cy.get('.moj-multi-file-upload__input').attachFile(fakeFile)
     addNotePage
       .getFileUploadListItem('error', 'text', 0)
-      .should('contain.text', `${fileName}: file type must be pdf or word`)
+      .should('contain.text', `${fileName}: File type must be pdf or word`)
     addNotePage.getFileUploadListItem('error', 'status', 0).should('contain.text', 'Upload failed')
     addNotePage.getFileUploadListItemDeleteButton(0).should('contain.text', 'Delete')
   })
@@ -161,13 +164,12 @@ describe('Manage appointment - add a note', () => {
     const [fakeFile2, fileName2] = createFakeFile(1, 'pdf')
     addNotePage.getChooseFilesButton().click()
     cy.get('.moj-multi-file-upload__input').attachFile(fakeFile1)
-    cy.wait('@fileUpload')
     cy.get('.moj-multi-file-upload__input').attachFile(fakeFile2)
     cy.wait('@fileUpload')
     addNotePage.getSubmitBtn().click()
     addNotePage
       .getFileUploadListItem('error', 'text', 0)
-      .should('contain.text', `${fileName1}: file type must be pdf or word`)
+      .should('contain.text', `${fileName1}: File type must be pdf or word`)
     addNotePage.getFileUploadListItem('error', 'status', 0).should('contain.text', 'Upload failed')
     addNotePage.getFileUploadListItem('success', 'text', 1).should('contain.text', fileName2)
     addNotePage.getFileUploadListItem('success', 'status', 1).should('contain.text', 'Uploaded')
@@ -188,7 +190,7 @@ describe('Manage appointment - add a note', () => {
       addNotePage.getFileUploadListItemDeleteButton(0).should(assertion)
       addNotePage
         .getFileUploadListItem('error', 'text', 1)
-        .should('contain.text', `${fileName2}: file type must be pdf or word`)
+        .should('contain.text', `${fileName2}: File type must be pdf or word`)
       addNotePage.getFileUploadListItem('error', 'status', 1).should('contain.text', 'Upload failed')
       addNotePage.getFileUploadListItemDeleteButton(1).should(assertion)
       addNotePage

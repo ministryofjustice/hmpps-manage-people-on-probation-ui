@@ -172,16 +172,24 @@ const multiFileUpload = () => {
     for (const file of files) {
       if (!validMimeTypes.includes(file.type)) {
         this.setUploadRow(file)
-        this.params.uploadFileErrorHook({ handle: this, file, errorMessage: 'file type must be pdf or word' })
+        this.params.uploadFileErrorHook({
+          handle: this,
+          file,
+          errorMessage: `${file.name}: File type must be pdf or word`,
+        })
       } else if (file.size > window.maxFileSize) {
         this.setUploadRow(file)
-        this.params.uploadFileErrorHook({ handle: this, file, errorMessage: 'file size must be 5mb or under' })
+        this.params.uploadFileErrorHook({
+          handle: this,
+          file,
+          errorMessage: `${file.name}: File size must be 5mb or under`,
+        })
       } else if (i > window.fileUploadLimit) {
         this.setUploadRow(file)
         this.params.uploadFileErrorHook({
           handle: this,
           file,
-          errorMessage: `You can only select up to ${window.fileUploadLimit} files at the same time`,
+          errorMessage: `${file.name}: You can only select up to ${window.fileUploadLimit} files at the same time`,
         })
       } else {
         this.uploadFile(file)
