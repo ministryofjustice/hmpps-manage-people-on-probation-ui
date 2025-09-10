@@ -294,11 +294,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         body: { nextAppointment },
       } = req
       const { nextAppointmentSession } = res.locals
-      if (nextAppointment === 'keepType') {
-        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
-      }
-      if (nextAppointment === 'changeType') {
-        return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
+      if (nextAppointment !== 'no') {
+        const clearType = nextAppointment === 'changeType'
+        return cloneAppointmentAndRedirect(nextAppointmentSession, { clearType })(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
