@@ -28,7 +28,7 @@
 {% endset %}
 {% set locationHtml = '' %}
 {% if appointment.location.address %}
-    {% set locationHtml = addressToList(appointment.location.address).join('<br>') | safe %}
+    {% set locationHtml = [appointment.location.description + "<br>", addressToList(appointment.location.address).join('<br>')] | join | safe %}
 {% endif %}
 {% if appointment.location == 'NO_LOCATION_REQUIRED' %}
     {% set locationHtml = 'Not required' %}
@@ -114,9 +114,9 @@
      } if showAction
      } if appointment.meta.isVisor,
      { key: { text: "Location" }, 
-     value: { text: locationAddress | safe if appointment.location else 'Not entered' }, 
+     value: { text: locationHtml | safe if locationHtml else 'Not entered' }, 
      actions: { items: [ { href: changePath + "/location?change=" + url, 
-     text: "Change" if appointment.location else "Choose location",
+     text: "Change" if locationHtml else "Choose location",
       visuallyHiddenText: "location"
       }
       ]
