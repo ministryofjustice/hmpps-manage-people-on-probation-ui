@@ -117,7 +117,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         ...appointment,
         meta: {
           ...appointment.meta,
-          hasLocation,
+          hasLocation: locationCode !== noLocationValue,
         },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,

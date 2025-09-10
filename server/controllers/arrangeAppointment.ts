@@ -84,12 +84,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
-        }
-      }
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
