@@ -203,7 +203,7 @@
         {% endif %}
       </section>
 
-      <section class="govuk-!-margin-bottom-8" data-qa="pastAppointments">
+      <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="pastAppointments">
         <h2 class="govuk-heading-m" id="section2">Past appointments</h2>
         {% if pastAppointments.length == 0 %}
           <p>There are no past appointments.</p>
@@ -214,22 +214,22 @@
               head: [
                 {
                   text: "Appointment type",
-                  classes: "govuk-!-width-one-third"
+                  classes: "vertical-align--middle govuk-!-width-one-third"
                 },
                 {
                   text: "Date",
                   format: "numeric",
-                  classes: "govuk-!-width-one-third-plus-three"
+                  classes: "vertical-align--middle govuk-!-width-one-third-plus-three"
                 },
                 {
                   text: "Time",
                   format: "numeric",
-                  classes: "govuk-!-width-one-third-plus-three"
+                  classes: "vertical-align--middle govuk-!-width-one-third-plus-three"
                 },
                 {
                   html: "Action",
                   format: "numeric",
-                  classes: "govuk-!-width-one-third-plus-three"
+                  classes: "vertical-align--middle govuk-!-width-one-third-plus-three"
                 }
               ],
               rows: pastAppointmentRows
