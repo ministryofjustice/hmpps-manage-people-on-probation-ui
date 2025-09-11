@@ -37,34 +37,38 @@
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
     {% set appointmentDetails %}
-      <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
-        {{ appointment.type }}
-        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      </a>
+    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+      {{ appointment.type }}
+      {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+    </a>
     {% endset %}
-      {% set actionsButton %}
-          {{ manageAppointmentLink(flags, appointment, crn) }}
-      {% endset %}
+    {% set actionsButton %}
+    {{ manageAppointmentLink(flags, appointment, crn) }}
+    {% endset %}
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
       {
         html: appointmentDetails,
-        attributes: { "data-qa":"upcomingAppointmentType"+loop.index }
+        attributes: { "data-qa":"upcomingAppointmentType"+loop.index },
+        classes: "govuk-!-width-one-third"
       },
       {
         text: appointment.startDateTime | dateWithYear,
         format: "numeric",
-        attributes: { "data-qa":"upcomingAppointmentDate"+loop.index }
+        attributes: { "data-qa":"upcomingAppointmentDate"+loop.index },
+        classes: "govuk-!-width-one-third-plus-three"
       },
       {
         text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
         format: "numeric",
-        attributes: { "data-qa":"upcomingAppointmentTime"+loop.index }
+        attributes: { "data-qa":"upcomingAppointmentTime"+loop.index },
+        classes: "govuk-!-width-one-third-plus-three"
       },
       {
         html: actionsButton,
         format: "numeric",
-        attributes: {"data-qa": "upcomingAppointmentAction" + loop.index }
+        attributes: {"data-qa": "upcomingAppointmentAction" + loop.index },
+        classes: "govuk-!-width-one-third-plus-three"
       }
     ]), upcomingAppointmentRows) %}
   {% endfor %}
@@ -74,34 +78,38 @@
   {% for appointment in pastAppointments %}
 
     {% set appointmentDetails %}
-      <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
-        {{ appointment.type }}
-        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      </a>
+    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+      {{ appointment.type }}
+      {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+    </a>
     {% endset %}
 
-      {% set actionsButton %}
-          {{ manageAppointmentLink(flags, appointment, crn) }}
-      {% endset %}
+    {% set actionsButton %}
+    {{ manageAppointmentLink(flags, appointment, crn) }}
+    {% endset %}
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
       {
         html: appointmentDetails,
-        attributes: { "data-qa":"pastAppointmentType"+loop.index }
+        attributes: { "data-qa":"pastAppointmentType"+loop.index },
+        classes: "govuk-!-width-one-third"
       },
       {
         text: appointment.startDateTime | dateWithYear,
         format: "numeric",
-        attributes: { "data-qa":"pastAppointmentDate"+loop.index }
+        attributes: { "data-qa":"pastAppointmentDate"+loop.index },
+        classes: "govuk-!-width-one-third-plus-three"
       },
       {
         text: timeFromTo(appointment.startDateTime, appointment.endDateTime),
         format: "numeric",
-        attributes: { "data-qa":"pastAppointmentTime"+loop.index }
+        attributes: { "data-qa":"pastAppointmentTime"+loop.index },
+        classes: "govuk-!-width-one-third-plus-three"
       },
       {
         html: actionsButton,
-        format: "numeric"
+        format: "numeric",
+        classes: "govuk-!-width-one-third-plus-three"
       }
     ]), pastAppointmentRows) %}
   {% endfor %}
@@ -167,21 +175,21 @@
               head: [
                 {
                   text: "Appointment type",
-                  classes: "vertical-align--middle"
+                  classes: "vertical-align--middle govuk-!-width-one-third"
                 },
                 {
                   text: "Date",
-                  classes: "vertical-align--middle",
+                  classes: "vertical-align--middle govuk-!-width-one-third-plus-three",
                   format: "numeric"
                 },
                 {
                   text: "Time",
-                  classes: "vertical-align--middle",
+                  classes: "vertical-align--middle govuk-!-width-one-third-plus-three",
                   format: "numeric"
                 },
                 {
                   html: "Action",
-                  classes: "vertical-align--middle",
+                  classes: "vertical-align--middle govuk-!-width-one-third-plus-three",
                   format: "numeric"
                 }
               ],
@@ -189,7 +197,8 @@
             }) }}
 
           {% if totalUpcomingAppointments > 10 %}
-            <p><a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
+            <p>
+              <a href="/case/{{crn}}/upcoming-appointments" class="govuk-link">View all upcoming appointments</a>.</p>
           {% endif %}
         {% endif %}
       </section>
@@ -204,19 +213,23 @@
               captionClasses: 'govuk-visually-hidden',
               head: [
                 {
-                  text: "Appointment type"
+                  text: "Appointment type",
+                  classes: "govuk-!-width-one-third"
                 },
                 {
                   text: "Date",
-                  format: "numeric"
+                  format: "numeric",
+                  classes: "govuk-!-width-one-third-plus-three"
                 },
                 {
                   text: "Time",
-                  format: "numeric"
+                  format: "numeric",
+                  classes: "govuk-!-width-one-third-plus-three"
                 },
                 {
                   html: "Action",
-                  format: "numeric"
+                  format: "numeric",
+                  classes: "govuk-!-width-one-third-plus-three"
                 }
               ],
               rows: pastAppointmentRows
@@ -225,7 +238,8 @@
       </section>
       <section data-qa="appointmentHistory">
         <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
-        <p><a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
+        <p>
+          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
       </section>
     </div>
   </div>

@@ -5,36 +5,44 @@
 {% if entry.rescheduled %}
   {% set text = 'Rescheduled' %}
   {% set shorthand = '⟳' %}
+  {% set iconClass = 'rescheduled' %}
   {% set colour = 'blue' %}
 {% elseif entry.didTheyComply === true %}
   {% set text = 'Complied' %}
   {% set shorthand = '✓' %}
+  {% set iconClass = 'tick' %}
   {% set colour = 'green' %}
 {% elseif entry.wasAbsent === true %}
   {% if entry.acceptableAbsence === true %}
     {% set text = 'Acceptable absence' %}
     {% set shorthand = '✓' %}
+    {% set iconClass = 'tick' %}
     {% set colour = 'green' %}
   {% elseif entry.absentWaitingEvidence === true %}
     {% set text = 'Waiting for evidence' %}
     {% set shorthand = '?' %}
     {% set colour = 'yellow' %}
+    {% set iconClass = 'waiting' %}
   {% elseif entry.acceptableAbsence === false %}
     {% set text = 'Unacceptable absence' %}
     {% set shorthand = '✘' %}
+    {% set iconClass = 'strike' %}
     {% set colour = 'red' %}
   {% endif %}
 {% elseif entry.didTheyComply === false %}
   {% set text = 'Failed to comply' %}
   {% set shorthand = '✘' %}
+  {% set iconClass = 'strike' %}
   {% set colour = 'red' %}
 {% elseif entry.isSensitive === true %}
   {% set text = 'Sensitive' %}
   {% set shorthand = '✘' %}
+  {% set iconClass = 'strike' %}
   {% set colour = 'orange' %}
 {% elseif entry.complied === true %}
   {% set text = 'Complied' %}
   {% set shorthand = '✘' %}
+  {% set iconClass = 'strike' %}
   {% set colour = 'grey' %}
 {% endif %}
 
@@ -42,7 +50,7 @@
 {% if text %}
   {% if isCompact %}
     {% set html %}
-      {{ shorthand }}<span class="govuk-visually-hidden">{{ text }}</span>
+    <span class="app-compliance-tag-icon app-compliance-tag-icon--{{ iconClass }}">{{ shorthand }}</span><span class="govuk-visually-hidden">{{ text }}</span>
     {% endset %}
     <span class="app-compliance-tag--compact" style="float: right" title="{{ text }}">
       {{ govukTag({ html: html, classes: tagClasses }) }}
