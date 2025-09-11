@@ -9,6 +9,11 @@ export interface AppointmentSession {
     username?: string
     locationCode?: string
   }
+  temp?: {
+    providerCode?: string
+    teamCode?: string
+    username?: string
+  }
   type?: string
   visorReport?: 'Yes' | 'No'
   date?: string
