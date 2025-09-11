@@ -311,7 +311,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
     })
   })
-  xdescribe('getLocation', () => {
+  describe('getLocation', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
@@ -363,7 +363,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list?noLocations=true`)
     })
-    xit('user locations', async () => {
+    it('user locations', async () => {
       const mockReq = createMockRequest({
         query: { change: '' },
         dataSession: {
@@ -922,12 +922,14 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-    xit('if no date has been submitted for the appointment, it should redirect to the date/time page and display validation errors', async () => {
+    it('if no date has been submitted for the appointment, it should redirect to the date/time page and display validation errors', async () => {
       const mockReq = createMockRequest({
         request: {
           url,
         },
         appointmentSession: {
+          eventId: '123',
+          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
           type: 'type',
           date: '',
           start: '',
@@ -942,9 +944,17 @@ describe('controllers/arrangeAppointment', () => {
         `/case/${crn}/arrange-appointment/${uuid}/date-time?validation=true&change=${url}`,
       )
     })
-    xit('should redirect to the confirmation page if all required values are present in appointment session', async () => {
+    it('should redirect to the confirmation page if all required values are present in appointment session', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { type: 'type', date: '2025/7/2', start: '9:00am', end: '9:30am' },
+        appointmentSession: {
+          eventId: '123',
+          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
+          type: 'type',
+          date: '2025/7/2',
+          start: '9:00am',
+          end: '9:30am',
+          sensitivity: 'No',
+        },
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)

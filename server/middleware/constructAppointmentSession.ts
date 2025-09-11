@@ -29,7 +29,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   let username = appointment?.officer?.username || ''
   let teamCode = appointment?.officer?.teamCode || ''
   let providerCode = appointment?.officer?.providerCode || ''
-
   if (!eventId) {
     type = ''
     locationCode = ''
@@ -37,14 +36,12 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     teamCode = ''
     username = ''
   }
-
   if (!type) {
     locationCode = ''
     providerCode = ''
     teamCode = ''
     username = ''
   }
-
   if (!providerCode || !teamCode || !username) {
     locationCode = ''
   }
