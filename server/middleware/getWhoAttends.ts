@@ -12,12 +12,14 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
     const region = providerCode || req?.session?.data?.appointments?.[crn]?.[id]?.user?.providerCode
+    const { data } = req.session
+
+    console.log(getDataValue(data, ['appointments', crn, id, 'user']))
 
     let selectedRegion: string
     let selectedTeam: string
 
     if (back) {
-      const { data } = req.session
       selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
       selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
     } else {
