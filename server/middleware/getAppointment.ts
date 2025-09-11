@@ -76,32 +76,17 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
-      const selectedRegion =
-        providerCode && req?.session?.data?.providers?.[loggedInUsername]
-          ? req.session.data.providers[loggedInUsername].find(r => r.code === providerCode)?.name
-          : null
 
-      // The region and team data in the drop-downs on attendance screen are dynamically updated
-      // If the region is updated on the attendance page, but the team is not, and back is selected,
-      // the team code in the session is not updated.  This is because the back link does not invoke
-      // a post.  The logic below will handle this scenario.
-      let selectedTeam: string
-      if (teamCode && providerCode?.substring(0, 3) !== teamCode?.substring(0, 3)) {
-        const team = req?.session?.data.teams?.[loggedInUsername] ? req.session.data.teams[loggedInUsername][0] : null
-        selectedTeam = team.description
-        setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], team.code)
-      } else {
-        selectedTeam =
-          teamCode && req?.session?.data.teams?.[loggedInUsername]
-            ? req.session.data.teams[loggedInUsername].find(t => t.code === teamCode)?.description
-            : null
-      }
-
+      const { providers, teams, users } = await masClient.getUserProviders(
+        res.locals.user.username,
+        providerCode,
+        teamCode,
+      )
+      const selectedRegion = providerCode && providers ? providers.find(r => r.code === providerCode)?.name : null
+      const selectedTeam = teamCode && teams ? teams.find(t => t.code === teamCode)?.description : null
       const selectedUser =
-        staffId && req?.session?.data?.staff?.[loggedInUsername]
-          ? req.session.data.staff[loggedInUsername].find(s => s.username.toLowerCase() === staffId.toLowerCase())
-              ?.nameAndRole
-          : null
+        staffId && users ? users.find(s => s.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole : null
+
       const noLocationValue = 'I do not need to pick a location'
       const location: Location | string =
         locationCode && locationCode !== noLocationValue && loggedInUsername

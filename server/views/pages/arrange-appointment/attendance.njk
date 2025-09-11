@@ -28,7 +28,7 @@
         attributes: {
             'data-qa': 'providerCode'
         }
-    } | decorateFormAttributes(['appointments', crn, id, 'user', 'providerCode'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'temp', 'providerCode'])) }}
 
     {{ govukSelect({
         label: { text: "Select team" },
@@ -36,7 +36,7 @@
          attributes: {
             'data-qa': 'teamCode'
         }
-    } | decorateFormAttributes(['appointments', crn, id, 'user', 'teamCode'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'temp', 'teamCode'])) }}
 
     {{ govukSelect({
         label: { text: "Select name" },
@@ -44,6 +44,6 @@
          attributes: {
             'data-qa': 'username'
         }
-    } | decorateFormAttributes(['appointments', crn, id, 'user', 'username'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'temp', 'username'])) }}
 
 {% endblock %}

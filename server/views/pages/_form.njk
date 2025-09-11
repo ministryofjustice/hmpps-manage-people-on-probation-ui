@@ -3,7 +3,7 @@
 {% block beforeContent %}
   {% if backLink %}
     {{ govukBackLink({
-    href: backLink + ("?change=" + change if change else '')
+    href: backLink
   }) }}
   {% endif %}
 {% endblock %}
