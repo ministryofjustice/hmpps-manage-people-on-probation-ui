@@ -25,14 +25,7 @@
             </a>
         {% endset %}
         {% set actionsButton %}
-            {% if not appointment.deliusManaged %}
-                {{ manageAppointmentLink(flags, appointment, crn) }}
-            {% else %}
-                <a class="govuk-link govuk-link--no-visited-state" target="_blank"
-                   href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
-                   aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">Manage on NDelius<span
-                            class="govuk-visually-hidden"> (opens in new tab)</span></a>
-            {% endif %}
+            {{ manageAppointmentLink(flags, appointment, crn) }}
         {% endset %}
 
         {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
