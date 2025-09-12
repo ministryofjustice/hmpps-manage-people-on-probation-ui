@@ -229,7 +229,7 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode: '', teamCode: '', username: '', locationCode: '' },
+        user: { providerCode: 'N07', teamCode: 'N07CHT', username: 'tony-pan', locationCode: '' },
         type: '',
         eventId: '',
       }),
@@ -245,7 +245,10 @@ describe('/middleware/constructAppointmentSession', () => {
     })
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
-      expectedSession({ user: { providerCode: '', teamCode: '', username: '', locationCode: '' }, type: '' }),
+      expectedSession({
+        user: { providerCode: 'N07', teamCode: 'N07CHT', username: 'tony-pan', locationCode: '' },
+        type: '',
+      }),
     )
   })
   it('should set until as an empty string if end date does not exist in person appointment', () => {
