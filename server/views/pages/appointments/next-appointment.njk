@@ -28,18 +28,18 @@
     items: [
     {
         text: "Yes - another " + personAppointment.appointment.type | toSentenceCase(['(NS)'], [], false),
-        value: "keepType",
-        checked: body.nextAppointment == "keepType"
+        value: "KEEP_TYPE",
+        checked: body.nextAppointment == "KEEP_TYPE"
     },
     {
         text: "Yes - another appointment type",
-        value: "changeType",
-       checked: body.nextAppointment == "changeType"
+        value: "CHANGE_TYPE",
+        checked: body.nextAppointment == "CHANGE_TYPE"
     },
         {
         text: "No",
-        value: "no",
-        checked: body.nextAppointment == "no"
+        value: "NO",
+        checked: body.nextAppointment == "NO"
     }] 
   }) }}
 
