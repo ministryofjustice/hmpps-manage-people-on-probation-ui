@@ -154,19 +154,19 @@ const getAppointmentStub = (
         id: '83fdbf8a-a2f2-43b4-93ef-67e71c04fc58',
         name: 'Document-1.pdf',
         lastUpdated: '2023-04-06T11:06:25.672587+01:00',
-        dateCreated: '2023-04-06T11:06:25.672587+01:00',
+        createdAt: '2023-04-06T11:06:25.672587+01:00',
       },
       {
         id: 'c2650260-9568-476e-a293-0b168027a5f1',
         name: 'Document-2.pdf',
         lastUpdated: '2023-04-06T11:09:45.860739+01:00',
-        dateCreated: '2023-04-06T11:09:45.860739+01:00',
+        createdAt: '2023-04-06T11:09:45.860739+01:00',
       },
       {
         id: 'b82e444b-c77c-4d44-bf99-4ce4dc426ff4',
         name: 'Document-3.pdf',
         lastUpdated: '2023-04-06T11:21:17.06356+01:00',
-        dateCreated: '2023-04-06T11:21:17.06356+01:00',
+        createdAt: '2023-04-06T11:21:17.06356+01:00',
       },
     ]
   }
