@@ -55,6 +55,9 @@ on:
       HMPPS_VERACODE_API_KEY_4:
         description: Veracode app secret
         required: true
+      SENTRY_AUTH_TOKEN:
+        description: sentry auth secret
+        required: true
 
 permissions:
   contents: read
