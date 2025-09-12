@@ -205,7 +205,7 @@
     "@types/luxon-business-days": "^3.0.0",
     "@types/mocha": "^10.0.10",
     "@types/multer": "^2.0.0",
-    "@types/node": "^24.3.1",
+    "@types/node": "^24.3.2",
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.17",
     "@types/passport-oauth2": "^1.4.17",
