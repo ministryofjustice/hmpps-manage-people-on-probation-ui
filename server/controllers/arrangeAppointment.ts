@@ -3,11 +3,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { ResponseError } from 'superagent'
 import { Controller, Route } from '../@types'
-import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
-import { StatusErrorCode } from '../properties'
+import { appointmentTypes, StatusErrorCode } from '../properties'
 
 const routes = [
   'redirectToSentence',
@@ -52,7 +52,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params as Record<string, string>
-      const { change } = req.query
+      const { change, validation } = req.query
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-eventId`]: 'Select a sentence',
+        }
+      }
       return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors })
     }
   },
@@ -76,8 +82,14 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
       const { crn, id } = req.params
-      const { change } = req.query
+      const { change, validation } = req.query
       const { data } = req.session
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
+        }
+      }
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -86,7 +98,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel })
+      if (personLevel) {
+        res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
+      }
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
     }
   },
   postType: () => {
@@ -143,7 +158,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { data } = req.session
-      const { change } = req.query
+      const { change, validation } = req.query
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-user-locationCode`]: 'Select an appointment location',
+        }
+      }
       const errors = data?.errors
       const { appointment } = res.locals
       const locations = res?.locals?.userLocations || []
@@ -159,14 +180,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postLocation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const change = req?.query?.change as string
+      const { change } = req.query as Record<string, string>
       const { data } = req.session
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const page =
-        selectedLocation === `The location I’m looking for is not in this list` ? 'location-not-in-list' : 'date-time'
+      const page = selectedLocation === `LOCATION_NOT_IN_LIST` ? 'location-not-in-list' : 'date-time'
       let redirect = `/case/${crn}/arrange-appointment/${id}/${page}`
       if (change && page !== 'location-not-in-list') {
         redirect = change
@@ -345,11 +365,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { data } = req.session
       let location = null
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      if (
-        ![`The location I’m looking for is not in this list`, 'I do not need to pick a location'].includes(
-          selectedLocation,
-        )
-      ) {
+      if (![`LOCATION_NOT_IN_LIST`, 'NO_LOCATION_REQUIRED'].includes(selectedLocation)) {
         location = res.locals.userLocations.find((loc: any) => loc.description === selectedLocation)
       }
       return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, location, url, repeatingEnabled })
@@ -393,6 +409,9 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { url } = req
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
+      if (!getDataValue<AppointmentSession>(data, ['appointments', crn, id])) {
+        return res.redirect(`/case/${crn}/appointments`)
+      }
       return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id })
     }
   },
@@ -403,12 +422,33 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const date = getDataValue(data, ['appointments', crn, id, 'date'])
-      if (!date) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/date-time?validation=true&change=${req.url}`)
+      const {
+        user: { providerCode, teamCode, username, locationCode },
+        eventId,
+        type,
+        date,
+        sensitivity,
+      } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+      const mapping = {
+        eventId: 'sentence',
+        type: 'type',
+        providerCode: 'attendance',
+        teamCode: 'attendance',
+        username: 'attendance',
+        locationCode: 'location',
+        date: 'date-time',
+        sensitivity: 'add-notes',
+      }
+      const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
+      const baseUrl = `/case/${crn}/arrange-appointment/${id}`
+      for (const [k, v] of Object.entries(mapping)) {
+        const value = requiredValues[k as keyof typeof requiredValues]
+        if (!value) {
+          return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
+        }
       }
       await postAppointments(hmppsAuthClient)(req, res)
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`) // and then redirect based on redirect-id
+      return res.redirect(`${baseUrl}/confirmation`)
     }
   },
 }

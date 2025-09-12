@@ -134,4 +134,5 @@ export interface LocalParams {
   _maxDate?: string
   contactId?: string
   uploadedFiles?: any
+  personLevel?: boolean
 }

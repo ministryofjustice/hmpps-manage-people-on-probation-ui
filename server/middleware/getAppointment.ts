@@ -58,7 +58,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
@@ -92,11 +91,12 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         locationCode && locationCode !== noLocationValue && loggedInUsername
           ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
           : 'Not needed'
+
       appointment = {
         ...appointment,
         meta: {
           ...appointment.meta,
-          hasLocation: locationCode !== noLocationValue,
+          hasLocation,
         },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,
