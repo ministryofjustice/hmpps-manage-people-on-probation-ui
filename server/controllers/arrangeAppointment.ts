@@ -3,11 +3,11 @@ import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { ResponseError } from 'superagent'
 import { Controller, Route } from '../@types'
-import { getDataValue, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
-import { StatusErrorCode } from '../properties'
+import { appointmentTypes, StatusErrorCode } from '../properties'
 
 const routes = [
   'redirectToSentence',
@@ -98,7 +98,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors, personLevel })
+      if (personLevel) {
+        res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
+      }
+      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
     }
   },
   postType: () => {

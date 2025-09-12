@@ -164,6 +164,10 @@ describe('Arrange an appointment', () => {
       it('should have limited set of appointmentTypes', () => {
         cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
       })
+      it('should keep limited set even after error', () => {
+        typePage.getSubmitBtn().click()
+        cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
+      })
     })
   })
 })
