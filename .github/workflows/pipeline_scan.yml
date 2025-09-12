@@ -56,7 +56,7 @@ on:
         description: Veracode app secret
         required: true
       SENTRY_AUTH_TOKEN:
-        description: sentry auth secret
+        description: Sentry auth secret
         required: true
 
 permissions:
@@ -129,6 +129,7 @@ jobs:
       id: veracode-pipeline-scan
       shell: bash
       run: |
+        # shellcheck disable=SC2046
         echo "Randomly picking 1 of 5 api keys, to help avoid veracode API rate limits."
         X=$(( RANDOM % 4 ))
         VERACODE_API_ID_X="VERACODE_API_ID_${X}"
