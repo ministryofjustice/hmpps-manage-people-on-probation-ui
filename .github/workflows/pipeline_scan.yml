@@ -134,7 +134,7 @@ jobs:
         VERACODE_API_KEY="${!VERACODE_API_KEY_X}"
         echo "Using VERACODE_API_ID_${X} from pool (${VERACODE_API_ID:0:5}...)"
         java -jar pipeline-scan.jar \
-          "$(test -f results.json && echo "--baseline_file results.json")" \
+          $(test -f results.json && echo "--baseline_file results.json") \
           --json_output true \
           --file "${{ inputs.veracode_artifact_name }}" \
           --policy_file Ministry_of_Justice.json \
