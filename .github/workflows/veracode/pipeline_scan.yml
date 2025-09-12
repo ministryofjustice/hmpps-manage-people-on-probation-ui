@@ -82,7 +82,7 @@ jobs:
         distribution: 'temurin'
     - name: prepare assets
       if: inputs.veracode_package_artifact_name == ''
-      uses: ./.github/actions/security_veracode_prepare_artifacts@v2 # WORKFLOW_VERSION
+      uses: ./.github/actions/security_veracode_prepare_artifacts
       with:
         docker_image_app_dir: ${{ inputs.docker_image_app_dir }}
     - name: download assets artifact
