@@ -22,8 +22,12 @@ import { HmppsAuthClient } from '../data'
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all('/case/:crn/arrange-appointment/:id/*path', getAppointmentTypes(hmppsAuthClient))
-  router.all('/case/:crn/arrange-appointment/:id/*path', getPersonalDetails(hmppsAuthClient))
+  router.all(
+    '/case/:crn/arrange-appointment/:id/*path',
+    getAppointmentTypes(hmppsAuthClient),
+    getPersonalDetails(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+  )
   router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
   get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
   get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
@@ -125,7 +129,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/check-your-answers',
     redirectWizard(['eventId', 'repeating']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
     checkAnswers,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
@@ -136,14 +139,12 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
     redirectWizard(['eventId', 'type', ['user', 'locationCode'], 'repeating']),
-    getPersonalDetails(hmppsAuthClient),
     controllers.arrangeAppointments.getConfirmation(),
   )
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
   router.get(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
     checkAnswers,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
