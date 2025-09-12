@@ -310,7 +310,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
     })
   })
-  xdescribe('getLocation', () => {
+  describe('getLocation', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
@@ -362,7 +362,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getLocation()(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list?noLocations=true`)
     })
-    xit('user locations', async () => {
+    it('user locations', async () => {
       const mockReq = createMockRequest({
         query: { change: '' },
         dataSession: {
