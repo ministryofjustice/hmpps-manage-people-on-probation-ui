@@ -1,10 +1,13 @@
 import { Request, NextFunction } from 'express'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
+
+const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
   const { crn } = req.params
+  const { nextAppointment: nextAppointmentSelection } = req.body
   const { appointmentTypes } = res.locals
   let eventId = appointment?.eventId || ''
   if (!eventId && appointment?.eventNumber) {
@@ -26,55 +29,87 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   }
 
   let type = appointmentTypes.find(t => t?.description === appointment?.type)?.code || ''
-  const username = appointment?.officer?.username || ''
-  const teamCode = appointment?.officer?.teamCode || ''
-  const providerCode = appointment?.officer?.providerCode || ''
+  let username = appointment?.officer?.username || ''
+  let teamCode = appointment?.officer?.teamCode || ''
+  let providerCode = appointment?.officer?.providerCode || ''
+  const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
+  const date = appointment?.startDateTime || ''
+  const end = appointment?.endDateTime || ''
+  const sensitivity = appointment?.isSensitive !== undefined ? booleanToYesNo(appointment.isSensitive) : ''
 
-  if (!eventId) {
-    type = ''
-    locationCode = ''
-  }
-
-  if (!type) {
-    locationCode = ''
-  }
-
-  if (!providerCode || !teamCode || !username) {
-    locationCode = ''
-  }
-  const nextAppointment: AppointmentSession = {
-    user: {
-      providerCode,
-      teamCode,
-      username,
-      locationCode,
-    },
-    type,
-    visorReport: appointment?.isVisor ? 'Yes' : 'No',
-    date: appointment?.startDateTime || '',
-    start: appointment?.startDateTime || '',
-    end: appointment?.endDateTime || '',
-    until: appointment?.endDateTime || '',
+  let nextAppointment: AppointmentSession = {
     interval: 'DAY',
     numberOfAppointments: '1',
     numberOfRepeatAppointments: '0',
-    eventId: eventId?.toString() || '',
+    eventId: '',
     username: res.locals.user.username,
     uuid: '',
     repeating: 'No',
     repeatingDates: [],
-    notes,
-    sensitivity: appointment?.isSensitive ? 'Yes' : 'No',
   }
-  if (appointment?.component?.type === 'REQUIREMENT') {
-    nextAppointment.requirementId = appointment?.component?.id.toString() || ''
+
+  if (nextAppointmentSelection === 'KEEP_TYPE') {
+    eventId = eventId?.toString()
+    if (!eventId) {
+      type = ''
+      locationCode = ''
+      providerCode = ''
+      teamCode = ''
+      username = ''
+    }
+
+    if (eventId && !type) {
+      providerCode = ''
+      teamCode = ''
+      username = ''
+      locationCode = ''
+    }
+
+    if (eventId && type && (!providerCode || !teamCode || !username)) {
+      providerCode = ''
+      teamCode = ''
+      username = ''
+      locationCode = ''
+    }
+    nextAppointment = {
+      ...nextAppointment,
+      user: {
+        providerCode,
+        teamCode,
+        username,
+        locationCode,
+      },
+      type,
+      date,
+      start: date,
+      end,
+      until: end,
+      interval: 'DAY',
+      numberOfAppointments: '1',
+      numberOfRepeatAppointments: '0',
+      eventId: eventId?.toString(),
+      username: res.locals.user.username,
+      uuid: '',
+      repeating: 'No',
+      repeatingDates: [],
+      notes,
+      sensitivity,
+    }
+
+    if (visorReport) {
+      nextAppointment.visorReport = visorReport
+    }
+    if (appointment?.component?.type === 'REQUIREMENT') {
+      nextAppointment.requirementId = appointment?.component?.id.toString() || ''
+    }
+    if (appointment?.component?.type === 'LICENCE_CONDITION') {
+      nextAppointment.licenceConditionId = appointment?.component?.id?.toString() || ''
+    }
+    if (appointment?.nsiId) {
+      nextAppointment.nsiId = appointment.nsiId.toString()
+    }
   }
-  if (appointment?.component?.type === 'LICENCE_CONDITION') {
-    nextAppointment.licenceConditionId = appointment?.component?.id?.toString() || ''
-  }
-  if (appointment?.nsiId) {
-    nextAppointment.nsiId = appointment.nsiId.toString()
-  }
+
   res.locals.nextAppointmentSession = nextAppointment
   return next()
 }
