@@ -76,21 +76,24 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         }
       }
 
-      const { providers, teams, users } = await masClient.getUserProviders(
+      const { providers, teams, users } = (await masClient.getUserProviders(
         res.locals.user.username,
         providerCode,
         teamCode,
-      )
+      ))
+        ? await masClient.getUserProviders(res.locals.user.username, providerCode, teamCode)
+        : {}
+
       const selectedRegion = providerCode && providers ? providers.find(r => r.code === providerCode)?.name : null
       const selectedTeam = teamCode && teams ? teams.find(t => t.code === teamCode)?.description : null
       const selectedUser =
         staffId && users ? users.find(s => s.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole : null
 
-      const noLocationValue = 'I do not need to pick a location'
-      const location: Location | string =
-        locationCode && locationCode !== noLocationValue && loggedInUsername
-          ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
-          : 'Not needed'
+      const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
+      let location: Location | string = locationCode
+      if (hasLocation && loggedInUsername) {
+        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) || ''
+      }
 
       appointment = {
         ...appointment,
