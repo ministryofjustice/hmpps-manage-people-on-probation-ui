@@ -1,8 +1,25 @@
 import httpMocks from 'node-mocks-http'
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { getDataValue } from '../utils'
+import { setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
+
+const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
+
+jest.mock('uuid', () => ({
+  v4: jest.fn(() => uuid),
+}))
+
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    setDataValue: jest.fn(),
+  }
+})
+
+// const mockedUuidv4 = uuidv4 as jest.Mock
+const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 const mockAppt: AppointmentSession = {
   user: {
@@ -30,7 +47,7 @@ const mockAppt: AppointmentSession = {
   licenceConditionId: '80',
 }
 
-function setup() {
+function setup(clearType = false) {
   const req = httpMocks.createRequest({
     params: {
       crn: 'X000001',
@@ -55,12 +72,13 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
+  const { req, res } = setup()
+  const { crn } = req.params
+  const redirectSpy = jest.spyOn(res, 'redirect')
+
   it('should construct the correct session with date removed', () => {
-    const { req, res } = setup()
     cloneAppointmentAndRedirect(mockAppt)(req, res)
-    const uuid = Object.keys(getDataValue(req.session.data, ['appointments', req.params.crn]))[0]
-    const result = getDataValue(req.session.data, ['appointments', req.params.crn, uuid])
-    expect(result).toEqual({
+    const expectedClone = {
       ...mockAppt,
       date: '',
       start: '',
@@ -71,6 +89,27 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
       numberOfRepeatAppointments: '0',
       repeating: 'No',
       uuid,
-    })
+    }
+    expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
+    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
+  })
+
+  it('should construct the correct session with date and type removed', () => {
+    cloneAppointmentAndRedirect(mockAppt, { clearType: true })(req, res)
+    const expectedClone = {
+      ...mockAppt,
+      type: '',
+      date: '',
+      start: '',
+      end: '',
+      repeatingDates: [] as string[],
+      until: '',
+      numberOfAppointments: '1',
+      numberOfRepeatAppointments: '0',
+      repeating: 'No',
+      uuid,
+    }
+    expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
+    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
 })

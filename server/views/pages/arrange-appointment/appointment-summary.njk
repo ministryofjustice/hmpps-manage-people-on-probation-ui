@@ -26,29 +26,13 @@
     {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
 {% endif %}
 {% endset %}
-{% set locationAddress %}
-{% if appointment.meta.hasLocation %}
-    {{appointment.location.description}}<br>
-    {% if appointment.location.address.buildingNumber %}{{location.address.buildingNumber}}
-    {% endif %}
-    {% if appointment.location.address.streetName %}{{appointment.location.address.streetName}}<br>
-    {% endif %}
-    {% if appointment.location.address.district %}
-        {{appointment.location.address.district}}<br>
-    {% endif %}
-    {% if appointment.location.address.town %}
-        {{appointment.location.address.town}}<br>
-    {% endif %}
-    {% if appointment.location.address.county %}
-        {{appointment.location.address.county}}<br>
-    {% endif %}
-    {% if appointment.location.address.postcode %}
-        {{ appointment.location.address.postcode }}
-    {% endif %}
-{% else %}
-    {{appointment.location}}
+{% set locationHtml = '' %}
+{% if appointment.location.address %}
+    {% set locationHtml = addressToList(appointment.location.address).join('<br>') | safe %}
 {% endif %}
-{% endset %}
+{% if appointment.location == 'NO_LOCATION_REQUIRED' %}
+    {% set locationHtml = 'Not required' %}
+{% endif %}
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {% set showAction = true %}
     {% set appointmentDates = [] %}
@@ -61,7 +45,7 @@
     {% set appointmentDatesHtml %}
     <ul class="govuk-list">
         {% for appointmentDate in appointmentDates %}
-            <li>{{  appointmentDate | dateWithYear }}
+            <li>{{ appointmentDate | dateWithYear }}
           from
           {{appointment.start}}
           to
@@ -72,29 +56,28 @@
     {{ govukSummaryList({
         classes: 'govuk-!-margin-bottom-9',
         rows: [
-
             { key: { text: "Appointment for" },
-            value: { html: sentenceHtml | safe },
+            value: { html: 'Not entered' if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else sentenceHtml | safe  },
             actions: {
             items: [ { 
             href: changePath + "/sentence?change=" + url, 
-            text: "Change", 
+            text: "Choose for" if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else "Change", 
             visuallyHiddenText: "sentence"
             } 
             ] 
             } if showAction }, 
             {
             key: { text: "Appointment type" },
-            value: { text: 'Not entered' if anotherAppointment and not appointment.type else appointment.type.description | toSentenceCase(['(NS)']) },
+            value: { text: 'Not entered' if not appointment.type else appointment.type.description | toSentenceCase(['(NS)']) },
             actions: {
                 items: [
                 {
                     href: changePath + "/type?change=" + url,
-                    text: "Choose type" if anotherAppointment and not appointment.type else "Change",
+                    text: "Choose type" if not appointment.type else "Change",
                     visuallyHiddenText: "type of appointment"
                 }
                 ]
-            } if showAction
+            } if showAction and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename)
             },
             {
                 key: { text: "VISOR report"},
@@ -110,15 +93,15 @@
                 } if showAction
             } if appointment.meta.isVisor,
     { key: { text: "Attending" },
-    value: { html: attendingHtml | safe },
+    value: { html: 'Not entered' if (not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) else attendingHtml | safe },
     actions: {
     items: [ { 
     href: changePath + "/attendance?change=" + url + "&back=attendance", 
-    text: "Change", 
+    text: "Choose attending" if (not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) else "Change", 
     visuallyHiddenText: "attendance"
      } 
      ] 
-     } if showAction },
+     } if showAction and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) and appointment.type},
      { key: { text: "VISOR report"},
       value: { text: appointment.visorReport },
       actions: {
@@ -131,38 +114,38 @@
      } if showAction
      } if appointment.meta.isVisor,
      { key: { text: "Location" }, 
-     value: { text: locationAddress | safe if appointment.location else appointment.location }, 
+     value: { text: 'Not entered' if not locationHtml else locationHtml | safe }, 
      actions: { items: [ { href: changePath + "/location?change=" + url, 
-     text: "Change",
+     text: "Choose location" if not locationHtml else  "Change",
       visuallyHiddenText: "location"
       }
       ]
-      } if showAction },
+      } if showAction  and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) and appointment.type and appointment.attending.name },
       { key: { text: "Date and time" },
-      value: { html: 'Not entered' if anotherAppointment and appointmentDates.length == 0 else appointmentDatesHtml }, 
+      value: { html: 'Not entered' if appointmentDates.length == 0 else appointmentDatesHtml }, 
       actions: { items: [ { href: changePath + "/date-time?change=" + url,
-      text: "Choose date and time" if anotherAppointment and appointmentDates.length == 0 else "Change",
+      text: "Choose date and time" if appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
          { 
             key: { html: '<span data-qa="repeatingAppointmentLabel">Repeating appointment</span>' },
       value: { html: '<span data-qa="repeatingAppointmentValue">' + ('Yes' if appointment.repeating === 'Yes' else 'No') + '</span>' },
       actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
        { key: { text: "Supporting information" },
-    value: { html: "Not entered" if anotherAppointment and not appointment.notes else appointment.notes | nl2br },
+    value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 
     href: changePath + "/add-notes?change=" + url, 
-    text: "Change", 
+    text: "Add notes" if not appointment.notes else "Change", 
     visuallyHiddenText: "notes"
      } 
      ] 
      } if showAction }, 
       { key: { text: "Sensitivity" },
-    value: { text: "Not entered" if anotherAppointment and not appointment.sensitivity else appointment.sensitivity | safe },
+    value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ { 
     href: changePath + "/add-notes?change=" + url, 
-    text: "Change", 
+    text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
     visuallyHiddenText: "sensitivity"
      } 
      ] 

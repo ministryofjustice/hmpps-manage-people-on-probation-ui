@@ -504,7 +504,7 @@ describe('controllers/arrangeAppointment', () => {
       const appointmentSession: AppointmentSession = {
         user: {
           username: 'user-1',
-          locationCode: `The location I’m looking for is not in this list`,
+          locationCode: `LOCATION_NOT_IN_LIST`,
           teamCode: '',
           providerCode: '',
         },
@@ -928,6 +928,8 @@ describe('controllers/arrangeAppointment', () => {
           url,
         },
         appointmentSession: {
+          eventId: '123',
+          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
           type: 'type',
           date: '',
           start: '',
@@ -944,7 +946,15 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should redirect to the confirmation page if all required values are present in appointment session', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { type: 'type', date: '2025/7/2', start: '9:00am', end: '9:30am' },
+        appointmentSession: {
+          eventId: '123',
+          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
+          type: 'type',
+          date: '2025/7/2',
+          start: '9:00am',
+          end: '9:30am',
+          sensitivity: 'No',
+        },
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)

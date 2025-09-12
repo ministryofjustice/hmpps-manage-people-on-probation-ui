@@ -195,7 +195,6 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
   page
     .getSummaryListRow(4)
     .find('.govuk-summary-list__value')
-    .should('contain.text', 'HMP Wakefield')
     .should('contain.text', 'Love Lane')
     .should('contain.text', 'Wakefield')
     .should('contain.text', 'West Yorkshire')

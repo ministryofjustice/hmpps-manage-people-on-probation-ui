@@ -720,7 +720,7 @@
           },
           "appointment": {
             "id": 6,
-            "eventNumber": "123456",
+            "eventNumber": "7654321",
             "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z",
             "endDateTime": "2024-02-21T10:30:00.382936Z",
@@ -811,7 +811,7 @@
             "outcome": "",
             "deliusManaged": false,
             "isVisor": true,
-            "eventId": 0,
+            "eventId": 48,
             "component": {
               "id": 0,
               "description": "",
