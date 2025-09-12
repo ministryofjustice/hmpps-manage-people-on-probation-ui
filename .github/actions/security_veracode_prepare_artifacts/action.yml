@@ -28,4 +28,3 @@ runs:
       zip -r ../source.zip . -x "*node_modules*" -x "*agent.jar*" -x "*vendor/bundle*" -x "*.venv*"
     env:
       BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
