@@ -1,4 +1,4 @@
-name: Security veracode pipeline scan
+name: veracode pipeline scan
 
 on:
   workflow_call:
