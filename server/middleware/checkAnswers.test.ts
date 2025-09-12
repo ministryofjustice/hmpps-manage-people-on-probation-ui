@@ -23,7 +23,7 @@ const mockAppointmentSessions = [
   },
   {
     user: {
-      locationCode: 'I do not need to pick a location',
+      locationCode: 'NO_LOCATION_REQUIRED',
     },
     type: 'COAP',
     eventId: '',

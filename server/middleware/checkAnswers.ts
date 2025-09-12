@@ -32,7 +32,7 @@ export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction)
     // checkLocation valid
     if (validType && session.user?.locationCode) {
       let validLocation = false
-      if (!appointment.type.isLocationRequired && session.user.locationCode === 'I do not need to pick a location') {
+      if (!appointment.type.isLocationRequired && session.user.locationCode === 'NO_LOCATION_REQUIRED') {
         validLocation = true
       } else {
         for (let i = 0; i < userLocations.length; i += 1) {
