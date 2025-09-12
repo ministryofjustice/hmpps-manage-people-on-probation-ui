@@ -1,13 +1,14 @@
 /* eslint-disable no-underscore-dangle */
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
-import { ResponseError } from 'superagent'
-import { Controller, Route } from '../@types'
+import { Request } from 'express'
+import { Controller } from '../@types'
 import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
-import { appointmentTypes, StatusErrorCode } from '../properties'
+import { AppResponse } from '../models/Locals'
+import { HmppsAuthClient } from '../data'
 
 const routes = [
   'redirectToSentence',
@@ -33,6 +34,41 @@ const routes = [
   'getArrangeAnotherAppointment',
   'postArrangeAnotherAppointment',
 ] as const
+
+const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
+  const { data } = req.session
+  const { crn, id } = req.params as Record<string, string>
+  if (!isValidCrn(crn) || !isValidUUID(id)) {
+    return renderError(404)(req, res)
+  }
+  const {
+    user: { providerCode, teamCode, username, locationCode },
+    eventId,
+    type,
+    date,
+    sensitivity,
+  } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+  const mapping = {
+    eventId: 'sentence',
+    type: 'type',
+    providerCode: 'attendance',
+    teamCode: 'attendance',
+    username: 'attendance',
+    locationCode: 'location',
+    date: 'date-time',
+    sensitivity: 'add-notes',
+  }
+  const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
+  const baseUrl = `/case/${crn}/arrange-appointment/${id}`
+  for (const [k, v] of Object.entries(mapping)) {
+    const value = requiredValues[k as keyof typeof requiredValues]
+    if (!value) {
+      return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
+    }
+  }
+  await postAppointments(client)(req, res)
+  return res.redirect(`${baseUrl}/confirmation`)
+}
 
 const arrangeAppointmentController: Controller<typeof routes, void> = {
   redirectToSentence: () => {
@@ -84,12 +120,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
-      const showValidation = validation === 'true'
-      if (showValidation) {
-        res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
-        }
-      }
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -98,8 +128,15 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+      const { appointmentTypes } = res.locals
       if (personLevel) {
-        res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
+        res.locals.appointmentTypes = getPersonLevelTypes(appointmentTypes)
+      }
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-type`]: 'Select a valid appointment type',
+        }
       }
       return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
     }
@@ -167,7 +204,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!locations?.length && appointment.type?.isLocationRequired) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
-      return res.render(`pages/arrange-appointment/location`, { crn, id, errors, change })
+      return res.render(`pages/arrange-appointment/location`, { crn, id, errors, change, showValidation })
     }
   },
   postLocation: () => {
@@ -365,19 +402,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     }
   },
   postCheckYourAnswers: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      try {
-        await postAppointments(hmppsAuthClient)(req, res)
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/confirmation`)
-      } catch (err: unknown) {
-        const error = err as ResponseError
-        return renderError(error.status as StatusErrorCode)(req, res)
-      }
-    }
+    return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
   getConfirmation: () => {
     return async (req, res) => {
@@ -409,40 +434,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     }
   },
   postArrangeAnotherAppointment: hmppsAuthClient => {
-    return async (req, res) => {
-      const { data } = req.session
-      const { crn, id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      const {
-        user: { providerCode, teamCode, username, locationCode },
-        eventId,
-        type,
-        date,
-        sensitivity,
-      } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-      const mapping = {
-        eventId: 'sentence',
-        type: 'type',
-        providerCode: 'attendance',
-        teamCode: 'attendance',
-        username: 'attendance',
-        locationCode: 'location',
-        date: 'date-time',
-        sensitivity: 'add-notes',
-      }
-      const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
-      const baseUrl = `/case/${crn}/arrange-appointment/${id}`
-      for (const [k, v] of Object.entries(mapping)) {
-        const value = requiredValues[k as keyof typeof requiredValues]
-        if (!value) {
-          return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
-        }
-      }
-      await postAppointments(hmppsAuthClient)(req, res)
-      return res.redirect(`${baseUrl}/confirmation`)
-    }
+    return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
 }
 

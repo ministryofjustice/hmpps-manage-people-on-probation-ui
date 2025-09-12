@@ -413,6 +413,7 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         errors: null,
         change: mockReq.query.change,
+        showValidation: false,
       })
     })
   })
@@ -843,10 +844,23 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-    it('should redirect to the confirmation page', async () => {
+    it('should redirect to the confirmation page if all data provided', async () => {
+      const appointmentSession: AppointmentSession = {
+        user: {
+          username: 'X',
+          locationCode: `X`,
+          teamCode: 'X',
+          providerCode: 'X',
+        },
+        eventId: 'X',
+        type: 'X',
+        date: 'X',
+        sensitivity: 'No',
+        repeating: 'No',
+      }
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({})
+      const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })
@@ -931,9 +945,8 @@ describe('controllers/arrangeAppointment', () => {
           user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
           type: 'type',
           date: '',
-          start: '',
-          end: '',
-          until: '',
+          sensitivity: 'No',
+          repeating: 'No',
         },
       })
       mockedIsValidCrn.mockReturnValue(true)
@@ -945,6 +958,9 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should redirect to the confirmation page if all required values are present in appointment session', async () => {
       const mockReq = createMockRequest({
+        request: {
+          url,
+        },
         appointmentSession: {
           eventId: '123',
           user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
