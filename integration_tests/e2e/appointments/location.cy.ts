@@ -45,7 +45,7 @@ describe('Pick a location for this appointment', () => {
       locationPage = new AppointmentLocationPage()
     })
     it('should display the non-mandatory location option', () => {
-      locationPage.getRadioLabel('locationCode', 6).should('contain.text', 'NO_LOCATION_REQUIRED')
+      locationPage.getRadioLabel('locationCode', 6).should('contain.text', 'I do not need to pick a location')
     })
   })
 
@@ -65,7 +65,7 @@ describe('Pick a location for this appointment', () => {
       locationPage
         .getRadioLabel('locationCode', 1)
         .should('contain.text', 'The location I’m looking for is not in this list')
-      locationPage.getRadioLabel('locationCode', 2).should('contain.text', 'NO_LOCATION_REQUIRED')
+      locationPage.getRadioLabel('locationCode', 2).should('contain.text', 'I do not need to pick a location')
       cy.get('[data-qa="locationOption"]').should('not.exist')
     })
     it('should not display the radio list divider', () => {
