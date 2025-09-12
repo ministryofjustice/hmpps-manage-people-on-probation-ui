@@ -24,8 +24,6 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateType = (): void => {
     if (req.url.includes('/type')) {
-      const eventId = getDataValue(req.session.data, ['appointments', crn, id, 'eventId'])
-      const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
       if (personLevel) {
         res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
       }
