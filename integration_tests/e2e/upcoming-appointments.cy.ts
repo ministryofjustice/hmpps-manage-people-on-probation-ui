@@ -22,6 +22,6 @@ context('All Upcoming Appointment', () => {
       .upcomingAppointmentAction(1)
       .find('a')
       .should('contain.text', 'Manage')
-      .should('have.attr', 'href', '/case/X000001/appointments/appointment/1')
+      .should('have.attr', 'href', '/case/X000001/appointments/appointment/1/manage')
   })
 })

@@ -941,14 +941,9 @@ describe('controllers/arrangeAppointment', () => {
           url,
         },
         appointmentSession: {
-          user: {
-            username: 'X',
-            locationCode: `X`,
-            teamCode: 'X',
-            providerCode: 'X',
-          },
-          eventId: 'X',
-          type: 'X',
+          eventId: '123',
+          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
+          type: 'type',
           date: '',
           sensitivity: 'No',
           repeating: 'No',
@@ -967,17 +962,13 @@ describe('controllers/arrangeAppointment', () => {
           url,
         },
         appointmentSession: {
-          user: {
-            username: 'X',
-            locationCode: `X`,
-            teamCode: 'X',
-            providerCode: 'X',
-          },
-          eventId: 'X',
-          type: 'X',
-          date: 'X',
+          eventId: '123',
+          user: { providerCode: '123', teamCode: '456', username, locationCode: '789' },
+          type: 'type',
+          date: '2025/7/2',
+          start: '9:00am',
+          end: '9:30am',
           sensitivity: 'No',
-          repeating: 'No',
         },
       })
       mockedIsValidCrn.mockReturnValue(true)

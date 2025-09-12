@@ -114,9 +114,9 @@
      } if showAction
      } if appointment.meta.isVisor,
      { key: { text: "Location" }, 
-     value: { text: locationHtml | safe if locationHtml else 'Not entered' }, 
+     value: { text: 'Not entered' if not locationHtml else locationHtml | safe }, 
      actions: { items: [ { href: changePath + "/location?change=" + url, 
-     text: "Change" if locationHtml else "Choose location",
+     text: "Choose location" if not locationHtml else  "Change",
       visuallyHiddenText: "location"
       }
       ]

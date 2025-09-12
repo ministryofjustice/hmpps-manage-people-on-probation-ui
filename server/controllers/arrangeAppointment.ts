@@ -2,13 +2,16 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Request } from 'express'
-import { Controller } from '../@types'
+import { ResponseError } from 'superagent'
+import { Controller, Route } from '../@types'
+
 import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
+import { appointmentTypes, StatusErrorCode } from '../properties'
 
 const routes = [
   'redirectToSentence',
@@ -120,6 +123,12 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-type`]: 'Select an appointment type',
+        }
+      }
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -393,7 +402,12 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { url } = req
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
-      return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, url, repeatingEnabled })
+      let location = null
+      const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
+      if (![`LOCATION_NOT_IN_LIST`, 'NO_LOCATION_REQUIRED'].includes(selectedLocation)) {
+        location = res.locals.userLocations.find((loc: any) => loc.description === selectedLocation)
+      }
+      return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, location, url, repeatingEnabled })
     }
   },
   postCheckYourAnswers: hmppsAuthClient => {

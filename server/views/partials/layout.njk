@@ -92,6 +92,9 @@
     })
   </script>
   <script nonce="{{ cspNonce }}">
-    window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile if  flags.enableDeleteAppointmentFile !== undefined else false }}
+    {% if flags.enableDeleteAppointmentFile !== undefined %}window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile }}{% endif %}
+    {% if validMimeTypes %}window.validMimeTypes = '{{ validMimeTypes }}'{% endif %}
+    {% if maxFileSize %}window.maxFileSize = {{ maxFileSize }}{% endif %}
+    {% if fileUploadLimit %}window.fileUploadLimit = {{ fileUploadLimit }}{% endif %}
   </script>
 {% endblock %}

@@ -376,6 +376,71 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/.*/providers",
+        "queryParameters": {
+          "region": {
+            "matches": ".*"
+          },
+          "team": {
+            "matches": ".*"
+          }
+        },
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "defaultUserDetails": {
+            "username": "PETER-PARKER",
+            "homeArea": "London",
+            "team": "Automated Allocation Team"
+          },
+          "providers": [
+            {
+              "code": "N50",
+              "name": "Greater Manchester"
+            },
+            {
+              "code": "N07",
+              "name": "London"
+            },
+            {
+              "code": "N54",
+              "name": "North East Region"
+            }
+          ],
+          "teams": [
+            {
+              "description": "Automated Allocation Team North",
+              "code": "N54AAT"
+            },
+            {
+              "description": "Breach Team (Durham and Cleveland)",
+              "code": "N54N03"
+            },
+            {
+              "description": "CRC Created",
+              "code": "N54PRC"
+            }
+          ],
+          "users": [
+            {
+              "username": "george-parker",
+              "nameAndRole": "george parker (PS-PSO)"
+            },
+            {
+              "username": "jack-smith",
+              "nameAndRole": "jack smith (PS-PSO)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }

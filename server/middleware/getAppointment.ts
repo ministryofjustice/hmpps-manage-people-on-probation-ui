@@ -59,7 +59,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
@@ -97,27 +96,23 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
             ? req.session.data.teams[loggedInUsername].find(t => t.code === teamCode)?.description
             : null
       }
-
       const selectedUser =
         staffId && req?.session?.data?.staff?.[loggedInUsername]
           ? req.session.data.staff[loggedInUsername].find(s => s.username.toLowerCase() === staffId.toLowerCase())
               ?.nameAndRole
           : null
-      const noLocationValue = 'I do not need to pick a location'
-      let location: Location | string = null
-      if (locationCode === noLocationValue) {
-        location = 'Not needed'
-      } else {
-        location =
-          locationCode && locationCode !== noLocationValue && loggedInUsername
-            ? req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode)
-            : null
+
+      const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
+      let location: Location | string = locationCode
+      if (hasLocation && loggedInUsername) {
+        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) || ''
       }
+
       appointment = {
         ...appointment,
         meta: {
           ...appointment.meta,
-          hasLocation: locationCode !== noLocationValue,
+          hasLocation,
         },
         type,
         visorReport: visorReport ? upperFirst(visorReport) : null,

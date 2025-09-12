@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { Route } from '../../@types'
-import { getDataValue } from '../../utils'
+import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
@@ -24,6 +24,11 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateType = (): void => {
     if (req.url.includes('/type')) {
+      const eventId = getDataValue(req.session.data, ['appointments', crn, id, 'eventId'])
+      const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+      if (personLevel) {
+        res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
+      }
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor }),

@@ -9,6 +9,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress } from '../utils'
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
+import config from '../config'
 
 const routes = [
   'getAppointments',
@@ -229,9 +230,13 @@ const appointmentsController: Controller<typeof routes, void> = {
         errorMessages = req.session.errorMessages
         delete req.session.errorMessages
       }
+      const { validMimeTypes, maxFileSize, fileUploadLimit } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
+        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
+        maxFileSize,
+        fileUploadLimit,
         uploadedFiles,
       })
     }
@@ -289,11 +294,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         body: { nextAppointment },
       } = req
       const { nextAppointmentSession } = res.locals
-      if (nextAppointment === 'keepType') {
-        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
-      }
-      if (nextAppointment === 'changeType') {
-        return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
+      if (nextAppointment !== 'no') {
+        const clearType = nextAppointment === 'changeType'
+        return cloneAppointmentAndRedirect(nextAppointmentSession, { clearType })(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }

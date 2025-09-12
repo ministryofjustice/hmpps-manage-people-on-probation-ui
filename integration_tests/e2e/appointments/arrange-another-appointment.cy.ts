@@ -1,6 +1,10 @@
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
+import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
+import AppointmentLocationPage from '../../pages/appointments/location.page'
+import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
+import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import {
   completeTypePage,
   completeSentencePage,
@@ -35,7 +39,17 @@ const loadPage = () => {
   completeConfirmationPage()
 }
 
+const loadPageFromManage = () => {
+  cy.visit(`/case/X000001/appointments/appointment/6/next-appointment`)
+  const nextAppointmentPage = new NextAppointmentPage()
+  nextAppointmentPage.getRadio('option', 1).click()
+  nextAppointmentPage.getSubmitBtn().click()
+}
+
 describe('Arrange another appointment', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('should render the page', () => {
     loadPage()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
@@ -68,6 +82,81 @@ describe('Arrange another appointment', () => {
         })
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
           expect($error.text().trim()).to.include('Select an end time')
+        })
+      })
+    })
+  })
+  describe('User clicks submit without selecting sentence or person', () => {
+    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    let sentencePage: AppointmentSentencePage
+    beforeEach(() => {
+      cy.task('stubAppointmentNoEventId')
+      loadPageFromManage()
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      arrangeAnotherAppointmentPage.getSubmitBtn().click()
+    })
+    it('should redirect to the sentence page', () => {
+      sentencePage = new AppointmentSentencePage()
+      sentencePage.checkOnPage()
+    })
+    it('should display the error summary box', () => {
+      sentencePage.checkErrorSummaryBox(['Select a sentence'])
+    })
+    it('should display the error messages', () => {
+      getUuid().then(uuid => {
+        sentencePage.getElement(`#appointments-X000001-${uuid}-eventId-error`).should($error => {
+          expect($error.text().trim()).to.include('Select a sentence')
+        })
+      })
+    })
+  })
+
+  describe('User clicks submit without selecting an attendee', () => {
+    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    let attendancePage: AttendancePage
+    beforeEach(() => {
+      cy.task('stubAppointmentNoAttendee')
+      loadPageFromManage()
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      arrangeAnotherAppointmentPage.getSubmitBtn().click()
+      attendancePage = new AttendancePage()
+    })
+    it('should redirect to the attendance page', () => {
+      attendancePage.checkOnPage()
+      attendancePage.getSubmitBtn().click()
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      arrangeAnotherAppointmentPage.checkOnPage()
+    })
+    it('should redirect to the arrange another appointment page when question is submitted', () => {
+      attendancePage.checkOnPage()
+      attendancePage.getSubmitBtn().click()
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      arrangeAnotherAppointmentPage.checkOnPage()
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'peter parker (PS-PSO) (Automated Allocation Team, London)')
+    })
+  })
+
+  describe('User clicks submit without selecting a location', () => {
+    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    let locationPage: AppointmentLocationPage
+    beforeEach(() => {
+      cy.task('stubAppointmentNoLocation')
+      loadPageFromManage()
+      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      arrangeAnotherAppointmentPage.getSubmitBtn().click()
+      locationPage = new AppointmentLocationPage()
+      locationPage.checkOnPage()
+    })
+    it('should display the error summary box', () => {
+      locationPage.checkErrorSummaryBox(['Select an appointment location'])
+    })
+    it('should display the error messages', () => {
+      getUuid().then(uuid => {
+        locationPage.getElement(`#appointments-X000001-${uuid}-user-locationCode-error`).should($error => {
+          expect($error.text().trim()).to.include('Select an appointment location')
         })
       })
     })

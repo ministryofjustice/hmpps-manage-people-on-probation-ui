@@ -10,6 +10,10 @@ interface Args {
   acceptableAbsence?: boolean
   locationOfficeName?: boolean
   rar?: boolean
+  noEventId?: boolean
+  noType?: boolean
+  noAttendee?: boolean
+  noLocation?: boolean
 }
 
 const getAppointmentStub = (
@@ -22,6 +26,10 @@ const getAppointmentStub = (
     acceptableAbsence,
     rar = false,
     locationOfficeName = false,
+    noEventId = false,
+    noType = false,
+    noAttendee = false,
+    noLocation = false,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -42,7 +50,7 @@ const getAppointmentStub = (
         },
         appointment: {
           id: 6,
-          eventNumber: '',
+          eventNumber: '7654321',
           type: 'Planned Office Visit (NS)',
           startDateTime: '2024-02-21T10:15:00.382936Z[Europe/London]',
           endDateTime: '2024-02-21T10:30:00.382936Z[Europe/London]',
@@ -58,6 +66,9 @@ const getAppointmentStub = (
               forename: 'Terry',
               surname: 'Jones',
             },
+            teamCode: '1234',
+            providerCode: '5678',
+            username: 'TerryJones',
           },
           isInitial: true,
           isNationalStandard: true,
@@ -73,8 +84,6 @@ const getAppointmentStub = (
             postcode: 'NW10 1EP',
             ldu: '',
             telephoneNumber: '',
-            providerCode: '',
-            teamCode: '',
           },
           rescheduled: true,
           rescheduledStaff: true,
@@ -114,7 +123,7 @@ const getAppointmentStub = (
           outcome: '',
           deliusManaged: false,
           isVisor: true,
-          eventId: 0,
+          eventId: 48,
           component: {
             id: 0,
             description: '',
@@ -197,6 +206,32 @@ const getAppointmentStub = (
   if (rar === true) {
     mapping.response.jsonBody.appointment.rarCategory = 'Stepping Stones'
   }
+  if (noType) {
+    mapping.response.jsonBody.appointment.type = ''
+  }
+  if (noEventId) {
+    mapping.response.jsonBody.appointment.eventId = 0
+    mapping.response.jsonBody.appointment.eventNumber = ''
+  }
+  if (noAttendee) {
+    mapping.response.jsonBody.appointment.officer.teamCode = ''
+    mapping.response.jsonBody.appointment.officer.providerCode = ''
+    mapping.response.jsonBody.appointment.officer.username = ''
+  }
+  if (noLocation) {
+    mapping.response.jsonBody.appointment.location = null
+    mapping.response.jsonBody.appointment.officer = {
+      code: '',
+      name: {
+        forename: 'George',
+        surname: 'Parker',
+      },
+      username: 'george-parker',
+      teamCode: '1234',
+      providerCode: 'N50',
+    }
+  }
+
   return mapping
 }
 
@@ -408,6 +443,22 @@ const stubAppointmentAcceptableAbsenceNoNotes = (): SuperAgentRequest => {
   })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubAppointmentNoEventId = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noEventId: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNoType = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noType: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNoAttendee = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noAttendee: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentNoLocation = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noLocation: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubNotComNoNextAppointment = (): SuperAgentRequest => {
   const stub = getNextAppointmentStub({ appointment: false, usernameIsCom: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -499,6 +550,10 @@ export default {
   stubAppointmentUnacceptableAbsenceWithRAR,
   stubAppointmentAcceptableAbsenceWithNotes,
   stubAppointmentAcceptableAbsenceNoNotes,
+  stubAppointmentNoEventId,
+  stubAppointmentNoType,
+  stubAppointmentNoAttendee,
+  stubAppointmentNoLocation,
   stubNotComNoNextAppointment,
   stubNotComNextAppointment,
   stubNotComNoNextAppointmentAtHome,

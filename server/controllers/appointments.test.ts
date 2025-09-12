@@ -19,6 +19,7 @@ import { checkAuditMessage } from './testutils'
 import { renderError } from '../middleware'
 import { NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
+import config from '../config'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -358,10 +359,14 @@ describe('controllers/appointments', () => {
       expect(mockReq.session.errorMessages).toBeUndefined()
     })
     it('should render the add note page', () => {
+      const { fileUploadLimit, maxFileSize, validMimeTypes } = config
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
         crn,
         errorMessages: null,
         uploadedFiles: [],
+        fileUploadLimit,
+        maxFileSize,
+        validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })
   })
