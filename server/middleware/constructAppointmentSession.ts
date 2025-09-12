@@ -26,9 +26,9 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   }
 
   let type = appointmentTypes.find(t => t?.description === appointment?.type)?.code || ''
-  let username = appointment?.officer?.username || ''
-  let teamCode = appointment?.officer?.teamCode || ''
-  let providerCode = appointment?.officer?.providerCode || ''
+  const username = appointment?.officer?.username || ''
+  const teamCode = appointment?.officer?.teamCode || ''
+  const providerCode = appointment?.officer?.providerCode || ''
 
   if (!eventId) {
     type = ''
