@@ -86,7 +86,7 @@ jobs:
       with:
         docker_image_app_dir: ${{ inputs.docker_image_app_dir }}
     - name: download assets artifact
-      if: inputs.veracode_package_artifact_name != ''§
+      if: inputs.veracode_package_artifact_name != ''
       uses: actions/download-artifact@v4
       with:
         name: ${{ inputs.veracode_package_artifact_name }}
