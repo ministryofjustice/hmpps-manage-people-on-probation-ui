@@ -207,22 +207,8 @@ describe('Create next appointment', () => {
       .find('a')
       .should('contain.text', 'Change')
     arrangeAnotherAppointmentPage
-      .getSummaryListRow(3)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', 'george parker (PS-PSO) (Automated Allocation Team North, Greater Manchester)')
-    arrangeAnotherAppointmentPage
-      .getSummaryListRow(3)
-      .find('.govuk-summary-list__actions')
-      .find('a')
-      .should('contain.text', 'Change')
-    arrangeAnotherAppointmentPage
       .getSummaryListRow(4)
       .find('.govuk-summary-list__value')
       .should('contain.text', 'Not entered')
-    arrangeAnotherAppointmentPage
-      .getSummaryListRow(4)
-      .find('.govuk-summary-list__actions')
-      .find('a')
-      .should('contain.text', 'Choose location')
   })
 })

@@ -475,14 +475,28 @@ describe('controllers/arrangeAppointment', () => {
     it('should redirect to the change url if the change query parameter exists in the url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({ query: { change } })
+      const appointmentSession: AppointmentSession = {
+        temp: {
+          username: '',
+          teamCode: '',
+          providerCode: '',
+        },
+      }
+      const mockReq = createMockRequest({ query: { change }, appointmentSession })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
     it('should redirect to the location page if page query parameter does not exist in url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest()
+      const appointmentSession: AppointmentSession = {
+        temp: {
+          username: '',
+          teamCode: '',
+          providerCode: '',
+        },
+      }
+      const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location`)
     })

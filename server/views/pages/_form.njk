@@ -3,7 +3,7 @@
 {% block beforeContent %}
   {% if backLink %}
     {{ govukBackLink({
-    href: backLink + ("?change=" + change if change else '')
+    href: backLink
   }) }}
   {% endif %}
 {% endblock %}
@@ -40,7 +40,7 @@
             {{ govukButton({
             html: buttonText if buttonText else 'Continue',
             isStartButton: buttonText === 'Start now',
-            id: submitButtonId if submitButtonId else 'submit',
+            id: submitButtonId if submitButtonId else 'submit-btn',
             attributes: {
               'data-qa': 'submit-btn'
             }

@@ -158,6 +158,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
+      const { data } = req.session
       const errors = req?.session?.data?.errors
       if (errors) {
         delete req.session.data.errors
@@ -171,12 +172,18 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const { data } = req.session
       const { change, page, providerCode, teamCode } = req.query as Record<string, string>
+      const changeQueryParam = change ? `&change=${change}` : ''
       const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
-      const queryParameters = providerCode ? `?providerCode=${providerCode}${teamQueryParam}` : ''
+      const queryParameters = providerCode ? `?providerCode=${providerCode}${teamQueryParam}${changeQueryParam}` : ''
       if (page) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`)
       }
+      const tempUser = getDataValue(data, ['appointments', crn, id, 'temp'])
+      setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], tempUser.providerCode)
+      setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], tempUser.teamCode)
+      setDataValue(data, ['appointments', crn, id, 'user', 'username'], tempUser.username)
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
     }
