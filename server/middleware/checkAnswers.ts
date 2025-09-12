@@ -12,14 +12,8 @@ export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction)
   // checkType valid
   if (session?.type) {
     if (session?.eventId === 'PERSON_LEVEL_CONTACT') appointmentTypes = getPersonLevelTypes(appointmentTypes)
-    let validType = false
-    for (let j = 0; j < appointmentTypes.length; j += 1) {
-      const type = appointmentTypes[j]
-      if (session.type === type.code) {
-        validType = true
-        break
-      }
-    }
+
+    const validType = appointmentTypes.some(appointmentType => appointmentType.code === session.type)
     if (!validType) {
       session.type = null
       res.locals.appointment.type = null
@@ -36,13 +30,7 @@ export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction)
       if (!appointment.type.isLocationRequired && session.user.locationCode === 'NO_LOCATION_REQUIRED') {
         validLocation = true
       } else {
-        for (let i = 0; i < userLocations.length; i += 1) {
-          const location = userLocations[i]
-          if (session.user.locationCode === location.code) {
-            validLocation = true
-            break
-          }
-        }
+        validLocation = userLocations.some(location => location.code === session.user.locationCode)
       }
       if (!validLocation) {
         session.user.locationCode = null

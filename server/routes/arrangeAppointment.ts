@@ -24,9 +24,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.all('/case/:crn/arrange-appointment/:id/*path', getAppointmentTypes(hmppsAuthClient))
   router.all('/case/:crn/arrange-appointment/:id/*path', getPersonalDetails(hmppsAuthClient))
-  router.all('/case/:crn/arrange-appointment/:id/*path', getOfficeLocationsByTeamAndProvider(hmppsAuthClient))
-  router.get('/case/:crn/arrange-appointment/:id/*path', getAppointment(hmppsAuthClient))
-  router.get('/case/:crn/arrange-appointment/:id/*path', checkAnswers)
   router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
   get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
   get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
@@ -128,7 +125,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/check-your-answers',
     redirectWizard(['eventId', 'repeating']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointmentTypes(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.getCheckYourAnswers(),
   )
   router.post(
@@ -146,6 +144,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
   router.post(
