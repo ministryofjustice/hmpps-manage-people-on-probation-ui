@@ -183,7 +183,7 @@
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
         {% else %}
           <p class="govuk-body">
-            <a href="#" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.</p>
+            <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.</p>
         {% endif %}
         {{ govukSummaryList({
   rows: [

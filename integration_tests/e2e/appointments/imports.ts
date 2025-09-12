@@ -371,7 +371,11 @@ export const checkAppointmentDetails = (
         .find('.govuk-body a')
         .should('contain.text', 'Manage this appointment on NDelius (opens in a new tab)')
         .should('have.attr', 'target', '_blank')
-        .should('have.attr', 'href', '#')
+        .should(
+          'have.attr',
+          'href',
+          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
+        )
     })
   }
   if (deliusManaged && hasOutcome) {
