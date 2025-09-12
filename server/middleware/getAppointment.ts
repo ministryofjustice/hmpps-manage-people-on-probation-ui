@@ -17,6 +17,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
+
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
       userIsAttending = req.session.data.appointments[crn][id].user.username === loggedInUsername
