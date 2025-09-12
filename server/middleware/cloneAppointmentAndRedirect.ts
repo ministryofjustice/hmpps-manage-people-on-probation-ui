@@ -21,7 +21,6 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       numberOfRepeatAppointments: '0',
       repeating: 'No',
     }
-    console.dir(clonedAppt, { depth: null })
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     const redirectTo = clearType
       ? `/case/${crn}/arrange-appointment/${uuid}/sentence`
