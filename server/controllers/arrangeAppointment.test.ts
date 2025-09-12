@@ -460,7 +460,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ query: { page: 'true', providerCode } })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${providerCode}&change=undefined`,
+        `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${providerCode}`,
       )
     })
     it('should redirect to the attendance page if page, providerCode and teamCode query parameters are in url', async () => {
@@ -469,7 +469,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ query: { page: 'true', providerCode, teamCode } })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${providerCode}&teamCode=${teamCode}&change=undefined`,
+        `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${providerCode}&teamCode=${teamCode}`,
       )
     })
     it('should redirect to the change url if the change query parameter exists in the url', async () => {

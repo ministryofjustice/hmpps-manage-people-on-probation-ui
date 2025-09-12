@@ -122,7 +122,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       const { data } = req.session
       const { change, page, providerCode, teamCode } = req.query as Record<string, string>
-      const changeQueryParam = change !== 'null' ? `&change=${change}` : ''
+      const changeQueryParam = change ? `&change=${change}` : ''
       const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
       const queryParameters = providerCode ? `?providerCode=${providerCode}${teamQueryParam}${changeQueryParam}` : ''
       if (page) {
