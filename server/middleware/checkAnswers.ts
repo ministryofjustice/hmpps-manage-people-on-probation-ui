@@ -1,13 +1,14 @@
 import { NextFunction, Request } from 'express'
 import { getDataValue, getPersonLevelTypes, setDataValue } from '../utils'
 import { AppResponse } from '../models/Locals'
+import { AppointmentSession } from '../models/Appointments'
 
 export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction) => {
   const { data } = req.session
   const { crn, id } = req.params
   let { appointmentTypes } = res.locals
   const { userLocations, appointment } = res.locals
-  const session = getDataValue(data, ['appointments', crn, id])
+  const session: AppointmentSession = getDataValue(data, ['appointments', crn, id])
   // checkType valid
   if (session?.type) {
     if (session?.eventId === 'PERSON_LEVEL_CONTACT') appointmentTypes = getPersonLevelTypes(appointmentTypes)

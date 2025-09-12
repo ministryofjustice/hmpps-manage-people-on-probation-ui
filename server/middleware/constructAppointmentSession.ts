@@ -75,7 +75,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   if (appointment?.nsiId) {
     nextAppointment.nsiId = appointment.nsiId.toString()
   }
-  // console.dir(nextAppointment, { depth: null })
   res.locals.nextAppointmentSession = nextAppointment
   return next()
 }

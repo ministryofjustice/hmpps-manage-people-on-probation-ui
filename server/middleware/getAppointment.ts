@@ -138,7 +138,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sensitivity: sensitivity || 'No',
       }
     }
-    // console.dir(appointment, { depth: null })
     res.locals.appointment = appointment
     return next()
   }
