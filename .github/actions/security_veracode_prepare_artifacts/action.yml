@@ -14,13 +14,10 @@ runs:
   steps:
   - name: run the script to do the thing
     shell: bash
-    with:
-      secret-envs: |
-        "sentry=SENTRY_AUTH_TOKEN"
     run:
       |
       export DOCKER_BUILDKIT=1
-      IMAGE_ID=$(docker build -q . --build-arg BUILD_NUMBER=${{ github.sha }} --build-arg GIT_REF=${{ github.sha }} --build-arg GIT_BRANCH=${BRANCH_NAME} | cut -d: -f2 )
+      IMAGE_ID=$(docker build -q . --secret id=sentry,env=SENTRY_AUTH_TOKEN --build-arg BUILD_NUMBER=${{ github.sha }} --build-arg GIT_REF=${{ github.sha }} --build-arg GIT_BRANCH=${BRANCH_NAME} | cut -d: -f2 )
       echo "IMAGE_ID is ${IMAGE_ID}"
       echo "docker_image_app_dir is ${{ inputs.docker_image_app_dir }}"
       CONTAINER_ID=$(docker create --rm ${IMAGE_ID})
@@ -30,4 +27,5 @@ runs:
       cd temp_app   
       zip -r ../source.zip . -x "*node_modules*" -x "*agent.jar*" -x "*vendor/bundle*" -x "*.venv*"
     env:
-      BRANCH_NAME: ${{ github.head_ref || github.ref_name }} 
+      BRANCH_NAME: ${{ github.head_ref || github.ref_name }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
