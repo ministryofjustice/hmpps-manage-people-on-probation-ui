@@ -49,28 +49,16 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   }
 
   if (nextAppointmentSelection === 'KEEP_TYPE') {
-    eventId = eventId?.toString()
-    if (!eventId) {
-      type = ''
-      locationCode = ''
-      providerCode = ''
-      teamCode = ''
-      username = ''
-    }
-
-    if (eventId && !type) {
+    if (!eventId || !type || !providerCode || !teamCode || !username) {
+      if (!eventId) {
+        type = ''
+      }
       providerCode = ''
       teamCode = ''
       username = ''
       locationCode = ''
     }
 
-    if (eventId && type && (!providerCode || !teamCode || !username)) {
-      providerCode = ''
-      teamCode = ''
-      username = ''
-      locationCode = ''
-    }
     nextAppointment = {
       ...nextAppointment,
       user: {
