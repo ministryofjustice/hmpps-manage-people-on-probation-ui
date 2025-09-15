@@ -433,6 +433,15 @@ context('Activity log', () => {
     recordAnOutcomePage.getSubmitBtn().click()
     page.checkOnPage()
   })
+  it('should link to record an outcome page', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getCardHeader('timeline7').find('.app-summary-card__actions a').click()
+    const recordAnOutcomePage = new RecordAnOutcomePage()
+    cy.get('#outcomeRecorded').click()
+    recordAnOutcomePage.getSubmitBtn().click()
+    page.checkOnPage()
+  })
   it('should display the pagination navigation', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
