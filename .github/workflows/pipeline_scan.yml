@@ -85,16 +85,16 @@ jobs:
           distribution: 'temurin'
       - name: prepare assets
         if: inputs.veracode_package_artifact_name == ''
-        uses: ministryofjustice/hmpps-github-actions/.github/actions/security_veracode_prepare_artifacts@v2 # WORKFLOW_VERSION
+        uses: ./.github/actions/security_veracode_prepare_artifacts
         with:
           docker_image_app_dir: ${{ inputs.docker_image_app_dir }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: download assets artifact
         if: inputs.veracode_package_artifact_name != ''
         uses: actions/download-artifact@v4
         with:
           name: ${{ inputs.veracode_package_artifact_name }}
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: "Download/Extract pipeline scanner"
         shell: bash
         run: |
