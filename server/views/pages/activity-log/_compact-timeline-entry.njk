@@ -1,34 +1,34 @@
 {% set hasOutcomeBeenConfirmed = entry.didTheyComply === true or entry.rescheduled === true %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
-{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed  %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 
 {% set titleHtml %}
-  <p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
-    <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}">
-      {% if entry.isAppointment === true %}
-        {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-        {{ entry.type }} at&nbsp;{{ entry.startDateTime | govukTime }}
-      {% elseif entry.isCommunication %}
-        {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-        {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
-      {% else %}
-        {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-        {{ entry.type }}
-      {% endif %}
-      <span class="govuk-visually-hidden"> on {{ thisDate }}
+<p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
+  <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}">
+    {% if entry.isAppointment === true %}
+      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      {{ entry.type }} at&nbsp;{{ entry.startDateTime | govukTime }}
+    {% elseif entry.isCommunication %}
+      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
+    {% else %}
+      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      {{ entry.type }}
+    {% endif %}
+    <span class="govuk-visually-hidden"> on {{ thisDate }}
     </a>
-     {% if shouldPromptToRecordAnOutcome %}
-        <br /><a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" class="govuk-!-font-weight-bold">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-     {% endif %}
+    {% if shouldPromptToRecordAnOutcome %}
+      <br/>{% include './_log-outcome-link.njk' %}
+    {% endif %}
   </p>
-{% endset %}
+  {% endset %}
 
-{% set html %}
+  {% set html %}
   {% include './_timeline-notes.njk' %}
-{% endset %}
+  {% endset %}
 
-{% set actionsHtml %}
-    {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
-{% endset %}
+  {% set actionsHtml %}
+  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
+  {% endset %}
 
-{{ titleHtml | safe }}
+  {{ titleHtml | safe }}
