@@ -24,7 +24,7 @@
   {% for document in appointment.documents %}
     {% set documents = (documents.push([
       {
-        html: '<a href="personal-details/documents/' + document.id + '/download" download="' + document.name +'">' + document.name + '</a>'
+        html: '<a href="/case/' + crn + '/personal-details/documents/' + document.id + '/download" download="' + document.name +'">' + document.name + '</a>'
       },
       {
         text: document.level if document.level else "Contact"
