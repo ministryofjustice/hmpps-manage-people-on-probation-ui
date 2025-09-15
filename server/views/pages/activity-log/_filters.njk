@@ -1,12 +1,14 @@
 {%- from "moj/components/filter/macro.njk" import mojFilter -%}
 {%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
 
-{% set queryString = '?' + queryParams.join('&') if queryParams.length > 0  else ''  %}
-{% set clearLink = '?clear=true&view=' + view if view else '?clear=true' %}
+{% set queryString = '?' + queryParams.join('&')if queryParams.length > 0 else 
+  '' %}
+{% set clearLink = '?clear=true&view=' + view if view else 
+  '?clear=true' %}
 
 {%- set filterOptionsHtml %}
 
-  {{ govukInput({
+{{ govukInput({
     id: 'keywords',
     name: 'keywords',
     label: {
@@ -65,7 +67,7 @@
       }
     } if errorMessages.dateTo
 }) }}
-  {{ govukCheckboxes({
+{{ govukCheckboxes({
     idPrefix: 'compliance',
     name: 'compliance',
     classes: "govuk-checkboxes--small",
@@ -83,41 +85,37 @@
     items: filters.complianceOptions
   }) }}
 
-  
 {% endset -%}
 
 {% set filterCategories = [] %}
 {% if filters.selectedFilterItems.keywords.length %}
-   {% set filterCategories = (filterCategories.push(
-    {
-        heading: {
-          text: 'Search term'
-        },
-        items: filters.selectedFilterItems.keywords
-   }), filterCategories) %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Search term'
+    },
+    items: filters.selectedFilterItems.keywords
+  }), filterCategories) %}
 {% endif %}
 {% if filters.selectedFilterItems.dateRange.length %}
-   {% set filterCategories = (filterCategories.push(
-    {
-        heading: {
-          text: 'Date range'
-        },
-        items: filters.selectedFilterItems.dateRange
-   }), filterCategories) %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Date range'
+    },
+    items: filters.selectedFilterItems.dateRange
+  }), filterCategories) %}
 {% endif %}
 {% if filters.selectedFilterItems.compliance.length %}
-  {% set filterCategories = (filterCategories.push(
-    {
-        heading: {
-          text: 'Compliance filters'
-        },
-        items: filters.selectedFilterItems.compliance
-   }), filterCategories) %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Compliance filters'
+    },
+    items: filters.selectedFilterItems.compliance
+  }), filterCategories) %}
 {% endif %}
 
 <div class="govuk-grid-column-one-third">
-<form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
-{{ mojFilter({
+  <form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+    {{ mojFilter({
   heading: {
     html: 'Filter activity log',
     classes: 'govuk-heading-s'
@@ -140,10 +138,10 @@
   } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length,
   optionsHtml: filterOptionsHtml
 }) }}
-<input type="hidden" name="_csrf" value="{{ csrfToken }}">
-<input type="hidden" name="submit" value="true">
-<input type="hidden" name="view" value="{{view}}">
-<input type="hidden" name="page" value="{{page}}">
-</form>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <input type="hidden" name="submit" value="true">
+    <input type="hidden" name="view" value="{{view}}">
+    <input type="hidden" name="page" value="{{page}}">
+  </form>
 
 </div>
