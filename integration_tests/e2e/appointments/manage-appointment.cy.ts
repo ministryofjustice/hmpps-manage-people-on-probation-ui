@@ -642,7 +642,7 @@ describe('Manage an appointment', () => {
         .should(
           'have.attr',
           'href',
-          `case/${crn}personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download`,
+          `case/${crn}/personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download`,
         )
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 2).should('contain.text', 'Contact')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 3).should('contain.text', '3 Way Meeting (NS)')
