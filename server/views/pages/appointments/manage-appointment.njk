@@ -33,11 +33,11 @@
         text: document.type if document.type else appointment.type
       },
       {
-        text: document.dateCreated | dateWithYear if document.dateCreated else "",
+        text: document.createdAt | dateWithYear if document.createdAt else "",
         format: "numeric",
         attributes: {
-          "data-sort-value": document.dateCreated | dateToTimestamp if document.dateCreated else "1"
-        } if document.dateCreated
+          "data-sort-value": document.createdAt | dateToTimestamp if document.createdAt else "1"
+        } if document.createdAt
       },
       {
         text: document.lastUpdated | dateWithYear if document.lastUpdated else "",
