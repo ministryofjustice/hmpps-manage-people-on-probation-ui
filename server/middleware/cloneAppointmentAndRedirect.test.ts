@@ -76,40 +76,28 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
   const { crn } = req.params
   const redirectSpy = jest.spyOn(res, 'redirect')
 
-  it('should construct the correct session with date removed', () => {
+  const expectedClone = {
+    ...mockAppt,
+    date: '',
+    start: '',
+    end: '',
+    repeatingDates: [] as string[],
+    until: '',
+    numberOfAppointments: '1',
+    numberOfRepeatAppointments: '0',
+    repeating: 'No',
+    uuid,
+  }
+
+  it('should construct the correct session with date removed and redirect to arrange another appointment page', () => {
     cloneAppointmentAndRedirect(mockAppt)(req, res)
-    const expectedClone = {
-      ...mockAppt,
-      date: '',
-      start: '',
-      end: '',
-      repeatingDates: [] as string[],
-      until: '',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
-      repeating: 'No',
-      uuid,
-    }
     expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
 
-  it('should construct the correct session with date and type removed', () => {
+  it('should clone the current appointment session with date removed and redirect to sentence page', () => {
     cloneAppointmentAndRedirect(mockAppt, { clearType: true })(req, res)
-    const expectedClone = {
-      ...mockAppt,
-      type: '',
-      date: '',
-      start: '',
-      end: '',
-      repeatingDates: [] as string[],
-      until: '',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
-      repeating: 'No',
-      uuid,
-    }
     expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
-    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
+    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   })
 })

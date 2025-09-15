@@ -2,6 +2,10 @@ import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
 
+export type YesNo = '' | 'Yes' | 'No'
+
+export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
+
 export interface AppointmentSession {
   user?: {
     providerCode?: string
@@ -15,7 +19,7 @@ export interface AppointmentSession {
     username?: string
   }
   type?: string
-  visorReport?: 'Yes' | 'No'
+  visorReport?: YesNo
   date?: string
   start?: string
   end?: string
@@ -29,10 +33,10 @@ export interface AppointmentSession {
   requirementId?: string
   licenceConditionId?: string
   nsiId?: string
-  repeating?: 'Yes' | 'No'
+  repeating?: YesNo
   repeatingDates?: string[]
   notes?: string
-  sensitivity?: 'Yes' | 'No'
+  sensitivity?: YesNo
 }
 
 export interface AppointmentType {
@@ -72,8 +76,6 @@ export interface AppointmentTypeOption {
   text: string
   value: AppointmentType
 }
-
-export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export interface AppointmentRequestBody {
   user: {

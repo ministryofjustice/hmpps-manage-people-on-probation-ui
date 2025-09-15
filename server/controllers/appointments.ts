@@ -271,7 +271,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        action: 'VIEW_NEXT_APPOINTMENT',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
@@ -293,9 +293,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         params: { crn, contactId },
         body: { nextAppointment },
       } = req
+      if (!isValidCrn(crn) || !isNumericString(contactId)) {
+        return renderError(404)(req, res)
+      }
       const { nextAppointmentSession } = res.locals
-      if (nextAppointment !== 'no') {
-        const clearType = nextAppointment === 'changeType'
+      if (nextAppointment !== 'NO') {
+        const clearType = nextAppointment === 'CHANGE_TYPE'
         return cloneAppointmentAndRedirect(nextAppointmentSession, { clearType })(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
