@@ -188,6 +188,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       return res.redirect(redirect)
     }
   },
+
   getLocation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
