@@ -85,7 +85,7 @@
                 <ul class="govuk-list govuk-!-margin-top-0">
                     {% for doc in sentence.courtDocuments %}
                         <li>
-                            <a href="personal-details/documents/{{ doc.id }}/download" download="{{ doc.documentName }}">{{ doc.documentName }}</a><br>
+                            <a href="case/{{ crn }}/personal-details/documents/{{ doc.id }}/download" download="{{ doc.documentName }}">{{ doc.documentName }}</a><br>
                             <span class="govuk-!-font-size-16">
                                 {% if doc.lastSaved %}
                             Last updated {{ doc.lastSaved | dateWithYearShortMonth }}

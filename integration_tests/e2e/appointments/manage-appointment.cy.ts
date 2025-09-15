@@ -639,7 +639,11 @@ describe('Manage an appointment', () => {
         .getAssociatedDocumentsTableRowCell(1, 1)
         .find('a')
         .should('contain.text', 'Document-1.pdf')
-        .should('have.attr', 'href', 'personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download')
+        .should(
+          'have.attr',
+          'href',
+          `case/${crn}personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download`,
+        )
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 2).should('contain.text', 'Contact')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 3).should('contain.text', '3 Way Meeting (NS)')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 4).should('contain.text', '6 April 2023')
