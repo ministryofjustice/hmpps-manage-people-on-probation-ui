@@ -1,4 +1,5 @@
 import ActivityLogDetailsPage from '../pages/activityLogDetails'
+import RecordAnOutcomePage from '../pages/appointments/record-an-outcome.page'
 
 context('Activity log details', () => {
   afterEach(() => {
@@ -65,7 +66,8 @@ context('Activity log details', () => {
     page.assertAnchorElementAtIndexWithin(cardBody, 1, 1, '/case/X000001/activity-log/activity/15/note/0')
     page.assertAnchorElementAtIndexWithin(cardBody, 1, 2, '/case/X000001/activity-log/activity/15/note/2')
   })
-  it('should render an appointment without an outcome', () => {
+  it('should render a MPOP managed appointment without an outcome', () => {
+    let activityLogPage: ActivityLogDetailsPage
     cy.visit('/case/X000001/activity-log/activity/16')
     const page = new ActivityLogDetailsPage()
     page.setPageTitle('Office appointment with Terry Jones')
@@ -77,7 +79,7 @@ context('Activity log details', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=16',
+        '/case/X000001/appointments/appointment/16/record-an-outcome?back=/case/X000001/activity-log/activity/16',
       )
     page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
     page
@@ -101,6 +103,24 @@ context('Activity log details', () => {
     page.getCardElement('appointmentDetails', '.govuk-summary-list__key', 5).should('contain.text', 'Sensitive')
     page.getCardElement('appointmentDetails', '.govuk-summary-list__value', 5).should('contain.text', 'No')
     page.getCardHeader('outcomeDetails').should('not.exist')
+    cy.get('.note-panel').find('a').click()
+    const logOutcomePage = new RecordAnOutcomePage()
+    logOutcomePage.checkOnPage()
+    cy.get('#outcomeRecorded').click()
+    logOutcomePage.getSubmitBtn().click()
+    page.checkOnPage()
+  })
+  it('should render an NDelius managed appointment without an outcome', () => {
+    cy.visit('/case/X000001/activity-log/activity/14')
+    cy.get('.note-panel').find('.govuk-warning-text__text').should('contain.text', 'Outcome not recorded')
+    cy.get('.note-panel')
+      .find('a')
+      .should('contain.text', 'Log an outcome on NDelius (opens in new tab)')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
+      )
   })
   it('should render a complied appointment with a single selected note', () => {
     cy.visit('/case/X000001/activity-log/activity/15/note/0')

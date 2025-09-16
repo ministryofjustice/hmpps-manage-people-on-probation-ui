@@ -3,6 +3,7 @@ import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
 import { activityLogValidation } from '../../server/properties/validation/activityLog'
 import { getErrorMessage } from '../utils/index'
+import RecordAnOutcomePage from '../pages/appointments/record-an-outcome.page'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'
@@ -408,9 +409,29 @@ context('Activity log', () => {
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
       )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
+    page.getCardHeader('timeline7').get('.app-summary-card__actions a').should('contain.text', 'Log an outcome')
+
+    page
+      .getCardHeader('timeline7')
+      .find('.app-summary-card__actions a')
+      .should(
+        'have.attr',
+        'href',
+        '/case/X000001/appointments/appointment/16/record-an-outcome?back=/case/X000001/activity-log?page=0',
+      )
+
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline10').should('contain.text', 'Planned Video Contact (NS) at 10:15am')
+  })
+  it('should link to record an outcome page', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getCardHeader('timeline7').find('.app-summary-card__actions a').click()
+    const recordAnOutcomePage = new RecordAnOutcomePage()
+    cy.get('#outcomeRecorded').click()
+    recordAnOutcomePage.getSubmitBtn().click()
+    page.checkOnPage()
   })
   it('should display the pagination navigation', () => {
     cy.visit('/case/X000001/activity-log')

@@ -205,8 +205,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         id: parseInt(id, 10),
         outcomeRecorded: true,
       }
+      const { back } = req.query as Record<string, string>
       await masClient.patchAppointment(body)
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+      return res.redirect(back ?? `/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
   getAddNote: _hmppsAuthClient => {
