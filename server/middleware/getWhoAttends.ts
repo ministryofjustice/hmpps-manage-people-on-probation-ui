@@ -2,7 +2,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
-import { getDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 
 export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -15,13 +15,17 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
     let selectedRegion: string
     let selectedTeam: string
+    let selectedUser: string
 
-    if (!providerCode || back) {
-      selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
-      selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
-    } else {
+    if (providerCode) {
       selectedRegion = providerCode
-      selectedTeam = teamCode
+      if (teamCode) {
+        selectedTeam = teamCode
+      }
+    } else {
+      selectedRegion = getDataValue(data, ['appointments', crn, id, 'temp', 'providerCode'])
+      selectedTeam = getDataValue(data, ['appointments', crn, id, 'temp', 'teamCode'])
+      selectedUser = getDataValue(data, ['appointments', crn, id, 'temp', 'username'])
     }
 
     const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(
@@ -42,42 +46,34 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     // On page load need to default the drop-down to
     // user default values
     if (req.method === 'GET') {
-      if (selectedRegion || back) {
-        displayedProviders = providers.map(p => {
-          if (p.code === selectedRegion) {
-            return { code: p.code, name: p.name, selected: 'selected' }
-          }
-          return { code: p.code, name: p.name }
-        })
-        displayedTeams = teams.map(t => {
-          if (t.code === selectedTeam) {
-            return { description: t.description, code: t.code, selected: 'selected' }
-          }
-          return { description: t.description, code: t.code }
-        })
-        displayedUsers = users
-      } else {
-        displayedProviders = providers.map(p => {
-          if (p.name === defaultUserDetails.homeArea) {
-            return { code: p.code, name: p.name, selected: 'selected' }
-          }
-          return { code: p.code, name: p.name }
-        })
-
-        displayedTeams = teams.map(t => {
-          if (t.description === defaultUserDetails.team) {
-            return { description: t.description, code: t.code, selected: 'selected' }
-          }
-          return { description: t.description, code: t.code }
-        })
-
-        displayedUsers = users.map(u => {
-          if (u.username.toUpperCase() === defaultUserDetails.username) {
-            return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
-          }
-          return { username: u.username, nameAndRole: u.nameAndRole }
-        })
-      }
+      // if (selectedRegion || back) {
+      displayedProviders = providers.map(p => {
+        if (
+          (selectedRegion && p.code === selectedRegion) ||
+          (!selectedRegion && p.name === defaultUserDetails.homeArea)
+        ) {
+          setDataValue(data, ['appointments', crn, id, 'temp', 'providerCode'], p.code)
+          return { code: p.code, name: p.name, selected: 'selected' }
+        }
+        return { code: p.code, name: p.name }
+      })
+      displayedTeams = teams.map(t => {
+        if ((selectedTeam && t.code === selectedTeam) || (!selectedTeam && t.description === defaultUserDetails.team)) {
+          setDataValue(data, ['appointments', crn, id, 'temp', 'teamCode'], t.code)
+          return { description: t.description, code: t.code, selected: 'selected' }
+        }
+        return { description: t.description, code: t.code }
+      })
+      displayedUsers = users.map(u => {
+        if (
+          (selectedUser && u.username === selectedUser) ||
+          (!selectedUser && u.username.toUpperCase() === defaultUserDetails.username)
+        ) {
+          setDataValue(data, ['appointments', crn, id, 'temp', 'username'], u.username)
+          return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
+        }
+        return { username: u.username, nameAndRole: u.nameAndRole }
+      })
 
       req.session.data = {
         ...(req?.session?.data ?? {}),

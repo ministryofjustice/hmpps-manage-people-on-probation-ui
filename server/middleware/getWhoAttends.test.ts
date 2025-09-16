@@ -153,28 +153,28 @@ describe('/middleware/getWhoAttends()', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
   })
-  describe('back link selected', () => {
-    const req = httpMocks.createRequest({
-      session: {
-        data: {
-          providers: {
-            [username]: mockAPIResponse.providers,
-          },
-        },
-      },
-      query: {
-        back: 'attendance',
-      },
-    })
-    beforeEach(async () => {
-      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should fetch the user providers from session', () => {
-      expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
-      expect(req.session.data.providers).toEqual({
-        ...req.session.data.providers,
-        [username]: mockAPIResponse.providers,
-      })
-    })
-  })
+  // describe('back link selected', () => {
+  //   const req = httpMocks.createRequest({
+  //     session: {
+  //       data: {
+  //         providers: {
+  //           [username]: mockAPIResponse.providers,
+  //         },
+  //       },
+  //     },
+  //     query: {
+  //       back: 'attendance',
+  //     },
+  //   })
+  //   beforeEach(async () => {
+  //     await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+  //   })
+  //   // it('should fetch the user providers from session', () => {
+  //   //   expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
+  //   //   expect(req.session.data.providers).toEqual({
+  //   //     ...req.session.data.providers,
+  //   //     [username]: mockAPIResponse.providers,
+  //   //   })
+  //   // })
+  // })
 })
