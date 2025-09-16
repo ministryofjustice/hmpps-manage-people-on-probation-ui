@@ -173,10 +173,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { data } = req.session
-      const { change, page, providerCode, teamCode } = req.query as Record<string, string>
+      const { change, page, providerCode, teamCode, username } = req.query as Record<string, string>
       const changeQueryParam = change ? `&change=${change}` : ''
+      const userQueryParam = username ? `&user=${username}` : ''
       const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
-      const queryParameters = providerCode ? `?providerCode=${providerCode}${teamQueryParam}${changeQueryParam}` : ''
+      const queryParameters = providerCode
+        ? `?providerCode=${providerCode}${teamQueryParam}${userQueryParam}${changeQueryParam}`
+        : ''
       if (page) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`)
       }

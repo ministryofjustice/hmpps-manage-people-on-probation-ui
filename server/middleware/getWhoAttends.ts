@@ -8,7 +8,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
   return async (req, res, next) => {
     const { username } = res.locals.user
     const { crn, id } = req.params
-    const { providerCode, teamCode, back } = req.query as Record<string, string>
+    const { providerCode, teamCode, user } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
     const { data } = req.session
@@ -21,6 +21,9 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       selectedRegion = providerCode
       if (teamCode) {
         selectedTeam = teamCode
+        if (user) {
+          selectedUser = user
+        }
       }
     } else {
       selectedRegion = getDataValue(data, ['appointments', crn, id, 'temp', 'providerCode'])

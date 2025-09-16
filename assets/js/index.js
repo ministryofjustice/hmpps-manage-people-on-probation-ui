@@ -79,6 +79,7 @@ const setNoFixedAddressConditional = () => {
 const attendanceSelectors = () => {
   const providerSelect = document.querySelector('[data-qa="providerCode"]')
   const teamSelect = document.querySelector('[data-qa="teamCode"]')
+  const userSelect = document.querySelector('[data-qa="username"]')
   const params = new URL(window.location.toString()).searchParams
   const change = params.get('change')
   let providerCode = ''
@@ -94,13 +95,26 @@ const attendanceSelectors = () => {
       form.submit()
     })
   }
+  let teamCode = ''
   if (teamSelect) {
+    teamCode = teamSelect.value
     teamSelect.addEventListener('change', event => {
       const { form, value } = event.target
       if (change) {
         form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${value}&change=${change}`
       } else {
         form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${value}`
+      }
+      form.submit()
+    })
+  }
+  if (userSelect) {
+    userSelect.addEventListener('change', event => {
+      const { form, value } = event.target
+      if (change) {
+        form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${teamCode}&username=${value}&change=${change}`
+      } else {
+        form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${teamCode}&username=${value}`
       }
       form.submit()
     })
