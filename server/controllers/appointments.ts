@@ -15,7 +15,6 @@ const routes = [
   'getAppointments',
   'getAllUpcomingAppointments',
   'postAppointments',
-  'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
   'getAddNote',
@@ -124,27 +123,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
-    }
-  },
-  getAppointmentDetails: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn } = req.params
-      const { contactId } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      res.render('pages/appointments/appointment', {
-        personAppointment,
-        crn,
-      })
     }
   },
   getManageAppointment: hmppsAuthClient => {

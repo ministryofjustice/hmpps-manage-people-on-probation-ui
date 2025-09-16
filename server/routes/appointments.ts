@@ -24,12 +24,6 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   post('/case/:crn/appointments', controllers.appointments.postAppointments(hmppsAuthClient))
 
-  router.get(
-    '/case/:crn/appointments/appointment/:contactId',
-    getPersonalDetails(hmppsAuthClient),
-    controllers.appointments.getAppointmentDetails(hmppsAuthClient),
-  )
-
   router.all(
     '/case/:crn/appointments/appointment/:contactId/record-an-outcome',
     getPersonalDetails(hmppsAuthClient),

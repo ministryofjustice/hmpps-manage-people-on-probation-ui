@@ -37,7 +37,7 @@
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
     {% set appointmentDetails %}
-    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}/manage">
       {{ appointment.type }}
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
     </a>
@@ -78,7 +78,7 @@
   {% for appointment in pastAppointments %}
 
     {% set appointmentDetails %}
-    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
+    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}/manage">
       {{ appointment.type }}
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
     </a>
