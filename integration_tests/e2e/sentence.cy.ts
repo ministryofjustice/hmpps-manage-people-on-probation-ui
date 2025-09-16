@@ -106,7 +106,10 @@ context('Sentence', () => {
             cy
               .get('a')
               .invoke('attr', 'href')
-              .should('equal', 'case/X000001/personal-details/documents/4d74f43c-5b42-4317-852e-56c7d29b610b/download'),
+              .should(
+                'equal',
+                '/case/X000001/personal-details/documents/4d74f43c-5b42-4317-852e-56c7d29b610b/download',
+              ),
           ),
       )
     page
