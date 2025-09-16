@@ -77,6 +77,7 @@ interface Locals {
   userStaff?: User[]
   regionCode?: string
   teamCode?: string
+  providerCode?: string
   selectProvider?: Provider[]
   sentry?: SentryConfig
   csrfToken?: string

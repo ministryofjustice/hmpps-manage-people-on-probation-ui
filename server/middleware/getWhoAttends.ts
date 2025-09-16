@@ -103,6 +103,8 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     res.locals.userProviders = displayedProviders
     res.locals.userTeams = displayedTeams
     res.locals.userStaff = displayedUsers
+    res.locals.providerCode = providerCode ?? ''
+    res.locals.teamCode = teamCode ?? ''
     return next()
   }
 }

@@ -172,18 +172,20 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const { data } = req.session
-      const { change, page, providerCode, teamCode } = req.query as Record<string, string>
-      const changeQueryParam = change ? `&change=${change}` : ''
-      const teamQueryParam = teamCode ? `&teamCode=${teamCode}` : ''
-      const queryParameters = providerCode ? `?providerCode=${providerCode}${teamQueryParam}${changeQueryParam}` : ''
-      if (page) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${id}/attendance${queryParameters}`)
+      const { body, query, session } = req
+      const { change } = query as Record<string, string>
+      const { data } = session
+      // if body contains temp values, then save them to the user session
+      const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
+      const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
+      const username = body?.appointments?.[crn]?.[id]?.temp?.username
+      if (providerCode) {
+        setDataValue(data, ['appointments', crn, id, 'user'], { teamCode, providerCode, username })
       }
-      const tempUser = getDataValue(data, ['appointments', crn, id, 'temp'])
-      setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], tempUser.providerCode)
-      setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], tempUser.teamCode)
-      setDataValue(data, ['appointments', crn, id, 'user', 'username'], tempUser.username)
+      // if temp session exists, delete it
+      if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
+        delete req.session.data.appointments[crn][id].temp
+      }
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
     }

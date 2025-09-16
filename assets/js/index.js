@@ -85,24 +85,22 @@ const attendanceSelectors = () => {
   if (providerSelect) {
     providerCode = providerSelect.value
     providerSelect.addEventListener('change', event => {
-      const { form, value } = event.target
-      if (change) {
-        form.action = `attendance?page=self&providerCode=${value}&change=${change}`
-      } else {
-        form.action = `attendance?page=self&providerCode=${value}`
-      }
-      form.submit()
+      const { value } = event.target
+      const urlParts = location.href.split('?')[0].split('/')
+      const crn = urlParts[4]
+      const uuid = urlParts[6]
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
+      location.href = `${baseUrl}?providerCode=${value}${change ? `&change=${change}` : ''}`
     })
   }
   if (teamSelect) {
     teamSelect.addEventListener('change', event => {
-      const { form, value } = event.target
-      if (change) {
-        form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${value}&change=${change}`
-      } else {
-        form.action = `attendance?page=self&providerCode=${providerCode}&teamCode=${value}`
-      }
-      form.submit()
+      const { value } = event.target
+      const urlParts = location.href.split('?')[0].split('/')
+      const crn = urlParts[4]
+      const uuid = urlParts[6]
+      const baseUrl = `/case/${crn}/arrange-appointment/${uuid}/attendance`
+      location.href = `${baseUrl}?${providerCode ? `providerCode=${providerCode}&` : ''}teamCode=${value}${change ? `&change=${change}` : ''}`
     })
   }
 }
