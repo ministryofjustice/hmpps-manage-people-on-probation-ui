@@ -101,7 +101,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           ? req.session.data.staff[loggedInUsername].find(s => s.username.toLowerCase() === staffId.toLowerCase())
               ?.nameAndRole
           : null
-
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {
