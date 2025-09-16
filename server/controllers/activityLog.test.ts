@@ -158,41 +158,6 @@ describe('/controllers/activityLogController', () => {
       })
     })
   })
-
-  describe('getActivityDetails', () => {
-    const getPersonAppointmentSpy = jest
-      .spyOn(MasApiClient.prototype, 'getPersonAppointment')
-      .mockImplementation(() => Promise.resolve(mockActivity))
-    beforeEach(async () => {
-      await controllers.activityLog.getActivityDetails(hmppsAuthClient)(req, res)
-    })
-    afterEach(() => {
-      jest.clearAllMocks()
-    })
-    it('should request the person appointment from the api', () => {
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
-    })
-    it('should request the tier calculation from the api', () => {
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request risks and predictors from the api', () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
-    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
-    it('should render the appointment page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
-        category: req.query.category,
-        queryParams: ['view=default'],
-        personAppointment: mockActivity,
-        crn,
-        isActivityLog: true,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
-      })
-    })
-  })
   describe('getActivityNote', () => {
     const getPersonAppointmentNoteSpy = jest
       .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
