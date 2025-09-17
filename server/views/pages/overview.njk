@@ -140,7 +140,7 @@
     <ul class="govuk-list govuk-!-margin-bottom-0">
       {% if appointmentsWithoutAnOutcomeCount > 0 %}
         <li>
-          <a href="/case/{{ crn }}/record-an-outcome/outcome">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }}
+          <a href="/case/{{ crn }}/appointments">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }}
             {{ 'appointment' if appointmentsWithoutAnOutcomeCount == 1 else 'appointments' }}</a>
         </li>
       {% endif %}
