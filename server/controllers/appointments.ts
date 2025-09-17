@@ -10,6 +10,7 @@ import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddr
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
+import { getQueryString } from './activityLog'
 
 const routes = [
   'getAppointments',
@@ -137,6 +138,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const { back } = req.query
+      const queryParams = getQueryString(req.query as Record<string, string>)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -152,6 +154,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         personAppointment,
         crn,
         back,
+        queryParams,
         nextAppointment,
         nextAppointmentIsAtHome,
       })

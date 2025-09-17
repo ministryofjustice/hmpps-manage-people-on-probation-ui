@@ -2,7 +2,7 @@
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 
 {% set titleHtml %}
-<a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="govuk-!-font-weight-bold">
+<a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="govuk-!-font-weight-bold">
   {{ entry.type }}
   <span class="govuk-visually-hidden"> on {{ thisDate }}</span>
 </a>
