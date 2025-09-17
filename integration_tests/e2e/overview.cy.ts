@@ -16,6 +16,16 @@ context('Overview', () => {
     page.getTab('activityLog').should('contain.text', 'Activity log')
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
+
+    page
+      .getAppointmentsLink('X000001')
+      .should('exist')
+      .invoke('text')
+      .then(text => {
+        const normalized = text.replace(/\s+/g, ' ').trim()
+        expect(normalized).to.include('You need to record an outcome for 5 appointments')
+      })
+
     page
       .getRowData('schedule', 'nextAppointment', 'Value')
       .should('contain.text', 'Saturday 9 March at 2:59pm (Initial Appointment - In office (NS))')
