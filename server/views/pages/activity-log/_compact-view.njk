@@ -20,7 +20,7 @@
       <li>
         {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false %}
           <div class="govuk-hint govuk-!-margin-bottom-1">
-            <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="app-!-inherit-colour">{{ entry.type }}<span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+            <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase(['(NS)','-']) }}<span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
           </div>
         {% else %}
           {% include "./_compact-timeline-entry.njk" %}
