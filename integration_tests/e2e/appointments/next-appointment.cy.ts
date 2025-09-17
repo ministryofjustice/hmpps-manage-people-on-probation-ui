@@ -232,7 +232,6 @@ describe('Create next appointment', () => {
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
-      cy.pause()
 
       arrangeAnotherAppointmentPage
         .getSummaryListRow(1)
@@ -255,7 +254,7 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team North, London)')
+        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__actions')
