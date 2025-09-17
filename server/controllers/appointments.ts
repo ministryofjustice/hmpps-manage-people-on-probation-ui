@@ -136,6 +136,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const { back } = req.query
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -150,6 +151,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
+        back,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
