@@ -175,14 +175,12 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { body, query, session } = req
       const { change } = query as Record<string, string>
       const { data } = session
-      // if body contains temp values, then save them to the user session
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
       if (providerCode) {
         setDataValue(data, ['appointments', crn, id, 'user'], { teamCode, providerCode, username })
       }
-      // if temp session exists, delete it
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp
       }
