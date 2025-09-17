@@ -663,7 +663,20 @@
             },
             "repeating": true,
             "nonComplianceReason": "",
-            "documents": [],
+            "documents": [
+              {
+                "id": "94111a36-ae1a-4bba-851a-07924da0d929",
+                "name": "Mpop test.docx",
+                "createdAt": "2025-09-11T17:38:40+01:00",
+                "lastUpdated": "2025-09-11T17:38:40.340173+01:00"
+              },
+              {
+                "id": "b16cc5e9-aae8-43f6-add1-de8f4e07f33f",
+                "name": "file.pdf",
+                "createdAt": "2025-09-11T17:42:23+01:00",
+                "lastUpdated": "2025-09-11T17:42:23.487913+01:00"
+              }
+            ],
             "isRarRelated": true,
             "rarCategory": "",
             "acceptableAbsence": true,
@@ -744,7 +757,7 @@
             "isInitial": true,
             "isNationalStandard": true,
             "location": {
-              "code": "",
+              "code": "N56NTME",
               "officeName": "",
               "buildingName": "The Building",
               "buildingNumber": "77",

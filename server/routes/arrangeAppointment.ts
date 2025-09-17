@@ -146,6 +146,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     checkAnswers,
+    getAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.getArrangeAnotherAppointment(),
   )
   router.post(

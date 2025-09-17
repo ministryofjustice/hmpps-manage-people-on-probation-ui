@@ -1,0 +1,214 @@
+name: pipeline scan
+
+on:
+  workflow_call:
+    inputs:
+      channel_id:
+        required: false
+        default: 'NO_SLACK'
+        type: string
+      docker_image_app_dir:
+        required: false
+        default: '/app'
+        type: string
+      veracode_package_artifact_name:
+        required: false
+        type: string
+        default: ''
+        description: "The name of the artifact to download, containing a veracode_artifact_name (default source.zip) packaged application. Optional."
+      veracode_artifact_name:
+        required: false
+        type: string
+        default: 'source.zip'
+        description: "The name of the artifact within the package, Optional."
+    secrets:
+      HMPPS_SRE_SLACK_BOT_TOKEN:
+        description: Slack bot token
+        required: true
+      HMPPS_VERACODE_API_ID_0:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_ID_1:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_ID_2:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_ID_3:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_ID_4:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_KEY_0:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_KEY_1:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_KEY_2:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_KEY_3:
+        description: Veracode app secret
+        required: true
+      HMPPS_VERACODE_API_KEY_4:
+        description: Veracode app secret
+        required: true
+      SENTRY_AUTH_TOKEN:
+        description: Sentry auth secret
+        required: true
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  security-veracode-pipeline-scan:
+    name: Security veracode pipeline scan
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+      contents: read
+      actions: read
+    env:
+      additional_docker_build_args: ""
+      jdk_tag: "17.0"
+      java_options: "-Xmx1024m -XX:ParallelGCThreads=2 -XX:ConcGCThreads=2 -Djava.util.concurrent.ForkJoinPool.common.parallelism=2 -Dorg.gradle.daemon=false -Dkotlin.compiler.execution.strategy=in-process"
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: prepare assets
+        if: inputs.veracode_package_artifact_name == ''
+        uses: ./.github/actions/security_veracode_prepare_artifacts
+        with:
+          docker_image_app_dir: ${{ inputs.docker_image_app_dir }}
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      - name: download assets artifact
+        if: inputs.veracode_package_artifact_name != ''
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{ inputs.veracode_package_artifact_name }}
+      - name: "Download/Extract pipeline scanner"
+        shell: bash
+        run: |
+          wget https://downloads.veracode.com/securityscan/pipeline-scan-LATEST.zip -O pipeline-scan.zip
+          unzip pipeline-scan.zip -x README.md
+      - name: "Download Veracode Policy"
+        shell: bash
+        run: |
+          echo "Randomly picking 1 of 5 api keys, to help avoid veracode API rate limits."
+          X=$(( RANDOM % 4 ))
+          VERACODE_API_ID_X="VERACODE_API_ID_${X}"
+          VERACODE_API_KEY_X="VERACODE_API_KEY_${X}"
+          VERACODE_API_ID="${!VERACODE_API_ID_X}"
+          VERACODE_API_KEY="${!VERACODE_API_KEY_X}"
+          echo "Using VERACODE_API_ID_${X} from pool (${VERACODE_API_ID:0:5}...)"
+          java -jar pipeline-scan.jar \
+          --request_policy "Ministry of Justice" \
+          --veracode_api_id "${VERACODE_API_ID}" \
+          --veracode_api_key "${VERACODE_API_KEY}"
+        env:
+          VERACODE_API_ID_0: ${{ secrets.HMPPS_VERACODE_API_ID_0 }}
+          VERACODE_API_ID_1: ${{ secrets.HMPPS_VERACODE_API_ID_1 }}
+          VERACODE_API_ID_2: ${{ secrets.HMPPS_VERACODE_API_ID_2 }}
+          VERACODE_API_ID_3: ${{ secrets.HMPPS_VERACODE_API_ID_3 }}
+          VERACODE_API_ID_4: ${{ secrets.HMPPS_VERACODE_API_ID_4 }}
+          VERACODE_API_KEY_0: ${{ secrets.HMPPS_VERACODE_API_KEY_0 }}
+          VERACODE_API_KEY_1: ${{ secrets.HMPPS_VERACODE_API_KEY_1 }}
+          VERACODE_API_KEY_2: ${{ secrets.HMPPS_VERACODE_API_KEY_2 }}
+          VERACODE_API_KEY_3: ${{ secrets.HMPPS_VERACODE_API_KEY_3 }}
+          VERACODE_API_KEY_4: ${{ secrets.HMPPS_VERACODE_API_KEY_4 }}
+      - name: "Scan the project"
+        id: veracode-pipeline-scan
+        shell: bash
+        run: |
+          echo "Randomly picking 1 of 5 api keys, to help avoid veracode API rate limits."
+          X=$(( RANDOM % 4 ))
+          VERACODE_API_ID_X="VERACODE_API_ID_${X}"
+          VERACODE_API_KEY_X="VERACODE_API_KEY_${X}"
+          VERACODE_API_ID="${!VERACODE_API_ID_X}"
+          VERACODE_API_KEY="${!VERACODE_API_KEY_X}"
+          echo "Using VERACODE_API_ID_${X} from pool (${VERACODE_API_ID:0:5}...)"
+          java -jar pipeline-scan.jar \
+          $(test -f results.json && echo "--baseline_file results.json") \
+          --json_output true \
+          --file ${{ inputs.veracode_artifact_name }} \
+          --policy_file Ministry_of_Justice.json \
+          --veracode_api_id "${VERACODE_API_ID}" \
+          --veracode_api_key "${VERACODE_API_KEY}" \
+          --timeout 60 \
+          --issue_details false \
+          --summary_output true
+        continue-on-error: true
+        env:
+          VERACODE_API_ID_0: ${{ secrets.HMPPS_VERACODE_API_ID_0 }}
+          VERACODE_API_ID_1: ${{ secrets.HMPPS_VERACODE_API_ID_1 }}
+          VERACODE_API_ID_2: ${{ secrets.HMPPS_VERACODE_API_ID_2 }}
+          VERACODE_API_ID_3: ${{ secrets.HMPPS_VERACODE_API_ID_3 }}
+          VERACODE_API_ID_4: ${{ secrets.HMPPS_VERACODE_API_ID_4 }}
+          VERACODE_API_KEY_0: ${{ secrets.HMPPS_VERACODE_API_KEY_0 }}
+          VERACODE_API_KEY_1: ${{ secrets.HMPPS_VERACODE_API_KEY_1 }}
+          VERACODE_API_KEY_2: ${{ secrets.HMPPS_VERACODE_API_KEY_2 }}
+          VERACODE_API_KEY_3: ${{ secrets.HMPPS_VERACODE_API_KEY_3 }}
+          VERACODE_API_KEY_4: ${{ secrets.HMPPS_VERACODE_API_KEY_4 }}
+      - uses: actions/upload-artifact@v4
+        id: veracode-artifact-upload
+        if: success()
+        continue-on-error: true
+        with:
+          name: veracode-pipeline-check-${{ github.event.repository.name }}
+          path: results.txt
+      - name: send a failure slack message
+        if: steps.veracode-pipeline-scan.outcome == 'failure' && inputs.channel_id != 'NO_SLACK'
+        uses: ministryofjustice/hmpps-github-actions/.github/actions/slack_failure_results@v2 # WORKFLOW_VERSION
+        with:
+          SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
+          channel_id: ${{ inputs.channel_id }}
+          input_file: results.txt
+
+      - uses: slackapi/slack-github-action@37ebaef184d7626c5f204ab8d3baff4262dd30f0 # v1.27.0
+        if: steps.veracode-artifact-upload.conclusion == 'failure' && inputs.channel_id != 'NO_SLACK'
+        with:
+          channel-id: ${{ inputs.channel_id}}
+          payload: |
+            { "text": "Veracode pipeline scan failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": ":no_entry: Failed GitHub Action:"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Workflow:*\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.workflow }}>"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Job:*\n${{ github.job }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Repo:*\n${{ github.repository }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Project:*\n${{ github.event.repository.name }}"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}

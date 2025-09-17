@@ -331,6 +331,30 @@ describe('controllers/appointments', () => {
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
       })
     })
+    describe('If back query param in url', () => {
+      const mockedReq = httpMocks.createRequest({
+        params: {
+          crn,
+          id,
+          contactId,
+          actionType,
+        },
+        query: {
+          back: '/back/url',
+        },
+        body: {
+          outcomeRecorded: 'yes',
+        },
+      })
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
+        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockedReq, res)
+      })
+      it('should post the request then redirect to the back link', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(mockedReq.query.back)
+      })
+    })
   })
   describe('get add note', () => {
     const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]

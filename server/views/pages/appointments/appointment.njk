@@ -7,6 +7,11 @@
   '' %}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set logOutcomeLinkHtml = '<a href="/case/' + crn + '/appointments/appointment/' + appointment.id + '/record-an-outcome?back=/case/' + crn + '/activity-log/activity/' + appointment.id + '">Log an outcome</a>' %}
+{% if appointment.deliusManaged %}
+  {% set logOutcomeLinkHtml = '<a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome on NDelius (opens in new tab)</a>' %}
+{% endif %}
+
 {% block beforeContent %}
   {{ govukBreadcrumbs({
   items: [
@@ -60,7 +65,7 @@
       <div class="govuk-grid-column-two-thirds">
         <div class="note-panel govuk-!-margin-bottom-6">
           {{ govukWarningText({
-          html: 'Outcome not recorded<br /><a href="' + deliusDeepLinkUrl('UpdateContact', crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome on NDelius (opens in new tab)</a>',
+          html: 'Outcome not recorded<br />' + logOutcomeLinkHtml,
           iconFallbackText: 'Warning',
           classes: 'govuk-!-margin-bottom-0'
         }) }}

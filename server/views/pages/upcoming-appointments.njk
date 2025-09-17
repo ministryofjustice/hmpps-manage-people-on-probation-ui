@@ -20,7 +20,7 @@
     {% for appointment in upcomingAppointments %}
         {% set appointmentDetails %}
             <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}">
-                {{ appointment.type }}
+                {{ appointment.type | toSentenceCase(['(NS)','-']) }}
                 {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
             </a>
         {% endset %}

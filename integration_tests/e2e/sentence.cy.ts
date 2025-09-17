@@ -106,7 +106,10 @@ context('Sentence', () => {
             cy
               .get('a')
               .invoke('attr', 'href')
-              .should('equal', 'personal-details/documents/4d74f43c-5b42-4317-852e-56c7d29b610b/download'),
+              .should(
+                'equal',
+                '/case/X000001/personal-details/documents/4d74f43c-5b42-4317-852e-56c7d29b610b/download',
+              ),
           ),
       )
     page
@@ -124,7 +127,7 @@ context('Sentence', () => {
           cy
             .get('a')
             .invoke('attr', 'href')
-            .should('equal', 'personal-details/documents/6037becb-0d0c-44e1-8727-193f22df0494/download'),
+            .should('equal', '/case/X000001/personal-details/documents/6037becb-0d0c-44e1-8727-193f22df0494/download'),
         ),
     )
     page
@@ -142,7 +145,7 @@ context('Sentence', () => {
           cy
             .get('a')
             .invoke('attr', 'href')
-            .should('equal', 'personal-details/documents/d072ed9a-999f-4333-a116-a871a845aeb3/download'),
+            .should('equal', '/case/X000001/personal-details/documents/d072ed9a-999f-4333-a116-a871a845aeb3/download'),
         ),
     )
     page

@@ -10,25 +10,33 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   const { nextAppointment: nextAppointmentSelection } = req.body
   const { appointmentTypes } = res.locals
   let eventId = appointment?.eventId || ''
+
   if (!eventId && appointment?.eventNumber) {
     const sentences = req?.session?.data?.sentences?.[crn]
     if (sentences) {
       eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
     }
   }
+
   let notes = ''
   if (appointment?.appointmentNotes) {
     notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
   } else if (appointment?.appointmentNote?.note) {
     notes = appointment.appointmentNote.note
   }
-  const selectedType = appointmentTypes.find(t => t?.description === appointment?.type)
+  const typeObj = appointmentTypes.find(t => t?.description === appointment?.type)
+  if (!eventId && typeObj?.isPersonLevelContact === true) {
+    eventId = 'PERSON_LEVEL_CONTACT'
+  }
   let locationCode = appointment?.location?.code || ''
-  if (!selectedType?.isLocationRequired && !locationCode) {
+  if (!typeObj?.isLocationRequired === true && !locationCode) {
     locationCode = 'NO_LOCATION_REQUIRED'
   }
 
-  let type = appointmentTypes.find(t => t?.description === appointment?.type)?.code || ''
+  let type = typeObj?.code || ''
+  if (!type) {
+    locationCode = ''
+  }
   let username = appointment?.officer?.username || ''
   let teamCode = appointment?.officer?.teamCode || ''
   let providerCode = appointment?.officer?.providerCode || ''
@@ -49,10 +57,10 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   }
 
   if (nextAppointmentSelection === 'KEEP_TYPE') {
+    if (!eventId) {
+      type = ''
+    }
     if (!eventId || !type || !providerCode || !teamCode || !username) {
-      if (!eventId) {
-        type = ''
-      }
       providerCode = ''
       teamCode = ''
       username = ''
@@ -97,7 +105,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       nextAppointment.nsiId = appointment.nsiId.toString()
     }
   }
-
   res.locals.nextAppointmentSession = nextAppointment
   return next()
 }

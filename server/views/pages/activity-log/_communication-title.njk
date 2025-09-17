@@ -9,5 +9,5 @@
 {% elseif entry.isPhoneCallFromPop === true %}
    Phone call from {{ personSummary.name | fullName }}
 {% else %}
-    {{ entry.type }}
+    {{ entry.type | toSentenceCase(['(NS)','-']) }}
 {% endif %}

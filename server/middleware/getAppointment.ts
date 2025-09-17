@@ -89,7 +89,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const selectedTeam = teamCode && teams ? teams.find(t => t.code === teamCode)?.description : null
       const selectedUser =
         staffId && users ? users.find(s => s.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole : null
-
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {

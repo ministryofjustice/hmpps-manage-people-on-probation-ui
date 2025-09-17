@@ -1,27 +1,28 @@
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
-{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed  %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 
 {% set titleHtml %}
-  <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="govuk-!-font-weight-bold">
-    {{ entry.type }}<span class="govuk-visually-hidden"> on {{ thisDate }}</span>
-  </a>
+<a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="govuk-!-font-weight-bold">
+  {{ entry.type | toSentenceCase(['(NS)','-']) }}
+  <span class="govuk-visually-hidden"> on {{ thisDate }}</span>
+</a>
 {% endset %}
 
 {% set actionsHtml %}
-  {% if entry.countsTowardsRAR %}
-    {{ govukTag({text: 'RAR', classes: 'govuk-tag--purple'}) }}
-  {% endif %}
+{% if entry.countsTowardsRAR %}
+  {{ govukTag({text: 'RAR', classes: 'govuk-tag--purple'}) }}
+{% endif %}
 
-  {% if shouldPromptToRecordAnOutcome %}
-     <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}"target="_blank" rel="external noopener noreferrer" class="govuk-!-font-weight-bold govuk-!-margin-left-2">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
-  {% else %}
-     {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
-  {% endif %}
+{% if shouldPromptToRecordAnOutcome %}
+  {% include './_log-outcome-link.njk' %}
+{% else %}
+  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
+{% endif %}
 
 {% endset %}
 
 {% set html %}
-  {% include './_timeline-notes.njk' %}
+{% include './_timeline-notes.njk' %}
 {% endset %}
 
 {{ appSummaryCard({

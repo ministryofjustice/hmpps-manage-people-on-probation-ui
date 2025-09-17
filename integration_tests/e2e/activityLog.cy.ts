@@ -3,6 +3,7 @@ import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
 import { activityLogValidation } from '../../server/properties/validation/activityLog'
 import { getErrorMessage } from '../utils/index'
+import RecordAnOutcomePage from '../pages/appointments/record-an-outcome.page'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'
@@ -243,7 +244,7 @@ context('Activity log', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getSelectedFiltersBox().should('not.exist')
     page.getKeywordsInput().should('have.value', '')
-    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
   })
   it('should display the filter tag and filter the list if a date from and date to are submitted', () => {
     cy.visit('/case/X000001/activity-log')
@@ -276,7 +277,7 @@ context('Activity log', () => {
     page.getSelectedFiltersBox().should('not.exist')
     page.getDateFromInput().should('have.value', '')
     page.getDateToInput().should('have.value', '')
-    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
@@ -297,9 +298,9 @@ context('Activity log', () => {
     page.getSelectedFilterTag(1).should('contain.text', 'Without an outcome')
     page.getSelectedFilterTag(2).should('contain.text', 'Complied')
     page.getSelectedFilterTag(3).should('contain.text', 'Not complied')
-    page.getCardHeader('timeline1').should('contain.text', 'AP PA - Attitudes, thinking & behaviours at 9:15am')
-    page.getCardHeader('timeline2').should('contain.text', 'Pre-Intervention Session 1 at 9:15am')
-    page.getCardHeader('timeline3').should('contain.text', 'Initial Appointment - Home Visit (NS) at 9:15am')
+    page.getCardHeader('timeline1').should('contain.text', 'Ap pa - attitudes, thinking & behaviours at 9:15am')
+    page.getCardHeader('timeline2').should('contain.text', 'Pre intervention session 1 at 9:15am')
+    page.getCardHeader('timeline3').should('contain.text', 'Initial appointment - home visit (NS) at 9:15am')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '3')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '3')
@@ -319,8 +320,8 @@ context('Activity log', () => {
     page.getComplianceFilter(1).should('be.checked')
     page.getComplianceFilter(2).should('be.checked')
     page.getComplianceFilter(3).should('not.be.checked')
-    page.getCardHeader('timeline1').should('contain.text', 'AP PA - Attitudes, thinking & behaviours at 9:15am')
-    page.getCardHeader('timeline2').should('contain.text', 'Pre-Intervention Session 1 at 9:15am')
+    page.getCardHeader('timeline1').should('contain.text', 'Ap pa - attitudes, thinking & behaviours at 9:15am')
+    page.getCardHeader('timeline2').should('contain.text', 'Pre intervention session 1 at 9:15am')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '2')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '2')
@@ -370,7 +371,7 @@ context('Activity log', () => {
     page.getComplianceFilter(1).should('not.be.checked')
     page.getComplianceFilter(2).should('not.be.checked')
     page.getComplianceFilter(3).should('not.be.checked')
-    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
@@ -383,7 +384,7 @@ context('Activity log', () => {
       'contain.text',
       'All links to log outcomes open in new tabs on NDelius.',
     )
-    page.getCardHeader('timeline1').should('contain.text', 'Planned Video Contact (NS)')
+    page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
     page.getRowData('timeline1', 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
     page.getCardHeader('timeline2').should('contain.text', 'Phone call from Eula Schmeler')
     page.getRowData('timeline2', 'rarActivity', 'Value').should('contain.text', 'Stepping Stones')
@@ -408,9 +409,29 @@ context('Activity log', () => {
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
       )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
+    page.getCardHeader('timeline7').get('.app-summary-card__actions a').should('contain.text', 'Log an outcome')
+
+    page
+      .getCardHeader('timeline7')
+      .find('.app-summary-card__actions a')
+      .should(
+        'have.attr',
+        'href',
+        '/case/X000001/appointments/appointment/16/record-an-outcome?back=/case/X000001/activity-log?page=0',
+      )
+
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
-    page.getCardHeader('timeline10').should('contain.text', 'Planned Video Contact (NS) at 10:15am')
+    page.getCardHeader('timeline10').should('contain.text', 'Planned video contact (NS) at 10:15am')
+  })
+  it('should link to record an outcome page', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getCardHeader('timeline7').find('.app-summary-card__actions a').click()
+    const recordAnOutcomePage = new RecordAnOutcomePage()
+    cy.get('#outcomeRecorded').click()
+    recordAnOutcomePage.getSubmitBtn().click()
+    page.checkOnPage()
   })
   it('should display the pagination navigation', () => {
     cy.visit('/case/X000001/activity-log')
@@ -531,7 +552,7 @@ context('Activity log', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
-    page.getActivity('1').should('contain.text', 'Planned Video Contact (NS)')
+    page.getActivity('1').should('contain.text', 'Planned video contact (NS)')
     page.getActivity('2').should('contain.text', 'Phone call from Eula Schmeler')
     page.getActivity('3').should('contain.text', 'Planned appointment')
     page.getActivity('4').should('contain.text', 'Initial appointment')
@@ -540,7 +561,7 @@ context('Activity log', () => {
     page.getActivity('7').should('contain.text', 'Office appointment')
     page.getActivity('8').should('contain.text', 'Initial appointment')
     page.getActivity('9').should('contain.text', 'Initial appointment')
-    page.getActivity('10').should('contain.text', 'Planned Video Contact (NS)')
+    page.getActivity('10').should('contain.text', 'Planned video contact (NS)')
   })
   it('should display the no results message when no results are returned', () => {
     cy.visit('/case/X000001/activity-log')

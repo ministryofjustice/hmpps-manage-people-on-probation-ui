@@ -4,6 +4,7 @@ import { WiremockMapping } from '../../integration_tests/utils'
 interface Args {
   isFuture?: boolean
   managedType?: boolean
+  personLevel?: boolean
   documents?: boolean
   notes?: boolean
   complied?: boolean
@@ -20,6 +21,7 @@ const getAppointmentStub = (
   {
     isFuture = true,
     managedType = true,
+    personLevel = false,
     documents = false,
     notes = false,
     complied,
@@ -67,13 +69,13 @@ const getAppointmentStub = (
               surname: 'Jones',
             },
             teamCode: '1234',
-            providerCode: '5678',
-            username: 'TerryJones',
+            providerCode: 'N07',
+            username: 'terry-jones',
           },
           isInitial: true,
           isNationalStandard: true,
           location: {
-            code: '',
+            code: 'N56NTME',
             officeName: '',
             buildingName: 'The Building',
             buildingNumber: '77',
@@ -140,6 +142,9 @@ const getAppointmentStub = (
   if (managedType) {
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
   }
+  if (personLevel) {
+    mapping.response.jsonBody.appointment.type = 'Planned Doorstep Contact (NS)'
+  }
   mapping.response.jsonBody.appointment.deliusManaged = !managedType
   if (isFuture) {
     mapping.response.jsonBody.appointment.isInPast = false
@@ -163,19 +168,19 @@ const getAppointmentStub = (
         id: '83fdbf8a-a2f2-43b4-93ef-67e71c04fc58',
         name: 'Document-1.pdf',
         lastUpdated: '2023-04-06T11:06:25.672587+01:00',
-        dateCreated: '2023-04-06T11:06:25.672587+01:00',
+        createdAt: '2023-04-06T11:06:25.672587+01:00',
       },
       {
         id: 'c2650260-9568-476e-a293-0b168027a5f1',
         name: 'Document-2.pdf',
         lastUpdated: '2023-04-06T11:09:45.860739+01:00',
-        dateCreated: '2023-04-06T11:09:45.860739+01:00',
+        createdAt: '2023-04-06T11:09:45.860739+01:00',
       },
       {
         id: 'b82e444b-c77c-4d44-bf99-4ce4dc426ff4',
         name: 'Document-3.pdf',
         lastUpdated: '2023-04-06T11:21:17.06356+01:00',
-        dateCreated: '2023-04-06T11:21:17.06356+01:00',
+        createdAt: '2023-04-06T11:21:17.06356+01:00',
       },
     ]
   }
@@ -365,6 +370,10 @@ const stubPastAppointmentOutcomeNoNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, complied: true, notes: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubPastAppointmentNoOutcomeHasNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ isFuture: false, complied: false, notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubPastAppointmentWithNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, notes: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -445,6 +454,10 @@ const stubAppointmentAcceptableAbsenceNoNotes = (): SuperAgentRequest => {
 }
 const stubAppointmentNoEventId = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ noEventId: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentPersonLevel = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noEventId: true, personLevel: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubAppointmentNoType = (): SuperAgentRequest => {
@@ -539,6 +552,7 @@ export default {
   stubPastAppointmentNoOutcomeNoNotes,
   stubPastAppointmentOutcomeNoNotes,
   stubPastAppointmentWithNotes,
+  stubPastAppointmentNoOutcomeHasNotes,
   stubAppointmentNDeliusManagedType,
   stubAppointmentNDeliusManagedTypeComplied,
   stubAppointmentNDeliusManagedTypeWithNotesNoOutcome,
@@ -551,6 +565,7 @@ export default {
   stubAppointmentAcceptableAbsenceWithNotes,
   stubAppointmentAcceptableAbsenceNoNotes,
   stubAppointmentNoEventId,
+  stubAppointmentPersonLevel,
   stubAppointmentNoType,
   stubAppointmentNoAttendee,
   stubAppointmentNoLocation,

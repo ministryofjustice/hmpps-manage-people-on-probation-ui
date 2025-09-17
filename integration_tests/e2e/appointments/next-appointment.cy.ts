@@ -53,7 +53,7 @@ describe('Create next appointment', () => {
   it('should return to manage page when backLink selected', () => {
     nextAppointmentPage.getBackLink().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with George Parker')
+    manageAppointmentPage.setPageTitle('Manage planned office visit (NS) with George Parker')
     manageAppointmentPage.checkOnPage()
   })
 
@@ -67,7 +67,7 @@ describe('Create next appointment', () => {
     nextAppointmentPage.getRadio('option', 3).click()
     nextAppointmentPage.getSubmitBtn().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with George Parker')
+    manageAppointmentPage.setPageTitle('Manage planned office visit (NS) with George Parker')
     manageAppointmentPage.checkOnPage()
   })
 
@@ -82,7 +82,7 @@ describe('Create next appointment', () => {
   })
 
   describe('Same appointment type', () => {
-    it('should handle an appointment with no eventId', () => {
+    it('should handle a sentence appointment with no eventId', () => {
       cy.task('stubAppointmentNoEventId')
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
       nextAppointmentPage = new NextAppointmentPage()
@@ -144,6 +144,7 @@ describe('Create next appointment', () => {
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+      arrangeAnotherAppointmentPage.getSummaryListRow(3).find('.govuk-summary-list__actions').should('not.exist')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
@@ -199,6 +200,7 @@ describe('Create next appointment', () => {
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
+
       arrangeAnotherAppointmentPage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
@@ -221,6 +223,53 @@ describe('Create next appointment', () => {
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+    })
+    it('should handle person level appointment', () => {
+      cy.task('stubAppointmentPersonLevel')
+      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
+      nextAppointmentPage = new NextAppointmentPage()
+      nextAppointmentPage.getRadio('option', 1).click()
+      nextAppointmentPage.getSubmitBtn().click()
+      const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
+      arrangeAnotherAppointmentPage.checkOnPage()
+      cy.pause()
+
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(1)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'Caroline')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(1)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(2)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'Planned doorstep contact (NS)')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(2)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team North, London)')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(4)
+        .find('.govuk-summary-list__value')
+        .should('contain.html', 'The Building<br>77 Some Street<br>Some City Centre<br>London<br>Essex<br>NW10 1EP')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(4)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
     })
   })
   describe('Another appointment type', () => {

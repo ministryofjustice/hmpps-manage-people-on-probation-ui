@@ -19,6 +19,12 @@ const mockTypes: AppointmentType[] = [
     isPersonLevelContact: false,
     isLocationRequired: false,
   },
+  {
+    code: 'CODC',
+    description: 'Planned Doorstep Contact (NS)',
+    isPersonLevelContact: true,
+    isLocationRequired: true,
+  },
 ]
 
 const crn = 'X000001'
@@ -366,5 +372,21 @@ describe('/middleware/constructAppointmentSession', () => {
     })
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ nsiId: '100' }))
+  })
+  it('should create the correct session from a person level appointment', () => {
+    const mockAppt = mockPersonAppointmentResponse({
+      eventId: undefined,
+      eventNumber: undefined,
+      type: 'Planned Doorstep Contact (NS)',
+    })
+    const req = mockReq()
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toStrictEqual(
+      expectedSession({ eventId: 'PERSON_LEVEL_CONTACT', type: 'CODC' }),
+    )
   })
 })

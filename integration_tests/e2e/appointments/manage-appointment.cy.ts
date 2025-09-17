@@ -17,12 +17,13 @@ describe('Manage an appointment', () => {
   })
   it('should render the page', () => {
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
-    manageAppointmentPage.setPageTitle('Manage Planned Office Visit (NS) with Terry Jones')
+    manageAppointmentPage.setPageTitle('Manage planned office visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
   })
   describe('Alert banner', () => {
     describe('Appointment is in the future', () => {
       beforeEach(() => {
+        cy.task('stubFutureAppointmentManagedTypeWithNotes')
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -60,6 +61,17 @@ describe('Manage an appointment', () => {
         })
         it('should display the alert banner with the correct message', () => {
           manageAppointmentPage.getAlertBanner().should('contain.text', 'You should add notes to this appointment.')
+        })
+      })
+      describe('No outcome logged, has notes', () => {
+        beforeEach(() => {
+          cy.task('stubPastAppointmentNoOutcomeHasNotes')
+          loadPage()
+
+          manageAppointmentPage = new ManageAppointmentPage()
+        })
+        it('should display the alert banner with the correct message', () => {
+          manageAppointmentPage.getAlertBanner().should('contain.text', 'You must log an outcome for this appointment.')
         })
       })
     })
@@ -639,7 +651,11 @@ describe('Manage an appointment', () => {
         .getAssociatedDocumentsTableRowCell(1, 1)
         .find('a')
         .should('contain.text', 'Document-1.pdf')
-        .should('have.attr', 'href', 'personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download')
+        .should(
+          'have.attr',
+          'href',
+          `/case/${crn}/personal-details/documents/83fdbf8a-a2f2-43b4-93ef-67e71c04fc58/download`,
+        )
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 2).should('contain.text', 'Contact')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 3).should('contain.text', '3 Way Meeting (NS)')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 4).should('contain.text', '6 April 2023')
