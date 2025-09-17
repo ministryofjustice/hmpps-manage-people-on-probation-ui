@@ -4,9 +4,9 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
-import { getDataValue, setDataValue } from '../utils'
+import { getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
-import { Location, Team } from '../data/model/caseload'
+import { Location, Provider, Team, User } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -76,14 +76,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           sentenceNsi = sentenceObj?.nsis.find(n => n.id === parseInt(nsiId, 10))
         }
       }
-
-      const { providers, teams, users } = (await masClient.getUserProviders(
-        res.locals.user.username,
-        providerCode,
-        teamCode,
-      ))
-        ? await masClient.getUserProviders(res.locals.user.username, providerCode, teamCode)
-        : {}
+      const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
+      const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
+      const users: User[] = getDataValue(data, ['staff', loggedInUsername])
 
       const selectedRegion = providerCode && providers ? providers.find(r => r.code === providerCode)?.name : null
       const selectedTeam = teamCode && teams ? teams.find(t => t.code === teamCode)?.description : null
