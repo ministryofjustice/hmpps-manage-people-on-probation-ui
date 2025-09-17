@@ -460,10 +460,6 @@ const stubAppointmentNoType = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ noType: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
-const stubAppointmentNoTypePersonLevel = (): SuperAgentRequest => {
-  const stub = getAppointmentStub({ noType: true, personLevel: true })
-  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
-}
 const stubAppointmentNoAttendee = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ noAttendee: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -566,7 +562,6 @@ export default {
   stubAppointmentNoEventId,
   stubAppointmentPersonLevel,
   stubAppointmentNoType,
-  stubAppointmentNoTypePersonLevel,
   stubAppointmentNoAttendee,
   stubAppointmentNoLocation,
   stubNotComNoNextAppointment,
