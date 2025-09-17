@@ -101,7 +101,6 @@
   {% endif %}
 {% endblock %}
 {% block content %}
-  {{appointment.isInPast}}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
