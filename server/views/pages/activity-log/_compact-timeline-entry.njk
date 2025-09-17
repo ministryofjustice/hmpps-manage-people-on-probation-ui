@@ -7,13 +7,13 @@
   <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}">
     {% if entry.isAppointment === true %}
       {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      {{ entry.type }} at&nbsp;{{ entry.startDateTime | govukTime }}
+      {{ entry.type | toSentenceCase(['(NS)','-']) }} at&nbsp;{{ entry.startDateTime | govukTime }}
     {% elseif entry.isCommunication %}
       {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
       {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
     {% else %}
       {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      {{ entry.type }}
+      {{ entry.type | toSentenceCase(['(NS)','-']) }}
     {% endif %}
     <span class="govuk-visually-hidden"> on {{ thisDate }}
     </a>
