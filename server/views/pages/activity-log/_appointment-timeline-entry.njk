@@ -4,7 +4,7 @@
 
 {% set titleHtml %}
 <span class="govuk-heading-s govuk-!-margin-bottom-0">
-  <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}">{{ entry.type }} at {{ entry.startDateTime | govukTime }}
+  <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}">{{ entry.type | toSentenceCase(['(NS)','-']) }} at {{ entry.startDateTime | govukTime }}
     <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 </span>
 {% endset %}

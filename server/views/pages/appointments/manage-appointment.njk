@@ -26,7 +26,7 @@
   {% for document in appointment.documents %}
     {% set documents = (documents.push([
       {
-        html: '<a href="personal-details/documents/' + document.id + '/download" download="' + document.name +'">' + document.name + '</a>'
+        html: '<a href="/case/' + crn + '/personal-details/documents/' + document.id + '/download" download="' + document.name +'">' + document.name + '</a>'
       },
       {
         text: document.level if document.level else "Contact"
@@ -77,9 +77,13 @@
 {% if appointment.isInPast and appointment.hasOutcome and not hasNotes %}
   {% set alert = "You should add notes to this appointment." %}
 {% endif %}
-{% if appointment.hasOutcome and not hasNotes %}
+{% if appointment.isInPast and appointment.hasOutcome and not hasNotes %}
   {% set alert = "You should add notes to this appointment." %}
 {% endif %}
+{% if appointment.isInPast and not appointment.hasOutcome and hasNotes %}
+  {% set alert = "You must log an outcome for this appointment." %}
+{% endif %}
+
 {% if not appointment.isInPast and not appointment.hasOutcome and hasNotes %}
   {% set notesStatus = 'In progress' %}
   {% set notesTagColour = 'yellow' %}
@@ -99,14 +103,13 @@
   {% endif %}
 {% endblock %}
 {% block content %}
-
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
   {% endif %}
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds">
-      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type }} with {{ appointment.officer.name | fullName }}</h2>
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">Manage {{ appointment.type | toSentenceCase(['(NS)','-'], [], false) }} with {{ appointment.officer.name | fullName }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
   variant: "information",

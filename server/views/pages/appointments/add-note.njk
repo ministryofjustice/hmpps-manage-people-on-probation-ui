@@ -13,8 +13,6 @@
         {% endif %}
     {% endfor %}
 {% endif %}
-{% set backLink = change if change else 
-    '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage' %}
 {% block form %}
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
     {{ govukDetails({

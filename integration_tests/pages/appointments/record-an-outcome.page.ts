@@ -2,6 +2,6 @@ import Page from '../page'
 
 export default class RecordAnOutcomePage extends Page {
   constructor() {
-    super(`Confirm Eula attended and complied`)
+    super(`Confirm if Eula attended and complied`)
   }
 }

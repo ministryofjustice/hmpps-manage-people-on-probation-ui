@@ -92,7 +92,7 @@ context('Appointment', () => {
 
     page.upcomingAppointmentDate(2).should('contain.text', '22 March 2045')
     page.upcomingAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
-    page.upcomingAppointmentType(2).should('contain.text', 'Planned Video Contact (NS)')
+    page.upcomingAppointmentType(2).should('contain.text', 'Planned video contact (NS)')
 
     page.getElement('[data-qa="pastAppointments"]').find('h2').should('contain.text', 'Past appointments')
     page.pastAppointmentDate(1).should('contain.text', '22 March 2024')

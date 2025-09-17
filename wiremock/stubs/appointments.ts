@@ -4,6 +4,7 @@ import { WiremockMapping } from '../../integration_tests/utils'
 interface Args {
   isFuture?: boolean
   managedType?: boolean
+  personLevel?: boolean
   documents?: boolean
   notes?: boolean
   complied?: boolean
@@ -20,6 +21,7 @@ const getAppointmentStub = (
   {
     isFuture = true,
     managedType = true,
+    personLevel = false,
     documents = false,
     notes = false,
     complied,
@@ -67,13 +69,13 @@ const getAppointmentStub = (
               surname: 'Jones',
             },
             teamCode: '1234',
-            providerCode: '5678',
-            username: 'TerryJones',
+            providerCode: 'N07',
+            username: 'terry-jones',
           },
           isInitial: true,
           isNationalStandard: true,
           location: {
-            code: '',
+            code: 'N56NTME',
             officeName: '',
             buildingName: 'The Building',
             buildingNumber: '77',
@@ -139,6 +141,9 @@ const getAppointmentStub = (
   }
   if (managedType) {
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
+  }
+  if (personLevel) {
+    mapping.response.jsonBody.appointment.type = 'Planned Doorstep Contact (NS)'
   }
   mapping.response.jsonBody.appointment.deliusManaged = !managedType
   if (isFuture) {
@@ -365,6 +370,10 @@ const stubPastAppointmentOutcomeNoNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, complied: true, notes: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubPastAppointmentNoOutcomeHasNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ isFuture: false, complied: false, notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubPastAppointmentWithNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, notes: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -445,6 +454,10 @@ const stubAppointmentAcceptableAbsenceNoNotes = (): SuperAgentRequest => {
 }
 const stubAppointmentNoEventId = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ noEventId: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubAppointmentPersonLevel = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noEventId: true, personLevel: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubAppointmentNoType = (): SuperAgentRequest => {
@@ -539,6 +552,7 @@ export default {
   stubPastAppointmentNoOutcomeNoNotes,
   stubPastAppointmentOutcomeNoNotes,
   stubPastAppointmentWithNotes,
+  stubPastAppointmentNoOutcomeHasNotes,
   stubAppointmentNDeliusManagedType,
   stubAppointmentNDeliusManagedTypeComplied,
   stubAppointmentNDeliusManagedTypeWithNotesNoOutcome,
@@ -551,6 +565,7 @@ export default {
   stubAppointmentAcceptableAbsenceWithNotes,
   stubAppointmentAcceptableAbsenceNoNotes,
   stubAppointmentNoEventId,
+  stubAppointmentPersonLevel,
   stubAppointmentNoType,
   stubAppointmentNoAttendee,
   stubAppointmentNoLocation,

@@ -3,7 +3,7 @@
 
 {% set titleHtml %}
 <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="govuk-!-font-weight-bold">
-  {{ entry.type }}
+  {{ entry.type | toSentenceCase(['(NS)','-']) }}
   <span class="govuk-visually-hidden"> on {{ thisDate }}</span>
 </a>
 {% endset %}
