@@ -27,7 +27,8 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   router.get(
     '/case/:crn/appointments/appointment/:contactId',
     getPersonalDetails(hmppsAuthClient),
-    controllers.appointments.getAppointmentDetails(hmppsAuthClient),
+    getNextComAppointment(hmppsAuthClient),
+    controllers.appointments.getManageAppointment(hmppsAuthClient),
   )
 
   router.all(
@@ -63,10 +64,10 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     getUserProviders(hmppsAuthClient),
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )
-  router.get(
-    '/case/:crn/appointments/appointment/:contactId/manage',
-    getPersonalDetails(hmppsAuthClient),
-    getNextComAppointment(hmppsAuthClient),
-    controllers.appointments.getManageAppointment(hmppsAuthClient),
-  )
+  // router.get(
+  //   '/case/:crn/appointments/appointment/:contactId/manage',
+  //   getPersonalDetails(hmppsAuthClient),
+  //   getNextComAppointment(hmppsAuthClient),
+  //   controllers.appointments.getManageAppointment(hmppsAuthClient),
+  // )
 }

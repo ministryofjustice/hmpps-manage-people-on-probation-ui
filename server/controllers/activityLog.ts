@@ -2,12 +2,12 @@ import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget } from '../utils'
+import { isMatchingAddress, toPredictors, toRoshWidget } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
 
-const routes = ['getOrPostActivityLog', 'getActivityDetails', 'getActivityNote'] as const
+const routes = ['getOrPostActivityLog', 'getManageActivity', 'getActivityNote'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -78,19 +78,25 @@ const activityLogController: Controller<typeof routes, void> = {
       })
     }
   },
-  getActivityDetails: hmppsAuthClient => {
+  getManageActivity: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
-      const [personAppointment, tierCalculation, risks, predictors] = await Promise.all([
+      const { username } = res.locals.user
+      const [personAppointment, nextAppointment, tierCalculation, risks, predictors] = await Promise.all([
         masClient.getPersonAppointment(crn, id),
+        masClient.getNextAppointment(username, crn, id),
         tierClient.getCalculationDetails(crn),
         arnsClient.getRisks(crn),
         arnsClient.getPredictorsAll(crn),
       ])
+      const nextAppointmentIsAtHome = isMatchingAddress(
+        res.locals.case.mainAddress,
+        nextAppointment?.appointment?.location,
+      )
       const isActivityLog = true
       const queryParams = getQueryString(req.query as Record<string, string>)
       const { category } = req.query
@@ -104,12 +110,14 @@ const activityLogController: Controller<typeof routes, void> = {
       })
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-      res.render('pages/appointments/appointment', {
-        category,
-        queryParams,
+      res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
+        nextAppointment,
+        nextAppointmentIsAtHome,
         isActivityLog,
+        category,
+        queryParams,
         tierCalculation,
         risksWidget,
         predictorScores,

@@ -1,7 +1,7 @@
 import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import { type Services } from '../services'
-import { filterActivityLog } from '../middleware'
+import { filterActivityLog, getNextComAppointment, getPersonalDetails } from '../middleware'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import validate from '../middleware/validation/index'
@@ -15,6 +15,11 @@ export default function activityLogRoutes(router: Router, { hmppsAuthClient }: S
     filterActivityLog,
     controllers.activityLog.getOrPostActivityLog(hmppsAuthClient),
   )
-  get('/case/:crn/activity-log/activity/:id', controllers.activityLog.getActivityDetails(hmppsAuthClient))
+  router.get(
+    '/case/:crn/activity-log/activity/:id',
+    getPersonalDetails(hmppsAuthClient),
+    getNextComAppointment(hmppsAuthClient),
+    controllers.activityLog.getManageActivity(hmppsAuthClient),
+  )
   get('/case/:crn/activity-log/activity/:id/note/:noteId', controllers.activityLog.getActivityNote(hmppsAuthClient))
 }

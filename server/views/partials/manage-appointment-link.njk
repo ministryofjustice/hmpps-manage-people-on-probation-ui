@@ -2,13 +2,13 @@
     {% if flags.enableManageAppointments %}
         {% if not appointment.deliusManaged %}
             <a class="govuk-link govuk-link--no-visited-state"
-               href="/case/{{crn}}/appointments/appointment/{{ appointment.id }}/manage"
+               href="/case/{{crn}}/appointments/appointment/{{ appointment.id }}"
                aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">
                 Manage
             </a>
         {% else %}
             <a class="govuk-link govuk-link--no-visited-state"
-               href="/case/{{crn}}/appointments/appointment/{{ appointment.id }}/manage"
+               href="/case/{{crn}}/appointments/appointment/{{ appointment.id }}"
                aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">
                 Manage on NDelius
             </a>

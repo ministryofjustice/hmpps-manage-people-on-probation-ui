@@ -5,12 +5,12 @@
 {% set notes = '' %}
 {% set alert = '' %}
 {% set documents = [] %}
+{% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
+  '' %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
-{% set backLink = change if change else 
-  '/case/' + crn + '/appointments' %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = nextAppointment.appointment.type + " arranged with " + personSummary.name.forename + " at " + (
@@ -94,11 +94,26 @@
   {% endfor %}
 {% endif %}
 {% block beforeContent %}
-  {% if backLink %}
-    {{ govukBackLink({
-    href: backLink + ("?change=" + change if change else '')
-  }) }}
-  {% endif %}
+  {{ govukBreadcrumbs({
+  items: [
+    {
+      text: "Cases",
+      href: "/case"
+    },
+    {
+      text: personAppointment.personSummary.name | fullName,
+      href: "/case/" + crn,
+      attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+    },
+    {
+      text: "Appointments" if not isActivityLog else "Activity log",
+      href: "/case/" + crn + "/appointments" if not isActivityLog else "/case/" + crn + "/activity-log" + extraBreadcrumb
+    },
+    {
+      text: appointment.type
+    }
+  ]
+}) }}
 {% endblock %}
 {% block content %}
   {% if not hidePageHeader %}
