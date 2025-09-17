@@ -35,8 +35,8 @@ describe('Arrange an appointment in another location', () => {
     locationNotInListPage
       .getElement('p:nth-of-type(2)')
       .should(
-        'contain.text',
-        'You’ll need to open Alton’s case on NDelius to arrange an appointment in another location.',
+        'contain.html',
+        'If you think you’re missing a location, complete the <a href="https://mojprod.service-now.com/moj_sp?id=sc_cat_item&amp;table=sc_cat_item&amp;sys_id=6eb2ff221[…]ew.do%3Fv%3D1&amp;sysparm_id=6eb2ff221b2dad10a1e2ddf0b24bcb67" target="_blank" rel="noopener noreferrer">NDelius reference data - team/location form on the MoJ Technology Portal</a>.',
       )
     locationNotInListPage
       .getElement('p:nth-of-type(3)')
