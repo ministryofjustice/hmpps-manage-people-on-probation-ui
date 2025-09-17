@@ -23,6 +23,7 @@ describe('Manage an appointment', () => {
   describe('Alert banner', () => {
     describe('Appointment is in the future', () => {
       beforeEach(() => {
+        cy.task('stubFutureAppointmentManagedTypeWithNotes')
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -60,6 +61,17 @@ describe('Manage an appointment', () => {
         })
         it('should display the alert banner with the correct message', () => {
           manageAppointmentPage.getAlertBanner().should('contain.text', 'You should add notes to this appointment.')
+        })
+      })
+      describe('No outcome logged, has notes', () => {
+        beforeEach(() => {
+          cy.task('stubPastAppointmentNoOutcomeHasNotes')
+          loadPage()
+
+          manageAppointmentPage = new ManageAppointmentPage()
+        })
+        it('should display the alert banner with the correct message', () => {
+          manageAppointmentPage.getAlertBanner().should('contain.text', 'You must log an outcome for this appointment.')
         })
       })
     })

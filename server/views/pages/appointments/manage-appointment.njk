@@ -75,9 +75,13 @@
 {% if appointment.isInPast and appointment.hasOutcome and not hasNotes %}
   {% set alert = "You should add notes to this appointment." %}
 {% endif %}
-{% if appointment.hasOutcome and not hasNotes %}
+{% if appointment.isInPast and appointment.hasOutcome and not hasNotes %}
   {% set alert = "You should add notes to this appointment." %}
 {% endif %}
+{% if appointment.isInPast and not appointment.hasOutcome and hasNotes %}
+  {% set alert = "You must log an outcome for this appointment." %}
+{% endif %}
+
 {% if not appointment.isInPast and not appointment.hasOutcome and hasNotes %}
   {% set notesStatus = 'In progress' %}
   {% set notesTagColour = 'yellow' %}
@@ -97,7 +101,7 @@
   {% endif %}
 {% endblock %}
 {% block content %}
-
+  {{appointment.isInPast}}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
