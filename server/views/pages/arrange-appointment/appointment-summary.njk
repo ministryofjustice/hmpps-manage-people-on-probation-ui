@@ -28,7 +28,10 @@
 {% endset %}
 {% set locationHtml = '' %}
 {% if appointment.location.address %}
-    {% set locationHtml = [appointment.location.description + "<br>", addressToList(appointment.location.address).join('<br>')] | join | safe %}
+    {% set locationHtml = [
+        appointment.location.description + "<br>",
+        addressToList(appointment.location.address).join('<br>')
+    ] | join | safe %}
 {% endif %}
 {% if appointment.location == 'NO_LOCATION_REQUIRED' %}
     {% set locationHtml = 'Not required' %}
@@ -101,7 +104,7 @@
     visuallyHiddenText: "attendance"
      } 
      ] 
-     } if showAction},
+     } if showAction and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) and appointment.type },
      { key: { text: "VISOR report"},
       value: { text: appointment.visorReport },
       actions: {
