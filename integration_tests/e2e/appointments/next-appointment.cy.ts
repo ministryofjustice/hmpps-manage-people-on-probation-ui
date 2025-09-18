@@ -245,7 +245,6 @@ describe('Create next appointment', () => {
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
-      cy.pause()
 
       arrangeAnotherAppointmentPage
         .getSummaryListRow(1)
