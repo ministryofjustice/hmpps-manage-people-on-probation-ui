@@ -27,7 +27,7 @@
   } if errorMessages.nextAppointment,
     items: [
     {
-        text: "Yes - another " + personAppointment.appointment.type | toSentenceCase(['(NS)', '(Non', 'NS)', '-'], [], false),
+        text: ("Yes - another " + personAppointment.appointment.type) | toSentenceCase,
         value: "KEEP_TYPE",
         checked: body.nextAppointment == "KEEP_TYPE"
     },

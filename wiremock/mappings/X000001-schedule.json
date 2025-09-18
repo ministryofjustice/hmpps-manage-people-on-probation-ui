@@ -857,6 +857,7 @@
           "appointment": {
             "id": 7,
             "eventNumber": "123456",
+            "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z",
             "endDateTime": "2024-02-21T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
@@ -974,6 +975,7 @@
           "appointment": {
             "id": 8,
             "eventNumber": "123456",
+            "type": "Planned Office Visit (NS)",
             "startDateTime": "2024-02-21T10:15:00.382936Z",
             "endDateTime": "2024-02-21T10:30:00.382936Z",
             "rarToolKit": "Choices and Changes",
