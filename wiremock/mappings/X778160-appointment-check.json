@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/mas/appointment/X778160/check",
+        "urlPattern": "/mas/appointment/.*/check",
         "method": "POST"
       },
       "response": {

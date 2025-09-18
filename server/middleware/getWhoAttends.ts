@@ -11,17 +11,16 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     const { providerCode, teamCode, back } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
-    const region = providerCode || req?.session?.data?.appointments?.[crn]?.[id]?.user?.providerCode
+    const { data } = req.session
 
     let selectedRegion: string
     let selectedTeam: string
 
-    if (back) {
-      const { data } = req.session
+    if (!providerCode || back) {
       selectedRegion = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
       selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
     } else {
-      selectedRegion = region
+      selectedRegion = providerCode
       selectedTeam = teamCode
     }
 
@@ -43,9 +42,19 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     // On page load need to default the drop-down to
     // user default values
     if (req.method === 'GET') {
-      if (providerCode || back) {
-        displayedProviders = providers
-        displayedTeams = teams
+      if (selectedRegion || back) {
+        displayedProviders = providers.map(p => {
+          if (p.code === selectedRegion) {
+            return { code: p.code, name: p.name, selected: 'selected' }
+          }
+          return { code: p.code, name: p.name }
+        })
+        displayedTeams = teams.map(t => {
+          if (t.code === selectedTeam) {
+            return { description: t.description, code: t.code, selected: 'selected' }
+          }
+          return { description: t.description, code: t.code }
+        })
         displayedUsers = users
       } else {
         displayedProviders = providers.map(p => {
@@ -94,6 +103,8 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     res.locals.userProviders = displayedProviders
     res.locals.userTeams = displayedTeams
     res.locals.userStaff = displayedUsers
+    res.locals.providerCode = providerCode ?? ''
+    res.locals.teamCode = teamCode ?? ''
     return next()
   }
 }

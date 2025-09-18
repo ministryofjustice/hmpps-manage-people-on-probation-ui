@@ -8,42 +8,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   const { appointment } = res.locals.personAppointment
   const { crn } = req.params
   const { nextAppointment: nextAppointmentSelection } = req.body
-  const { appointmentTypes } = res.locals
-  let eventId = appointment?.eventId || ''
-
-  if (!eventId && appointment?.eventNumber) {
-    const sentences = req?.session?.data?.sentences?.[crn]
-    if (sentences) {
-      eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
-    }
-  }
-
-  let notes = ''
-  if (appointment?.appointmentNotes) {
-    notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
-  } else if (appointment?.appointmentNote?.note) {
-    notes = appointment.appointmentNote.note
-  }
-  const typeObj = appointmentTypes.find(t => t?.description === appointment?.type)
-  if (!eventId && typeObj?.isPersonLevelContact === true) {
-    eventId = 'PERSON_LEVEL_CONTACT'
-  }
-  let locationCode = appointment?.location?.code || ''
-  if (!typeObj?.isLocationRequired === true && !locationCode) {
-    locationCode = 'NO_LOCATION_REQUIRED'
-  }
-
-  let type = typeObj?.code || ''
-  if (!type) {
-    locationCode = ''
-  }
-  let username = appointment?.officer?.username || ''
-  let teamCode = appointment?.officer?.teamCode || ''
-  let providerCode = appointment?.officer?.providerCode || ''
-  const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
-  const date = appointment?.startDateTime || ''
-  const end = appointment?.endDateTime || ''
-  const sensitivity = appointment?.isSensitive !== undefined ? booleanToYesNo(appointment.isSensitive) : ''
 
   let nextAppointment: AppointmentSession = {
     interval: 'DAY',
@@ -57,6 +21,44 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   }
 
   if (nextAppointmentSelection === 'KEEP_TYPE') {
+    const { appointmentTypes } = res.locals
+    let eventId = appointment?.eventId || ''
+    const sentences = req?.session?.data?.sentences?.[crn]
+
+    if (!eventId && appointment?.eventNumber) {
+      if (sentences) {
+        eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
+      }
+    }
+    let notes = ''
+    if (appointment?.appointmentNotes) {
+      notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
+    } else if (appointment?.appointmentNote?.note) {
+      notes = appointment.appointmentNote.note
+    }
+    if (eventId && !sentences.some(sentence => sentence.id === eventId)) {
+      eventId = ''
+    }
+
+    const matchingType = appointmentTypes.find(t => t?.description === appointment?.type)
+    let type = matchingType?.code || ''
+
+    if (!eventId && matchingType?.isPersonLevelContact === true) {
+      eventId = 'PERSON_LEVEL_CONTACT'
+    }
+    let locationCode = appointment?.location?.code || ''
+    if (!matchingType?.isLocationRequired === true && !locationCode) {
+      locationCode = 'NO_LOCATION_REQUIRED'
+    }
+
+    let username = appointment?.officer?.username || ''
+    let teamCode = appointment?.officer?.teamCode || ''
+    let providerCode = appointment?.officer?.providerCode || ''
+    const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
+    const date = appointment?.startDateTime || ''
+    const end = appointment?.endDateTime || ''
+    const sensitivity = appointment?.isSensitive !== undefined ? booleanToYesNo(appointment.isSensitive) : ''
+
     if (!eventId) {
       type = ''
     }

@@ -15,7 +15,7 @@
   '/case/' + crn + '/appointments' %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
-  {% set nextAppointmentHint = nextAppointment.appointment.type + " arranged with " + personSummary.name.forename + " at " + (
+  {% set nextAppointmentHint = nextAppointment.appointment.type | toSentenceCase(['(NS)','-']) + " arranged with " + personSummary.name.forename + " at " + (
   'their home' if nextAppointmentIsAtHome else 
     addressToList(nextAppointment.appointment.location)[0]) + " on " + nextAppointment.appointment.startDateTime | dateWithYear + "." %}
 {% endif %}

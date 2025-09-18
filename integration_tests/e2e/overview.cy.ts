@@ -28,7 +28,7 @@ context('Overview', () => {
 
     page
       .getRowData('schedule', 'nextAppointment', 'Value')
-      .should('contain.text', 'Saturday 9 March at 2:59pm (Initial Appointment - In office (NS))')
+      .should('contain.text', 'Saturday 9 March at 2:59pm (Initial appointment - in office (NS))')
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
     page.getRowData('personalDetails', 'preferredName', 'Value').should('contain.text', 'Caz')
     page.getRowData('personalDetails', 'preferredGender', 'Value').should('contain.text', 'Female')

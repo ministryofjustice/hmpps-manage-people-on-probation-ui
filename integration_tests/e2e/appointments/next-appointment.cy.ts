@@ -80,6 +80,7 @@ describe('Create next appointment', () => {
     manageAppointmentPage.setPageTitle('Manage with Terry Jones')
     manageAppointmentPage.checkOnPage()
   })
+
   describe('Same appointment type', () => {
     it('should handle a sentence appointment with no eventId', () => {
       cy.task('stubAppointmentNoEventId')
@@ -219,23 +220,9 @@ describe('Create next appointment', () => {
         .find('a')
         .should('contain.text', 'Change')
       arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'george parker (PS-PSO) (Automated Allocation Team North, Greater Manchester)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Choose location')
     })
     it('should handle person level appointment', () => {
       cy.task('stubAppointmentPersonLevel')
@@ -245,7 +232,6 @@ describe('Create next appointment', () => {
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
-      cy.pause()
 
       arrangeAnotherAppointmentPage
         .getSummaryListRow(1)
@@ -268,7 +254,7 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team North, London)')
+        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__actions')

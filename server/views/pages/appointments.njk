@@ -80,7 +80,7 @@
     {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" %}
     {% set appointmentDetails %}
     <a class='govuk-link' href={{ manageUrl }}>
-      {{ appointment.type }}
+      {{ appointment.type | toSentenceCase(['(NS)','-']) }}
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
     </a>
     {% endset %}
