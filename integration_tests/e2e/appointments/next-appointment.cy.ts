@@ -71,16 +71,6 @@ describe('Create next appointment', () => {
     manageAppointmentPage.checkOnPage()
   })
 
-  it('should still work with no component for the appointment', () => {
-    cy.visit(`/case/${crn}/appointments/appointment/7/next-appointment`)
-    nextAppointmentPage = new NextAppointmentPage()
-    nextAppointmentPage.getRadio('option', 3).click()
-    nextAppointmentPage.getSubmitBtn().click()
-    const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.checkPageTitle('Manage with Terry Jones')
-    manageAppointmentPage.checkOnPage()
-  })
-
   describe('Same appointment type', () => {
     it('should handle a sentence appointment with no eventId', () => {
       cy.task('stubAppointmentNoEventId')

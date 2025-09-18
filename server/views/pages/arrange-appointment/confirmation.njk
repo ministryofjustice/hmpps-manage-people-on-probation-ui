@@ -32,7 +32,7 @@
 
 {% set panelHtml %}
 <div class="govuk-!-font-size-27">
-  <strong>{{ appointment.type.description | toSentenceCase(['(NS)', '(Non', 'NS)', '-']) }}</strong><br/>
+  <strong>{{ appointment.type.description | toSentenceCase }}</strong><br/>
   {{ appointmentDatesHtml | safe }}
 </div>
 {% endset %}

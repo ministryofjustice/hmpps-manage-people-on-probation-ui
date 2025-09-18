@@ -149,6 +149,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         masClient.getPersonAppointment(crn, contactId),
         masClient.getNextAppointment(username, crn, contactId),
       ])
+      console.dir(personAppointment, { depth: null })
       const nextAppointmentIsAtHome = isMatchingAddress(
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,

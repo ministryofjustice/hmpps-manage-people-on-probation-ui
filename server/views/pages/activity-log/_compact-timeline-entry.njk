@@ -8,7 +8,7 @@
             {% if entry.isAppointment === true %}
                   {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
                   {{ entry.type | toSentenceCase }} at&nbsp;{{ entry.startDateTime | govukTime }}
-            {% elseif entry.isCommunication %}
+            {% elif entry.isCommunication %}
                   {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
                   {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
             {% else %}
