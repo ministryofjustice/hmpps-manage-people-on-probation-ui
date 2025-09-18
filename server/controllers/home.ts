@@ -15,11 +15,13 @@ const homeController: Controller<typeof routes, void> = {
       const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
         req.host.includes(host),
       )
+      const { url } = req
       return res.render('pages/homepage/homepage', {
         totalAppointments,
         totalOutcomes,
         appointments,
         outcomes,
+        url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
         interventions_link: config.interventions.link,

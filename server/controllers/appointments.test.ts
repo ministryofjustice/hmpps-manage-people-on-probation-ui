@@ -238,14 +238,16 @@ describe('controllers/appointments', () => {
     it('should request the next appointment', () => {
       expect(getNextAppointmentSpy).toHaveBeenCalledWith('user-1', crn, id)
     })
-    // it('should render the manage appointment page', () => {
-    //   expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
-    //     personAppointment: mockPersonAppointment,
-    //     crn,
-    //     nextAppointment: nextApptResponse(),
-    //     nextAppointmentIsAtHome: true,
-    //   })
-    // })
+    it('should render the manage appointment page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+        back: undefined,
+        nextAppointment: nextApptResponse(),
+        nextAppointmentIsAtHome: true,
+        queryParams: ['view=default'],
+      })
+    })
   })
 
   describe('get record an outcome', () => {
