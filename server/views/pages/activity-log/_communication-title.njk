@@ -1,5 +1,5 @@
 {% if entry.action %}
-  {{ entry.action }}
+   {{ entry.action }}
 {% elseif entry.isEmailOrTextToPop === true %}
     Email/Text to {{ personSummary.name | fullName }}
 {% elseif entry.isEmailOrTextFromPop === true %}
@@ -9,5 +9,5 @@
 {% elseif entry.isPhoneCallFromPop === true %}
    Phone call from {{ personSummary.name | fullName }}
 {% else %}
-    {{ entry.type | toSentenceCase(['(NS)','-']) }}
+   {{ entry.type | toSentenceCase(['(NS)','(Non NS)','-']) }}
 {% endif %}

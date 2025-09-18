@@ -6,7 +6,7 @@
 {% set types = [] %}
 {% for appointmentType in appointmentTypes %}
   {% set types = (types.push({
-    text: appointmentType.description | toSentenceCase(['(NS)']),
+    text: appointmentType.description | toSentenceCase(['(NS)','(Non NS)','-']),
     value: appointmentType.code
   }), types) %}
 {% endfor %}
