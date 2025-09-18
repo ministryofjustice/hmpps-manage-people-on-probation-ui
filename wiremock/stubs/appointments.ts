@@ -68,7 +68,7 @@ const getAppointmentStub = (
               forename: 'Terry',
               surname: 'Jones',
             },
-            teamCode: '1234',
+            teamCode: 'N07AAT',
             providerCode: 'N07',
             username: 'terry-jones',
           },

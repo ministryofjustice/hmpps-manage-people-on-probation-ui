@@ -2,6 +2,10 @@
 
 {% set title = 'Who will attend the appointment?' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type' %}
+{% set decoratorTarget = 'temp' %}
+{% if not providerCode and not teamCode %}
+    {% set decoratorTarget = 'user' %}
+{% endif %}
 
 {% block form %}
     <input type="hidden" id="uri_ref" value="/case/{{ crn }}/arrange-appointment/{{ id }}/attendance">
@@ -28,7 +32,7 @@
         attributes: {
             'data-qa': 'providerCode'
         }
-    } | decorateFormAttributes(['appointments', crn, id, 'user', 'providerCode'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'providerCode'])) }}
 
     {{ govukSelect({
         label: { text: "Select team" },
@@ -36,7 +40,7 @@
          attributes: {
             'data-qa': 'teamCode'
         }
-    } | decorateFormAttributes(['appointments', crn, id, 'user', 'teamCode'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'teamCode'])) }}
 
     {{ govukSelect({
         label: { text: "Select name" },
@@ -44,6 +48,6 @@
          attributes: {
             'data-qa': 'username'
         }
-    } | decorateFormAttributes(['appointments', crn, id, 'user', 'username'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, decoratorTarget, 'username'])) }}
 
 {% endblock %}

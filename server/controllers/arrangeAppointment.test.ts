@@ -78,7 +78,7 @@ const createMockRequest = ({
   request?: Record<string, string>
   dataSession?: Data
   appointmentSession?: AppointmentSession
-  appointmentBody?: Record<string, string>
+  appointmentBody?: Record<string, string> | Record<string, Record<string, string>>
   query?: Record<string, string>
 } = {}): httpMocks.MockRequest<any> => ({
   ...req,
@@ -443,8 +443,8 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
   describe('postWhoWillAttend', () => {
-    const teamCode = '123'
-    const providerCode = '456'
+    const providerCode = '123'
+    const teamCode = '456'
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
@@ -454,35 +454,45 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-    it('should redirect to the attendance page if page and providerCode query parameters are in url', async () => {
+    it('should set the appointments.user session with appointments.temp, then delete appointments.temp', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({ query: { page: 'true', providerCode } })
+      const mockReq = createMockRequest({
+        appointmentBody: { temp: { providerCode, teamCode, username } },
+      })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${providerCode}`,
-      )
-    })
-    it('should redirect to the attendance page if page, providerCode and teamCode query parameters are in url', async () => {
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({ query: { page: 'true', providerCode, teamCode } })
-      await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${crn}/arrange-appointment/${uuid}/attendance?providerCode=${providerCode}&teamCode=${teamCode}`,
-      )
+      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user'], {
+        teamCode,
+        providerCode,
+        username,
+      })
+      expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
     })
     it('should redirect to the change url if the change query parameter exists in the url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({ query: { change } })
+      const appointmentSession: AppointmentSession = {
+        temp: {
+          username: '',
+          teamCode: '',
+          providerCode: '',
+        },
+      }
+      const mockReq = createMockRequest({ query: { change }, appointmentSession })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
     it('should redirect to the location page if page query parameter does not exist in url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest()
+      const appointmentSession: AppointmentSession = {
+        temp: {
+          username: '',
+          teamCode: '',
+          providerCode: '',
+        },
+      }
+      const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location`)
     })
