@@ -184,6 +184,7 @@ describe('controllers/appointments', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
         upcomingAppointments: mockPersonSchedule,
         crn,
+        url: '',
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
