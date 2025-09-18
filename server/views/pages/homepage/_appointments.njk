@@ -30,7 +30,7 @@
               html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.caseName.surname + ', ' + appointment.caseName.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
           },
           {
-              html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '">' + appointment.type + '</a>'
+              html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>'
           },
           {
               text: appointment.location if appointment.location else 'Not Provided'

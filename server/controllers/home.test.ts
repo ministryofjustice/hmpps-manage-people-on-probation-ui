@@ -23,6 +23,7 @@ jest.mock('../data/hmppsAuthClient', () => {
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
+const url = 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk'
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -34,6 +35,7 @@ describe('homeController', () => {
       params: {
         crn,
       },
+      url,
       host: 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
     })
     const originalEnv = process.env.NODE_ENV
@@ -63,6 +65,7 @@ describe('homeController', () => {
           totalOutcomes,
           appointments,
           outcomes,
+          url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
           interventions_link: config.interventions.link,
@@ -83,6 +86,7 @@ describe('homeController', () => {
         params: {
           crn,
         },
+        url,
         host: 'manage-people-on-probation.hmpps.service.justice.gov.uk',
       })
       beforeEach(async () => {
@@ -98,6 +102,7 @@ describe('homeController', () => {
           totalOutcomes,
           appointments,
           outcomes,
+          url,
           delius_link: config.delius.link,
           oasys_link: config.oaSys.link,
           interventions_link: config.interventions.link,

@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
 
-const routes = ['getOrPostActivityLog', 'getActivityDetails', 'getActivityNote'] as const
+const routes = ['getOrPostActivityLog', 'getActivityNote'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -75,44 +75,6 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsStart,
         resultsEnd,
         errorMessages: req.session.errorMessages,
-      })
-    }
-  },
-  getActivityDetails: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
-      const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [personAppointment, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getPersonAppointment(crn, id),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const isActivityLog = true
-      const queryParams = getQueryString(req.query as Record<string, string>)
-      const { category } = req.query
-      await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
-      res.render('pages/appointments/appointment', {
-        category,
-        queryParams,
-        personAppointment,
-        crn,
-        isActivityLog,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
       })
     }
   },

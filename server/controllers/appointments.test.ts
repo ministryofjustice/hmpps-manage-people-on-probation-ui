@@ -184,6 +184,7 @@ describe('controllers/appointments', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
         upcomingAppointments: mockPersonSchedule,
         crn,
+        url: '',
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
@@ -226,21 +227,6 @@ describe('controllers/appointments', () => {
       })
     })
   })
-  describe('appointment details', () => {
-    beforeEach(async () => {
-      await controllers.appointments.getAppointmentDetails(hmppsAuthClient)(req, res)
-    })
-    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
-    it('should request the person appointment from the api', () => {
-      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, contactId)
-    })
-    it('should render the appointment detail page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
-        personAppointment: mockPersonAppointment,
-        crn,
-      })
-    })
-  })
 
   describe('get manage appointment', () => {
     beforeEach(async () => {
@@ -257,8 +243,10 @@ describe('controllers/appointments', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/manage-appointment', {
         personAppointment: mockPersonAppointment,
         crn,
+        back: undefined,
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
+        queryParams: ['view=default'],
       })
     })
   })

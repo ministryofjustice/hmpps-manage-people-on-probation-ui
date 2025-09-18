@@ -8,29 +8,6 @@ const url = (contactId: number, component = 'UpdateContact') =>
 const mpopurl = (contactId: number) => `/case/X000001/appointments/appointment/${contactId}/manage`
 
 context('Appointment', () => {
-  it('Appointment page with outcome is rendered', () => {
-    cy.visit('/case/X000001/appointments/appointment/4')
-    const page = new AppointmentPage()
-    page.setPageTitle('Planned Telephone Contact (NS) with Steve Bruce')
-    page.appointmentType().should('contain.text', 'Initial appointment')
-    page.appointmentTitle().should('contain.text', 'Planned Telephone Contact (NS) with Steve Bruce')
-    page.complianceTag().should('contain.text', 'Acceptable absence')
-    page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
-    page.getRowData('appointmentDetails', 'type', 'Value').should('contain.text', 'Planned Telephone Contact (NS)')
-    page.getRowData('appointmentDetails', 'date', 'Value').should('contain.text', 'Wednesday 21 February')
-    page.getRowData('appointmentDetails', 'time', 'Value').should('contain.text', '10:15am to 10:30am')
-    page.getRowData('appointmentDetails', 'repeating', 'Value').should('contain.text', 'Yes')
-    page.getRowData('appointmentDetails', 'rar', 'Value').should('contain.text', 'Choices and Changes')
-    page.getCardHeader('outcomeDetails').should('contain.text', 'Outcome details')
-    page.getRowData('outcomeDetails', 'complied', 'Value').should('contain.text', 'No')
-    page.getRowData('outcomeDetails', 'outcome', 'Value').should('contain.text', 'User-generated free text content')
-    page
-      .getRowData('outcomeDetails', 'enforcementAction', 'Value')
-      .should('contain.text', 'Enforcement action description')
-    page.getRowData('outcomeDetails', 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
-    page.getRowData('outcomeDetails', 'sensitive', 'Value').should('contain.text', 'No')
-    page.getRowData('outcomeDetails', 'notes', 'Value').should('contain.text', 'Some notes')
-  })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
@@ -51,19 +28,6 @@ context('Appointment', () => {
       .find('a')
       .should('contain.text', 'Manage')
       .should('have.attr', 'href', `/case/X000001/appointments/appointment/1/manage`)
-  })
-  it('Appointment page with no outcome recorded is rendered', () => {
-    cy.visit('/case/X000001/appointments/appointment/3')
-    const page = new AppointmentPage()
-    page.setPageTitle('Video call with Paulie Walnuts')
-    page.appointmentType().should('contain.text', 'Other contact')
-    page.appointmentTitle().should('contain.text', 'Video call with Paulie Walnuts')
-    cy.get('.note-panel').should('contain.text', 'Outcome not recorded')
-    cy.get('.note-panel')
-      .find('a')
-      .should('contain.text', 'Log an outcome on NDelius (opens in new tab)')
-      .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', url(3, 'UpdateContact'))
   })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')

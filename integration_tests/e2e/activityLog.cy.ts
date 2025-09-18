@@ -606,7 +606,7 @@ context('Activity log', () => {
     fillFilters(page)
     page.getApplyFiltersButton().click()
     page.getActivity('1').find('h2 a').click()
-    cy.get('.govuk-breadcrumbs__list .govuk-breadcrumbs__list-item:nth-of-type(3) a').click()
+    page.getBackLink().click()
     filtersAreFilled(page)
   })
   it('should persist the selected compact view', () => {
@@ -629,7 +629,7 @@ context('Activity log', () => {
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getDateToInput().type('11/1/2025')
     cy.get('[data-qa="timeline1Card"] a').click()
-    cy.get('.govuk-breadcrumbs__list-item:nth-of-type(3) a').click()
+    page.getBackLink().click()
     checkDefaultViewPersists()
   })
 })

@@ -10,12 +10,12 @@ import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddr
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
+import { getQueryString } from './activityLog'
 
 const routes = [
   'getAppointments',
   'getAllUpcomingAppointments',
   'postAppointments',
-  'getAppointmentDetails',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
   'getAddNote',
@@ -68,6 +68,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getAllUpcomingAppointments: hmppsAuthClient => {
     return async (req, res) => {
+      const { url } = req
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
       const [sortName, sortDirection] = sortedBy.split('.')
       const isAscending: boolean = sortDirection === 'asc'
@@ -113,6 +114,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         risksWidget,
         predictorScores,
         sortedBy,
+        url,
         pagination,
       })
     }
@@ -126,27 +128,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
     }
   },
-  getAppointmentDetails: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn } = req.params
-      const { contactId } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const personAppointment = await masClient.getPersonAppointment(crn, contactId)
-      res.render('pages/appointments/appointment', {
-        personAppointment,
-        crn,
-      })
-    }
-  },
   getManageAppointment: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId } = req.params
@@ -158,6 +139,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const { back } = req.query
+      const queryParams = getQueryString(req.query as Record<string, string>)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -172,6 +155,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
+        back,
+        queryParams,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
