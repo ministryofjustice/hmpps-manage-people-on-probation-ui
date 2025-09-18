@@ -8,9 +8,10 @@
             </a>
         {% else %}
             <a class="govuk-link govuk-link--no-visited-state"
-               href={{ manageUrl }}
-               aria-label="Manage {{ appointment.type | lower }} appointment on Manage People on Probation">
-                Manage on NDelius
+               target="_blank"
+               href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
+               aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
+                Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
             </a>
         {% endif %}
     {% else %}
