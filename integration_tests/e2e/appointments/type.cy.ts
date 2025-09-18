@@ -40,7 +40,10 @@ describe('Arrange an appointment', () => {
         for (let i = 1; i < mockAppointmentTypes.length; i += 1) {
           typePage
             .getRadioLabel('type', i)
-            .should('contain.text', toSentenceCase(mockAppointmentTypes[i - 1].description, ['(NS)']))
+            .should(
+              'contain.text',
+              toSentenceCase(mockAppointmentTypes[i - 1].description, ['(NS)', '(Non', 'NS)', '-']),
+            )
           typePage.getRadio('type', i).should('not.be.checked')
         }
 

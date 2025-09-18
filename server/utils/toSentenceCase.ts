@@ -1,3 +1,5 @@
+const capsRegex = /^[A-Z]+(?:\/[A-Z]+)*$/
+
 export const toSentenceCase = (
   value: string | null | undefined,
   preserveWords: string[] = [],
@@ -20,7 +22,7 @@ export const toSentenceCase = (
     return formattedWord
       .split(' ')
       .map(subWord => {
-        if (preserveWords.includes(subWord)) {
+        if (preserveWords.includes(subWord) || capsRegex.test(subWord)) {
           return subWord
         }
         return subWord.toLowerCase()
