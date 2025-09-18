@@ -70,6 +70,7 @@ generic-service:
       - digital_staff_and_mojo
       - unilink_staff
       - moj_cloud_platform
+      - probation
 
   serviceAccountName: manage-people-on-probation-ui
 
