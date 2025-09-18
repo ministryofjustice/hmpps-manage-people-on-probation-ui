@@ -144,7 +144,11 @@ describe('Create next appointment', () => {
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
-      arrangeAnotherAppointmentPage.getSummaryListRow(3).find('.govuk-summary-list__actions').should('not.exist')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Choose attending')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
