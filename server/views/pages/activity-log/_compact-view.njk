@@ -11,25 +11,26 @@
       {% set thisDate = entry.startDateTime | compactActivityLogDate %}
       {% if lastDate != thisDate %}
       </td>
-        </tr>
-        <tr class="govuk-table__row">
-          <td class="govuk-table__cell">{{ thisDate }}</td>
-          <td class="govuk-table__cell">
-            <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
-      {% endif %}
-      <li>
-        {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false %}
-          <div class="govuk-hint govuk-!-margin-bottom-1">
-            <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase(['(NS)','-']) }}<span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
-          </div>
-        {% else %}
-          {% include "./_compact-timeline-entry.njk" %}
-        {% endif %}
-        </li>
-      {% set lastEntry = entry %}
-    {% endfor %}
-    </ul>
-    </td>
     </tr>
-  </tbody>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">{{ thisDate }}</td>
+      <td class="govuk-table__cell">
+        <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
+        {% endif %}
+        <li>
+          {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false %}
+            <div class="govuk-hint govuk-!-margin-bottom-1">
+              <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
+                <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+            </div>
+          {% else %}
+            {% include "./_compact-timeline-entry.njk" %}
+          {% endif %}
+        </li>
+        {% set lastEntry = entry %}
+      {% endfor %}
+    </ul>
+  </td>
+</tr>
+</tbody>
 </table>

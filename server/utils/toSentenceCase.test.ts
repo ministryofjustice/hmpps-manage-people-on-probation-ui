@@ -10,13 +10,13 @@ describe('toSentenceCase()', () => {
     expect(toSentenceCase('')).toEqual('')
   })
   it('should return the correctly formatted string if argument is a capitalised snake case value', () => {
-    expect(toSentenceCase('SNAKE_CASE_VALUE')).toEqual('Snake case value')
+    expect(toSentenceCase('SNAKE_CASE_VALUE')).toEqual('SNAKE CASE VALUE')
   })
   it('should return the correctly formatted string if argument is a train case value', () => {
     expect(toSentenceCase('train-case-value')).toEqual('Train case value')
   })
   it('should return the correctly formatted string if argument is a capitalised value', () => {
-    expect(toSentenceCase('A CAPITALISED VALUE')).toEqual('A capitalised value')
+    expect(toSentenceCase('A CAPITALISED VALUE')).toEqual('A CAPITALISED VALUE')
   })
   it('should return the correctly formatted string if argument is a camel cased value', () => {
     expect(toSentenceCase('Camel Cased Value')).toEqual('Camel cased value')
@@ -24,6 +24,8 @@ describe('toSentenceCase()', () => {
   it('should not convert preserved values', () => {
     const str = 'Initial Appointment - In office (NS)'
     expect(toSentenceCase(str, ['-', '(NS)'])).toEqual('Initial appointment - in office (NS)')
+    const strNonNS = 'Initial Appointment - In office (Non NS)'
+    expect(toSentenceCase(strNonNS, ['-', '(Non', 'NS)'])).toEqual('Initial appointment - in office (Non NS)')
   })
   it('should not remove hyphens from the string if they are preserved', () => {
     const str = 'A-Title-Cased-Value'

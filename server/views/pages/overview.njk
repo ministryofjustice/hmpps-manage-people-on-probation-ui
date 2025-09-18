@@ -158,7 +158,7 @@
   {% set nextApp = overview.schedule.nextAppointment %}
   {% set nextAppointmentText %}
   {% if nextApp %}
-    {{ nextApp['date'] | dateWithDayAndWithoutYear }} at {{ nextApp['date'] | govukTime }} ({{ nextApp['description'] | toSentenceCase(['(NS)','-']) }})
+    {{ nextApp['date'] | dateWithDayAndWithoutYear }} at {{ nextApp['date'] | govukTime }} ({{ nextApp['description'] | toSentenceCase(['(NS)', '(Non', 'NS)', '-']) }})
                 {% else %}
                     No appointments scheduled
                 {% endif %}
