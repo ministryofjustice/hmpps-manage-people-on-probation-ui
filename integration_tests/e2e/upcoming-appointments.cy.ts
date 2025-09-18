@@ -25,7 +25,7 @@ context('All Upcoming Appointment', () => {
       .should(
         'have.attr',
         'href',
-        '/case/X000001/appointments/appointment/1/manage?back=http://localhost:3007/case/X000001/upcoming-appointments?page=1',
+        '/case/X000001/appointments/appointment/1/manage?back=/case/X000001/upcoming-appointments',
       )
   })
 })

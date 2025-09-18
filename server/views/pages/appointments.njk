@@ -36,14 +36,15 @@
 
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
+    {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" %}
     {% set appointmentDetails %}
-    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}/manage">
+    <a class='govuk-link' href={{ manageUrl }}>
       {{ appointment.type | toSentenceCase(['(NS)','-']) }}
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
     </a>
     {% endset %}
     {% set actionsButton %}
-    {{ manageAppointmentLink(flags, appointment, crn) }}
+    {{ manageAppointmentLink(flags, appointment, crn, manageUrl) }}
     {% endset %}
 
     {% set upcomingAppointmentRows = (upcomingAppointmentRows.push([
@@ -76,16 +77,16 @@
 
 {% if pastAppointments.length > 0 %}
   {% for appointment in pastAppointments %}
-
+    {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" %}
     {% set appointmentDetails %}
-    <a class='govuk-link' href="/case/{{ crn }}/appointments/appointment/{{ appointment.id  }}/manage">
+    <a class='govuk-link' href={{ manageUrl }}>
       {{ appointment.type }}
       {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
     </a>
     {% endset %}
 
     {% set actionsButton %}
-    {{ manageAppointmentLink(flags, appointment, crn) }}
+    {{ manageAppointmentLink(flags, appointment, crn, manageUrl) }}
     {% endset %}
 
     {% set pastAppointmentRows = (pastAppointmentRows.push([
