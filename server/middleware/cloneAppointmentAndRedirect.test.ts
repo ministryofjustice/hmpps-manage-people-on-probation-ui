@@ -95,9 +95,8 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
 
-  it('should clone the current appointment session with date removed and redirect to sentence page', () => {
+  it('should redirect to sentence page with an empty appointment session', () => {
     cloneAppointmentAndRedirect(mockAppt, { clearType: true })(req, res)
-    expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   })
 })

@@ -9,6 +9,9 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
     const uuid = uuidv4()
     const { data } = req.session
     const { crn } = req.params
+    if (clearType) {
+      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+    }
     const clonedAppt: AppointmentSession = {
       ...appointmentToClone,
       uuid,
@@ -22,10 +25,6 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       repeating: 'No',
     }
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
-    const redirectTo = clearType
-      ? `/case/${crn}/arrange-appointment/${uuid}/sentence`
-      : `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
-
-    return res.redirect(redirectTo)
+    return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   }
 }
