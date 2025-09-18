@@ -32,25 +32,5 @@
     </ul>
   </td>
 </tr>
-<tr class="govuk-table__row">
-  <td class="govuk-table__cell">{{ thisDate }}</td>
-  <td class="govuk-table__cell">
-    <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
-    {% endif %}
-    <li>
-      {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false %}
-        <div class="govuk-hint govuk-!-margin-bottom-1">
-          <a href="/case/{{ crn }}/activity-log/activity/{{ entry.id }}?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase(['(NS)','(Non NS)','-']) }}
-            <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
-        </div>
-      {% else %}
-        {% include "./_compact-timeline-entry.njk" %}
-      {% endif %}
-    </li>
-    {% set lastEntry = entry %}
-  {% endfor %}
-</ul>
-</td>
-</tr>
 </tbody>
 </table>
