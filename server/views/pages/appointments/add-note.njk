@@ -42,12 +42,15 @@
   id: "notes",
   name: "notes",
   rows: '10',
-  maxlength: 150,
+  maxlength: maxCharCount,
   classes: "",
   formGroup: {
     attributes: { "data-qa": "notes"}
    },
-  value: body.notes
+  value: body.notes,
+   errorMessage: {
+        text: 'Please enter a value ' + maxCharCount + ' characters or less'
+    }  if errorMessages.notes
 }) }}
 
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>

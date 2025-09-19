@@ -137,4 +137,5 @@ export interface LocalParams {
   contactId?: string
   uploadedFiles?: any
   personLevel?: boolean
+  maxCharCount?: number
 }
