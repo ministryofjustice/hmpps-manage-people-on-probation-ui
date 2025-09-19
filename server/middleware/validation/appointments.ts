@@ -149,6 +149,37 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  /*
+  const validateCharCount = ({
+    field,
+    fieldName,
+    value,
+    errors = null,
+    isValid = true,
+  }: Params): [boolean, ErrorSummary] => {
+    const { label, maxChars } = field
+    const lineBreaks = value.split('\r\n').length - 1
+    const textLength = value.split('\r\n').join('').length
+    if (value.trim() === '') {
+      errors = addErrorMessage(errors, {
+        name: label as string,
+        id: `#${fieldName}`,
+        message: errorMessages[fieldName].isInvalid as string,
+      })
+      isValid = false
+    }
+    if (value.trim() !== '' && textLength + lineBreaks > maxChars) {
+      errors = addErrorMessage(errors, {
+        name: label as string,
+        id: `#${fieldName}`,
+        message: (errorMessages[fieldName].isMoreChars as DynamicFunction)(maxChars),
+      })
+      isValid = false
+    }
+    return [isValid, errors]
+  }
+    */
+
   const validateAddNote = () => {
     if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
