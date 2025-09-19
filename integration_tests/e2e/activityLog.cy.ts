@@ -3,7 +3,7 @@ import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
 import { activityLogValidation } from '../../server/properties/validation/activityLog'
 import { getErrorMessage } from '../utils/index'
-import RecordAnOutcomePage from '../pages/appointments/record-an-outcome.page'
+import ManageAppointmentPage from '../pages/appointments/manage-appointment.page'
 
 const keywords = 'Phone call'
 const dateFrom = '11/1/2025'
@@ -414,24 +414,17 @@ context('Activity log', () => {
     page
       .getCardHeader('timeline7')
       .find('.app-summary-card__actions a')
-      .should(
-        'have.attr',
-        'href',
-        '/case/X000001/appointments/appointment/16/record-an-outcome?back=/case/X000001/activity-log?page=0',
-      )
+      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage')
 
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline10').should('contain.text', 'Planned video contact (NS) at 10:15am')
   })
-  it('should link to record an outcome page', () => {
+  it('should link to the manage appointment page', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getCardHeader('timeline7').find('.app-summary-card__actions a').click()
-    const recordAnOutcomePage = new RecordAnOutcomePage()
-    cy.get('#outcomeRecorded').click()
-    recordAnOutcomePage.getSubmitBtn().click()
-    page.checkOnPage()
+    Page.verifyOnPage(ManageAppointmentPage)
   })
   it('should display the pagination navigation', () => {
     cy.visit('/case/X000001/activity-log')
