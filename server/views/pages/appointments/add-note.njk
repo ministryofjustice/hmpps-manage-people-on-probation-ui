@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% from "_components/note/macro.njk" import appNote %}
-{% set title = 'Add a note (optional)' %}
+{% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
 {% set multipartForm = true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}

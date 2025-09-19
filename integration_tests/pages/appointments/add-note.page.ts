@@ -2,7 +2,7 @@ import Page from '../page'
 
 export default class AddNotePage extends Page {
   constructor() {
-    super('Add a note (optional)')
+    super('Add a note')
   }
 
   getSensitiveInformation = () => {
