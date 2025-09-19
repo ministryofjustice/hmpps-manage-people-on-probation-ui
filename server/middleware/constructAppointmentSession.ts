@@ -59,13 +59,21 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const end = appointment?.endDateTime || ''
     const sensitivity = appointment?.isSensitive !== undefined ? booleanToYesNo(appointment.isSensitive) : ''
 
+    /*
+      If event has not been selected, then the user cannot select type or location, but can select the attendee
+      If type has not been selected, then the user cannot select location, but can select the attendee
+      if attendee has not been selected, then the user cannot select the location.
+    */
+
     if (!eventId) {
       type = ''
     }
-    if (!eventId || !type || !providerCode || !teamCode || !username) {
+    if (!providerCode || !teamCode || !username) {
       providerCode = ''
       teamCode = ''
       username = ''
+    }
+    if (!eventId || !type || !providerCode || !teamCode || !username) {
       locationCode = ''
     }
 

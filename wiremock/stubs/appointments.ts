@@ -228,12 +228,12 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.officer = {
       code: '',
       name: {
-        forename: 'George',
+        forename: 'Peter',
         surname: 'Parker',
       },
-      username: 'george-parker',
-      teamCode: '1234',
-      providerCode: 'N50',
+      username: 'peter-parker',
+      teamCode: 'N07AAT',
+      providerCode: 'N07',
     }
   }
 

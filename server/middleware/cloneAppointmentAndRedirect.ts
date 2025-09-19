@@ -4,14 +4,11 @@ import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { setDataValue } from '../utils'
 
-export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession, { clearType = false } = {}) => {
+export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession) => {
   return (req: Request, res: AppResponse): void => {
     const uuid = uuidv4()
     const { data } = req.session
     const { crn } = req.params
-    if (clearType) {
-      return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-    }
     const clonedAppt: AppointmentSession = {
       ...appointmentToClone,
       uuid,

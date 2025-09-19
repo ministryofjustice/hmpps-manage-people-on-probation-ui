@@ -3,10 +3,9 @@ import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
-import TokenStore from '../data/tokenStore/redisTokenStore'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString, isMatchingAddress } from '../utils'
+import { toRoshWidget, toPredictors, isValidCrn, isNumericString } from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -20,9 +19,8 @@ import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import config from '../config'
+import arrangeAppointmentController from './arrangeAppointment'
 
-const token = { access_token: 'token-1', expires_in: 300 }
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const id = '1234'
 const contactId = '1234'
@@ -61,6 +59,10 @@ jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
 }))
 
+jest.mock('./arrangeAppointment', () => ({
+  redirectToSentence: jest.fn(() => mockMiddlewareFn),
+}))
+
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -69,7 +71,6 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
-tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const req = httpMocks.createRequest({
   params: {
@@ -474,22 +475,7 @@ describe('controllers/appointments', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
-    it('should redirect to the manage page if answer is NO', async () => {
-      mockIsValidCrn.mockReturnValue(true)
-      mockIsNumericString.mockReturnValue(true)
-      const mockReq = httpMocks.createRequest({
-        params: {
-          crn,
-          id,
-          contactId,
-        },
-        body: {
-          nextAppointment: 'NO',
-        },
-      })
-      await controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
-    })
+
     it('should clone the appointment and redirect if KEEP_TYPE selected', () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsNumericString.mockReturnValue(true)
@@ -507,15 +493,11 @@ describe('controllers/appointments', () => {
         nextAppointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith(
-        {},
-        {
-          clearType: false,
-        },
-      )
+      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({})
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
     })
-    it('should clone the appointment and redirect if CHANGE_TYPE selected', () => {
+
+    it('should redirect to the sentence page if CHANGE_TYPE selected', () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsNumericString.mockReturnValue(true)
       const mockReq = httpMocks.createRequest({
@@ -532,10 +514,25 @@ describe('controllers/appointments', () => {
         nextAppointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith(mockRes.locals.nextAppointmentSession, {
-        clearType: true,
-      })
+      expect(arrangeAppointmentController.redirectToSentence).toHaveBeenCalled()
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
+    })
+
+    it('should redirect to the manage page if answer is NO', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsNumericString.mockReturnValue(true)
+      const mockReq = httpMocks.createRequest({
+        params: {
+          crn,
+          id,
+          contactId,
+        },
+        body: {
+          nextAppointment: 'NO',
+        },
+      })
+      await controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     })
   })
 })
