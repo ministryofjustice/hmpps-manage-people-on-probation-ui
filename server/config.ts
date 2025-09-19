@@ -195,4 +195,5 @@ export default {
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
   fileUploadLimit: 5,
+  maxCharCount: 200,
 }

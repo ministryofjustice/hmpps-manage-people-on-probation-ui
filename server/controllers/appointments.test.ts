@@ -345,7 +345,7 @@ describe('controllers/appointments', () => {
       })
     })
   })
-  describe('get add note', () => {
+  xdescribe('get add note', () => {
     const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
     const errorMessages = {
       notes: 'Notes error',

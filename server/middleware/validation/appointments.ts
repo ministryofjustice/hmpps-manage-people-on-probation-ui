@@ -4,14 +4,16 @@ import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
+import config from '../../config'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId } = params
   const { data } = session
+  const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, personLevel }
+  const localParams: LocalParams = { crn, id, body, contactId, personLevel, maxCharCount }
   let isAddNotePage = false
   let render = `pages/${[
     url
@@ -149,37 +151,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  /*
-  const validateCharCount = ({
-    field,
-    fieldName,
-    value,
-    errors = null,
-    isValid = true,
-  }: Params): [boolean, ErrorSummary] => {
-    const { label, maxChars } = field
-    const lineBreaks = value.split('\r\n').length - 1
-    const textLength = value.split('\r\n').join('').length
-    if (value.trim() === '') {
-      errors = addErrorMessage(errors, {
-        name: label as string,
-        id: `#${fieldName}`,
-        message: errorMessages[fieldName].isInvalid as string,
-      })
-      isValid = false
-    }
-    if (value.trim() !== '' && textLength + lineBreaks > maxChars) {
-      errors = addErrorMessage(errors, {
-        name: label as string,
-        id: `#${fieldName}`,
-        message: (errorMessages[fieldName].isMoreChars as DynamicFunction)(maxChars),
-      })
-      isValid = false
-    }
-    return [isValid, errors]
-  }
-    */
-
   const validateAddNote = () => {
     if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
@@ -190,6 +161,8 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'add-note',
+          notes: req.body.notes,
+          maxCharCount,
         }),
       )
     }
@@ -210,6 +183,7 @@ const appointments: Route<void> = (req, res, next) => {
     res.locals.errorMessages = errorMessages
     if (isAddNotePage) {
       req.session.errorMessages = errorMessages
+      req.session.body = body
       return res.redirect(req.url)
     }
     return res.render(render, { errorMessages, ...localParams })
