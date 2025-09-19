@@ -99,7 +99,7 @@
       {% set html %}
       <span class="app-compliance-tag-icon app-compliance-tag-icon--{{ tag.iconClass }}">{{ tag.shorthand }}</span><span class="govuk-visually-hidden">{{ tag.text }}</span>
       {% endset %}
-      <span class="app-compliance-tag--compact" style="float: right" title="{{ tag.text }}">
+      <span class="app-compliance-tag--compact" title="{{ tag.text }}">
         {{ govukTag({ html: html, classes: tagClasses }) }}
       </span>
     {% else %}
