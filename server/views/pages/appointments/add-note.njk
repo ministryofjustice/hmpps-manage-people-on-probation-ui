@@ -37,14 +37,19 @@
     },
     type: 'button'
     }) }}
-    {{ govukTextarea({
-    id: "notes",
-    name: "notes",
-    rows: '10',
-    formGroup: {
-        attributes: { "data-qa": "notes"}
-    }
+
+    {{ govukCharacterCount({
+  id: "notes",
+  name: "notes",
+  rows: '10',
+  maxlength: 150,
+  classes: "",
+  formGroup: {
+    attributes: { "data-qa": "notes"}
+   },
+  value: body.notes
 }) }}
+
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
 
     {% set uploadHtml %}

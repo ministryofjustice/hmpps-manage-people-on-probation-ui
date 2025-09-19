@@ -339,6 +339,7 @@ const crissHeaders = () => {
       if (textarea.value.trim() === '') {
         textarea.value = `Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks`
         status.textContent = 'CRISS headers inserted'
+        textarea.focus()
       }
     })
   }
