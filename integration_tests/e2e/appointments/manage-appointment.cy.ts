@@ -18,6 +18,7 @@ describe('Manage an appointment', () => {
   it('should render the page', () => {
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.setPageTitle('Manage planned office visit (NS) with Terry Jones')
+    cy.pause()
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
   })
   describe('Alert banner', () => {

@@ -4,31 +4,31 @@
 
 {% set titleHtml %}
 <p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
-  <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}">
-    {% if entry.isAppointment === true %}
-      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      {{ entry.type | toSentenceCase(['(NS)','-']) }} at&nbsp;{{ entry.startDateTime | govukTime }}
-    {% elseif entry.isCommunication %}
-      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
-    {% else %}
-      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-      {{ entry.type | toSentenceCase(['(NS)','-']) }}
-    {% endif %}
-    <span class="govuk-visually-hidden"> on {{ thisDate }}
-    </a>
-    {% if shouldPromptToRecordAnOutcome %}
-      <br/>{% include './_log-outcome-link.njk' %}
-    {% endif %}
-  </p>
-  {% endset %}
+      <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=compact&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}">
+            {% if entry.isAppointment === true %}
+                  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
+                  {{ entry.type | toSentenceCase }} at&nbsp;{{ entry.startDateTime | govukTime }}
+            {% elif entry.isCommunication %}
+                  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
+                  {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
+            {% else %}
+                  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
+                  {{ entry.type | toSentenceCase }}
+            {% endif %}
+            <span class="govuk-visually-hidden"> on {{ thisDate }}
+            </a>
+            {% if shouldPromptToRecordAnOutcome %}
+                  <br/>{% include './_log-outcome-link.njk' %}
+            {% endif %}
+      </p>
+      {% endset %}
 
-  {% set html %}
-  {% include './_timeline-notes.njk' %}
-  {% endset %}
+      {% set html %}
+      {% include './_timeline-notes.njk' %}
+      {% endset %}
 
-  {% set actionsHtml %}
-  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
-  {% endset %}
+      {% set actionsHtml %}
+      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
+      {% endset %}
 
-  {{ titleHtml | safe }}
+      {{ titleHtml | safe }}

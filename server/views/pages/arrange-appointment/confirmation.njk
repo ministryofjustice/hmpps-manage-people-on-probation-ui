@@ -32,7 +32,7 @@
 
 {% set panelHtml %}
 <div class="govuk-!-font-size-27">
-  <strong>{{ appointment.type.description | toSentenceCase(['(NS)']) }}</strong><br/>
+  <strong>{{ appointment.type.description | toSentenceCase }}</strong><br/>
   {{ appointmentDatesHtml | safe }}
 </div>
 {% endset %}
@@ -65,18 +65,18 @@
 
     </div>
   </div>
-<form method="post" autocomplete="off" action="{{ paths.current }}">
-  <div class="govuk-button-group">
-    {{ govukButton({
+  <form method="post" autocomplete="off" action="{{ paths.current }}">
+    <div class="govuk-button-group">
+      {{ govukButton({
       html: buttonText,
       attributes: {
         'data-qa': 'submit-btn'
       }
     }) }}
-    <a class="govuk-link" href={{ returnLink }} data-qa="finishLink">
+      <a class="govuk-link" href={{ returnLink }} data-qa="finishLink">
       Finish and return to appointments
     </a>
-  </div>
-  <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-</form>
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+  </form>
 {% endblock %}

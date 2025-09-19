@@ -3,7 +3,7 @@
 
 {% set titleHtml %}
 <span class="govuk-heading-s govuk-!-margin-bottom-0">
-  <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase(['(NS)','-']) }}
+  <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
     <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 </span>
 {% endset %}
