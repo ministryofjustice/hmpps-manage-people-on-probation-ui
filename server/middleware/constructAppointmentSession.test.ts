@@ -235,6 +235,7 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ notes: 'some note' }))
   })
+
   it('should set the location code to not required', () => {
     const mockAppt = mockPersonAppointmentResponse({
       location: {
@@ -257,6 +258,7 @@ describe('/middleware/constructAppointmentSession', () => {
     )
     expect(nextSpy).toHaveBeenCalled()
   })
+
   it('should reset the dependent values if no eventId in person appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
       eventId: undefined,
@@ -267,19 +269,22 @@ describe('/middleware/constructAppointmentSession', () => {
       appointmentTypes: mockTypes,
     })
     constructNextAppointmentSession(req, res, nextSpy)
+    const { providerCode, teamCode, username: mockUsername } = mockAppointment.officer
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode: '', teamCode: '', username: '', locationCode: '' },
+        user: { providerCode, teamCode, username: mockUsername, locationCode: '' },
         type: '',
         eventId: '',
       }),
     )
   })
-  it('should reset the dependent values if eventId, but no type in person appointment', () => {
+
+  it('should reset the dependent values if eventId but no type in person appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
       eventId: 49,
       type: undefined,
     })
+    const { providerCode, teamCode, username: mockUsername } = mockAppointment.officer
     const req = mockReq()
     const res = mockAppResponse({
       personAppointment: mockAppt,
@@ -288,24 +293,13 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode: '', teamCode: '', username: '', locationCode: '' },
+        user: { providerCode, teamCode, username: mockUsername, locationCode: '' },
         type: '',
         eventId: '49',
       }),
     )
   })
-  it('should set until as an empty string if end date does not exist in person appointment', () => {
-    const mockAppt = mockPersonAppointmentResponse({
-      endDateTime: undefined,
-    })
-    const req = mockReq()
-    const res = mockAppResponse({
-      personAppointment: mockAppt,
-      appointmentTypes: mockTypes,
-    })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ until: '', end: '' }))
-  })
+
   it('should reset the location value if eventId and type but no providerCode, teamCode or username in person appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
       eventId: 49,
@@ -330,6 +324,20 @@ describe('/middleware/constructAppointmentSession', () => {
       }),
     )
   })
+
+  it('should set until as an empty string if end date does not exist in person appointment', () => {
+    const mockAppt = mockPersonAppointmentResponse({
+      endDateTime: undefined,
+    })
+    const req = mockReq()
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ until: '', end: '' }))
+  })
+
   it('should add requirementId if requirement component in person appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
       component: {
@@ -361,6 +369,7 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ licenceConditionId: '2' }))
   })
+
   it('should add nsiId if nsi in person appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
       nsiId: 100,
@@ -373,6 +382,7 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ nsiId: '100' }))
   })
+
   it('should create the correct session from a person level appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
       eventId: undefined,
@@ -389,6 +399,7 @@ describe('/middleware/constructAppointmentSession', () => {
       expectedSession({ eventId: 'PERSON_LEVEL_CONTACT', type: 'CODC' }),
     )
   })
+
   it('should create correct session if eventId has no match in sentences', () => {
     const mockAppt = mockPersonAppointmentResponse({
       eventId: 999,
@@ -398,15 +409,17 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
+    const { providerCode, teamCode, username: mockUsername } = mockAppointment.officer
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
         eventId: '',
         type: '',
-        user: { locationCode: '', providerCode: '', teamCode: '', username: '' },
+        user: { locationCode: '', providerCode, teamCode, username: mockUsername },
       }),
     )
   })
+
   it('should create the correct session if type has not match in appointment types', () => {
     const mockAppt = mockPersonAppointmentResponse({
       type: 'Invalid Appointment Type',
@@ -418,7 +431,10 @@ describe('/middleware/constructAppointmentSession', () => {
     })
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
-      expectedSession({ type: '', user: { locationCode: '', providerCode: '', teamCode: '', username: '' } }),
+      expectedSession({
+        type: '',
+        user: { username: 'tony-pan', teamCode: 'N07CHT', providerCode: 'N07', locationCode: '' },
+      }),
     )
   })
 })

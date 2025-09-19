@@ -47,7 +47,7 @@ const mockAppt: AppointmentSession = {
   licenceConditionId: '80',
 }
 
-function setup(clearType = false) {
+function setup() {
   const req = httpMocks.createRequest({
     params: {
       crn: 'X000001',
@@ -93,11 +93,5 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     cloneAppointmentAndRedirect(mockAppt)(req, res)
     expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
-  })
-
-  it('should clone the current appointment session with date removed and redirect to sentence page', () => {
-    cloneAppointmentAndRedirect(mockAppt, { clearType: true })(req, res)
-    expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
-    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   })
 })

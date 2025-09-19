@@ -11,6 +11,7 @@ import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
+import arrangeAppointmentController from './arrangeAppointment'
 
 const routes = [
   'getAppointments',
@@ -277,15 +278,18 @@ const appointmentsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const {
         params: { crn, contactId },
-        body: { nextAppointment },
+        body,
       } = req
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
+      const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
       const { nextAppointmentSession } = res.locals
-      if (nextAppointment !== 'NO') {
-        const clearType = nextAppointment === 'CHANGE_TYPE'
-        return cloneAppointmentAndRedirect(nextAppointmentSession, { clearType })(req, res)
+      if (nextAppointment === 'CHANGE_TYPE') {
+        return arrangeAppointmentController.redirectToSentence()(req, res)
+      }
+      if (nextAppointment === 'KEEP_TYPE') {
+        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }

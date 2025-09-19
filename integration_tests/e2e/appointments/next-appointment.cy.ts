@@ -107,13 +107,19 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
+        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
     })
+
     it('should handle an appointment with no type', () => {
       cy.task('stubAppointmentNoType')
       cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
@@ -143,12 +149,17 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-      arrangeAnotherAppointmentPage.getSummaryListRow(3).find('.govuk-summary-list__actions').should('not.exist')
+        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+      arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
     })
     it('should handle an appointment with no attendee', () => {
@@ -200,7 +211,6 @@ describe('Create next appointment', () => {
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
-
       arrangeAnotherAppointmentPage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
@@ -220,9 +230,23 @@ describe('Create next appointment', () => {
         .find('a')
         .should('contain.text', 'Change')
       arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'peter parker (PS-PSO) (Automated Allocation Team, London)')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Change')
+      arrangeAnotherAppointmentPage
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+      arrangeAnotherAppointmentPage
+        .getSummaryListRow(4)
+        .find('.govuk-summary-list__actions')
+        .find('a')
+        .should('contain.text', 'Choose location')
     })
     it('should handle person level appointment', () => {
       cy.task('stubAppointmentPersonLevel')
@@ -232,7 +256,6 @@ describe('Create next appointment', () => {
       nextAppointmentPage.getSubmitBtn().click()
       const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.checkOnPage()
-
       arrangeAnotherAppointmentPage
         .getSummaryListRow(1)
         .find('.govuk-summary-list__value')
