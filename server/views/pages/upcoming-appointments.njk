@@ -28,7 +28,7 @@
         {% endset %}
         {% set actionsButton %}
             {% if not appointment.deliusManaged %}
-                {{ manageAppointmentLink(flags, appointment, crn) }}
+                {{ manageAppointmentLink(flags, appointment, crn, manageUrl) }}
             {% else %}
                 <a class="govuk-link govuk-link--no-visited-state" target="_blank"
                    href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
