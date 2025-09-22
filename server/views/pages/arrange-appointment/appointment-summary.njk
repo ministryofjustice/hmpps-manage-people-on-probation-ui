@@ -36,6 +36,29 @@
 {% if appointment.location == 'NO_LOCATION_REQUIRED' %}
     {% set locationHtml = 'Not required' %}
 {% endif %}
+
+{% set typeValue = 'Not entered' if not appointment.type else 
+    appointment.type.description | toSentenceCase(['(NS)']) %}
+{% set locationValue = 'Not entered' if not locationHtml else 
+    locationHtml | safe %}
+{% set typeHint = '' %}
+{% set locationHint = '' %}
+{% set noForHint = 'Select what the appointment is for first.' %}
+{% set noTypeHint = 'Select the appointment type first.' %}
+{% set noAttendingHint = 'Select who is attending first.' %}
+{% if not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename %}
+    {% set typeHint = noForHint %}
+    {% set locationHint = noForHint %}
+{% endif %}
+{% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) 
+    and not appointment.type %}
+    {% set locationHint = noTypeHint %}
+{% endif %}
+{% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) 
+    and appointment.type and(not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) %}
+    {% set locationHint = noAttendingHint %}
+{% endif %}
+
 <form method="post" autocomplete="off" action="{{ paths.current }}">
     {% set showAction = true %}
     {% set appointmentDates = [] %}
@@ -71,7 +94,7 @@
             } if showAction }, 
             {
             key: { text: "Appointment type" },
-            value: { text: 'Not entered' if not appointment.type else appointment.type.description | toSentenceCase(['(NS)']) },
+            value: { html: typeValue + ('<span class="govuk-summary-list__hint">' + typeHint + '</span>' if typeHint )  },
             actions: {
                 items: [
                 {
@@ -105,19 +128,8 @@
      } 
      ] 
      } if showAction },
-     { key: { text: "VISOR report"},
-      value: { text: appointment.visorReport },
-      actions: {
-      items: [ {
-     href: changePath + "/type?change=" + url,
-     text: "Change",
-     visuallyHiddenText: "type of appointment"
-     }
-     ]
-     } if showAction
-     } if appointment.meta.isVisor,
      { key: { text: "Location" }, 
-     value: { text: 'Not entered' if not locationHtml else locationHtml | safe }, 
+     value: { html: locationValue + ('<span class="govuk-summary-list__hint">' + locationHint + '</span>' if locationHint )  },
      actions: { items: [ { href: changePath + "/location?change=" + url, 
      text: "Choose location" if not locationHtml else  "Change",
       visuallyHiddenText: "location"
