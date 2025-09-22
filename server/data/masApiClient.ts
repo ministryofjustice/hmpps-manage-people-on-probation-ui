@@ -63,8 +63,15 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/sentence/${crn}${queryParam}`, handle404: false })
   }
 
-  async getSentences(crn: string, number = ''): Promise<Sentences | null> {
-    const queryParameters = number ? `?number=${number}` : ''
+  async getSentences(crn: string, number = '', includeRarRequirements = true): Promise<Sentences | null> {
+    let queryParameters = number || !includeRarRequirements ? '?' : ''
+    if (queryParameters) {
+      if (number) queryParameters = `${queryParameters}number=${number}`
+      if (!includeRarRequirements) {
+        if (number) queryParameters = `${queryParameters}&`
+        queryParameters = `${queryParameters}includeRarRequirements=false`
+      }
+    }
     return this.get({ path: `/sentences/${crn}${queryParameters}`, handle500: true, handle404: false })
   }
 
