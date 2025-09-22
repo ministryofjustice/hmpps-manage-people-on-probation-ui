@@ -128,9 +128,9 @@ jobs:
       - name: "Scan the project"
         id: veracode-pipeline-scan
         shell: bash
-        'run': |
+        run: |
           echo "Randomly picking 1 of 5 api keys, to help avoid veracode API rate limits."
-          X=$(( RANDOM % 4 ))
+          X="$(( RANDOM % 4 ))"
           VERACODE_API_ID_X="VERACODE_API_ID_${X}"
           VERACODE_API_KEY_X="VERACODE_API_KEY_${X}"
           VERACODE_API_ID="${!VERACODE_API_ID_X}"
