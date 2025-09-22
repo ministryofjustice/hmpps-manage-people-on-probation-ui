@@ -2,60 +2,108 @@
 {% set isCompact = params.compact %}
 {% set entry = params.entry %}
 
+{% set tags = [] %}
 {% if entry.rescheduled %}
   {% set text = 'Rescheduled' %}
   {% set shorthand = '⟳' %}
   {% set iconClass = 'rescheduled' %}
   {% set colour = 'blue' %}
-{% elseif entry.didTheyComply === true %}
+  {% set tags = (tags.push({ 
+    'text': text, 
+    'shorthand': shorthand, 
+    'iconClass': iconClass, 
+    'colour': colour }), tags) %}
+{% endif %}
+{% if entry.didTheyComply === true and (entry.wasAbsent === false or entry.acceptableAbsence === false) %}
   {% set text = 'Complied' %}
   {% set shorthand = '✓' %}
   {% set iconClass = 'tick' %}
   {% set colour = 'green' %}
-{% elseif entry.wasAbsent === true %}
+  {% set tags = (tags.push({ 
+    'text': text, 
+    'shorthand': shorthand, 
+    'iconClass': iconClass, 
+    'colour': colour }), tags) %}
+{% endif %}
+{% if entry.wasAbsent === true %}
   {% if entry.acceptableAbsence === true %}
     {% set text = 'Acceptable absence' %}
     {% set shorthand = '✓' %}
     {% set iconClass = 'tick' %}
     {% set colour = 'green' %}
+    {% set tags = (tags.push({ 
+      'text': text, 
+      'shorthand': shorthand, 
+      'iconClass': iconClass, 
+      'colour': colour }), tags) %}
   {% elseif entry.absentWaitingEvidence === true %}
     {% set text = 'Waiting for evidence' %}
     {% set shorthand = '?' %}
     {% set colour = 'yellow' %}
     {% set iconClass = 'waiting' %}
+    {% set tags = (tags.push({ 
+      'text': text, 
+      'shorthand': shorthand, 
+      'iconClass': iconClass, 
+      'colour': colour }), tags) %}
   {% elseif entry.acceptableAbsence === false %}
     {% set text = 'Unacceptable absence' %}
     {% set shorthand = '✘' %}
     {% set iconClass = 'strike' %}
     {% set colour = 'red' %}
+    {% set tags = (tags.push({ 
+      'text': text, 
+      'shorthand': shorthand, 
+      'iconClass': iconClass, 
+      'colour': colour }), tags) %}
   {% endif %}
-{% elseif entry.didTheyComply === false %}
+{% endif %}
+{% if entry.didTheyComply === false and (entry.wasAbsent === false or entry.acceptableAbsence === true) %}
   {% set text = 'Failed to comply' %}
   {% set shorthand = '✘' %}
   {% set iconClass = 'strike' %}
   {% set colour = 'red' %}
-{% elseif entry.isSensitive === true %}
+  {% set tags = (tags.push({ 
+    'text': text, 
+    'shorthand': shorthand, 
+    'iconClass': iconClass, 
+    'colour': colour }), tags) %}
+{% endif %}
+{% if entry.isSensitive === true %}
   {% set text = 'Sensitive' %}
   {% set shorthand = '!' %}
   {% set iconClass = 'waiting' %}
   {% set colour = 'yellow' %}
-{% elseif entry.complied === true %}
+  {% set tags = (tags.push({ 
+    'text': text, 
+    'shorthand': shorthand, 
+    'iconClass': iconClass, 
+    'colour': colour }), tags) %}
+{% endif %}
+{% if entry.complied === true %}
   {% set text = 'Complied' %}
   {% set shorthand = '✘' %}
   {% set iconClass = 'strike' %}
   {% set colour = 'grey' %}
+  {% set tags = (tags.push({ 
+    'text': text, 
+    'shorthand': shorthand, 
+    'iconClass': iconClass, 
+    'colour': colour }), tags) %}
 {% endif %}
 
-{% set tagClasses = 'app-compliance-tag govuk-tag--' + colour + ' ' + params.classes + (' app-compliance-tag--compact' if isCompact) %}
-{% if text %}
-  {% if isCompact %}
-    {% set html %}
-    <span class="app-compliance-tag-icon app-compliance-tag-icon--{{ iconClass }}">{{ shorthand }}</span><span class="govuk-visually-hidden">{{ text }}</span>
-    {% endset %}
-    <span class="app-compliance-tag--compact" style="float: right" title="{{ text }}">
-      {{ govukTag({ html: html, classes: tagClasses }) }}
-    </span>
-  {% else %}
-    {{ govukTag({ text: text, classes: tagClasses }) }}
+{% for tag in tags %}
+  {% set tagClasses = 'app-compliance-tag govuk-tag--' + tag.colour + ' ' + params.classes + (' app-compliance-tag--compact' if isCompact) %}
+  {% if tag.text %}
+    {% if isCompact %}
+      {% set html %}
+      <span class="app-compliance-tag-icon app-compliance-tag-icon--{{ tag.iconClass }}">{{ tag.shorthand }}</span><span class="govuk-visually-hidden">{{ tag.text }}</span>
+      {% endset %}
+      <span class="app-compliance-tag--compact" title="{{ tag.text }}">
+        {{ govukTag({ html: html, classes: tagClasses }) }}
+      </span>
+    {% else %}
+      {{ govukTag({ text: tag.text, classes: tagClasses }) }}
+    {% endif %}
   {% endif %}
-{% endif %}
+{% endfor %}
