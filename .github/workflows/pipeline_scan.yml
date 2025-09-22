@@ -79,7 +79,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Set up JDK 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -136,11 +136,11 @@ jobs:
           VERACODE_API_ID="${!VERACODE_API_ID_X}"
           VERACODE_API_KEY="${!VERACODE_API_KEY_X}"
           echo "Using VERACODE_API_ID_${X} from pool (${VERACODE_API_ID:0:5}...)"
-          java -jar pipeline-scan.jar \
-          $(test -f results.json && echo "--baseline_file results.json") \
+          java -jar "pipeline-scan.jar" \
+          '$(test -f "results.json" && echo "--baseline_file results.json")' \
           --json_output true \
-          --file ${{ inputs.veracode_artifact_name }} \
-          --policy_file Ministry_of_Justice.json \
+          --file "${{ inputs.veracode_artifact_name }}" \
+          --policy_file "Ministry_of_Justice.json" \
           --veracode_api_id "${VERACODE_API_ID}" \
           --veracode_api_key "${VERACODE_API_KEY}" \
           --timeout 60 \
