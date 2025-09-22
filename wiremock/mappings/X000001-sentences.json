@@ -91,6 +91,100 @@
     },
     {
       "request": {
+        "urlPathPattern": "/mas/sentences/X000001",
+        "method": "GET",
+        "queryParameters": {
+          "includeRarRequirements": {
+            "equalTo": "false"
+          }
+        }
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "personSummary": {
+            "name": {
+              "forename": "Caroline",
+              "surname": "Wolff"
+            },
+            "crn": "X000001",
+            "dateOfBirth": "1979-08-18"
+          },
+          "contactTypeCode": "CHVS",
+          "associatedWithPerson": false,
+          "personNsis": [],
+          "sentences": [
+            {
+              "id": 49,
+              "eventNumber": "1234567",
+              "order": {
+                "description": "Pre-Sentence"
+              },
+              "nsis": [],
+              "licenceConditions": [],
+              "requirements": []
+            },
+            {
+              "id": 48,
+              "eventNumber": "7654321",
+              "order": {
+                "description": "Default Sentence Type (12 Months)",
+                "startDate": "2025-05-31"
+              },
+              "nsis": [
+                {
+                  "id": 162,
+                  "description": "BRE description"
+                },
+                {
+                  "id": 163,
+                  "description": "OPD1 description (OPD1 subtype)"
+                }
+              ],
+              "licenceConditions": [
+                {
+                  "id": 166,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 167,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 168,
+                  "mainDescription": "lic cond main",
+                  "active": true
+                },
+                {
+                  "id": 169,
+                  "mainDescription": "lic cond main",
+                  "active": false
+                }
+              ],
+              "requirements": [
+                {
+                  "id": 80,
+                  "description": "2 of 12 RAR days completed",
+                  "active": true
+                },
+                {
+                  "id": 83,
+                  "description": "Unpaid Work - Intensive",
+                  "active": false
+                }
+              ]
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
         "urlPathPattern": "/mas/sentence/X000001",
         "queryParameters": {
           "activeSentence": {
