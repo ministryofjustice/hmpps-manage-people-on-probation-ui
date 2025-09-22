@@ -5,7 +5,6 @@ import { crn } from './appointments/imports'
 
 const url = (contactId: number, component = 'UpdateContact') =>
   `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
-const mpopurl = (contactId: number) => `/case/X000001/appointments/appointment/${contactId}/manage`
 
 context('Appointment', () => {
   it('Appointments page with upcoming and past appointments is rendered', () => {
@@ -50,9 +49,13 @@ context('Appointment', () => {
     page
       .upcomingAppointmentAction(2)
       .find('a')
-      .should('contain.text', 'Manage on NDelius')
-      .should('have.attr', 'aria-label', 'Manage planned video contact (ns) appointment on Manage People on Probation')
-      .should('have.attr', 'href', '/case/X000001/appointments/appointment/2/manage')
+      .should('contain.text', 'Manage')
+      .should('have.attr', 'aria-label', 'Manage planned video contact (ns) appointment on NDelius')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=2',
+      )
 
     page.upcomingAppointmentDate(2).should('contain.text', '22 March 2045')
     page.upcomingAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
@@ -72,16 +75,16 @@ context('Appointment', () => {
       1,
       `/case/X000001/appointments/appointment/1/manage`,
     )
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, mpopurl(2))
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, mpopurl(4))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url(2))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url(4))
     page.assertAnchorElementAtIndexWithin(
       '[class="govuk-table__row"]',
       5,
       1,
       `/case/X000001/appointments/appointment/5/manage`,
     )
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, mpopurl(6))
-    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, mpopurl(3))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
+    page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
 
     page.getElement('[data-qa="appointmentHistory"]').find('h2').should('contain.text', 'Appointment history')
     page

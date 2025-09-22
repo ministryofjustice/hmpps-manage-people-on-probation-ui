@@ -60,6 +60,12 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
 
     /* constructed session does not include notes or sensitivity */
 
+    /*
+      If event has not been selected, then the user cannot select type or location, but can select the attendee
+      If type has not been selected, then the user cannot select location, but can select the attendee
+      if attendee has not been selected, then the user cannot select the location.
+    */
+
     if (!eventId) {
       type = ''
     }
