@@ -30,12 +30,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
         eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
       }
     }
-    let notes = ''
-    if (appointment?.appointmentNotes) {
-      notes = appointment.appointmentNotes.map(appointmentNote => appointmentNote.note).join('\n')
-    } else if (appointment?.appointmentNote?.note) {
-      notes = appointment.appointmentNote.note
-    }
     if (eventId && !sentences.some(sentence => sentence.id === eventId)) {
       eventId = ''
     }
@@ -57,7 +51,14 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
     const date = appointment?.startDateTime || ''
     const end = appointment?.endDateTime || ''
-    const sensitivity = appointment?.isSensitive !== undefined ? booleanToYesNo(appointment.isSensitive) : ''
+
+    /*
+      If event has not been selected, then the user cannot select type or location, but can select the attendee
+      If type has not been selected, then the user cannot select location, but can select the attendee
+      if attendee has not been selected, then the user cannot select the location.
+    */
+
+    /* constructed session does not include notes or sensitivity */
 
     /*
       If event has not been selected, then the user cannot select type or location, but can select the attendee
@@ -98,8 +99,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       uuid: '',
       repeating: 'No',
       repeatingDates: [],
-      notes,
-      sensitivity,
     }
 
     if (visorReport) {

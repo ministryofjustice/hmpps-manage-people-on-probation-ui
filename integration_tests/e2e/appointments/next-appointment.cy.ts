@@ -103,6 +103,8 @@ describe('Create next appointment', () => {
         .getSummaryListRow(2)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+        .should('contain.text', 'Select what the appointment is for first.')
+
       arrangeAnotherAppointmentPage.getSummaryListRow(2).find('.govuk-summary-list__actions').should('not.exist')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
@@ -117,6 +119,8 @@ describe('Create next appointment', () => {
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+        .should('contain.text', 'Select what the appointment is for first.')
+
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
     })
 
@@ -141,6 +145,7 @@ describe('Create next appointment', () => {
         .getSummaryListRow(2)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+        .should('not.contain.html', '<span class="govuk-summary-list__hint">')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(2)
         .find('.govuk-summary-list__actions')
@@ -159,6 +164,7 @@ describe('Create next appointment', () => {
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+        .should('contain.text', 'Select the appointment type first.')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
     })
@@ -183,6 +189,7 @@ describe('Create next appointment', () => {
         .getSummaryListRow(2)
         .find('.govuk-summary-list__value')
         .should('contain.text', '3 way meeting (NS)')
+        .should('not.contain.html', '<span class="govuk-summary-list__hint">')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(2)
         .find('.govuk-summary-list__actions')
@@ -201,6 +208,7 @@ describe('Create next appointment', () => {
         .getSummaryListRow(4)
         .find('.govuk-summary-list__value')
         .should('contain.text', 'Not entered')
+        .should('contain.text', 'Select who is attending first.')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
     })
     it('should handle an appointment with no location', () => {
