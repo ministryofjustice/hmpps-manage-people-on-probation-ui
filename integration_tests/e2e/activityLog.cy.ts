@@ -395,7 +395,7 @@ context('Activity log', () => {
     page.getRowData('timeline4', 'reschedule', 'Value').should('contain.text', 'Requested by Terry Jones')
     page.getRowData('timeline4', 'reschedule', 'Value').should('contain.text', 'Requested by Terry Jones')
     page.getCardHeader('timeline5').should('contain.text', 'Office appointment at 10:15am')
-    page.getCardHeader('timeline5').get('.app-summary-card__actions').should('contain.text', 'Complied')
+    page.getCardHeader('timeline5').get('.app-summary-card__actions').should('contain.text', 'Rescheduled')
     page.getCardHeader('timeline6').should('contain.text', 'Phone call at 8:15am')
     page
       .getCardHeader('timeline6')
