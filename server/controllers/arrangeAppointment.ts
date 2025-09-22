@@ -378,10 +378,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getNotes: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { change } = req.query
+      const { change, validation } = req.query
+      const showValidation = validation === 'true'
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-sensitivity`]: 'Select the sensitivity of the appointment',
+        }
+      }
       const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
       const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
-      return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back, change })
+      return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back, change, showValidation })
     }
   },
   postNotes: () => {

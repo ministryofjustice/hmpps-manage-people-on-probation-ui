@@ -116,8 +116,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         repeating,
         repeatingDates,
-        notes: notes || 'None',
-        sensitivity: sensitivity || 'No',
+        notes: notes || null,
+        sensitivity: sensitivity || null,
       }
     }
     res.locals.appointment = appointment
