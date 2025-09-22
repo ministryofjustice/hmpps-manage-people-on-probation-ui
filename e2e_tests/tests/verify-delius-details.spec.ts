@@ -1,11 +1,11 @@
 import { Browser, BrowserContext, expect, Page, test } from '@playwright/test'
 import * as dotenv from 'dotenv'
-import { Person } from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/utils/person.js'
+import { Person } from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/utils/person'
 import {
   buildAddress,
   Address,
 } from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/address/create-address'
-import { login as loginToManageMySupervision } from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/manage-a-supervision/login.js'
+import { login as loginToManageMySupervision } from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/manage-a-supervision/login'
 import loginDeliusAndCreateOffender from '../steps/delius/create-offender/createOffender'
 
 import addPersonalDetails from '../steps/delius/add-personal-details/addPersonalDetails'
