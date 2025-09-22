@@ -160,8 +160,6 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     uuid: '',
     repeating: 'No',
     repeatingDates: [] as string[],
-    notes: 'Some notes\nSome more notes',
-    sensitivity: isSensitive ? 'Yes' : 'No',
     ...values,
   }
 }
@@ -220,20 +218,6 @@ describe('/middleware/constructAppointmentSession', () => {
       }),
     )
     expect(nextSpy).toHaveBeenCalled()
-  })
-
-  it('should use appointment note', () => {
-    const mockAppt = mockPersonAppointmentResponse({
-      appointmentNotes: undefined,
-      appointmentNote: { id: 1, note: 'some note' },
-    })
-    const req = mockReq()
-    const res = mockAppResponse({
-      personAppointment: mockAppt,
-      appointmentTypes: mockTypes,
-    })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ notes: 'some note' }))
   })
 
   it('should set the location code to not required', () => {
