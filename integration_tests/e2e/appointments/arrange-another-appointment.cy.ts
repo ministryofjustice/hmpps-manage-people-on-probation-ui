@@ -184,6 +184,7 @@ describe('Arrange another appointment', () => {
       checkUpdateRepeating(arrangeAnotherAppointmentPage)
     })
     it('should update the notes when value is changed', () => {
+      checkUpdateSensitivity(arrangeAnotherAppointmentPage)
       checkUpdateNotes(arrangeAnotherAppointmentPage)
     })
     it('should update the sensitivity when value is changed', () => {
@@ -200,6 +201,7 @@ describe('Arrange another appointment', () => {
       getUuid().then(uuid => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
         checkUpdateDateTime(arrangeAnotherAppointmentPage)
+        checkUpdateSensitivity(arrangeAnotherAppointmentPage)
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage.checkOnPage()

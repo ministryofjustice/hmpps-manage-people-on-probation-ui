@@ -42,8 +42,8 @@ const mockAppt: AppointmentSession = {
   uuid: '',
   repeating: 'No',
   repeatingDates: [],
-  notes: 'Some notes',
-  sensitivity: 'No',
+  notes: null,
+  sensitivity: null,
   licenceConditionId: '80',
 }
 
