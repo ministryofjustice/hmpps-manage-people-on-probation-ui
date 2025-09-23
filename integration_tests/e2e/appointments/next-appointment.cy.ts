@@ -53,7 +53,7 @@ describe('Create next appointment', () => {
   it('should return to manage page when backLink selected', () => {
     nextAppointmentPage.getBackLink().click()
     const manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.setPageTitle('Manage planned office visit (NS) with George Parker')
+    manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with George Parker')
     manageAppointmentPage.checkOnPage()
   })
 
