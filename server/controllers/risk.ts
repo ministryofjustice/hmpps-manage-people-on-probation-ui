@@ -40,7 +40,6 @@ const riskController: Controller<typeof routes, void> = {
         arnsClient.getNeeds(crn),
         arnsClient.getSanIndicator(crn),
       ])
-      console.log(sanIndicatorResponse)
       let timeline: TimelineItem[] = []
       let predictorScores
       if (Array.isArray(predictors)) {
