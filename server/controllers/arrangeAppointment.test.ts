@@ -708,7 +708,7 @@ describe('controllers/arrangeAppointment', () => {
       const spy = jest.spyOn(mockRes, 'redirect')
       const mockReq = createMockRequest({})
       await controllers.arrangeAppointments.postDateTime()(mockReq, mockRes)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/add-notes`)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/supporting-information`)
     })
     it('should redirect to change url if in request params', async () => {
       const mockReq = createMockRequest({ query: { change } })
@@ -827,7 +827,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({})
       await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/add-notes`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/supporting-information`)
     })
     it('should redirect to change url if in request params', async () => {
       const mockReq = createMockRequest({ query: { change } })
@@ -837,16 +837,69 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
   })
-  xdescribe('getNotes', () => {
-    it('should set local vars for error messages if validation query param is in url', async () => {
-      const mockReq = createMockRequest({ query: { validation: 'true' } })
-      await controllers.arrangeAppointments.getNotes(mockReq)
-      expect(res.locals.errorMessages).toStrictEqual({
-        [`appointments-${crn}-${uuid}-sensitivity`]: 'Select the sensitivity of the appointment',
+  describe('getSupportingInformation', () => {
+    const mockReq = createMockRequest({ query: { change } })
+    it('should use the correct back link if repeating appointment flag is enabled', async () => {
+      const mockRes = createMockResponse({
+        flags: {
+          enableRepeatAppointments: true,
+        },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getSupportingInformation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/supporting-information`, {
+        crn,
+        id: uuid,
+        back: 'repeating',
+        change,
+        maxCharCount: 4000,
+        showValidation: false,
+      })
+    })
+    it('should use the correct back link if repeating appointment flag is disabled', async () => {
+      const mockRes = createMockResponse({
+        flags: {
+          enableRepeatAppointments: false,
+        },
+      })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getSupportingInformation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/supporting-information`, {
+        crn,
+        id: uuid,
+        back: 'date-time',
+        change,
+        maxCharCount: 4000,
+        showValidation: false,
       })
     })
   })
-  describe('getCheckYourAnswers', () => {})
+  describe('postSupportingInformation', () => {
+    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
+      mockedIsValidCrn.mockReturnValue(false)
+      mockedIsValidUUID.mockReturnValue(false)
+      const mockReq = createMockRequest({ query: { change } })
+      await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
+      expect(redirectSpy).not.toHaveBeenCalled()
+    })
+    it('should redirect to the change url', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({ query: { change } })
+      await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(change)
+    })
+    it('should redirect to the check your answers page', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest()
+      await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
+    })
+  })
+  //   describe('getCheckYourAnswers', () => {})
   describe('postCheckYourAnswers', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)

@@ -19,6 +19,7 @@ import {
   timeIsNotLaterThan,
   isTodayOrLater,
   timeIsNowOrInFuture,
+  isValidCharCount,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -522,5 +523,24 @@ describe('hasNestedKeys()', () => {
       },
     }
     expect(hasNestedKeys(mockData, path)).toEqual(false)
+  })
+})
+
+describe('isValidCharCount', () => {
+  it('should return true if no value', () => {
+    expect(isValidCharCount([null])).toEqual(true)
+  })
+  it('should return true if value is less than 4000 chars', () => {
+    const value = 'x'.repeat(4000)
+    expect(isValidCharCount([value])).toEqual(true)
+  })
+  it('should return false if value is more than 4000 chars', () => {
+    const value = 'x'.repeat(4001)
+    expect(isValidCharCount([value])).toEqual(false)
+  })
+  it('should return false if value including line breaks is more than 4000 chars', () => {
+    const paragraph = 'x'.repeat(1000)
+    const value = `${paragraph}\r\n${paragraph}\r\n${paragraph}\r\n${paragraph}`
+    expect(isValidCharCount([value])).toEqual(false)
   })
 })

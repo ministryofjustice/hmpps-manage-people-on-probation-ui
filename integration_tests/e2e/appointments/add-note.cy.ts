@@ -123,11 +123,35 @@ describe('Manage appointment - add a note', () => {
 
   it('should display validation errors if continue button is clicked without first selecting a sensitive option', () => {
     loadPage()
+    const note = 'x'.repeat(4000)
+    cy.get('#notes').type(note, { delay: 0 })
     addNotePage.getSubmitBtn().click()
     addNotePage.checkErrorSummaryBox(['Select whether or not the appointment note contains sensitive information'])
     addNotePage.getElement(`#sensitive-error`).should('contain.text', 'Please select an option')
     addNotePage.getErrorSummaryLink(0).click()
     addNotePage.getElement(`#sensitive`).should('be.focused')
+  })
+
+  it('should display validation errors if note is more than 4000 character', () => {
+    loadPage()
+    const note = 'x'.repeat(4001)
+    cy.get('#notes').type(note, { delay: 0 })
+    addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    addNotePage.getSubmitBtn().click()
+    addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+    cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
+  })
+
+  it('should count a return as 1 character', () => {
+    loadPage()
+    const paragraph = 'x'.repeat(2000)
+    cy.get('#notes').type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
+    addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    addNotePage.getSubmitBtn().click()
+    addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+    cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
   })
 
   it('should validate a png file as being an invalid file type when selected', () => {

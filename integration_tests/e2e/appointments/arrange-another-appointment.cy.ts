@@ -12,7 +12,7 @@ import {
   completeLocationPage,
   completeDateTimePage,
   completeRepeatingPage,
-  completeNotePage,
+  completeSupportingInformationPage,
   completeCYAPage,
   completeConfirmationPage,
   checkAppointmentSummary,
@@ -34,7 +34,7 @@ const loadPage = () => {
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()
-  completeNotePage()
+  completeSupportingInformationPage()
   completeCYAPage()
   completeConfirmationPage()
 }

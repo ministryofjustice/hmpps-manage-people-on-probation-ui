@@ -4,6 +4,7 @@ import logger from '../../logger'
 // import logger from '/Users/aidan.filby/Desktop/MPoP-Dev/hmpps-manage-people-on-probation-ui/logger'
 import { dateTime } from './dateTime'
 import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
+import config from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const isNotEmpty = (args: any[]) => {
@@ -114,6 +115,17 @@ export const timeIsNotLaterThan = (args: any[]) => {
     return true
   }
   return notLaterThanDate < date
+}
+
+export const isValidCharCount = (args: any[]) => {
+  const value = args?.[0]
+  const { maxCharCount } = config
+  if (!value) {
+    return true
+  }
+  const lineBreaks = value.split('\r\n').length - 1
+  const textLength = value.split('\r\n').join('').length
+  return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
 }
 
 export function validateWithSpec<R extends Validateable>(request: R, validationSpec: ValidationSpec) {

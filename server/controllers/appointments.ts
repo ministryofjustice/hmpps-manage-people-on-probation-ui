@@ -209,6 +209,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       let uploadedFiles: FileCache[] = []
       let errorMessages = null
+      let body = null
       if (req?.session?.cache?.uploadedFiles) {
         uploadedFiles = req.session.cache.uploadedFiles
         delete req.session.cache.uploadedFiles
@@ -217,14 +218,20 @@ const appointmentsController: Controller<typeof routes, void> = {
         errorMessages = req.session.errorMessages
         delete req.session.errorMessages
       }
-      const { validMimeTypes, maxFileSize, fileUploadLimit } = config
+      if (req?.session?.body) {
+        body = req.session.body
+        delete req.session.body
+      }
+      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
+        body,
         validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
         maxFileSize,
         fileUploadLimit,
         uploadedFiles,
+        maxCharCount,
       })
     }
   },

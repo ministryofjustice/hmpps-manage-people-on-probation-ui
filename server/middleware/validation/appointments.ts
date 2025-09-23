@@ -4,14 +4,16 @@ import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
+import config from '../../config'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId } = params
   const { data } = session
+  const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, personLevel }
+  const localParams: LocalParams = { crn, id, body, contactId, personLevel, maxCharCount }
   let isAddNotePage = false
   let render = `pages/${[
     url
@@ -121,15 +123,17 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateSensitivity = () => {
-    if (req.url.includes('/add-notes')) {
+  const validateSupportingInformation = () => {
+    if (req.url.includes('/supporting-information')) {
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           contactId,
-          page: 'add-notes',
+          page: 'supporting-information',
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount,
         }),
       )
     }
@@ -159,6 +163,8 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'add-note',
+          notes: req.body.notes,
+          maxCharCount,
         }),
       )
     }
@@ -171,7 +177,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateDateTime()
   validateRepeating()
   validateRecordAnOutcome()
-  validateSensitivity()
+  validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
   validateAddNote()
@@ -179,6 +185,7 @@ const appointments: Route<void> = (req, res, next) => {
     res.locals.errorMessages = errorMessages
     if (isAddNotePage) {
       req.session.errorMessages = errorMessages
+      req.session.body = body
       return res.redirect(req.url)
     }
     return res.render(render, { errorMessages, ...localParams })

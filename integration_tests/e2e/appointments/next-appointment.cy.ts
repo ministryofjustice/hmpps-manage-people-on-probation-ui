@@ -10,7 +10,7 @@ import {
   completeCYAPage,
   completeDateTimePage,
   completeLocationPage,
-  completeNotePage,
+  completeSupportingInformationPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
@@ -29,7 +29,7 @@ const completeAppointment = () => {
   completeLocationPage()
   completeDateTimePage()
   completeRepeatingPage()
-  completeNotePage()
+  completeSupportingInformationPage()
   completeCYAPage()
   // completeConfirmationPage()
 }

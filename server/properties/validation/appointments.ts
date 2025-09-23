@@ -7,6 +7,7 @@ import {
   timeIsNowOrInFuture,
   isTodayOrLater,
   isNotEarlierThan,
+  isValidCharCount,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -17,10 +18,12 @@ export interface AppointmentsValidationArgs {
   repeatingValue?: 'Yes' | 'No'
   visor?: boolean
   contactId?: string
+  notes?: string
+  maxCharCount?: number
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue, contactId } = args
+  const { crn, id, page, visor, repeatingValue, notes, maxCharCount } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -160,8 +163,18 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][notes]`]: {
+      optional: page !== 'supporting-information' || (page === 'supporting-information' && notes.trim() === ''),
+      checks: [
+        {
+          validator: isValidCharCount,
+          msg: `Note must be ${maxCharCount} characters or less`,
+          log: `Note exceeds maximum character length`,
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== 'add-notes',
+      optional: page !== 'supporting-information',
       checks: [
         {
           validator: isNotEmpty,
@@ -177,6 +190,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select whether or not you wanted to arrange the next appointment',
           log: 'Next appointment type not selected',
+        },
+      ],
+    },
+    notes: {
+      optional: page !== 'add-note' || (page === 'add-note' && notes.trim() === ''),
+      checks: [
+        {
+          validator: isValidCharCount,
+          msg: `Note must be ${maxCharCount} characters or less`,
+          log: `Note exceeds maximum character length`,
         },
       ],
     },

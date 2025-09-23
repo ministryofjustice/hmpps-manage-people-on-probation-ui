@@ -11,7 +11,7 @@ import {
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
-  completeNotePage,
+  completeSupportingInformationPage,
   date,
   endTime,
   startTime,
@@ -30,7 +30,7 @@ const loadPage = (crnOverride = '') => {
   completeLocationPage(1, crnOverride)
   completeDateTimePage(crnOverride)
   completeRepeatingPage(2, crnOverride)
-  completeNotePage(true, crnOverride)
+  completeSupportingInformationPage(true, crnOverride)
   completeCYAPage()
 }
 describe('Confirmation page', () => {

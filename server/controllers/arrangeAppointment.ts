@@ -9,6 +9,7 @@ import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../m
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
+import config from '../config'
 
 const routes = [
   'redirectToSentence',
@@ -25,8 +26,8 @@ const routes = [
   'postDateTime',
   'getRepeating',
   'postRepeating',
-  'getNotes',
-  'postNotes',
+  'getSupportingInformation',
+  'postSupportingInformation',
   'getCheckYourAnswers',
   'postCheckYourAnswers',
   'getConfirmation',
@@ -56,7 +57,7 @@ const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsA
     username: 'attendance',
     locationCode: 'location',
     date: 'date-time',
-    sensitivity: 'add-notes',
+    sensitivity: 'supporting-information',
   }
   const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
   const baseUrl = `/case/${crn}/arrange-appointment/${id}`
@@ -297,7 +298,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
       const nextPage = repeatAppointmentsEnabled
         ? `/case/${crn}/arrange-appointment/${id}/repeating`
-        : `/case/${crn}/arrange-appointment/${id}/add-notes`
+        : `/case/${crn}/arrange-appointment/${id}/supporting-information`
       const redirect = change || nextPage
       return res.redirect(redirect)
     }
@@ -371,12 +372,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           parseInt(numberOfRepeatAppointments, 10) + 1,
         )
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/add-notes`
+      const redirect = change || `/case/${crn}/arrange-appointment/${id}/supporting-information`
       return res.redirect(redirect)
     }
   },
-  getNotes: () => {
+  getSupportingInformation: () => {
     return async (req, res) => {
+      const { maxCharCount } = config
       const { crn, id } = req.params as Record<string, string>
       const { change, validation } = req.query
       const showValidation = validation === 'true'
@@ -387,10 +389,17 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
       const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
-      return res.render(`pages/arrange-appointment/add-notes`, { crn, id, back, change, showValidation })
+      return res.render(`pages/arrange-appointment/supporting-information`, {
+        crn,
+        id,
+        back,
+        change,
+        showValidation,
+        maxCharCount,
+      })
     }
   },
-  postNotes: () => {
+  postSupportingInformation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string

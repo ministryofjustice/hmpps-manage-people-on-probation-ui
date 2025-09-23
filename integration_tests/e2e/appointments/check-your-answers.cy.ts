@@ -9,7 +9,7 @@ import {
   completeSentencePage,
   completeTypePage,
   completeAttendancePage,
-  completeNotePage,
+  completeSupportingInformationPage,
   checkPopHeader,
   checkAppointmentSummary,
   checkUpdateDateTime,
@@ -37,7 +37,7 @@ const loadPage = ({
   if (repeatAppointments) {
     completeRepeatingPage()
   }
-  completeNotePage(notes)
+  completeSupportingInformationPage(notes)
 }
 
 describe('Check your answers then confirm the appointment', () => {
