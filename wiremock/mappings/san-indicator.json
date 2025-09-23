@@ -1,0 +1,20 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/arns/san-indicator/crn/.*",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "crn": "X000001",
+          "sanIndicator": false
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

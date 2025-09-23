@@ -32,12 +32,13 @@ const riskController: Controller<typeof routes, void> = {
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
-      const [personRisk, risks, tierCalculation, predictors, needs] = await Promise.all([
+      const [personRisk, risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
         masClient.getPersonRiskFlags(crn),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
         arnsClient.getNeeds(crn),
+        arnsClient.getSanIndicator(crn),
       ])
       let timeline: TimelineItem[] = []
       let predictorScores
@@ -59,6 +60,7 @@ const riskController: Controller<typeof routes, void> = {
         timeline,
         needs,
         oasysLink,
+        sanIndicator: sanIndicatorResponse.sanIndicator,
       })
     }
   },

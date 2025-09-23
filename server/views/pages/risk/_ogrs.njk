@@ -1,0 +1,25 @@
+{% if predictorScores.scores.OGRS.level %}
+    <section data-qa="ogrs">
+        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}  class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }}" score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OGRS score">
+        OGRS (offender group reconviction scale)
+    </h{{ scoresHeadingLevel if scoresHeadingLevel else '3' }}>
+        <div class="govuk-grid-row  govuk-!-margin-bottom-4">
+            <div class="govuk-grid-column-full">
+                <div class="flex-mobile">
+                    <div class='flex__item-one-third-mobile'>
+                        <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h3>
+                        <div class='govuk-body' data-qa='ogrs-1yr'>{{ predictorScores.scores.OGRS.oneYear }}%</div>
+                    </div>
+                    <div class='flex__item-one-third-mobile'>
+                        <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h3>
+                        <div class='govuk-body' data-qa='ogrs-2yr'>{{ predictorScores.scores.OGRS.twoYears }}%</div>
+                    </div>
+                    <div class='flex__item-one-third-mobile'>
+                        <h3 class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h3>
+                        <div class='govuk-body' data-qa='ogrs-level'>{{ riskLevelLabel(predictorScores.scores.OGRS.level) }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endif %}

@@ -30,7 +30,7 @@ context('Upcoming appointments', () => {
   it('Upcoming appointments page is rendered', () => {
     cy.visit('/caseload/appointments/upcoming')
     const page = new UserAppointments()
-    page.setPageTitle('My upcoming appointments')
+    page.checkPageTitle('My upcoming appointments')
     checkColumnHeading(page, 0, 'Name / CRN', 'name', '/caseload/appointments/upcoming')
     checkColumnHeading(page, 1, 'DOB / Age', 'dob', '/caseload/appointments/upcoming')
     checkColumnHeading(page, 2, 'Sentence', 'sentence', '/caseload/appointments/upcoming')

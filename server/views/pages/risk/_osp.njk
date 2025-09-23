@@ -1,0 +1,26 @@
+<section data-qa="osp">
+    {% if predictorScores.scores.OSPI.score or predictorScores.scores.OSPC.score %}
+        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP score">
+        OSP (OASys sexual predictor scores)
+    </h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
+    {% endif %}
+    {% if predictorScores.scores.OSPI.score %}
+        <h{{ scoresSubHeadingLevel if scoresSubHeadingLevel else '4'  }}  class="govuk-heading-s score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP/I score">
+                    OSP/I (internet-related offences) or OSP/IIC (internet-involved child offences)
+   </h{{ scoresSubHeadingLevel if scoresSubHeadingLevel else '4'  }} >
+        <div aria-hidden="true">
+            {{ predictorScore(predictorScores.scores.OSPI) }}
+        </div>
+        <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPI.score }}%</div>
+
+        {% if predictorScores.scores.OSPC.score %}
+            <h4 class="govuk-heading-s score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OSP/C score">
+                    OSP/C (contact-related sexual reoffending) or OSP/DC (direct contact)
+                </h4>
+            <div aria-hidden="true">
+                {{ predictorScore(predictorScores.scores.OSPC) }}
+            </div>
+            <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.OSPC.score }}%</div>
+        {% endif %}
+    {% endif %}
+</section>
