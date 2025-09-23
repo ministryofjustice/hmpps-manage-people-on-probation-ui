@@ -853,6 +853,7 @@ describe('controllers/arrangeAppointment', () => {
         back: 'repeating',
         change,
         maxCharCount: 4000,
+        showValidation: false,
       })
     })
     it('should use the correct back link if repeating appointment flag is disabled', async () => {
@@ -869,6 +870,7 @@ describe('controllers/arrangeAppointment', () => {
         back: 'date-time',
         change,
         maxCharCount: 4000,
+        showValidation: false,
       })
     })
   })
