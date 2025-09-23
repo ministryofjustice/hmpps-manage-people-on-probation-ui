@@ -532,6 +532,16 @@ describe('Manage an appointment', () => {
             .should('contain.text', 'Completed')
         })
       })
+      describe('Appointment is sensitive', () => {
+        beforeEach(() => {
+          cy.task('stubPastAppointmentSensitive')
+          loadPage()
+          manageAppointmentPage = new ManageAppointmentPage()
+        })
+        it('should display the sensitive tag', () => {
+          manageAppointmentPage.getSensitiveTag().should('contain.text', 'Sensitive')
+        })
+      })
       describe('Appointment is in the past with next appointment arranged at POP home address', () => {
         beforeEach(() => {
           cy.task('stubPastAppointmentOutcomeNoNotes')
