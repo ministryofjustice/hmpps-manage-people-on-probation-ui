@@ -363,6 +363,9 @@ describe('controllers/appointments', () => {
           uploadedFiles,
         },
         errorMessages,
+        body: {
+          fieldName: 'value',
+        },
       },
     })
     beforeEach(async () => {
@@ -374,6 +377,9 @@ describe('controllers/appointments', () => {
     })
     it('should delete errorMessages session value if it exists', () => {
       expect(mockReq.session.errorMessages).toBeUndefined()
+    })
+    it('should delete body session value if it exists', () => {
+      expect(mockReq.session.body).toBeUndefined()
     })
     it('should render the add note page', () => {
       const { fileUploadLimit, maxFileSize, validMimeTypes } = config
