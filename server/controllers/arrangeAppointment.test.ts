@@ -837,12 +837,16 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(change)
     })
   })
-  // xdescribe('getNotes', () => {
-  //   it('should', async () => {
-  //     await controllers.arrangeAppointments.getNotes(hmppsAuthClient)(mockReq, res)
-  //   })
-  // })
-  //   describe('getCheckYourAnswers', () => {})
+  xdescribe('getNotes', () => {
+    it('should set local vars for error messages if validation query param is in url', async () => {
+      const mockReq = createMockRequest({ query: { validation: 'true' } })
+      await controllers.arrangeAppointments.getNotes(mockReq)
+      expect(res.locals.errorMessages).toStrictEqual({
+        [`appointments-${crn}-${uuid}-sensitivity`]: 'Select the sensitivity of the appointment',
+      })
+    })
+  })
+  describe('getCheckYourAnswers', () => {})
   describe('postCheckYourAnswers', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)
