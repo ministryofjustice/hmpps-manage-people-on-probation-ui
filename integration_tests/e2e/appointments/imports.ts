@@ -220,9 +220,15 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
     .find('.govuk-summary-list__value')
     .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
   page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Supporting information')
-  page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Some notes')
+  page
+    .getSummaryListRow(7)
+    .find('.govuk-summary-list__value')
+    .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Not entered' : 'Some notes')
   page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
-  page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+  page
+    .getSummaryListRow(8)
+    .find('.govuk-summary-list__value')
+    .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Not entered' : 'Yes')
 }
 
 export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {

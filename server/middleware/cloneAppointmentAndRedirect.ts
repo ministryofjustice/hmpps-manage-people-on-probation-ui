@@ -20,6 +20,8 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       numberOfAppointments: '1',
       numberOfRepeatAppointments: '0',
       repeating: 'No',
+      notes: null,
+      sensitivity: null,
     }
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
     return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
