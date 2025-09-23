@@ -139,7 +139,11 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
     page.getElementData('plan').get('h4').should('contain.text', 'Plan')
     page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 24 January 2024')
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
-    page.getElementData('plan').find('a').should('have.attr', 'href', '#')
+    page
+      .getElementData('plan')
+      .find('a')
+      .should('have.attr', 'target', '_blank')
+      .should('have.attr', 'href', 'https://sentence-plan-dummy-url/X000001/plan')
   }
 }
 
