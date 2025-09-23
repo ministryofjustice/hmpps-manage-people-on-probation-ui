@@ -138,8 +138,8 @@ describe('Manage appointment - add a note', () => {
     cy.get('#notes').type(note, { delay: 0 })
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     addNotePage.getSubmitBtn().click()
-    addNotePage.checkErrorSummaryBox(['Enter a note 4000 characters or less'])
-    addNotePage.getElement(`#notes-error`).should('contain.text', 'Enter a note 4000 characters or less')
+    addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
   })
 
@@ -149,8 +149,8 @@ describe('Manage appointment - add a note', () => {
     cy.get('#notes').type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     addNotePage.getSubmitBtn().click()
-    addNotePage.checkErrorSummaryBox(['Enter a note 4000 characters or less'])
-    addNotePage.getElement(`#notes-error`).should('contain.text', 'Enter a note 4000 characters or less')
+    addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
   })
 

@@ -118,7 +118,6 @@ export const timeIsNotLaterThan = (args: any[]) => {
 }
 
 export const isValidCharCount = (args: any[]) => {
-  console.log('is valid char count')
   const value = args?.[0]
   const { maxCharCount } = config
   if (!value) {
@@ -126,7 +125,6 @@ export const isValidCharCount = (args: any[]) => {
   }
   const lineBreaks = value.split('\r\n').length - 1
   const textLength = value.split('\r\n').join('').length
-  console.log({ lineBreaks, textLength })
   return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
 }
 

@@ -30,13 +30,39 @@ describe('Add supporting information (optional)', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })
-  it('should be on Add supporting information (optional) page', () => {
+  it('should be on add supporting information (optional) page', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {
     checkPopHeader('Alton Berge', true)
   })
-  it('should show validation errors if sensitivity option is selected', () => {
+
+  it('should display validation errors if note is more than 4000 character', () => {
+    loadPage()
+    const note = 'x'.repeat(4001)
+    cy.get(`#appointments-${crn}-${uuid}-notes`).type(note, { delay: 0 })
+    cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+    appointmentNotePage.getSubmitBtn().click()
+    appointmentNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    appointmentNotePage
+      .getElement(`#appointments-${crn}-${uuid}-notes-error`)
+      .should('contain.text', 'Note must be 4000 characters or less')
+    cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
+  })
+
+  it('should count a return as 1 character', () => {
+    loadPage()
+    const paragraph = 'x'.repeat(2000)
+    cy.get(`#appointments-${crn}-${uuid}-notes`).type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
+    cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+    appointmentNotePage.getSubmitBtn().click()
+    appointmentNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    appointmentNotePage
+      .getElement(`#appointments-${crn}-${uuid}-notes-error`)
+      .should('contain.text', 'Note must be 4000 characters or less')
+    cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
+  })
+  it('should show validation errors if sensitivity option is not selected', () => {
     cy.get('textarea').clear()
     cy.get('textarea').type('A test note')
     appointmentNotePage.getSubmitBtn().click()

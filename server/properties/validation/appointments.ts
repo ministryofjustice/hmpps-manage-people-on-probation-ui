@@ -163,8 +163,18 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][notes]`]: {
+      optional: page !== 'supporting-information' || (page === 'supporting-information' && notes.trim() === ''),
+      checks: [
+        {
+          validator: isValidCharCount,
+          msg: `Note must be ${maxCharCount} characters or less`,
+          log: `Note exceeds maximum character length`,
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== 'add-notes',
+      optional: page !== 'supporting-information',
       checks: [
         {
           validator: isNotEmpty,
@@ -188,7 +198,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isValidCharCount,
-          msg: `Enter a note ${maxCharCount} characters or less`,
+          msg: `Note must be ${maxCharCount} characters or less`,
           log: `Note exceeds maximum character length`,
         },
       ],

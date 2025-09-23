@@ -149,7 +149,7 @@
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 
-    href: changePath + "/add-notes?change=" + url, 
+    href: changePath + "/supporting-information?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "notes"
      } 
@@ -159,7 +159,7 @@
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ { 
-    href: changePath + "/add-notes?change=" + url, 
+    href: changePath + "/supporting-information?change=" + url, 
     text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
     visuallyHiddenText: "sensitivity"
      } 

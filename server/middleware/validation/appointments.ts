@@ -123,15 +123,17 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateSensitivity = () => {
-    if (req.url.includes('/add-notes')) {
+  const validateSupportingInformation = () => {
+    if (req.url.includes('/supporting-information')) {
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           contactId,
-          page: 'add-notes',
+          page: 'supporting-information',
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount,
         }),
       )
     }
@@ -175,7 +177,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateDateTime()
   validateRepeating()
   validateRecordAnOutcome()
-  validateSensitivity()
+  validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
   validateAddNote()

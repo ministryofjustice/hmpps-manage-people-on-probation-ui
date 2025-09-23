@@ -3,18 +3,19 @@
 {% set title = 'Add supporting information (optional)' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
 {% block form %}
-{{ govukTextarea({
-    hint: {
+
+    {{ govukCharacterCount({
+   hint: {
         text: "You can add any details that may help you with the appointment. Use paragraphs to make your notes easy to read."
     },
-    id: "notes",
-    name: "notes",
-    formGroup: {
-        attributes: { "data-qa": "notes"}
-    }
-} | decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
+  rows: '10',
+  maxlength: maxCharCount,
+  formGroup: {
+    attributes: { "data-qa": "notes"}
+   }
+}| decorateFormAttributes(['appointments', crn, id, 'notes'])) }}
 
-{{ govukRadios({
+    {{ govukRadios({
     fieldset: {
         legend: {
             text: 'Does this contact include sensitive information?',
