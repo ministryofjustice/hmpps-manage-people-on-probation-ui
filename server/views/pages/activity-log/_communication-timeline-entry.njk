@@ -6,10 +6,9 @@
   <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 {% endset %}
 {% set actionsHtml %}
+{{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
 {% if shouldPromptToRecordAnOutcome %}
   {% include './_log-outcome-link.njk' %}
-{% else %}
-  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
 {% endif %}
 {% endset %}
 
