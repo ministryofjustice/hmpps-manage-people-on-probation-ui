@@ -13,11 +13,12 @@
   {{ govukTag({text: 'RAR', classes: 'govuk-tag--purple'}) }}
 {% endif %}
 
+{{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
 {% if shouldPromptToRecordAnOutcome %}
   {% include './_log-outcome-link.njk' %}
-{% else %}
-  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
 {% endif %}
+
+
 
 {% endset %}
 

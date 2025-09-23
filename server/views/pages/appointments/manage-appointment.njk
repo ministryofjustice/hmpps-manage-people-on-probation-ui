@@ -121,6 +121,14 @@
   }
 }) }}
       {% endif %}
+      {% if appointment.isSensitive === true %}
+        {% set text = 'Sensitive' %}
+        {% set shorthand = '!' %}
+        {% set iconClass = 'waiting' %}
+        {% set colour = 'yellow' %}
+        {% set tagClasses = 'app-compliance-tag govuk-tag--' + colour + ' govuk-!-margin-bottom-6' %}
+        {{ govukTag({ text: text, classes: tagClasses, attributes: { 'data-qa': 'sensitiveTag' } }) }}
+      {% endif %}
       {% if not appointment.deliusManaged %}
         <section data-qa="appointmentActions">
           <h3 class="govuk-heading-m">Appointment actions</h3>

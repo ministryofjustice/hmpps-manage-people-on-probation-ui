@@ -3,6 +3,7 @@ import { WiremockMapping } from '../../integration_tests/utils'
 
 interface Args {
   isFuture?: boolean
+  isSensitive?: boolean
   managedType?: boolean
   personLevel?: boolean
   documents?: boolean
@@ -20,6 +21,7 @@ interface Args {
 const getAppointmentStub = (
   {
     isFuture = true,
+    isSensitive = false,
     managedType = true,
     personLevel = false,
     documents = false,
@@ -59,7 +61,7 @@ const getAppointmentStub = (
           rarToolKit: 'Choices and Changes',
           appointmentNotes: [],
           appointmentNote: null,
-          isSensitive: false,
+          isSensitive,
           hasOutcome: false,
           wasAbsent: true,
           officer: {
@@ -362,6 +364,10 @@ const stubFutureAppointmentManagedTypeNoNextAppt = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ notes: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubPastAppointmentSensitive = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ isFuture: false, isSensitive: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubPastAppointmentNoOutcomeNoNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, notes: false })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -549,6 +555,7 @@ export default {
   stubFutureAppointmentManagedTypeWithNotes,
   stubFutureAppointmentManagedTypeNoNextAppt,
   stubFutureAppointmentManagedTypeWithDocs,
+  stubPastAppointmentSensitive,
   stubPastAppointmentNoOutcomeNoNotes,
   stubPastAppointmentOutcomeNoNotes,
   stubPastAppointmentWithNotes,
