@@ -1,13 +1,13 @@
 {% if entry.action %}
-  {{ entry.action }}
-{% elseif entry.isEmailOrTextToPop === true %}
+   {{ entry.action }}
+{% elif entry.isEmailOrTextToPop === true %}
     Email/Text to {{ personSummary.name | fullName }}
-{% elseif entry.isEmailOrTextFromPop === true %}
+{% elif entry.isEmailOrTextFromPop === true %}
    Email or Text from {{ personSummary.name | fullName }}
-{% elseif entry.isPhoneCallToPop === true %}
+{% elif entry.isPhoneCallToPop === true %}
    Phone call to {{  personSummary.name | fullName }}
-{% elseif entry.isPhoneCallFromPop === true %}
+{% elif entry.isPhoneCallFromPop === true %}
    Phone call from {{ personSummary.name | fullName }}
 {% else %}
-    {{ entry.type | toSentenceCase(['(NS)','-']) }}
+   {{ entry.type | toSentenceCase }}
 {% endif %}

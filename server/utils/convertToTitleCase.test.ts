@@ -40,6 +40,6 @@ describe('utils/convertToTitleCase', () => {
   })
   it('should not convert ignored values', () => {
     const str = 'Initial appointment - in office (NS)'
-    expect(convertToTitleCase(str, ['(NS)'])).toEqual('Initial Appointment - In Office (NS)')
+    expect(convertToTitleCase(str, ['(NS)', '(Non', 'NS)', '-'])).toEqual('Initial Appointment - In Office (NS)')
   })
 })
