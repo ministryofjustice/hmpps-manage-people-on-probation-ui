@@ -18,6 +18,10 @@ export default class ManageAppointmentPage extends Page {
     return cy.get(`[data-qa="associatedDocuments"]`)
   }
 
+  getSensitiveTag = () => {
+    return cy.get(`[data-qa="sensitiveTag"]`)
+  }
+
   getTaskName = (rowIndex: number) => {
     return cy.get(
       `[data-qa="appointmentActions"] li:nth-child(${rowIndex}) .govuk-task-list__name-and-hint div:nth-child(1)`,
