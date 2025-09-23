@@ -110,11 +110,14 @@ export const completeDateTimePage = (crnOverride = '') => {
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeNotePage = (notes = true, crnOverride = '') => {
+export const completeSupportingInformationPage = (notes = true, crnOverride = '') => {
   const notePage = new AppointmentNotePage()
   cy.get('form').then(form => form[0].reset())
   if (notes) {
-    notePage.getElement(`#notes`).focus().type('Some notes')
+    notePage
+      .getElement(`#appointments-${crnOverride || crn}-${uuid}-notes`)
+      .focus()
+      .type('Some notes')
   }
   notePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-sensitivity`).click()
   notePage.getSubmitBtn().click()
@@ -323,13 +326,15 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
 }
 
 export const checkUpdateNotes = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  page.getSummaryListRow(7).find('.govuk-link').click()
-  const updatedNotes = 'Some updated notes'
-  const notePage = new AppointmentNotePage()
-  notePage.getElement(`#notes`).focus().clear().type(updatedNotes)
-  notePage.getSubmitBtn().click()
-  page.checkOnPage()
-  page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
+  getUuid().then(pageUuid => {
+    page.getSummaryListRow(7).find('.govuk-link').click()
+    const updatedNotes = 'Some updated notes'
+    const notePage = new AppointmentNotePage()
+    notePage.getElement(`#appointments-${crn}-${pageUuid}-notes`).focus().clear().type(updatedNotes)
+    notePage.getSubmitBtn().click()
+    page.checkOnPage()
+    page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
+  })
 }
 
 export const checkUpdateSensitivity = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
