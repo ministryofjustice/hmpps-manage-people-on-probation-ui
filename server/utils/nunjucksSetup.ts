@@ -66,6 +66,7 @@ import {
   shortTime,
   convertToTitleCase,
   getPersonLevelTypes,
+  handleQuotes,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -137,6 +138,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('shortTime', shortTime)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
+  njkEnv.addFilter('handleQuotes', handleQuotes)
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))

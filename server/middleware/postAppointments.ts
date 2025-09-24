@@ -1,7 +1,7 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Response } from 'supertest'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, escapeQuotes } from '../utils'
+import { getDataValue, dateTime, handleQuotes } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
@@ -43,7 +43,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       uuid,
       createOverlappingAppointment: true,
       until: dateTime(untilDate, end),
-      notes: escapeQuotes(notes),
+      notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
     }
