@@ -1,4 +1,4 @@
-export const escapeQuotes = (input: string): string => {
-  if (!input) return input
-  return input.replace(/"/g, '\\"').replace(/'/g, "\\'")
+export const escapeQuotes = (str: string): string => {
+  if (!str) return str
+  return str.replaceAll('"', '\\"')
 }
