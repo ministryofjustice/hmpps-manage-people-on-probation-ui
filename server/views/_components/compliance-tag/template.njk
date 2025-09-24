@@ -3,6 +3,17 @@
 {% set entry = params.entry %}
 
 {% set tags = [] %}
+{% if entry.isSensitive === true %}
+  {% set text = 'Sensitive' %}
+  {% set shorthand = '!' %}
+  {% set iconClass = 'waiting' %}
+  {% set colour = 'yellow' %}
+  {% set tags = (tags.push({ 
+    'text': text, 
+    'shorthand': shorthand, 
+    'iconClass': iconClass, 
+    'colour': colour }), tags) %}
+{% endif %}
 {% if entry.rescheduled %}
   {% set text = 'Rescheduled' %}
   {% set shorthand = '⟳' %}
@@ -63,17 +74,6 @@
   {% set shorthand = '✘' %}
   {% set iconClass = 'strike' %}
   {% set colour = 'red' %}
-  {% set tags = (tags.push({ 
-    'text': text, 
-    'shorthand': shorthand, 
-    'iconClass': iconClass, 
-    'colour': colour }), tags) %}
-{% endif %}
-{% if entry.isSensitive === true %}
-  {% set text = 'Sensitive' %}
-  {% set shorthand = '!' %}
-  {% set iconClass = 'waiting' %}
-  {% set colour = 'yellow' %}
   {% set tags = (tags.push({ 
     'text': text, 
     'shorthand': shorthand, 
