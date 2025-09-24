@@ -6,7 +6,7 @@ import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress } from '../utils'
+import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress, escapeQuotes } from '../utils'
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
@@ -247,7 +247,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
-        notes,
+        notes: escapeQuotes(notes),
         sensitive: sensitive === 'Yes',
       }
       await masClient.patchAppointment(body)
