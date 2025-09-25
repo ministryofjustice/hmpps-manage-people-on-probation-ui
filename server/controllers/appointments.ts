@@ -311,11 +311,10 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
-      const isActivityLog = true
       const queryParams = getQueryString(req.query as Record<string, string>)
       const { back } = req.query
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
+        action: 'VIEW_MAS_APPOINTMENT_NOTE',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
@@ -328,7 +327,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         personAppointment,
         crn,
         contactId,
-        isActivityLog,
       })
     }
   },

@@ -15,7 +15,7 @@ import {
   mockPersonAppointment,
 } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, getPersonAppointment, renderError } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import config from '../config'
@@ -23,6 +23,7 @@ import arrangeAppointmentController from './arrangeAppointment'
 
 const crn = 'X000001'
 const id = '1234'
+const noteId = '1'
 const contactId = '1234'
 const actionType = 'mockType'
 
@@ -76,6 +77,7 @@ const req = httpMocks.createRequest({
   params: {
     crn,
     id,
+    noteId,
     contactId,
     actionType,
   },
@@ -100,6 +102,10 @@ const getPersonScheduleSpy = jest
 
 const getPersonAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointment')
+  .mockImplementation(() => Promise.resolve(mockPersonAppointment))
+
+const getPersonAppointmentNoteSpy = jest
+  .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
 
 const nextApptResponse = (appointment = {} as Activity | null): NextAppointmentResponse => ({
@@ -540,6 +546,25 @@ describe('controllers/appointments', () => {
       })
       await controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
+    })
+  })
+
+  describe('get appointment note', () => {
+    beforeEach(async () => {
+      await controllers.appointments.getAppointmentNote(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_APPOINTMENT_NOTE', uuidv4(), crn, 'CRN')
+    it('should request the person appointment note', () => {
+      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
+    })
+    it('should render the appointment notepage', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+        contactId,
+        back: undefined,
+        queryParams: ['view=default'],
+      })
     })
   })
 })
