@@ -226,11 +226,13 @@ const appointmentsController: Controller<typeof routes, void> = {
         body = req.session.body
         delete req.session.body
       }
+      const { url } = req
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
+        url,
         validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
         maxFileSize,
         fileUploadLimit,
