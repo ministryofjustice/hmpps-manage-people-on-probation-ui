@@ -30,7 +30,6 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     res.locals.tierCalculation = tierCalculation
     res.locals.predictorScores = toPredictors(predictors)
     res.locals.headerPersonName = `${overview.name.forename} ${overview.name.surname}`
-    console.log(res.locals.headerPersonName)
     res.locals.headerCRN = overview.crn
     res.locals.headerDob = overview.dateOfBirth
     return next()
