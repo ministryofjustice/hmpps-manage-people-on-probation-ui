@@ -177,7 +177,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn, actionType } = req.params
       const { contactId } = req.query
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_PERSONAL_DETAILS',
+        action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',

@@ -266,7 +266,7 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
+    checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
         crn,
