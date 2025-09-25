@@ -248,6 +248,7 @@ describe('controllers/appointments', () => {
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
         queryParams: ['view=default'],
+        url: '',
       })
     })
   })

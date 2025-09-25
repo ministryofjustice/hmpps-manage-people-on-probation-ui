@@ -24,6 +24,7 @@ const routes = [
   'getManageAppointment',
   'getNextAppointment',
   'postNextAppointment',
+  'getAppointmentNote',
 ] as const
 
 const appointmentsController: Controller<typeof routes, void> = {
@@ -141,6 +142,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const { back } = req.query
+      let { url } = req
+      url = encodeURIComponent(url)
       const queryParams = getQueryString(req.query as Record<string, string>)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -158,6 +161,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         crn,
         back,
         queryParams,
+        url,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
@@ -299,6 +303,34 @@ const appointmentsController: Controller<typeof routes, void> = {
         return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
+    }
+  },
+  getAppointmentNote: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, contactId, noteId } = req.params
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
+      const isActivityLog = true
+      const queryParams = getQueryString(req.query as Record<string, string>)
+      const { back } = req.query
+      console.log(back)
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      res.render('pages/appointments/appointment', {
+        queryParams,
+        back,
+        personAppointment,
+        crn,
+        contactId,
+        isActivityLog,
+      })
     }
   },
 }

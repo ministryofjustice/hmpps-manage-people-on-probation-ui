@@ -4,7 +4,7 @@
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
-      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/activity-log/activity/' + appointment.id + '/note/' + appointmentNote.id)) %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
     {% endif %}
   {% endfor %}
 {% endif %}

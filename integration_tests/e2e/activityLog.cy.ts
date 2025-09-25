@@ -91,7 +91,12 @@ context('Activity log', () => {
     page.assertPageElementAtIndexWithin(cardBody, 0, 'dd', 0, 'Warning letter sent')
     page.assertPageElementAtIndexWithin(cardBody, 0, 'p', 0, 'No notes')
 
-    page.assertAnchorElementAtIndexWithin(cardBody, 1, 0, '/case/X000001/activity-log/activity/11/note/1')
+    page.assertAnchorElementAtIndexWithin(
+      cardBody,
+      1,
+      0,
+      '/case/X000001/appointments/appointment/11/manage/note/1?category=undefined&view=default&requirement=undefined&undefined&page=0&back=/case/X000001/activity-log',
+    )
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
     cy.visit('/case/X000001/activity-log')

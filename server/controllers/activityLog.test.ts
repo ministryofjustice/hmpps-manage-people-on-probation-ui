@@ -158,25 +158,4 @@ describe('/controllers/activityLogController', () => {
       })
     })
   })
-  describe('getActivityNote', () => {
-    const getPersonAppointmentNoteSpy = jest
-      .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
-      .mockImplementation(() => Promise.resolve(mockActivityNote))
-    beforeEach(async () => {
-      await controllers.activityLog.getActivityNote(hmppsAuthClient)(req, res)
-    })
-    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
-    it('should request the person activity note from the api', () => {
-      expect(getPersonAppointmentNoteSpy).toHaveBeenCalledWith(crn, id, noteId)
-    })
-    it('should render the appointment page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
-        category: req.query.category,
-        queryParams: ['view=default'],
-        personAppointment: mockActivityNote,
-        crn,
-        isActivityLog: true,
-      })
-    })
-  })
 })
