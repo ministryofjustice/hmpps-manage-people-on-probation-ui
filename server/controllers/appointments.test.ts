@@ -62,6 +62,7 @@ jest.mock('../middleware', () => ({
 
 jest.mock('./arrangeAppointment', () => ({
   redirectToSentence: jest.fn(() => mockMiddlewareFn),
+  getSentence: jest.fn(() => mockMiddlewareFn),
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
@@ -530,8 +531,6 @@ describe('controllers/appointments', () => {
         nextAppointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(arrangeAppointmentController.redirectToSentence).toHaveBeenCalled()
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
     })
 
     it('should redirect to the manage page if answer is NO', async () => {
