@@ -7,13 +7,10 @@ import controllers from '../controllers'
 import validate from '../middleware/validation/index'
 
 export default function activityLogRoutes(router: Router, { hmppsAuthClient }: Services) {
-  const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
-
   router.all(
     '/case/:crn/activity-log',
     validate.activityLog,
     filterActivityLog,
     controllers.activityLog.getOrPostActivityLog(hmppsAuthClient),
   )
-  get('/case/:crn/activity-log/activity/:id/note/:noteId', controllers.activityLog.getActivityNote(hmppsAuthClient))
 }

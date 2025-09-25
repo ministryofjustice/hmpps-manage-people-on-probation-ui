@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
 
-const routes = ['getOrPostActivityLog', 'getActivityNote'] as const
+const routes = ['getOrPostActivityLog'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
@@ -75,32 +75,6 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsStart,
         resultsEnd,
         errorMessages: req.session.errorMessages,
-      })
-    }
-  },
-  getActivityNote: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id, noteId } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const personAppointment = await masClient.getPersonAppointmentNote(crn, id, noteId)
-      const isActivityLog = true
-      const queryParams = getQueryString(req.query as Record<string, string>)
-      const { category } = req.query
-      await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      res.render('pages/appointments/appointment', {
-        category,
-        queryParams,
-        personAppointment,
-        crn,
-        isActivityLog,
       })
     }
   },
