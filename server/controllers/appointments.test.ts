@@ -16,11 +16,10 @@ import {
   mockPersonAppointment,
 } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, getPersonAppointment, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import config from '../config'
-import arrangeAppointmentController from './arrangeAppointment'
 
 const crn = 'X000001'
 const id = '1234'
