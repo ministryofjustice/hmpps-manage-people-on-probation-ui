@@ -81,6 +81,7 @@ const req = httpMocks.createRequest({
     contactId,
     actionType,
   },
+  session: {},
   query: { page: '', view: 'default', category: 'mock-category' },
 })
 
@@ -163,9 +164,11 @@ describe('controllers/appointments', () => {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
+        personRisks: undefined,
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+        url: '',
       })
     })
   })

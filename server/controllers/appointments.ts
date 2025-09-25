@@ -6,7 +6,16 @@ import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress, handleQuotes } from '../utils'
+import {
+  toRoshWidget,
+  toPredictors,
+  isNumericString,
+  isValidCrn,
+  isMatchingAddress,
+  handleQuotes,
+  setDataValue,
+  getDataValue,
+} from '../utils'
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
@@ -30,6 +39,7 @@ const routes = [
 const appointmentsController: Controller<typeof routes, void> = {
   getAppointments: hmppsAuthClient => {
     return async (req, res) => {
+      const { url } = req
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
@@ -61,6 +71,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         upcomingAppointments,
         pastAppointments,
         crn,
+        url,
         tierCalculation,
         risksWidget,
         predictorScores,
@@ -141,10 +152,23 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { back } = req.query
+      let { back } = req.query
+      const { data } = req.session
+      if (back) {
+        setDataValue(data, ['back'], back)
+      } else {
+        back = getDataValue(data, ['back'])
+      }
+      console.log(back)
       let { url } = req
       url = encodeURIComponent(url)
-      const queryParams = getQueryString(req.query as Record<string, string>)
+      let queryParams = getQueryString(req.query as Record<string, string>)
+      if (queryParams) {
+        setDataValue(data, ['query'], queryParams)
+      } else {
+        queryParams = getDataValue(data, ['query'])
+      }
+      console.log(queryParams)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
