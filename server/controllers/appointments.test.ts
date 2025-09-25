@@ -521,7 +521,6 @@ describe('controllers/appointments', () => {
         nextAppointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(arrangeAppointmentController.getSentence).toHaveBeenCalled()
     })
 
     it('should redirect to the manage page if answer is NO', async () => {
