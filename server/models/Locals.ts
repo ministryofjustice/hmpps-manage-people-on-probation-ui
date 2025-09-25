@@ -12,7 +12,7 @@ import { Errors } from './Errors'
 import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import { PersonAppointment } from '../data/model/schedule'
+import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 
 export interface AppointmentLocals {
@@ -90,6 +90,7 @@ interface Locals {
   version: string
   backLink: string
   personAppointment?: PersonAppointment
+  personSchedule?: PersonSchedule
   nextAppointmentSession?: AppointmentSession
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number

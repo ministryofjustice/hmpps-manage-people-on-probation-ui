@@ -148,7 +148,7 @@
        hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
       } if not appointment.isInPast,
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/record-an-outcome' if appointment.isInPast and not appointment.hasOutcome,
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/attended-complied' if appointment.isInPast and not appointment.hasOutcome,
       
       status: {
         tag: {

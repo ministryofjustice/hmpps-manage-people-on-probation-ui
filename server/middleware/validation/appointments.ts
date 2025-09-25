@@ -8,12 +8,12 @@ import config from '../../config'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
-  const { crn, id, contactId } = params
+  const { crn, id, contactId, actionType } = params
   const { data } = session
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, personLevel, maxCharCount }
+  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount }
   let isAddNotePage = false
   let render = `pages/${[
     url
@@ -109,7 +109,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateRecordAnOutcome = () => {
-    if (req.url.includes(`appointment/${contactId}/record-an-outcome`)) {
+    if (req.url.includes(`case/${crn}/record-an-outcome`)) {
       render = `pages/appointments/record-an-outcome`
       errorMessages = validateWithSpec(
         req.body,
@@ -118,6 +118,21 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           contactId,
           page: 'record-an-outcome',
+        }),
+      )
+    }
+  }
+
+  const validateAttendedComplied = () => {
+    if (req.url.includes(`appointment/${contactId}/attended-complied`)) {
+      render = `pages/appointments/attended-complied`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          contactId,
+          page: 'attended-complied',
         }),
       )
     }
@@ -176,10 +191,10 @@ const appointments: Route<void> = (req, res, next) => {
   validateLocation()
   validateDateTime()
   validateRepeating()
-  validateRecordAnOutcome()
   validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
+  validateAttendedComplied()
   validateAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages

@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
+import logger from '../../logger'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -82,7 +83,7 @@ const req = httpMocks.createRequest({
     contactId,
     actionType,
   },
-  query: { page: '', view: 'default', category: 'mock-category' },
+  query: { page: '', view: 'default', category: 'mock-category', contactId },
 })
 
 const res = mockAppResponse({
@@ -108,6 +109,7 @@ const getPersonAppointmentSpy = jest
 const getPersonAppointmentNoteSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
+const loggerSpy = jest.spyOn(logger, 'info')
 
 const nextApptResponse = (appointment = {} as Activity | null): NextAppointmentResponse => ({
   appointment,
@@ -264,15 +266,78 @@ describe('controllers/appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
     })
-    checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
+    checkAuditMessage(res, 'VIEW_MAS_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
         crn,
+        actionType,
+        contactId,
       })
     })
   })
 
   describe('post record an outcome', () => {
+    describe('CRN request parameter is invalid', () => {
+      beforeEach(() => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsNumericString.mockReturnValue(true)
+        controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(req, res)
+      })
+      it('should return a 404 status and render the error page', () => {
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+    describe('appointment id is invalid', () => {
+      beforeEach(() => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(false)
+        controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(req, res)
+      })
+      it('should return a 404 status and render the error page', () => {
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+    describe('If appointment is selected', () => {
+      beforeEach(async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsNumericString.mockReturnValue(true)
+        const mockReq = httpMocks.createRequest({
+          params: {
+            crn,
+            id,
+            contactId,
+            actionType,
+          },
+          query: { page: '', view: 'default', category: 'mock-category' },
+          body: {
+            'appointment-id': contactId,
+          },
+        })
+        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+      })
+      it('should redirect to the manage appointment page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(
+          `/case/${crn}/appointments/appointment/${contactId}/manage?back=/case/${crn}/record-an-outcome/${actionType}?contactId=${contactId}`,
+        )
+      })
+    })
+  })
+
+  describe('get attended and complied', () => {
+    beforeEach(async () => {
+      await controllers.appointments.getAttendedComplied(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
+    it('should render the record an outcome page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
+        crn,
+      })
+    })
+  })
+
+  describe('post attended and complied', () => {
     const mockReq = httpMocks.createRequest({
       params: {
         crn,
@@ -289,7 +354,7 @@ describe('controllers/appointments', () => {
         mockIsValidCrn.mockReturnValue(false)
         mockIsNumericString.mockReturnValue(false)
 
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
       })
       it('should return a 404 status and render the error page', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -306,7 +371,7 @@ describe('controllers/appointments', () => {
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
       })
       it('should send the patch request to the api', () => {
         expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
@@ -319,7 +384,7 @@ describe('controllers/appointments', () => {
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
+        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
       })
       it('should send the patch request to the api', () => {
         expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
@@ -346,7 +411,7 @@ describe('controllers/appointments', () => {
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockedReq, res)
+        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockedReq, res)
       })
       it('should post the request then redirect to the back link', () => {
         expect(redirectSpy).toHaveBeenCalledWith(mockedReq.query.back)

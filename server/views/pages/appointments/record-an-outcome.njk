@@ -1,48 +1,27 @@
 {% extends "../_form.njk" %}
-{% set appointment = personAppointment.appointment %}
-{% set personSummary = personAppointment.personSummary %}
-{% set headerPersonName = personSummary.name.forename + ' ' + personSummary.name.surname %}
-{% set hideButton = true %}
-{% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
+{% set title = "Which appointment are you recording an outcome for?" if actionType == "outcome" else 
+    "Which appointment?" %}
+{% set pageTitle = makePageTitle({
+    pageHeading: ["Record an outcome", "Outcome"]
+}) %}
+{% set action = '/case/' + crn + '/record-an-outcome/' + actionType %}
+{% set backLink = '/case/' + crn %}
 {% block form %}
-
-  {{ govukCheckboxes({
-    idPrefix: 'outcomeRecorded',
-    name: 'outcomeRecorded',
-    classes: "govuk-checkboxes--small",
-    fieldset: {
-      legend: {
-        html: '<span data-qa="pageHeading">Confirm if ' + personSummary.name.forename + ' attended and complied</span>',
-        classes: 'govuk-fieldset__legend--l'
-      }
-    },
-    hint: {
-        text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName + " on " + appointment.startDateTime | dateWithYear + "."
-    },
-    formGroup: {
-      attributes: {
-        'data-qa': 'outcome'
-      }
-    },
-    items: [
-     {
-      value: "Yes",
-      text: "Yes, " + personSummary.name.forename + " attended and complied"
-    }
-    ],
-    errorMessage: {
-    text: "Select if they attended and complied"
-  } if errorMessages.outcomeRecorded
-  }) }}
-
-  <div class="govuk-button-group">
-    {{ govukButton({
-    text: "Continue",
-    attributes: {
-      'data-qa': 'submit-btn'
-    }
-  }) }}
-    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{appointment.id}}/manage">Cancel and go back</a>
-  </div>
-
+    {% set appointmentRadioItems = [] %}
+    {% for appointment in getAppointmentsToAction(personSchedule.appointments, actionType) %}
+        {% set appointmentRadioItems = (appointmentRadioItems.push({
+            html: '<strong>' + appointment.type + '</strong><br />' + appointment.startDateTime | dateWithDayAndWithoutYear + ' from ' + timeFromTo(appointment.startDateTime, appointment.endDateTime),
+            value: appointment.id,
+            checked: contactId == appointment.id
+        }), appointmentRadioItems) %}
+    {% endfor %}
+    {{ govukRadios({
+           name: "appointment-id",
+           fieldset: {},
+           items: appointmentRadioItems,
+           errorMessage: {
+        text: "Which appointment are you recording an outcome for?"
+            }  if errorMessages['appointment-id'] 
+        })
+    }}
 {% endblock %}
