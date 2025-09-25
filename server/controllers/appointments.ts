@@ -314,7 +314,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       const isActivityLog = true
       const queryParams = getQueryString(req.query as Record<string, string>)
       const { back } = req.query
-      console.log(back)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
         who: res.locals.user.username,
