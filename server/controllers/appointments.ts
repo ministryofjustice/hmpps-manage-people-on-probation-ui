@@ -286,6 +286,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const {
         params: { crn, contactId },
         body,
+        url,
       } = req
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
@@ -293,7 +294,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
       const { nextAppointmentSession } = res.locals
       if (nextAppointment === 'CHANGE_TYPE') {
-        return arrangeAppointmentController.redirectToSentence()(req, res)
+        const uuid = v4()
+        return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
       }
       if (nextAppointment === 'KEEP_TYPE') {
         return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
