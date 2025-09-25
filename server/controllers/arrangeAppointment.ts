@@ -89,14 +89,14 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params as Record<string, string>
-      const { change, validation } = req.query
+      const { change, validation, back } = req.query
       const showValidation = validation === 'true'
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-eventId`]: 'Select a sentence',
         }
       }
-      return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors })
+      return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors, back })
     }
   },
   postSentence: () => {

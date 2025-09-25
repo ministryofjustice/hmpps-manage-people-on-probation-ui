@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
-{% set backLink = change if change else '/case/' + crn + '/appointments' %}
+{% set backLink = change if change else (back if back else '/case/' + crn + '/appointments') %}
 
 {% block heading %}{% endblock %}
 {% block form %}
