@@ -134,7 +134,7 @@
         {% if case.limitedAccess === true %}
                        Restricted
                    {% elseif case.previousAppointment %}
-          <a class="govuk-link" href="./case/{{ case.crn }}/appointments/appointment/{{ case.previousAppointment.id }}/manage">
+          <a class="govuk-link" href="./case/{{ case.crn }}/appointments/appointment/{{ case.previousAppointment.id }}/manage?back={{url}}">
             {{ case.previousAppointment.description }}
           </a><br/>
           <span class="secondary-text">{{ case.previousAppointment.date | dateWithYearShortMonth }}</span>
@@ -145,7 +145,7 @@
         {% if case.limitedAccess === true %}
                         Restricted
                     {% elseif case.nextAppointment  %}
-          <a class="govuk-link" href="./case/{{ case.crn }}/appointments/appointment/{{ case.nextAppointment.id }}/manage">
+          <a class="govuk-link" href="./case/{{ case.crn }}/appointments/appointment/{{ case.nextAppointment.id }}/manage?back={{url}}">
             {{ case.nextAppointment.description }}
           </a><br/>
           <span class="secondary-text">{{ case.nextAppointment.date | dateWithYearShortMonth }}</span>
