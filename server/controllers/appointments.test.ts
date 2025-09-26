@@ -375,23 +375,11 @@ describe('controllers/appointments', () => {
       it('should send the patch request to the api', () => {
         expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
       })
-      it('should redirect to the manage appointment page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+      it('should redirect to the add notes page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/add-note`)
       })
     })
-    describe('If CRN request param is valid', () => {
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
-      })
-      it('should send the patch request to the api', () => {
-        expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
-      })
-      it('should redirect to the manage appointment page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
-      })
-    })
+
     describe('If back query param in url', () => {
       const mockedReq = httpMocks.createRequest({
         params: {
