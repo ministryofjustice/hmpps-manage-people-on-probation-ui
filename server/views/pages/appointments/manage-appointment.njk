@@ -12,7 +12,7 @@
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
   '' %}
 {% set backLink = backLink + extraBreadcrumb if backLink else 
-  default('/case/' + crn + '/appointments') %}
+  '/case/' + crn + '/appointments' %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = nextAppointment.appointment.type | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
