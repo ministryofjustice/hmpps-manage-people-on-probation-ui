@@ -10,7 +10,8 @@ const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data } = session
-  const back = req.query?.back.toString()
+  let { back } = req.query
+  back = back ? back.toString() : ''
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
