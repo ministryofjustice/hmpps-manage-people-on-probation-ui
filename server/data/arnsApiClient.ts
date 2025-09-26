@@ -35,6 +35,11 @@ export default class ArnsApiClient extends RestClient {
   async getSanIndicator(crn: string): Promise<SanIndicatorResponse> {
     return this.get({
       path: `/san-indicator/crn/${crn}`,
+      handle404: true,
+      handle500: true,
+      handle401: true,
+      errorMessageFor500:
+        'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
     })
   }
 

@@ -60,7 +60,7 @@ const riskController: Controller<typeof routes, void> = {
         timeline,
         needs,
         oasysLink,
-        sanIndicator: sanIndicatorResponse.sanIndicator,
+        sanIndicator: sanIndicatorResponse?.sanIndicator,
       })
     }
   },
