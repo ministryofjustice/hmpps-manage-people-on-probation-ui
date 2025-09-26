@@ -3,6 +3,7 @@ import { getWiremockData, Wiremock } from '../../utils'
 import mockResponse from '../../../wiremock/mappings/user-schedule.json'
 import { UserActivity } from '../../../server/data/model/userSchedule'
 import { yearsSince } from '../../../server/utils'
+import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 
 const mockData = mockResponse as Wiremock
 
@@ -161,5 +162,13 @@ context('Upcoming appointments', () => {
     cy.get('p').should('contain.text', 'No upcoming appointments.')
     cy.get('table').should('not.exist')
     cy.get('.govuk-pagination').should('not.exist')
+  })
+  it('BackLink is correct when accessing an appointment', () => {
+    cy.visit('/caseload/appointments/upcoming')
+    const page = new UserAppointments()
+    page.getTableCell(1, 4).find('a').click()
+    const managePage = new ManageAppointmentPage()
+    managePage.getBackLink().click()
+    page.checkPageTitle('My upcoming appointments')
   })
 })

@@ -31,7 +31,8 @@
               "numberOfAdditionalSentences": 3,
               "type": "Home visit",
               "startDateTime": "2025-03-27T09:30:00.382936Z[Europe/London]",
-              "endDateTime": ""
+              "endDateTime": "",
+              "deliusManaged": true
             },
             {
               "caseName": {
@@ -191,7 +192,8 @@
               "numberOfAdditionalSentences": 1,
               "type": "3 Way Meeting (Non NS)",
               "startDateTime": "2025-03-28T09:30:00.382936Z[Europe/London]",
-              "endDateTime": "2025-03-28T10:30:00.382936Z[Europe/London]"
+              "endDateTime": "2025-03-28T10:30:00.382936Z[Europe/London]",
+              "deliusManaged": true
             },
             {
               "caseName": {
@@ -335,7 +337,8 @@
               "numberOfAdditionalSentences": 3,
               "type": "Home visit",
               "startDateTime": "2025-03-27T09:30:00.382936Z[Europe/London]",
-              "endDateTime": ""
+              "endDateTime": "",
+              "deliusManaged": true
             },
             {
               "caseName": {
@@ -509,7 +512,8 @@
               "numberOfAdditionalSentences": 1,
               "type": "3 Way Meeting (Non NS)",
               "startDateTime": "2025-03-28T09:30:00.382936Z[Europe/London]",
-              "endDateTime": "2025-03-28T10:30:00.382936Z[Europe/London]"
+              "endDateTime": "2025-03-28T10:30:00.382936Z[Europe/London]",
+              "deliusManaged": true
             },
             {
               "caseName": {
