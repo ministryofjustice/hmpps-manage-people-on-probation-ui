@@ -1,4 +1,5 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
+import AddNotePage from '../../pages/appointments/add-note.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 
 const crn = 'X778160'
@@ -11,6 +12,7 @@ const loadPage = () => {
 describe('Attended and complied', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let recordAnOutcomePage: AttendedCompliedPage
+  let addNotePage: AddNotePage
 
   beforeEach(() => {
     cy.task('resetMocks')
@@ -48,11 +50,9 @@ describe('Attended and complied', () => {
     })
   })
 
-  it('should navigate to management appointment if the user submits after selecting the checkbox', () => {
+  it('should navigate to add appointment notes if the user submits after selecting the checkbox', () => {
     cy.get('#outcomeRecorded').click()
-
     recordAnOutcomePage.getSubmitBtn().click()
-
-    manageAppointmentPage = new ManageAppointmentPage()
+    addNotePage = new AddNotePage()
   })
 })
