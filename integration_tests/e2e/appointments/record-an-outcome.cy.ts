@@ -1,58 +1,66 @@
-import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
+import Page from '../../pages/page'
+import OverviewPage from '../../pages/overview'
 import RecordAnOutcomePage from '../../pages/appointments/record-an-outcome.page'
+import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 
-const crn = 'X778160'
-const appointmentId = '6'
-
-const loadPage = () => {
-  cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
+const loadPage = (actionType = 'outcome') => {
+  cy.visit('/case/X000001')
+  const page = Page.verifyOnPage(OverviewPage)
+  page.getAppointmentsLink('X000001', actionType).click()
 }
-
-describe('Record an outcome', () => {
-  let manageAppointmentPage: ManageAppointmentPage
+context('Record an outcome', () => {
   let recordAnOutcomePage: RecordAnOutcomePage
+  let manageAppointmentPage: ManageAppointmentPage
 
-  beforeEach(() => {
-    cy.task('resetMocks')
-    cy.task('stubPastAppointmentNoOutcomeNoNotes')
-    loadPage()
-    manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.getTaskLink(1).click()
-  })
-
-  it('should link to record-an-outcome page', () => {
-    recordAnOutcomePage = new RecordAnOutcomePage()
-  })
-
-  it('should render page with correct elements', () => {
-    cy.get('#outcomeRecorded-hint').should(
-      'contain.text',
-      'Appointment: 3 Way Meeting (NS) with Terry Jones on 21 February 2024.',
-    )
-
-    cy.get('label[for="outcomeRecorded"]').should('contain.text', 'Yes, Eula attended and complied')
-  })
-
-  it('should return to management appointment when cancel link is clicked', () => {
-    cy.get('.govuk-link').should('contain.text', 'Cancel and go back').click()
-    manageAppointmentPage = new ManageAppointmentPage()
-  })
-
-  it('should reveal validation error if the user submits without selecting the checkbox', () => {
-    recordAnOutcomePage.getSubmitBtn().click()
-
-    recordAnOutcomePage.checkErrorSummaryBox(['Select if they attended and complied'])
-
-    recordAnOutcomePage.getElement('#outcomeRecorded-error').should($error => {
-      expect($error.text().trim()).to.include('Select if they attended and complied')
+  describe('Record an outcome', () => {
+    it('page is rendered', () => {
+      loadPage()
+      recordAnOutcomePage = new RecordAnOutcomePage()
+      recordAnOutcomePage.checkPageTitle('Which appointment are you recording an outcome for?')
+      cy.get('.govuk-radios').find('.govuk-radios__item').should('have.length', 2)
+      cy.get('label[for="appointment-id"]')
+        .should('contain.text', 'Phone call')
+        .should('contain.text', 'Thursday 21 March from 10:15am to 10:30am')
+      cy.get('input#appointment-id').should('not.be.checked')
+      cy.get('label[for="appointment-id-2"]')
+        .should('contain.text', 'Other call')
+        .should('contain.text', 'Wednesday 21 February from 10:15am to 10:30am')
+      cy.get('input#appointment-id-2').should('not.be.checked')
+    })
+    it('should display validation if continue is clicked without selecting an appointment', () => {
+      loadPage()
+      recordAnOutcomePage.getSubmitBtn().click()
+      recordAnOutcomePage.checkErrorSummaryBox(['Which appointment are you recording an outcome for?'])
+      recordAnOutcomePage
+        .getElement(`#appointment-id-error`)
+        .should('contain.text', 'Which appointment are you recording an outcome for?')
+    })
+    it('should redirect to the manage appointment page', () => {
+      loadPage()
+      cy.get('input#appointment-id').click()
+      recordAnOutcomePage.getSubmitBtn().click()
+      manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.checkPageTitle('Manage phone call with Terry Jones')
+      manageAppointmentPage.getBackLink().click()
+      cy.get('input#appointment-id').should('be.checked')
     })
   })
-
-  it('should navigate to management appointment if the user submits after selecting the checkbox', () => {
-    cy.get('#outcomeRecorded').click()
-
-    recordAnOutcomePage.getSubmitBtn().click()
-
-    manageAppointmentPage = new ManageAppointmentPage()
+  describe('Waiting for evidence', () => {
+    it('page is rendered', () => {
+      loadPage('evidence')
+      recordAnOutcomePage = new RecordAnOutcomePage()
+      recordAnOutcomePage.checkPageTitle('Which appointment?')
+      cy.get('.govuk-radios').find('.govuk-radios__item').should('have.length', 1)
+      cy.get('label[for="appointment-id"]')
+        .should('contain.text', 'Planned Video Contact (NS)')
+        .should('contain.text', 'Monday 12 February from 10:15am to 10:30am')
+      cy.get('input#appointment-id').should('not.be.checked')
+      cy.get('input#appointment-id').click()
+      recordAnOutcomePage.getSubmitBtn().click()
+      manageAppointmentPage = new ManageAppointmentPage()
+      manageAppointmentPage.checkPageTitle('Manage video call with Paulie Walnuts')
+      manageAppointmentPage.getBackLink().click()
+      cy.get('input#appointment-id').should('be.checked')
+    })
   })
 })

@@ -138,4 +138,5 @@ export interface LocalParams {
   uploadedFiles?: any
   personLevel?: boolean
   maxCharCount?: number
+  actionType?: string
 }

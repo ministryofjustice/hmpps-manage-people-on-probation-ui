@@ -1,0 +1,48 @@
+{% extends "../_form.njk" %}
+{% set appointment = personAppointment.appointment %}
+{% set personSummary = personAppointment.personSummary %}
+{% set headerPersonName = personSummary.name.forename + ' ' + personSummary.name.surname %}
+{% set hideButton = true %}
+{% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
+{% block form %}
+
+  {{ govukCheckboxes({
+    idPrefix: 'outcomeRecorded',
+    name: 'outcomeRecorded',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        html: '<span data-qa="pageHeading">Confirm if ' + personSummary.name.forename + ' attended and complied</span>',
+        classes: 'govuk-fieldset__legend--l'
+      }
+    },
+    hint: {
+        text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName + " on " + appointment.startDateTime | dateWithYear + "."
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'outcome'
+      }
+    },
+    items: [
+     {
+      value: "Yes",
+      text: "Yes, " + personSummary.name.forename + " attended and complied"
+    }
+    ],
+    errorMessage: {
+    text: "Select if they attended and complied"
+  } if errorMessages.outcomeRecorded
+  }) }}
+
+  <div class="govuk-button-group">
+    {{ govukButton({
+    text: "Continue",
+    attributes: {
+      'data-qa': 'submit-btn'
+    }
+  }) }}
+    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{appointment.id}}/manage">Cancel and go back</a>
+  </div>
+
+{% endblock %}
