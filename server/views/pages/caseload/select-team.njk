@@ -3,21 +3,21 @@
 {% set action = '/team/case' %}
 {% set backLink = '/case' %}
 {% block form %}
-    {% set errorList = [{ text: errorMessages.team.text, href: "#team-code" } if errorMessages.team else None ] | reject("undefined") %}
-        {% if errorList | length > 0 %}
-          {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
-          {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
-        {% endif %}
-    {% set teamRadioItems = [] %}
+  {% set errorList = [{ text: errorMessages.team.text, href: "#team-code" } if errorMessages.team else None ] | reject("undefined") %}
+  {% if errorList | length > 0 %}
+    {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+    {{ govukErrorSummary({ titleText: "There is a problem", errorList: errorList }) }}
+  {% endif %}
+  {% set teamRadioItems = [] %}
 
-    {% for team in userTeams.teams %}
-        {% set teamRadioItems = (teamRadioItems.push({
-          html: team.description ,
-          value: team.code,
-          checked: team.code === currentTeam
-        }), teamRadioItems) %}
-    {% endfor %}
-    {{ govukRadios({
+  {% for team in userTeams.teams %}
+    {% set teamRadioItems = (teamRadioItems.push({
+      html: team.description,
+      value: team.code,
+      checked: team.code === currentTeam
+    }), teamRadioItems) %}
+  {% endfor %}
+  {{ govukRadios({
            name: "team-code",
            items: teamRadioItems
         })

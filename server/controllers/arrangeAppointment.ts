@@ -111,6 +111,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
       const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
+      req.session.backLink = `/case/${crn}/arrange-appointment/${id}/sentence`
       const redirect = change || `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
       return res.redirect(redirect)
     }
@@ -130,6 +131,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
       const { appointmentTypes } = res.locals
+
       if (personLevel) {
         res.locals.appointmentTypes = getPersonLevelTypes(appointmentTypes)
       }
