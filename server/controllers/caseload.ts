@@ -165,7 +165,15 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         ...userSchedule,
         appointments,
       }
-      return res.render(`pages/caseload/appointments`, { userSchedule, page, type, sortBy, paginationUrl, sortUrl })
+      return res.render(`pages/caseload/appointments`, {
+        userSchedule,
+        page,
+        type,
+        sortBy,
+        paginationUrl,
+        sortUrl,
+        url,
+      })
     }
   },
   getTeams: hmppsAuthClient => {

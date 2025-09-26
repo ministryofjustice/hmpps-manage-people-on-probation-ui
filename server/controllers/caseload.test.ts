@@ -316,6 +316,7 @@ describe('caseloadController', () => {
         sortBy,
         paginationUrl: '/caseload/appointments/upcoming?',
         sortUrl: '/caseload/appointments/upcoming',
+        url: '/caseload/appointments/upcoming',
       })
     })
     it('renders the upcoming appointment page with page and sort name ascending search parameters set in url', async () => {
@@ -349,6 +350,7 @@ describe('caseloadController', () => {
         sortBy,
         paginationUrl: '/caseload/appointments/upcoming?sortBy=name.asc&',
         sortUrl: '/caseload/appointments/upcoming?page=2',
+        url: '/caseload/appointments/upcoming?page=0&sortBy=name.asc',
       })
     })
     it('renders the upcoming appointment page with page and sort appointment descending search parameters set in url', async () => {
@@ -382,6 +384,7 @@ describe('caseloadController', () => {
         sortBy,
         paginationUrl: '/caseload/appointments/upcoming?sortBy=appointment.desc&',
         sortUrl: '/caseload/appointments/upcoming?page=2',
+        url: '/caseload/appointments/upcoming?page=0&sortBy=appointment.asc',
       })
     })
     it('renders the caseload appointments page with appointments with no outcome', async () => {
@@ -413,6 +416,7 @@ describe('caseloadController', () => {
         sortBy,
         paginationUrl: '/caseload/appointments/no-outcome?',
         sortUrl: '/caseload/appointments/no-outcome?page=0',
+        url: '/caseload/appointments/no-outcome?page=0',
       })
     })
     it('renders the outcomes to log page with the sortBy search param included in the url', async () => {
@@ -444,6 +448,7 @@ describe('caseloadController', () => {
         sortBy,
         paginationUrl: '/caseload/appointments/no-outcome?sortBy=sentence.desc&',
         sortUrl: '/caseload/appointments/no-outcome',
+        url: '/caseload/appointments/no-outcome?sortBy=sentence.desc',
       })
     })
   })
