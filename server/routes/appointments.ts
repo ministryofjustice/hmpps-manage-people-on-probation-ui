@@ -10,6 +10,7 @@ import {
   getSentences,
   getUserProviders,
   getNextComAppointment,
+  getPersonSchedule,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
@@ -24,20 +25,32 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   post('/case/:crn/appointments', controllers.appointments.postAppointments(hmppsAuthClient))
 
+  router.all('/case/:crn/record-an-outcome/:actionType', [
+    getPersonalDetails(hmppsAuthClient),
+    getPersonSchedule(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/record-an-outcome/:actionType', controllers.appointments.getRecordAnOutcome(hmppsAuthClient))
+
+  router.post(
+    '/case/:crn/record-an-outcome/:actionType',
+    validate.appointments,
+    controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
+  )
+
   router.all(
-    '/case/:crn/appointments/appointment/:contactId/record-an-outcome',
+    '/case/:crn/appointments/appointment/:contactId/attended-complied',
     getPersonalDetails(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),
   )
   get(
-    '/case/:crn/appointments/appointment/:contactId/record-an-outcome',
-    controllers.appointments.getRecordAnOutcome(hmppsAuthClient),
+    '/case/:crn/appointments/appointment/:contactId/attended-complied',
+    controllers.appointments.getAttendedComplied(hmppsAuthClient),
   )
 
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/record-an-outcome',
+    '/case/:crn/appointments/appointment/:contactId/attended-complied',
     validate.appointments,
-    controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
+    controllers.appointments.postAttendedComplied(hmppsAuthClient),
   )
 
   router.get(

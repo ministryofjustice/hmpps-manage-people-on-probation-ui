@@ -12,6 +12,9 @@ import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
 import arrangeAppointmentController from './arrangeAppointment'
+import { AppResponse } from '../models/Locals'
+import { ErrorMessages } from '../data/model/caseload'
+import logger from '../../logger'
 
 const routes = [
   'getAppointments',
@@ -19,6 +22,8 @@ const routes = [
   'postAppointments',
   'getRecordAnOutcome',
   'postRecordAnOutcome',
+  'getAttendedComplied',
+  'postAttendedComplied',
   'getAddNote',
   'postAddNote',
   'getManageAppointment',
@@ -169,7 +174,8 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn, actionType } = req.params
+      const { contactId } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
@@ -180,10 +186,40 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       res.render('pages/appointments/record-an-outcome', {
         crn,
+        actionType,
+        contactId,
       })
     }
   },
-  postRecordAnOutcome: hmppsAuthClient => {
+  postRecordAnOutcome: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, actionType } = req.params
+      const appointmentId = req?.body?.['appointment-id'] as string
+      if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(
+        `/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/record-an-outcome/${actionType}?contactId=${appointmentId}`,
+      )
+    }
+  },
+  getAttendedComplied: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      await auditService.sendAuditMessage({
+        action: 'VIEW_RECORD_AN_OUTCOME',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      res.render('pages/appointments/attended-complied', {
+        crn,
+      })
+    }
+  },
+  postAttendedComplied: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId: id } = req.params
       if (!isValidCrn(crn) || !isNumericString(id)) {

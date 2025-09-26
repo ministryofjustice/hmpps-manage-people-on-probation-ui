@@ -183,6 +183,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    'appointment-id': {
+      optional: page !== 'record-an-outcome',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Which appointment are you recording an outcome for?',
+          log: 'Appointment not selected',
+        },
+      ],
+    },
     nextAppointment: {
       optional: page !== 'next-appointment',
       checks: [
@@ -214,7 +224,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     outcomeRecorded: {
-      optional: page !== 'record-an-outcome',
+      optional: page !== 'attended-complied',
       checks: [
         {
           validator: isNotEmpty,
