@@ -139,4 +139,5 @@ export interface LocalParams {
   personLevel?: boolean
   maxCharCount?: number
   actionType?: string
+  back?: string
 }

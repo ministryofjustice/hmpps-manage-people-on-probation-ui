@@ -10,10 +10,12 @@ const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data } = session
+  const back = req.query?.back.toString()
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount }
+  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back }
+  const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
   let render = `pages/${[
     url
@@ -25,7 +27,7 @@ const appointments: Route<void> = (req, res, next) => {
   ]}`
 
   const validateType = (): void => {
-    if (req.url.includes('/type')) {
+    if (baseUrl.includes('/type')) {
       if (personLevel) {
         res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
       }
@@ -37,7 +39,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateSentence = (): void => {
-    if (req.url.includes('/sentence')) {
+    if (baseUrl.includes('/sentence')) {
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
@@ -50,7 +52,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateLocation = (): void => {
-    if (req.url.includes('/location')) {
+    if (baseUrl.includes('/location')) {
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
@@ -63,7 +65,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateDateTime = (): void => {
-    if (req.url.includes('/date-time')) {
+    if (baseUrl.includes('/date-time')) {
       localParams._minDate = req.body._minDate
       localParams._maxDate = req.body._maxDate
       errorMessages = validateWithSpec(
@@ -78,7 +80,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateRepeating = () => {
-    if (req.url.includes('/repeating')) {
+    if (baseUrl.includes('/repeating')) {
       const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
       const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
       const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeatingDates'])
@@ -109,7 +111,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateRecordAnOutcome = () => {
-    if (req.url.includes(`case/${crn}/record-an-outcome`)) {
+    if (baseUrl.includes(`case/${crn}/record-an-outcome`)) {
       render = `pages/appointments/record-an-outcome`
       errorMessages = validateWithSpec(
         req.body,
@@ -139,7 +141,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateSupportingInformation = () => {
-    if (req.url.includes('/supporting-information')) {
+    if (baseUrl.includes('/supporting-information')) {
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
@@ -155,7 +157,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateNextAppointment = () => {
-    if (req.url.includes('/next-appointment')) {
+    if (baseUrl.includes('/next-appointment')) {
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
@@ -169,7 +171,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateAddNote = () => {
-    if (req.url.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
+    if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
       render = `pages/appointments/add-note`
       errorMessages = validateWithSpec(
