@@ -74,11 +74,13 @@ const caseloadController: Controller<typeof routes, void, Args> = {
           sortedBy: req.query.sortBy as string,
         }
       }
+      const { url } = req
       res.render('pages/caseload/minimal-cases', {
         pagination,
         caseload: newCaseload,
         currentNavSection,
         filter,
+        url,
       })
     }
   },

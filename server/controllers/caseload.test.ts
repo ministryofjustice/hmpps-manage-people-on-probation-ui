@@ -127,6 +127,7 @@ describe('caseloadController', () => {
         caseload: mockCaseload,
         currentNavSection: 'yourCases',
         filter: mockFilters,
+        url: '',
       })
     })
   })
