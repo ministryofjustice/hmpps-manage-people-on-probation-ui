@@ -59,7 +59,11 @@ context('Upcoming appointments', () => {
       .getTableCell(1, 4)
       .find('a')
       .should('contain.text', 'Home visit')
-      .should('have.attr', 'href', '/case/X778160/appointments/appointment/1/manage')
+      .should(
+        'have.attr',
+        'href',
+        '/case/X778160/appointments/appointment/1/manage?back=/caseload/appointments/upcoming',
+      )
     page.getTableCell(1, 5).should('contain.text', '27 March 2025').should('contain.text', '9:30am')
     page.getTableCell(2, 5).should('contain.text', '28 March 2025').should('contain.text', '9:30am to 10:30am')
     cy.get('.govuk-pagination').should('exist')

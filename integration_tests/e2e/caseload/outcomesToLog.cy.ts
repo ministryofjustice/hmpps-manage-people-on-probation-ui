@@ -75,11 +75,10 @@ context('Outcomes to log', () => {
       .getTableCell(1, 5)
       .find('a')
       .should('contain.text', 'Log an outcome')
-      .should('have.attr', 'target', '_blank')
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=1',
+        '/case/X778160/appointments/appointment/1/manage?back=/caseload/appointments/no-outcome',
       )
     cy.get('.govuk-pagination').should('exist')
     page
