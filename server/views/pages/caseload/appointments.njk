@@ -45,7 +45,7 @@
                     {% set actionCol = [] %}
                     {% if type == 'no-outcome' %}
                         {% set actionCol = [
- { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
+ { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
                          ]
                          %}
                     {% endif %}

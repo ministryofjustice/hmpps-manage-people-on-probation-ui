@@ -1,5 +1,5 @@
 {% if entry.deliusManaged %}
-    <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+    <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
 {% else %}
-    <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Log an outcome</a>
+    <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Manage</a>
 {% endif %}
