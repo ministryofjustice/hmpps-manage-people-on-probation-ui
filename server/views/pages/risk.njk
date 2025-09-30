@@ -8,7 +8,7 @@
 
 {% set pageTitle = makePageTitle({pageHeading: "Risk"}) %}
 {% set currentNavSection = 'risk' %}
-{% set currentSectionName = 'Risk' if not sanIndicator else 
+{% set currentSectionName = 'Risk' if not showSentencePlan else 
     'Risk and plan' %}
 
 {% set headerPersonName = personRisk.personSummary.name | fullName %}
@@ -23,11 +23,13 @@
     {% set lastUpdatedDate = 'Last updated (OASys): ' + risks.assessedOn | dateWithYear %}
 {% endif %}
 
-{% if sanIndicator %}
+{% if showSentencePlan %}
     {% set scoresHeadingLevel = '4' %}
     {% set scoresSubHeadingLevel = '5' %}
-    {% set scoresHeadingClass = 's' %}
 
+{% endif %}
+{% if sanIndicator %}
+    {% set scoresHeadingClass = 's' %}
 {% endif %}
 
 {% set highScoringNeeds %}

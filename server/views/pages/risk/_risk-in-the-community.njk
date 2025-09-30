@@ -1,53 +1,52 @@
-
 {% set veryHighRisks = getRisksWithScore(risks.summary.riskInCommunity, 'VERY_HIGH') %}
 {% set highRisks = getRisksWithScore(risks.summary.riskInCommunity, 'HIGH') %}
 {% set mediumRisks = getRisksWithScore(risks.summary.riskInCommunity, 'MEDIUM') %}
 {% set lowRisks = getRisksWithScore(risks.summary.riskInCommunity, 'LOW') %}
 
 {% set roshHtml %}
-  {% set overallRiskHtml %}
-    <p>
-      {{ govukTag({
+{% set overallRiskHtml %}
+<p>
+  {{ govukTag({
         text: risks.summary.overallRiskLevel + ' risk of serious harm',
         classes: getTagClass(risks.summary.overallRiskLevel)
       }) }}
-    </p>
-    <!-- <p>There are identifiable indicators of risk of serious harm. The offender has the potential to cause serious harm but is unlikely to do so unless there is a change in circumstances, for example, failure to take medication, loss of accommodation, relationship breakdown, drug or alcohol misuse.</p> -->
-  {% endset %}
+</p>
+<!-- <p>There are identifiable indicators of risk of serious harm. The offender has the potential to cause serious harm but is unlikely to do so unless there is a change in circumstances, for example, failure to take medication, loss of accommodation, relationship breakdown, drug or alcohol misuse.</p> -->
+{% endset %}
 
-  {% set veryHighRiskOfHarm %}
-    <ul class="govuk-list">
-      {% for risk in veryHighRisks %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% endset %}
+{% set veryHighRiskOfHarm %}
+<ul class="govuk-list">
+  {% for risk in veryHighRisks %}
+    <li>{{ risk }}</li>
+  {% endfor %}
+</ul>
+{% endset %}
 
-  {% set highRiskOfHarm %}
-    <ul class="govuk-list">
-      {% for risk in highRisks %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% endset %}
+{% set highRiskOfHarm %}
+<ul class="govuk-list">
+  {% for risk in highRisks %}
+    <li>{{ risk }}</li>
+  {% endfor %}
+</ul>
+{% endset %}
 
-  {% set mediumRiskOfHarm %}
-    <ul class="govuk-list">
-      {% for risk in mediumRisks %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% endset %}
+{% set mediumRiskOfHarm %}
+<ul class="govuk-list">
+  {% for risk in mediumRisks %}
+    <li>{{ risk }}</li>
+  {% endfor %}
+</ul>
+{% endset %}
 
-  {% set lowRiskOfHarm %}
-    <ul class="govuk-list">
-      {% for risk in lowRisks %}
-        <li>{{ risk }}</li>
-      {% endfor %}
-    </ul>
-  {% endset %}
+{% set lowRiskOfHarm %}
+<ul class="govuk-list">
+  {% for risk in lowRisks %}
+    <li>{{ risk }}</li>
+  {% endfor %}
+</ul>
+{% endset %}
 
-  {{ govukSummaryList({
+{{ govukSummaryList({
     rows: [
       {
         key: { text: "Overall" },
@@ -84,9 +83,9 @@
     ]
   }) }}
 
-  <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
+<p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
     OASys assessment completed on {{ risks.assessedOn | dateWithYear }}
-  </p>
+</p>
 {% endset %}
 
 {{ appSummaryCard({

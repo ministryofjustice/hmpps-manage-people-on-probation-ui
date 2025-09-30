@@ -51,7 +51,7 @@ interface Locals {
   errorMessages: Record<string, string>
   warningMessages: Record<string, string>
   filters?: ActivityLogFiltersResponse
-  user: { token: string; authSource: string; username?: string }
+  user: { token: string; authSource: string; username?: string; roles?: string[] }
   compactView?: boolean
   defaultView?: boolean
   requirement?: string

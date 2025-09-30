@@ -1,15 +1,14 @@
 import config from '../config'
-
 import RestClient from './restClient'
 import { ErrorSummary } from './model/common'
-import { Needs, RiskScoresDto, RiskSummary } from './model/risk'
+import { SentencePlan } from './model/sentencePlan'
 
 export default class SentencePlanApiClient extends RestClient {
   constructor(token: string) {
     super('Sentence Plan API', config.apis.sentencePlanApi, token)
   }
 
-  async getPlanByCrn(crn: string): Promise<RiskSummary | ErrorSummary | null> {
+  async getPlanByCrn(crn: string): Promise<SentencePlan[]> {
     return this.get({
       path: `/plans/crn/${crn}`,
       handle404: true,

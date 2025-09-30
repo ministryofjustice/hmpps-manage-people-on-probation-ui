@@ -34,7 +34,6 @@
       }
     },
     {
-      "id": "ddd92112-5010-4dc3-8f5b-57b4f15d02d5",
       "request": {
         "urlPattern": "/auth/oauth/token",
         "method": "POST"
@@ -50,8 +49,7 @@
           "internalUser": true
         },
         "headers": {
-          "Content-Type": "application/json;charset=UTF-8",
-          "Location": "http://localhost:3007/sign-in/callback?code=codexxxx&state=stateyyyy"
+          "Content-Type": "application/json"
         }
       }
     },

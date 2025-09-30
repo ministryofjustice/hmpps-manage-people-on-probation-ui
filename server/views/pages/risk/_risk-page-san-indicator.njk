@@ -5,7 +5,6 @@
             {% include "./_ogrs.njk" %}
             {% include "./_ovp.njk" %}
             {% include "./_ogp.njk" %}
-
         </div>
     {% else %}
         {% set html %}
@@ -19,15 +18,7 @@
 </div>
 
 <div class="govuk-grid-column-one-third">
-    {{ roshWidget(risksWidget) }}
-    {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
-    <section data-qa="plan">
-        <h4 class="govuk-heading-m">Plan</h4>
-        <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
-            <p class="govuk-body">Last updated: {{ risks.assessedOn | dateWithYear }}</p>
-            <p class="govuk-body">
-                <a href="{{ sentencePlanLink() }}/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
-        </div>
-    </section>
-
+    {% include './_rosh.njk' %}
+    {% include './_mappa.njk' %}
+    {% include './_sentence-plan.njk' %}
 </div>
