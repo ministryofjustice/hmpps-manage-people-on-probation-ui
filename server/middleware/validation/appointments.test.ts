@@ -11,6 +11,7 @@ const crn = 'X000001'
 const contactId = '1'
 const arrangeAppointmentUrl = `case/${{ crn }}/arrange-appointment/${{ contactId }}`
 const sentenceUrl = `${{ arrangeAppointmentUrl }}/sentence`
+const typeUrl = `${{ arrangeAppointmentUrl }}/type`
 
 const reqBase = {
   method: 'POST',
@@ -44,7 +45,7 @@ describe('/controllers/arrangeAppointmentController', () => {
   it('validation passes for sentence', async () => {
     const data = {} as Data
     setDataValue(data, ['appointments', crn, contactId, 'eventId'], 1)
-    const reqBaseType = {
+    const reqBaseSentence = {
       ...reqBase,
       url: sentenceUrl,
       session: {
@@ -54,33 +55,52 @@ describe('/controllers/arrangeAppointmentController', () => {
         appointments: data.appointments,
       },
     } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
-    expect(next).toHaveBeenCalled()
-  })
-  it('validation passes for person level sentence', async () => {
-    const data = {} as Data
-    setDataValue(data, ['appointments', crn, contactId, 'eventId'], 'PERSON_LEVEL_CONTACT')
-    const reqBaseType = {
-      ...reqBase,
-      url: sentenceUrl,
-      session: {
-        data,
-      },
-      body: {
-        appointments: data.appointments,
-      },
-    } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
+    const reqSentence = httpMocks.createRequest(reqBaseSentence)
+    validation.appointments(reqSentence, res, next)
     expect(next).toHaveBeenCalled()
   })
   it('validation fails if no sentence selected', async () => {
     const data = {} as Data
     setDataValue(data, ['appointments', crn, contactId, 'eventId'], '')
-    const reqBaseType = {
+    const reqBaseSentence = {
       ...reqBase,
       url: sentenceUrl,
+      session: {
+        data,
+      },
+      body: {
+        appointments: data.appointments,
+      },
+    } as unknown
+    const reqSentence = httpMocks.createRequest(reqBaseSentence)
+    validation.appointments(reqSentence, res, next)
+    expect(res.render).toHaveBeenCalled()
+  })
+  it('validation passes for type', async () => {
+    const data = {} as Data
+    setDataValue(data, ['appointments', crn, contactId, 'eventId'], 'PERSON_LEVEL_CONTACT')
+    setDataValue(data, ['appointments', crn, contactId, 'type'], 1)
+    const reqBaseType = {
+      ...reqBase,
+      url: typeUrl,
+      session: {
+        data,
+      },
+      body: {
+        appointments: data.appointments,
+      },
+    } as unknown
+    const reqType = httpMocks.createRequest(reqBaseType)
+    validation.appointments(reqType, res, next)
+    expect(next).toHaveBeenCalled()
+  })
+  it('validation fails for type', async () => {
+    const data = {} as Data
+    setDataValue(data, ['appointments', crn, contactId, 'eventId'], 'PERSON_LEVEL_CONTACT')
+    setDataValue(data, ['appointments', crn, contactId, 'type'], '')
+    const reqBaseType = {
+      ...reqBase,
+      url: typeUrl,
       session: {
         data,
       },

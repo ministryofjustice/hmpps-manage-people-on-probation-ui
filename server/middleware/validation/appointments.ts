@@ -26,8 +26,6 @@ const appointments: Route<void> = (req, res, next) => {
       .filter((_item, i) => ![0, 1, 3].includes(i))
       .join('/'),
   ]}`
-  console.log(body)
-  console.log(session)
 
   const validateType = (): void => {
     if (baseUrl.includes('/type')) {
@@ -202,7 +200,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateAttendedComplied()
   validateAddNote()
   if (Object.keys(errorMessages).length) {
-    console.log(errorMessages)
     res.locals.errorMessages = errorMessages
     if (isAddNotePage) {
       req.session.errorMessages = errorMessages
@@ -211,7 +208,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
     return res.render(render, { errorMessages, ...localParams })
   }
-  console.log('complete')
   return next()
 }
 
