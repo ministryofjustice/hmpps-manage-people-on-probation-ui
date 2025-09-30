@@ -419,7 +419,7 @@ context('Activity log', () => {
     page
       .getCardHeader('timeline7')
       .find('.app-summary-card__actions a')
-      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage')
+      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage?back=/case/X000001/activity-log')
 
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
