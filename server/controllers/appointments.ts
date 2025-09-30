@@ -167,7 +167,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         back = getDataValue(data, ['backLink-manage'])
       }
       let queryParams = getQueryString(req.query as Record<string, string>)
-      if (queryParams) {
+      if (queryParams.length > 0) {
         setDataValue(data, ['query'], queryParams)
       } else {
         queryParams = getDataValue(data, ['query'])
