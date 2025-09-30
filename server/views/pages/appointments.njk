@@ -36,7 +36,7 @@
 
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
-    {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" %}
+    {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
     {% set appointmentDetails %}
     <a class='govuk-link' href={{ manageUrl }}>
       {{ appointment.type | toSentenceCase }}
@@ -77,7 +77,7 @@
 
 {% if pastAppointments.length > 0 %}
   {% for appointment in pastAppointments %}
-    {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage" %}
+    {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
     {% set appointmentDetails %}
     <a class='govuk-link' href={{ manageUrl }}>
       {{ appointment.type | toSentenceCase }}

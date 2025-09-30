@@ -51,6 +51,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         req.session.caseFilter,
       )
       const { filter } = args
+      const { url } = req
       let newCaseload = caseload
       const currentNavSection = 'yourCases'
       await auditService.sendAuditMessage({
@@ -79,6 +80,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         caseload: newCaseload,
         currentNavSection,
         filter,
+        url,
       })
     }
   },
@@ -165,7 +167,15 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         ...userSchedule,
         appointments,
       }
-      return res.render(`pages/caseload/appointments`, { userSchedule, page, type, sortBy, paginationUrl, sortUrl })
+      return res.render(`pages/caseload/appointments`, {
+        userSchedule,
+        page,
+        type,
+        sortBy,
+        paginationUrl,
+        sortUrl,
+        url,
+      })
     }
   },
   getTeams: hmppsAuthClient => {

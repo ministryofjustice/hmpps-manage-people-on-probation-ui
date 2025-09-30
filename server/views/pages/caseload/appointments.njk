@@ -27,7 +27,7 @@
                     {% set appointmentCol = [] %}
                     {% if type == 'upcoming' %}
                         {% set appointmentCol = [
-{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage">' + appointment.type + '</a>',
+{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>',
                           attributes: { "data-sort-value": appointment.type  }
                         }
                 ]

@@ -89,7 +89,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         delete req.session.data.errors
       }
       const { crn, id } = req.params as Record<string, string>
-      const { change, validation, back } = req.query
+      const { change, validation } = req.query
+      // session based backLinks
+      const { data } = req.session
+      let { back } = req.query
+      if (back) {
+        setDataValue(data, ['backLink-sentence'], back)
+      } else {
+        back = getDataValue(data, ['backLink-sentence'])
+      }
+      //
       const showValidation = validation === 'true'
       if (showValidation) {
         res.locals.errorMessages = {
