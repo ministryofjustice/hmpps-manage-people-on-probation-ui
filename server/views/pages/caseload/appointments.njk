@@ -46,12 +46,12 @@
                     {% if type == 'no-outcome' %}
                         {% if appointment.deliusManaged %}
                             {% set actionCol = [
-    { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
+    { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
                             ]
                             %}
                         {% else %}
                             {% set actionCol = [
-    { html: '<a href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Log an outcome</a>'}
+    { html: '<a href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Manage</a>'}
                             ]
                             %}
                         {% endif %}

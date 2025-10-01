@@ -75,7 +75,7 @@ context('Outcomes to log', () => {
     page
       .getTableCell(1, 5)
       .find('a')
-      .should('contain.text', 'Log an outcome')
+      .should('contain.text', 'Manage')
       .should(
         'have.attr',
         'href',
@@ -84,7 +84,7 @@ context('Outcomes to log', () => {
     page
       .getTableCell(2, 5)
       .find('a')
-      .should('contain.text', 'Log an outcome')
+      .should('contain.text', 'Manage on NDelius')
       .should(
         'have.attr',
         'href',

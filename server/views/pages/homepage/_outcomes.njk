@@ -38,7 +38,7 @@
             },
             {
                 classes: 'govuk-!-text-align-right',
-                html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', outcome.crn, outcome.id) + '" target="_blank" rel="external noopener noreferrer">Log outcome</a>'
+                html: '<a class="govuk-link" href="' + deliusDeepLinkUrl('UpdateContact', outcome.crn, outcome.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius</a>'
             }
         ]) %}
       {% else %}
@@ -55,7 +55,7 @@
             },
             {
                 classes: 'govuk-!-text-align-right',
-                html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Log outcome</a>'
+                html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Manage</a>'
             }
         ]) %}
       {% endif %}
