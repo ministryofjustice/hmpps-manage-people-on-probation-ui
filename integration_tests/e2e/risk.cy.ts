@@ -159,13 +159,16 @@ context('Risk', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   it('Risk overview page is rendered when has sentence plan and san indicator is false', () => {
     cy.task('stubAuthSentencePlan')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     checkRiskPageView(page)
   })
+
   it('Risk overview page is rendered when has no sentence plan and san indicator is false', () => {
+    cy.task('stubSentencePlan404')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sentencePlan = false
@@ -178,11 +181,12 @@ context('Risk', () => {
     cy.task('stubAuthSentencePlan')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    // page.checkPageTitle('Risk and plan')
     const sanIndicator = true
     checkRiskPageView(page, sanIndicator)
   })
+
   it('Risk overview page is rendered when has no sentence plan and san indicator is true', () => {
+    cy.task('stubSentencePlan404')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
