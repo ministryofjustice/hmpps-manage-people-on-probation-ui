@@ -70,7 +70,6 @@ export const appointmentSummary = async (req: Request, res: AppResponse, client:
     }
   }
   const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
-  console.log(response)
   setDataValue(data, ['appointments', crn, id, 'backendId'], response.appointments[response.appointments.length - 1].id)
   return res.redirect(`${baseUrl}/confirmation`)
 }
