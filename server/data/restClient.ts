@@ -89,7 +89,6 @@ export default class RestClient {
         error.response.errors = warnings
         logger.info('Handling 500')
         JSON.stringify(error.response)
-
         return error.response
       }
       if (handle404 && error?.response?.status === 404) {

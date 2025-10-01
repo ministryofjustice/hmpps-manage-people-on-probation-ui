@@ -1,9 +1,9 @@
 <div class="govuk-grid-column-two-thirds">
     {% if hasRiskAssessment %}
         <div class='govuk-!-margin-bottom-4' data-qa="criminogenicNeeds">
-            <h3 class="govuk-heading-m score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
+            <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
                 Criminogenic needs
-            </h3>
+            </h{{ scoresHeadingLevel | default('3') }}>
             {{ govukSummaryList({
                 rows: [
                     {
@@ -38,7 +38,7 @@
         </div>
     {% else %}
         {% set html %}
-        <h3 class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h3>
+        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
         {% include './_no-oasys-risk-assessment.njk' %}
         {% endset %}
         {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
@@ -48,10 +48,10 @@
 </div>
 
 <div class="govuk-grid-column-one-third">
-    {{ roshWidget(risksWidget) }}
-    {{ mappaWidget({ mappa: personRisk.mappa, lastUpdatedDate: personRisk.mappa.startDate | dateWithYearShortMonth }) }}
+    {% include './_rosh.njk' %}
+    {% include './_mappa.njk' %}
     <div class="govuk-body predictor-timeline__heading" data-qa="oasysScoreHistory">
-        <h3 class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h3>
+        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
         {% if predictorScores.error and caseSummary.roshHistory.error %}
             <p class='govuk-body' data-qa='timeline-missing'>RoSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
         {% elseif predictorScores.error %}
@@ -71,4 +71,5 @@
     {% if timeline.length %}
         {{ predictorTimeline(timeline, 'x') }}
     {% endif %}
+    {% include './_sentence-plan.njk' %}
 </div>

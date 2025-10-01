@@ -1,8 +1,8 @@
 {% if predictorScores.scores.OGP.level %}
     <section data-qa="ogp">
-        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OGP score">
+        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="OGP score">
         OGP (OASys general predictor score)
-    </h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
+    </h{{ scoresHeadingLevel | default('3') }}>
         <div class="govuk-grid-row  govuk-!-margin-bottom-4">
             <div class="govuk-grid-column-full">
                 <div class="flex-mobile">

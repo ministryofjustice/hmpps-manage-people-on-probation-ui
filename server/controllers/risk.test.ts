@@ -4,6 +4,7 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
+import SentencePlanApiClient from '../data/sentencePlanApiClient'
 import { checkAuditMessage } from './testutils'
 import { toPredictors, toRoshWidget } from '../utils'
 import TierApiClient from '../data/tierApiClient'
@@ -17,10 +18,12 @@ import {
   mockPredictors,
   mockNeeds,
   mockSanIndicatorResponse,
+  mockSentencePlans,
 } from './mocks'
 import config from '../config'
 
 jest.mock('../data/masApiClient')
+jest.mock('../data/sentencePlanApiClient')
 jest.mock('../data/interventionsApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
@@ -39,7 +42,7 @@ const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const id = '1234'
-const res = mockAppResponse()
+const res = mockAppResponse({ user: { roles: ['SENTENCE_PLAN'] } })
 const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
@@ -70,34 +73,148 @@ const req = httpMocks.createRequest({
   },
 })
 describe('riskController', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
   describe('getRisk', () => {
-    beforeEach(async () => {
-      await controllers.risk.getRisk(hmppsAuthClient)(req, res)
+    describe('CRN has sentence plan, user does not have SENTENCE_PLAN role', () => {
+      let getPlanByCrnSpy: jest.SpyInstance
+      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS'] } })
+      const spy = jest.spyOn(mockRes, 'render')
+      beforeEach(async () => {
+        getPlanByCrnSpy = jest
+          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+        await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
+      })
+      checkAuditMessage(res, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
+      it('should request the page data from the api', () => {
+        expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
+        expect(getRisksSpy).toHaveBeenCalledWith(crn)
+        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
+        expect(predictorsSpy).toHaveBeenCalledWith(crn)
+        expect(needsSpy).toHaveBeenCalledWith(crn)
+        expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
+      })
+      it('should request the sentence plans from the api', () => {
+        expect(getPlanByCrnSpy).toHaveBeenCalledWith(crn)
+      })
+      it('should render the risk page', () => {
+        expect(spy).toHaveBeenCalledWith('pages/risk', {
+          personRisk: mockPersonRiskFlags,
+          risks: mockRisks,
+          crn,
+          tierCalculation: mockTierCalculation,
+          risksWidget: toRoshWidget(mockRisks),
+          predictorScores: toPredictors(mockPredictors),
+          timeline: [],
+          needs: mockNeeds,
+          oasysLink: config.oaSys.link,
+          sanIndicator: mockSanIndicatorResponse.sanIndicator,
+          showSentencePlan: false,
+          planLastUpdated: '',
+        })
+      })
     })
-    checkAuditMessage(res, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
-    it('should request the page data from the api', () => {
-      expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
-      expect(needsSpy).toHaveBeenCalledWith(crn)
-      expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
+
+    describe('CRN has sentence plan, user has SENTENCE_PLAN role', () => {
+      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
+      const spy = jest.spyOn(mockRes, 'render')
+      beforeEach(async () => {
+        jest
+          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+        await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
+      })
+      it('should render the risk page', () => {
+        expect(spy).toHaveBeenCalledWith('pages/risk', {
+          personRisk: mockPersonRiskFlags,
+          risks: mockRisks,
+          crn,
+          tierCalculation: mockTierCalculation,
+          risksWidget: toRoshWidget(mockRisks),
+          predictorScores: toPredictors(mockPredictors),
+          timeline: [],
+          needs: mockNeeds,
+          oasysLink: config.oaSys.link,
+          sanIndicator: mockSanIndicatorResponse.sanIndicator,
+          showSentencePlan: true,
+          planLastUpdated: '2025-09-29T10:54:36.782Z',
+        })
+      })
     })
-    it('should render the risk page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/risk', {
-        personRisk: mockPersonRiskFlags,
-        risks: mockRisks,
-        crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
-        timeline: [],
-        needs: mockNeeds,
-        oasysLink: config.oaSys.link,
-        sanIndicator: mockSanIndicatorResponse.sanIndicator,
+
+    describe('CRN does not have sentence plan, user does not have SENTENCE_PLAN role', () => {
+      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS'] } })
+      const spy = jest.spyOn(mockRes, 'render')
+      beforeEach(async () => {
+        jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
+        await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
+      })
+      it('should render the risk page', () => {
+        expect(spy).toHaveBeenCalledWith('pages/risk', {
+          personRisk: mockPersonRiskFlags,
+          risks: mockRisks,
+          crn,
+          tierCalculation: mockTierCalculation,
+          risksWidget: toRoshWidget(mockRisks),
+          predictorScores: toPredictors(mockPredictors),
+          timeline: [],
+          needs: mockNeeds,
+          oasysLink: config.oaSys.link,
+          sanIndicator: mockSanIndicatorResponse.sanIndicator,
+          showSentencePlan: false,
+          planLastUpdated: '',
+        })
+      })
+    })
+
+    describe('CRN does not have sentence plan, user has SENTENCE_PLAN role', () => {
+      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
+      const spy = jest.spyOn(mockRes, 'render')
+      beforeEach(async () => {
+        jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
+        await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
+      })
+      it('should render the risk page', () => {
+        expect(spy).toHaveBeenCalledWith('pages/risk', {
+          personRisk: mockPersonRiskFlags,
+          risks: mockRisks,
+          crn,
+          tierCalculation: mockTierCalculation,
+          risksWidget: toRoshWidget(mockRisks),
+          predictorScores: toPredictors(mockPredictors),
+          timeline: [],
+          needs: mockNeeds,
+          oasysLink: config.oaSys.link,
+          sanIndicator: mockSanIndicatorResponse.sanIndicator,
+          showSentencePlan: false,
+          planLastUpdated: '',
+        })
+      })
+    })
+    describe('Sentence plan api returns an error', () => {
+      beforeEach(async () => {
+        jest
+          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+          .mockImplementationOnce(() => Promise.reject(new Error()))
+        await controllers.risk.getRisk(hmppsAuthClient)(req, res)
+      })
+      it('should render the risk page', () => {
+        expect(renderSpy).toHaveBeenCalledWith('pages/risk', {
+          personRisk: mockPersonRiskFlags,
+          risks: mockRisks,
+          crn,
+          tierCalculation: mockTierCalculation,
+          risksWidget: toRoshWidget(mockRisks),
+          predictorScores: toPredictors(mockPredictors),
+          timeline: [],
+          needs: mockNeeds,
+          oasysLink: config.oaSys.link,
+          sanIndicator: mockSanIndicatorResponse.sanIndicator,
+          showSentencePlan: false,
+          planLastUpdated: '',
+        })
       })
     })
   })

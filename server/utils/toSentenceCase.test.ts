@@ -43,4 +43,8 @@ describe('toSentenceCase()', () => {
     const str = 'A_Title_Cased_Value'
     expect(toSentenceCase(str, ['Title', 'Value'])).toEqual('A Title cased Value')
   })
+  it('should convert capitalised words if ignoreCapWords param is false', () => {
+    const str = 'This is the CAPITAL city'
+    expect(toSentenceCase(str, [], [], true, false)).toEqual('This is the capital city')
+  })
 })

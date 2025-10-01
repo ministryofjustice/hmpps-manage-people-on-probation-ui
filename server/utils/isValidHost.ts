@@ -8,6 +8,7 @@ export const isValidHost = (host: string): boolean => {
     process.env.TIER_API_URL,
     process.env.FLIPT_URL,
     process.env.INTERVENTIONS_API_URL,
+    process.env.SENTENCE_PLAN_API_URL,
     'http://localhost:8100',
     'http://localhost:9091',
     'http://localhost:8080/api',

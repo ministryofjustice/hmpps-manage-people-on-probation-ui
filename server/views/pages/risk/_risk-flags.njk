@@ -34,7 +34,8 @@
                 {% endif %}
               {% endfor %}
             {% endif %}
-            {% set level = flag.level | toSentenceCase %}
+
+            {% set level = flag.level | toSentenceCase([], null, true, false) %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}LevelValue">
                 <span class="govuk-!-font-weight-bold{% if flag.level != 'INFORMATION_ONLY' %} rosh--{{ flag.level | lower }}{% endif %}">{{ level }}</span></td>
@@ -73,7 +74,7 @@
 {{ appSummaryCard({
   attributes: {'data-qa': 'riskFlagsCard'},
   titleText: "NDelius risk flags",
-  headingLevel: '3',
+  headingLevel: scoresHeadingLevel | default('3'),
   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
   html: riskFlags,
   actions: {

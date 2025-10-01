@@ -1,131 +1,131 @@
 {% set themselvesHtml %}
-  {% set suicideSelfHarm %}
-    {% set hasCurrentSuicideRisk = risks.riskToSelf.suicide.current == 'YES' %}
-    {% set hasCurrentSelfHarmRisk = risks.riskToSelf.selfHarm.current == 'YES' %}
-    {% set hasPreviousSuicideRisk = risks.riskToSelf.suicide.previous == 'YES'%}
-    {% set hasPreviousSelfHarmRisk = risks.riskToSelf.selfHarm.previous == 'YES' %}
+{% set suicideSelfHarm %}
+{% set hasCurrentSuicideRisk = risks.riskToSelf.suicide.current == 'YES' %}
+{% set hasCurrentSelfHarmRisk = risks.riskToSelf.selfHarm.current == 'YES' %}
+{% set hasPreviousSuicideRisk = risks.riskToSelf.suicide.previous == 'YES'%}
+{% set hasPreviousSelfHarmRisk = risks.riskToSelf.selfHarm.previous == 'YES' %}
 
-    {% set currentNotes = risks.riskToSelf.suicide.currentConcernsText or risks.riskToSelf.selfHarm.currentConcernsText %}
-    {% set previousNotes = risks.riskToSelf.suicide.previousConcernsText or risks.riskToSelf.selfHarm.previousConcernsText %}
+{% set currentNotes = risks.riskToSelf.suicide.currentConcernsText or risks.riskToSelf.selfHarm.currentConcernsText %}
+{% set previousNotes = risks.riskToSelf.suicide.previousConcernsText or risks.riskToSelf.selfHarm.previousConcernsText %}
 
-    {% if hasCurrentSuicideRisk and hasCurrentSelfHarmRisk %}
-      {% set text = 'Immediate concerns about suicide and self-harm' %}
-    {% elseif hasCurrentSuicideRisk and not hasPreviousSelfHarmRisk %}
-      {% set text = 'Immediate concerns about suicide' %}
-    {% elseif hasCurrentSelfHarmRisk and not hasPreviousSuicideRisk %}
-      {% set text = 'Immediate concerns about self-harm' %}
-    {% elseif hasCurrentSuicideRisk and hasPreviousSelfHarmRisk %}
-      {% set text = 'Immediate concerns about suicide and previous concerns about self-harm' %}
-    {% elseif hasCurrentSelfHarmRisk and hasPreviousSuicideRisk %}
-      {% set text = 'Immediate concerns about self-harm and previous concerns about suicide' %}
-    {% elseif hasPreviousSuicideRisk and hasPreviousSelfHarmRisk %}
-      {% set text = 'Previous concerns about self-harm and suicide' %}
-    {% elseif hasPreviousSuicideRisk %}
-      {% set text = 'Previous concerns about suicide' %}
-    {% elseif hasPreviousSelfHarmRisk %}
-      {% set text = 'Previous concerns about self-harm' %}
-    {% else %}
-      {% set text = 'No concerns' %}
-    {% endif %}
+{% if hasCurrentSuicideRisk and hasCurrentSelfHarmRisk %}
+  {% set text = 'Immediate concerns about suicide and self-harm' %}
+{% elseif hasCurrentSuicideRisk and not hasPreviousSelfHarmRisk %}
+  {% set text = 'Immediate concerns about suicide' %}
+{% elseif hasCurrentSelfHarmRisk and not hasPreviousSuicideRisk %}
+  {% set text = 'Immediate concerns about self-harm' %}
+{% elseif hasCurrentSuicideRisk and hasPreviousSelfHarmRisk %}
+  {% set text = 'Immediate concerns about suicide and previous concerns about self-harm' %}
+{% elseif hasCurrentSelfHarmRisk and hasPreviousSuicideRisk %}
+  {% set text = 'Immediate concerns about self-harm and previous concerns about suicide' %}
+{% elseif hasPreviousSuicideRisk and hasPreviousSelfHarmRisk %}
+  {% set text = 'Previous concerns about self-harm and suicide' %}
+{% elseif hasPreviousSuicideRisk %}
+  {% set text = 'Previous concerns about suicide' %}
+{% elseif hasPreviousSelfHarmRisk %}
+  {% set text = 'Previous concerns about self-harm' %}
+{% else %}
+  {% set text = 'No concerns' %}
+{% endif %}
 
-    {% if currentNotes or previousNotes %}
-      {% set detailsHtml %}
-        <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
-        {{ currentNotes or 'No detail given' | nl2br | safe }}
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Previous circumstances, issues and needs</h3>
-        {{ previousNotes or 'No detail given' | nl2br | safe or 'None' }}
-      {% endset %}
+{% if currentNotes or previousNotes %}
+  {% set detailsHtml %}
+  <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-s">Current circumstances, issues and needs</h{{ scoresHeadingLevel | default('3') }}>
+  {{ currentNotes or 'No detail given' | nl2br | safe }}
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+  <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Previous circumstances, issues and needs</h{{ scoresHeadingLevel | default('3') }}>
+  {{ previousNotes or 'No detail given' | nl2br | safe or 'None' }}
+  {% endset %}
 
-      {{ govukDetails({
+  {{ govukDetails({
         summaryText: text,
         html: detailsHtml
       }) }}
-    {% else %}
-      {{ text }}
-    {% endif %}
+{% else %}
+  {{ text }}
+{% endif %}
+{% endset %}
+
+{% set copingCustodyHostel %}
+{% set hasCurrentCustodyRisk = risks.riskToSelf.custody.current == 'YES' %}
+{% set hasCurrentHostelRisk = risks.riskToSelf.hostelSetting.current == 'YES' %}
+{% set hasPreviousCustodyRisk = risks.riskToSelf.custody.previous == 'YES' %}
+{% set hasPreviousHostelRisk = risks.riskToSelf.hostelSetting.previous == 'YES' %}
+
+{% set currentNotes = risks.riskToSelf.custody.currentConcernsText or case.riskToSelf.hostelSetting.currentConcernsText %}
+{% set previousNotes = risks.riskToSelf.custody.previousConcernsText or case.riskToSelf.hostelSetting.previousConcernsText %}
+
+{% if hasCurrentCustodyRisk and hasCurrentHostelRisk %}
+  {% set text = 'Immediate concerns about coping in custody and in a hostel' %}
+{% elseif hasCurrentCustodyRisk and not hasPreviousHostelRisk %}
+  {% set text = 'Immediate concerns about coping in custody' %}
+{% elseif hasCurrentHostelRisk and not hasPreviousCustodyRisk %}
+  {% set text = 'Immediate concerns about coping in a hostel' %}
+{% elseif hasCurrentCustodyRisk and hasPreviousHostelRisk %}
+  {% set text = 'Immediate concerns about coping in custody and previous concerns about coping in a hostel' %}
+{% elseif hasCurrentHostelRisk and hasPreviousCustodyRisk %}
+  {% set text = 'Immediate concerns about coping in a hostel and previous concerns about coping in custody' %}
+{% elseif hasPreviousCustodyRisk and hasPreviousHostelRisk %}
+  {% set text = 'Previous concerns about coping in custody or in a hostel' %}
+{% elseif hasPreviousCustodyRisk %}
+  {% set text = 'Previous concerns about coping in custody' %}
+{% elseif hasPreviousHostelRisk %}
+  {% set text = 'Previous concerns about coping in a hostel' %}
+{% else %}
+  {% set text = 'No concerns' %}
+{% endif %}
+
+{% if currentNotes or previousNotes %}
+  {% set detailsHtml %}
+  <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-s">Current circumstances, issues and needs</h{{ scoresHeadingLevel | default('3') }}>
+  {{ currentNotes or 'No detail given' | nl2br | safe }}
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+  <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Previous circumstances, issues and needs</h{{ scoresHeadingLevel | default('3') }}>
+  {{ previousNotes or 'No detail given' | nl2br | safe or 'None' }}
   {% endset %}
 
-  {% set copingCustodyHostel %}
-    {% set hasCurrentCustodyRisk = risks.riskToSelf.custody.current == 'YES' %}
-    {% set hasCurrentHostelRisk = risks.riskToSelf.hostelSetting.current == 'YES' %}
-    {% set hasPreviousCustodyRisk = risks.riskToSelf.custody.previous == 'YES' %}
-    {% set hasPreviousHostelRisk = risks.riskToSelf.hostelSetting.previous == 'YES' %}
-
-    {% set currentNotes = risks.riskToSelf.custody.currentConcernsText or case.riskToSelf.hostelSetting.currentConcernsText %}
-    {% set previousNotes = risks.riskToSelf.custody.previousConcernsText or case.riskToSelf.hostelSetting.previousConcernsText %}
-
-    {% if hasCurrentCustodyRisk and hasCurrentHostelRisk %}
-      {% set text = 'Immediate concerns about coping in custody and in a hostel' %}
-    {% elseif hasCurrentCustodyRisk and not hasPreviousHostelRisk %}
-      {% set text = 'Immediate concerns about coping in custody' %}
-    {% elseif hasCurrentHostelRisk and not hasPreviousCustodyRisk %}
-      {% set text = 'Immediate concerns about coping in a hostel' %}
-    {% elseif hasCurrentCustodyRisk and hasPreviousHostelRisk %}
-      {% set text = 'Immediate concerns about coping in custody and previous concerns about coping in a hostel' %}
-    {% elseif hasCurrentHostelRisk and hasPreviousCustodyRisk %}
-      {% set text = 'Immediate concerns about coping in a hostel and previous concerns about coping in custody' %}
-    {% elseif hasPreviousCustodyRisk and hasPreviousHostelRisk %}
-      {% set text = 'Previous concerns about coping in custody or in a hostel' %}
-    {% elseif hasPreviousCustodyRisk %}
-      {% set text = 'Previous concerns about coping in custody' %}
-    {% elseif hasPreviousHostelRisk %}
-      {% set text = 'Previous concerns about coping in a hostel' %}
-    {% else %}
-      {% set text = 'No concerns' %}
-    {% endif %}
-
-    {% if currentNotes or previousNotes %}
-      {% set detailsHtml %}
-        <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
-        {{ currentNotes or 'No detail given' | nl2br | safe }}
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Previous circumstances, issues and needs</h3>
-        {{ previousNotes or 'No detail given' | nl2br | safe or 'None' }}
-      {% endset %}
-
-      {{ govukDetails({
+  {{ govukDetails({
         summaryText: text,
         html: detailsHtml
       }) }}
-    {% else %}
-      {{ text }}
-    {% endif %}
+{% else %}
+  {{ text }}
+{% endif %}
+{% endset %}
+
+{% set vulnerability %}
+{% set hasCurrentRisk = risks.riskToSelf.vulnerability.current == 'YES' %}
+{% set hasPreviousRisk = risks.riskToSelf.vulnerability.previous == 'YES' %}
+{% set currentNotes = risks.riskToSelf.vulnerability.currentConcernsText %}
+{% set previousNotes = risks.riskToSelf.vulnerability.previousConcernsText %}
+
+{% if hasCurrentRisk %}
+  {% set text = 'Immediate concerns about a vulnerability' %}
+{% elseif hasPreviousRisk %}
+  {% set text = 'Previous concerns about a vulnerability' %}
+{% else %}
+  {% set text = 'No concerns' %}
+{% endif %}
+
+{% if currentNotes or previousNotes %}
+  {% set detailsHtml %}
+  <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-s">Current circumstances, issues and needs</h{{ scoresHeadingLevel | default('3') }}>
+  {{ currentNotes or 'No detail given' | nl2br | safe }}
+  <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+  <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Previous circumstances, issues and needs</h{{ scoresHeadingLevel | default('3') }}>
+  {{ previousNotes or 'No detail given' | nl2br | safe or 'None' }}
   {% endset %}
 
-  {% set vulnerability %}
-    {% set hasCurrentRisk = risks.riskToSelf.vulnerability.current == 'YES' %}
-    {% set hasPreviousRisk = risks.riskToSelf.vulnerability.previous == 'YES' %}
-    {% set currentNotes = risks.riskToSelf.vulnerability.currentConcernsText %}
-    {% set previousNotes = risks.riskToSelf.vulnerability.previousConcernsText %}
-
-    {% if hasCurrentRisk %}
-      {% set text = 'Immediate concerns about a vulnerability' %}
-    {% elseif hasPreviousRisk %}
-      {% set text = 'Previous concerns about a vulnerability' %}
-    {% else %}
-      {% set text = 'No concerns' %}
-    {% endif %}
-
-    {% if currentNotes or previousNotes %}
-      {% set detailsHtml %}
-        <h3 class="govuk-heading-s">Current circumstances, issues and needs</h3>
-        {{ currentNotes or 'No detail given' | nl2br | safe }}
-        <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
-        <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-4">Previous circumstances, issues and needs</h3>
-        {{ previousNotes or 'No detail given' | nl2br | safe or 'None' }}
-      {% endset %}
-
-      {{ govukDetails({
+  {{ govukDetails({
         summaryText: text,
         html: detailsHtml
       }) }}
-    {% else %}
-      {{ text }}
-    {% endif %}
-  {% endset %}
+{% else %}
+  {{ text }}
+{% endif %}
+{% endset %}
 
-  {{ govukSummaryList({
+{{ govukSummaryList({
     rows: [
       {
         key: { text: "Risk of suicide or self harm" },
@@ -142,9 +142,9 @@
     ]
   }) }}
 
-  <p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
+<p class="govuk-!-margin-bottom-0 govuk-!-margin-top-4 govuk-body-s govuk-hint-s">
     OASys assessment completed on {{ risks.assessedOn | dateWithYear }}
-  </p>
+</p>
 {% endset %}
 
 {{ appSummaryCard({
