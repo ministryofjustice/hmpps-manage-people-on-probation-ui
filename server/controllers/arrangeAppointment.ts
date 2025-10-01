@@ -97,9 +97,9 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { data } = req.session
       let { back } = req.query
       if (back) {
-        setDataValue(data, ['backLink-sentence'], back)
+        setDataValue(data, ['backLink', 'sentence'], back)
       } else {
-        back = getDataValue(data, ['backLink-sentence'])
+        back = getDataValue(data, ['backLink', 'sentence'])
       }
       const showValidation = validation === 'true'
       if (showValidation) {
