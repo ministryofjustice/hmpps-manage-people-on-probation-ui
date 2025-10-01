@@ -226,7 +226,7 @@ describe('controllers/appointments', () => {
       })
 
       it('should redirect to the arrange appointment sentence page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence?back=`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence?back=${req.url}`)
       })
     })
     describe('CRN request parameter is invalid', () => {

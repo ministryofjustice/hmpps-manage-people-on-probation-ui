@@ -158,7 +158,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      // session based backLinks
       const { data } = req.session
       let { back } = req.query
       if (back) {
@@ -172,7 +171,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         queryParams = getDataValue(data, ['query'])
       }
-      //
       let { url } = req
       url = encodeURIComponent(url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
