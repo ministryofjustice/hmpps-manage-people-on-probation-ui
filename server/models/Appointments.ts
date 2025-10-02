@@ -37,6 +37,7 @@ export interface AppointmentSession {
   repeatingDates?: string[]
   notes?: string
   sensitivity?: YesNo
+  outcomeRecorded?: boolean
 }
 
 export interface AppointmentType {
