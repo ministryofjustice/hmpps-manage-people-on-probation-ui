@@ -85,7 +85,6 @@ const req = httpMocks.createRequest({
     actionType,
   },
   url: '',
-  session: {},
   query: { page: '', view: 'default', category: 'mock-category', contactId },
   session: {
     data: {},
@@ -392,34 +391,6 @@ describe('controllers/appointments', () => {
       })
       it('should redirect to the add notes page', () => {
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/add-note`)
-      })
-    })
-
-    describe('If back query param in url', () => {
-      const mockedReq = httpMocks.createRequest({
-        params: {
-          crn,
-          id,
-          contactId,
-          actionType,
-        },
-        query: {
-          back: '/back/url',
-        },
-        body: {
-          outcomeRecorded: 'yes',
-        },
-        session: {
-          data: {},
-        },
-      })
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockedReq, res)
-      })
-      it('should redirect to the back link', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(mockedReq.query.back)
       })
     })
   })

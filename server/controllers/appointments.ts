@@ -246,8 +246,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const { data } = req.session
       setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true)
-      const { back } = req.query as Record<string, string>
-      return res.redirect(back ?? `/case/${crn}/appointments/appointment/${id}/add-note`)
+      return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },
   getAddNote: _hmppsAuthClient => {
