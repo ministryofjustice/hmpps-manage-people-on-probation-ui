@@ -6,7 +6,16 @@ import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors, isNumericString, isValidCrn, isMatchingAddress, handleQuotes } from '../utils'
+import {
+  toRoshWidget,
+  toPredictors,
+  isNumericString,
+  isValidCrn,
+  isMatchingAddress,
+  handleQuotes,
+  setDataValue,
+  getDataValue,
+} from '../utils'
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
@@ -301,6 +310,13 @@ const appointmentsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { nextAppointment } = res.locals
       const { crn, contactId } = req.params
+      const { data } = req.session
+      let { back } = req.query
+      if (back) {
+        setDataValue(data, ['backLink', 'next'], back)
+      } else {
+        back = getDataValue(data, ['backLink', 'next'])
+      }
       if (nextAppointment?.appointment) {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
       }
@@ -318,6 +334,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
+        back,
         contactId,
       })
     }

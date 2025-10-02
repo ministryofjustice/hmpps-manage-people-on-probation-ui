@@ -440,12 +440,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postConfirmation: () => {
     return async (req, res) => {
       const { data } = req.session
+      const { url } = req
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
-      return res.redirect(`/case/${crn}/appointments/appointment/${backendId}/next-appointment`)
+      return res.redirect(`/case/${crn}/appointments/appointment/${backendId}/next-appointment?back=${url}`)
     }
   },
 
