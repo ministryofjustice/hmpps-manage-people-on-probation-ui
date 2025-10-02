@@ -45,6 +45,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   getAppointments: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params as Record<string, string>
+      const { url } = req
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
@@ -75,6 +76,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         upcomingAppointments,
         pastAppointments,
         crn,
+        url,
         tierCalculation,
         risksWidget,
         predictorScores,
@@ -138,10 +140,11 @@ const appointmentsController: Controller<typeof routes, void> = {
   postAppointments: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      const { url } = req
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/arrange-appointment/sentence`)
+      return res.redirect(`/case/${crn}/arrange-appointment/sentence?back=${url}`)
     }
   },
   getManageAppointment: hmppsAuthClient => {
@@ -155,10 +158,21 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { back } = req.query
-      const { url } = req
-      const baseUrl = req.url.split('?')[0]
-      const queryParams = getQueryString(req.query as Record<string, string>)
+      const { data } = req.session
+      let { back } = req.query
+      if (back) {
+        setDataValue(data, ['backLink', 'manage'], back)
+      } else {
+        back = getDataValue(data, ['backLink', 'manage'])
+      }
+      let queryParams = getQueryString(req.query as Record<string, string>)
+      if (queryParams.length > 0) {
+        setDataValue(data, ['query'], queryParams)
+      } else {
+        queryParams = getDataValue(data, ['query'])
+      }
+      let { url } = req
+      url = req.url.split('?')[0]
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -175,7 +189,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         crn,
         back,
         queryParams,
-        url: baseUrl,
+        url,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
@@ -242,7 +256,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query as Record<string, string>
       await masClient.patchAppointment(body)
-      return res.redirect(back ?? `/case/${crn}/appointments/appointment/${id}/manage`)
+      return res.redirect(back ?? `/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },
   getAddNote: _hmppsAuthClient => {

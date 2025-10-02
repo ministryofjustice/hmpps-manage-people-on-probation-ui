@@ -82,6 +82,8 @@ const req = httpMocks.createRequest({
     contactId,
     actionType,
   },
+  url: '',
+  session: {},
   query: { page: '', view: 'default', category: 'mock-category', contactId },
 })
 
@@ -168,6 +170,8 @@ describe('controllers/appointments', () => {
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+        personRisks: undefined,
+        url: '',
       })
     })
   })
@@ -222,7 +226,7 @@ describe('controllers/appointments', () => {
       })
 
       it('should redirect to the arrange appointment sentence page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence?back=${req.url}`)
       })
     })
     describe('CRN request parameter is invalid', () => {
@@ -375,23 +379,11 @@ describe('controllers/appointments', () => {
       it('should send the patch request to the api', () => {
         expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
       })
-      it('should redirect to the manage appointment page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+      it('should redirect to the add notes page', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/add-note`)
       })
     })
-    describe('If CRN request param is valid', () => {
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
-      })
-      it('should send the patch request to the api', () => {
-        expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
-      })
-      it('should redirect to the manage appointment page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
-      })
-    })
+
     describe('If back query param in url', () => {
       const mockedReq = httpMocks.createRequest({
         params: {

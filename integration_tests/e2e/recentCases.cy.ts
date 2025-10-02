@@ -48,7 +48,7 @@ context('Recent Cases', () => {
       .within(() => cy.get('th').eq(3).should('contain.text', 'Sentence'))
 
     page.createAliasAtIndexWithin('tbody', 0, 'td', 0, 'row1col1')
-    cy.get('@row1col1').within(() => cy.get('a').invoke('attr', 'href').should('equal', './case/X000001'))
+    cy.get('@row1col1').within(() => cy.get('a').invoke('attr', 'href').should('equal', '/case/X000001'))
     cy.get('@row1col1').within(() => cy.contains('a', 'Wolff,Caroline'))
     cy.get('@row1col1').within(() => cy.contains('span', 'X000001'))
 
@@ -63,7 +63,7 @@ context('Recent Cases', () => {
       cy
         .get('tr')
         .eq(0)
-        .within(() => cy.get('a').eq(1).invoke('attr', 'href').should('equal', './case/X000001/sentence')),
+        .within(() => cy.get('a').eq(1).invoke('attr', 'href').should('equal', '/case/X000001/sentence')),
     )
 
     cy.get('tbody').within(() =>

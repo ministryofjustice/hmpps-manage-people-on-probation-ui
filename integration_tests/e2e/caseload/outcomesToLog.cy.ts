@@ -3,6 +3,7 @@ import { getWiremockData, Wiremock } from '../../utils'
 import { UserActivity } from '../../../server/data/model/userSchedule'
 import mockResponse from '../../../wiremock/mappings/user-schedule.json'
 import { yearsSince } from '../../../server/utils'
+import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 
 const mockData = mockResponse as Wiremock
 
@@ -74,13 +75,22 @@ context('Outcomes to log', () => {
     page
       .getTableCell(1, 5)
       .find('a')
-      .should('contain.text', 'Log an outcome')
-      .should('have.attr', 'target', '_blank')
+      .should('contain.text', 'Manage')
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=1',
+        '/case/X778160/appointments/appointment/1/manage?back=/caseload/appointments/no-outcome',
       )
+    page
+      .getTableCell(2, 5)
+      .find('a')
+      .should('contain.text', 'Manage on NDelius')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X801756&contactID=2',
+      )
+      .should('have.attr', 'target', '_blank')
     cy.get('.govuk-pagination').should('exist')
     page
       .getPaginationItem(1)
@@ -106,5 +116,14 @@ context('Outcomes to log', () => {
     cy.get('p').should('contain.text', 'No outcomes to log.')
     cy.get('table').should('not.exist')
     cy.get('.govuk-pagination').should('not.exist')
+  })
+
+  it('BackLink is correct when logging an outcome', () => {
+    cy.visit('/caseload/appointments/no-outcome')
+    const page = new UserAppointments()
+    page.getTableCell(1, 5).find('a').click()
+    const managePage = new ManageAppointmentPage()
+    managePage.getBackLink().click()
+    page.checkPageTitle('Outcomes to log')
   })
 })

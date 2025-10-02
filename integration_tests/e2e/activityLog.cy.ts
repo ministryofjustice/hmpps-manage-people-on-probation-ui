@@ -385,10 +385,6 @@ context('Activity log', () => {
   it('Activity log page is rendered in default view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    cy.get('[data-qa="currentSectionNameSubText"]').should(
-      'contain.text',
-      'All links to log outcomes open in new tabs on NDelius.',
-    )
     page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
     page.getRowData('timeline1', 'enforcement', 'Value').should('contain.text', 'Warning letter sent')
     page.getCardHeader('timeline2').should('contain.text', 'Phone call from Eula Schmeler')
@@ -405,7 +401,7 @@ context('Activity log', () => {
     page
       .getCardHeader('timeline6')
       .get('.app-summary-card__actions a')
-      .should('contain.text', 'Log an outcome')
+      .should('contain.text', 'Manage on NDelius')
       .should('contain.html', '<span class="govuk-visually-hidden"> (opens in new tab)</span>')
       .should('have.attr', 'target', '_blank')
       .should(
@@ -414,12 +410,12 @@ context('Activity log', () => {
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=14',
       )
     page.getCardHeader('timeline7').should('contain.text', 'Office appointment at 10:15am')
-    page.getCardHeader('timeline7').get('.app-summary-card__actions a').should('contain.text', 'Log an outcome')
+    page.getCardHeader('timeline7').get('.app-summary-card__actions a').should('contain.text', 'Manage on NDelius')
 
     page
       .getCardHeader('timeline7')
       .find('.app-summary-card__actions a')
-      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage')
+      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage?back=/case/X000001/activity-log')
 
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')

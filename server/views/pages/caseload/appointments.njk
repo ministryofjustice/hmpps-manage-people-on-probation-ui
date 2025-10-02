@@ -27,7 +27,7 @@
                     {% set appointmentCol = [] %}
                     {% if type == 'upcoming' %}
                         {% set appointmentCol = [
-{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage">' + appointment.type + '</a>',
+{ html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>',
                           attributes: { "data-sort-value": appointment.type  }
                         }
                 ]
@@ -44,10 +44,17 @@
 
                     {% set actionCol = [] %}
                     {% if type == 'no-outcome' %}
-                        {% set actionCol = [
- { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Log an outcome<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
-                         ]
-                         %}
+                        {% if appointment.deliusManaged %}
+                            {% set actionCol = [
+    { html: '<a href="' + deliusDeepLinkUrl('UpdateContact', appointment.crn, appointment.id) + '" target="_blank" rel="external noopener noreferrer">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>'}
+                            ]
+                            %}
+                        {% else %}
+                            {% set actionCol = [
+    { html: '<a href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Manage</a>'}
+                            ]
+                            %}
+                        {% endif %}
                     {% endif %}
                     {% set newRow = columns | concat(appointmentCol) | concat(dateCol) | concat(actionCol) %}
                     {% set rows = (rows.push(newRow), rows) %}
