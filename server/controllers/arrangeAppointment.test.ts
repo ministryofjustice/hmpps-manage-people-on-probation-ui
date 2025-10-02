@@ -975,7 +975,7 @@ describe('controllers/arrangeAppointment', () => {
       mockedCloneAppointment.mockReturnValue(handler)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
       expect(res.redirect).toHaveBeenCalledWith(
-        `/case/${mockReq.params.crn}/appointments/appointment/5/next-appointment`,
+        `/case/${mockReq.params.crn}/appointments/appointment/5/next-appointment?back=${mockReq.url}`,
       )
     })
   })
