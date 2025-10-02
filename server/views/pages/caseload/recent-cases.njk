@@ -57,7 +57,7 @@
                         }else{
                           anchor.className = "govuk-!-font-weight-bold"
                         }
-                        anchor.href = "./case/" + recentCase.crn
+                        anchor.href = "/case/" + recentCase.crn
                         anchor.text = lao(recentCase.limitedAccess, recentCase.name, "Restricted access")
                         anchor.setAttribute("data-ai-id", "recentCasesPersonNameLink")
                         const span1 = document.createElement("span")
@@ -88,7 +88,7 @@
                             const anchorSentence = document.createElement("a")
                             anchorSentence.className ="govuk-link"
                             if (recentCase.limitedAccess !== true){
-                                anchorSentence.href = "./case/" + recentCase.crn + "/sentence"
+                                anchorSentence.href = "/case/" + recentCase.crn + "/sentence"
                             }
                             anchorSentence.text = lao(recentCase.limitedAccess,"+ " + recentCase.numberOfAdditionalSentences + " more")
                             rd4.innerText = lao(recentCase.limitedAccess, recentCase.sentence)
