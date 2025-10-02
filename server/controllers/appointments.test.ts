@@ -82,6 +82,8 @@ const req = httpMocks.createRequest({
     contactId,
     actionType,
   },
+  url: '',
+  session: {},
   query: { page: '', view: 'default', category: 'mock-category', contactId },
 })
 
@@ -168,6 +170,8 @@ describe('controllers/appointments', () => {
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+        personRisks: undefined,
+        url: '',
       })
     })
   })
@@ -222,7 +226,7 @@ describe('controllers/appointments', () => {
       })
 
       it('should redirect to the arrange appointment sentence page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/sentence?back=${req.url}`)
       })
     })
     describe('CRN request parameter is invalid', () => {

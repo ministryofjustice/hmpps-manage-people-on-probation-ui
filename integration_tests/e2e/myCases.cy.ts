@@ -26,7 +26,7 @@ const checkColumnSorting = (page: YourCasesPage, index: number) => {
     .getRowData('myCases', 'nameOrCrn', 'Value1')
     .find('a')
     .should('contain.text', 'Berge, Alton')
-    .should('have.attr', 'href', './case/X778160')
+    .should('have.attr', 'href', '/case/X778160')
   page.getColumnHeader('myCases', index).find('button').click()
   page.getColumnHeader('myCases', index).should('have.attr', 'aria-sort', secondSort)
   page.getRowData('myCases', 'nameOrCrn', 'Value1').should('contain.text', 'X778160')
@@ -34,7 +34,7 @@ const checkColumnSorting = (page: YourCasesPage, index: number) => {
     .getRowData('myCases', 'nameOrCrn', 'Value1')
     .find('a')
     .should('contain.text', 'Berge, Alton')
-    .should('have.attr', 'href', './case/X778160')
+    .should('have.attr', 'href', '/case/X778160')
 }
 
 context('Cases', () => {
