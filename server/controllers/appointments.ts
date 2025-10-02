@@ -20,10 +20,6 @@ import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
-import arrangeAppointmentController from './arrangeAppointment'
-import { AppResponse } from '../models/Locals'
-import { ErrorMessages } from '../data/model/caseload'
-import logger from '../../logger'
 
 const routes = [
   'getAppointments',
@@ -242,20 +238,15 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-  postAttendedComplied: hmppsAuthClient => {
+  postAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, contactId: id } = req.params
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const body: AppointmentPatch = {
-        id: parseInt(id, 10),
-        outcomeRecorded: true,
-      }
+      const { data } = req.session
+      setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true)
       const { back } = req.query as Record<string, string>
-      await masClient.patchAppointment(body)
       return res.redirect(back ?? `/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },
@@ -308,12 +299,18 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { notes, sensitive } = req.body
+      const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
+
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
         notes: handleQuotes(notes),
         sensitive: sensitive === 'Yes',
+      }
+      if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
+        body.outcomeRecorded = true
+        delete req.session.data.appointments[crn][id].outcomeRecorded
       }
       await masClient.patchAppointment(body)
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)

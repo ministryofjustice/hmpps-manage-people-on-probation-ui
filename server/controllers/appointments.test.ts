@@ -6,7 +6,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString } from '../utils'
+import { toRoshWidget, toPredictors, isValidCrn, isNumericString, setDataValue } from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -52,6 +52,7 @@ jest.mock('../utils', () => {
     isValidCrn: jest.fn(),
     isNumericString: jest.fn(),
     isMatchingAddress: jest.fn(() => true),
+    setDataValue: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -73,6 +74,7 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
+const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 const req = httpMocks.createRequest({
   params: {
@@ -85,6 +87,9 @@ const req = httpMocks.createRequest({
   url: '',
   session: {},
   query: { page: '', view: 'default', category: 'mock-category', contactId },
+  session: {
+    data: {},
+  },
 })
 
 const res = mockAppResponse({
@@ -351,12 +356,14 @@ describe('controllers/appointments', () => {
       body: {
         outcomeRecorded: 'yes',
       },
+      session: {
+        data: {},
+      },
     })
     describe('If CRN request param is invalid', () => {
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(false)
         mockIsNumericString.mockReturnValue(false)
-
         await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
       })
       it('should return a 404 status and render the error page', () => {
@@ -376,8 +383,12 @@ describe('controllers/appointments', () => {
         mockIsNumericString.mockReturnValue(true)
         await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockReq, res)
       })
-      it('should send the patch request to the api', () => {
-        expect(patchAppointmentSpy).toHaveBeenCalledWith({ id: parseInt(contactId, 10), outcomeRecorded: true })
+      it('should set the outcome recorded session', () => {
+        expect(mockSetDataValue).toHaveBeenCalledWith(
+          req.session.data,
+          ['appointments', crn, contactId, 'outcomeRecorded'],
+          true,
+        )
       })
       it('should redirect to the add notes page', () => {
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/add-note`)
@@ -398,18 +409,21 @@ describe('controllers/appointments', () => {
         body: {
           outcomeRecorded: 'yes',
         },
+        session: {
+          data: {},
+        },
       })
       beforeEach(async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsNumericString.mockReturnValue(true)
         await controllers.appointments.postAttendedComplied(hmppsAuthClient)(mockedReq, res)
       })
-      it('should post the request then redirect to the back link', () => {
+      it('should redirect to the back link', () => {
         expect(redirectSpy).toHaveBeenCalledWith(mockedReq.query.back)
       })
     })
   })
-  xdescribe('get add note', () => {
+  describe('get add note', () => {
     const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
     const errorMessages = {
       notes: 'Notes error',
@@ -448,11 +462,14 @@ describe('controllers/appointments', () => {
     it('should render the add note page', () => {
       const { fileUploadLimit, maxFileSize, validMimeTypes } = config
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
+        body: null,
         crn,
         errorMessages: null,
         uploadedFiles: [],
         fileUploadLimit,
         maxFileSize,
+        url: '',
+        maxCharCount: 4000,
         validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })
@@ -474,30 +491,78 @@ describe('controllers/appointments', () => {
       })
     })
     describe('If CRN request param is valid', () => {
-      const mockReq = httpMocks.createRequest({
-        body: {
-          notes: 'some mock notes',
-          sensitive: 'Yes',
-        },
-        params: {
-          contactId: id,
-          crn,
-        },
-      })
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
-      })
-      it('should send the patch request to the api', () => {
-        expect(patchAppointmentSpy).toHaveBeenCalledWith({
-          id: parseInt(mockReq.params.contactId, 10),
-          notes: mockReq.body.notes,
-          sensitive: true,
+      describe('click thru from manage appointment page', () => {
+        const mockReq = httpMocks.createRequest({
+          body: {
+            notes: 'some mock notes',
+            sensitive: 'Yes',
+          },
+          params: {
+            contactId: id,
+            crn,
+          },
+          session: {
+            data: {},
+          },
+        })
+        beforeEach(async () => {
+          mockIsValidCrn.mockReturnValue(true)
+          mockIsNumericString.mockReturnValue(true)
+          await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+        })
+        it('should send the patch request to the api', () => {
+          expect(patchAppointmentSpy).toHaveBeenCalledWith({
+            id: parseInt(mockReq.params.contactId, 10),
+            notes: mockReq.body.notes,
+            sensitive: true,
+          })
+        })
+        it('should redirect to the manage appointment page', () => {
+          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
         })
       })
-      it('should redirect to the manage appointment page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+      describe('redirect from attended and complied page', () => {
+        let mockReq: httpMocks.MockRequest<any>
+        beforeEach(async () => {
+          mockIsValidCrn.mockReturnValue(true)
+          mockIsNumericString.mockReturnValue(true)
+          mockReq = httpMocks.createRequest({
+            body: {
+              notes: 'some mock notes',
+              sensitive: 'Yes',
+            },
+            params: {
+              contactId: id,
+              crn,
+            },
+            session: {
+              data: {
+                appointments: {
+                  [crn]: {
+                    [contactId]: {
+                      outcomeRecorded: true,
+                    },
+                  },
+                },
+              },
+            },
+          })
+          await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+        })
+        it('should delete the outcome recorded session value', () => {
+          expect(mockReq.session.data.appointments[crn][id].outcomeRecorded).toBeUndefined()
+        })
+        it('should send the patch request to the api', () => {
+          expect(patchAppointmentSpy).toHaveBeenCalledWith({
+            id: parseInt(mockReq.params.contactId, 10),
+            notes: mockReq.body.notes,
+            sensitive: true,
+            outcomeRecorded: true,
+          })
+        })
+        it('should redirect to the manage appointment page', () => {
+          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+        })
       })
     })
   })
