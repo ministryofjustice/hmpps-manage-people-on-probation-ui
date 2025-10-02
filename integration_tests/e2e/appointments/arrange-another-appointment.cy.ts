@@ -19,8 +19,8 @@ import {
   checkUpdateSensitivity,
 } from './imports'
 
-const loadPage = (id: number, c: string = crn) => {
-  cy.visit(`/case/${c}/appointments/appointment/${id}/next-appointment`)
+const loadPage = (c: string = crn) => {
+  cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
   const nextAppointmentPage = new NextAppointmentPage()
   nextAppointmentPage.getRadio('option', 1).click()
   nextAppointmentPage.getSubmitBtn().click()
@@ -31,7 +31,8 @@ describe('Arrange another appointment', () => {
     cy.task('resetMocks')
   })
   it('should render the page', () => {
-    loadPage(9)
+    cy.task('stubNextAppointment')
+    loadPage()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     checkAppointmentSummary(arrangeAnotherAppointmentPage)
     arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
@@ -40,7 +41,8 @@ describe('Arrange another appointment', () => {
     let dateTimePage: AppointmentDateTimePage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
-      loadPage(9)
+      cy.task('stubNextAppointment')
+      loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
     })
@@ -71,7 +73,7 @@ describe('Arrange another appointment', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
       cy.task('stubAppointmentNoEventId')
-      loadPage(6, 'X000001')
+      loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
     })
@@ -96,7 +98,7 @@ describe('Arrange another appointment', () => {
     let attendancePage: AttendancePage
     beforeEach(() => {
       cy.task('stubAppointmentNoAttendee')
-      loadPage(6, 'X000001')
+      loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
       attendancePage = new AttendancePage()
@@ -124,7 +126,7 @@ describe('Arrange another appointment', () => {
     let locationPage: AppointmentLocationPage
     beforeEach(() => {
       cy.task('stubAppointmentNoLocation')
-      loadPage(6, 'X000001')
+      loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
       locationPage = new AppointmentLocationPage()
@@ -145,7 +147,8 @@ describe('Arrange another appointment', () => {
   describe('Change appointment values', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
-      loadPage(9)
+      cy.task('stubNextAppointment')
+      loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     })
     it('should update the type when value is changed', () => {
@@ -175,7 +178,8 @@ describe('Arrange another appointment', () => {
   describe('Practitioner submits the appointment', () => {
     let confirmPage: AppointmentConfirmationPage
     beforeEach(() => {
-      loadPage(9)
+      cy.task('stubNextAppointment')
+      loadPage()
     })
     it('should redirect to the confirmation page', () => {
       getUuid().then(uuid => {
