@@ -508,6 +508,9 @@ describe('controllers/appointments', () => {
         id,
         contactId,
       },
+      session: {
+        data: {},
+      },
     })
     describe('Audit message', () => {
       beforeEach(async () => {

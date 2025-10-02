@@ -177,7 +177,7 @@
       hint: {
         text: nextAppointmentHint
       },
-      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment" if not nextAppointment.appointment,
+      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not nextAppointment.appointment,
       status: {
         tag: {
           text: "Not started",

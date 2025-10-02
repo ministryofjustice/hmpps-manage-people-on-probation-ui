@@ -4,9 +4,14 @@ import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
-import { AppointmentRequestBody, AppointmentSession } from '../models/Appointments'
+import {
+  AppointmentPostResponse,
+  AppointmentRequestBody,
+  AppointmentSession,
+  AppointmentsPostResponse,
+} from '../models/Appointments'
 
-export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<Response>> => {
+export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
     const { crn, id: uuid } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

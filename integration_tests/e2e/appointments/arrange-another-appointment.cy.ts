@@ -1,3 +1,4 @@
+import { v4 } from 'uuid'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
@@ -6,18 +7,9 @@ import AppointmentLocationPage from '../../pages/appointments/location.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import {
-  completeTypePage,
-  completeSentencePage,
-  completeAttendancePage,
-  completeLocationPage,
-  completeDateTimePage,
-  completeRepeatingPage,
-  completeSupportingInformationPage,
-  completeCYAPage,
-  completeConfirmationPage,
   checkAppointmentSummary,
-  crn,
   getUuid,
+  crn,
   checkUpdateType,
   checkUpdateSentence,
   checkUpdateLocation,
@@ -27,20 +19,8 @@ import {
   checkUpdateSensitivity,
 } from './imports'
 
-const loadPage = () => {
-  completeSentencePage()
-  completeTypePage()
-  completeAttendancePage()
-  completeLocationPage()
-  completeDateTimePage()
-  completeRepeatingPage()
-  completeSupportingInformationPage()
-  completeCYAPage()
-  completeConfirmationPage()
-}
-
-const loadPageFromManage = () => {
-  cy.visit(`/case/X000001/appointments/appointment/6/next-appointment`)
+const loadPage = (c: string = crn) => {
+  cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
   const nextAppointmentPage = new NextAppointmentPage()
   nextAppointmentPage.getRadio('option', 1).click()
   nextAppointmentPage.getSubmitBtn().click()
@@ -51,6 +31,7 @@ describe('Arrange another appointment', () => {
     cy.task('resetMocks')
   })
   it('should render the page', () => {
+    cy.task('stubNextAppointment')
     loadPage()
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     checkAppointmentSummary(arrangeAnotherAppointmentPage)
@@ -60,6 +41,7 @@ describe('Arrange another appointment', () => {
     let dateTimePage: AppointmentDateTimePage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
+      cy.task('stubNextAppointment')
       loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
@@ -91,7 +73,7 @@ describe('Arrange another appointment', () => {
     let sentencePage: AppointmentSentencePage
     beforeEach(() => {
       cy.task('stubAppointmentNoEventId')
-      loadPageFromManage()
+      loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
     })
@@ -116,7 +98,7 @@ describe('Arrange another appointment', () => {
     let attendancePage: AttendancePage
     beforeEach(() => {
       cy.task('stubAppointmentNoAttendee')
-      loadPageFromManage()
+      loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
       attendancePage = new AttendancePage()
@@ -144,7 +126,7 @@ describe('Arrange another appointment', () => {
     let locationPage: AppointmentLocationPage
     beforeEach(() => {
       cy.task('stubAppointmentNoLocation')
-      loadPageFromManage()
+      loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
       locationPage = new AppointmentLocationPage()
@@ -165,6 +147,7 @@ describe('Arrange another appointment', () => {
   describe('Change appointment values', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
+      cy.task('stubNextAppointment')
       loadPage()
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     })
@@ -195,6 +178,7 @@ describe('Arrange another appointment', () => {
   describe('Practitioner submits the appointment', () => {
     let confirmPage: AppointmentConfirmationPage
     beforeEach(() => {
+      cy.task('stubNextAppointment')
       loadPage()
     })
     it('should redirect to the confirmation page', () => {

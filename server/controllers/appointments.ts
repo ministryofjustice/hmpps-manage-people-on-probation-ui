@@ -171,8 +171,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         queryParams = getDataValue(data, ['query'])
       }
-      let { url } = req
-      url = encodeURIComponent(url)
+      const { url } = req
+      const baseUrl = url.split('?')[0]
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -189,7 +189,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         crn,
         back,
         queryParams,
-        url,
+        url: baseUrl,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
@@ -324,6 +324,13 @@ const appointmentsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { nextAppointment } = res.locals
       const { crn, contactId } = req.params
+      const { data } = req.session
+      let { back } = req.query
+      if (back) {
+        setDataValue(data, ['backLink', 'next'], back)
+      } else {
+        back = getDataValue(data, ['backLink', 'next'])
+      }
       if (nextAppointment?.appointment) {
         return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
       }
@@ -341,6 +348,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/appointments/next-appointment', {
         personAppointment,
         crn,
+        back,
         contactId,
       })
     }
