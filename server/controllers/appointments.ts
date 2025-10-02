@@ -156,8 +156,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const { back } = req.query
-      let { url } = req
-      url = encodeURIComponent(url)
+      const { url } = req
+      const baseUrl = req.url.split('?')[0]
       const queryParams = getQueryString(req.query as Record<string, string>)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -175,7 +175,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         crn,
         back,
         queryParams,
-        url,
+        url: baseUrl,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
