@@ -171,8 +171,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         queryParams = getDataValue(data, ['query'])
       }
-      let { url } = req
-      url = req.url.split('?')[0]
+      const { url } = req
+      const baseUrl = url.split('?')[0]
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -189,7 +189,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         crn,
         back,
         queryParams,
-        url,
+        url: baseUrl,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
