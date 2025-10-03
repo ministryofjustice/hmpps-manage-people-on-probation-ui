@@ -30,7 +30,7 @@ npm install
 
 ### Run the service
 
-To run the service locally, with an in-memory session store and local user account, run:
+To run the service locally, with an in-memory session store and local user  account, run:
 
 ```shell
 npm run start:dev
