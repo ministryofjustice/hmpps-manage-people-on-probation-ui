@@ -1,7 +1,7 @@
 <section data-qa="opd">
-    <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
+    <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
     Offender personality disorder (OPD)
-</h{{ scoresHeadingLevel if scoresHeadingLevel else '3' }}>
+</h{{ scoresHeadingLevel | default('3') }}>
     {% if personRisk.opd.eligible === true %}
         <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
         Last updated (NDelius): {{ personRisk.opd.date | dateWithYear }}

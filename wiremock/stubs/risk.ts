@@ -18,4 +18,18 @@ const stubSanIndicatorTrue = (): SuperAgentRequest =>
     },
   })
 
-export default { stubSanIndicatorTrue }
+const stubSentencePlan404 = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/sentence-plan/plans/crn/.*',
+      method: 'GET',
+    },
+    response: {
+      status: 404,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default { stubSanIndicatorTrue, stubSentencePlan404 }

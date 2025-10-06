@@ -1,8 +1,20 @@
 $govuk-global-styles: true;
 $path: '/assets/images/';
-
 $moj-page-width: 1170px;
 $govuk-page-width: $moj-page-width;
+$low-score-colour: #485b10;
+$low-score-border-colour: #85994b;
+$medium-score-colour: #a34e00;
+$medium-score-border-colour: #f47738;
+$high-score-colour: #942514;
+$high-score-border-colour: #d4351c;
+$very-high-score-colour: #711a0d;
+$very-high-score-border-colour: #942514;
+$unknown-score-border-colour: #fd0;
+$no-score-colour: #505a5f;
+$no-score-border-colour: #505a5f;
+$no-score-background-colour: #ffffff;
+$mappa-colour: #4c2c92;
 
 @import '../../node_modules/govuk-frontend/dist/govuk/all';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
@@ -14,10 +26,8 @@ $govuk-page-width: $moj-page-width;
 @import './components/sortable-table';
 @import '../../node_modules/govuk-frontend/dist/govuk/base';
 @import '../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table';
-@import './components/mappa-widget';
 @import './components/predictor-scores';
 @import './components/risk-flag-widget';
-@import './components/rosh-widget';
 @import './components/timeline';
 @import './components/flex';
 @import './components/note';
@@ -444,4 +454,120 @@ body.feature-disabled {
   margin-top: 5px;
   color: #505a5f;
   display: block;
+}
+
+.rosh--very-high {
+  color: $very-high-score-colour;
+}
+
+.rosh--high {
+  color: $high-score-colour;
+}
+
+.rosh--medium {
+  color: $medium-score-colour;
+}
+
+.rosh--low {
+  color: $low-score-colour;
+}
+
+.rosh-widget {
+  border: 2px solid govuk-colour('black');
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+  & h3,
+  & h4 {
+    margin-bottom: govuk-spacing(1);
+    font-weight: 400;
+  }
+}
+
+.rosh-widget--none,
+.risk-badge--none {
+  background-color: $no-score-background-colour;
+  border: 2px solid $no-score-border-colour;
+  & h3,
+  & h4 {
+    color: $no-score-colour;
+  }
+}
+
+.rosh-widget--unknown {
+  border: 2px solid $unknown-score-border-colour;
+}
+
+.rosh-widget--low {
+  border: 2px solid $low-score-border-colour;
+  & h3,
+  & h4 {
+    color: $low-score-colour;
+  }
+}
+
+.rosh-widget--medium {
+  border: 2px solid $medium-score-border-colour;
+  & h3,
+  & h4 {
+    color: $medium-score-colour;
+  }
+}
+
+.rosh-widget--high {
+  border: 2px solid $high-score-border-colour;
+  & h3,
+  & h4 {
+    color: $high-score-colour;
+  }
+}
+
+.rosh-widget--very-high {
+  border: 2px solid $very-high-score-border-colour;
+  & h3,
+  & h4 {
+    color: $very-high-score-colour;
+  }
+}
+
+.rosh-widget__table {
+  text-align: left;
+  margin: 0;
+
+  & tbody {
+    & th {
+      font-weight: 400;
+    }
+
+    & td {
+      font-weight: bold;
+    }
+  }
+}
+
+.rosh-widget__risk--low {
+  color: $low-score-colour;
+}
+
+.rosh-widget__risk--medium {
+  color: $medium-score-colour;
+}
+
+.rosh-widget__risk--high {
+  color: $high-score-colour;
+}
+
+.rosh-widget__risk--very-high {
+  color: $very-high-score-colour;
+}
+
+.mappa-widget {
+  border: 2px solid $mappa-colour;
+  padding: govuk-spacing(4);
+  margin-bottom: govuk-spacing(4);
+  & h3,
+  & h4 {
+    color: $mappa-colour;
+    margin-bottom: govuk-spacing(1);
+    font-weight: 400;
+  }
 }

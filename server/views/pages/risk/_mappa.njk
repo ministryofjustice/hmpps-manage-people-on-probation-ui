@@ -1,0 +1,28 @@
+<div class="mappa-widget">
+    {% if hasValue(personRisk.mappa)and personRisk.mappa.error == null %}
+        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m text-uppercase" data-qa='mappa-heading'>
+            <strong>
+                {% if isNotNull(personRisk.mappa.category) %}CAT {{ personRisk.mappa.category }}/{% endif %}
+                {% if isNotNull(personRisk.mappa.level) %}LEVEL {{ personRisk.mappa.level }}
+                {% else %}No{% endif %}
+            </strong> MAPPA</h{{ scoresHeadingLevel | default('3') }}>
+        <p class="govuk-body-m govuk-!-margin-bottom-2">Multi-agency public protection arrangements</p>
+        {% if personRisk.mappa.level and personRisk.mappa.startDate %}
+            <p class="text-secondary govuk-!-margin-bottom-0 govuk-hint">Last updated (NDelius): {{ personRisk.mappa.startDate | dateWithYearShortMonth }}</p>
+        {% endif %}
+    {% else %}
+        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m text-uppercase">
+            <strong>UNKNOWN</strong> MAPPA</h{{ scoresHeadingLevel | default('3') }}>
+        <p class="govuk-body-m govuk-!-margin-bottom-2">Multi-agency public protection arrangements</p>
+        <p class="govuk-body-m govuk-!-margin-bottom-0">
+            No MAPPA data found in NDelius.<br>
+            If you think this is wrong:<br>
+            <br>
+            1. Check and update NDelius.<br>
+            2. Refresh this page to see your update.<br>
+            <br>
+            You can continue with the Part A<br>
+            if you still get this error. Update the<br>
+            MAPPA section manually.<br></p>
+    {% endif %}
+</div>

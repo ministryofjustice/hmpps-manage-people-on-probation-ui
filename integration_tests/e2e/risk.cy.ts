@@ -14,8 +14,8 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
 ).response.jsonBody.riskFlags
 
-const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
-  const headingLevel = !sanIndicator ? '3' : '4'
+const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = true) => {
+  const headingLevel = !sentencePlan ? '3' : '4'
   page.getElementData('rsr').should('exist')
   page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
 
@@ -41,7 +41,9 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
   for (let i = 0; i < mockRiskFlags.length; i += 1) {
     const index = i + 1
     const { level, description, riskNotes, createdDate, nextReviewDate } = mockRiskFlags[i]
-    page.getRowData('riskFlags', `risk${index}Level`, 'Value').should('contain.text', toSentenceCase(level))
+    page
+      .getRowData('riskFlags', `risk${index}Level`, 'Value')
+      .should('contain.text', toSentenceCase(level, [], null, true, false))
     const classes = level !== 'INFORMATION_ONLY' ? ` rosh--${level.toLowerCase()}` : ''
     page
       .getElementData(`risk${index}LevelValue`)
@@ -81,9 +83,8 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
 
   page.getElementData('opd').should('exist')
   page.getElementData('opd').get(`h${headingLevel}`).should('contain.text', 'Offender personality disorder (OPD)')
-
-  page.getElementData('mappa-heading').should('contain.text', 'Cat 0/').should('contain.text', 'Level 2')
-
+  cy.get('.rosh-widget').get(`h${headingLevel}`).should('contain.text', 'VERY HIGH').should('contain.text', 'ROSH')
+  cy.get('.mappa-widget').get(`h${headingLevel}`).should('contain.text', 'CAT 0/').should('contain.text', 'LEVEL 2')
   page.getElementData('riskToLabelValue1').should('contain.text', 'Children')
   page.getElementData('riskToLabelValue2').should('contain.text', 'Staff')
   page.getElementData('riskToLabelValue3').should('contain.text', 'Known adult')
@@ -103,7 +104,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
   page.getElementData('riskToCustodyValue5').should('contain.text', 'Low')
 
   if (!sanIndicator) {
-    page.getElementData('criminogenicNeeds').find('h3').should('contain.text', 'Criminogenic needs')
+    page.getElementData('criminogenicNeeds').find(`h${headingLevel}`).should('contain.text', 'Criminogenic needs')
     page
       .getElementData('oasysViewRiskAssessmentLink')
       .should('contain.text', 'View the full risk assessment on OASys (opens in new tab).')
@@ -121,12 +122,10 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
       })
     })
     page.getElementData('oasysScoreHistory').should('exist')
-    page.getElementData('plan').should('not.exist')
   }
   if (sanIndicator) {
     page.getElementData('criminogenicNeeds').should('not.exist')
     page.getInsetText().should('not.exist')
-    cy.get('h3').should('contain.text', 'Risk')
     page.getElementData('osp').should('not.exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
       page.getElementData('opd').then($opd => {
@@ -135,9 +134,13 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
       })
     })
     page.getElementData('oasysScoreHistory').should('not.exist')
+  }
+  if (sentencePlan) {
+    page.checkPageTitle('Risk and plan')
+    cy.get('[data-qa="pageSubHeading"]').should('contain.text', 'Risk')
     page.getElementData('plan').should('exist')
     page.getElementData('plan').get('h4').should('contain.text', 'Plan')
-    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 24 January 2024')
+    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 29 September 2025')
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
     page
       .getElementData('plan')
@@ -145,26 +148,51 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false) => {
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://sentence-plan-dummy-url/X000001/plan')
   }
+  if (!sentencePlan) {
+    page.checkPageTitle('Risk')
+    cy.get('[data-qa="pageSubHeading"]').should('not.exist')
+    page.getElementData('plan').should('not.exist')
+  }
 }
 
 context('Risk', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
-  it('Risk overview page is rendered when san indicator is false', () => {
+
+  it('Risk overview page is rendered when has sentence plan and san indicator is false', () => {
+    cy.task('stubAuthSentencePlan')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    page.checkPageTitle('Risk')
     checkRiskPageView(page)
   })
 
-  it('Risk overview page is rendered when san indicator is true', () => {
+  it('Risk overview page is rendered when has no sentence plan and san indicator is false', () => {
+    cy.task('stubSentencePlan404')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sentencePlan = false
+    const sanIndicator = false
+    checkRiskPageView(page, sanIndicator, sentencePlan)
+  })
+
+  it('Risk overview page is rendered when has sentence plan and san indicator is true', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubAuthSentencePlan')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = true
+    checkRiskPageView(page, sanIndicator)
+  })
+
+  it('Risk overview page is rendered when has no sentence plan and san indicator is true', () => {
+    cy.task('stubSentencePlan404')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    page.checkPageTitle('Risk and plan')
     const sanIndicator = true
-    checkRiskPageView(page, sanIndicator)
+    const sentencePlan = false
+    checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
   it('Removed risk page is rendered', () => {

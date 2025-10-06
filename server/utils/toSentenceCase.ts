@@ -7,6 +7,7 @@ export const toSentenceCase = (
   preserveWords: string[] = [],
   preserveSeparators: string[] | null = null,
   leadingCaps: boolean = true,
+  ignoreCapWords: boolean = true,
 ): string => {
   if (!value) return ''
   const preservedWords = [...preserveWords, ...config.preservedWords]
@@ -26,7 +27,7 @@ export const toSentenceCase = (
     return formattedWord
       .split(' ')
       .map(subWord => {
-        if (preservedWords.includes(subWord) || capsRegex.test(subWord)) {
+        if (preservedWords.includes(subWord) || (capsRegex.test(subWord) && ignoreCapWords)) {
           return subWord
         }
         return subWord.toLowerCase()
