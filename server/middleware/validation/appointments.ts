@@ -10,12 +10,13 @@ const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data } = session
-  let { back } = req.query
+  let { back, change } = req.query
   back = back ? back.toString() : ''
+  change = change ? change.toString() : ''
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back }
+  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
   let render = `pages/${[
