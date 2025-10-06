@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import type { UserDetails } from '../../services/userService'
 import { Errors } from '../../models/Errors'
 import { ActivityLogCache } from '../index'
@@ -35,6 +36,8 @@ declare module 'express-session' {
       activityLog?: ActivityLogCache
       uploadedFiles?: FileCache[]
     }
+    pageHistory?: string[]
+    mockedTime?: string
   }
 
   interface DocumentFilters {

@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment details' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+{% set backLink = backLink | default('/case/' + crn + '/arrange-appointment/' + id + '/sentence') %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
 {% set types = [] %}

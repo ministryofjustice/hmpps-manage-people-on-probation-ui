@@ -2,11 +2,10 @@
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
 {% set pageTitle = makePageTitle({
-  pageHeading: [appointment.type, 'note']}) %}
-{% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
-  '' %}
-{% set backLink = back + extraBreadcrumb if back else 
-  '/case/' + crn + '/appointments/appointment/' + contactId + '/manage' %}
+  pageHeading: [appointment.type, 'note']
+}) %}
+
+{% set backLink = backLink | default('/case/' + crn + '/appointments/appointment/' + contactId + '/manage') %}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% block beforeContent %}
@@ -41,7 +40,7 @@
       </h2>
     </div>
   </div>
-  
+
   {% set appointmentDetails %}
   {% set showAction = false %}
   {% set noMargin = true %}

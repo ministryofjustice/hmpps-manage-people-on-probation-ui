@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import config from './config'
 import { defaultName } from './utils/azureAppInsights'
 import { makePageTitle } from './utils'
+import { pageHistory } from './middleware'
 
 const baseController = () => {
   return (req: Request, res: Response, next: NextFunction): void => {
@@ -12,6 +13,7 @@ const baseController = () => {
     res.locals.cases = url[0] === 'case'
     res.locals.search = url[0] === 'search'
     res.locals.makePageTitle = makePageTitle
+    pageHistory(req, res)
     return next()
   }
 }
