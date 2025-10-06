@@ -38,6 +38,7 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
+  outcomeRecorded?: boolean
 }
 
 export interface AppointmentType {
