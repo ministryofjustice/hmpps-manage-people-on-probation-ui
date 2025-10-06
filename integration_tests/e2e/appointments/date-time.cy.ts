@@ -13,7 +13,7 @@ import {
 } from './imports'
 
 const loadPage = (date?: DateTime<true>) => {
-  completeSentencePage(1, '', '', date)
+  completeSentencePage(1, '', '')
   completeTypePage(1, false)
   completeAttendancePage()
   completeLocationPage()
@@ -106,28 +106,30 @@ describe('Enter the date and time of the appointment', () => {
   })
 
   describe('Continue is clicked selecting a start time which is in the past', () => {
-    let originalNow: typeof DateTime.now
+    const todayAt8 = DateTime.local().set({
+      hour: 8,
+      minute: 0,
+      second: 0,
+      millisecond: 0,
+    })
+    const mockedNow = todayAt8.toUTC().toISO()
+    before(() => {
+      // set the mocked time on the back end
+      cy.request('POST', '/__test/set-mocked-time', { time: mockedNow })
+    })
     beforeEach(() => {
-      originalNow = DateTime.now
-      const newDate = DateTime.now().set({
-        hour: 10,
-        minute: 30,
-        second: 0,
-        millisecond: 0,
-      })
-      cy.wrap(null).then(() => {
-        DateTime.now = () => newDate as DateTime<true>
-      })
-      loadPage(newDate)
+      cy.clock(DateTime.fromISO(mockedNow).toMillis())
+      loadPage()
       dateTimePage.getDatePickerToggle().click()
       dateTimePage.getActiveDayButton().click()
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
+      cy.pause()
     })
-    afterEach(() => {
-      DateTime.now = originalNow
-    })
+    // afterEach(() => {
+    //   DateTime.now = originalNow
+    // })
     it('should display the error summary box', () => {
       dateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
     })

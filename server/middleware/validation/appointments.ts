@@ -1,4 +1,5 @@
 /* eslint-disable no-underscore-dangle */
+import { DateTime } from 'luxon'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
@@ -69,12 +70,14 @@ const appointments: Route<void> = (req, res, next) => {
     if (baseUrl.includes('/date-time')) {
       localParams._minDate = req.body._minDate
       localParams._maxDate = req.body._maxDate
+      const now = req.session.mockedTime ? DateTime.fromISO(req.session.mockedTime) : DateTime.now()
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           page: 'datetime',
+          now,
         }),
       )
     }

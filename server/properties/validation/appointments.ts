@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import {
   isNotEmpty,
   isValidDate,
@@ -20,10 +21,12 @@ export interface AppointmentsValidationArgs {
   contactId?: string
   notes?: string
   maxCharCount?: number
+  now?: DateTime<true | false>
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue, notes, maxCharCount } = args
+  const { crn, id, page, visor, repeatingValue, notes, maxCharCount, now } = args
+  console.log('mocked time=', now)
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
