@@ -28,6 +28,9 @@
     {% if currentSectionName %}
         {% if lastUpdatedDate %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">{{ currentSectionName }}</h2>
+            {% if showSentencePlan %}
+                <h3 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="pageSubHeading">Risk</h3>
+            {% endif %}
             {% if not sanIndicator %}
                 <div class="govuk-inset-text govuk-!-margin-top-0">{{ lastUpdatedDate }}</div>
                 {% endif%}
@@ -37,10 +40,6 @@
                     <p class="govuk-!-margin-bottom-7" data-qa="currentSectionNameSubText">{{ currentSectionNameSubText }}</p>
                 {% endif %}
             {% endif %}
-        {% endif %}
-
-        {% if sanIndicator %}
-            <h3 class="govuk-heading-m govuk-!-margin-bottom-3" >Risk</h3>
         {% endif %}
 
         {% set errors = [] %}

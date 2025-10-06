@@ -1,14 +1,12 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-{% from "../_components/rosh-widget/macro.njk" import roshWidget %}
-{% from "../_components/mappa-widget/macro.njk" import mappaWidget %}
 {% from "../_components/predictor-timeline/macro.njk" import predictorTimeline %}
 {% from "../_components/predictor-score/macro.njk" import predictorScore %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 
 {% set pageTitle = makePageTitle({pageHeading: "Risk"}) %}
 {% set currentNavSection = 'risk' %}
-{% set currentSectionName = 'Risk' if not sanIndicator else 
+{% set currentSectionName = 'Risk' if not showSentencePlan else 
     'Risk and plan' %}
 
 {% set headerPersonName = personRisk.personSummary.name | fullName %}
@@ -23,11 +21,13 @@
     {% set lastUpdatedDate = 'Last updated (OASys): ' + risks.assessedOn | dateWithYear %}
 {% endif %}
 
-{% if sanIndicator %}
+{% if showSentencePlan %}
     {% set scoresHeadingLevel = '4' %}
     {% set scoresSubHeadingLevel = '5' %}
-    {% set scoresHeadingClass = 's' %}
 
+{% endif %}
+{% if sanIndicator %}
+    {% set scoresHeadingClass = 's' %}
 {% endif %}
 
 {% set highScoringNeeds %}
