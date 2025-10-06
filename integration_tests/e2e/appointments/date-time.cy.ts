@@ -106,20 +106,23 @@ describe('Enter the date and time of the appointment', () => {
   })
 
   describe('Continue is clicked selecting a start time which is in the past', () => {
-    const todayAt8 = DateTime.local().set({
-      hour: 7,
-      minute: 0,
+    const mockedTime = DateTime.local().set({
+      hour: 9,
+      minute: 1,
       second: 0,
       millisecond: 0,
     })
-    const mockedNow = todayAt8.toUTC().toISO()
+    const mockedNow = mockedTime.toUTC().toISO()
     before(() => {
       // set the mocked time on the back end
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:3007/__test/set-mocked-time',
-        body: { time: mockedNow },
-      })
+      const currentHour = DateTime.local().hour
+      if (currentHour <= 9) {
+        cy.request({
+          method: 'POST',
+          url: 'http://localhost:3007/__test/set-mocked-time',
+          body: { time: mockedNow },
+        })
+      }
     })
     beforeEach(() => {
       cy.clock(DateTime.fromISO(mockedNow).toMillis())

@@ -61,7 +61,7 @@ export const timeIsNotEarlierThan = (args: any[]) => {
   return notEarlierThanTime > date
 }
 
-export const timeIsNowOrInFuture = (args: any[]) => {
+export const timeIsNowOrInFuture = (args: any[], mockDateToOverride?: DateTime) => {
   if (!args[0] || !args[1]) {
     return false
   }
@@ -75,7 +75,8 @@ export const timeIsNowOrInFuture = (args: any[]) => {
       second: 0,
       millisecond: 0,
     })
-    return dateAndTime >= DateTime.now()
+    const now = mockDateToOverride || DateTime.now()
+    return dateAndTime >= now
   }
   return true
 }
@@ -128,7 +129,11 @@ export const isValidCharCount = (args: any[]) => {
   return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
 }
 
-export function validateWithSpec<R extends Validateable>(request: R, validationSpec: ValidationSpec) {
+export function validateWithSpec<R extends Validateable>(
+  request: R,
+  validationSpec: ValidationSpec,
+  mockValue: { now?: DateTime } = {},
+) {
   const errors: Record<string, string> = {}
   Object.entries(validationSpec).forEach(([fieldName, checks]) => {
     const formattedFieldName = fieldName.split('][').join('-').replace('[', '').replace(']', '')
@@ -147,7 +152,7 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
       hasProperty = Object.keys(request).includes(fieldName)
     }
     if (hasProperty) {
-      const error = executeValidator(checks.checks, fieldName, request)
+      const error = executeValidator(checks.checks, fieldName, request, mockValue)
       if (error) {
         errors[formattedFieldName] = error
       }
@@ -161,11 +166,16 @@ export function validateWithSpec<R extends Validateable>(request: R, validationS
   return errors
 }
 
-function executeValidator(checks: ErrorCheck[], fieldName: string, request: Validateable) {
+function executeValidator(
+  checks: ErrorCheck[],
+  fieldName: string,
+  request: Validateable,
+  mockValue: { now?: DateTime },
+) {
   for (const check of checks) {
     const { log = '' } = check
     const args: any[] = setArgs(fieldName, check, request)
-    if (!check.validator(args)) {
+    if (!check.validator(args, mockValue.now)) {
       if (log) {
         logger.info(check.log)
       }

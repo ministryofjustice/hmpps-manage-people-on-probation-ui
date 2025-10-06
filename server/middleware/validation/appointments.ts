@@ -80,6 +80,7 @@ const appointments: Route<void> = (req, res, next) => {
           page: 'datetime',
           now,
         }),
+        { now },
       )
     }
   }
