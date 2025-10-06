@@ -166,8 +166,8 @@
         tag: {
           text: notesStatus,
           classes: "govuk-tag--" + notesTagColour
-        } if not hasNotes or (hasNotes and not appointment.isInPast),
-        text: 'Completed' if hasNotes and appointment.isInPast
+        } if not hasNotes or (hasNotes and not appointment.isInPast) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
+        text: 'Completed' if hasNotes and appointment.isInPast and appointment.hasOutcome
       } 
     },
     {
