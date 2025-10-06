@@ -6,6 +6,7 @@ import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
+import { getMockedTime } from '../../routes/testRoutes'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
@@ -70,7 +71,7 @@ const appointments: Route<void> = (req, res, next) => {
     if (baseUrl.includes('/date-time')) {
       localParams._minDate = req.body._minDate
       localParams._maxDate = req.body._maxDate
-      const now = req.session.mockedTime ? DateTime.fromISO(req.session.mockedTime) : DateTime.now()
+      const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
       errorMessages = validateWithSpec(
         req.body,
         appointmentsValidation({

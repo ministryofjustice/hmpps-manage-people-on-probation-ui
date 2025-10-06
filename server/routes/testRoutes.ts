@@ -1,17 +1,26 @@
 import { DateTime } from 'luxon'
 import { type Router } from 'express'
-import asyncMiddleware from '../middleware/asyncMiddleware'
-import type { Route } from '../@types'
+
+let mockedTime: string | null = null
+
+const setMockedTime = (time: string) => {
+  mockedTime = DateTime.fromISO(time).toISO()
+}
+
+export const getMockedTime = () => mockedTime
 
 export default function testRoutes(router: Router) {
-  const post = (path: string, handler: Route<void>) => router.post(path, asyncMiddleware(handler))
-
-  post('/__test/set-mocked-time', (req, res) => {
+  router.post('/__test/set-mocked-time', (req, res) => {
     const { time } = req.body
     if (!time) return res.status(400).send('Missing time')
-
-    // Save mocked time as ISO string in session
+    setMockedTime(time)
     req.session.mockedTime = DateTime.fromISO(time).toISO()
     return res.sendStatus(200)
   })
+
+  router.get('/__test/get-mocked-time', (req, res) => {
+    return res.status(200).send('mocked time')
+  })
+
+  return router
 }

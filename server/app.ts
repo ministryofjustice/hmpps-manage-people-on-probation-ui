@@ -27,6 +27,7 @@ import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
+import testRoutes from './routes/testRoutes'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -48,14 +49,15 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpStaticResources())
   app.use(baseController())
   nunjucksSetup(app, services.applicationInfo)
-
+  const apiRouter = Router()
+  app.use(testRoutes(apiRouter))
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
-  const router = Router()
   // Routes that use multer for multipart upload must be registered before csrf executes
+  const router = Router()
   app.use(multipartRoutes(router, services))
   app.use(setUpCsrf())
   app.use(routes(router, services))
