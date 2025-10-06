@@ -1,6 +1,5 @@
 import config from '../config'
 import RestClient from './restClient'
-import { ErrorSummary } from './model/common'
 import { SentencePlan } from './model/sentencePlan'
 
 export default class SentencePlanApiClient extends RestClient {
