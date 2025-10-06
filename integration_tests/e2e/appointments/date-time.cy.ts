@@ -129,11 +129,7 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start`).select('9:00am')
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end`).focus().select('9:30am')
       dateTimePage.getSubmitBtn().click()
-      cy.pause()
     })
-    // afterEach(() => {
-    //   DateTime.now = originalNow
-    // })
     it('should display the error summary box', () => {
       dateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
     })

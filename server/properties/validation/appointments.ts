@@ -26,7 +26,6 @@ export interface AppointmentsValidationArgs {
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
   const { crn, id, page, visor, repeatingValue, notes, maxCharCount, now } = args
-  console.log('mocked time=', now)
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
