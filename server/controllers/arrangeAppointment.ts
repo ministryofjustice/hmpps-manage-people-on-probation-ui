@@ -114,6 +114,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
+      const { backLink } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -122,7 +123,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
       const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
+      const redirect = change ? backLink : `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
       return res.redirect(redirect)
     }
   },
@@ -157,12 +158,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
+      const { backLink } = res.locals
       const { number } = req.query as Record<string, string>
       const query = number ? `?number=${number}` : ''
       if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance${query}`
+      const redirect = change ? backLink : `/case/${crn}/arrange-appointment/${id}/attendance${query}`
       return res.redirect(redirect)
     }
   },
@@ -186,6 +188,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       const { body, query, session } = req
       const { change } = query as Record<string, string>
+      const { backLink } = res.locals
       const { data } = session
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
@@ -196,7 +199,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
+      const redirect = change ? backLink : `/case/${crn}/arrange-appointment/${id}/location`
       return res.redirect(redirect)
     }
   },
@@ -231,6 +234,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query as Record<string, string>
+      const { backLink } = res.locals
       const { data } = req.session
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -239,10 +243,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const page = selectedLocation === `LOCATION_NOT_IN_LIST` ? 'location-not-in-list' : 'date-time'
       let redirect = `/case/${crn}/arrange-appointment/${id}/${page}`
       if (change && page !== 'location-not-in-list') {
-        redirect = change
+        redirect = backLink
       }
       if (change && page === 'location-not-in-list') {
-        redirect = `${redirect}?change=${change}`
+        redirect = `${redirect}?change=${backLink}`
       }
       return res.redirect(redirect)
     }
@@ -284,6 +288,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
+      const { backLink } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -310,7 +315,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const nextPage = repeatAppointmentsEnabled
         ? `/case/${crn}/arrange-appointment/${id}/repeating`
         : `/case/${crn}/arrange-appointment/${id}/supporting-information`
-      const redirect = change || nextPage
+      const redirect = change ? backLink : nextPage
       return res.redirect(redirect)
     }
   },
@@ -359,6 +364,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const change = req?.query?.change as string
+      const { backLink } = res.locals
       const { data } = req.session
       const { repeating, numberOfRepeatAppointments = '0' } = getDataValue<AppointmentSession>(data, [
         'appointments',
@@ -383,7 +389,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           parseInt(numberOfRepeatAppointments, 10) + 1,
         )
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/supporting-information`
+      const redirect = change ? backLink : `/case/${crn}/arrange-appointment/${id}/supporting-information`
       return res.redirect(redirect)
     }
   },
@@ -414,10 +420,11 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const change = req?.query?.change as string
+      const { backLink } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      const redirect = change ? backLink : `/case/${crn}/arrange-appointment/${id}/check-your-answers`
       return res.redirect(redirect)
     }
   },

@@ -5,7 +5,7 @@
     pageHeading: ["Record an outcome", "Outcome"]
 }) %}
 {% set action = '/case/' + crn + '/record-an-outcome/' + actionType %}
-{% set backLink = '/case/' + crn %}
+{% set backLink = backLink | default('/case/' + crn) %}
 {% block form %}
     {% set appointmentRadioItems = [] %}
     {% for appointment in getAppointmentsToAction(personSchedule.appointments, actionType) %}
