@@ -32,4 +32,5 @@ export interface Data {
   staff?: {
     [userId: string]: User[]
   }
+  pageHistory?: string[]
 }

@@ -95,6 +95,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  pageHistory?: string[]
 }
 
 export interface AppResponse extends Response {

@@ -27,6 +27,7 @@ import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
+import { pageHistory, setUpPageHistory } from './middleware/pageHistory'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -53,6 +54,7 @@ export default function createApp(services: Services): express.Application {
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
+  app.use(pageHistory())
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
   const router = Router()
   // Routes that use multer for multipart upload must be registered before csrf executes

@@ -3,6 +3,8 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Route } from '../@types'
 import type { Services } from '../services'
 import controllers from '../controllers'
+import { pageHistory } from '../middleware/pageHistory'
+import { autoStoreSessionData } from '../middleware'
 
 export default function homeRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
