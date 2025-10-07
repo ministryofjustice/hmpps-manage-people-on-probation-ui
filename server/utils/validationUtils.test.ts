@@ -166,6 +166,20 @@ describe('time is now or in future', () => {
   it('should return true if date and time are in the future', () => {
     expect(timeIsNowOrInFuture(['2/7/2025', '8:00am'])).toEqual(true)
   })
+  it('should return true if using mock-date and selected date/time is equal', () => {
+    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00') // BST
+    expect(timeIsNowOrInFuture(['1/7/2025', '09:00am'], mockNowDate)).toEqual(true)
+  })
+
+  it('should return false if using mock-date and selected date/time is in past', () => {
+    const mockNowDate = DateTime.fromISO('2025-07-01T10:30:00.000+01:00') // 10:30am BST
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'], mockNowDate)).toEqual(false)
+  })
+
+  it('should return true if using mock-date and selected date/time is in future', () => {
+    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00') // 9:00am BST
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'], mockNowDate)).toEqual(true)
+  })
 })
 
 describe('date which is not later than date', () => {
