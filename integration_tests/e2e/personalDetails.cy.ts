@@ -98,6 +98,13 @@ context('Personal Details', () => {
       )
   })
 
+  it('Personal details page is rendered for new san indicator assessment', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.visit('/case/X000001/personal-details')
+    const page = Page.verifyOnPage(PersonalDetailsPage)
+    cy.get('[data-qa="criminogenicNeedsValue"]').should('not.exist')
+  })
+
   it('Personal Details page for a main address with a single note is rendered', () => {
     cy.visit('/case/X000001/personal-details/main-address/note/0')
     const page = Page.verifyOnPage(PersonalDetailsPage)

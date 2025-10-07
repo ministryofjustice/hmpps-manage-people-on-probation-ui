@@ -7,7 +7,14 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { mockTierCalculation, mockRisks, mockPredictors, mockContacts, mockAppResponse } from './mocks'
+import {
+  mockTierCalculation,
+  mockRisks,
+  mockPredictors,
+  mockContacts,
+  mockAppResponse,
+  mockSanIndicatorResponse,
+} from './mocks'
 import { toRoshWidget, toPredictors, isValidCrn } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
 import { renderError } from '../middleware'
@@ -108,6 +115,9 @@ const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementat
 const predictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
+const getSanIndicatorSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
+  .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
 const mockPersonalDetails = {} as PersonalDetails
 const mockNeeds = {} as Needs
 const getPersonalDetailsSpy = jest
@@ -115,7 +125,7 @@ const getPersonalDetailsSpy = jest
   .mockImplementation(() => Promise.resolve(mockPersonalDetails))
 const getNeedsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 
-const checkApiRequests = (): void => {
+const checkApiRequests = (sanIndicator = false): void => {
   it('should request tier calculation details from the api', () => {
     expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
   })
@@ -125,6 +135,11 @@ const checkApiRequests = (): void => {
   it('should request predictors from the api', () => {
     expect(predictorsSpy).toHaveBeenCalledWith(crn)
   })
+  if (sanIndicator) {
+    it('should request the san indicator from the api', () => {
+      expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
+    })
+  }
 }
 
 describe('/controllers/personalDetails', () => {
@@ -159,6 +174,9 @@ describe('/controllers/personalDetails', () => {
           await controllers.personalDetails.getPersonalDetails(hmppsAuthClient)(mockReq, res)
         })
         checkAuditMessage(res, 'VIEW_EDIT_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
+        const sanIndicator = true
+        checkApiRequests(sanIndicator)
+
         it('should render the main address page', () => {
           expect(renderSpy).toHaveBeenCalledWith('pages/edit-contact-details/edit-contact-details', {
             personalDetails: mockPersonalDetails,
@@ -171,6 +189,7 @@ describe('/controllers/personalDetails', () => {
             backLink: `/case/${crn}/personal-details`,
             hidePageHeader: true,
             manageUsersAccess: true,
+            sanIndicator: true,
           })
         })
       })
@@ -225,6 +244,7 @@ describe('/controllers/personalDetails', () => {
             backLink: `/case/${crn}/personal-details`,
             hidePageHeader: true,
             manageUsersAccess: true,
+            sanIndicator: true,
           })
         })
       })
