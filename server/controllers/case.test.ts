@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks } from './mocks'
+import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks, mockSanIndicatorResponse } from './mocks'
 import { Overview } from '../data/model/overview'
 import { Needs, PersonRiskFlags } from '../data/model/risk'
 import { toPredictors, toRoshWidget } from '../utils'
@@ -41,6 +41,9 @@ const tierCalculationSpy = jest
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
 const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
+const getSanIndicatorSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
+  .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
 const getPersonRiskFlagsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
   .mockImplementation(() => Promise.resolve(mockRiskFlags))
@@ -79,6 +82,7 @@ describe('caseController', () => {
       expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
       expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
       expect(predictorsSpy).toHaveBeenCalledWith(crn)
+      expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
@@ -90,6 +94,7 @@ describe('caseController', () => {
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+        sanIndicator: true,
       })
     })
   })
@@ -122,6 +127,7 @@ describe('caseController', () => {
         tierCalculation: mockTierCalculation,
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
+        sanIndicator: true,
       })
     })
   })

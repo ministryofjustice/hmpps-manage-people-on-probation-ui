@@ -384,7 +384,6 @@
       {{'There is no RoSH summary.'}}
     {% endif %}
     {% endset %}
-
     {{ govukSummaryList({
         rows: [
           {
@@ -398,7 +397,7 @@
           {
             key: { html: '<span data-qa="criminogenicNeedsLabel">Criminogenic needs</span>' },
             value: { html: '<span data-qa="criminogenicNeedsValue">' + criminogenicNeedsHtml + '</span>'}
-          },
+          } if sanIndicator == false,
           {
             key: { html: '<span data-qa="riskFlagsLabel">NDelius risk flags</span>' },
             value: { html: '<span data-qa="riskFlagsValue">' + riskFlagsHtml + '</span>'}

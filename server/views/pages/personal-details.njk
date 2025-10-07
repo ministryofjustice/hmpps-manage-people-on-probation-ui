@@ -317,7 +317,6 @@
                 {% endif %}
   </ul>
   {% endset %}
-
   {{ govukSummaryList({
             rows: [
               {
@@ -359,7 +358,7 @@
               {
                 key: { html: '<span data-qa="criminogenicNeedsLabel">Criminogenic needs</span>' },
                 value: { html: '<span data-qa="criminogenicNeedsValue">' + criminogenicNeeds + '</span>' }
-              },
+              } if sanIndicator == false,
               {
                 key: { html: '<span data-qa="documentsLabel">Personal documents</span>' },
                 value: { html: '<span data-qa="documentsValue">' + documents + '</span>' }
