@@ -34,7 +34,7 @@ describe('getStaffRisk()', () => {
     expect(getStaffRisk(mockRiskFlags)).toEqual(null)
   })
 
-  it('should return null if "Risk to Staff" flag has is not Medium or High levelDescription', () => {
+  it('should return null if "Risk to Staff" flag is not Medium or High levelDescription', () => {
     const mockRiskFlags: RiskFlag[] = [
       {
         id: 1,
