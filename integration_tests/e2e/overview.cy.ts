@@ -2,6 +2,9 @@ import Page from '../pages/page'
 import OverviewPage from '../pages/overview'
 
 context('Overview', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('Overview page is rendered', () => {
     cy.visit('/case/X000001')
     const page = Page.verifyOnPage(OverviewPage)
@@ -136,6 +139,12 @@ context('Overview', () => {
         const recentCase = JSON.parse(JSON.stringify(result))
         expect(expected, recentCase)
       })
+  })
+  it('Overview page is rendered for new san indicator assessment', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.visit('/case/X000001')
+    const page = Page.verifyOnPage(OverviewPage)
+    cy.get('[data-qa="criminogenicNeedsLabel"]').should('not.exist')
   })
   it('Risk information and tier is not provided due to 500 from ARNS and TIER', () => {
     cy.visit('/case/X000002')

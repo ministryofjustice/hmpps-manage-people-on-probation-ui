@@ -25,14 +25,16 @@ const caseController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [overview, risks, needs, personRisks, tierCalculation, predictors] = await Promise.all([
-        masClient.getOverview(crn, sentenceNumber),
-        arnsClient.getRisks(crn),
-        arnsClient.getNeeds(crn),
-        masClient.getPersonRiskFlags(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
+      const [overview, risks, needs, personRisks, tierCalculation, predictors, sanIndicatorResponse] =
+        await Promise.all([
+          masClient.getOverview(crn, sentenceNumber),
+          arnsClient.getRisks(crn),
+          arnsClient.getNeeds(crn),
+          masClient.getPersonRiskFlags(crn),
+          tierClient.getCalculationDetails(crn),
+          arnsClient.getPredictorsAll(crn),
+          arnsClient.getSanIndicator(crn),
+        ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
       return res.render('pages/overview', {
@@ -44,6 +46,7 @@ const caseController: Controller<typeof routes, void> = {
         tierCalculation,
         risksWidget,
         predictorScores,
+        sanIndicator: sanIndicatorResponse?.sanIndicator,
       })
     }
   },

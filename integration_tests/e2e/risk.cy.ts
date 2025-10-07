@@ -113,7 +113,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
     page.getElementData('highScoringNeedsValue').should('contain.text', 'Relationships')
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
-    page.getInsetText().should('contain.text', 'Last updated (OASys): 24 January 2024')
+    page.getInsetText().should('contain.text', 'Last updated: 24 January 2024')
     page.getElementData('osp').should('exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
       page.getElementData('opd').then($opd => {

@@ -71,12 +71,13 @@ const personalDetailsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [personalDetails, risks, needs, tierCalculation, predictors] = await Promise.all([
+      const [personalDetails, risks, needs, tierCalculation, predictors, sanIndicatorResponse] = await Promise.all([
         masClient.getPersonalDetails(crn),
         arnsClient.getRisks(crn),
         arnsClient.getNeeds(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
+        arnsClient.getSanIndicator(crn),
       ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
@@ -91,6 +92,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         backLink,
         hidePageHeader,
         manageUsersAccess,
+        sanIndicator: sanIndicatorResponse.sanIndicator,
       })
     }
   },
