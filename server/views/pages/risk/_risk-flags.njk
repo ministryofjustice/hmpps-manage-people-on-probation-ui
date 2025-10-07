@@ -34,12 +34,18 @@
                 {% endif %}
               {% endfor %}
             {% endif %}
-
-            {% set level = flag.level | toSentenceCase([], null, true, false) %}
+            {% set rawLevel = flag.levelDescription or flag.level %}
+            {% set level = rawLevel | lower | toSentenceCase([], null, true, false) %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}LevelValue">
-                <span class="govuk-!-font-weight-bold{% if flag.level != 'INFORMATION_ONLY' %} rosh--{{ flag.level | lower }}{% endif %}">{{ level }}</span></td>
+                <span class="govuk-!-font-weight-bold{% if rawLevel | upper != 'INFORMATION_ONLY' %} rosh--{{ rawLevel | lower }}{% endif %}">{{ level }}</span></td>
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}DescriptionValue">
+              {% set rawLevel = flag.levelDescription or flag.level %}
+              {% set level = rawLevel | lower | toSentenceCase %}
+              <tr class="govuk-table__row">
+                  <td class="govuk-table__cell" data-qa="risk{{ loop.index }}LevelValue">
+                    <span class="govuk-!-font-weight-bold{% if rawLevel | upper != 'INFORMATION_ONLY' %} rosh--{{ rawLevel | lower  }}{% endif %}">{{ level }}</span></td>
+                  <td class="govuk-table__cell" data-qa="risk{{loop.index}}DescriptionValue">
                 <a href="/case/{{ crn }}/risk/flag/{{ flag.id }}">{{ flag.description }}</a>
               </td>
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}NotesValue">

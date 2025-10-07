@@ -40,10 +40,11 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
   page.getElementData('riskFlagsCard').should('exist')
   for (let i = 0; i < mockRiskFlags.length; i += 1) {
     const index = i + 1
-    const { level, description, riskNotes, createdDate, nextReviewDate } = mockRiskFlags[i]
+    const { description, createdDate, nextReviewDate } = mockRiskFlags[i]
+    const level = mockRiskFlags[i]?.levelDescription ?? mockRiskFlags[i]?.level
     page
       .getRowData('riskFlags', `risk${index}Level`, 'Value')
-      .should('contain.text', toSentenceCase(level, [], null, true, false))
+      .should('contain.text', toSentenceCase(level.toLowerCase(), [], null, true, false))
     const classes = level !== 'INFORMATION_ONLY' ? ` rosh--${level.toLowerCase()}` : ''
     page
       .getElementData(`risk${index}LevelValue`)
