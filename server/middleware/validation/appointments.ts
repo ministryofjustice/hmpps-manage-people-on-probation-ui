@@ -78,7 +78,6 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'datetime',
-          now,
         }),
         { now },
       )

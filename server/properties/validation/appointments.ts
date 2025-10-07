@@ -21,11 +21,10 @@ export interface AppointmentsValidationArgs {
   contactId?: string
   notes?: string
   maxCharCount?: number
-  now?: DateTime<true | false>
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue, notes, maxCharCount, now } = args
+  const { crn, id, page, visor, repeatingValue, notes, maxCharCount } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',

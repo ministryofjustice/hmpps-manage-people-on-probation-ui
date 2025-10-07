@@ -132,7 +132,7 @@ export const isValidCharCount = (args: any[]) => {
 export function validateWithSpec<R extends Validateable>(
   request: R,
   validationSpec: ValidationSpec,
-  mockValue: { now?: DateTime } = {},
+  mocks: { now?: DateTime } = {},
 ) {
   const errors: Record<string, string> = {}
   Object.entries(validationSpec).forEach(([fieldName, checks]) => {
@@ -152,7 +152,7 @@ export function validateWithSpec<R extends Validateable>(
       hasProperty = Object.keys(request).includes(fieldName)
     }
     if (hasProperty) {
-      const error = executeValidator(checks.checks, fieldName, request, mockValue)
+      const error = executeValidator(checks.checks, fieldName, request, mocks)
       if (error) {
         errors[formattedFieldName] = error
       }
@@ -166,16 +166,11 @@ export function validateWithSpec<R extends Validateable>(
   return errors
 }
 
-function executeValidator(
-  checks: ErrorCheck[],
-  fieldName: string,
-  request: Validateable,
-  mockValue: { now?: DateTime },
-) {
+function executeValidator(checks: ErrorCheck[], fieldName: string, request: Validateable, mocks: { now?: DateTime }) {
   for (const check of checks) {
     const { log = '' } = check
     const args: any[] = setArgs(fieldName, check, request)
-    if (!check.validator(args, mockValue.now)) {
+    if (!check.validator(args, mocks.now)) {
       if (log) {
         logger.info(check.log)
       }
