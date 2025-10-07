@@ -17,10 +17,5 @@ export default function testRoutes(router: Router) {
     req.session.mockedTime = DateTime.fromISO(time).toISO()
     return res.sendStatus(200)
   })
-
-  router.get('/__test/get-mocked-time', (req, res) => {
-    return res.status(200).send('mocked time')
-  })
-
   return router
 }

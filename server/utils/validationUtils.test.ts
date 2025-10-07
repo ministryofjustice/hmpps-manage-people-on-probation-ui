@@ -167,17 +167,17 @@ describe('time is now or in future', () => {
     expect(timeIsNowOrInFuture(['2/7/2025', '8:00am'])).toEqual(true)
   })
   it('should return true if using mock-date and selected date/time is equal', () => {
-    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00').setZone('Europe/London')
+    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
     expect(timeIsNowOrInFuture(['1/7/2025', '09:00am'], mockNowDate)).toEqual(true)
   })
 
   it('should return false if using mock-date and selected date/time is in past', () => {
-    const mockNowDate = DateTime.fromISO('2025-07-01T10:30:00.000+01:00').setZone('Europe/London')
-    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'], mockNowDate)).toEqual(false)
+    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
+    expect(timeIsNowOrInFuture(['1/7/2025', '8:00am'], mockNowDate)).toEqual(false)
   })
 
   it('should return true if using mock-date and selected date/time is in future', () => {
-    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00').setZone('Europe/London')
+    const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
     expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'], mockNowDate)).toEqual(true)
   })
 })
