@@ -41,7 +41,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       eventId = 'PERSON_LEVEL_CONTACT'
     }
     let locationCode = appointment?.location?.code || ''
-    if (!matchingType?.isLocationRequired === true && !locationCode) {
+    if (matchingType?.isLocationRequired === false && !locationCode) {
       locationCode = 'NO_LOCATION_REQUIRED'
     }
 
