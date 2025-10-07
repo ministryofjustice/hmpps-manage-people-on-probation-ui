@@ -173,7 +173,7 @@ describe('time is now or in future', () => {
 
   it('should return false if using mock-date and selected date/time is in past', () => {
     const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
-    expect(timeIsNowOrInFuture(['1/7/2025', '8:00am'], mockNowDate)).toEqual(false)
+    expect(timeIsNowOrInFuture(['30/6/2025', '8:00am'], mockNowDate)).toEqual(false)
   })
 
   it('should return true if using mock-date and selected date/time is in future', () => {
