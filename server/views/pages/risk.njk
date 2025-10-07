@@ -4,11 +4,10 @@
 {% from "../_components/predictor-score/macro.njk" import predictorScore %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 
-{% set pageTitle = makePageTitle({pageHeading: "Risk"}) %}
 {% set currentNavSection = 'risk' %}
 {% set currentSectionName = 'Risk' if not showSentencePlan else 
     'Risk and plan' %}
-
+{% set pageTitle = makePageTitle({pageHeading: currentSectionName}) %}
 {% set headerPersonName = personRisk.personSummary.name | fullName %}
 {% set headerCRN = crn %}
 {% set headerDob = personRisk.personSummary.dateOfBirth %}
@@ -18,7 +17,7 @@
 {% set lowScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
 {% if risks.assessedOn %}
-    {% set lastUpdatedDate = 'Last updated (OASys): ' + risks.assessedOn | dateWithYear %}
+    {% set lastUpdatedDate = 'Last updated: ' + risks.assessedOn | dateWithYear %}
 {% endif %}
 
 {% if showSentencePlan %}

@@ -62,7 +62,7 @@
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m" data-qa="overallRiskValue">
             <strong>{{ getRiskLevelText(risksWidget.overallRisk) | upper }}</strong> ROSH</h{{ scoresHeadingLevel | default('3') }}>
         <p class="govuk-body-m">Risk of serious harm<br>
-            <span class="govuk-body-s govuk-hint">Last updated (OASys): {{ risksWidget.assessedOn | dateWithYearShortMonth | default("Not provided") }}</span></p>
+            <span class="govuk-body-s govuk-hint">Last updated: {{ risksWidget.assessedOn | dateWithYearShortMonth | default("Not provided") }}</span></p>
         <div class="moj-scrollable-pane">
             <table class="govuk-table rosh-widget__table">
                 <caption class="govuk-visually-hidden">Risk of serious harm in Community</caption>
