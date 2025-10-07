@@ -33,6 +33,64 @@ describe('getStaffRisk()', () => {
     ] as unknown as RiskFlag[]
     expect(getStaffRisk(mockRiskFlags)).toEqual(null)
   })
+
+  it('should return null if "Risk to Staff" flag has is not Medium or High levelDescription', () => {
+    const mockRiskFlags: RiskFlag[] = [
+      {
+        id: 1,
+        level: 'HIGH',
+        description: 'Risk to Staff',
+        levelDescription: 'Low',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Jane', surname: 'Doe' },
+        removed: false,
+        removalHistory: [],
+      },
+    ]
+    expect(getStaffRisk(mockRiskFlags)).toEqual(null)
+  })
+
+  it('should return "Risk to Staff" flag if levelDescription is valid (case-insensitive)', () => {
+    const mockRiskFlags: RiskFlag[] = [
+      {
+        id: 1,
+        level: 'HIGH',
+        description: 'Risk to Staff',
+        levelDescription: 'medium',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Alice', surname: 'Brown' },
+        removed: false,
+        removalHistory: [],
+      },
+      {
+        id: 2,
+        level: 'HIGH',
+        description: 'Risk to Staff',
+        levelDescription: 'HIGH',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Bob', surname: 'Green' },
+        removed: false,
+        removalHistory: [],
+      },
+    ]
+    expect(getStaffRisk(mockRiskFlags)).toEqual(mockRiskFlags[0])
+  })
+
+  it('should return "Risk to Staff" flag if levelDescription is missing', () => {
+    const mockRiskFlags: RiskFlag[] = [
+      {
+        id: 1,
+        level: 'HIGH',
+        description: 'Risk to Staff',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Charlie', surname: 'White' },
+        removed: false,
+        removalHistory: [],
+      },
+    ]
+    expect(getStaffRisk(mockRiskFlags)).toEqual(mockRiskFlags[0])
+  })
+
   it('should return the single "Risk to Staff" flag if it exists', () => {
     const mockRiskFlags = [
       {
