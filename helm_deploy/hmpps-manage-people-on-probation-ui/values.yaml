@@ -1,6 +1,6 @@
 generic-service:
   nameOverride: hmpps-manage-people-on-probation-ui
-  productId: "HMPPS543" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
+  productId: "HMPPS541" # productId for the product that this belongs too, i.e. DPS001, see README.md for details
   replicaCount: 4
 
   image:
