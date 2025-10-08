@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Do you want to arrange the next appointment with ' + personAppointment.personSummary.name.forename + '?'%}
-{% set backLink = change if change else 
+{% set backLink = back if back else 
   '/case/' + crn + '/appointments/appointment/' + contactId + '/manage/' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 

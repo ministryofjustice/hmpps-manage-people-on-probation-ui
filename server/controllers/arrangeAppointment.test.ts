@@ -927,6 +927,7 @@ describe('controllers/arrangeAppointment', () => {
       }
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
+      mockedPostAppointments.mockReturnValue(() => Promise.resolve({ appointments: [{ id: 0 }] }))
       const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
@@ -952,6 +953,7 @@ describe('controllers/arrangeAppointment', () => {
       start: '9:00am',
       end: '9:30am',
       repeatingDates: ['2025/7/9', '2025/7/16'],
+      backendId: 5,
     }
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedUuidv4.mockReturnValueOnce(uuid2)
@@ -963,8 +965,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-
-    it('should clone the current appointment with no date or time set and save it to session', async () => {
+    it('should redirect to next appointment page', async () => {
       const mockReq = createMockRequest({
         appointmentSession,
       })
@@ -973,8 +974,9 @@ describe('controllers/arrangeAppointment', () => {
       const handler = jest.fn()
       mockedCloneAppointment.mockReturnValue(handler)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      expect(mockedCloneAppointment).toHaveBeenCalledWith(appointmentSession)
-      expect(handler).toHaveBeenCalledWith(mockReq, res)
+      expect(res.redirect).toHaveBeenCalledWith(
+        `/case/${mockReq.params.crn}/appointments/appointment/5/next-appointment?back=${mockReq.url}`,
+      )
     })
   })
   describe('getArrangeAnotherAppointment', () => {
@@ -1040,6 +1042,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
+      mockedPostAppointments.mockReturnValue(() => Promise.resolve({ appointments: [{ id: 0 }] }))
       await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })

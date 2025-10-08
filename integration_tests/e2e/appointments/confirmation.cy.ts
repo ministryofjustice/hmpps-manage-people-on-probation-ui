@@ -3,6 +3,7 @@ import AppointmentsPage from '../../pages/appointments'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
+import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import {
   completeAttendancePage,
   completeCYAPage,
@@ -73,8 +74,9 @@ describe('Confirmation page', () => {
 
     confirmPage.getSubmitBtn().should('contain.text', 'Arrange next appointment')
     confirmPage.getSubmitBtn().click()
-    const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    arrangeAnotherAppointmentPage.checkOnPage()
+    const nextAppointmentPage = new NextAppointmentPage()
+    nextAppointmentPage.checkPageTitle('Do you want to arrange the next appointment with Eula')
+    nextAppointmentPage.checkOnPage()
   })
 
   it('should render the page with pop telephone number', () => {

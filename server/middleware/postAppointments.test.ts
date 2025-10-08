@@ -138,9 +138,9 @@ describe('/middleware/postAppointments', () => {
     licenceConditionId,
   } = req.session.data.appointments[crn][id]
 
-  // let spy: jest.SpyInstance
-
-  const spy = jest.spyOn(MasApiClient.prototype, 'postAppointments').mockImplementation(() => Promise.resolve(''))
+  const spy = jest
+    .spyOn(MasApiClient.prototype, 'postAppointments')
+    .mockImplementation(() => Promise.resolve({ appointments: [{ id: 0 }] }))
 
   it('should post the correct request body', async () => {
     const expectedBody = {

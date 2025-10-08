@@ -16,6 +16,7 @@ interface Args {
   noType?: boolean
   noAttendee?: boolean
   noLocation?: boolean
+  createNext?: boolean
 }
 
 const getAppointmentStub = (
@@ -34,6 +35,7 @@ const getAppointmentStub = (
     noType = false,
     noAttendee = false,
     noLocation = false,
+    createNext = false,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -238,6 +240,12 @@ const getAppointmentStub = (
       providerCode: 'N07',
     }
   }
+  if (createNext) {
+    mapping.response.jsonBody.appointment.eventNumber = '12345'
+    mapping.response.jsonBody.appointment.officer.username = 'peter-parker'
+    mapping.response.jsonBody.appointment.location.code = 'N56NTMC'
+    mapping.response.jsonBody.appointment.eventId = 2501192724
+  }
 
   return mapping
 }
@@ -344,6 +352,10 @@ const getNextAppointmentStub = ({ appointment = true, usernameIsCom = true, home
   return mapping
 }
 
+const stubNextAppointment = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: false, createNext: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubFutureAppointmentManagedTypeNoNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub()
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -585,4 +597,5 @@ export default {
   stubIsComNextAppointmentAtHome,
   stubAppointmentClash,
   stubAppointmentDuplicate,
+  stubNextAppointment,
 }
