@@ -315,11 +315,14 @@ export default class MasApiClient extends RestClient {
 
   async searchUserCaseload(
     username: string,
-    page: string,
-    sortBy: string,
+    page = '',
+    sortBy = '',
     body: Record<never, never> = {},
   ): Promise<UserCaseload> {
-    const pageQuery = `?${new URLSearchParams({ size: '10', page, sortBy }).toString()}`
+    const searchParams: Record<string, string> = { size: '10' }
+    if (page) searchParams.page = page
+    if (sortBy) searchParams.sortBy = sortBy
+    const pageQuery = `?${new URLSearchParams(searchParams).toString()}`
     return this.post({ data: body, path: `/caseload/user/${username}/search${pageQuery}`, handle404: true })
   }
 

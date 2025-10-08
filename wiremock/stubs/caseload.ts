@@ -81,4 +81,85 @@ const stubUserNoStaffRecord = (): SuperAgentRequest =>
     },
   })
 
-export default { stubUserNoCaseload, stubUserNoStaffRecord }
+const stubUserCaseloadSearch = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/caseload/user/USER1/search',
+      method: 'POST',
+      queryParameters: {
+        size: {
+          equalTo: '10',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        totalPages: 4,
+        totalElements: 33,
+        sortedBy: 'nextContact.asc',
+        provider: 'London',
+        staff: {
+          forename: 'Paul',
+          surname: 'McPhee',
+        },
+        caseload: [
+          {
+            caseName: {
+              forename: 'Alton',
+              middleName: '',
+              surname: 'Berge',
+            },
+            crn: 'X000001',
+            dob: '1975-09-25',
+            nextAppointment: {
+              id: 6,
+              date: '2024-10-22T09:00:00+01:00',
+              description: 'AP PA - Accommodation',
+            },
+            previousAppointment: {
+              id: 5,
+              date: '2024-09-24T09:00:00+01:00',
+              description: 'AP PA - Accommodation',
+            },
+            latestSentence: 'CJA - Std Determinate Custody',
+            numberOfAdditionalSentences: 0,
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubNoUserCaseloadSearch = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/caseload/user/USER1/search',
+      method: 'POST',
+      queryParameters: {
+        size: {
+          equalTo: '10',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        totalPages: 0,
+        totalElements: 0,
+        sortedBy: 'nextContact.asc',
+        provider: 'London',
+        staff: {
+          forename: 'Paul',
+          surname: 'McPhee',
+        },
+        caseload: [],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+export default { stubUserNoCaseload, stubUserNoStaffRecord, stubUserCaseloadSearch, stubNoUserCaseloadSearch }

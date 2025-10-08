@@ -21,7 +21,8 @@ const riskController: Controller<typeof routes, void> = {
   getRisk: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const { username } = res.locals.user
+      const token = await hmppsAuthClient.getSystemClientToken(username)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_RISKS',
         who: res.locals.user.username,
@@ -34,19 +35,23 @@ const riskController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
       const sentencePlanClient = new SentencePlanApiClient(token)
-      const [personRisk, risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
-        masClient.getPersonRiskFlags(crn),
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
-        arnsClient.getNeeds(crn),
-        arnsClient.getSanIndicator(crn),
-      ])
+      const [personRisk, risks, tierCalculation, predictors, needs, sanIndicatorResponse, userCaseload] =
+        await Promise.all([
+          masClient.getPersonRiskFlags(crn),
+          arnsClient.getRisks(crn),
+          tierClient.getCalculationDetails(crn),
+          arnsClient.getPredictorsAll(crn),
+          arnsClient.getNeeds(crn),
+          arnsClient.getSanIndicator(crn),
+          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
+        ])
+      const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
       let showSentencePlan: boolean
       let planLastUpdated = ''
       try {
         const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
-        showSentencePlan = sentencePlans?.[0] !== undefined && res.locals?.user?.roles?.includes('SENTENCE_PLAN')
+        showSentencePlan =
+          sentencePlans?.[0] !== undefined && res.locals?.user?.roles?.includes('SENTENCE_PLAN') && popInUsersCaseload
         if (showSentencePlan && sentencePlans[0]?.lastUpdatedDate) planLastUpdated = sentencePlans[0].lastUpdatedDate
       } catch (error) {
         showSentencePlan = false
