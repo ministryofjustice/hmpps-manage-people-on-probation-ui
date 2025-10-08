@@ -92,7 +92,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         backLink,
         hidePageHeader,
         manageUsersAccess,
-        sanIndicator: sanIndicatorResponse.sanIndicator,
+        sanIndicator: sanIndicatorResponse?.sanIndicator,
       })
     }
   },
