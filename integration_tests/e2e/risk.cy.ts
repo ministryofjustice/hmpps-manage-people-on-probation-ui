@@ -160,15 +160,17 @@ context('Risk', () => {
     cy.task('resetMocks')
   })
 
-  it('Risk overview page is rendered when has sentence plan and san indicator is false', () => {
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload and san indicator is false', () => {
     cy.task('stubAuthSentencePlan')
+    cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     checkRiskPageView(page)
   })
 
-  it('Risk overview page is rendered when has no sentence plan and san indicator is false', () => {
+  it('Risk overview page is rendered when has no sentence plan, pop in users caseload and san indicator is false', () => {
     cy.task('stubSentencePlan404')
+    cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sentencePlan = false
@@ -176,8 +178,9 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan and san indicator is true', () => {
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload and san indicator is true', () => {
     cy.task('stubSanIndicatorTrue')
+    cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
@@ -185,9 +188,22 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator)
   })
 
-  it('Risk overview page is rendered when has no sentence plan and san indicator is true', () => {
+  it('Risk overview page is rendered when has no sentence plan, pop in users caseload and san indicator is true', () => {
     cy.task('stubSentencePlan404')
+    cy.task('stubUserCaseloadSearch')
     cy.task('stubSanIndicatorTrue')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = true
+    const sentencePlan = false
+    checkRiskPageView(page, sanIndicator, sentencePlan)
+  })
+
+  it('Risk overview page is rendered when has sentence plan, pop not in users caseload and san indicator is true', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubAuthSentencePlan')
+    cy.task('stubUserNoCaseload')
+    cy.task('stubNoUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true

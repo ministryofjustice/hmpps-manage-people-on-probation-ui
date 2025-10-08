@@ -19,8 +19,10 @@ import {
   mockNeeds,
   mockSanIndicatorResponse,
   mockSentencePlans,
+  mockUserCaseload,
 } from './mocks'
 import config from '../config'
+import { UserCaseload } from '../data/model/caseload'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/sentencePlanApiClient')
@@ -37,6 +39,8 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+
+const username = 'user-1'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -63,7 +67,9 @@ const predictorsSpy = jest
 const sanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
-
+const searchUserCaseloadSpy = jest
+  .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+  .mockImplementation(() => Promise.resolve(mockUserCaseload))
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 
 const req = httpMocks.createRequest({
@@ -77,9 +83,9 @@ describe('riskController', () => {
     jest.clearAllMocks()
   })
   describe('getRisk', () => {
-    describe('CRN has sentence plan, user does not have SENTENCE_PLAN role', () => {
+    describe('CRN has sentence plan, user does not have SENTENCE_PLAN role, pop in users caseload', () => {
       let getPlanByCrnSpy: jest.SpyInstance
-      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS'] } })
+      const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
         getPlanByCrnSpy = jest
@@ -87,7 +93,7 @@ describe('riskController', () => {
           .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
-      checkAuditMessage(res, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
+      checkAuditMessage(mockRes, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
         expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
         expect(getRisksSpy).toHaveBeenCalledWith(crn)
@@ -95,6 +101,7 @@ describe('riskController', () => {
         expect(predictorsSpy).toHaveBeenCalledWith(crn)
         expect(needsSpy).toHaveBeenCalledWith(crn)
         expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
+        expect(searchUserCaseloadSpy).toHaveBeenCalledWith(username, '', '', { nameOrCrn: crn })
       })
       it('should request the sentence plans from the api', () => {
         expect(getPlanByCrnSpy).toHaveBeenCalledWith(crn)
@@ -117,8 +124,8 @@ describe('riskController', () => {
       })
     })
 
-    describe('CRN has sentence plan, user has SENTENCE_PLAN role', () => {
-      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
+    describe('CRN has sentence plan, user has SENTENCE_PLAN role, pop in users caseload', () => {
+      const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
         jest
@@ -144,8 +151,8 @@ describe('riskController', () => {
       })
     })
 
-    describe('CRN does not have sentence plan, user does not have SENTENCE_PLAN role', () => {
-      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS'] } })
+    describe('CRN does not have sentence plan, user does not have SENTENCE_PLAN role, pop in users caseload', () => {
+      const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
         jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
@@ -169,8 +176,8 @@ describe('riskController', () => {
       })
     })
 
-    describe('CRN does not have sentence plan, user has SENTENCE_PLAN role', () => {
-      const mockRes = mockAppResponse({ user: { roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
+    describe('CRN does not have sentence plan, user has SENTENCE_PLAN role, pop in users caseload', () => {
+      const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
         jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
@@ -193,6 +200,38 @@ describe('riskController', () => {
         })
       })
     })
+
+    describe('CRN has sentence plan, user has SENTENCE_PLAN role, pop not in users caseload', () => {
+      const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
+      const spy = jest.spyOn(mockRes, 'render')
+      const mockNoUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+      beforeEach(async () => {
+        jest
+          .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+          .mockImplementationOnce(() => Promise.resolve(mockNoUserCaseload))
+        jest
+          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+        await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
+      })
+      it('should render the risk page', () => {
+        expect(spy).toHaveBeenCalledWith('pages/risk', {
+          personRisk: mockPersonRiskFlags,
+          risks: mockRisks,
+          crn,
+          tierCalculation: mockTierCalculation,
+          risksWidget: toRoshWidget(mockRisks),
+          predictorScores: toPredictors(mockPredictors),
+          timeline: [],
+          needs: mockNeeds,
+          oasysLink: config.oaSys.link,
+          sanIndicator: mockSanIndicatorResponse.sanIndicator,
+          showSentencePlan: false,
+          planLastUpdated: '',
+        })
+      })
+    })
+
     describe('Sentence plan api returns an error', () => {
       beforeEach(async () => {
         jest
