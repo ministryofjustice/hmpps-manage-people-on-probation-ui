@@ -117,7 +117,6 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
     page.getElementData('osp').should('exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
       page.getElementData('opd').then($opd => {
-        // Check risk flags card is before opd
         expect(Cypress.$($riskFlagsCard).index()).to.be.lessThan(Cypress.$($opd).index())
       })
     })
@@ -142,11 +141,12 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
     page.getElementData('plan').get('h4').should('contain.text', 'Plan')
     page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 29 September 2025')
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
+
     page
       .getElementData('plan')
       .find('a')
       .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', 'https://sentence-plan-dummy-url/X000001/plan')
+      .should('have.attr', 'href', 'https://sentence-plan-dummy-url/crn/X000001/plan')
   }
   if (!sentencePlan) {
     page.checkPageTitle('Risk')
