@@ -1,5 +1,4 @@
 import superagent, { SuperAgentRequest } from 'superagent'
-import { create } from 'lodash'
 import { WiremockMapping } from '../../integration_tests/utils'
 
 interface Args {

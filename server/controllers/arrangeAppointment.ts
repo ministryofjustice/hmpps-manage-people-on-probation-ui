@@ -1,17 +1,15 @@
 /* eslint-disable no-underscore-dangle */
-import { v4 as uuidv4, v4 } from 'uuid'
+import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Request } from 'express'
-import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { Controller } from '../@types'
 import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
-import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
+import { renderError, postAppointments } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
-import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToSentence',

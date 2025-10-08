@@ -5,7 +5,7 @@ import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import { postAppointments, renderError, cloneAppointmentAndRedirect } from '../middleware'
-import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
+import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
 import { ArrangedSession } from '../models/ArrangedSession'
