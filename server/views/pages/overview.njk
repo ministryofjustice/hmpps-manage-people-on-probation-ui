@@ -122,13 +122,14 @@
 {% endblock %}
 
 {% block pageContent %}
-  {% if riskToStaff.level == 'HIGH' or riskToStaff.level == 'MEDIUM' %}
+    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
+    {% if level and (level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
     {% set html %}
     <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
     {% endset %}
     {{ mojAlert({
       variant: "warning",
-      title: overview.personalDetails.name.forename + " is " + riskLevelLabel(riskToStaff.level).toLowerCase() + " risk to staff ",
+      title: overview.personalDetails.name.forename + " is " + riskLevelLabel(level).toLowerCase() + " risk to staff ",
       showTitleAsHeading: true,
       dismissible: false,
       html: html

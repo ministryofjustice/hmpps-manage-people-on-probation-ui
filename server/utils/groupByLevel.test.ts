@@ -5,7 +5,7 @@ describe('groupByLevel()', () => {
   it('should return an empty array if no data', () => {
     expect(groupByLevel('STANDARD', null)).toEqual([])
   })
-  it('should return filtered needs', () => {
+  it('should return filtered needs by severity', () => {
     const mockNeeds: Need[] = [
       {
         section: 'ACCOMMODATION',
@@ -31,56 +31,71 @@ describe('groupByLevel()', () => {
     ]
     expect(groupByLevel('STANDARD', mockNeeds)).toEqual(mockNeeds.filter(need => need?.severity === 'STANDARD'))
   })
-  it('should return filtered risk flags', () => {
-    const mockRiskFlags = [
+
+  it('should return filtered risk flags by levelDescription (case-insensitive)', () => {
+    const mockRiskFlags: RiskFlag[] = [
       {
         id: 1,
-        level: 'HIGH',
-        description: 'Restraining Order',
-        notes: 'Some notes',
+        level: 'LOW',
+        levelDescription: 'Medium',
+        description: 'Risk to Known Adult',
         createdDate: '2022-12-18',
-        nextReviewDate: '2024-12-15',
         createdBy: { forename: 'Paul', surname: 'Smith' },
         removed: false,
         removalHistory: [],
       },
       {
         id: 2,
-        description: 'Domestic Abuse Perpetrator',
+        level: 'HIGH',
+        levelDescription: 'HIGH',
+        description: 'Risk to Staff',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Jane', surname: 'Doe' },
+        removed: false,
+        removalHistory: [],
+      },
+    ]
+    expect(groupByLevel('medium', mockRiskFlags)).toEqual([mockRiskFlags[0]])
+    expect(groupByLevel('HIGH', mockRiskFlags)).toEqual([mockRiskFlags[1]])
+  })
+
+  it('should return filtered risk flags by level when levelDescription is missing (case-insensitive)', () => {
+    const mockRiskFlags: RiskFlag[] = [
+      {
+        id: 1,
+        level: 'HIGH',
+        description: 'Restraining Order',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Paul', surname: 'Smith' },
+        removed: false,
+        removalHistory: [],
+      },
+      {
+        id: 2,
         level: 'MEDIUM',
-        notes: 'Some notes',
-        nextReviewDate: '2025-08-18',
-        mostRecentReviewDate: '2023-12-18',
-        createdDate: '2022-12-18',
-        createdBy: { forename: 'Paul', surname: 'Smith' },
-        removed: false,
-        removalHistory: [],
-      },
-      {
-        id: 3,
-        description: 'Risk to Known Adult',
-        level: 'LOW',
-        notes: 'Some notes',
-        nextReviewDate: '2025-08-18',
-        mostRecentReviewDate: '2023-12-18',
-        createdDate: '2022-12-18',
-        createdBy: { forename: 'Paul', surname: 'Smith' },
-        removed: false,
-        removalHistory: [],
-      },
-      {
-        id: 4,
         description: 'Domestic Abuse Perpetrator',
-        level: 'INFORMATION_ONLY',
-        notes: 'Some notes',
-        nextReviewDate: '2025-08-18',
-        mostRecentReviewDate: '2023-12-18',
         createdDate: '2022-12-18',
-        createdBy: { forename: 'Paul', surname: 'Smith' },
+        createdBy: { forename: 'Jane', surname: 'Doe' },
         removed: false,
         removalHistory: [],
       },
-    ] as unknown as RiskFlag[]
-    expect(groupByLevel('MEDIUM', mockRiskFlags)).toEqual(mockRiskFlags.filter(riskFlag => riskFlag.level === 'MEDIUM'))
+    ]
+    expect(groupByLevel('medium', mockRiskFlags)).toEqual([mockRiskFlags[1]])
+    expect(groupByLevel('HIGH', mockRiskFlags)).toEqual([mockRiskFlags[0]])
+  })
+
+  it('should return empty array if no matches found', () => {
+    const mockRiskFlags: RiskFlag[] = [
+      {
+        id: 1,
+        level: 'LOW',
+        description: 'Some other risk',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Alex', surname: 'Brown' },
+        removed: false,
+        removalHistory: [],
+      },
+    ]
+    expect(groupByLevel('HIGH', mockRiskFlags)).toEqual([])
   })
 })

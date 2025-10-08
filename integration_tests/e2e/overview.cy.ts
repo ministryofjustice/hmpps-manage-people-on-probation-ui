@@ -106,28 +106,24 @@ context('Overview', () => {
     page.getRowData('risk', 'riskFlags', 'Label').should('contain.text', 'NDelius risk flags')
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(0)
-      .should('contain.text', 'High')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--high')
+      .should('contain.text', 'Medium')
+      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--medium')
     cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(0).should('contain.text', 'Risk to Staff')
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(1)
-      .should('contain.text', 'Medium')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--medium')
-    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(1).should('contain.text', 'Domestic Abuse Perpetrator')
+      .should('contain.text', 'Low')
+      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--low')
+    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(1).should('contain.text', 'Risk to Known Adult')
 
     cy.get('[data-qa="riskFlagsValue"] dt')
       .eq(2)
-      .should('contain.text', 'Low')
-      .should('have.attr', 'class', 'govuk-!-font-weight-bold rosh--low')
-    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(2).should('contain.text', 'Risk to Known Adult')
-
-    page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'Risk to Known Adult')
-    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(3).should('contain.text', 'Domestic Abuse Perpetrator')
-    cy.get('[data-qa="riskFlagsValue"] dt').eq(3).should('contain.text', 'Information only')
+      .should('contain.text', 'Information only')
+      .should('have.attr', 'class', 'govuk-!-font-weight-bold')
+    cy.get('[data-qa="riskFlagsValue"]').find('ul').eq(2).should('contain.text', 'Domestic Abuse Perpetrator')
 
     page.getElementData('overallRiskValue').should('contain.text', 'VERY HIGH RISK OF SERIOUS HARM')
 
-    page.getAlert().should('contain.text', 'high')
+    page.getAlert().should('contain.text', 'medium')
 
     const expected =
       '{"name":"Wolff,Caroline","crn":"X000001","dob":"9 January 2002","age":"22","tierScore":"B2","sentence":"12 month Community order"}'

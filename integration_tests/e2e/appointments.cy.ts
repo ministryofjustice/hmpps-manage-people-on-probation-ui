@@ -1,7 +1,5 @@
 import Page from '../pages/page'
-import AppointmentPage from '../pages/appointment'
 import AppointmentsPage from '../pages/appointments'
-import { crn } from './appointments/imports'
 
 const url = (contactId: number, component = 'UpdateContact') =>
   `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
@@ -20,7 +18,7 @@ context('Appointment', () => {
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
 
-    page.getAlert().should('contain.text', 'high')
+    page.getAlert().should('contain.text', 'medium')
 
     page
       .upcomingAppointmentAction(1)
@@ -36,7 +34,7 @@ context('Appointment', () => {
     page.headerName().should('contain.text', 'Eula Schmeler')
     page.assertRiskTags()
 
-    page.getAlert().should('contain.text', 'high')
+    page.getAlert().should('contain.text', 'medium')
 
     cy.get('[data-qa="upcomingAppointments"] th').eq(0).should('contain.text', 'Appointment type')
     cy.get('[data-qa="upcomingAppointments"] th').eq(1).should('contain.text', 'Date')
