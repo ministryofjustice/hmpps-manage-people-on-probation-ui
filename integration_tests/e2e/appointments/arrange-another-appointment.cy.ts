@@ -17,6 +17,7 @@ import {
   checkUpdateRepeating,
   checkUpdateNotes,
   checkUpdateSensitivity,
+  checkUpdateBackLinkRefresh,
 } from './imports'
 
 const loadPage = (c: string = crn) => {
@@ -172,6 +173,9 @@ describe('Arrange another appointment', () => {
     })
     it('should update the sensitivity when value is changed', () => {
       checkUpdateSensitivity(arrangeAnotherAppointmentPage)
+    })
+    it('validation errors on change pages do not reset backLink/changeLink', () => {
+      checkUpdateBackLinkRefresh(arrangeAnotherAppointmentPage)
     })
   })
 

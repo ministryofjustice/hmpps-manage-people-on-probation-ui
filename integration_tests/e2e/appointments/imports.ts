@@ -14,6 +14,7 @@ import { dateWithYear } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
+import Page from '../../pages/page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -345,6 +346,16 @@ export const checkUpdateSensitivity = (page: AppointmentCheckYourAnswersPage | A
     notePage.getSubmitBtn().click()
     page.checkOnPage()
     page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
+  })
+}
+
+export const checkUpdateBackLinkRefresh = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+  const pages = [5, 8]
+  cy.wrap(pages).each((index: number) => {
+    page.getSummaryListRow(index).find('.govuk-link').click()
+    page.getSubmitBtn().click()
+    page.getBackLink().click()
+    page.checkOnPage()
   })
 }
 

@@ -150,4 +150,5 @@ export interface LocalParams {
   maxCharCount?: number
   actionType?: string
   back?: string
+  change?: string
 }
