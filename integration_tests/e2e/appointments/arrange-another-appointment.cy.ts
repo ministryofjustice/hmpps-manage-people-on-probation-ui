@@ -83,12 +83,12 @@ describe('Arrange another appointment', () => {
       sentencePage.checkOnPage()
     })
     it('should display the error summary box', () => {
-      sentencePage.checkErrorSummaryBox(['Select a sentence'])
+      sentencePage.checkErrorSummaryBox(['Select what this appointment is for'])
     })
     it('should display the error messages', () => {
       getUuid().then(uuid => {
         sentencePage.getElement(`#appointments-X000001-${uuid}-eventId-error`).should($error => {
-          expect($error.text().trim()).to.include('Select a sentence')
+          expect($error.text().trim()).to.include('Select what this appointment is for')
         })
       })
     })

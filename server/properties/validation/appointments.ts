@@ -51,7 +51,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select a sentence',
+          msg: 'Select what this appointment is for',
           log: 'Sentence not selected',
         },
       ],

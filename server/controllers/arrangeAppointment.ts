@@ -105,7 +105,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const showValidation = validation === 'true'
       if (showValidation) {
         res.locals.errorMessages = {
-          [`appointments-${crn}-${id}-eventId`]: 'Select a sentence',
+          [`appointments-${crn}-${id}-eventId`]: 'Select what this appointment is for',
         }
       }
       return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors, back })
