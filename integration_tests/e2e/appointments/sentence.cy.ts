@@ -103,12 +103,12 @@ describe('What is this appointment for?', () => {
       sentencePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      sentencePage.checkErrorSummaryBox(['Select a sentence'])
+      sentencePage.checkErrorSummaryBox(['Select what this appointment is for'])
     })
 
     it('should display the error message', () => {
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-error`).should($error => {
-        expect($error.text().trim()).to.include('Select a sentence')
+        expect($error.text().trim()).to.include('Select what this appointment is for')
       })
     })
     describe('The error summary link is clicked', () => {
