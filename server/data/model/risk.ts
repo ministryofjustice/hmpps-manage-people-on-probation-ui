@@ -128,6 +128,7 @@ export interface RemovalHistory {
 export interface RiskFlag {
   id: number
   description: string
+  levelDescription?: string
   level: 'HIGH' | 'MEDIUM' | 'LOW' | 'INFORMATION_ONLY'
   riskNotes?: Note[]
   riskNote?: Note
