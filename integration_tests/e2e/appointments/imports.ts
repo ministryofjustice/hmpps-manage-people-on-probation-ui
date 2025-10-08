@@ -353,7 +353,6 @@ export const checkUpdateBackLinkRefresh = (page: AppointmentCheckYourAnswersPage
   const pages = [5, 8]
   cy.wrap(pages).each((index: number) => {
     page.getSummaryListRow(index).find('.govuk-link').click()
-    // const newPage = new Page()
     page.getSubmitBtn().click()
     page.getBackLink().click()
     page.checkOnPage()
