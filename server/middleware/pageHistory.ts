@@ -2,16 +2,6 @@ import { Data } from 'applicationinsights/out/Declarations/Contracts'
 import { Route } from '../@types'
 import { getDataValue, setDataValue } from '../utils'
 
-export const setUpPageHistory = (nested: boolean = false): Route<Promise<void>> => {
-  return async (req, res, next) => {
-    const { url } = req
-    if (!res.locals.pageHistory) {
-      res.locals.pageHistory = [url]
-    }
-    return next()
-  }
-}
-
 export const pageHistory = (nested: boolean = false): Route<Promise<void>> => {
   return async (req, res, next) => {
     const newSessionData = req?.session?.data ?? {}
@@ -23,10 +13,15 @@ export const pageHistory = (nested: boolean = false): Route<Promise<void>> => {
       history = []
     }
     // remove previous history for this page
-    for (let i = 0; i < history.length - 1; i += 1) {
+    for (let i = 0; i < history.length - 2; i += 1) {
       if (history[i] === url) {
         history = history.slice(i + 1, history.length)
       }
+    }
+    // if a backLink was used
+    // (is this neccesarily the case or does this just track a return to a previous page)
+    if (history[history.length - 2] === url) {
+      history = history.slice(0, history.length - 2)
     }
     // don't update if no page change
     if (history[history.length - 1] !== url) {

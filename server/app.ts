@@ -27,7 +27,7 @@ import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
-import { pageHistory, setUpPageHistory } from './middleware/pageHistory'
+import { pageHistory } from './middleware/pageHistory'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
