@@ -6,7 +6,7 @@
                 <p class="govuk-body" data-qa="planLastUpdated">Last updated: {{ planLastUpdated | dateWithYear }}</p>
             {% endif %}
             <p class="govuk-body">
-                <a href="{{ sentencePlanLink() }}/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
+                <a href="{{ sentencePlanLink() }}/crn/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
         </div>
     </section>
 {% endif %}
