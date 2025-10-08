@@ -5,8 +5,8 @@ import { Request } from 'express'
 import { Controller } from '../@types'
 import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
-import { renderError, postAppointments, cloneAppointmentAndRedirect } from '../middleware'
-import { AppointmentSession } from '../models/Appointments'
+import { renderError, postAppointments } from '../middleware'
+import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
@@ -36,7 +36,7 @@ const routes = [
   'postArrangeAnotherAppointment',
 ] as const
 
-const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
+export const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
   const { data } = req.session
   const { crn, id } = req.params as Record<string, string>
   if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -67,7 +67,8 @@ const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsA
       return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
     }
   }
-  await postAppointments(client)(req, res)
+  const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
+  setDataValue(data, ['appointments', crn, id, 'backendId'], response.appointments[response.appointments.length - 1].id)
   return res.redirect(`${baseUrl}/confirmation`)
 }
 
@@ -447,15 +448,17 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   },
   postConfirmation: () => {
     return async (req, res) => {
+      const { data } = req.session
+      const { url } = req
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const { data } = req.session
-      const currentAppt = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
-      return cloneAppointmentAndRedirect(currentAppt)(req, res)
+      const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
+      return res.redirect(`/case/${crn}/appointments/appointment/${backendId}/next-appointment?back=${url}`)
     }
   },
+
   getArrangeAnotherAppointment: () => {
     return async (req, res) => {
       const { url } = req

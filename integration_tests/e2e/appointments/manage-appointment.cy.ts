@@ -284,7 +284,11 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getTaskLink(3)
             .should('contain.text', name)
-            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
+            .should(
+              'have.attr',
+              'href',
+              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+            )
         })
         it('should display the hint text', () => {
           manageAppointmentPage
@@ -353,7 +357,11 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getTaskLink(3)
             .should('contain.text', name)
-            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
+            .should(
+              'have.attr',
+              'href',
+              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+            )
         })
         it('should display the hint text', () => {
           manageAppointmentPage
@@ -418,7 +426,11 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getTaskLink(3)
             .should('contain.text', name)
-            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
+            .should(
+              'have.attr',
+              'href',
+              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+            )
         })
         it('should display the hint text', () => {
           manageAppointmentPage
@@ -493,7 +505,11 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getTaskLink(3)
             .should('contain.text', name)
-            .should('have.attr', 'href', '/case/X778160/appointments/appointment/6/next-appointment')
+            .should(
+              'have.attr',
+              'href',
+              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+            )
         })
         it('should display the hint text', () => {
           manageAppointmentPage

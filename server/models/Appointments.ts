@@ -37,6 +37,7 @@ export interface AppointmentSession {
   repeatingDates?: string[]
   notes?: string
   sensitivity?: YesNo
+  backendId?: number
   outcomeRecorded?: boolean
 }
 
@@ -126,6 +127,14 @@ export interface AppointmentCheck {
   isCurrentUser: boolean
   appointmentIsWith: Name
   startAndEnd: string
+}
+
+export interface AppointmentPostResponse {
+  id: number
+}
+
+export interface AppointmentsPostResponse {
+  appointments: AppointmentPostResponse[]
 }
 
 export interface LocalParams {
