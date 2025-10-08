@@ -3,7 +3,8 @@
 {% set pageTitle = makePageTitle({ pageHeading: title }) %}
 
 {% block pageContent %}
-    <table class="govuk-table">
+    <p id="none">You do not have any recently viewed cases</p>
+    <table id="table" class="govuk-table">
         <thead class="govuk-table__head">
         <tr class="govuk-table__row">
             <th scope="col" class="govuk-table__header">Name / CRN</th>
@@ -43,6 +44,7 @@
             }
 
             if (recentCases != null) {
+                document.getElementById("none").style.display="none"
                 recentCases.forEach((recentCase) => {
                         const tableBody = document.getElementById("tabBody")
 
@@ -107,6 +109,8 @@
                         tableBody.appendChild(row)
                     }
                 )
+            } else {
+              document.getElementById("table").style.display="none"
             }
         </script>
     </table>
