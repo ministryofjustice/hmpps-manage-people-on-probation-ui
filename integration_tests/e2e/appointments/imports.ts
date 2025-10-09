@@ -19,8 +19,8 @@ import Page from '../../pages/page'
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 export const date = DateTime.now().plus({ days: 1 }).toISODate()
-export const startTime = '9:00am'
-export const endTime = '10:00am'
+export const startTime = '09:00'
+export const endTime = '10:00'
 export const dateRegex: RegExp =
   /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday) \d{1,2} (January|February|March|April|May|June|July|August|September|October|November|December) \d{4}$/
 
@@ -101,11 +101,11 @@ export const completeDateTimePage = (crnOverride = '') => {
 
   dateTimePage.getDatePickerToggle().click()
   dateTimePage.getActiveDayButton().click()
-  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-start`).select(startTime)
+  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-start`).type(startTime)
   dateTimePage
     .getElement(`#appointments-${crnOverride || crn}-${uuid}-end`)
     .focus()
-    .select(endTime)
+    .type(endTime)
   // Ignore warnings on second click
   dateTimePage.getSubmitBtn().click()
   dateTimePage.getSubmitBtn().click()
@@ -277,14 +277,16 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
         second: 0,
         millisecond: 0,
       })
-      const changedStart = '9:30am'
-      const changedEnd = '10:30am'
+      const changedStart = '09:30'
+      const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
       const dateTimePage = new AppointmentDateTimePage()
       dateTimePage.getDatePickerToggle().click()
       cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
-      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).select(changedStart)
-      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).focus().select(changedEnd)
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).clear()
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).type(changedStart)
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).clear()
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).focus().type(changedEnd)
       // Ignore warnings
       dateTimePage.getSubmitBtn().click()
       dateTimePage.getSubmitBtn().click()
