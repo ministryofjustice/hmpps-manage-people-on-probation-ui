@@ -158,7 +158,7 @@
     {% endset %}
     {{ mojAlert({
       variant: "warning",
-      title: personForename + " is " + riskLevelLabel(level).toLowerCase() + " risk to staff ",
+      title: personForename + " is " + riskLevelLabel(level) | lower + " risk to staff ",
       showTitleAsHeading: true,
       dismissible: false,
       html: html
