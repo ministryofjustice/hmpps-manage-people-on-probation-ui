@@ -262,11 +262,11 @@ describe('Manage an appointment', () => {
           .should('contain.text', name)
           .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
       })
-      it(`should display the status as 'Completed'`, () => {
+      it(`should display the status as 'Not Started'`, () => {
         manageAppointmentPage
           .getTaskStatus(2)
-          .should('not.contain.html', 'class="govuk-tag')
-          .should('contain.text', 'Completed')
+          .should('contain.html', 'class="govuk-tag govuk-tag--blue')
+          .should('contain.text', 'Not started')
       })
     })
   })
