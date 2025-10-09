@@ -76,7 +76,7 @@ export const timeIsNowOrInFuture = (args: any[], mockDateToOverride?: DateTime) 
   const [dateStr, timeStr] = args
   const date = DateTime.fromFormat(dateStr, 'd/M/yyyy')
   if (date.isValid) {
-    const time = DateTime.fromFormat(timeStr.toUpperCase(), 'h:mma')
+    const time = DateTime.fromFormat(timeStr.toUpperCase(), 'HH:mm')
     const dateAndTime = date.set({
       hour: time.hour,
       minute: time.minute,

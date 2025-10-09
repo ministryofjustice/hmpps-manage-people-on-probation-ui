@@ -147,39 +147,39 @@ describe('time is now or in future', () => {
     jest.useRealTimers()
   })
   it('should return false if date is today, but time is in the past', () => {
-    expect(timeIsNowOrInFuture(['1/7/2025', '8:00am'])).toEqual(false)
+    expect(timeIsNowOrInFuture(['1/7/2025', '08:00'])).toEqual(false)
   })
   it('should return true if today and time is now', () => {
-    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:00'])).toEqual(true)
   })
   it('should return true if today and time is in the future', () => {
-    expect(timeIsNowOrInFuture(['1/7/2025', '10:15am'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:15'])).toEqual(true)
   })
   it('should return false if date and time are in the past', () => {
-    expect(timeIsNowOrInFuture(['30/6/2025', '8:00am'])).toEqual(false)
+    expect(timeIsNowOrInFuture(['30/6/2025', '08:00'])).toEqual(false)
   })
   it('should return true if date is invalid', () => {
-    expect(timeIsNowOrInFuture(['XXDFDS', '8:00am'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['XXDFDS', '08:00'])).toEqual(true)
   })
   it('should return false if date is undefined', () => {
-    expect(timeIsNowOrInFuture([undefined, '8:00am'])).toEqual(false)
+    expect(timeIsNowOrInFuture([undefined, '08:00'])).toEqual(false)
   })
   it('should return true if date and time are in the future', () => {
-    expect(timeIsNowOrInFuture(['2/7/2025', '8:00am'])).toEqual(true)
+    expect(timeIsNowOrInFuture(['2/7/2025', '08:00'])).toEqual(true)
   })
   it('should return true if using mock-date and selected date/time is equal', () => {
     const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
-    expect(timeIsNowOrInFuture(['1/7/2025', '09:00am'], mockNowDate)).toEqual(true)
+    expect(timeIsNowOrInFuture(['1/7/2025', '09:00'], mockNowDate)).toEqual(true)
   })
 
   it('should return false if using mock-date and selected date/time is in past', () => {
     const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
-    expect(timeIsNowOrInFuture(['30/6/2025', '8:00am'], mockNowDate)).toEqual(false)
+    expect(timeIsNowOrInFuture(['30/6/2025', '08:00'], mockNowDate)).toEqual(false)
   })
 
   it('should return true if using mock-date and selected date/time is in future', () => {
     const mockNowDate = DateTime.fromISO('2025-07-01T09:00:00.000+01:00')
-    expect(timeIsNowOrInFuture(['1/7/2025', '10:00am'], mockNowDate)).toEqual(true)
+    expect(timeIsNowOrInFuture(['1/7/2025', '10:00'], mockNowDate)).toEqual(true)
   })
 })
 
