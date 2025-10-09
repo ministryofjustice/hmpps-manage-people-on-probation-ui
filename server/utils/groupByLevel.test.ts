@@ -104,7 +104,7 @@ describe('groupByLevel()', () => {
         removalHistory: [],
       },
     ]
-    expect(groupByLevel('medium', mockRiskFlags)).toEqual([mockRiskFlags[1]])
+    expect(groupByLevel('MEDIUM', mockRiskFlags)).toEqual([mockRiskFlags[1]])
   })
 
   it('should return empty array if no matches found', () => {
