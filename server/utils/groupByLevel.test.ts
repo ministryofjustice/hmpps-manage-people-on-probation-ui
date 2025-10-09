@@ -84,7 +84,7 @@ describe('groupByLevel()', () => {
     expect(groupByLevel('HIGH', mockRiskFlags)).toEqual([mockRiskFlags[0]])
   })
 
-  it('should ignore items where level is null', () => {
+  it('should ignore items where level is undefined', () => {
     const mockRiskFlags: RiskFlag[] = [
       {
         id: 1,
