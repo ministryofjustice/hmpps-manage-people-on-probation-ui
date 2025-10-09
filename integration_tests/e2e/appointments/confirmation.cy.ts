@@ -21,8 +21,7 @@ import {
   completeArrangeAnotherPage,
 } from './imports'
 
-const regex: RegExp =
-  /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2}[ap]m)\sto\s(\d{1,2}:\d{2}[ap]m)$/
+const regex: RegExp = /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2})\sto\s(\d{1,2}:\d{2})$/
 
 const loadPage = (crnOverride = '') => {
   completeSentencePage(1, '', crnOverride)

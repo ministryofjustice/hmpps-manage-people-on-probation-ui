@@ -137,19 +137,46 @@
     maxDate: _maxDate
   } | decorateFormAttributes(['appointments', crn, id, 'date'])) }}
 
-  {{ govukSelect({
-   label: {
-      text: "Start time"
-    },
-  items: timeOptions
-  } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
+  {{ govukInput({
+          label: {
+            text: "Start time",
+            classes: "govuk-label--s govuk-!-font-weight-regular"
+          },
+          hint: {
+                text: "Use the 24-hour format, for example 09:30 or 16:30."
+           },
+           attributes: {
+               size: 5,
+               maxlength: 5
+            },
+          formGroup: {
+            attributes: {
+              'data-qa': 'startTime'
+            }
+          },
+          classes: "govuk-input--width-3"
+   } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
 
-  {{ govukSelect({
-   label: {
-      text: "End time"
-    },
-  items: endTimeOptions
-  } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
+     {{ govukInput({
+             label: {
+               text: "End time",
+               classes: "govuk-label--s govuk-!-font-weight-regular"
+             },
+             hint: {
+                    text: "Use the 24-hour format, for example 09:30 or 16:30."
+              },
+             attributes: {
+                 maxlength: 5,
+                 size: 5
+               },
+             formGroup: {
+               attributes: {
+                 'data-qa': 'endTime'
+               }
+             },
+             classes: "govuk-input--width-3"
+     } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
+
 
   <input type="hidden" name="_minDate" value="{{_minDate}}">
   <input type="hidden" name="_maxDate" value="{{_maxDate}}">

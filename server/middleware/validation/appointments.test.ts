@@ -165,8 +165,8 @@ describe('/controllers/arrangeAppointmentController', () => {
       [crn]: {
         [contactId]: {
           date: '17/5/2030',
-          start: '9:15am',
-          end: '10:15am',
+          start: '09:15',
+          end: '10:15',
         },
       },
     }
