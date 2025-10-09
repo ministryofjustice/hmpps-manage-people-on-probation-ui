@@ -60,6 +60,14 @@ export const timeIsNotEarlierThan = (args: any[]) => {
   }
   return notEarlierThanTime > date
 }
+export const timeIsValid24HourFormat = (args: any[]): boolean => {
+  if (!args[1]) {
+    return false
+  }
+  const timeStr = args[1]
+  const regex = /^([01]\d|2[0-3]):[0-5]\d$/
+  return regex.test(timeStr)
+}
 
 export const timeIsNowOrInFuture = (args: any[], mockDateToOverride?: DateTime) => {
   if (!args[0] || !args[1]) {

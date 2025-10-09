@@ -5,10 +5,10 @@ import {
   isValidDateFormat,
   isStringNumber,
   timeIsNotLaterThan,
-  timeIsNowOrInFuture,
   isTodayOrLater,
   isNotEarlierThan,
   isValidCharCount,
+  timeIsValid24HourFormat,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -106,9 +106,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Appointment start time not selected or entered',
         },
         {
-          validator: timeIsNowOrInFuture,
-          msg: 'The start time must be now or in the future',
-          log: 'The start time must be now or in the future',
+          validator: timeIsValid24HourFormat,
+          msg: 'Enter a time in the 24-hour format, for example 16:30',
+          log: 'Enter a time in the 24-hour format, for example 16:30',
           crossField: `[appointments][${crn}][${id}][date]`,
         },
       ],
@@ -120,6 +120,12 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select an end time',
           log: 'Appointment end time not selected or entered',
+        },
+        {
+          validator: timeIsValid24HourFormat,
+          msg: 'Enter a time in the 24-hour format, for example 16:30',
+          log: 'Enter a time in the 24-hour format, for example 16:30',
+          crossField: `[appointments][${crn}][${id}][date]`,
         },
         {
           validator: timeIsNotLaterThan,

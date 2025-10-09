@@ -20,6 +20,7 @@ import {
   isTodayOrLater,
   timeIsNowOrInFuture,
   isValidCharCount,
+  timeIsValid24HourFormat,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -387,8 +388,8 @@ describe('validates appointment date time request with spec', () => {
       [crn]: {
         [id]: {
           date: '21/11/2',
-          start: '9:00am',
-          end: '9:30am',
+          start: '09:00',
+          end: '09:30',
         },
       },
     },
@@ -556,5 +557,20 @@ describe('isValidCharCount', () => {
     const paragraph = 'x'.repeat(1000)
     const value = `${paragraph}\r\n${paragraph}\r\n${paragraph}\r\n${paragraph}`
     expect(isValidCharCount([value])).toEqual(false)
+  })
+
+  describe('time is in 24 hours format', () => {
+    it('should return true for valid 24-hour time', () => {
+      expect(timeIsValid24HourFormat([null, '09:00'])).toEqual(true)
+      expect(timeIsValid24HourFormat([null, '23:59'])).toEqual(true)
+      expect(timeIsValid24HourFormat([null, '16:30'])).toEqual(true)
+    })
+
+    it('should return false for invalid time format', () => {
+      expect(timeIsValid24HourFormat([null, '24:00'])).toEqual(false)
+      expect(timeIsValid24HourFormat([null, '12:60'])).toEqual(false)
+      expect(timeIsValid24HourFormat([null, '12'])).toEqual(false)
+      expect(timeIsValid24HourFormat([null, ''])).toEqual(false)
+    })
   })
 })
