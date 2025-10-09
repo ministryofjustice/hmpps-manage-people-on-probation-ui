@@ -12,6 +12,6 @@ export const groupByLevel = (level: string, data: Need[] | RiskFlag[]) => {
   return data.filter(item =>
     item?.levelDescription
       ? item.levelDescription.toLowerCase() === targetLevel
-      : item.level.toLowerCase() === targetLevel,
+      : item.level?.toLowerCase() === targetLevel,
   )
 }
