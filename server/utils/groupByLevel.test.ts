@@ -84,6 +84,29 @@ describe('groupByLevel()', () => {
     expect(groupByLevel('HIGH', mockRiskFlags)).toEqual([mockRiskFlags[0]])
   })
 
+  it('should ignore items where level is null', () => {
+    const mockRiskFlags: RiskFlag[] = [
+      {
+        id: 1,
+        description: 'Unknown risk level',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Sam', surname: 'Taylor' },
+        removed: false,
+        removalHistory: [],
+      },
+      {
+        id: 2,
+        level: 'MEDIUM',
+        description: 'Verified risk',
+        createdDate: '2022-12-18',
+        createdBy: { forename: 'Alex', surname: 'Brown' },
+        removed: false,
+        removalHistory: [],
+      },
+    ]
+    expect(groupByLevel('medium', mockRiskFlags)).toEqual([mockRiskFlags[1]])
+  })
+
   it('should return empty array if no matches found', () => {
     const mockRiskFlags: RiskFlag[] = [
       {
