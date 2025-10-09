@@ -139,3 +139,5 @@ integration_tests/screenshots/
 .DS_Store
 
 cypress
+
+server/views/_components/x-gov/**/node_modules/

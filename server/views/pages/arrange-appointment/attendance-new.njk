@@ -1,0 +1,13 @@
+{% extends "../_form.njk" %}
+
+{% set title = 'Who will attend the appointment?' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type' %}
+{% set decoratorTarget = 'temp' %}
+{% if not providerCode and not teamCode %}
+    {% set decoratorTarget = 'user' %}
+{% endif %}
+
+{% block form %}
+New attendence page
+
+{% endblock %}
