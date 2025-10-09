@@ -318,7 +318,6 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { nextAppointment } = res.locals
       const { crn, contactId } = req.params
       const { data } = req.session
       let { back } = req.query
@@ -326,9 +325,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         setDataValue(data, ['backLink', 'next'], back)
       } else {
         back = getDataValue(data, ['backLink', 'next'])
-      }
-      if (nextAppointment?.appointment) {
-        return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)

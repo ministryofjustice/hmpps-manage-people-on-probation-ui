@@ -554,12 +554,6 @@ describe('controllers/appointments', () => {
       })
       checkAuditMessage(res, 'VIEW_NEXT_APPOINTMENT', uuidv4(), crn, 'CRN')
     })
-    it('should redirect to the manage appointment page if next appointment is already arranged', async () => {
-      const mockRes = mockAppResponse({ nextAppointment: nextApptResponse() })
-      const spy = jest.spyOn(mockRes, 'redirect')
-      await controllers.appointments.getNextAppointment(hmppsAuthClient)(mockReq, mockRes)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage`)
-    })
     it('should request the person appointment', async () => {
       const mockRes = mockAppResponse({ nextAppointment: nextApptResponse(null) })
       await controllers.appointments.getNextAppointment(hmppsAuthClient)(mockReq, mockRes)
