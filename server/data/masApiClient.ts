@@ -235,7 +235,7 @@ export default class MasApiClient extends RestClient {
       path: `/risk-flags/${crn}`,
       handle404: false,
       handle500: true,
-      errorMessageFor500: 'Error getting Delius risk flags',
+      errorMessageFor500: 'Risk flag information is currently unavailable. Try again later or use NDelius.',
     })
   }
 
