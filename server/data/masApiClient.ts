@@ -235,8 +235,7 @@ export default class MasApiClient extends RestClient {
       path: `/risk-flags/${crn}`,
       handle404: false,
       handle500: true,
-      errorMessageFor500:
-        'OASys is experiencing technical difficulties. It has not been possible to provide the Criminogenic needs information held in OASys',
+      errorMessageFor500: 'Error getting Delius risk flags',
     })
   }
 
