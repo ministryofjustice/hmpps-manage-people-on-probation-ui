@@ -84,7 +84,7 @@
   {% set alert = "You must log an outcome for this appointment." %}
 {% endif %}
 
-{% if not appointment.isInPast and not appointment.hasOutcome and hasNotes %}
+{% if not appointment.hasOutcome and hasNotes %}
   {% set notesStatus = 'In progress' %}
   {% set notesTagColour = 'yellow' %}
 {% endif %}
@@ -167,7 +167,7 @@
           text: notesStatus,
           classes: "govuk-tag--" + notesTagColour
         } if not hasNotes or (hasNotes and not appointment.isInPast) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
-        text: 'Completed' if hasNotes and appointment.isInPast and appointment.hasOutcome
+        text: 'Completed' if hasNotes and appointment.hasOutcome
       } 
     },
     {

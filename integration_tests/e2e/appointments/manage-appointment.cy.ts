@@ -250,6 +250,63 @@ describe('Manage an appointment', () => {
           .should('contain.text', 'Not started')
       })
     })
+    describe('Appointment in past no outcome recorded and has notes', () => {
+      beforeEach(() => {
+        cy.task('stubPastAppointmentNoOutcomeHasNotes')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      it('should display a link to add appointment notes', () => {
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
+      })
+      it(`should display the status tag as 'In Progress'`, () => {
+        manageAppointmentPage
+          .getTaskStatus(2)
+          .should('contain.html', 'class="govuk-tag govuk-tag--yellow"')
+          .should('contain.text', 'In progress')
+      })
+    })
+    describe('Appointment in past has outcome recorded and has notes', () => {
+      beforeEach(() => {
+        cy.task('stubPastAppointmentOutcomeHasNotes')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      it('should display a link to add appointment notes', () => {
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
+      })
+      it(`should display the status tag as 'Completed'`, () => {
+        manageAppointmentPage
+          .getTaskStatus(2)
+          .should('not.contain.html', 'class="govuk-tag"')
+          .should('contain.text', 'Completed')
+      })
+    })
+    describe('Appointment in future has outcome recorded and has notes', () => {
+      beforeEach(() => {
+        cy.task('stubFutureAppointmentOutcomeHasNotes')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      it('should display a link to add appointment notes', () => {
+        manageAppointmentPage
+          .getTaskLink(2)
+          .should('contain.text', name)
+          .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
+      })
+      it(`should display the status tag as 'Completed'`, () => {
+        manageAppointmentPage
+          .getTaskStatus(2)
+          .should('not.contain.html', 'class="govuk-tag"')
+          .should('contain.text', 'Completed')
+      })
+    })
     describe('Appointment in past and has notes', () => {
       beforeEach(() => {
         cy.task('stubPastAppointmentWithNotes')
@@ -262,11 +319,11 @@ describe('Manage an appointment', () => {
           .should('contain.text', name)
           .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
       })
-      it(`should display the status as 'Not Started'`, () => {
+      it(`should display the status as 'In progress'`, () => {
         manageAppointmentPage
           .getTaskStatus(2)
-          .should('contain.html', 'class="govuk-tag govuk-tag--blue')
-          .should('contain.text', 'Not started')
+          .should('contain.html', 'class="govuk-tag govuk-tag--yellow')
+          .should('contain.text', 'In progress')
       })
     })
   })
