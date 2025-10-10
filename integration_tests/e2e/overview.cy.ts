@@ -142,6 +142,15 @@ context('Overview', () => {
     const page = Page.verifyOnPage(OverviewPage)
     cy.get('[data-qa="criminogenicNeedsLabel"]').should('not.exist')
   })
+  it('Overview page is rendered when riskFlag level and levelDescription is undefined', () => {
+    cy.task('stubOverviewRiskFlagsNoLevel')
+    cy.visit('/case/X000001')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.headerCrn().should('contain.text', 'X000001')
+    page.headerName().should('contain.text', 'Caroline Wolff')
+    page.pageHeading().should('contain.text', 'Overview')
+    page.assertRiskTags()
+  })
   it('Risk information and tier is not provided due to 500 from ARNS and TIER', () => {
     cy.visit('/case/X000002')
     const page = Page.verifyOnPage(OverviewPage)
