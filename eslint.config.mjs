@@ -9,7 +9,8 @@ export default [
       '.zap/**',
       'instrumented/**',
       'server/views/_components/govuk/**',
-      'server/views/_components/x-gov/**',
+      'server/views/_components/x-govuk/**',
+      'assets/js/index.js',
     ],
   },
   ...hmppsConfig({
@@ -31,6 +32,8 @@ export default [
       '@typescript-eslint/no-unused-vars': 0,
       '@typescript-eslint/no-explicit-any': 0,
       'import/prefer-default-export': 0,
+      'import/no-unresolved': 'error',
+      'import/no-relative-packages': 'off',
     },
   },
 ]

@@ -31,6 +31,7 @@ $mappa-colour: #4c2c92;
 @import './components/timeline';
 @import './components/flex';
 @import './components/note';
+@import '../../server/views/_components/x-govuk/govuk-prototype-components/x-govuk/components/all';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
