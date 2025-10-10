@@ -96,14 +96,17 @@ export const completeLocationPage = (index = 1, crnOverride = '') => {
   locationPage.getSubmitBtn().click()
 }
 
-export const completeDateTimePage = (crnOverride = '') => {
+export const completeDateTimePage = (crnOverride = '', uuidOveride = '', next = false) => {
   const dateTimePage = new AppointmentDateTimePage()
-
   dateTimePage.getDatePickerToggle().click()
-  dateTimePage.getActiveDayButton().click()
-  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-start`).type(startTime)
+  if (next) {
+    dateTimePage.getNextDayButton().click()
+  } else {
+    dateTimePage.getActiveDayButton().click()
+  }
+  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
   dateTimePage
-    .getElement(`#appointments-${crnOverride || crn}-${uuid}-end`)
+    .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-end`)
     .focus()
     .type(endTime)
   // Ignore warnings on second click
@@ -111,16 +114,16 @@ export const completeDateTimePage = (crnOverride = '') => {
   dateTimePage.getSubmitBtn().click()
 }
 
-export const completeSupportingInformationPage = (notes = true, crnOverride = '') => {
+export const completeSupportingInformationPage = (notes = true, crnOverride = '', uuidOveride = '') => {
   const notePage = new AppointmentNotePage()
   cy.get('form').then(form => form[0].reset())
   if (notes) {
     notePage
-      .getElement(`#appointments-${crnOverride || crn}-${uuid}-notes`)
+      .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-notes`)
       .focus()
       .type('Some notes')
   }
-  notePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-sensitivity`).click()
+  notePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-sensitivity`).click()
   notePage.getSubmitBtn().click()
 }
 
@@ -240,6 +243,12 @@ export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeA
   const typePage = new AppointmentTypePage()
   typePage.getRadio('type', 2).click()
   typePage.getSubmitBtn().click()
+  if (page instanceof ArrangeAnotherAppointmentPage) {
+    getUuid().then(pageUuid => {
+      completeDateTimePage('', pageUuid, true)
+      completeSupportingInformationPage(true, '', pageUuid)
+    })
+  }
   page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned telephone contact (NS)')
 }
 
@@ -250,6 +259,10 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-eventId-2`).click()
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-requirementId`).click()
     sentencePage.getSubmitBtn().click()
+    if (page instanceof ArrangeAnotherAppointmentPage) {
+      completeDateTimePage('', pageUuid, true)
+      completeSupportingInformationPage(true, '', pageUuid)
+    }
     page.checkOnPage()
     page
       .getSummaryListRow(1)
@@ -264,6 +277,12 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   const locationPage = new AppointmentLocationPage()
   locationPage.getRadio('locationCode', 2).click()
   locationPage.getSubmitBtn().click()
+  if (page instanceof ArrangeAnotherAppointmentPage) {
+    getUuid().then(pageUuid => {
+      completeDateTimePage('', pageUuid, true)
+      completeSupportingInformationPage(true, '', pageUuid)
+    })
+  }
   page.checkOnPage()
   page.getSummaryListRow(4).find('.govuk-summary-list__value').should('contain.text', '102 Petty France')
 }
@@ -290,8 +309,10 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
       // Ignore warnings
       dateTimePage.getSubmitBtn().click()
       dateTimePage.getSubmitBtn().click()
+      if (page instanceof ArrangeAnotherAppointmentPage) {
+        completeSupportingInformationPage(true, '', pageUuid)
+      }
       page.checkOnPage()
-
       page
         .getSummaryListRow(5)
         .find('.govuk-summary-list__value li:nth-child(1)')
@@ -312,6 +333,10 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
     const repeatingPage = new AppointmentRepeatingPage()
     repeatingPage.getElement(`#appointments-${crn}-${pageUuid}-repeating-2`).click()
     repeatingPage.getSubmitBtn().click()
+    if (page instanceof ArrangeAnotherAppointmentPage) {
+      completeDateTimePage('', pageUuid, true)
+      completeSupportingInformationPage(true, '', pageUuid)
+    }
     page.checkOnPage()
     page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'No')
     if (page instanceof AppointmentCheckYourAnswersPage) {
@@ -346,6 +371,9 @@ export const checkUpdateSensitivity = (page: AppointmentCheckYourAnswersPage | A
     const notePage = new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()
     notePage.getSubmitBtn().click()
+    if (page instanceof ArrangeAnotherAppointmentPage) {
+      completeDateTimePage('', pageUuid, true)
+    }
     page.checkOnPage()
     page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
   })
