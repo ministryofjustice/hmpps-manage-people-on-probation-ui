@@ -6,30 +6,8 @@
         "method": "GET"
       },
       "response": {
-        "status": 200,
-        "jsonBody": {
-          "personSummary": {
-            "name": {
-              "forename": "Eula",
-              "surname": "Schmeler"
-            },
-            "crn": "X000002",
-            "dateOfBirth": "1979-08-18"
-          },
-          "opd": {
-            "eligible": true,
-            "date": "2024-12-12"
-          },
-          "mappa": {
-            "level": 2,
-            "levelDescription": "M2 Desc",
-            "category": 0,
-            "categoryDescription": "X9 Desc",
-            "startDate": "2024-12-12",
-            "reviewDate": "2024-12-13"
-          },
-          "riskFlags": []
-        },
+        "status": 500,
+        "jsonBody": { "message": "Error" },
         "headers": {
           "Content-Type": "application/json"
         }
