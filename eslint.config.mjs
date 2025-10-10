@@ -11,6 +11,7 @@ export default [
       'server/views/_components/govuk/**',
       'server/views/_components/x-govuk/**',
       'assets/js/index.js',
+      'assets/js/accessible-autocomplete/**',
     ],
   },
   ...hmppsConfig({

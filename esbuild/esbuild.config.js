@@ -30,6 +30,7 @@ const buildConfig = {
       {
         from: path.join(cwd, 'server/views/**/*'),
         to: path.join(cwd, 'dist/server/views'),
+        ignore: ['**/accessible-autocomplete/node_modules/**'],
       },
     ],
   },

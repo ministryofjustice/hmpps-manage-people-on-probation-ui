@@ -1,4 +1,4 @@
-import accessibleAutocomplete from 'accessible-autocomplete'
+import accessibleAutocomplete from '../../../../../../../../assets/js/accessible-autocomplete'
 
 /**
  * @param {HTMLElement} $module - Module

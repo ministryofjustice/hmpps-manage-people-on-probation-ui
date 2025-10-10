@@ -140,4 +140,5 @@ integration_tests/screenshots/
 
 cypress
 
-server/views/_components/x-gov/**/node_modules/
+server/views/_components/x-govuk/**/node_modules/
+assets/js/accessible-autocomplete/node_modules/
