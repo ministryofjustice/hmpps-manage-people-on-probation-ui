@@ -376,6 +376,10 @@ const stubFutureAppointmentManagedTypeNoNextAppt = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ notes: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubFutureAppointmentOutcomeHasNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ isFuture: true, complied: true, notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubPastAppointmentSensitive = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, isSensitive: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -390,6 +394,10 @@ const stubPastAppointmentOutcomeNoNotes = (): SuperAgentRequest => {
 }
 const stubPastAppointmentNoOutcomeHasNotes = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ isFuture: false, complied: false, notes: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+const stubPastAppointmentOutcomeHasNotes = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ isFuture: false, complied: true, notes: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 const stubPastAppointmentWithNotes = (): SuperAgentRequest => {
@@ -567,11 +575,13 @@ export default {
   stubFutureAppointmentManagedTypeWithNotes,
   stubFutureAppointmentManagedTypeNoNextAppt,
   stubFutureAppointmentManagedTypeWithDocs,
+  stubFutureAppointmentOutcomeHasNotes,
   stubPastAppointmentSensitive,
   stubPastAppointmentNoOutcomeNoNotes,
   stubPastAppointmentOutcomeNoNotes,
   stubPastAppointmentWithNotes,
   stubPastAppointmentNoOutcomeHasNotes,
+  stubPastAppointmentOutcomeHasNotes,
   stubAppointmentNDeliusManagedType,
   stubAppointmentNDeliusManagedTypeComplied,
   stubAppointmentNDeliusManagedTypeWithNotesNoOutcome,
