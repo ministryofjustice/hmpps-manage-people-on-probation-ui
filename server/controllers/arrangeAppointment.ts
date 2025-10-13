@@ -272,7 +272,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       // setting temporary fix for minDate
       // (https://github.com/ministryofjustice/moj-frontend/issues/923)
 
-      let _minDate
+      let _minDate: string
       if (today.getDate() > 9) {
         today.setDate(today.getDate() - 1)
         _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
