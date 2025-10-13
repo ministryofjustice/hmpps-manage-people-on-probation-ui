@@ -27,8 +27,8 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 
 RUN apk update && apk add --no-cache \
     build-base=0.5-r3 \
-    python3=3.12.11-r0 \
-    python3-dev=3.12.11-r0 \
+    python3=3.12.12-r0 \
+    python3-dev=3.12.12-r0 \
     make=4.4.1-r2 \
     g++=14.2.0-r4 \
     ca-certificates=20250911-r0
@@ -46,7 +46,7 @@ RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 ENV NODE_ENV='production'
 
 COPY . .
-RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry) \
+RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=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\
     npm run build
 
 RUN npm prune --no-audit --omit=dev
