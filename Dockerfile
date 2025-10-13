@@ -46,7 +46,7 @@ RUN CYPRESS_INSTALL_BINARY=0 npm ci --no-audit
 ENV NODE_ENV='production'
 
 COPY . .
-RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=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\
+RUN --mount=type=secret,id=sentry SENTRY_AUTH_TOKEN=$(cat /run/secrets/sentry) \
     npm run build
 
 RUN npm prune --no-audit --omit=dev
