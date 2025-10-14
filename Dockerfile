@@ -27,8 +27,8 @@ ENV GIT_BRANCH=${GIT_BRANCH}
 
 RUN apk update && apk add --no-cache \
     build-base=0.5-r3 \
-    python3=3.12.11-r0 \
-    python3-dev=3.12.11-r0 \
+    python3=3.12.12-r0 \
+    python3-dev=3.12.12-r0 \
     make=4.4.1-r2 \
     g++=14.2.0-r4 \
     ca-certificates=20250911-r0
