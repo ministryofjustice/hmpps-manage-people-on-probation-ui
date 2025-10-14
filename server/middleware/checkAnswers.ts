@@ -11,7 +11,7 @@ export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction)
     let { appointmentTypes } = res.locals
     const { userLocations, appointment } = res.locals
     const session: AppointmentSession = getDataValue(data, ['appointments', crn, id])
-    // checkType valid
+
     if (session?.type) {
       if (session?.eventId === 'PERSON_LEVEL_CONTACT') appointmentTypes = getPersonLevelTypes(appointmentTypes)
 
@@ -26,7 +26,6 @@ export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction)
         }
       }
 
-      // checkLocation valid
       if (validType && session.user?.locationCode) {
         let validLocation = false
         if (!appointment.type.isLocationRequired && session.user.locationCode === 'NO_LOCATION_REQUIRED') {
