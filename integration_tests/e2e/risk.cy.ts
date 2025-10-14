@@ -9,7 +9,6 @@ import mockRiskData from '../../wiremock/mappings/X000001-risk.json'
 import { RiskFlag } from '../../server/data/model/risk'
 import { dateWithYear, toSentenceCase } from '../../server/utils'
 import { checkPopHeader } from './appointments/imports'
-import OverviewPage from '../pages/overview'
 
 const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
