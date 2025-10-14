@@ -113,6 +113,9 @@ function setup(session: any, appt: any) {
       crn: 'X000001',
       id: 1,
     },
+    query: {
+      change: 'change',
+    },
     session: {
       data: {
         appointments: {

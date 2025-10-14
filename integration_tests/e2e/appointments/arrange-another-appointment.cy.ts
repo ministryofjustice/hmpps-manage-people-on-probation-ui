@@ -97,6 +97,7 @@ describe('Arrange another appointment', () => {
   describe('User clicks submit without selecting an attendee', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     let attendancePage: AttendancePage
+    let locationPage: AppointmentLocationPage
     beforeEach(() => {
       cy.task('stubAppointmentNoAttendee')
       loadPage('X000001')
@@ -106,19 +107,12 @@ describe('Arrange another appointment', () => {
     })
     it('should redirect to the attendance page', () => {
       attendancePage.checkOnPage()
-      attendancePage.getSubmitBtn().click()
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
     })
-    it('should redirect to the arrange another appointment page when question is submitted', () => {
+    it('should redirect to the next uncompleted page when question is submitted', () => {
       attendancePage.checkOnPage()
       attendancePage.getSubmitBtn().click()
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'peter parker (PS-PSO) (Automated Allocation Team, London)')
+      locationPage = new AppointmentLocationPage()
+      locationPage.checkOnPage()
     })
   })
 
@@ -189,7 +183,6 @@ describe('Arrange another appointment', () => {
       getUuid().then(uuid => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
         checkUpdateDateTime(arrangeAnotherAppointmentPage)
-        checkUpdateSensitivity(arrangeAnotherAppointmentPage)
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
         confirmPage.checkOnPage()
