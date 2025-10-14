@@ -62,4 +62,5 @@ document.initialiseTelemetry = (applicationInsightsConnectionString, application
   appInsights.loadAppInsights()
   appInsights.addTelemetryInitializer(telemetryInitializer)
   appInsights.trackPageView()
+  appInsights.trackEvent({ name: 'screenSize', properties: { width: window.innerWidth, height: window.innerHeight } })
 }
