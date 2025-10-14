@@ -10,6 +10,7 @@ import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointm
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
+import { findUncompleted } from '../utils/findUncompleted'
 
 const routes = [
   'redirectToSentence',
@@ -123,7 +124,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
       const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
+      if (change) {
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+      }
       return res.redirect(redirect)
     }
   },
@@ -157,13 +161,17 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postType: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      const { data } = req.session
       const change = req?.query?.change as string
       const { number } = req.query as Record<string, string>
       const query = number ? `?number=${number}` : ''
       if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/attendance${query}`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/attendance${query}`
+      if (change) {
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+      }
       return res.redirect(redirect)
     }
   },
@@ -197,7 +205,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/location`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/location`
+      if (change) {
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+      }
       return res.redirect(redirect)
     }
   },
@@ -240,7 +251,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const page = selectedLocation === `LOCATION_NOT_IN_LIST` ? 'location-not-in-list' : 'date-time'
       let redirect = `/case/${crn}/arrange-appointment/${id}/${page}`
       if (change && page !== 'location-not-in-list') {
-        redirect = change
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
       if (change && page === 'location-not-in-list') {
         redirect = `${redirect}?change=${change}`
@@ -269,7 +280,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         }
       }
       const today = new Date()
-      const _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+      // setting temporary fix for minDate
+      // (https://github.com/ministryofjustice/moj-frontend/issues/923)
+
+      let _minDate: string
+      if (today.getDate() > 9) {
+        today.setDate(today.getDate() - 1)
+        _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
+      } else {
+        _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+      }
       const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
       return res.render(`pages/arrange-appointment/date-time`, {
         crn,
@@ -311,7 +331,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const nextPage = repeatAppointmentsEnabled
         ? `/case/${crn}/arrange-appointment/${id}/repeating`
         : `/case/${crn}/arrange-appointment/${id}/supporting-information`
-      const redirect = change || nextPage
+      let redirect = nextPage
+      if (change) {
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+      }
       return res.redirect(redirect)
     }
   },
@@ -384,7 +407,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           parseInt(numberOfRepeatAppointments, 10) + 1,
         )
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/supporting-information`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
+      if (change) {
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+      }
       return res.redirect(redirect)
     }
   },
@@ -414,11 +440,15 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postSupportingInformation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
+      const { data } = req.session
       const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const redirect = change || `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      if (change) {
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+      }
       return res.redirect(redirect)
     }
   },
