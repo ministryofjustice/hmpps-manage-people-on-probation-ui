@@ -1,7 +1,6 @@
-@import "node_modules/accessible-autocomplete/src/autocomplete";
-
-// Ensure the autocomplete uses the correct typeface
-.autocomplete__wrapper {
+@import '../../../../../../../../assets/js/accessible-autocomplete/src/autocomplete'
+  // Ensure the autocomplete uses the correct typeface
+  .autocomplete__wrapper {
   font-family: $govuk-font-family;
 }
 
