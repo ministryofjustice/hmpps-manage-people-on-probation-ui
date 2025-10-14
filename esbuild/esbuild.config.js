@@ -43,8 +43,11 @@ const buildConfig = {
         to: path.join(cwd, 'dist/assets/images'),
       },
       {
-        from: path.join(cwd, 'assets/js/accessible-autocomplete'),
-        to: path.join(cwd, 'dist/assets/js/accessible-autocomplete'),
+        from: path.join(cwd, 'assets/js/accessible-autocomplete/dist/accessible-autocomplete.min.js'),
+        to: path.join(
+          cwd,
+          'dist/server/views/_components/x-govuk/govuk-prototype-components/x-govuk/autocomplete/accessible-autocomplete.min.js',
+        ),
       },
       {
         from: path.join(cwd, 'package.json'),
