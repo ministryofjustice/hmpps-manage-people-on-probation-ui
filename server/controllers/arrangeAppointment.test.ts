@@ -296,10 +296,12 @@ describe('controllers/arrangeAppointment', () => {
   })
 
   describe('postType', () => {
-    it('should redirect to the change url if found in the request query', async () => {
+    it('should redirect to the next uncompleted page if change found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postType()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(change)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
+      )
     })
     it('should return a 404 and render the error page if CRN or UUId is invalid in request params', async () => {
       mockedIsValidCrn.mockReturnValue(false)
@@ -468,7 +470,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
     })
-    it('should redirect to the change url if the change query parameter exists in the url', async () => {
+    it('should redirect to the next uncompleted field if the change query parameter exists in the url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       const appointmentSession: AppointmentSession = {
@@ -480,7 +482,9 @@ describe('controllers/arrangeAppointment', () => {
       }
       const mockReq = createMockRequest({ query: { change }, appointmentSession })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(change)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
+      )
     })
     it('should redirect to the location page if page query parameter does not exist in url', async () => {
       mockedIsValidCrn.mockReturnValue(true)
@@ -538,12 +542,14 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocation()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/date-time`)
     })
-    it('should redirect to change url if in request params', async () => {
+    it('should redirect to the next uncompleted field if the change query parameter exists in the url', async () => {
       const mockReq = createMockRequest({ query: { change } })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postLocation()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(change)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
+      )
     })
   })
   describe('getLocationNotInList', () => {
@@ -741,12 +747,14 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postDateTime()(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/supporting-information`)
     })
-    it('should redirect to change url if in request params', async () => {
+    it('should redirect to the next uncompleted page if change url in request params', async () => {
       const mockReq = createMockRequest({ query: { change } })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postDateTime()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(change)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
+      )
     })
   })
   describe('getRepeating', () => {
@@ -860,12 +868,14 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postRepeating()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/supporting-information`)
     })
-    it('should redirect to change url if in request params', async () => {
+    it('should redirect to the next uncompleted page if change url in request params', async () => {
       const mockReq = createMockRequest({ query: { change } })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(change)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
+      )
     })
   })
   describe('getSupportingInformation', () => {
@@ -915,12 +925,14 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       expect(redirectSpy).not.toHaveBeenCalled()
     })
-    it('should redirect to the change url', async () => {
+    it('should redirect to the next uncompleted page if change url in request params', async () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       const mockReq = createMockRequest({ query: { change } })
       await controllers.arrangeAppointments.postSupportingInformation(hmppsAuthClient)(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(change)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
+      )
     })
     it('should redirect to the check your answers page', async () => {
       mockedIsValidCrn.mockReturnValue(true)
