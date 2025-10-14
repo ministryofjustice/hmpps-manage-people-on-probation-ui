@@ -591,6 +591,37 @@ describe('controllers/arrangeAppointment', () => {
       })
     })
   })
+
+  describe('getDateTime for double digit date', () => {
+    beforeAll(() => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date('2025-07-10T09:00:00Z')) // 10:00 BST
+    })
+    afterAll(() => {
+      jest.useRealTimers()
+    })
+    it('should set local vars for error messages if validation query param is in url', async () => {
+      const mockReq = createMockRequest({ query: { validation: 'true' } })
+      await controllers.arrangeAppointments.getDateTime()(mockReq, res)
+      expect(res.locals.errorMessages).toStrictEqual({
+        [`appointments-${crn}-${uuid}-date`]: 'Enter or select a date',
+        [`appointments-${crn}-${uuid}-start`]: 'Select a start time',
+        [`appointments-${crn}-${uuid}-end`]: 'Select an end time',
+      })
+    })
+    it('should render the date/time page', async () => {
+      const mockReq = createMockRequest({ query: {} })
+      await controllers.arrangeAppointments.getDateTime()(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/date-time`, {
+        crn,
+        id: uuid,
+        _minDate: '09/7/2025',
+        _maxDate: '31/12/2199',
+        change: undefined,
+        showValidation: false,
+      })
+    })
+  })
   describe('postDateTime', () => {
     it('should return a 404 status and render the error page, if CRN or UUID in request params are invalid', async () => {
       mockedIsValidCrn.mockReturnValue(false)
