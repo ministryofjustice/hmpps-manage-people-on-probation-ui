@@ -9,6 +9,7 @@ import mockRiskData from '../../wiremock/mappings/X000001-risk.json'
 import { RiskFlag } from '../../server/data/model/risk'
 import { dateWithYear, toSentenceCase } from '../../server/utils'
 import { checkPopHeader } from './appointments/imports'
+import OverviewPage from '../pages/overview'
 
 const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
@@ -351,5 +352,23 @@ context('Risk', () => {
   it('should display the pop header on the individual risk flag page', () => {
     cy.visit('/case/X000001/risk/flag/4')
     checkPopHeader()
+  })
+  it('Risk flag information and tier is not provided due to 500 from ARNS, TIER, RiskFlag endpoint', () => {
+    cy.visit('/case/X000002/risk')
+    const page = new RiskDetailPage()
+
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    )
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
+    )
+
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'Risk flag information is currently unavailable. Try again later or use NDelius.',
+    )
   })
 })
