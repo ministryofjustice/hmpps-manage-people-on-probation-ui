@@ -269,7 +269,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         }
       }
       const today = new Date()
-      const _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+      // setting temporary fix for minDate
+      // (https://github.com/ministryofjustice/moj-frontend/issues/923)
+
+      let _minDate: string
+      if (today.getDate() > 9) {
+        today.setDate(today.getDate() - 1)
+        _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
+      } else {
+        _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+      }
       const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
       return res.render(`pages/arrange-appointment/date-time`, {
         crn,
