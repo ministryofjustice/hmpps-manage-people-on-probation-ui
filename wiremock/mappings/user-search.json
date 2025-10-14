@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/user/search",
+        "urlPathPattern": "/psa/user/search",
         "method": "GET",
         "queryParameters": {
           "query": {

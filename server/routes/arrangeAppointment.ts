@@ -17,7 +17,7 @@ import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
-import { HmppsAuthClient } from '../data'
+import ProbationSupervisionAppointmentsApiClient from '../data/probationSupervisionAppointmentsApiClient'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -153,6 +153,14 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
   )
+  router.get('/user/search', async (req, res) => {
+    const { username } = res.locals.user
+    const { query = '' } = req.query as Record<string, string>
+    const token = await hmppsAuthClient.getSystemClientToken(username)
+    const psaClient = new ProbationSupervisionAppointmentsApiClient(token)
+    const response = await psaClient.getUsersSearch(query)
+    return res.json(response.users)
+  })
 }
 
 export default arrangeAppointmentRoutes

@@ -1,4 +1,4 @@
-import { createElement, Component } from 'preact' /** @jsx createElement */
+import { createElement, Component, useRef } from 'preact' /** @jsx createElement */
 import Status from './status'
 import DropdownArrowDown from './dropdown-arrow-down'
 
@@ -64,13 +64,14 @@ export default class Autocomplete extends Component {
     inputClasses: null,
     hintClasses: null,
     menuClasses: null,
+    debounceDelay: 300,
   }
 
   elementReferences = {}
+  abortController = null
 
   constructor(props) {
     super(props)
-
     this.state = {
       focused: null,
       hovered: null,
@@ -80,6 +81,7 @@ export default class Autocomplete extends Component {
       validChoiceMade: false,
       selected: null,
       ariaHint: true,
+      loading: false,
     }
 
     this.handleComponentBlur = this.handleComponentBlur.bind(this)
@@ -138,7 +140,7 @@ export default class Autocomplete extends Component {
     }
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(_prevProps, prevState) {
     const { focused } = this.state
     const componentLostFocus = focused === null
     const focusedChanged = prevState.focused !== focused
@@ -211,7 +213,7 @@ export default class Autocomplete extends Component {
     }
   }
 
-  handleInputBlur(event) {
+  handleInputBlur() {
     const { focused, menuOpen, options, query, selected } = this.state
     const focusingAnOption = focused !== -1
     if (!focusingAnOption) {
@@ -224,6 +226,34 @@ export default class Autocomplete extends Component {
     }
   }
 
+  async handleRequest(query = '') {
+    if (!query) return []
+    const url = `/user/search?query=${encodeURIComponent(query)}` // this needs to be a prop ideally
+    this.setState({ loading: true })
+    if (this.abortController) {
+      this.abortController.abort()
+    }
+    this.abortController = new AbortController()
+    const { signal } = this.abortController
+    try {
+      const response = await fetch(url, { signal })
+      console.log(response)
+      const data = await response.json()
+      return data
+    } catch (error) {
+      // Ignore abort errors (they’re expected)
+      if (error.name === 'AbortError') {
+        console.debug('Previous request aborted')
+        return []
+      }
+      console.error('Autocomplete request failed:', error)
+      return []
+    } finally {
+      this.setState({ loading: false })
+    }
+  }
+
+  /*
   handleInputChange(event) {
     const { minLength, source, showAllValues } = this.props
     const autoselect = this.hasAutoselect()
@@ -240,6 +270,7 @@ export default class Autocomplete extends Component {
     const searchForOptions = showAllValues || (!queryEmpty && queryChanged && queryLongEnough)
     if (searchForOptions) {
       source(query, options => {
+        console.log(query)
         const optionsAvailable = options.length > 0
         this.setState({
           menuOpen: optionsAvailable,
@@ -254,6 +285,33 @@ export default class Autocomplete extends Component {
         options: [],
       })
     }
+  }
+    */
+
+  async handleInputChange(event) {
+    clearTimeout(this.debounceTimeout)
+    const { debounceDelay, minLength, showAllValues } = this.props
+    const autoselect = this.hasAutoselect()
+    const query = event.target.value
+    const queryEmpty = query.length === 0
+    const queryChanged = this.state.query !== query
+    const queryLongEnough = query.length >= minLength
+    this.setState({ query, ariaHint: queryEmpty })
+    this.debounceTimeout = setTimeout(async () => {
+      const searchForOptions = showAllValues || (!queryEmpty && queryChanged && queryLongEnough)
+      if (searchForOptions) {
+        const options = await this.handleRequest(query)
+        const optionsAvailable = options.length > 0
+        this.setState({
+          menuOpen: optionsAvailable,
+          options,
+          selected: autoselect && optionsAvailable ? 0 : -1,
+          validChoiceMade: false,
+        })
+      } else {
+        this.setState({ menuOpen: false, options: [] })
+      }
+    }, debounceDelay)
   }
 
   handleInputClick(event) {
@@ -585,6 +643,11 @@ export default class Autocomplete extends Component {
         {dropdownArrow}
 
         <ul {...computedMenuAttributes}>
+          {this.state.loading && (
+            <li className={`${cssNamespace}__option ${cssNamespace}__option--loading`} role="status" aria-live="polite">
+              Loading...
+            </li>
+          )}
           {options.map((option, index) => {
             const showFocused = focused === -1 ? selected === index : focused === index
             const optionModifierFocused = showFocused && hovered === null ? ` ${optionClassName}--focused` : ''

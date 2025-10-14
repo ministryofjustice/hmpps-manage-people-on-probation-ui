@@ -7,9 +7,10 @@ export default class ProbationSupervisionAppointmentsApiClient extends RestClien
     super('Probation Supervision Appointments API', config.apis.probationSupervisionAppointmentsApi, token)
   }
 
-  async getUsersSearch(crn: string): Promise<UserSearch[]> {
+  async getUsersSearch(query = ''): Promise<UserSearch> {
+    const queryStr = query ? `?query=${query}` : ''
     return this.get({
-      path: `/users/search`,
+      path: `/user/search${queryStr}`,
       handle404: false,
       handle500: true,
       errorMessageFor500:
