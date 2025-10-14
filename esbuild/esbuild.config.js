@@ -43,6 +43,10 @@ const buildConfig = {
         to: path.join(cwd, 'dist/assets/images'),
       },
       {
+        from: path.join(cwd, 'assets/js/accessible-autocomplete'),
+        to: path.join(cwd, 'dist/assets/js/accessible-autocomplete'),
+      },
+      {
         from: path.join(cwd, 'package.json'),
         to: path.join(cwd, 'dist/package.json'),
       },
