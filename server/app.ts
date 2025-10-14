@@ -29,6 +29,12 @@ import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
 import testRoutes from './routes/testRoutes'
 
+declare module 'express-session' {
+    export interface SessionData {
+        originPage: string
+    }
+}
+
 export default function createApp(services: Services): express.Application {
   const app = express()
 

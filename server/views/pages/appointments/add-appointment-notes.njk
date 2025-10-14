@@ -1,0 +1,20 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+
+{% block content %}
+    {{ govukBackLink(presenter.backLinkArgs) }}
+
+    <h1 class="govuk-heading-l govuk-!-margin-top-4">{{ presenter.title }}</h1>
+
+    <form action="/case/{{ presenter.crn }}/appointments/appointment/{{ presenter.appointmentId }}/add-note" method="post" class="govuk-!-margin-top-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--m" for="note">
+                Note
+            </label>
+            <textarea class="govuk-textarea" id="note" name="note" rows="8"></textarea>
+        </div>
+
+        {{ govukButton({ text: "Save note" }) }}
+    </form>
+{% endblock %}
