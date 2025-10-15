@@ -4,6 +4,9 @@
 
 import * as govukFrontend from 'govuk-frontend'
 import * as mojFrontend from '@ministryofjustice/frontend'
+// import { Autocomplete } from '@x-govuk/govuk-prototype-components'
+import { Autocomplete } from '../../server/views/_components/x-govuk/govuk-prototype-components/x-govuk/all.mjs'
+
 import './appInsights'
 import './backendSortableTable'
 import './mpopSortableTable'
@@ -11,6 +14,10 @@ import './predictors'
 
 govukFrontend.initAll()
 mojFrontend.initAll()
+
+const myAutocomplete = document.querySelector('#country')
+new Autocomplete(myAutocomplete).init()
+
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-interval]')
   if (repeatingFrequency) {

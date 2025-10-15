@@ -139,3 +139,6 @@ integration_tests/screenshots/
 .DS_Store
 
 cypress
+
+server/views/_components/x-govuk/**/node_modules/
+assets/js/accessible-autocomplete/node_modules/

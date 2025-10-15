@@ -146,6 +146,7 @@
     "connect-redis": "9.0.0",
     "csurf": "^1.11.0",
     "dotenv": "^17.2.2",
+    "eventslibjs": "^1.2.0",
     "express": "^5.1.0",
     "express-prom-bundle": "^8.0.0",
     "express-session": "^1.18.1",
@@ -174,9 +175,9 @@
     "url-value-parser": "^2.2.0",
     "util": "^0.12.5",
     "util.inherits": "^1.0.3",
+    "uuid": "^13.0.0",
     "webpack": "^5.101.3",
     "webpack-cli": "^6.0.1",
-    "uuid": "^13.0.0",
     "wiremock": "^3.13.1"
   },
   "devDependencies": {

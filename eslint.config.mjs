@@ -4,7 +4,15 @@ import tsParser from '@typescript-eslint/parser'
 
 export default [
   {
-    ignores: ['playwright-report/**', '.zap/**', 'instrumented/**', 'server/views/_components/govuk/**'],
+    ignores: [
+      'playwright-report/**',
+      '.zap/**',
+      'instrumented/**',
+      'server/views/_components/govuk/**',
+      'server/views/_components/x-govuk/**',
+      'assets/js/index.js',
+      'assets/js/accessible-autocomplete/**',
+    ],
   },
   ...hmppsConfig({
     extraPathsAllowingDevDependencies: ['e2e_tests/**', 'playwright.config.ts'],
@@ -25,6 +33,8 @@ export default [
       '@typescript-eslint/no-unused-vars': 0,
       '@typescript-eslint/no-explicit-any': 0,
       'import/prefer-default-export': 0,
+      'import/no-unresolved': 'error',
+      'import/no-relative-packages': 'off',
     },
   },
 ]

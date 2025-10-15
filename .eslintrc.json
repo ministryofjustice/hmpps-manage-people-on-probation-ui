@@ -16,7 +16,7 @@
         "alwaysTryTypes": true
       },
       "node": {
-        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json"]
+        "extensions": [".js", ".jsx", ".ts", ".tsx", ".json", ".mjs"]
       }
     }
   },
@@ -40,7 +40,8 @@
         "import/prefer-default-export": 0,
         "@typescript-eslint/no-explicit-any": 0,
         "@typescript-eslint/semi": 0,
-        "import/no-unresolved": "error",
+        "import/no-unresolved": "true",
+        "import/no-relative-packages": "off",
         "prettier/prettier": [
           "error",
           {
@@ -67,6 +68,7 @@
     "no-use-before-define": 0,
     "semi": 0,
     "import/no-unresolved": "error",
+    "import/no-relative-packages": "off",
     "import/extensions": [
       "error",
       "ignorePackages",

@@ -30,6 +30,7 @@ const buildConfig = {
       {
         from: path.join(cwd, 'server/views/**/*'),
         to: path.join(cwd, 'dist/server/views'),
+        ignore: ['**/accessible-autocomplete/node_modules/**'],
       },
     ],
   },
@@ -40,6 +41,13 @@ const buildConfig = {
       {
         from: path.join(cwd, 'assets/images/**/*'),
         to: path.join(cwd, 'dist/assets/images'),
+      },
+      {
+        from: path.join(cwd, 'assets/js/accessible-autocomplete/dist/accessible-autocomplete.min.js'),
+        to: path.join(
+          cwd,
+          'dist/server/views/_components/x-govuk/govuk-prototype-components/x-govuk/autocomplete/accessible-autocomplete.min.js',
+        ),
       },
       {
         from: path.join(cwd, 'package.json'),
