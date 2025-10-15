@@ -275,8 +275,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
-          [`appointments-${crn}-${id}-start`]: 'Select a start time',
-          [`appointments-${crn}-${id}-end`]: 'Select an end time',
+          [`appointments-${crn}-${id}-start`]: 'Enter a start time',
+          [`appointments-${crn}-${id}-end`]: 'Enter an end time',
         }
       }
       const today = new Date()
