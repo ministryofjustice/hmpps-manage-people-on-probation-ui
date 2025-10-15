@@ -93,7 +93,7 @@
 
 {% block pageContent %}
     <div class="govuk-grid-row govuk-!-margin-top-4">
-        {% if not sanIndicator %}
+        {% if not sanIndicator or not flags.enableSanIndicator %}
             {% include "./risk/_risk-page.njk" %}
         {% else %}
             {% include "./risk/_risk-page-san-indicator.njk" %}

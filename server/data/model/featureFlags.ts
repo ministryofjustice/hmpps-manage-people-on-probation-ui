@@ -7,4 +7,5 @@ export class FeatureFlags {
   enableDeleteAppointmentFile?: boolean = undefined
   enableManageAppointments?: boolean = undefined
   enableSentencePlan?: boolean = undefined
+  enableSanIndicator?: boolean = undefined
 }
