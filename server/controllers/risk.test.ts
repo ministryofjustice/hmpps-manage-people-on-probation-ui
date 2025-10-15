@@ -125,7 +125,10 @@ describe('riskController', () => {
     })
 
     describe('CRN has sentence plan, user has SENTENCE_PLAN role, pop in users caseload', () => {
-      const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
+      const mockRes = mockAppResponse({
+        user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] },
+        flags: { enableSentencePlan: { enabled: true } },
+      })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
         jest
