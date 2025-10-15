@@ -352,4 +352,22 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk/flag/4')
     checkPopHeader()
   })
+  it('Risk flag information and tier is not provided due to 500 from ARNS, TIER, RiskFlag endpoint', () => {
+    cy.visit('/case/X000002/risk')
+    const page = new RiskDetailPage()
+
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    )
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
+    )
+
+    cy.get(`[data-qa=errors]`).should(
+      'contain.text',
+      'Risk flag information is currently unavailable. Try again later or use NDelius.',
+    )
+  })
 })
