@@ -51,7 +51,10 @@ const riskController: Controller<typeof routes, void> = {
       try {
         const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
         showSentencePlan =
-          sentencePlans?.[0] !== undefined && res.locals?.user?.roles?.includes('SENTENCE_PLAN') && popInUsersCaseload
+          res.locals.flags.enableSentencePlan &&
+          sentencePlans?.[0] !== undefined &&
+          res.locals?.user?.roles?.includes('SENTENCE_PLAN') &&
+          popInUsersCaseload
         if (showSentencePlan && sentencePlans[0]?.lastUpdatedDate) planLastUpdated = sentencePlans[0].lastUpdatedDate
       } catch (error) {
         showSentencePlan = false
