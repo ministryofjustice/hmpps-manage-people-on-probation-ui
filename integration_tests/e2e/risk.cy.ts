@@ -222,7 +222,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and feature flag is not enabled', () => {
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
@@ -230,6 +230,18 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
+    const sentencePlan = false
+    checkRiskPageView(page, sanIndicator, sentencePlan)
+  })
+
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
+    cy.task('stubNoSentencePlanAndSanIndicator')
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubUserCaseloadSearch')
+    cy.task('stubAuthSentencePlan')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = false
     const sentencePlan = false
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
