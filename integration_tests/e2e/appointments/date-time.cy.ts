@@ -90,17 +90,17 @@ describe('Enter the date and time of the appointment', () => {
       dateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Select a start time', 'Select an end time'])
+      dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Enter a start time', 'Enter an end time'])
     })
     it('should display the error messages', () => {
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
         expect($error.text().trim()).to.include('Enter or select a date')
       })
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include('Select a start time')
+        expect($error.text().trim()).to.include('Enter a start time')
       })
       dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
-        expect($error.text().trim()).to.include('Select an end time')
+        expect($error.text().trim()).to.include('Enter an end time')
       })
     })
   })
