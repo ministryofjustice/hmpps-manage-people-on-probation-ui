@@ -580,8 +580,8 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getDateTime()(mockReq, res)
       expect(res.locals.errorMessages).toStrictEqual({
         [`appointments-${crn}-${uuid}-date`]: 'Enter or select a date',
-        [`appointments-${crn}-${uuid}-start`]: 'Select a start time',
-        [`appointments-${crn}-${uuid}-end`]: 'Select an end time',
+        [`appointments-${crn}-${uuid}-start`]: 'Enter a start time',
+        [`appointments-${crn}-${uuid}-end`]: 'Enter an end time',
       })
     })
     it('should render the date/time page', async () => {
@@ -611,8 +611,8 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getDateTime()(mockReq, res)
       expect(res.locals.errorMessages).toStrictEqual({
         [`appointments-${crn}-${uuid}-date`]: 'Enter or select a date',
-        [`appointments-${crn}-${uuid}-start`]: 'Select a start time',
-        [`appointments-${crn}-${uuid}-end`]: 'Select an end time',
+        [`appointments-${crn}-${uuid}-start`]: 'Enter a start time',
+        [`appointments-${crn}-${uuid}-end`]: 'Enter an end time',
       })
     })
     it('should render the date/time page', async () => {

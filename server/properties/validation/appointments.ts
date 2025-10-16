@@ -103,7 +103,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select a start time',
+          msg: 'Enter a start time',
           log: 'Appointment start time not selected or entered',
         },
         {
@@ -125,7 +125,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an end time',
+          msg: 'Enter an end time',
           log: 'Appointment end time not selected or entered',
         },
         {
