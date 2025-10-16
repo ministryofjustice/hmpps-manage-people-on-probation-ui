@@ -33,7 +33,7 @@
             {% endif %}
         {% else %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">{{ currentSectionName }}</h2>
-            {% if showSentencePlan %}
+            {% if sentencePlan.showLink %}
                 <h3 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="pageSubHeading">Risk</h3>
             {% endif %}
             {% if (not sanIndicator and lastUpdatedDate) 

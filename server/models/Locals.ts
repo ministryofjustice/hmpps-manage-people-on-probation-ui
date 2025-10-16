@@ -14,6 +14,7 @@ import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
+import { SentencePlan } from './Risk'
 
 export interface AppointmentLocals {
   meta: {
@@ -95,6 +96,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  sentencePlan?: SentencePlan
 }
 
 export interface AppResponse extends Response {

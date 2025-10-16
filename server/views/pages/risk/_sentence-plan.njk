@@ -1,9 +1,9 @@
-{% if showSentencePlan %}
+{% if sentencePlan.showLink %}
     <section data-qa="plan">
-        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m">Plan</h{{ scoresHeadingLevel | default('3') }}>
+        <h3 class="govuk-heading-m">Plan</h3>
         <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
-            {% if planLastUpdated %}
-                <p class="govuk-body" data-qa="planLastUpdated">Last updated: {{ planLastUpdated | dateWithYear }}</p>
+            {% if sentencePlan.lastUpdatedDate %}
+                <p class="govuk-body" data-qa="planLastUpdated">Last updated: {{ sentencePlan.lastUpdatedDate | dateWithYear }}</p>
             {% endif %}
             <p class="govuk-body">
                 <a href="{{ sentencePlanLink() }}/crn/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>

@@ -25,10 +25,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   post('/case/:crn/appointments', controllers.appointments.postAppointments(hmppsAuthClient))
 
-  router.all('/case/:crn/record-an-outcome/:actionType', [
-    getPersonalDetails(hmppsAuthClient),
-    getPersonSchedule(hmppsAuthClient),
-  ])
+  router.all('/case/:crn/record-an-outcome/:actionType', [getPersonSchedule(hmppsAuthClient)])
   router.get('/case/:crn/record-an-outcome/:actionType', controllers.appointments.getRecordAnOutcome(hmppsAuthClient))
 
   router.post(
@@ -37,11 +34,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
   )
 
-  router.all(
-    '/case/:crn/appointments/appointment/:contactId/attended-complied',
-    getPersonalDetails(hmppsAuthClient),
-    getPersonAppointment(hmppsAuthClient),
-  )
+  router.all('/case/:crn/appointments/appointment/:contactId/attended-complied', getPersonAppointment(hmppsAuthClient))
   get(
     '/case/:crn/appointments/appointment/:contactId/attended-complied',
     controllers.appointments.getAttendedComplied(hmppsAuthClient),
@@ -55,13 +48,11 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   router.get(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
-    getPersonalDetails(hmppsAuthClient),
     getNextComAppointment(hmppsAuthClient),
     controllers.appointments.getNextAppointment(hmppsAuthClient),
   )
   router.post(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
-    getPersonalDetails(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),
     validate.appointments,
     getAppointmentTypes(hmppsAuthClient),
@@ -72,14 +63,12 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/manage',
-    getPersonalDetails(hmppsAuthClient),
     getNextComAppointment(hmppsAuthClient),
     controllers.appointments.getManageAppointment(hmppsAuthClient),
   )
 
   router.get(
     '/case/:crn/appointments/appointment/:contactId/manage/note/:noteId',
-    getPersonalDetails(hmppsAuthClient),
     controllers.appointments.getAppointmentNote(hmppsAuthClient),
   )
 }
