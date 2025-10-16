@@ -1,3 +1,5 @@
+@use '../../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table' as *;
+
 .non-sortable__sortable-table-header {
   color: #005ea5;
 }
