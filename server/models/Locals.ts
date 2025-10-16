@@ -95,6 +95,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  defaultUser?: { username: string; homeArea: string; team: string }
 }
 
 export interface AppResponse extends Response {

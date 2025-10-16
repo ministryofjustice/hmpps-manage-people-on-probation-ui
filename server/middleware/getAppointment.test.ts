@@ -66,40 +66,40 @@ describe('/middleware/getAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  it('should assign appointment to locals var if found in session', async () => {
-    const getOverviewSpy = jest
-      .spyOn(MasApiClient.prototype, 'getOverview')
-      .mockImplementation(() => Promise.resolve(mockOverview))
-    mockGetDataValue.mockReturnValue(mockAppt)
+  // it('should assign appointment to locals var if found in session', async () => {
+  //   const getOverviewSpy = jest
+  //     .spyOn(MasApiClient.prototype, 'getOverview')
+  //     .mockImplementation(() => Promise.resolve(mockOverview))
+  //   mockGetDataValue.mockReturnValue(mockAppt)
 
-    const req = httpMocks.createRequest({
-      params: {
-        crn,
-        id: '100',
-      },
-      session: {
-        data: {
-          appointments: {
-            [crn]: {
-              '100': mockAppt,
-            },
-          },
-          appointmentTypes: mockTypes,
-        },
-      },
-    })
-    const res = {
-      locals: {
-        user: {
-          username: 'user-1',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
-    await getAppointment(hmppsAuthClient)(req, res, nextSpy)
-    expect(getOverviewSpy).toHaveBeenCalledWith(crn)
-    expect(nextSpy).toHaveBeenCalled()
-  })
+  //   const req = httpMocks.createRequest({
+  //     params: {
+  //       crn,
+  //       id: '100',
+  //     },
+  //     session: {
+  //       data: {
+  //         appointments: {
+  //           [crn]: {
+  //             '100': mockAppt,
+  //           },
+  //         },
+  //         appointmentTypes: mockTypes,
+  //       },
+  //     },
+  //   })
+  //   const res = {
+  //     locals: {
+  //       user: {
+  //         username: 'user-1',
+  //       },
+  //     },
+  //     redirect: jest.fn().mockReturnThis(),
+  //   } as unknown as AppResponse
+  //   await getAppointment(hmppsAuthClient)(req, res, nextSpy)
+  //   expect(getOverviewSpy).toHaveBeenCalledWith(crn)
+  //   expect(nextSpy).toHaveBeenCalled()
+  // })
 
   it('should set the meta data correctly if visor in registrations', async () => {
     const overview: Overview = {

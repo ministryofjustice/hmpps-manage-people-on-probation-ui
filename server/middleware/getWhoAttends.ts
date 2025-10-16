@@ -2,7 +2,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
-import { getDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 
 export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -103,6 +103,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     res.locals.userProviders = displayedProviders
     res.locals.userTeams = displayedTeams
     res.locals.userStaff = displayedUsers
+    res.locals.defaultUser = defaultUserDetails
     res.locals.providerCode = providerCode ?? ''
     res.locals.teamCode = teamCode ?? ''
     return next()
