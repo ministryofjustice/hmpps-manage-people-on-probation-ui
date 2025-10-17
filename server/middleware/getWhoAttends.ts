@@ -2,7 +2,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
-import { getDataValue } from '../utils'
+import { getDataValue, setDataValue } from '../utils'
 
 export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -34,13 +34,6 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     let displayedTeams: Team[]
     let displayedUsers: User[]
 
-    // On page load only username will be provided
-    // when drop down is changed in attendance.njk
-    // providerCode will be populated and potentially teamCode.
-    // When back link is selected from location page, treat this
-    // in the same instance as providerCode flow.
-    // On page load need to default the drop-down to
-    // user default values
     if (req.method === 'GET') {
       if (selectedRegion || back) {
         displayedProviders = providers.map(p => {
@@ -59,6 +52,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       } else {
         displayedProviders = providers.map(p => {
           if (p.name === defaultUserDetails.homeArea) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], p.code)
             return { code: p.code, name: p.name, selected: 'selected' }
           }
           return { code: p.code, name: p.name }
@@ -66,6 +60,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
         displayedTeams = teams.map(t => {
           if (t.description === defaultUserDetails.team) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], t.code)
             return { description: t.description, code: t.code, selected: 'selected' }
           }
           return { description: t.description, code: t.code }
@@ -73,6 +68,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
         displayedUsers = users.map(u => {
           if (u.username.toUpperCase() === defaultUserDetails.username) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'username'], u.username)
             return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
           }
           return { username: u.username, nameAndRole: u.nameAndRole }
@@ -103,6 +99,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     res.locals.userProviders = displayedProviders
     res.locals.userTeams = displayedTeams
     res.locals.userStaff = displayedUsers
+    res.locals.defaultUser = defaultUserDetails
     res.locals.providerCode = providerCode ?? ''
     res.locals.teamCode = teamCode ?? ''
     return next()

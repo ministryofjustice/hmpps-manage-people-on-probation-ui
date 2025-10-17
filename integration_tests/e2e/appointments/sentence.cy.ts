@@ -1,7 +1,6 @@
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
-import AttendancePage from '../../pages/appointments/attendance.page'
-import { crn, uuid, completeTypePage, checkPopHeader } from './imports'
+import { crn, uuid, checkPopHeader } from './imports'
 
 const loadPage = () => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)

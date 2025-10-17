@@ -158,6 +158,18 @@ describe('controllers/arrangeAppointment', () => {
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
       })
     })
+    describe('back query parameter is provided', () => {
+      const back = 'back'
+      const mockReqwithBack = createMockRequest({ query: { back } })
+      beforeEach(async () => {
+        mockedIsValidCrn.mockReturnValue(true)
+        mockedIsValidUUID.mockReturnValue(true)
+        await controllers.arrangeAppointments.redirectToSentence()(mockReqwithBack, res)
+      })
+      it('should redirect to the sentence page keeping the query parameter', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${back}`)
+      })
+    })
     describe('if CRN or UUID are invalid format in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(false)
@@ -211,7 +223,7 @@ describe('controllers/arrangeAppointment', () => {
           await controllers.arrangeAppointments.postSentence()(mockReq, res)
         })
         it('should redirect to the types page', () => {
-          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`) // ?number=1234
+          expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`) // ?number=1234
         })
       })
     })
@@ -221,7 +233,7 @@ describe('controllers/arrangeAppointment', () => {
         await controllers.arrangeAppointments.postSentence()(mockReq, res)
       })
       it('should redirect to the types page with no number query parameter in url', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type`)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`)
       })
     })
     describe('if CRN is invalid format in request params', () => {
@@ -258,20 +270,20 @@ describe('controllers/arrangeAppointment', () => {
       it('if crn and uuid are valid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.getType()(mockReq, res)
+        await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
       })
       it('if crn is invalid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(false)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.getType()(mockReq, res)
+        await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
       it('if uuid is invalid in request params', async () => {
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(false)
-        await controllers.arrangeAppointments.getType()(mockReq, res)
+        await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
       })
@@ -282,14 +294,15 @@ describe('controllers/arrangeAppointment', () => {
         const mockReq = createMockRequest({ appointmentSession })
         mockedIsValidCrn.mockReturnValue(true)
         mockedIsValidUUID.mockReturnValue(true)
-        await controllers.arrangeAppointments.getType()(mockReq, res)
+        await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
       })
       it('should render the type page', () => {
-        expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type`, {
+        expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type-attendance`, {
           crn,
           id: uuid,
           change: undefined,
           errors: undefined,
+          url: '',
         })
       })
     })
@@ -298,7 +311,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('postType', () => {
     it('should redirect to the next uncompleted page if change found in the request query', async () => {
       const mockReq = createMockRequest({ query: { change } })
-      await controllers.arrangeAppointments.postType()(mockReq, res)
+      await controllers.arrangeAppointments.postTypeAttendance()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(
         '/case/X000001/arrange-appointment/f1654ea3-0abb-46eb-860b-654a96edbe20/sentence?change=/path/to/change',
       )
@@ -306,7 +319,7 @@ describe('controllers/arrangeAppointment', () => {
     it('should return a 404 and render the error page if CRN or UUId is invalid in request params', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
-      await controllers.arrangeAppointments.postType()(req, res)
+      await controllers.arrangeAppointments.postTypeAttendance()(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -498,7 +511,7 @@ describe('controllers/arrangeAppointment', () => {
       }
       const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/type-attendance`)
     })
   })
 
@@ -942,7 +955,6 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
   })
-  //   describe('getCheckYourAnswers', () => {})
   describe('postCheckYourAnswers', () => {
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
       mockedIsValidCrn.mockReturnValue(false)

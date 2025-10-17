@@ -42,7 +42,7 @@ describe('utils/findUncompleted', () => {
       type: null,
     }
     expect(findUncompleted(session, crn, id, change)).toBe(
-      `/case/${crn}/arrange-appointment/${id}/type?change=${change}`,
+      `/case/${crn}/arrange-appointment/${id}/type-attendance?change=${change}`,
     )
   })
   it('returns attendance url if no user info (and previous conditions not met)', () => {

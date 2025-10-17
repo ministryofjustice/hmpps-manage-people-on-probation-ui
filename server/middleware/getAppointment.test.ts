@@ -93,6 +93,11 @@ describe('/middleware/getAppointment', () => {
         user: {
           username: 'user-1',
         },
+        defaultUser: {
+          homeArea: '',
+          team: '',
+          username: '',
+        },
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
