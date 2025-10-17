@@ -6,6 +6,7 @@ import TierApiClient from '../data/tierApiClient'
 import SentencePlanApiClient from '../data/sentencePlanApiClient'
 import { toPredictors, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
+import logger from '../../logger'
 
 export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -36,6 +37,7 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       if (sentencePlan.showLink && sentencePlans[0]?.lastUpdatedDate)
         sentencePlan.lastUpdatedDate = sentencePlans[0].lastUpdatedDate
     } catch (error) {
+      logger.error(error, 'Failed to connect to sentence plan service.')
       sentencePlan.showLink = false
     }
 

@@ -4,7 +4,6 @@ import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import {
-  getPersonalDetails,
   constructNextAppointmentSession,
   getAppointmentTypes,
   getSentences,
