@@ -34,13 +34,6 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     let displayedTeams: Team[]
     let displayedUsers: User[]
 
-    // On page load only username will be provided
-    // when drop down is changed in attendance.njk
-    // providerCode will be populated and potentially teamCode.
-    // When back link is selected from location page, treat this
-    // in the same instance as providerCode flow.
-    // On page load need to default the drop-down to
-    // user default values and default the session too
     if (req.method === 'GET') {
       if (selectedRegion || back) {
         displayedProviders = providers.map(p => {
