@@ -78,7 +78,7 @@ describe('Arrange an appointment', () => {
           typePage.getRadio('type', 2).click()
           typePage.getSubmitBtn().click()
         })
-        it('should redirect to the attendance page', () => {
+        it('should redirect to the location page', () => {
           locationPage = new AppointmentLocationPage()
           locationPage.checkOnPage()
         })
@@ -135,7 +135,7 @@ describe('Arrange an appointment', () => {
             typePage.getElement(`#appointments-${crn}-${uuid}-visorReport`).click()
             typePage.getSubmitBtn().click()
           })
-          it('should redirect to the attendance page', () => {
+          it('should redirect to the location page', () => {
             locationPage = new AppointmentLocationPage()
             locationPage.checkOnPage()
           })
@@ -170,6 +170,27 @@ describe('Arrange an appointment', () => {
         typePage.getSubmitBtn().click()
         cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
       })
+    })
+  })
+  describe('Changing the attendee', () => {
+    beforeEach(() => {
+      loadPage()
+      typePage = new AppointmentTypePage()
+      typePage.getElement('.govuk-link').click()
+    })
+    it('should render the attendee page', () => {
+      attendancePage = new AttendancePage()
+      attendancePage.checkOnPage()
+    })
+    it('backlink should return to type-attendee page', () => {
+      attendancePage = new AttendancePage()
+      attendancePage.getBackLink().click()
+      typePage.checkOnPage()
+    })
+    it('submitting should return to type-attendee page', () => {
+      attendancePage = new AttendancePage()
+      attendancePage.getSubmitBtn().click()
+      typePage.checkOnPage()
     })
   })
 })

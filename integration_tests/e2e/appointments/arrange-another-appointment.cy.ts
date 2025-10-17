@@ -1,6 +1,5 @@
 import { v4 } from 'uuid'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
-import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'

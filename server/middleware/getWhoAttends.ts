@@ -40,7 +40,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     // When back link is selected from location page, treat this
     // in the same instance as providerCode flow.
     // On page load need to default the drop-down to
-    // user default values
+    // user default values and default the session too
     if (req.method === 'GET') {
       if (selectedRegion || back) {
         displayedProviders = providers.map(p => {

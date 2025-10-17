@@ -1,9 +1,9 @@
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import { completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
-import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import Page from '../../pages/page'
+import AppointmentTypePage from '../../pages/appointments/type.page'
 
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
@@ -78,9 +78,9 @@ describe('Pick a location for this appointment', () => {
       locationPage = new AppointmentLocationPage()
       locationPage.getBackLink().click()
     })
-    it('should render the sentence page', () => {
-      const attendancePage = new AttendancePage()
-      attendancePage.checkOnPage()
+    it('should render the type-attendance page', () => {
+      const typePage = new AppointmentTypePage()
+      typePage.checkOnPage()
     })
   })
 
