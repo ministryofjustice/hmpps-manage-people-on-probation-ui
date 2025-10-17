@@ -7,7 +7,6 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { TimelineItem } from '../data/model/risk'
 import TierApiClient from '../data/tierApiClient'
 import { toTimeline, toRoshWidget } from '../utils'
-import SentencePlanApiClient from '../data/sentencePlanApiClient'
 
 const routes = [
   'getRisk',
@@ -34,31 +33,15 @@ const riskController: Controller<typeof routes, void> = {
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
-      const sentencePlanClient = new SentencePlanApiClient(token)
-      const [personRisk, risks, tierCalculation, predictors, needs, sanIndicatorResponse, userCaseload] =
-        await Promise.all([
-          masClient.getPersonRiskFlags(crn),
-          arnsClient.getRisks(crn),
-          tierClient.getCalculationDetails(crn),
-          arnsClient.getPredictorsAll(crn),
-          arnsClient.getNeeds(crn),
-          arnsClient.getSanIndicator(crn),
-          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-        ])
-      const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
-      let showSentencePlan: boolean
-      let planLastUpdated = ''
-      try {
-        const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
-        showSentencePlan =
-          res.locals.flags.enableSentencePlan &&
-          sentencePlans?.[0] !== undefined &&
-          res.locals?.user?.roles?.includes('SENTENCE_PLAN') &&
-          popInUsersCaseload
-        if (showSentencePlan && sentencePlans[0]?.lastUpdatedDate) planLastUpdated = sentencePlans[0].lastUpdatedDate
-      } catch (error) {
-        showSentencePlan = false
-      }
+      const [personRisk, risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
+        masClient.getPersonRiskFlags(crn),
+        arnsClient.getRisks(crn),
+        tierClient.getCalculationDetails(crn),
+        arnsClient.getPredictorsAll(crn),
+        arnsClient.getNeeds(crn),
+        arnsClient.getSanIndicator(crn),
+      ])
+
       let timeline: TimelineItem[] = []
       let predictorScores
       if (Array.isArray(predictors)) {
@@ -80,8 +63,6 @@ const riskController: Controller<typeof routes, void> = {
         needs,
         oasysLink,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
-        showSentencePlan,
-        planLastUpdated,
       })
     }
   },
