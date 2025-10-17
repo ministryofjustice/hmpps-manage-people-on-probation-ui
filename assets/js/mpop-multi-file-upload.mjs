@@ -254,7 +254,7 @@ class MpopMultiFileUpload extends ConfigurableComponent {
       if (xhr.status < 200 || xhr.status >= 300 || !('success' in xhr.response)) {
         return onError()
       }
-      $message.innerHTML = this.getSuccessHtml(xhr.response.success)
+      $message.innerHTML = this.getSuccessHtml(xhr.response.success, file.name)
       this.$status.textContent = xhr.response.success.messageText
       $actions.append(this.getDeleteButton(xhr.response.file))
       this.config.hooks.exitHook(this, file, xhr /*, xhr.responseText */)
@@ -263,7 +263,7 @@ class MpopMultiFileUpload extends ConfigurableComponent {
       const error = new Error(
         xhr.response && 'error' in xhr.response ? xhr.response.error.message : xhr.statusText || 'Upload failed',
       )
-      $message.innerHTML = this.getErrorHtml(error)
+      $message.innerHTML = this.getErrorHtml(error, file.name)
       this.$status.textContent = error.message
       this.config.hooks.errorHook(this, file, xhr, xhr.responseText, error)
     }
