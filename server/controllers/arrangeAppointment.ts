@@ -172,11 +172,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/location${query}`
       if (change) {
-        if (change.includes('type-attendance')) {
-          redirect = change
-        } else {
-          redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
-        }
+        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
       return res.redirect(redirect)
     }
