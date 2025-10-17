@@ -38,7 +38,7 @@
             {% set level = rawLevel | lower | toSentenceCase([], null, true, false) %}
             <tr class="govuk-table__row">
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}LevelValue">
-                <span class="govuk-!-font-weight-bold{% if rawLevel | upper != 'INFORMATION_ONLY' %} rosh--{{ rawLevel | lower }}{% endif %}">{{ level }}</span></td>
+                <span class="govuk-!-font-weight-bold{% if rawLevel | upper != 'INFORMATION_ONLY' %} rosh--{{ rawLevel | lower | replace(' ', '-') }}{% endif %}">{{ level }}</span></td>
               <td class="govuk-table__cell" data-qa="risk{{loop.index}}DescriptionValue">
                 <a href="/case/{{ crn }}/risk/flag/{{ flag.id }}">{{ flag.description }}</a>
               </td>
