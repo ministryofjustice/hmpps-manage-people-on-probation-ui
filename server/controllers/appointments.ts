@@ -20,6 +20,7 @@ import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
+import AddAppointmentNotePresenter from "./AddAppointmentNotePresenter";
 
 const routes = [
   'getAppointments',
@@ -35,6 +36,7 @@ const routes = [
   'getNextAppointment',
   'postNextAppointment',
   'getAppointmentNote',
+   'getAddAppointmentNote',
 ] as const
 
 const appointmentsController: Controller<typeof routes, void> = {
@@ -393,6 +395,23 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
+
+    getAddAppointmentNote: _hmppsAuthClient => {
+        return async (req, res) => {
+            const { crn } = req.params
+
+            const backlinkUri = req.session.originPage ?? `/case/${crn}/appointments`
+
+            const presenter = new AddAppointmentNotePresenter({
+                crn,
+                appointmentId: null,
+                backlinkUri: backlinkUri,
+            })
+
+            return res.render('pages/appointments/add-appointment-notes', { presenter })
+        }
+    },
+
 }
 
 export default appointmentsController

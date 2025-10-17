@@ -1,3 +1,4 @@
+{% from "govuk/components/button/macro.njk" import govukButton %}
 {% extends "../partials/case.njk" %}
 {% set pageTitle = makePageTitle({pageHeading: "Personal details"}) %}
 {% set currentNavSection = 'personal-details' %}
@@ -206,6 +207,15 @@
         classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
         html: contactDetails
     }) }}
+
+    <div class="govuk-!-margin-bottom-6">
+        <form action="/case/{{ crn }}/add-appointment-notes" method="get">
+            {{ govukButton({
+                text: "Add appointment notes",
+                classes: "govuk-button--primary"
+            }) }}
+        </form>
+    </div>
 
   {% set personalDetailsHtml %}
   {% set dateOfBirthAndAge %}

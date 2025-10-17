@@ -70,4 +70,11 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     '/case/:crn/appointments/appointment/:contactId/manage/note/:noteId',
     controllers.appointments.getAppointmentNote(hmppsAuthClient),
   )
+
+    router.get(
+        '/case/:crn/add-appointment-notes',
+        getPersonalDetails(hmppsAuthClient),
+        controllers.appointments.getAddAppointmentNote(hmppsAuthClient),
+    )
+
 }
