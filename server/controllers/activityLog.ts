@@ -85,18 +85,10 @@ const activityLogController: Controller<typeof routes, void> = {
       let { url } = req
       url = encodeURIComponent(url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [personAppointment, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getPersonAppointment(crn, id),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
+      const personAppointment = await masClient.getPersonAppointment(crn, id)
       const isActivityLog = true
       const queryParams = getQueryString(req.query as Record<string, string>)
-      const { category } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
         who: res.locals.user.username,
@@ -105,19 +97,14 @@ const activityLogController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
       res.render('pages/appointments/appointment', {
-        category,
         queryParams,
         back,
         personAppointment,
         crn,
+        id,
         url,
         isActivityLog,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
       })
     }
   },
