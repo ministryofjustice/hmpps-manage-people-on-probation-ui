@@ -1,4 +1,7 @@
 /* eslint-disable func-names,no-plusplus */
+
+const MOJFrontend = this
+
 MOJFrontend.BackendSortableTable = function (params) {
   this.table = $(params.table)
 
