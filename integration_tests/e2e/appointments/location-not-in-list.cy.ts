@@ -1,19 +1,11 @@
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
-import AppointmentTypePage from '../../pages/appointments/type.page'
-import {
-  checkPopHeader,
-  completeAttendancePage,
-  completeLocationPage,
-  completeSentencePage,
-  completeTypePage,
-} from './imports'
+import { checkPopHeader, completeLocationPage, completeSentencePage, completeTypePage } from './imports'
 
 const loadPage = (locations = true) => {
   completeSentencePage()
   completeTypePage()
-  completeAttendancePage()
   if (locations) {
     completeLocationPage(5)
   }

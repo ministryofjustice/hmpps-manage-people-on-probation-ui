@@ -68,6 +68,7 @@
   </div>
 
   {# ViSOR section (only if appointment.meta.isVisor is true) #}
+  {% if appointment.meta.isVisor %}
     {{ govukRadios({
     classes: "govuk-radios--inline",
     fieldset: {
@@ -97,5 +98,6 @@
     ]
   } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
     <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
+  {% endif %}
 {% endblock %}
 

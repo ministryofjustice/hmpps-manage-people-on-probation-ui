@@ -94,28 +94,6 @@ describe('Arrange another appointment', () => {
     })
   })
 
-  describe('User clicks submit without selecting an attendee', () => {
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let attendancePage: AttendancePage
-    let locationPage: AppointmentLocationPage
-    beforeEach(() => {
-      cy.task('stubAppointmentNoAttendee')
-      loadPage('X000001')
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.getSubmitBtn().click()
-      attendancePage = new AttendancePage()
-    })
-    it('should redirect to the attendance page', () => {
-      attendancePage.checkOnPage()
-    })
-    it('should redirect to the next uncompleted page when question is submitted', () => {
-      attendancePage.checkOnPage()
-      attendancePage.getSubmitBtn().click()
-      locationPage = new AppointmentLocationPage()
-      locationPage.checkOnPage()
-    })
-  })
-
   describe('User clicks submit without selecting a location', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     let locationPage: AppointmentLocationPage

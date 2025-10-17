@@ -1,6 +1,6 @@
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
-import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
+import { completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import Page from '../../pages/page'
@@ -8,7 +8,6 @@ import Page from '../../pages/page'
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
   completeTypePage(typeOptionIndex)
-  completeAttendancePage()
 }
 
 describe('Pick a location for this appointment', () => {

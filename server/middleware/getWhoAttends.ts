@@ -59,6 +59,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       } else {
         displayedProviders = providers.map(p => {
           if (p.name === defaultUserDetails.homeArea) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], p.code)
             return { code: p.code, name: p.name, selected: 'selected' }
           }
           return { code: p.code, name: p.name }
@@ -66,6 +67,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
         displayedTeams = teams.map(t => {
           if (t.description === defaultUserDetails.team) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], t.code)
             return { description: t.description, code: t.code, selected: 'selected' }
           }
           return { description: t.description, code: t.code }
@@ -73,6 +75,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
         displayedUsers = users.map(u => {
           if (u.username.toUpperCase() === defaultUserDetails.username) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'username'], u.username)
             return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
           }
           return { username: u.username, nameAndRole: u.nameAndRole }
