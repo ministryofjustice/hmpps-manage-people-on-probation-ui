@@ -5,7 +5,7 @@
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 
 {% set currentNavSection = 'risk' %}
-{% set currentSectionName = 'Risk' if not showSentencePlan else 
+{% set currentSectionName = 'Risk' if not sentencePlan.showLink else 
     'Risk and plan' %}
 {% set riskPage = true %}
 {% set pageTitle = makePageTitle({pageHeading: currentSectionName}) %}
@@ -21,7 +21,7 @@
     {% set lastUpdatedDate = 'Last updated: ' + risks.assessedOn | dateWithYear %}
 {% endif %}
 
-{% if showSentencePlan %}
+{% if sentencePlan.showLink %}
     {% set scoresHeadingLevel = '4' %}
     {% set scoresSubHeadingLevel = '5' %}
 
@@ -93,7 +93,7 @@
 
 {% block pageContent %}
     <div class="govuk-grid-row govuk-!-margin-top-4">
-        {% if not sanIndicator %}
+        {% if not sanIndicator or not flags.enableSanIndicator %}
             {% include "./risk/_risk-page.njk" %}
         {% else %}
             {% include "./risk/_risk-page-san-indicator.njk" %}

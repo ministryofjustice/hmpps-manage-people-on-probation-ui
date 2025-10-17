@@ -9,6 +9,24 @@ import mockRiskData from '../../wiremock/mappings/X000001-risk.json'
 import { RiskFlag } from '../../server/data/model/risk'
 import { dateWithYear, toSentenceCase } from '../../server/utils'
 import { checkPopHeader } from './appointments/imports'
+import OverviewPage from '../pages/overview'
+import AppointmentsPage from '../pages/appointments'
+import PersonalDetailsPage from '../pages/personalDetails'
+import DocumentsPage from '../pages/documents'
+import SentencePage from '../pages/sentence'
+import ActivityLogPage from '../pages/activityLog'
+import CompliancePage from '../pages/compliance'
+import InterventionsPage from '../pages/interventions'
+
+type NavPage =
+  | typeof OverviewPage
+  | typeof AppointmentsPage
+  | typeof PersonalDetailsPage
+  | typeof DocumentsPage
+  | typeof SentencePage
+  | typeof ActivityLogPage
+  | typeof CompliancePage
+  | typeof InterventionsPage
 
 const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
@@ -137,9 +155,10 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
   }
   if (sentencePlan) {
     page.checkPageTitle('Risk and plan')
+    page.getElementData('riskNavLink').should('contain.text', 'Risk and plan')
     cy.get('[data-qa="pageSubHeading"]').should('contain.text', 'Risk')
     page.getElementData('plan').should('exist')
-    page.getElementData('plan').get('h4').should('contain.text', 'Plan')
+    page.getElementData('plan').get('h3').should('contain.text', 'Plan')
     page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 29 September 2025')
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
 
@@ -153,6 +172,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
     page.checkPageTitle('Risk')
     cy.get('[data-qa="pageSubHeading"]').should('not.exist')
     page.getElementData('plan').should('not.exist')
+    page.getElementData('riskNavLink').should('contain.text', 'Risk')
   }
 }
 
@@ -189,6 +209,16 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator)
   })
 
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and san indicator feature flag is disabled', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubNoSanIndicator')
+    cy.task('stubUserCaseloadSearch')
+    cy.task('stubAuthSentencePlan')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView(page)
+  })
+
   it('Risk overview page is rendered when has no sentence plan, pop in users caseload and san indicator is true', () => {
     cy.task('stubSentencePlan404')
     cy.task('stubUserCaseloadSearch')
@@ -212,7 +242,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and feature flag is not enabled', () => {
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
@@ -224,6 +254,37 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
+  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
+    cy.task('stubNoSentencePlanAndSanIndicator')
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubUserCaseloadSearch')
+    cy.task('stubAuthSentencePlan')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = false
+    const sentencePlan = false
+    checkRiskPageView(page, sanIndicator, sentencePlan)
+  })
+
+  it('Should persist Risk and plan nav link for all case pages', () => {
+    const mappings: [string, NavPage][] = [
+      ['/case/X000001', OverviewPage],
+      ['/case/X000001/appointments', AppointmentsPage],
+      ['case/X000001/personal-details', PersonalDetailsPage],
+      ['/case/X000001/documents', DocumentsPage],
+      ['/case/X000001/sentence', SentencePage],
+      ['/case/X000001/activity-log', ActivityLogPage],
+      ['/case/X000001/compliance', CompliancePage],
+      ['/case/X000001/interventions', InterventionsPage],
+    ]
+    for (const [url, Class] of mappings) {
+      cy.task('stubUserCaseloadSearch')
+      cy.task('stubAuthSentencePlan')
+      cy.visit(url)
+      const page = new Class()
+      page.getElementData('riskNavLink').should('contain.text', 'Risk and plan')
+    }
+  })
   it('Removed risk page is rendered', () => {
     cy.visit('/case/X000001/risk/removed-risk-flags')
     const page = Page.verifyOnPage(RemovedRiskPage)
