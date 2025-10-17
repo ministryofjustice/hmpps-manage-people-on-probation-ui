@@ -80,27 +80,44 @@ const activityLogController: Controller<typeof routes, void> = {
   },
   getActivity: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const personAppointment = await masClient.getPersonalContact(crn, contactId)
-      console.log(personAppointment)
-      const queryParams = getQueryString(req.query as Record<string, string>)
+      const { crn, id } = req.params
       const { back } = req.query
+      let { url } = req
+      url = encodeURIComponent(url)
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const arnsClient = new ArnsApiClient(token)
+      const masClient = new MasApiClient(token)
+      const tierClient = new TierApiClient(token)
+      const [personAppointment, tierCalculation, risks, predictors] = await Promise.all([
+        masClient.getPersonAppointment(crn, id),
+        tierClient.getCalculationDetails(crn),
+        arnsClient.getRisks(crn),
+        arnsClient.getPredictorsAll(crn),
+      ])
+      const isActivityLog = true
+      const queryParams = getQueryString(req.query as Record<string, string>)
+      const { category } = req.query
       await auditService.sendAuditMessage({
-        action: 'VIEW_MAS_APPOINTMENT_NOTE',
+        action: 'VIEW_MAS_ACTIVITY_LOG_DETAIL',
         who: res.locals.user.username,
         subjectId: crn,
         subjectType: 'CRN',
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const risksWidget = toRoshWidget(risks)
+      const predictorScores = toPredictors(predictors)
       res.render('pages/appointments/appointment', {
+        category,
         queryParams,
         back,
         personAppointment,
         crn,
-        contactId,
+        url,
+        isActivityLog,
+        tierCalculation,
+        risksWidget,
+        predictorScores,
       })
     }
   },
