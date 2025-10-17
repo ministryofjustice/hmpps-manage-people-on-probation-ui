@@ -35,7 +35,8 @@
             {% if currentNavSection == 'risk' %}
             aria-current="page"
             {% endif %}
-            href="/case/{{ crn }}/risk">Risk</a>
+            href="/case/{{ crn }}/risk" data-qa="riskNavLink">Risk{% if sentencePlan.showLink %} and plan{% endif %}
+          </a>
         </li>
         <li class="moj-sub-navigation__item" data-qa="sentenceTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
