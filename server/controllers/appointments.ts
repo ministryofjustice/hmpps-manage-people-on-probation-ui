@@ -245,8 +245,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { data } = req.session
-      setDataValue(data, ['appointments', crn], {})
-      setDataValue(data, ['appointments', crn, id], {})
       setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true)
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
     }
