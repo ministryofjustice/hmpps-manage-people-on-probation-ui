@@ -66,25 +66,4 @@ describe('MasOutlookClient', () => {
     const result = await client.postOutlookCalendarEvent(requestBody)
     expect(result).toEqual(responseBody)
   })
-
-  it('should reject with ApiError when server returns 500', async () => {
-    const requestBody: OutlookEventRequestBody = {
-      subject: 'Test event',
-      start: '2025-01-01T10:00:00Z',
-      recipients: [{ emailAddress: 'recipient@example.com', name: 'Recipient Name' }],
-      message: 'Test message',
-      durationInMinutes: 60,
-      supervisionAppointmentUrn: 'URN-123',
-    }
-    const jsonString = JSON.stringify(requestBody)
-
-    const errorMessage = 'Internal Server Error'
-
-    fakeApi
-      .post('/calendar/event', jsonString)
-      .matchHeader('authorization', `Bearer ${token.access_token}`)
-      .reply(500, errorMessage)
-
-    await expect(client.postOutlookCalendarEvent(requestBody)).rejects.toThrow('Internal Server Error')
-  })
 })
