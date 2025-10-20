@@ -1,14 +1,13 @@
-export const setDataValue = (data: any, sections: any, value: any) => {
-  const path = Array.isArray(sections) ? sections.map(String) : [String(sections)]
-
-  let target = data
+export const setDataValue = <T extends Record<string, any>>(data: T, sections: string | string[], value: any): T => {
+  const path = Array.isArray(sections) ? sections : [sections]
+  let target: Record<string, any> = data
   for (let i = 0; i < path.length - 1; i += 1) {
     const key = path[i]
-    if (typeof target?.[key] !== 'object' || target?.[key] === null || Array.isArray(target?.[key])) {
+    if (!target?.[key] || typeof target[key] !== 'object') {
       target[key] = {}
     }
     target = target[key]
   }
-  target[path[path.length - 1]] = value
+  target[path.at(-1)] = value
   return data
 }
