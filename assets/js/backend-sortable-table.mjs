@@ -1,3 +1,6 @@
+/* eslint-disable no-nested-ternary */
+/* eslint-disable import/prefer-default-export */
+/* eslint-disable no-constructor-return */
 /* eslint-disable no-param-reassign */
 /* eslint-disable class-methods-use-this */
 import { ConfigurableComponent } from 'govuk-frontend'
