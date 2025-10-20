@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas-outlook/calendar/event",
+        "urlPathPattern": "/sva/calendar/event",
         "method": "POST"
       },
       "response": {

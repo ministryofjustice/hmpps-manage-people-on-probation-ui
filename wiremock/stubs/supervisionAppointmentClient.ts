@@ -3,7 +3,7 @@ import superagent, { SuperAgentRequest } from 'superagent'
 const stubPostMasOutlookEvent = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPattern: '/mas-outlook/calendar/event',
+      urlPattern: '/sva/calendar/event',
       method: 'POST',
     },
     response: {
@@ -22,8 +22,9 @@ const stubPostMasOutlookEvent = (): SuperAgentRequest =>
   })
 const stubSchuleOutlookEvent500Response = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
+    priority: 1,
     request: {
-      urlPathPattern: '/mas-outlook/calendar/event',
+      urlPathPattern: '/sva/calendar/event',
       method: 'POST',
     },
     response: {
@@ -34,4 +35,20 @@ const stubSchuleOutlookEvent500Response = (): SuperAgentRequest =>
       },
     },
   })
-export default { stubPostMasOutlookEvent, stubSchuleOutlookEvent500Response }
+
+const stubUserDetails404Response = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    priority: 1,
+    request: {
+      urlPathPattern: '/mas/user/[^/]+',
+      method: 'GET',
+    },
+    response: {
+      status: 404,
+      jsonBody: { message: 'User not found' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+export default { stubPostMasOutlookEvent, stubSchuleOutlookEvent500Response, stubUserDetails404Response }

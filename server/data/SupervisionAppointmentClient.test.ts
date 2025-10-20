@@ -3,7 +3,7 @@ import nock from 'nock'
 
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
-import MasOutlookClient from './masOutlookClient'
+import SupervisionAppointmentClient from './SupervisionAppointmentClient'
 import { OutlookEventRequestBody, OutlookEventResponse } from './model/OutlookEvent'
 
 jest.mock('../utils', () => {
@@ -23,14 +23,14 @@ const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('MasOutlookClient', () => {
   let fakeApi: nock.Scope
-  let client: MasOutlookClient
+  let client: SupervisionAppointmentClient
 
   beforeEach(() => {
     jest.clearAllMocks()
     mockedIsValidHost.mockReturnValue(true)
     mockedIsValidPath.mockReturnValue(true)
     fakeApi = nock(config.apis.masAppointmentsApi.url)
-    client = new MasOutlookClient(token.access_token)
+    client = new SupervisionAppointmentClient(token.access_token)
   })
 
   afterEach(() => {
@@ -65,5 +65,29 @@ describe('MasOutlookClient', () => {
 
     const result = await client.postOutlookCalendarEvent(requestBody)
     expect(result).toEqual(responseBody)
+  })
+
+  it('should handle 500 by returning an error response with message', async () => {
+    const requestBody: OutlookEventRequestBody = {
+      subject: 'Test event',
+      start: '2025-01-01T10:00:00Z',
+      recipients: [{ emailAddress: 'recipient@example.com', name: 'Recipient Name' }],
+      message: 'Test message',
+      durationInMinutes: 60,
+      supervisionAppointmentUrn: 'URN-123',
+    }
+    const jsonString = JSON.stringify(requestBody)
+
+    const errorMessage = 'Internal Server Error'
+
+    fakeApi
+      .post('/calendar/event', jsonString)
+      .matchHeader('authorization', `Bearer ${token.access_token}`)
+      .reply(500, errorMessage)
+
+    const result: any = await client.postOutlookCalendarEvent(requestBody)
+    expect(result.status).toBe(500)
+    expect(result.errors?.[0]?.text).toBe('Calendar event creation not successful')
+    expect(result.text).toContain('Internal Server Error')
   })
 })

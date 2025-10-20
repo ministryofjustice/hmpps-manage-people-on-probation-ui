@@ -6,7 +6,7 @@ import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '..
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import { AppointmentRequestBody, AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
-import MasOutlookClient from '../data/masOutlookClient'
+import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
@@ -17,7 +17,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const { crn, id: uuid } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
-    const masOutlookClient = new MasOutlookClient(token)
+    const masOutlookClient = new SupervisionAppointmentClient(token)
 
     const { data } = req.session
     const {

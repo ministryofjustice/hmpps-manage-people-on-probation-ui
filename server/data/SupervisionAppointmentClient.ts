@@ -3,7 +3,7 @@ import RestClient from './restClient'
 
 import { OutlookEventRequestBody, OutlookEventResponse } from './model/OutlookEvent'
 
-export default class MasOutlookClient extends RestClient {
+export default class SupervisionAppointmentClient extends RestClient {
   constructor(token: string) {
     super('HMPPS Probation Supervision Appointments API', config.apis.masAppointmentsApi, token)
   }

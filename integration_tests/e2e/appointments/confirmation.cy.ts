@@ -107,4 +107,98 @@ describe('Confirmation page', () => {
     const appointmentsPage = new YourCasesPage()
     appointmentsPage.checkOnPage()
   })
+
+  describe('Should render the page with error message, when SVA client API call fails', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+      cy.task('stubSchuleOutlookEvent500Response')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+    })
+    it('should render the page with error message', () => {
+      checkPopHeader('Alton Berge', true)
+      confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
+      confirmPage
+        .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
+        })
+      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
+      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
+      confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `You need to send Alton the appointment details. Their phone number is 071838893.`,
+          )
+        })
+
+      cy.get('[data-qa="outlook-err-msg-1"]').should(
+        'contain',
+        'There is a technical problem with Outlook and we could not send you a calendar invitation.',
+      )
+      cy.get('[data-qa="outlook-err-msg-2"]').should(
+        'contain',
+        'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
+      )
+
+      confirmPage.getSubmitBtn().click()
+      const nextAppointmentPage = new OverviewPage()
+      nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
+      nextAppointmentPage.checkOnPage()
+    })
+  })
+
+  describe('User details error', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+      cy.task('stubUserDetails404Response')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+    })
+    it('should render the page with error message when no user details found from MAS API', () => {
+      checkPopHeader('Alton Berge', true)
+      confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
+      confirmPage
+        .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
+        })
+      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
+      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
+      confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `You need to send Alton the appointment details. Their phone number is 071838893.`,
+          )
+        })
+
+      cy.get('[data-qa="outlook-err-msg-1"]').should(
+        'contain',
+        'There is a technical problem with Outlook and we could not send you a calendar invitation.',
+      )
+      cy.get('[data-qa="outlook-err-msg-2"]').should(
+        'contain',
+        'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
+      )
+
+      confirmPage.getSubmitBtn().click()
+      const nextAppointmentPage = new OverviewPage()
+      nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
+      nextAppointmentPage.checkOnPage()
+    })
+  })
 })

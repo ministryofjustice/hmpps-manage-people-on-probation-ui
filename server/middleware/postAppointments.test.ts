@@ -8,14 +8,14 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
 import { AppointmentSession } from '../models/Appointments'
-import MasOutlookClient from '../data/masOutlookClient'
+import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import config from '../config'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/masOutlookClient')
+jest.mock('../data/SupervisionAppointmentClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -161,15 +161,17 @@ describe('/middleware/postAppointments', () => {
     }),
   )
 
-  const spymasOutlookEvent = jest.spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent').mockImplementation(() =>
-    Promise.resolve({
-      id: 'id',
-      subject: 'sub',
-      startDate: 'date',
-      endDate: 'date',
-      attendees: ['attendee1', 'attendee2'],
-    }),
-  )
+  const spymasOutlookEvent = jest
+    .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+    .mockImplementation(() =>
+      Promise.resolve({
+        id: 'id',
+        subject: 'sub',
+        startDate: 'date',
+        endDate: 'date',
+        attendees: ['attendee1', 'attendee2'],
+      }),
+    )
 
   it('should post the correct request body', async () => {
     const expectedBody = {
@@ -237,7 +239,7 @@ describe('/middleware/postAppointments', () => {
       .mockResolvedValue({ appointments: [{ id: 123, externalReference: 'urn-1' }] })
 
     const outlookSpy = jest
-      .spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent')
+      .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
       .mockResolvedValue({ id: 'evt-1', subject: 's', startDate: 'd1', endDate: 'd2', attendees: [] })
 
     await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
@@ -284,7 +286,7 @@ describe('/middleware/postAppointments', () => {
       roles: [],
     } as any)
 
-    jest.spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent').mockResolvedValue({
+    jest.spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent').mockResolvedValue({
       id: '',
       subject: 's',
       startDate: 'd1',
@@ -313,7 +315,7 @@ describe('/middleware/postAppointments', () => {
 
     // Ensure outlook call succeeds
     const outlookSpy = jest
-      .spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent')
+      .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
       .mockResolvedValue({ id: 'evt-555', subject: 's', startDate: 'd1', endDate: 'd2', attendees: [] })
 
     await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
