@@ -8,10 +8,14 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
 import { AppointmentSession } from '../models/Appointments'
+import MasOutlookClient from '../data/masOutlookClient'
+import config from '../config'
+import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 jest.mock('../data/masApiClient')
+jest.mock('../data/masOutlookClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -126,6 +130,9 @@ const req = createMockReq(mockAppointment)
 const nextSpy = jest.fn()
 
 describe('/middleware/postAppointments', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   const {
     user: { locationCode, teamCode },
     date,
@@ -140,7 +147,29 @@ describe('/middleware/postAppointments', () => {
 
   const spy = jest
     .spyOn(MasApiClient.prototype, 'postAppointments')
-    .mockImplementation(() => Promise.resolve({ appointments: [{ id: 0 }] }))
+    .mockImplementation(() => Promise.resolve({ appointments: [{ id: 0, externalReference: 'apt-ref-1' }] }))
+
+  const spyUserEmail = jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockImplementation(() =>
+    Promise.resolve({
+      userId: 1,
+      username: 'user.name',
+      firstName: 'John',
+      surname: 'Doe',
+      email: 'jdoe@example.com',
+      enabled: true,
+      roles: ['role1', 'role2'],
+    }),
+  )
+
+  const spymasOutlookEvent = jest.spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent').mockImplementation(() =>
+    Promise.resolve({
+      id: 'id',
+      subject: 'sub',
+      startDate: 'date',
+      endDate: 'date',
+      attendees: ['attendee1', 'attendee2'],
+    }),
+  )
 
   it('should post the correct request body', async () => {
     const expectedBody = {
@@ -197,5 +226,120 @@ describe('/middleware/postAppointments', () => {
     }
     await postAppointments(hmppsAuthClient)(mockReq, res, nextSpy)
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
+  })
+
+  it('should create Outlook event when user has email and not set isOutLookEventFailed', async () => {
+    const localReq = createMockReq(mockAppointment)
+
+    // getUserDetails returns email (already mocked above)
+    const postSpy = jest
+      .spyOn(MasApiClient.prototype, 'postAppointments')
+      .mockResolvedValue({ appointments: [{ id: 123, externalReference: 'urn-1' }] })
+
+    const outlookSpy = jest
+      .spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent')
+      .mockResolvedValue({ id: 'evt-1', subject: 's', startDate: 'd1', endDate: 'd2', attendees: [] })
+
+    await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
+
+    expect(postSpy).toHaveBeenCalled()
+    expect(outlookSpy).toHaveBeenCalled()
+    expect(localReq.session.data.isOutLookEventFailed).toBeUndefined()
+  })
+
+  it('should set isOutLookEventFailed when no user email', async () => {
+    const localReq = createMockReq(mockAppointment)
+
+    jest
+      .spyOn(MasApiClient.prototype, 'postAppointments')
+      .mockResolvedValue({ appointments: [{ id: 321, externalReference: 'urn-2' }] })
+    jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValue({
+      userId: 1,
+      username: 'user.name',
+      firstName: 'John',
+      surname: 'Platt',
+      email: undefined,
+      enabled: true,
+      roles: [],
+    } as any)
+
+    await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
+
+    expect(localReq.session.data.isOutLookEventFailed).toBe(true)
+  })
+
+  it('should set isOutLookEventFailed when Outlook response has no id', async () => {
+    const localReq = createMockReq(mockAppointment)
+
+    jest
+      .spyOn(MasApiClient.prototype, 'postAppointments')
+      .mockResolvedValue({ appointments: [{ id: 222, externalReference: 'urn-3' }] })
+    jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValue({
+      userId: 1,
+      username: 'user.name',
+      firstName: 'John',
+      surname: 'Platt',
+      email: 'jplatt@example.com',
+      enabled: true,
+      roles: [],
+    } as any)
+
+    jest.spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent').mockResolvedValue({
+      id: '',
+      subject: 's',
+      startDate: 'd1',
+      endDate: 'd2',
+      attendees: [],
+    })
+
+    await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
+
+    expect(localReq.session.data.isOutLookEventFailed).toBe(true)
+  })
+
+  it('should build the correct Outlook event request body on success', async () => {
+    const localReq = createMockReq(mockAppointment)
+    // Provide name for subject building
+    localReq.session.data.personalDetails = {
+      [crn]: { name: { forename: 'John', middleName: '', surname: 'Doe' } },
+    } as any
+
+    const appointmentId = 555
+    const externalReference = 'apt-ref-555'
+
+    jest
+      .spyOn(MasApiClient.prototype, 'postAppointments')
+      .mockResolvedValue({ appointments: [{ id: appointmentId, externalReference }] })
+
+    // Ensure outlook call succeeds
+    const outlookSpy = jest
+      .spyOn(MasOutlookClient.prototype, 'postOutlookCalendarEvent')
+      .mockResolvedValue({ id: 'evt-555', subject: 's', startDate: 'd1', endDate: 'd2', attendees: [] })
+
+    await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
+
+    const arg = outlookSpy.mock.calls[0][0]
+
+    const expectedMessage = `<a href=${config.domain}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank'> View the appointment on Manage people on probation (opens in new tab).</a>`
+    const expectedSubject = 'Planned office visit (NS) with John Doe'
+    const expectedStart = dateTime(mockAppointment.date, mockAppointment.start).toISOString()
+    const expectedDuration = getDurationInMinutes(
+      dateTime(mockAppointment.date, mockAppointment.start),
+      dateTime(mockAppointment.date, mockAppointment.end),
+    )
+
+    expect(arg).toEqual({
+      recipients: [
+        {
+          emailAddress: 'jplatt@example.com',
+          name: 'John Platt',
+        },
+      ],
+      message: expectedMessage,
+      subject: expectedSubject,
+      start: expectedStart,
+      durationInMinutes: expectedDuration,
+      supervisionAppointmentUrn: externalReference,
+    })
   })
 })

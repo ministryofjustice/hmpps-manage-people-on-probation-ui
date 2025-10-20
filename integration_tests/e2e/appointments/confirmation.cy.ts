@@ -20,6 +20,8 @@ import {
   completeNextAppointmentPage,
   completeArrangeAnotherPage,
 } from './imports'
+import OverviewPage from '../../pages/overview'
+import YourCasesPage from '../../pages/myCases'
 
 const regex: RegExp = /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2})\sto\s(\d{1,2}:\d{2})$/
 
@@ -60,7 +62,9 @@ describe('Confirmation page', () => {
       .invoke('text')
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`You need to send Alton the appointment details.`)
+        expect(normalizedText).to.include(
+          `You need to send Alton the appointment details. Their phone number is 071838893.`,
+        )
       })
     confirmPage
       .getWhatHappensNext()
@@ -68,13 +72,19 @@ describe('Confirmation page', () => {
       .invoke('text')
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`Alton’s phone number is 071838893`)
+        expect(normalizedText).to.include(`The appointment has been added to:`)
       })
+    cy.get('[data-qa="outlook-msg"] li').eq(0).should('contain', 'your calendar')
+    cy.get('[data-qa="outlook-msg"] li')
+      .eq(1)
+      .should('contain', 'the NDelius contact log and officer diary, along with any supporting information')
+    cy.get('[data-qa="outlook-err-msg-1"]').should('not.exist')
+    cy.get('[data-qa="outlook-err-msg-2"]').should('not.exist')
 
-    confirmPage.getSubmitBtn().should('contain.text', 'Arrange next appointment')
+    confirmPage.getSubmitBtn().should('contain.text', "Return to Alton's overview")
     confirmPage.getSubmitBtn().click()
-    const nextAppointmentPage = new NextAppointmentPage()
-    nextAppointmentPage.checkPageTitle('Do you want to arrange the next appointment with Eula')
+    const nextAppointmentPage = new OverviewPage()
+    nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
     nextAppointmentPage.checkOnPage()
   })
 
@@ -91,10 +101,10 @@ describe('Confirmation page', () => {
     confirmPage.getPopContactNumber().should('not.exist')
   })
 
-  it('should link to the appointment page when practitioner click finish and no return-dest', () => {
+  it('should link to the appointment page when practitioner click Return to all cases', () => {
     loadPage()
-    cy.get('[data-qa="finishLink"]').click()
-    const appointmentsPage = new AppointmentsPage()
+    cy.get('[data-qa="returnToAllCases"]').click()
+    const appointmentsPage = new YourCasesPage()
     appointmentsPage.checkOnPage()
   })
 })

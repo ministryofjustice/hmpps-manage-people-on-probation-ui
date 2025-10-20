@@ -306,13 +306,5 @@ describe('Create next appointment', () => {
       sentencePage = new AppointmentSentencePage()
       sentencePage.checkOnPage()
     })
-    it('should post next appointment and redirect to confirmation, then goto appointments page when finish is clicked', () => {
-      completeAppointment()
-      confirmPage = new AppointmentConfirmationPage()
-      confirmPage.checkOnPage()
-      cy.get('[data-qa="finishLink"]').click()
-      appointmentsPage = new AppointmentsPage()
-      appointmentsPage.checkOnPage()
-    })
   })
 })

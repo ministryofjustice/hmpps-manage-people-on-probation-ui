@@ -1,21 +1,24 @@
 /* eslint-disable import/no-extraneous-dependencies */
 import { Response } from 'supertest'
+import moment from 'moment'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes } from '../utils'
+import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
-import {
-  AppointmentPostResponse,
-  AppointmentRequestBody,
-  AppointmentSession,
-  AppointmentsPostResponse,
-} from '../models/Appointments'
+import { AppointmentRequestBody, AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
+import MasOutlookClient from '../data/masOutlookClient'
+import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
+import config from '../config'
+import { Name } from '../data/model/personalDetails'
+import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
     const { crn, id: uuid } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
+    const masOutlookClient = new MasOutlookClient(token)
+
     const { data } = req.session
     const {
       user: { username, locationCode, teamCode },
@@ -64,7 +67,35 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
+
     const response = await masClient.postAppointments(crn, body)
+    const userDetails = await masClient.getUserDetails(username)
+    let outlookEventResponse: OutlookEventResponse
+    if (userDetails?.email) {
+      const appointmentId = response.appointments[0].id
+      const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
+      const subject: string = `Planned office visit (NS) with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const outlookEventRequestBody: OutlookEventRequestBody = {
+        recipients: [
+          {
+            emailAddress: userDetails.email,
+            name: `${userDetails.firstName} ${userDetails.surname}`,
+          },
+        ],
+        message,
+        subject,
+        start: dateTime(date, start).toISOString(),
+        durationInMinutes: getDurationInMinutes(body.start, body.end),
+        supervisionAppointmentUrn: response.appointments[0].externalReference,
+      }
+      outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
+    }
+
+    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
+
     return response
   }
 }
+
+const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string) =>
+  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank'> View the appointment on Manage people on probation (opens in new tab).</a>`

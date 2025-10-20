@@ -1,0 +1,25 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/user/[^/]+",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "userId": 1,
+          "username": "user.name",
+          "firstName": "John",
+          "surname": "Doe",
+          "email": "jdoe@example.com",
+          "enabled": true,
+          "roles": ["role1", "role2"]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
