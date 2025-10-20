@@ -28,6 +28,10 @@
 <h3 class="govuk-heading-l" data-qa="pageHeading">Appointment date, time and location</h3>
 {% endblock %}
 
+{% block heading %}
+<h3 class="govuk-heading-l">Appointment date, time and location</h3>
+{% endblock %}
+
 {% for disability in case.disabilities.disabilities %}
   {% set disabilities = (disabilities.push(disability), disabilities) %}
 {% endfor %}
