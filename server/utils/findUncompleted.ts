@@ -5,8 +5,8 @@ export const findUncompleted = (appointment: AppointmentSession, crn: string, id
     [appointment?.eventId, 'sentence'],
     [appointment?.type, 'type'],
     [appointment?.user?.username, 'attendance'],
-    [appointment?.user?.locationCode, 'location'],
-    [appointment?.date, 'date-time'],
+    [appointment?.user?.locationCode, 'location-date-time'],
+    [appointment?.date, 'location-date-time'],
     [appointment?.sensitivity, 'supporting-information'],
   ]
   for (const [value, redirect] of mapping) {

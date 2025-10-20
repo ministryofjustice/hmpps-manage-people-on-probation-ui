@@ -130,7 +130,7 @@
      } if showAction },
      { key: { text: "Location" }, 
      value: { html: locationValue + ('<span class="govuk-summary-list__hint">' + locationHint + '</span>' if locationHint )  },
-     actions: { items: [ { href: changePath + "/location?change=" + url, 
+     actions: { items: [ { href: changePath + "/location-date-time?change=" + url, 
      text: "Choose location" if not locationHtml else  "Change",
       visuallyHiddenText: "location"
       }
@@ -138,7 +138,7 @@
       } if showAction  and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) and appointment.type and appointment.attending.name },
       { key: { text: "Date and time" },
       value: { html: 'Not entered' if appointmentDates.length == 0 else appointmentDatesHtml }, 
-      actions: { items: [ { href: changePath + "/date-time?change=" + url,
+      actions: { items: [ { href: changePath + "/location-date-time?change=" + url,
       text: "Choose date and time" if appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
          { 

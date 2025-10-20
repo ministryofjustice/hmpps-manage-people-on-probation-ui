@@ -68,38 +68,23 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     controllers.arrangeAppointments.postWhoWillAttend(),
   )
 
+  router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
   router.get(
-    '/case/:crn/arrange-appointment/:id/location',
+    '/case/:crn/arrange-appointment/:id/location-date-time',
     redirectWizard(['eventId', 'type']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    controllers.arrangeAppointments.getLocation(),
+    controllers.arrangeAppointments.getLocationDateTime(),
   )
-
   router.post(
-    '/case/:crn/arrange-appointment/:id/location',
+    '/case/:crn/arrange-appointment/:id/location-date-time',
     validate.appointments,
-    controllers.arrangeAppointments.postLocation(),
+    controllers.arrangeAppointments.postLocationDateTime(),
   )
 
   router.get(
     '/case/:crn/arrange-appointment/:id/location-not-in-list',
     redirectWizard(['eventId', 'type']),
     controllers.arrangeAppointments.getLocationNotInList(),
-  )
-
-  router.all('/case/:crn/arrange-appointment/:id/date-time', getTimeOptions)
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/date-time',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
-    controllers.arrangeAppointments.getDateTime(),
-  )
-
-  router.post(
-    '/case/:crn/arrange-appointment/:id/date-time',
-    validate.appointments,
-    checkAppointments(hmppsAuthClient),
-    controllers.arrangeAppointments.postDateTime(),
   )
 
   router.get(
