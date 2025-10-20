@@ -171,13 +171,6 @@ class MpopMultiFileUpload extends ConfigurableComponent {
   }
 
   /**
-   * @param {UploadResponseError['error']} error
-   */
-  // getErrorHtml(error) {
-  //   return `<span class="moj-multi-file-upload__error"> <svg class="moj-banner__icon" fill="currentColor" role="presentation" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 25 25" height="25" width="25"><path d="M13.6,15.4h-2.3v-4.5h2.3V15.4z M13.6,19.8h-2.3v-2.2h2.3V19.8z M0,23.2h25L12.5,2L0,23.2z"/></svg>${error.message}</span>`
-  // }
-
-  /**
    * @param {File} file
    */
   setUploadRow(file) {
@@ -242,7 +235,9 @@ class MpopMultiFileUpload extends ConfigurableComponent {
    */
   uploadFile(file) {
     this.config.hooks.entryHook(this, file)
-    const $item = this.getFileRow(file)
+    const template = document.createElement('template')
+    template.innerHTML = this.getFileRowHtml(file).trim()
+    const $item = template.content.firstElementChild
     const $message = $item.querySelector('.moj-multi-file-upload__message')
     const $actions = $item.querySelector('.moj-multi-file-upload__actions')
     const $progress = $item.querySelector('.moj-multi-file-upload__progress')
