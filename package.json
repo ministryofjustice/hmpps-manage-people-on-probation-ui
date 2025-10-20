@@ -188,7 +188,7 @@
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/eslint-config-hmpps": "^0.0.4",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.107.0",
-    "@playwright/test": "^1.53.0",
+    "@playwright/test": "^1.56.1",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
     "@types/compression": "^1.8.1",
