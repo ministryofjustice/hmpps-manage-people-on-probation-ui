@@ -8,12 +8,11 @@ import {
   checkPopHeader,
   completeAttendancePage,
   completeCYAPage,
-  completeDateTimePage,
-  completeLocationPage,
   completeSupportingInformationPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
+  completeLocationDateTimePage,
 } from './imports'
 
 const crn = 'X000001'
@@ -26,9 +25,7 @@ const completeAppointment = () => {
   completeSentencePage()
   completeTypePage()
   completeAttendancePage()
-  completeLocationPage()
-  completeDateTimePage()
-  completeRepeatingPage()
+  completeLocationDateTimePage()
   completeSupportingInformationPage()
   completeCYAPage()
   // completeConfirmationPage()

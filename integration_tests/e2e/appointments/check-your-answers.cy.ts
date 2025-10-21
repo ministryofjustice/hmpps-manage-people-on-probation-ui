@@ -3,8 +3,7 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import IndexPage from '../../pages'
 
 import {
-  completeDateTimePage,
-  completeLocationPage,
+  completeLocationDateTimePage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
@@ -26,14 +25,16 @@ const loadPage = ({
   hasVisor = false,
   typeOptionIndex = 1,
   sentenceOptionIndex = 1,
-  repeatAppointments = true,
+  repeatAppointments = false,
   notes = true,
 } = {}) => {
+  if (repeatAppointments) {
+    cy.task('stubRepeats')
+  }
   completeSentencePage(sentenceOptionIndex, '')
   completeTypePage(typeOptionIndex, hasVisor)
   completeAttendancePage()
-  completeLocationPage()
-  completeDateTimePage()
+  completeLocationDateTimePage()
   if (repeatAppointments) {
     completeRepeatingPage()
   }
@@ -107,7 +108,7 @@ describe('Check your answers then confirm the appointment', () => {
   it('should render the page when no notes have been entered', () => {
     loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, notes: false })
     const cyaPage = new AppointmentCheckYourAnswersPage()
-    cyaPage.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
+    cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   })
 
   describe('Change appointment values', () => {
@@ -127,9 +128,6 @@ describe('Check your answers then confirm the appointment', () => {
     })
     it('should update the date when value is changed', () => {
       checkUpdateDateTime(cyaPage)
-    })
-    it('should update the repeat appointment when value is changed', () => {
-      checkUpdateRepeating(cyaPage)
     })
     it('should update the notes when value is changed', () => {
       checkUpdateNotes(cyaPage)

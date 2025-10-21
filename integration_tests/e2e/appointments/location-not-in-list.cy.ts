@@ -1,11 +1,11 @@
 import AttendancePage from '../../pages/appointments/attendance.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
-import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import {
   checkPopHeader,
   completeAttendancePage,
-  completeLocationPage,
+  completeLocationDateTimePage,
   completeSentencePage,
   completeTypePage,
 } from './imports'
@@ -15,7 +15,7 @@ const loadPage = (locations = true) => {
   completeTypePage()
   completeAttendancePage()
   if (locations) {
-    completeLocationPage(5)
+    completeLocationDateTimePage(5)
   }
 }
 describe('Arrange an appointment in another location', () => {
@@ -50,14 +50,14 @@ describe('Arrange an appointment in another location', () => {
       .click()
     cy.location().should(location => {
       expect(location.href).to.eq(
-        'http://localhost:3007/case/X778160/arrange-appointment/19a88188-6013-43a7-bb4d-6e338516818f/location',
+        'http://localhost:3007/case/X778160/arrange-appointment/19a88188-6013-43a7-bb4d-6e338516818f/location-date-time',
       )
     })
   })
   it('should return to the locations page when back is clicked', () => {
     loadPage()
     cy.get('.govuk-back-link').click()
-    const locationPage = new AppointmentLocationPage()
+    const locationPage = new AppointmentLocationDateTimePage()
     locationPage.checkOnPage()
   })
   it('should return to the attending page if no locations found and location selection is mandatory', () => {

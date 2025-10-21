@@ -78,6 +78,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',
     validate.appointments,
+    checkAppointments(hmppsAuthClient),
     controllers.arrangeAppointments.postLocationDateTime(),
   )
 

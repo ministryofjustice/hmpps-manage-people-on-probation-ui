@@ -8,9 +8,8 @@ import {
   completeTypePage,
   completeSentencePage,
   completeAttendancePage,
-  completeLocationPage,
-  completeDateTimePage,
   checkPopHeader,
+  completeLocationDateTimePage,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
@@ -19,8 +18,7 @@ const loadPage = () => {
   completeSentencePage()
   completeTypePage()
   completeAttendancePage()
-  completeLocationPage()
-  completeDateTimePage()
+  completeLocationDateTimePage()
 }
 
 describe('Will the appointment repeat? (with feature flag disabled)', () => {
@@ -41,6 +39,7 @@ describe('Will the appointment repeat? (with feature flag disabled)', () => {
 describe('Will the appointment repeat?', () => {
   let repeatingPage: AppointmentRepeatingPage
   beforeEach(() => {
+    cy.task('stubRepeats')
     loadPage()
     repeatingPage = new AppointmentRepeatingPage()
   })
@@ -59,6 +58,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('Continue is clicked without selecting a repeat option', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage = new AppointmentRepeatingPage()
       repeatingPage.getSubmitBtn().click()
@@ -74,6 +74,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('The error summary link is clicked', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage = new AppointmentRepeatingPage()
       repeatingPage.getSubmitBtn().click()
@@ -85,6 +86,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('Yes is selected', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage = new AppointmentRepeatingPage()
     })
@@ -95,6 +97,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('No is selected', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage = new AppointmentRepeatingPage()
     })
@@ -108,6 +111,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('Continue is clicked without selecting a repeat frequency or count', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage = new AppointmentRepeatingPage()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
@@ -138,6 +142,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('Weekly frequency is selected, the continue is clicked', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
@@ -149,6 +154,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('An invalid repeat count in entered', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating`).click()
       repeatingPage.getElement(`#appointments-${crn}-${uuid}-interval`).click()
@@ -161,6 +167,7 @@ describe('Will the appointment repeat?', () => {
   })
   describe('Valid count is entered', () => {
     beforeEach(() => {
+      cy.task('stubRepeats')
       loadPage()
       cy.intercept(
         'GET',

@@ -7,8 +7,6 @@ import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import {
   completeAttendancePage,
   completeCYAPage,
-  completeDateTimePage,
-  completeLocationPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
@@ -19,6 +17,7 @@ import {
   checkPopHeader,
   completeNextAppointmentPage,
   completeArrangeAnotherPage,
+  completeLocationDateTimePage,
 } from './imports'
 
 const regex: RegExp = /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2})\sto\s(\d{1,2}:\d{2})$/
@@ -27,9 +26,7 @@ const loadPage = (crnOverride = '') => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
   completeAttendancePage()
-  completeLocationPage(1, crnOverride)
-  completeDateTimePage(crnOverride)
-  completeRepeatingPage(2, crnOverride)
+  completeLocationDateTimePage(1, crnOverride)
   completeSupportingInformationPage(true, crnOverride)
   completeCYAPage()
 }
@@ -51,8 +48,6 @@ describe('Confirmation page', () => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
         expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
       })
-    confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
-    confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
     confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
     confirmPage
       .getWhatHappensNext()
