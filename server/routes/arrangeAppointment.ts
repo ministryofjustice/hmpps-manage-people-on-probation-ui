@@ -73,7 +73,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/location-date-time',
     redirectWizard(['eventId', 'type']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    controllers.arrangeAppointments.getLocationDateTime(),
+    controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',

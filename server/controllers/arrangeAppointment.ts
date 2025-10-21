@@ -11,6 +11,7 @@ import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
 import { findUncompleted } from '../utils/findUncompleted'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToSentence',
@@ -211,7 +212,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     }
   },
 
-  getLocationDateTime: () => {
+  getLocationDateTime: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -249,6 +250,11 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
       }
       const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personRisks = await masClient.getPersonRiskFlags(crn)
+      console.log(res.locals)
       return res.render(`pages/arrange-appointment/location-date-time`, {
         crn,
         id,
@@ -257,6 +263,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         errors,
         change,
         showValidation,
+        personRisks,
       })
     }
   },
