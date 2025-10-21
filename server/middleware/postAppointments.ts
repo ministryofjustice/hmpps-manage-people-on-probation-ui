@@ -5,7 +5,12 @@ import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
-import { AppointmentRequestBody, AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
+import {
+  AppointmentRequestBody,
+  AppointmentSession,
+  AppointmentsPostResponse,
+  AppointmentType,
+} from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
 import config from '../config'
@@ -74,7 +79,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (userDetails?.email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
-      const subject: string = `Planned office visit (NS) with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
+      const apptDescription = appointmentTypes.find(entry => entry.code === type).description
+      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {

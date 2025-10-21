@@ -60,6 +60,7 @@ TIER_LINK="https://tier-dev.hmpps.service.justice.gov.uk/case"
 DELIUS_LINK=https://ndelius.test.probation.service.justice.gov.uk
 INTERVENTIONS_API_URL=http://localhost:9091/interventions
 INTERVENTIONS_LINK=https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk
+SUPERVISION_API_URL="https://probation-supervision-appointments-api-dev.hmpps.service.justice.gov.uk"
 
 ```
 

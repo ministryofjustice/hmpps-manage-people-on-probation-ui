@@ -7,7 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
-import { AppointmentSession } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import config from '../config'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
@@ -87,7 +87,7 @@ const mockAppointment: AppointmentSession = {
     teamCode: 'TEA',
     username,
   },
-  type: 'C084',
+  type: 'COAP',
   date: '2025-03-12',
   start: '9:00am',
   end: '9:30pm',
@@ -101,6 +101,26 @@ const mockAppointment: AppointmentSession = {
   sensitivity: 'Yes',
 }
 
+const appointmentTypes: AppointmentType[] = [
+  {
+    code: 'COAP',
+    description: 'Planned Office Visit (NS)',
+    isPersonLevelContact: false,
+    isLocationRequired: true,
+  },
+  {
+    code: 'COPT',
+    description: 'Planned Telephone Contact (NS)',
+    isPersonLevelContact: false,
+    isLocationRequired: false,
+  },
+  {
+    code: 'CODC',
+    description: 'Planned Doorstep Contact (NS)',
+    isPersonLevelContact: true,
+    isLocationRequired: true,
+  },
+]
 const createMockReq = (appointment: AppointmentSession) => {
   return httpMocks.createRequest({
     params: {
@@ -120,6 +140,7 @@ const createMockReq = (appointment: AppointmentSession) => {
             [id]: appointment,
           },
         },
+        appointmentTypes,
       },
     },
   })
@@ -323,7 +344,7 @@ describe('/middleware/postAppointments', () => {
     const arg = outlookSpy.mock.calls[0][0]
 
     const expectedMessage = `<a href=${config.domain}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank'> View the appointment on Manage people on probation (opens in new tab).</a>`
-    const expectedSubject = 'Planned office visit (NS) with John Doe'
+    const expectedSubject = 'Planned Office Visit (NS) with John Doe'
     const expectedStart = dateTime(mockAppointment.date, mockAppointment.start).toISOString()
     const expectedDuration = getDurationInMinutes(
       dateTime(mockAppointment.date, mockAppointment.start),

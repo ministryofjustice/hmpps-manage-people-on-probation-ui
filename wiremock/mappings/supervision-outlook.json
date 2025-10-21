@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/sva/calendar/event",
+        "urlPathPattern": "/supervision/calendar/event",
         "method": "POST"
       },
       "response": {

@@ -181,10 +181,10 @@ export default {
       agent: new AgentConfig(Number(get('INTERVENTIONS_API_TIMEOUT_RESPONSE', 10000))),
     },
     masAppointmentsApi: {
-      url: get('SVA_CLIENT_API_URL', 'http://localhost:8100', requiredInProduction),
+      url: get('SUPERVISION_API_URL', 'http://localhost:8100', requiredInProduction),
       timeout: {
-        response: Number(get('SVA_CLIENT_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('SVA_CLIENT_API_TIMEOUT_DEADLINE', 10000)),
+        response: Number(get('SUPERVISION_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('SUPERVISION_API_TIMEOUT_DEADLINE', 10000)),
       },
       agent: new AgentConfig(Number(get('SVA_CLIENT_API_TIMEOUT_RESPONSE', 10000))),
     },

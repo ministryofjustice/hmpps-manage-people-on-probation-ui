@@ -3,7 +3,7 @@ import superagent, { SuperAgentRequest } from 'superagent'
 const stubPostMasOutlookEvent = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPattern: '/sva/calendar/event',
+      urlPattern: '/supervision/calendar/event',
       method: 'POST',
     },
     response: {
@@ -24,7 +24,7 @@ const stubSchuleOutlookEvent500Response = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     priority: 1,
     request: {
-      urlPathPattern: '/sva/calendar/event',
+      urlPathPattern: '/supervision/calendar/event',
       method: 'POST',
     },
     response: {
