@@ -215,9 +215,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getLocationDateTime: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
       const { data } = req.session
       const { change, validation } = req.query
       const showValidation = validation === 'true'
@@ -254,7 +251,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personRisks = await masClient.getPersonRiskFlags(crn)
-      console.log(res.locals)
       return res.render(`pages/arrange-appointment/location-date-time`, {
         crn,
         id,
@@ -294,16 +290,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       setDataValue(data, [...path, 'until'], until)
       setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
-      const nextPage = repeatAppointmentsEnabled
-        ? `/case/${crn}/arrange-appointment/${id}/repeating`
-        : `/case/${crn}/arrange-appointment/${id}/supporting-information`
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      const page = selectedLocation === `LOCATION_NOT_IN_LIST` ? 'location-not-in-list' : 'date-time'
-      let redirect = nextPage
-      if (change && page !== 'location-not-in-list') {
+      let nextPage = repeatAppointmentsEnabled ? `repeating` : `supporting-information`
+      if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
+        nextPage = `location-not-in-list`
+      }
+      let redirect = `/case/${crn}/arrange-appointment/${id}/${nextPage}`
+      if (change && nextPage !== 'location-not-in-list') {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
-      if (change && page === 'location-not-in-list') {
+      if (change && nextPage === 'location-not-in-list') {
         redirect = `${redirect}?change=${change}`
       }
       return res.redirect(redirect)
