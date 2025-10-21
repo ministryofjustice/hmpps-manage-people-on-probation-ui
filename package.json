@@ -131,7 +131,7 @@
     "@microsoft/applicationinsights-web": "^3.3.9",
     "@ministryofjustice/frontend": "^6.0.0",
     "@ministryofjustice/hmpps-audit-client": "^1.1.1",
-    "@ministryofjustice/probation-search-frontend": "^2.4.0",
+    "@ministryofjustice/probation-search-frontend": "^3.2.1",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.120.0",
     "@sentry/cli": "^2.46.0",
     "@sentry/node": "^10.12.0",
