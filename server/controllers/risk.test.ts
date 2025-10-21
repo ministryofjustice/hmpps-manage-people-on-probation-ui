@@ -67,9 +67,7 @@ const predictorsSpy = jest
 const sanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
-const searchUserCaseloadSpy = jest
-  .spyOn(MasApiClient.prototype, 'searchUserCaseload')
-  .mockImplementation(() => Promise.resolve(mockUserCaseload))
+
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 
 const req = httpMocks.createRequest({
@@ -101,11 +99,8 @@ describe('riskController', () => {
         expect(predictorsSpy).toHaveBeenCalledWith(crn)
         expect(needsSpy).toHaveBeenCalledWith(crn)
         expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
-        expect(searchUserCaseloadSpy).toHaveBeenCalledWith(username, '', '', { nameOrCrn: crn })
       })
-      it('should request the sentence plans from the api', () => {
-        expect(getPlanByCrnSpy).toHaveBeenCalledWith(crn)
-      })
+
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
           personRisk: mockPersonRiskFlags,
@@ -118,8 +113,6 @@ describe('riskController', () => {
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
           sanIndicator: mockSanIndicatorResponse.sanIndicator,
-          showSentencePlan: false,
-          planLastUpdated: '',
         })
       })
     })
@@ -148,8 +141,6 @@ describe('riskController', () => {
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
           sanIndicator: mockSanIndicatorResponse.sanIndicator,
-          showSentencePlan: true,
-          planLastUpdated: '2025-09-29T10:54:36.782Z',
         })
       })
     })
@@ -173,8 +164,6 @@ describe('riskController', () => {
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
           sanIndicator: mockSanIndicatorResponse.sanIndicator,
-          showSentencePlan: false,
-          planLastUpdated: '',
         })
       })
     })
@@ -198,8 +187,6 @@ describe('riskController', () => {
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
           sanIndicator: mockSanIndicatorResponse.sanIndicator,
-          showSentencePlan: false,
-          planLastUpdated: '',
         })
       })
     })
@@ -229,8 +216,6 @@ describe('riskController', () => {
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
           sanIndicator: mockSanIndicatorResponse.sanIndicator,
-          showSentencePlan: false,
-          planLastUpdated: '',
         })
       })
     })
@@ -254,8 +239,6 @@ describe('riskController', () => {
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
           sanIndicator: mockSanIndicatorResponse.sanIndicator,
-          showSentencePlan: false,
-          planLastUpdated: '',
         })
       })
     })

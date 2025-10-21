@@ -7,7 +7,16 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
 import { toPredictors, toRoshWidget } from '../utils'
-import { mockTierCalculation, mockPredictors, mockRisks } from '../controllers/mocks'
+import {
+  mockTierCalculation,
+  mockPredictors,
+  mockRisks,
+  mockUserCaseload,
+  mockAppResponse,
+  mockSentencePlans,
+} from '../controllers/mocks'
+import { UserCaseload } from '../data/model/caseload'
+import SentencePlanApiClient from '../data/sentencePlanApiClient'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -16,19 +25,6 @@ jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
-
-const getPersonalDetailsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-  .mockImplementation(() => Promise.resolve(mock('X000002')))
-const hmppsAuthClient = new HmppsAuthClient(tokenStore)
-
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 
 const mock = (crn = 'X000001') =>
   ({
@@ -40,31 +36,58 @@ const mock = (crn = 'X000001') =>
     dateOfBirth: '1979-08-18',
   }) as any
 
+const getPersonalDetailsSpy = jest
+  .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+  .mockImplementation(() => Promise.resolve(mock('X000002')))
+const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+const tierCalculationSpy = jest
+  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
+  .mockImplementation(() => Promise.resolve(mockTierCalculation))
+const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
+const predictorsSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
+  .mockImplementation(() => Promise.resolve(mockPredictors))
+const searchUserCaseloadSpy = jest
+  .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+  .mockImplementation(() => Promise.resolve(mockUserCaseload))
+const getPlanByCrnSpy = jest
+  .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+  .mockImplementation(() => Promise.resolve(mockSentencePlans))
+
+const nextSpy = jest.fn()
+
+const req = httpMocks.createRequest({
+  params: {
+    crn: 'X000002',
+  },
+  session: {
+    data: {
+      personalDetails: {
+        X000001: mock(),
+      },
+    },
+  },
+})
+
 const res = {
   locals: {
     user: {
       username: 'user-1',
+      roles: ['SENTENCE_PLAN'],
+    },
+    flags: {
+      enableSentencePlan: true,
     },
   },
   redirect: jest.fn().mockReturnThis(),
 } as unknown as AppResponse
 
-const nextSpy = jest.fn()
-
 describe('/middleware/getPersonalDetails', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('should request data from the api if personal details for crn does not exist in the session', async () => {
-    const req = httpMocks.createRequest({
-      params: {
-        crn: 'X000002',
-      },
-      session: {
-        data: {
-          personalDetails: {
-            X000001: mock(),
-          },
-        },
-      },
-    })
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     const expected = {
       personalDetails: {
@@ -77,6 +100,8 @@ describe('/middleware/getPersonalDetails', () => {
     expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
     expect(risksSpy).toHaveBeenCalledWith(req.params.crn)
     expect(predictorsSpy).toHaveBeenCalledWith(req.params.crn)
+    expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', { nameOrCrn: req.params.crn })
+    expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')
     expect(res.locals.case).toEqual(mock('X000002'))
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
@@ -86,5 +111,115 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerDob).toEqual('1979-08-18')
     expect(nextSpy).toHaveBeenCalled()
     getPersonalDetailsSpy.mockRestore()
+  })
+
+  it('should set the correct sentence plan local variaibles if sentence plan feature flag is disabled', async () => {
+    const mockedRes = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: false,
+      },
+    })
+
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+    await getPersonalDetails(hmppsAuthClient)(req, mockedRes, nextSpy)
+    expect(mockedRes.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      lastUpdatedDate: '',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if pop not in caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      lastUpdatedDate: '',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user does not have sentence plan role', async () => {
+    const mockedRes = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: [],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+    await getPersonalDetails(hmppsAuthClient)(req, mockedRes, nextSpy)
+    expect(mockedRes.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      lastUpdatedDate: '',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if pop has no sentence plan', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+    jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
+
+    const mockedRes = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: [],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, mockedRes, nextSpy)
+    expect(mockedRes.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      lastUpdatedDate: '',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has sentence plan and pop in user caseload', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+    const mockedReq = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+          },
+        },
+      },
+    })
+    const mockedRes = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(mockedReq, mockedRes, nextSpy)
+    expect(mockedRes.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+    })
   })
 })
