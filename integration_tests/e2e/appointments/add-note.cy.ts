@@ -211,7 +211,7 @@ describe('Manage appointment - add a note', () => {
       const assertion = reload ? 'not.be.visible' : 'not.exist'
       addNotePage.getFileUploadListItem('success', 'text', 0).should('contain.text', fileName)
       addNotePage.getFileUploadListItem('success', 'status', 0).should('contain.text', 'Uploaded')
-      addNotePage.getFileUploadListItemDeleteButton(0).should(assertion)
+      addNotePage.getFileUploadListItemDeleteButton(0).should('not.be.visible')
       addNotePage
         .getFileUploadListItem('error', 'text', 1)
         .should('contain.text', `${fileName2}: File type must be pdf or word`)
