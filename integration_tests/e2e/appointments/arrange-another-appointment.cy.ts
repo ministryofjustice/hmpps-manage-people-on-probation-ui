@@ -1,6 +1,5 @@
 import { v4 } from 'uuid'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
-import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
@@ -91,28 +90,6 @@ describe('Arrange another appointment', () => {
           expect($error.text().trim()).to.include('Select what this appointment is for')
         })
       })
-    })
-  })
-
-  describe('User clicks submit without selecting an attendee', () => {
-    let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let attendancePage: AttendancePage
-    let locationPage: AppointmentLocationPage
-    beforeEach(() => {
-      cy.task('stubAppointmentNoAttendee')
-      loadPage('X000001')
-      arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.getSubmitBtn().click()
-      attendancePage = new AttendancePage()
-    })
-    it('should redirect to the attendance page', () => {
-      attendancePage.checkOnPage()
-    })
-    it('should redirect to the next uncompleted page when question is submitted', () => {
-      attendancePage.checkOnPage()
-      attendancePage.getSubmitBtn().click()
-      locationPage = new AppointmentLocationPage()
-      locationPage.checkOnPage()
     })
   })
 

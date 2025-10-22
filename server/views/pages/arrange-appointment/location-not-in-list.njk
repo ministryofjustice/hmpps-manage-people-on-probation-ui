@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Arrange an appointment in another location' %}
-{% set backLink = ('/case/' + crn + '/arrange-appointment/' + id + '/attendance') if noLocations else ('/case/' + crn + '/arrange-appointment/' + id + '/location')  %}
+{% set backLink = ('/case/' + crn + '/arrange-appointment/' + id + '/type-attendance') if noLocations else ('/case/' + crn + '/arrange-appointment/' + id + '/location')  %}
 {% set notStandardForm = true %}
 {% block primary %}
   <div class="govuk-grid-row">

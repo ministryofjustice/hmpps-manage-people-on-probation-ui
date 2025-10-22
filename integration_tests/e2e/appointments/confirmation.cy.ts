@@ -5,7 +5,6 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import {
-  completeAttendancePage,
   completeCYAPage,
   completeDateTimePage,
   completeLocationPage,
@@ -26,7 +25,6 @@ const regex: RegExp = /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{
 const loadPage = (crnOverride = '') => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
-  completeAttendancePage()
   completeLocationPage(1, crnOverride)
   completeDateTimePage(crnOverride)
   completeRepeatingPage(2, crnOverride)

@@ -3,7 +3,6 @@ import {
   uuid,
   completeTypePage,
   completeSentencePage,
-  completeAttendancePage,
   completeLocationPage,
   completeDateTimePage,
   checkPopHeader,
@@ -15,7 +14,6 @@ const loadPage = () => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   completeSentencePage()
   completeTypePage()
-  completeAttendancePage()
   completeLocationPage()
   completeDateTimePage()
 }
