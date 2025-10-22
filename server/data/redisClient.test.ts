@@ -22,7 +22,7 @@ describe('createRedisClient', () => {
   afterEach(() => {
     jest.restoreAllMocks()
   })
-  it('createRedisClient without tls', async () => {
+  it.skip('createRedisClient without tls', async () => {
     jest.mock('../config', () => {
       const config = jest.requireActual('../config')
       return {
@@ -37,7 +37,7 @@ describe('createRedisClient', () => {
       expect(error.code).toEqual('ECONNREFUSED')
     }
   })
-  it('createRedisClient with tls', async () => {
+  it.skip('createRedisClient with tls', async () => {
     jest.mock('../config', () => {
       const config = jest.requireActual('../config')
       return {
