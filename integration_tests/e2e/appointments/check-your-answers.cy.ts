@@ -7,7 +7,6 @@ import {
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
-  completeAttendancePage,
   completeSupportingInformationPage,
   checkPopHeader,
   checkAppointmentSummary,
@@ -33,7 +32,6 @@ const loadPage = ({
   }
   completeSentencePage(sentenceOptionIndex, '')
   completeTypePage(typeOptionIndex, hasVisor)
-  completeAttendancePage()
   completeLocationDateTimePage()
   if (repeatAppointments) {
     completeRepeatingPage()

@@ -1,6 +1,5 @@
 import { v4 } from 'uuid'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
-import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
@@ -18,6 +17,7 @@ import {
   checkUpdateSensitivity,
   checkUpdateBackLinkRefresh,
 } from './imports'
+import AttendancePage from '../../pages/appointments/attendance.page'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)

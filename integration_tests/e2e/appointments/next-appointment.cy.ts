@@ -6,7 +6,6 @@ import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import {
   checkPopHeader,
-  completeAttendancePage,
   completeCYAPage,
   completeSupportingInformationPage,
   completeRepeatingPage,
@@ -24,7 +23,6 @@ const loadPage = () => {
 const completeAppointment = () => {
   completeSentencePage()
   completeTypePage()
-  completeAttendancePage()
   completeLocationDateTimePage()
   completeSupportingInformationPage()
   completeCYAPage()
@@ -152,49 +150,6 @@ describe('Create next appointment', () => {
         .should('contain.text', 'Not entered')
         .should('contain.text', 'Select the appointment type first.')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
-      arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
-    })
-    it('should handle an appointment with no attendee', () => {
-      cy.task('stubAppointmentNoAttendee')
-      cy.visit(`/case/${crn}/appointments/appointment/6/next-appointment`)
-      nextAppointmentPage = new NextAppointmentPage()
-      nextAppointmentPage.getRadio('option', 1).click()
-      nextAppointmentPage.getSubmitBtn().click()
-      const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-      arrangeAnotherAppointmentPage.checkOnPage()
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Default Sentence Type (12 Months)')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(1)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', '3 way meeting (NS)')
-        .should('not.contain.html', '<span class="govuk-summary-list__hint">')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(2)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Change')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(3)
-        .find('.govuk-summary-list__actions')
-        .find('a')
-        .should('contain.text', 'Choose attending')
-      arrangeAnotherAppointmentPage
-        .getSummaryListRow(4)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'Not entered')
-        .should('contain.text', 'Select who is attending first.')
       arrangeAnotherAppointmentPage.getSummaryListRow(4).find('.govuk-summary-list__actions').should('not.exist')
     })
     it('should handle an appointment with no location', () => {

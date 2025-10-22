@@ -1,23 +1,19 @@
 import 'cypress-plugin-tab'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
-import AppointmentPreviewPage from '../../pages/appointments/preview.page'
 
 import {
   crn,
   uuid,
   completeTypePage,
   completeSentencePage,
-  completeAttendancePage,
   checkPopHeader,
   completeLocationDateTimePage,
 } from './imports'
-import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = () => {
   completeSentencePage()
   completeTypePage()
-  completeAttendancePage()
   completeLocationDateTimePage()
 }
 
