@@ -36,42 +36,42 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
 
     if (req.method === 'GET') {
       if (selectedRegion || back) {
-        displayedProviders = providers.map(p => {
-          if (p.code === selectedRegion) {
-            return { code: p.code, name: p.name, selected: 'selected' }
+        displayedProviders = providers.map(provider => {
+          if (provider.code === selectedRegion) {
+            return { code: provider.code, name: provider.name, selected: 'selected' }
           }
-          return { code: p.code, name: p.name }
+          return { code: provider.code, name: provider.name }
         })
-        displayedTeams = teams.map(t => {
-          if (t.code === selectedTeam) {
-            return { description: t.description, code: t.code, selected: 'selected' }
+        displayedTeams = teams.map(team => {
+          if (team.code === selectedTeam) {
+            return { description: team.description, code: team.code, selected: 'selected' }
           }
-          return { description: t.description, code: t.code }
+          return { description: team.description, code: team.code }
         })
         displayedUsers = users
       } else {
-        displayedProviders = providers.map(p => {
-          if (p.name === defaultUserDetails.homeArea) {
-            setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], p.code)
-            return { code: p.code, name: p.name, selected: 'selected' }
+        displayedProviders = providers.map(provider => {
+          if (provider.name === defaultUserDetails.homeArea) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], provider.code)
+            return { code: provider.code, name: provider.name, selected: 'selected' }
           }
-          return { code: p.code, name: p.name }
+          return { code: provider.code, name: provider.name }
         })
 
-        displayedTeams = teams.map(t => {
-          if (t.description === defaultUserDetails.team) {
-            setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], t.code)
-            return { description: t.description, code: t.code, selected: 'selected' }
+        displayedTeams = teams.map(team => {
+          if (team.description === defaultUserDetails.team) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], team.code)
+            return { description: team.description, code: team.code, selected: 'selected' }
           }
-          return { description: t.description, code: t.code }
+          return { description: team.description, code: team.code }
         })
 
-        displayedUsers = users.map(u => {
-          if (u.username.toUpperCase() === defaultUserDetails.username) {
-            setDataValue(data, ['appointments', crn, id, 'user', 'username'], u.username)
-            return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
+        displayedUsers = users.map(user => {
+          if (user.username.toUpperCase() === defaultUserDetails.username) {
+            setDataValue(data, ['appointments', crn, id, 'user', 'username'], user.username)
+            return { username: user.username, nameAndRole: user.nameAndRole, selected: 'selected' }
           }
-          return { username: u.username, nameAndRole: u.nameAndRole }
+          return { username: user.username, nameAndRole: user.nameAndRole }
         })
       }
 

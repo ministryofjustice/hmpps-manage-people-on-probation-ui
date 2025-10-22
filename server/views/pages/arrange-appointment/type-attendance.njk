@@ -2,7 +2,6 @@
 {% set title = 'Appointment type and attendance' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
-{% from "govuk/components/summary-list/macro.njk" import govukSummaryList %}
 
 {% set attendanceUrl = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?change=' + url if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
 

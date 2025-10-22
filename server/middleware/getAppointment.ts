@@ -52,7 +52,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         sensitivity,
       } = appointmentSession
       const type: AppointmentType | null = typeId
-        ? req.session.data.appointmentTypes.find(t => t.code === typeId)
+        ? req.session.data.appointmentTypes.find(team => team.code === typeId)
         : null
       let sentenceObj: Sentence
       let sentence: string
@@ -60,7 +60,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
-        sentenceObj = req.session.data.sentences[crn].find(s => s.id === parseInt(eventId, 10))
+        sentenceObj = req.session.data.sentences[crn].find(user => user.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
           sentenceRequirement = sentenceObj?.requirements?.find(
@@ -83,10 +83,10 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const selectedRegion =
         providerCode && providers ? providers.find(r => r.code === providerCode)?.name : res.locals.defaultUser.homeArea
       const selectedTeam =
-        teamCode && teams ? teams.find(t => t.code === teamCode)?.description : res.locals.defaultUser.team
+        teamCode && teams ? teams.find(team => team.code === teamCode)?.description : res.locals.defaultUser.team
       const selectedUser =
         staffId && users
-          ? users.find(s => s.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
+          ? users.find(user => user.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
           : res.locals.defaultUser.username
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
