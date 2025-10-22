@@ -94,8 +94,16 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
       startAndEnd: '11am to 12pm',
     },
   }
-
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
     spy = jest
       .spyOn(MasApiClient.prototype, 'checkAppointments')
       .mockImplementation(() => Promise.resolve(mockAppointmentChecks))
@@ -114,6 +122,8 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
           'You already have an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
         nonWorkingDayName: 'You have selected a non-working day (Sunday). Continue with these details or make changes.',
       },
+      _maxDate: '31/12/2199',
+      _minDate: '1/7/2025',
     })
   })
   it('should not call next()', () => {
@@ -122,6 +132,13 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
 })
 
 describe('/middleware/checkAppointments shows warnings the for a colleague', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: 'Saturday',
@@ -150,6 +167,8 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
         nonWorkingDayName:
           'You have selected a non-working day (Saturday). Continue with these details or make changes.',
       },
+      _maxDate: '31/12/2199',
+      _minDate: '1/7/2025',
     })
   })
   it('should not call next()', () => {
@@ -158,6 +177,13 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
 })
 
 describe('/middleware/checkAppointments does not show warnings the second time', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: 'Saturday',
@@ -206,6 +232,13 @@ describe('/middleware/checkAppointments does not show any warnings if none are r
 })
 
 describe('/middleware/checkAppointments does not show any warnings if checks do not return the required warnings, but shows errors', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: null,

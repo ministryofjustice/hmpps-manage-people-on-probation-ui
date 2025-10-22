@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+import { DateTime } from 'luxon'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, setDataValue, dateTime } from '../utils'
@@ -19,7 +21,20 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     const start = dateTime(date, startTime)
     const end = dateTime(date, endTime)
 
-    const localParams: LocalParams = { crn, id }
+    const today = new Date()
+    // setting temporary fix for minDate
+    // (https://github.com/ministryofjustice/moj-frontend/issues/923)
+
+    let _minDate: string
+    if (today.getDate() > 9) {
+      today.setDate(today.getDate() - 1)
+      _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
+    } else {
+      _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+    }
+    const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
+
+    const localParams: LocalParams = { crn, id, _minDate, _maxDate }
     const render = `pages/arrange-appointment/date-time`
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
