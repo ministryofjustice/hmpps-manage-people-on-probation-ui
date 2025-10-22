@@ -28,7 +28,6 @@ const completeAppointment = () => {
   completeLocationDateTimePage()
   completeSupportingInformationPage()
   completeCYAPage()
-  // completeConfirmationPage()
 }
 
 describe('Create next appointment', () => {

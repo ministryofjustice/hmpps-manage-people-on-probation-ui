@@ -308,8 +308,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getLocationNotInList: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const change = req?.query?.change as string
-      const { noLocations = '' } = req.query
+      const { change = undefined, noLocations = '' } = req.query
       return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id, noLocations, change })
     }
   },
