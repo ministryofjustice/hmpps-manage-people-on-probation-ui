@@ -206,7 +206,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp
       }
-      let redirect = `/case/${crn}/arrange-appointment/${id}/location-date-time`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance`
       if (change) {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
