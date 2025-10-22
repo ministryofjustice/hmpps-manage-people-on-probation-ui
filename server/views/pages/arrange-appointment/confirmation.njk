@@ -18,46 +18,43 @@
 {% endfor %}
 {% set title = 'Appointment arranged' %}
 {% set appointmentDatesHtml %}
-    {% for appointmentDate in appointmentDates %}
-        {% if loop.index > 1 %}<br>{% endif %}
-        <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
-            {{ appointmentDate | dateWithYear }}
+{% for appointmentDate in appointmentDates %}
+   {% if loop.index > 1 %}<br>{% endif %}
+   <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
+    {{ appointmentDate | dateWithYear }}
     from
     {{ appointment.start }}
     to
     {{ appointment.end }}</span>
-    {% endfor %}
-    {% set cases = "/case/" %}
-    {% set overViewLink = "/case/"+ crn %}
-    {% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
+{% endfor %}
+{% set cases = "/case/" %}
+{% set overViewLink = "/case/"+ crn %}
+{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
 {% endset %}
 
 {% set panelHtml %}
-    <div class="govuk-!-font-size-27">
-        <strong>{{ appointment.type.description | toSentenceCase }}</strong><br/>
-        {{ appointmentDatesHtml | safe }}
-    </div>
+<div class="govuk-!-font-size-27">
+    <strong>{{ appointment.type.description | toSentenceCase }}</strong><br/>
+    {{ appointmentDatesHtml | safe }}
+</div>
 {% endset %}
 
 {% block beforeContent %}{% endblock %}
 {% block primary %}
-    {{ govukPanel({
-        titleHtml: '<span data-qa="pageHeading">' + title + '</span>',
-        html: panelHtml
-    }) }}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
-        <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-        <p class="govuk-body">
-            You need to send
-            {{case.name.forename}}
-            the appointment details.
-
-
-            {% if phoneNumber %}
-
-            Their phone number is
-            <span data-qa="{{ phoneNumber }}">
+  {{ govukPanel({
+  titleHtml: '<span data-qa="pageHeading">' + title + '</span>',
+  html: panelHtml
+}) }}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+      <p class="govuk-body">
+        You need to send
+        {{case.name.forename}}
+        the appointment details.
+      {% if phoneNumber %}
+         Their phone number is
+         <span data-qa="{{ phoneNumber }}">
             {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
             {% else %}{{ case.telephoneNumber + "." }}
             {% endif %}</span>

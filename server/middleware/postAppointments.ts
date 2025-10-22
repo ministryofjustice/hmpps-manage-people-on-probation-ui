@@ -97,7 +97,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
-
+    // Setting isOutLookEventFailed to display error based on API responses.
     if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
 
     return response
@@ -105,4 +105,4 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
 }
 
 const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string) =>
-  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank'> View the appointment on Manage people on probation (opens in new tab).</a>`
+  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`

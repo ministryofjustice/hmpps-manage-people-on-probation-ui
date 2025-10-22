@@ -7,7 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
-import { AppointmentSession, AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType, MasUserDetails } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import config from '../config'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
@@ -284,7 +284,7 @@ describe('/middleware/postAppointments', () => {
       email: undefined,
       enabled: true,
       roles: [],
-    } as any)
+    } as MasUserDetails)
 
     await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
 
@@ -305,7 +305,7 @@ describe('/middleware/postAppointments', () => {
       email: 'jplatt@example.com',
       enabled: true,
       roles: [],
-    } as any)
+    } as MasUserDetails)
 
     jest.spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent').mockResolvedValue({
       id: '',
@@ -343,7 +343,7 @@ describe('/middleware/postAppointments', () => {
 
     const arg = outlookSpy.mock.calls[0][0]
 
-    const expectedMessage = `<a href=${config.domain}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank'> View the appointment on Manage people on probation (opens in new tab).</a>`
+    const expectedMessage = `<a href=${config.domain}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`
     const expectedSubject = 'Planned Office Visit (NS) with John Doe'
     const expectedStart = dateTime(mockAppointment.date, mockAppointment.start).toISOString()
     const expectedDuration = getDurationInMinutes(
