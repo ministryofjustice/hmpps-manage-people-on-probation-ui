@@ -1,11 +1,10 @@
-/* eslint-disable no-underscore-dangle */
-import { DateTime } from 'luxon'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, setDataValue, dateTime } from '../utils'
 import { Route } from '../@types'
 import { CheckAppointment, LocalParams } from '../models/Appointments'
 import { isEmptyObject } from '../utils/isEmptyObject'
+import { getMinMaxDates } from '../utils/getMinMaxDates'
 
 export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -21,18 +20,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     const start = dateTime(date, startTime)
     const end = dateTime(date, endTime)
 
-    const today = new Date()
-    // setting temporary fix for minDate
-    // (https://github.com/ministryofjustice/moj-frontend/issues/923)
-
-    let _minDate: string
-    if (today.getDate() > 9) {
-      today.setDate(today.getDate() - 1)
-      _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
-    } else {
-      _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
-    }
-    const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
+    const { _minDate, _maxDate } = getMinMaxDates()
 
     const localParams: LocalParams = { crn, id, _minDate, _maxDate }
     const render = `pages/arrange-appointment/date-time`

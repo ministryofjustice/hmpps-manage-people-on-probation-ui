@@ -1,4 +1,3 @@
-/* eslint-disable no-underscore-dangle */
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Request } from 'express'
@@ -11,6 +10,7 @@ import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
 import { findUncompleted } from '../utils/findUncompleted'
+import { getMinMaxDates } from '../utils/getMinMaxDates'
 
 const routes = [
   'redirectToSentence',
@@ -279,18 +279,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           [`appointments-${crn}-${id}-end`]: 'Enter an end time',
         }
       }
-      const today = new Date()
-      // setting temporary fix for minDate
-      // (https://github.com/ministryofjustice/moj-frontend/issues/923)
-
-      let _minDate: string
-      if (today.getDate() > 9) {
-        today.setDate(today.getDate() - 1)
-        _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
-      } else {
-        _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
-      }
-      const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
+      const { _minDate, _maxDate } = getMinMaxDates()
       return res.render(`pages/arrange-appointment/date-time`, {
         crn,
         id,
