@@ -10,10 +10,9 @@ export default class ProbationFrontendComponentsApiClient {
   }
 
   getComponents<T extends AvailableComponent[]>(components: T, userToken: string): Promise<ComponentsResponse> {
-    const queryStr = `?${components.join('&')}`
     return ProbationFrontendComponentsApiClient.restClient(userToken).get<ComponentsResponse>({
       path: '/api/components',
-      query: `component=${queryStr}`,
+      query: `component=${components.join('&component=')}`,
       headers: { 'x-user-token': userToken },
     })
   }
