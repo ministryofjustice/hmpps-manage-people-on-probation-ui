@@ -16,8 +16,8 @@ const routes = [
   'redirectToSentence',
   'getSentence',
   'postSentence',
-  'getType',
-  'postType',
+  'getTypeAttendance',
+  'postTypeAttendance',
   'getWhoWillAttend',
   'postWhoWillAttend',
   'getLocation',
@@ -52,7 +52,7 @@ export const appointmentSummary = async (req: Request, res: AppResponse, client:
   } = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
   const mapping = {
     eventId: 'sentence',
-    type: 'type',
+    type: 'type-attendance',
     providerCode: 'attendance',
     teamCode: 'attendance',
     username: 'attendance',
@@ -124,19 +124,21 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const selectedTeam = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
       const teamQueryParam = selectedTeam ? `&teamCode=${selectedTeam}` : ''
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
-      let redirect = `/case/${crn}/arrange-appointment/${id}/type${queryParameters}`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance${queryParameters}`
       if (change) {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
       return res.redirect(redirect)
     }
   },
-  getType: () => {
+  getTypeAttendance: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
+      let { url } = req
+      url = encodeURIComponent(url)
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -155,10 +157,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           [`appointments-${crn}-${id}-type`]: 'Select a valid appointment type',
         }
       }
-      return res.render(`pages/arrange-appointment/type`, { crn, id, change, errors })
+      return res.render(`pages/arrange-appointment/type-attendance`, { crn, id, url, change, errors })
     }
   },
-  postType: () => {
+  postTypeAttendance: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
@@ -168,7 +170,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
         return renderError(404)(req, res)
       }
-      let redirect = `/case/${crn}/arrange-appointment/${id}/attendance${query}`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/location${query}`
       if (change) {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
@@ -205,7 +207,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp
       }
-      let redirect = `/case/${crn}/arrange-appointment/${id}/location`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance`
       if (change) {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }

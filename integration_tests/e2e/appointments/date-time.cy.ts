@@ -2,20 +2,11 @@ import { DateTime } from 'luxon'
 import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
 import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
-import {
-  completeAttendancePage,
-  completeLocationPage,
-  completeSentencePage,
-  completeTypePage,
-  crn,
-  uuid,
-  checkPopHeader,
-} from './imports'
+import { completeLocationPage, completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
 
 const loadPage = (date?: DateTime<true>) => {
   completeSentencePage(1, '', '')
   completeTypePage(1, false)
-  completeAttendancePage()
   completeLocationPage()
 }
 describe('Enter the date and time of the appointment', () => {
