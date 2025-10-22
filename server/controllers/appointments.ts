@@ -82,7 +82,8 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getAllUpcomingAppointments: hmppsAuthClient => {
     return async (req, res) => {
-      const { url } = req
+      let { url } = req
+      url = encodeURIComponent(url)
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date.asc'
       const [sortName, sortDirection] = sortedBy.split('.')
       const isAscending: boolean = sortDirection === 'asc'

@@ -70,7 +70,7 @@ const activityLogController: Controller<typeof routes, void> = {
         tierCalculation,
         risksWidget,
         predictorScores,
-        url: req.url,
+        url: encodeURIComponent(req.url),
         baseUrl,
         resultsStart,
         resultsEnd,
