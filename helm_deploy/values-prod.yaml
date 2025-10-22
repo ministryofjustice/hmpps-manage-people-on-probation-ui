@@ -17,6 +17,7 @@ generic-service:
     TIER_API_URL: 'https://hmpps-tier.hmpps.service.justice.gov.uk'
     INTERVENTIONS_API_URL: 'https://hmpps-interventions-service.apps.live-1.cloud-platform.service.justice.gov.uk'
     SENTENCE_PLAN_API_URL: 'https://sentence-plan-api.hmpps.service.justice.gov.uk'
+    PROBATION_FRONTEND_COMPONENTS_API_URL: 'https://probation-frontend-components.hmpps.service.justice.gov.uk'
     FLIPT_URL: 'https://feature-flags-manage-people-on-probation.hmpps.service.justice.gov.uk'
     INTERVENTIONS_LINK: 'https://refer-monitor-intervention.service.justice.gov.uk'
     DELIUS_LINK: 'https://ndelius.probation.service.justice.gov.uk'
