@@ -219,7 +219,7 @@ export const checkAppointmentSummary = (
     page.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   }
 
-  const x = repeatingEnabled ? 1 : 0
+  const index = repeatingEnabled ? 1 : 0
   if (repeatingEnabled) {
     page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
     page
@@ -228,19 +228,19 @@ export const checkAppointmentSummary = (
       .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
   }
   page
-    .getSummaryListRow(6 + x)
+    .getSummaryListRow(6 + index)
     .find('.govuk-summary-list__key')
     .should('contain.text', 'Supporting information')
   page
-    .getSummaryListRow(6 + x)
+    .getSummaryListRow(6 + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Not entered' : 'Some notes')
   page
-    .getSummaryListRow(7 + x)
+    .getSummaryListRow(7 + index)
     .find('.govuk-summary-list__key')
     .should('contain.text', 'Sensitivity')
   page
-    .getSummaryListRow(7 + x)
+    .getSummaryListRow(7 + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Not entered' : 'Yes')
 }

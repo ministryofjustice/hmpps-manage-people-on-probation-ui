@@ -63,7 +63,7 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
-          page: 'location-datetime',
+          page: 'location-date-time',
         }),
         { now },
       )

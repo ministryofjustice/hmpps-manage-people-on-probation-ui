@@ -403,7 +403,7 @@ describe('validates appointment location and date time page request with spec', 
   const args = {
     crn,
     id,
-    page: 'location-datetime',
+    page: 'location-date-time',
   }
   const spec = appointmentsValidation(args)
   it('should return the correct validation errors', () => {
