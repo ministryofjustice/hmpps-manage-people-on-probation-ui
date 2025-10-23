@@ -69,6 +69,7 @@ export const appointmentSummary = async (req: Request, res: AppResponse, client:
     }
   }
   const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
+  // setting appointment id to backendId (part of AppointmentSession ) to create 'anotherAppointment' link in confirmation.njk
   setDataValue(data, ['appointments', crn, id, 'backendId'], response.appointments[response.appointments.length - 1].id)
   return res.redirect(`${baseUrl}/confirmation`)
 }
@@ -476,10 +477,11 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
+      // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
+      const appointmentId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
       delete req.session.data.isOutLookEventFailed
-      return res.render(`pages/arrange-appointment/confirmation`, { crn, backendId, isOutLookEventFailed })
+      return res.render(`pages/arrange-appointment/confirmation`, { crn, appointmentId, isOutLookEventFailed })
     }
   },
   postConfirmation: () => {
