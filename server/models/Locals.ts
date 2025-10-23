@@ -96,6 +96,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  defaultUser?: { username: string; homeArea: string; team: string }
   sentencePlan?: SentencePlan
 }
 

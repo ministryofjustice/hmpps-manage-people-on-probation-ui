@@ -21,9 +21,8 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     const end = dateTime(date, endTime)
 
     const { _minDate, _maxDate } = getMinMaxDates()
-
     const localParams: LocalParams = { crn, id, _minDate, _maxDate }
-    const render = `pages/arrange-appointment/date-time`
+    const render = `pages/arrange-appointment/location-date-time`
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const body: CheckAppointment = { start, end }

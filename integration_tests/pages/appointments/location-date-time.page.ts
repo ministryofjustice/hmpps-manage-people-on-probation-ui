@@ -1,9 +1,9 @@
 import { DateTime } from 'luxon'
 import Page from '../page'
 
-export default class AppointmentDateTimePage extends Page {
+export default class AppointmentLocationDateTimePage extends Page {
   constructor() {
-    super('Enter the date and time of the appointment')
+    super('Appointment date, time and location')
   }
 
   getSummaryLink = () => {

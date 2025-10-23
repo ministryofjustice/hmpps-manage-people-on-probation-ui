@@ -2,13 +2,31 @@
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
-{% set title = 'Enter the date and time of the appointment' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/location' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance?back=attendance' %}
 {% set disabilities = [] %}
 {% set dependents = [] %}
 {% set employments = [] %}
 {% set relationship = '' %}
 {% set provisions = [] %}
+{% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
+{% set personForename = case.name.forename %}
+
+{% block heading %}
+{% set level = riskToStaff.levelDescription or riskToStaff.level %}
+{% if level and (level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
+{% set html %}
+<a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ personForename }}&apos;s risk to staff flag</a>
+{% endset %}
+{{ mojAlert({
+    variant: "warning",
+    title: personForename + " is " + riskLevelLabel(level) | lower + " risk to staff ",
+    showTitleAsHeading: true,
+    dismissible: false,
+    html: html
+}) }}
+{% endif %}
+<h3 class="govuk-heading-l" data-qa="pageHeading">Appointment date, time and location</h3>
+{% endblock %}
 
 {% for disability in case.disabilities.disabilities %}
   {% set disabilities = (disabilities.push(disability), disabilities) %}
@@ -101,6 +119,23 @@
     {% endset %}
 {% endif %}
 
+{% set locationItems = [] %}
+{% for location in userLocations %}
+{% set locationItems = (locationItems.push({
+    text: location.description | convertToTitleCase,
+    value: location.code,
+    attributes: {
+    'data-qa': 'locationOption'
+    }
+}), locationItems) %}
+{% endfor %}
+{% if userLocations.length > 0 %}
+{% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
+{% endif %}
+{% set locationItems = (locationItems.push({text: 'The location I’m looking for is not in this list', value: 'LOCATION_NOT_IN_LIST'}), locationItems) %}
+{% if not appointment.type.isLocationRequired %}
+{% set locationItems = (locationItems.push({text: 'I do not need to pick a location', value: 'NO_LOCATION_REQUIRED'}), locationItems) %}
+{% endif %}
 
 {% block form %}
   {% if warningMessages %}
@@ -126,6 +161,7 @@
         html: circumstancesHTML
     }) }}
 {% endif %}
+  <h3 class="govuk-heading-m">Enter the date and time of the appointment</h3>
   {{ mojDatePicker({
     label: {
         text: "Date"
@@ -138,46 +174,61 @@
   } | decorateFormAttributes(['appointments', crn, id, 'date'])) }}
 
   {{ govukInput({
-          label: {
-            text: "Start time",
-            classes: "govuk-label--s govuk-!-font-weight-regular"
-          },
-          hint: {
-                text: "Use the 24-hour format, for example 09:30 or 16:30."
-           },
-           attributes: {
-               size: 5,
-               maxlength: 5
-            },
-          formGroup: {
-            attributes: {
-              'data-qa': 'startTime'
-            }
-          },
-          classes: "govuk-input--width-3"
+    label: {
+    text: "Start time",
+    classes: "govuk-label--s govuk-!-font-weight-regular"
+    },
+    hint: {
+        text: "Use the 24-hour format, for example 09:30 or 16:30."
+    },
+    attributes: {
+        size: 5,
+        maxlength: 5
+    },
+    formGroup: {
+    attributes: {
+        'data-qa': 'startTime'
+    }
+    },
+    classes: "govuk-input--width-3"
    } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
 
      {{ govukInput({
-             label: {
-               text: "End time",
-               classes: "govuk-label--s govuk-!-font-weight-regular"
-             },
-             hint: {
-                    text: "Use the 24-hour format, for example 09:30 or 16:30."
-              },
-             attributes: {
-                 maxlength: 5,
-                 size: 5
-               },
-             formGroup: {
-               attributes: {
-                 'data-qa': 'endTime'
-               }
-             },
-             classes: "govuk-input--width-3"
+        label: {
+        text: "End time",
+        classes: "govuk-label--s govuk-!-font-weight-regular"
+        },
+        hint: {
+            text: "Use the 24-hour format, for example 09:30 or 16:30."
+        },
+        attributes: {
+            maxlength: 5,
+            size: 5
+        },
+        formGroup: {
+        attributes: {
+            'data-qa': 'endTime'
+        }
+        },
+        classes: "govuk-input--width-3"
      } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
 
 
   <input type="hidden" name="_minDate" value="{{_minDate}}">
   <input type="hidden" name="_maxDate" value="{{_maxDate}}">
+
+  <h3 class="govuk-heading-m govuk-!-margin-bottom-0">Pick a location for this appointment</h3>
+  {{ govukRadios({
+    fieldset: {
+      legend: {
+        html: '<span data-qa="pageHeading">' + title | safe + '</span>',
+        classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6",
+        isPageHeading: false
+      },
+      attributes: {
+        'data-qa': 'locationCode'
+      }
+    },
+    items: locationItems
+   } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
 {% endblock %}
