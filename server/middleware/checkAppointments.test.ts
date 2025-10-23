@@ -106,7 +106,7 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
   })
   it('should show the warnings the first time', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
-    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/date-time', {
+    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
       warningMessages: {
@@ -141,7 +141,7 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
   })
   it('should show the warnings the first time', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
-    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/date-time', {
+    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
       warningMessages: {
