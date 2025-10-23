@@ -102,6 +102,7 @@ export class FeatureFlags {
   enableNavCompliance?: boolean = undefined
   enableNavInterventions?: boolean = undefined
   enableAppointmentCreate?: boolean = undefined
+  enableOutlookEvent?: boolean = undefined
 }
 ```
 

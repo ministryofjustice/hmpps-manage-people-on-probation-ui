@@ -11,6 +11,7 @@ import { AppointmentSession, AppointmentType, MasUserDetails } from '../models/A
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import config from '../config'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
+import FlagService from '../services/flagService'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -18,6 +19,7 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/SupervisionAppointmentClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('../services/flagService')
 
 const crn = 'X000001'
 const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
@@ -151,6 +153,9 @@ const req = createMockReq(mockAppointment)
 const nextSpy = jest.fn()
 
 describe('/middleware/postAppointments', () => {
+  beforeEach(() => {
+    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValue({ enableOutlookEvent: false } as any)
+  })
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -364,5 +369,24 @@ describe('/middleware/postAppointments', () => {
       durationInMinutes: expectedDuration,
       supervisionAppointmentUrn: externalReference,
     })
+  })
+
+  it('should not create Outlook event and NOT set isOutLookEventFailed when enableOutlookEvent is true', async () => {
+    // Override the default flag for this test only
+    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValueOnce({ enableOutlookEvent: true } as any)
+
+    const localReq = createMockReq(mockAppointment)
+
+    const postSpy = jest
+      .spyOn(MasApiClient.prototype, 'postAppointments')
+      .mockResolvedValue({ appointments: [{ id: 1, externalReference: 'ref-1' }] })
+
+    const outlookSpy = jest.spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+
+    await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
+
+    expect(postSpy).toHaveBeenCalled()
+    expect(outlookSpy).not.toHaveBeenCalled()
+    expect(localReq.session.data.isOutLookEventFailed).toBeUndefined()
   })
 })

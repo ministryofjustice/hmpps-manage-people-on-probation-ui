@@ -1,6 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { Response } from 'supertest'
-import moment from 'moment'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '../utils'
 import { HmppsAuthClient } from '../data'
@@ -16,6 +13,8 @@ import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/Out
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
+import FlagService from '../services/flagService'
+import { FeatureFlags } from '../data/model/featureFlags'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -23,7 +22,6 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
-
     const { data } = req.session
     const {
       user: { username, locationCode, teamCode },
@@ -76,7 +74,10 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const response = await masClient.postAppointments(crn, body)
     const userDetails = await masClient.getUserDetails(username)
     let outlookEventResponse: OutlookEventResponse
-    if (userDetails?.email) {
+
+    const flagService = new FlagService()
+    const featureFlags: FeatureFlags = await flagService.getFlags()
+    if (!featureFlags.enableOutlookEvent && userDetails?.email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
@@ -98,7 +99,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
+    if (!featureFlags.enableOutlookEvent && (!userDetails?.email || !outlookEventResponse.id))
+      data.isOutLookEventFailed = true
 
     return response
   }
