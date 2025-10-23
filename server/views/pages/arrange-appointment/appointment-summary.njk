@@ -122,7 +122,7 @@
     value: { html: 'Not entered' if (not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) else attendingHtml | safe },
     actions: {
     items: [ { 
-    href: changePath + "/attendance?change=" + url + "&back=attendance", 
+    href: changePath + "/attendance?change=" + url, 
     text: "Choose attending" if (not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) else "Change", 
     visuallyHiddenText: "attendance"
      } 
