@@ -155,7 +155,7 @@ const nextSpy = jest.fn()
 
 describe('/middleware/postAppointments', () => {
   beforeEach(() => {
-    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValue({ enableOutlookEvent: false } as FeatureFlags)
+    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValue({ enableOutlookEvent: true } as FeatureFlags)
   })
   afterEach(() => {
     jest.clearAllMocks()
@@ -372,9 +372,9 @@ describe('/middleware/postAppointments', () => {
     })
   })
 
-  it('should not create Outlook event and NOT set isOutLookEventFailed when enableOutlookEvent is true', async () => {
+  it('should not create Outlook event and NOT set isOutLookEventFailed when enableOutlookEvent is false', async () => {
     // Override the default flag for this test only
-    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValueOnce({ enableOutlookEvent: true } as FeatureFlags)
+    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValueOnce({ enableOutlookEvent: false } as FeatureFlags)
 
     const localReq = createMockReq(mockAppointment)
 
