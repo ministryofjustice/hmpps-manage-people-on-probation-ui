@@ -7,12 +7,11 @@ import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import {
   checkPopHeader,
   completeCYAPage,
-  completeDateTimePage,
-  completeLocationPage,
   completeSupportingInformationPage,
   completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
+  completeLocationDateTimePage,
 } from './imports'
 
 const crn = 'X000001'
@@ -24,12 +23,9 @@ const loadPage = () => {
 const completeAppointment = () => {
   completeSentencePage()
   completeTypePage()
-  completeLocationPage()
-  completeDateTimePage()
-  completeRepeatingPage()
+  completeLocationDateTimePage()
   completeSupportingInformationPage()
   completeCYAPage()
-  // completeConfirmationPage()
 }
 
 describe('Create next appointment', () => {

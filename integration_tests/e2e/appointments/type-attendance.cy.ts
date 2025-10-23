@@ -8,7 +8,7 @@ import { getWiremockData, Wiremock } from '../../utils'
 import { checkPopHeader, completeSentencePage } from './imports'
 import { toSentenceCase } from '../../../server/utils'
 import AttendancePage from '../../pages/appointments/attendance.page'
-import AppointmentLocationPage from '../../pages/appointments/location.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
 const mockData = mockResponse as Wiremock
 
@@ -24,7 +24,7 @@ const loadPage = () => {
 describe('Arrange an appointment', () => {
   let typePage: AppointmentTypePage
   let attendancePage: AttendancePage
-  let locationPage: AppointmentLocationPage
+  let locationPage: AppointmentLocationDateTimePage
   afterEach(() => {
     cy.task('resetMocks')
   })
@@ -79,7 +79,7 @@ describe('Arrange an appointment', () => {
           typePage.getSubmitBtn().click()
         })
         it('should redirect to the location page', () => {
-          locationPage = new AppointmentLocationPage()
+          locationPage = new AppointmentLocationDateTimePage()
           locationPage.checkOnPage()
         })
       })
@@ -136,7 +136,7 @@ describe('Arrange an appointment', () => {
             typePage.getSubmitBtn().click()
           })
           it('should redirect to the location page', () => {
-            locationPage = new AppointmentLocationPage()
+            locationPage = new AppointmentLocationDateTimePage()
             locationPage.checkOnPage()
           })
         })
