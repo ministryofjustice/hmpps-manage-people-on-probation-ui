@@ -169,7 +169,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id) || (number && !isNumericString(number))) {
         return renderError(404)(req, res)
       }
-      let redirect = `/case/${crn}/arrange-appointment/${id}/location${query}`
+      let redirect = `/case/${crn}/arrange-appointment/${id}/location-date-time${query}`
       if (change) {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }

@@ -52,7 +52,7 @@ describe('Arrange an appointment in another location', () => {
     const locationPage = new AppointmentLocationDateTimePage()
     locationPage.checkOnPage()
   })
-  it('should return to the attending page if no locations found and location selection is mandatory', () => {
+  it('should return to the type attending page if no locations found and location selection is mandatory', () => {
     cy.task('stubNoUserLocationsFound')
     const locations = false
     loadPage(locations)

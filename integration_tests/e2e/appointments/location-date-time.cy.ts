@@ -9,7 +9,6 @@ import AppointmentNotePage from '../../pages/appointments/note.page'
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
   completeTypePage(typeOptionIndex)
-  completeAttendancePage()
 }
 
 describe('Pick a date, location and time for this appointment', () => {
