@@ -9,7 +9,7 @@ import { Option } from '../models/Option'
 
 export const filterActivityLog: Route<void> = (req, res, next): void => {
   if (req?.query?.clear) {
-    // Only clear session when there is no query params in a GET request, or it has been explicitly requested
+    // Only clear session when it has been explicitly requested
     req.session.activityLogFilters = undefined
     req.session.errorMessages = undefined
   }

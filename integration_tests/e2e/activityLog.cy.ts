@@ -95,7 +95,7 @@ context('Activity log', () => {
       cardBody,
       1,
       0,
-      '/case/X000001/appointments/appointment/11/manage/note/1?back=%2Fcase%2FX000001%2Factivity-log',
+      '/case/X000001/appointments/appointment/11/manage/note/1?back=/case/X000001/activity-log',
     )
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
@@ -415,11 +415,7 @@ context('Activity log', () => {
     page
       .getCardHeader('timeline7')
       .find('.app-summary-card__actions a')
-      .should(
-        'have.attr',
-        'href',
-        '/case/X000001/appointments/appointment/16/manage?back=%2Fcase%2FX000001%2Factivity-log',
-      )
+      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage?back=/case/X000001/activity-log')
 
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
