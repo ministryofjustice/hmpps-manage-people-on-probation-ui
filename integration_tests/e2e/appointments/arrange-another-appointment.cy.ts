@@ -1,8 +1,7 @@
 import { v4 } from 'uuid'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
-import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
-import AppointmentLocationPage from '../../pages/appointments/location.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import {
@@ -18,6 +17,7 @@ import {
   checkUpdateSensitivity,
   checkUpdateBackLinkRefresh,
 } from './imports'
+import AttendancePage from '../../pages/appointments/attendance.page'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
@@ -38,7 +38,7 @@ describe('Arrange another appointment', () => {
     arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
   })
   describe('User clicks submit without selecting a date and time', () => {
-    let dateTimePage: AppointmentDateTimePage
+    let dateTimePage: AppointmentLocationDateTimePage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
       cy.task('stubNextAppointment')
@@ -48,11 +48,16 @@ describe('Arrange another appointment', () => {
     })
 
     it('should redirect to the date/time page', () => {
-      dateTimePage = new AppointmentDateTimePage()
+      dateTimePage = new AppointmentLocationDateTimePage()
       dateTimePage.checkOnPage()
     })
     it('should display the error summary box', () => {
-      dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Enter a start time', 'Enter an end time'])
+      dateTimePage.checkErrorSummaryBox([
+        'Enter or select a date',
+        'Enter a start time',
+        'Enter an end time',
+        'Select an appointment location',
+      ])
     })
     it('should display the error messages', () => {
       getUuid().then(uuid => {
@@ -64,6 +69,9 @@ describe('Arrange another appointment', () => {
         })
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
           expect($error.text().trim()).to.include('Enter an end time')
+        })
+        dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode-error`).should($error => {
+          expect($error.text().trim()).to.include('Select an appointment location')
         })
       })
     })
@@ -95,20 +103,34 @@ describe('Arrange another appointment', () => {
 
   describe('User clicks submit without selecting a location', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let locationPage: AppointmentLocationPage
+    let locationPage: AppointmentLocationDateTimePage
     beforeEach(() => {
       cy.task('stubAppointmentNoLocation')
       loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
-      locationPage = new AppointmentLocationPage()
+      locationPage = new AppointmentLocationDateTimePage()
       locationPage.checkOnPage()
     })
     it('should display the error summary box', () => {
-      locationPage.checkErrorSummaryBox(['Select an appointment location'])
+      locationPage.checkErrorSummaryBox([
+        'Enter or select a date',
+        'Enter a start time',
+        'Enter an end time',
+        'Select an appointment location',
+      ])
     })
     it('should display the error messages', () => {
       getUuid().then(uuid => {
+        locationPage.getElement(`#appointments-X000001-${uuid}-date-error`).should($error => {
+          expect($error.text().trim()).to.include('Enter or select a date')
+        })
+        locationPage.getElement(`#appointments-X000001-${uuid}-start-error`).should($error => {
+          expect($error.text().trim()).to.include('Enter a start time')
+        })
+        locationPage.getElement(`#appointments-X000001-${uuid}-end-error`).should($error => {
+          expect($error.text().trim()).to.include('Enter an end time')
+        })
         locationPage.getElement(`#appointments-X000001-${uuid}-user-locationCode-error`).should($error => {
           expect($error.text().trim()).to.include('Select an appointment location')
         })
@@ -134,9 +156,6 @@ describe('Arrange another appointment', () => {
     })
     it('should update the date when value is changed', () => {
       checkUpdateDateTime(arrangeAnotherAppointmentPage)
-    })
-    it('should update the repeat appointment when value is changed', () => {
-      checkUpdateRepeating(arrangeAnotherAppointmentPage)
     })
     it('should update the notes when value is changed', () => {
       checkUpdateSensitivity(arrangeAnotherAppointmentPage)
