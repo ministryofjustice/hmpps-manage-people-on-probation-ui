@@ -1,7 +1,5 @@
 import ActivityLogPage from '../../pages/activityLog'
 import AppointmentPage from '../../pages/appointment'
-import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
-import Page from '../../pages/page'
 
 const loadPage = () => {}
 
@@ -11,7 +9,7 @@ describe('View appointment note page', () => {
     const page = new AppointmentPage()
     page.appointmentType().should('contain.text', 'Communication')
     page.appointmentTitle().should('contain.text', 'Phone call with Terry Jones')
-    page.getCardHeader('appointmentDetails').should('contain.text', 'Appointment details')
+    page.getCardHeader('appointmentDetails').should('contain.text', 'Details')
     page.getRowData('appointmentDetails', 'type', 'Value').should('contain.text', 'Phone call')
     page.getRowData('appointmentDetails', 'date', 'Value').should('contain.text', 'Thursday 22 December')
     page.getRowData('appointmentDetails', 'time', 'Value').should('contain.text', '9:15am to 9:30am')
@@ -22,12 +20,12 @@ describe('View appointment note page', () => {
     page.getRowData('appointmentDetails', 'note', 'Value').should('contain.text', 'Email sent to Stuart')
     page.getRowData('appointmentDetails', 'sensitive', 'Label').should('contain.text', 'No')
   })
-  it('Back link goes to manage page by default', () => {
+  it('Back link goes to activity log by default', () => {
     cy.visit('/case/X000001/appointments/appointment/11/manage/note/1')
     const page = new AppointmentPage()
     page.getBackLink().click()
-    const managePage = new ManageAppointmentPage()
-    managePage.checkPageTitle('Manage phone call with Terry Jones')
+    const activityLogPage = new ActivityLogPage()
+    activityLogPage.checkOnPage()
   })
   it('Back link goes to source page', () => {
     cy.visit('/case/X000001/activity-log')
@@ -41,11 +39,11 @@ describe('View appointment note page', () => {
     cy.visit('/case/X000001/activity-log')
     const activityLogPage = new ActivityLogPage()
     activityLogPage.getTimelineCard(2).find('.app-summary-card__title').find('a').click()
-    const managePage = new ManageAppointmentPage()
-    managePage.getAppointmentDetailsListItem(5, 'value').find('.app-note').eq(1).find('a').click()
+    const appointmentPage = new AppointmentPage()
+    appointmentPage.getRowData('appointmentDetails', 'notes', 'Value').find('.app-note').eq(1).find('a').click()
     const page = new AppointmentPage()
     page.getBackLink().click()
-    managePage.getBackLink().click()
+    appointmentPage.getBackLink().click()
     activityLogPage.checkOnPage()
   })
 })
