@@ -20,7 +20,7 @@ const unmatchedUserDetails = {
   team: 'wrong',
 }
 const matchedUserDetails = {
-  username: 'peter-parker',
+  username: 'PETER-PARKER',
   homeArea: 'London',
   team: 'Ascot House Approved Premises',
 }
