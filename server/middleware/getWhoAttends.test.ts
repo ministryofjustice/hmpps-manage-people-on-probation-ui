@@ -15,7 +15,7 @@ const username = 'user-1'
 
 const mockAPIResponse = {
   defaultUserDetails: {
-    username: 'peter-parker',
+    username: 'bad-default',
     homeArea: 'London',
     team: 'Automated Allocation Team',
   },
