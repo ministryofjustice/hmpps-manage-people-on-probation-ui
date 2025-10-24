@@ -57,6 +57,9 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
           }
           return { code: provider.code, name: provider.name }
         })
+        if (getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) === undefined) {
+          setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], displayedProviders[0].code)
+        }
 
         displayedTeams = teams.map(team => {
           if (team.description === defaultUserDetails.team) {
@@ -65,6 +68,9 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
           }
           return { description: team.description, code: team.code }
         })
+        if (getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) === undefined) {
+          setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], displayedTeams[0].code)
+        }
 
         displayedUsers = users.map(user => {
           if (user.username.toUpperCase() === defaultUserDetails.username) {
@@ -73,6 +79,9 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
           }
           return { username: user.username, nameAndRole: user.nameAndRole }
         })
+        if (getDataValue(data, ['appointments', crn, id, 'user', 'username']) === undefined) {
+          setDataValue(data, ['appointments', crn, id, 'user', 'username'], displayedUsers[0].username)
+        }
       }
 
       req.session.data = {
