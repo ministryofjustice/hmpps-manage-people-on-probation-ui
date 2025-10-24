@@ -4,6 +4,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
+import { UserProviders } from '../data/model/caseload'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -13,12 +14,18 @@ jest.mock('../data/tokenStore/redisTokenStore')
 
 const username = 'user-1'
 
-const mockAPIResponse = {
-  defaultUserDetails: {
-    username: 'bad-default',
-    homeArea: 'London',
-    team: 'Automated Allocation Team',
-  },
+const unmatchedUserDetails = {
+  username: 'wrong',
+  homeArea: 'wrong',
+  team: 'wrong',
+}
+const matchedUserDetails = {
+  username: 'peter-parker',
+  homeArea: 'London',
+  team: 'Automated Allocation Team',
+}
+
+const rest = {
   providers: [
     {
       code: 'N50',
@@ -57,6 +64,15 @@ const mockAPIResponse = {
       name: 'jon smith (PS-PSO)',
     },
   ],
+}
+
+const mockAPIResponse = {
+  ...rest,
+  defaultUserDetails: matchedUserDetails,
+} as any
+const mockAPIResponseUnmatched = {
+  ...rest,
+  defaultUserDetails: unmatchedUserDetails,
 } as any
 
 const expectedSession = {
@@ -93,34 +109,46 @@ describe('/middleware/getWhoAttends()', () => {
 
   const spy = jest
     .spyOn(MasApiClient.prototype, 'getUserProviders')
-    .mockImplementation(() => Promise.resolve(mockAPIResponse))
+    .mockImplementation((user, regionCode, teamCode): Promise<UserProviders> => {
+      if (user === 'user-1') {
+        return Promise.resolve(mockAPIResponse)
+      }
+      return Promise.resolve(mockAPIResponseUnmatched)
+    })
 
   afterEach(() => {
     jest.clearAllMocks()
   })
 
   describe('If current user providers do not exist in session', () => {
+    const mockRes = {
+      locals: {
+        user: {
+          username: 'not',
+        },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
     const req = httpMocks.createRequest({
       session: {
         data: {
           providers: {
-            'user-2': mockAPIResponse.providers,
+            'user-1': mockAPIResponse.providers,
           },
         },
       },
     })
     beforeEach(async () => {
-      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+      await getWhoAttends(hmppsAuthClient)(req, mockRes, nextSpy)
     })
     it('should fetch the user providers from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
+      expect(spy).toHaveBeenCalledWith('not', undefined, undefined)
       expect(req.session.data.providers).toEqual({
         ...req.session.data.providers,
-        [username]: expectedSession.providers,
       })
     })
     it('should assign the user providers to res.locals', () => {
-      expect(res.locals.userProviders).toEqual(expectedSession.providers)
+      expect(res.locals.userProviders).toEqual(undefined)
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalled()
@@ -153,6 +181,7 @@ describe('/middleware/getWhoAttends()', () => {
       expect(nextSpy).toHaveBeenCalled()
     })
   })
+
   describe('back link selected', () => {
     const req = httpMocks.createRequest({
       session: {
