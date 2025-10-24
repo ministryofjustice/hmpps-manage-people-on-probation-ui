@@ -95,7 +95,7 @@ context('Activity log', () => {
       cardBody,
       1,
       0,
-      '/case/X000001/appointments/appointment/11/manage/note/1?category=undefined&view=default&requirement=undefined&undefined&page=0&back=/case/X000001/activity-log',
+      '/case/X000001/appointments/appointment/11/manage/note/1?back=/case/X000001/activity-log',
     )
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {

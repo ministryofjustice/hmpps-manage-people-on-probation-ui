@@ -8,8 +8,7 @@ import { ActivityLogFilters, SelectedFilterItem } from '../models/ActivityLog'
 import { Option } from '../models/Option'
 
 export const filterActivityLog: Route<void> = (req, res, next): void => {
-  if (req?.query?.clear || (Object.keys(req.query).length === 0 && req.method === 'GET')) {
-    // Only clear session when there is no query params in a GET request, or it has been explicitly requested
+  if (req?.query?.clear) {
     req.session.activityLogFilters = undefined
     req.session.errorMessages = undefined
   }

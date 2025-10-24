@@ -161,14 +161,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       } else {
         back = getDataValue(data, ['backLink', 'manage'])
       }
-      let queryParams = getQueryString(req.query as Record<string, string>)
-      if (queryParams.length > 0) {
-        setDataValue(data, ['query'], queryParams)
-      } else {
-        queryParams = getDataValue(data, ['query'])
-      }
       const { url } = req
-      const baseUrl = url.split('?')[0]
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const { username } = res.locals.user
@@ -184,8 +177,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         personAppointment,
         crn,
         back,
-        queryParams,
-        url: baseUrl,
+        url,
         nextAppointment,
         nextAppointmentIsAtHome,
       })
@@ -374,7 +366,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
-      const queryParams = getQueryString(req.query as Record<string, string>)
       const { back } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENT_NOTE',
@@ -385,7 +376,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       res.render('pages/appointments/appointment', {
-        queryParams,
         back,
         personAppointment,
         crn,

@@ -2,7 +2,7 @@
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 
 {% set titleHtml %}
-<a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="govuk-!-font-weight-bold">{% include './_communication-title.njk' %} at&nbsp;{{ entry.startDateTime | govukTime }}
+<a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?back={{ url }}" class="govuk-!-font-weight-bold">{% include './_communication-title.njk' %} at&nbsp;{{ entry.startDateTime | govukTime }}
   <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 {% endset %}
 {% set actionsHtml %}
