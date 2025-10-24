@@ -8,7 +8,11 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "appointments": [{ "id": 1 }, { "id": 2 }, { "id": 3 }]
+          "appointments": [
+            { "id": 1, "externalReference": "apt-ref-1" },
+            { "id": 2, "externalReference": "apt-ref-2" },
+            { "id": 3, "externalReference": "apt-ref-3" }
+          ]
         },
         "headers": {
           "Content-Type": "application/json"

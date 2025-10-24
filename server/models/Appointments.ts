@@ -131,6 +131,7 @@ export interface AppointmentCheck {
 
 export interface AppointmentPostResponse {
   id: number
+  externalReference: string
 }
 
 export interface AppointmentsPostResponse {
@@ -151,4 +152,14 @@ export interface LocalParams {
   actionType?: string
   back?: string
   change?: string
+}
+
+export interface MasUserDetails {
+  userId: number
+  username: string
+  firstName: string
+  surname: string
+  email?: string
+  enabled: boolean
+  roles: string[]
 }
