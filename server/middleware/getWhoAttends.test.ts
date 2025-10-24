@@ -120,7 +120,7 @@ describe('/middleware/getWhoAttends()', () => {
     jest.clearAllMocks()
   })
 
-  describe('If current user providers do not exist in session', () => {
+  describe('If defaults do not match userProviders ', () => {
     const mockRes = {
       locals: {
         user: {
@@ -149,6 +149,33 @@ describe('/middleware/getWhoAttends()', () => {
     })
     it('should assign the user providers to res.locals', () => {
       expect(res.locals.userProviders).toEqual(undefined)
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
+    })
+  })
+  describe('If current user providers do not exist in session', () => {
+    const req = httpMocks.createRequest({
+      session: {
+        data: {
+          providers: {
+            'user-2': mockAPIResponse.providers,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should fetch the user providers from the api and assign to session', () => {
+      expect(spy).toHaveBeenCalledWith('not', undefined, undefined)
+      expect(req.session.data.providers).toEqual({
+        ...req.session.data.providers,
+        [username]: expectedSession.providers,
+      })
+    })
+    it('should assign the user providers to res.locals', () => {
+      expect(res.locals.userProviders).toEqual(req.session.data.providers[username])
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalled()
