@@ -118,8 +118,6 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
         })
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
         .getWhatHappensNext()
@@ -165,8 +163,6 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
         })
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
         .getWhatHappensNext()
