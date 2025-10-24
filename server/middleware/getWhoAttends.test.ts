@@ -22,7 +22,7 @@ const unmatchedUserDetails = {
 const matchedUserDetails = {
   username: 'peter-parker',
   homeArea: 'London',
-  team: 'Automated Allocation Team',
+  team: 'Ascot House Approved Premises',
 }
 
 const rest = {
