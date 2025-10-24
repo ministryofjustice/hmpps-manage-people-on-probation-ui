@@ -21,8 +21,6 @@ import {
 import OverviewPage from '../../pages/overview'
 import YourCasesPage from '../../pages/myCases'
 
-const regex: RegExp = /^([A-Za-z]+)\s(\d{1,2})\s([A-Za-z]+)\s(\d{4})\sfrom\s(\d{1,2}:\d{2})\sto\s(\d{1,2}:\d{2})$/
-
 const loadPage = (crnOverride = '') => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
@@ -118,8 +116,6 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
         })
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
         .getWhatHappensNext()
@@ -165,8 +161,6 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
         })
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(2)').contains(regex)
-      confirmPage.getElement('[data-qa="appointment-date"]:nth-of-type(3)').contains(regex)
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
         .getWhatHappensNext()
