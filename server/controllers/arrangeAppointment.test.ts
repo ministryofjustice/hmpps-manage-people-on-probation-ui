@@ -955,7 +955,9 @@ describe('controllers/arrangeAppointment', () => {
       }
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      mockedPostAppointments.mockReturnValue(() => Promise.resolve({ appointments: [{ id: 0 }] }))
+      mockedPostAppointments.mockReturnValue(() =>
+        Promise.resolve({ appointments: [{ id: 0, externalReference: 'apt-ref-1' }] }),
+      )
       const mockReq = createMockRequest({ appointmentSession })
       await controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient)(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
@@ -1002,9 +1004,7 @@ describe('controllers/arrangeAppointment', () => {
       const handler = jest.fn()
       mockedCloneAppointment.mockReturnValue(handler)
       await controllers.arrangeAppointments.postConfirmation()(mockReq, res)
-      expect(res.redirect).toHaveBeenCalledWith(
-        `/case/${mockReq.params.crn}/appointments/appointment/5/next-appointment?back=${mockReq.url}`,
-      )
+      expect(res.redirect).toHaveBeenCalledWith(`/case/${mockReq.params.crn}?back=${mockReq.url}`)
     })
   })
   describe('getArrangeAnotherAppointment', () => {
@@ -1070,7 +1070,9 @@ describe('controllers/arrangeAppointment', () => {
       })
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      mockedPostAppointments.mockReturnValue(() => Promise.resolve({ appointments: [{ id: 0 }] }))
+      mockedPostAppointments.mockReturnValue(() =>
+        Promise.resolve({ appointments: [{ id: 0, externalReference: 'apt-ref-1' }] }),
+      )
       await controllers.arrangeAppointments.postArrangeAnotherAppointment()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })
