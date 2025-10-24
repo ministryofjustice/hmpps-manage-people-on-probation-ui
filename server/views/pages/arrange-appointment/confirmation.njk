@@ -64,8 +64,8 @@
                 <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send you a calendar invitation.</p>
                 <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.</p>
             {% else %}
-                <p>The appointment has been added to:</p>
-                <ul class="govuk-list govuk-list--bullet" data-qa="outlook-msg">
+                <p class="govuk-!-margin-bottom-0">The appointment has been added to:</p>
+                <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
                     {% if flags.enableOutlookEvent === true %}
                     <li>your calendar</li>
                     {% endif %}
@@ -73,8 +73,8 @@
                 </ul>
             {% endif %}
         <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
-            <p>You can:</p>
-            <ul class="govuk-list govuk-list--bullet">
+            <p class="govuk-!-margin-bottom-0">You can:</p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
                 <li><a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
                         arrange another appointment
                     </a>
