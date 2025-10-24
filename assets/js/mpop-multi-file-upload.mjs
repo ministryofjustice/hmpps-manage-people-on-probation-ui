@@ -104,21 +104,21 @@ class MpopMultiFileUpload extends ConfigurableComponent {
     for (const file of files) {
       if (!validMimeTypes.includes(file.type)) {
         this.setUploadRow(file)
-        this.config.uploadFileErrorHook({
+        this.config.hooks.errorHook({
           handle: this,
           file,
           errorMessage: `${file.name}: File type must be pdf or word`,
         })
       } else if (file.size > window.maxFileSize) {
         this.setUploadRow(file)
-        this.config.uploadFileErrorHook({
+        this.config.hooks.errorHook({
           handle: this,
           file,
           errorMessage: `${file.name}: File size must be 5mb or under`,
         })
       } else if (i > window.fileUploadLimit) {
         this.setUploadRow(file)
-        this.config.uploadFileErrorHook({
+        this.config.hooks.errorHook({
           handle: this,
           file,
           errorMessage: `${file.name}: You can only select up to ${window.fileUploadLimit} files at the same time`,
@@ -234,14 +234,14 @@ class MpopMultiFileUpload extends ConfigurableComponent {
    * @param {File} file
    */
   uploadFile(file) {
-    this.config.hooks.entryHook(this, file)
+    const formData = new FormData()
+    this.config.hooks.entryHook(this, file, formData)
     const template = document.createElement('template')
     template.innerHTML = this.getFileRowHtml(file).trim()
     const $item = template.content.firstElementChild
     const $message = $item.querySelector('.moj-multi-file-upload__message')
     const $actions = $item.querySelector('.moj-multi-file-upload__actions')
     const $progress = $item.querySelector('.moj-multi-file-upload__progress')
-    const formData = new FormData()
     formData.append('documents', file)
     this.$feedbackContainer.querySelector('.moj-multi-file-upload__list').append($item)
     const xhr = new XMLHttpRequest()
@@ -260,7 +260,7 @@ class MpopMultiFileUpload extends ConfigurableComponent {
       )
       $message.innerHTML = this.getErrorHtml(error, file.name)
       this.$status.textContent = error.message
-      this.config.hooks.errorHook(this, file, xhr, xhr.responseText, error)
+      this.config.hooks.errorHook(this, file, xhr, '', error)
     }
     xhr.addEventListener('load', onLoad)
     xhr.addEventListener('error', onError)
