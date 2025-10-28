@@ -26,21 +26,18 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     ])
     const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
     const sentencePlan: SentencePlan = { showLink: false, lastUpdatedDate: '' }
-    try {
-      const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
-      sentencePlan.showLink =
-        res.locals.flags.enableSentencePlan &&
-        sentencePlans?.[0] !== undefined &&
-        res.locals?.user?.roles?.includes('SENTENCE_PLAN') &&
-        popInUsersCaseload
+    if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {
+      try {
+        const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
+        sentencePlan.showLink =
+          res.locals.flags.enableSentencePlan && sentencePlans?.[0] !== undefined && popInUsersCaseload
 
-      if (sentencePlan.showLink && sentencePlans[0]?.lastUpdatedDate)
-        sentencePlan.lastUpdatedDate = sentencePlans[0].lastUpdatedDate
-    } catch (error) {
-      logger.error(error, 'Failed to connect to sentence plan service.')
-      sentencePlan.showLink = false
+        if (sentencePlan.showLink && sentencePlans[0]?.lastUpdatedDate)
+          sentencePlan.lastUpdatedDate = sentencePlans[0].lastUpdatedDate
+      } catch (error) {
+        logger.error(error, 'Failed to connect to sentence plan service.')
+      }
     }
-
     req.session.data = {
       ...(req?.session?.data ?? {}),
       personalDetails: {
