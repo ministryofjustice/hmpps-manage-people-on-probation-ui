@@ -22,6 +22,8 @@ export default abstract class Page {
 
   menuButton = (): PageElement => cy.get('button[aria-controls="probation-common-header-user-menu"]')
 
+  menuButtonBySpan = (): PageElement => cy.get('span.probation-common-header__menu-toggle-label')
+
   feSignOut = (): PageElement => cy.get('a.probation-common-header__submenu-link')
 
   signOut = (): PageElement => cy.get('[data-qa=signOut]')
