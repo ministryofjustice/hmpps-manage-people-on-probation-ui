@@ -10,7 +10,7 @@ context('Sign In', () => {
   it('User name visible in header', () => {
     cy.visit('/')
     const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.headerUserName().should('contain.text', 'J. Smith')
+    indexPage.headerUserNameByAnySpan().contains('J. Smith').should('exist')
   })
 
   it('Phase banner visible in header', () => {
@@ -22,7 +22,8 @@ context('Sign In', () => {
   it('User can sign out', () => {
     cy.visit('/')
     const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.signOut().click()
+    indexPage.menuButton().click()
+    indexPage.feSignOut().eq(1).click()
     Page.verifyOnPage(AuthSignInPage)
   })
 })

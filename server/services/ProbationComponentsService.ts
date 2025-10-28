@@ -10,7 +10,7 @@ export default class ProbationComponentsService {
     components: T,
     token: string,
   ): Promise<Record<T[number], Component>> {
-    logger.info('Getting FE details : calling Probation FE components API')
+    logger.info('Getting FE details  : calling Probation FE components API')
     return this.probationFEComponentsClient.getComponents(components, token)
   }
 }

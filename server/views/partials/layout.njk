@@ -37,6 +37,14 @@
   {% if flags.enableDeleteAppointmentFile %}
     <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
   {% endif %}
+    {% if feComponents.cssIncludes %}
+        {% for css in feComponents.cssIncludes %}
+            <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+        {% endfor %}
+    {% else %}
+        <link href="/assets/css/fe_app_header.css" rel="stylesheet"/>
+        <link href="/assets/css/fe_app_footer.css" rel="stylesheet"/>
+    {% endif %}
 {% endblock %}
 
 {% block pageTitle %}{{pageTitle | default(applicationName)}}
@@ -50,16 +58,11 @@
 
 {% block bodyStart %}{% endblock %}
 {% block footer %}
-  {{ govukFooter({
-        meta: {
-          items: [
-            {
-              href: "/accessibility",
-              text: "Accessibility"
-            }
-          ]
-        }
-      }) }}
+    {% if feComponents.footer %}
+        {{ feComponents.footer | safe }}
+    {% else %}
+        {% include "./_footer.njk" %}
+    {% endif %}
 {% endblock %}
 {% block bodyEnd %}
   {% if sentry and sentry.loaderScriptId %}
@@ -83,6 +86,13 @@
   {% endif %}
   <script src="/assets/js/jquery.min.js"></script>
   <script type="module" src="/assets/js/app.js"></script>
+    {% if feComponents.jsIncludes %}
+        {% for js in feComponents.jsIncludes %}
+            <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+        {% endfor %}
+    {% else %}
+        <script type="module" src="/assets/js/prob_fe_app.js"></script>
+    {% endif %}
   <script nonce="{{ cspNonce }}">
     window.csrfToken = "{{ csrfToken }}";
   </script>
