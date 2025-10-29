@@ -2,7 +2,7 @@
 {%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
 {%- from "moj/components/alert/macro.njk" import mojAlert -%}
 
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance?back=attendance' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/type-attendance' %}
 {% set disabilities = [] %}
 {% set dependents = [] %}
 {% set employments = [] %}
