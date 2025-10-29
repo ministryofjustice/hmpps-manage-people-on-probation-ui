@@ -22,7 +22,7 @@ context('Sign In', () => {
   it('User can sign out', () => {
     cy.visit('/')
     const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.menuButtonBySpan().should('be.visible').click()
+    indexPage.menuButtonBySpan().eq(1).should('be.visible').click()
     indexPage.feSignOut().eq(1).should('be.visible').click()
     Page.verifyOnPage(AuthSignInPage)
   })
