@@ -5,9 +5,13 @@ export default class IndexPage extends Page {
     super('Manage people on probation')
   }
 
+  headerUserName = (): PageElement => cy.get('[data-qa=header-user-name]')
+
   headerUserNameByAnySpan = (): PageElement => cy.get('span')
 
-  headerPhaseBanner = (): PageElement => cy.get('[data-qa=probation-common-environment-tag]')
+  headerPhaseBanner = (): PageElement => cy.get('[data-qa=header-phase-banner]')
+
+  headerPhaseProbFEBanner = (): PageElement => cy.get('[data-qa=probation-common-environment-tag]')
 
   getAppointments = (): PageElement => cy.get('[data-qa=homepage-appointments]')
 

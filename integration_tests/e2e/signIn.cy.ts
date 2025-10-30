@@ -3,6 +3,10 @@ import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
 
 context('Sign In', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+    cy.task('stubDisableProbFEComponent')
+  })
   afterEach(() => {
     cy.task('resetMocks')
   })
@@ -10,7 +14,7 @@ context('Sign In', () => {
   it('User name visible in header', () => {
     cy.visit('/')
     const indexPage = Page.verifyOnPage(IndexPage)
-    indexPage.headerUserNameByAnySpan().contains('J. Smith').should('exist')
+    indexPage.headerUserName().should('contain.text', 'J. Smith')
   })
 
   it('Phase banner visible in header', () => {
@@ -21,9 +25,8 @@ context('Sign In', () => {
 
   it('User can sign out', () => {
     cy.visit('/')
-    Page.verifyOnPage(IndexPage)
-    // The FE header user menu toggle can be hidden in CI; navigate directly to sign-out route instead
-    cy.visit('/sign-out')
+    const indexPage = Page.verifyOnPage(IndexPage)
+    indexPage.signOut().click()
     Page.verifyOnPage(AuthSignInPage)
   })
 })

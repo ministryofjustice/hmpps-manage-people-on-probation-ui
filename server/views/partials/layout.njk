@@ -37,13 +37,15 @@
   {% if flags.enableDeleteAppointmentFile %}
     <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
   {% endif %}
-    {% if feComponents.cssIncludes %}
-        {% for css in feComponents.cssIncludes %}
-            <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
-        {% endfor %}
-    {% else %}
-        <link href="/assets/css/fe_app_header.css" rel="stylesheet"/>
-        <link href="/assets/css/fe_app_footer.css" rel="stylesheet"/>
+    {% if flags.enableProbFEComponent === true %}
+        {% if feComponents.cssIncludes %}
+            {% for css in feComponents.cssIncludes %}
+                <link href="{{ css }}" nonce="{{ cspNonce }}" rel="stylesheet" />
+            {% endfor %}
+        {% else %}
+            <link href="/assets/css/fallback_prob_fe_app_header.css" nonce="{{ cspNonce }}" rel="stylesheet"/>
+            <link href="/assets/css/fallback_prob_fe_app_footer.css" nonce="{{ cspNonce }}" rel="stylesheet"/>
+        {% endif %}
     {% endif %}
 {% endblock %}
 
@@ -51,18 +53,14 @@
 {% endblock %}
 
 {% block header %}
-  {% include "./header.njk" %}
+  {% include "./prob_fe_header.njk" %}
   {% block banner %}{% endblock %}
 
 {% endblock %}
 
 {% block bodyStart %}{% endblock %}
 {% block footer %}
-    {% if feComponents.footer %}
-        {{ feComponents.footer | safe }}
-    {% else %}
-        {% include "./_footer.njk" %}
-    {% endif %}
+  {% include "./prob_fe_footer.njk" %}
 {% endblock %}
 {% block bodyEnd %}
   {% if sentry and sentry.loaderScriptId %}
@@ -86,12 +84,14 @@
   {% endif %}
   <script src="/assets/js/jquery.min.js"></script>
   <script type="module" src="/assets/js/app.js"></script>
-    {% if feComponents.jsIncludes %}
-        {% for js in feComponents.jsIncludes %}
-            <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
-        {% endfor %}
-    {% else %}
-        <script type="module" src="/assets/js/prob_fe_app.js"></script>
+    {% if flags.enableProbFEComponent === true %}
+        {% if feComponents.jsIncludes %}
+            {% for js in feComponents.jsIncludes %}
+                <script src="{{ js }}" nonce="{{ cspNonce }}"></script>
+            {% endfor %}
+        {% else %}
+            <script src="/assets/js/fallback_prob_fe_app.js" nonce="{{ cspNonce }}"></script>
+        {% endif %}
     {% endif %}
   <script nonce="{{ cspNonce }}">
     window.csrfToken = "{{ csrfToken }}";

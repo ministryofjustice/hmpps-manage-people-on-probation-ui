@@ -12,6 +12,7 @@ import overview from './overview'
 import userLocations from './userLocations'
 import activityLog from './activityLog'
 import risk from './risk'
+import probationFEIntegration from './probationFEIntegration'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -28,4 +29,5 @@ export default {
   ...userLocations,
   ...activityLog,
   ...risk,
+  ...probationFEIntegration,
 }

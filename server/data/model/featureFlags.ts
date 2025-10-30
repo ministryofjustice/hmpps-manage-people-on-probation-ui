@@ -8,4 +8,5 @@ export class FeatureFlags {
   enableManageAppointments?: boolean = undefined
   enableSentencePlan?: boolean = undefined
   enableSanIndicator?: boolean = undefined
+  enableProbFEComponent?: boolean = undefined
 }

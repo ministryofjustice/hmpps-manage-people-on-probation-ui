@@ -1,7 +1,6 @@
 import type { RequestHandler } from 'express'
 import ProbationComponentsService from '../services/ProbationComponentsService'
 import logger from '../../logger'
-import { replaceHashWithSlash } from '../utils'
 
 export default function getFrontendComponents(probationComponentsService: ProbationComponentsService): RequestHandler {
   return async (req, res, next) => {
@@ -29,14 +28,23 @@ export default function getFrontendComponents(probationComponentsService: Probat
         jsIncludes: [...header.javascript, ...footer.javascript],
       }
 
-      if (req.session) {
+      if (req?.session) {
         ;(req.session as any).feComponents = res.locals.feComponents
       }
 
       return next()
     } catch (error) {
       logger.info(error, 'Failed to fetch probation front end components')
+      // will display fallback pages
       return next()
     }
   }
+}
+
+function replaceHashWithSlash(source: string | null | undefined): string | null {
+  if (source === null || source === undefined) return null
+  const input = String(source)
+  if (!input.includes('#')) return input
+  // Replace attribute values that equal exactly '#', preserving the quote style
+  return input.replace(/=(['"])#\1/g, '=$1/$1')
 }
