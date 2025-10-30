@@ -3,10 +3,8 @@ import {
   uuid,
   completeTypePage,
   completeSentencePage,
-  completeAttendancePage,
-  completeLocationPage,
-  completeDateTimePage,
   checkPopHeader,
+  completeLocationDateTimePage,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
@@ -15,9 +13,7 @@ const loadPage = () => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
   completeSentencePage()
   completeTypePage()
-  completeAttendancePage()
-  completeLocationPage()
-  completeDateTimePage()
+  completeLocationDateTimePage()
 }
 
 describe('Add supporting information (optional)', () => {

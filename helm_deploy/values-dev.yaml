@@ -17,6 +17,7 @@ generic-service:
     ARNS_API_URL: 'https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk'
     TIER_API_URL: 'https://hmpps-tier-dev.hmpps.service.justice.gov.uk'
     INTERVENTIONS_API_URL: 'https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk'
+    SUPERVISION_API_URL: 'https://probation-supervision-appointments-api-dev.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_API_URL: 'https://sentence-plan-api-dev.hmpps.service.justice.gov.uk'
     PROBATION_FRONTEND_COMPONENTS_API_URL: 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'
     FLIPT_URL: 'https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk'

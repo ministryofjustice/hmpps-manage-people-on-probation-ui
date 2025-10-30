@@ -5,6 +5,7 @@ import { AppointmentSession, AppointmentType } from './Appointments'
 import { Errors } from './Errors'
 
 export interface Data {
+  isOutLookEventFailed?: any
   appointments?: {
     [crn: string]: {
       [id: string]: AppointmentSession

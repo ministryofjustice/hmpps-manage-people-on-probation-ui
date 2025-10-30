@@ -3,37 +3,39 @@
 {% extends "../_form.njk" %}
 {% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
-{% set buttonText = 'Arrange next appointment' %}
+{% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
 {% set appointmentDates = [appointment.date] %}
 {% set phoneNumber = '' %}
 {% if case.mobileNumber %}
-  {% set phoneNumber = 'mobile' %}
+    {% set phoneNumber = 'mobile' %}
 {% endif %}
 {% if not case.mobileNumber and case.telephoneNumber %}
-  {% set phoneNumber = 'telephone' %}
+    {% set phoneNumber = 'telephone' %}
 {% endif %}
 {% for appointmentDate in appointment.repeatingDates %}
-  {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
+    {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
 {% endfor %}
 {% set title = 'Appointment arranged' %}
 {% set appointmentDatesHtml %}
 {% for appointmentDate in appointmentDates %}
-  {% if loop.index > 1 %}<br>{% endif %}
-  <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
+   {% if loop.index > 1 %}<br>{% endif %}
+   <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
     {{ appointmentDate | dateWithYear }}
     from
     {{ appointment.start }}
     to
     {{ appointment.end }}</span>
 {% endfor %}
-{% set returnLink = "/case/" + crn + "/appointments" %}
+{% set cases = "/case/" %}
+{% set overViewLink = "/case/"+ crn %}
+{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
 {% endset %}
 
 {% set panelHtml %}
 <div class="govuk-!-font-size-27">
-  <strong>{{ appointment.type.description | toSentenceCase }}</strong><br/>
-  {{ appointmentDatesHtml | safe }}
+    <strong>{{ appointment.type.description | toSentenceCase }}</strong><br/>
+    {{ appointmentDatesHtml | safe }}
 </div>
 {% endset %}
 
@@ -50,22 +52,37 @@
         You need to send
         {{case.name.forename}}
         the appointment details.
-      </p>
       {% if phoneNumber %}
-        <p class="govuk-body" data-qa="popContactNumber">
-          {{case.name.forename}}’s phone number is
-        <span data-qa="{{ phoneNumber }}">
+         Their phone number is
+         <span data-qa="{{ phoneNumber }}">
             {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
             {% else %}{{ case.telephoneNumber + "." }}
-            {% endif %}</span></p>
-      {% endif %}
-      <h2 class="govuk-heading-m govuk-!-margin-top-6">Arrange another appointment</h2>
-      <p class="govuk-body">
-        Use the saved details of this appointment to create a new one. You can amend any of the details.</p>
-
+            {% endif %}</span>
+        {% endif %}
+        </p>
+            {% if isOutLookEventFailed %}
+                <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send you a calendar invitation.</p>
+                <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.</p>
+            {% else %}
+                <p class="govuk-!-margin-bottom-0">The appointment has been added to:</p>
+                <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
+                    {% if flags.enableOutlookEvent === true %}
+                    <li>your calendar</li>
+                    {% endif %}
+                    <li>the NDelius contact log and officer diary, along with any supporting information</li>
+                </ul>
+            {% endif %}
+        <h2 class="govuk-heading-m govuk-!-margin-top-6">Further actions for {{case.name.forename}}</h2>
+            <p class="govuk-!-margin-bottom-0">You can:</p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1">
+                <li><a class="govuk-link" href="{{ anotherAppointment }}" data-qa="anotherAppointmentLink">
+                        arrange another appointment
+                    </a>
+                </li>
+            </ul>
     </div>
   </div>
-  <form method="post" autocomplete="off" action="{{ paths.current }}">
+  <form method="post" autocomplete="off" action="{{ paths.current  }}">
     <div class="govuk-button-group">
       {{ govukButton({
       html: buttonText,
@@ -73,8 +90,8 @@
         'data-qa': 'submit-btn'
       }
     }) }}
-      <a class="govuk-link" href={{ returnLink }} data-qa="finishLink">
-      Finish and return to appointments
+      <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
+      Return to all cases
     </a>
     </div>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">

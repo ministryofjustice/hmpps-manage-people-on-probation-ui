@@ -12,6 +12,7 @@ import overview from './overview'
 import userLocations from './userLocations'
 import activityLog from './activityLog'
 import risk from './risk'
+import supervisionAppointmentClient from './supervisionAppointmentClient'
 import probationFEIntegration from './probationFEIntegration'
 
 export default {
@@ -29,5 +30,6 @@ export default {
   ...userLocations,
   ...activityLog,
   ...risk,
+  ...supervisionAppointmentClient,
   ...probationFEIntegration,
 }
