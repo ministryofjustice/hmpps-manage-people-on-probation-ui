@@ -9,4 +9,5 @@ export class FeatureFlags {
   enableSentencePlan?: boolean = undefined
   enableSanIndicator?: boolean = undefined
   enableOutlookEvent?: boolean = undefined
+  enableProbFEComponent?: boolean = undefined
 }

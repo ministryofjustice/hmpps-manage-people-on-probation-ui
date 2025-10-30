@@ -28,6 +28,7 @@ import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
 import testRoutes from './routes/testRoutes'
+import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -52,6 +53,7 @@ export default function createApp(services: Services): express.Application {
   const apiRouter = Router()
   app.use(testRoutes(apiRouter))
   app.use(setUpAuthentication())
+  app.use(getFrontendComponents(services.probationComponentsApiService))
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
