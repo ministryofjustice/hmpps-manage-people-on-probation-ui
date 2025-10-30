@@ -3,6 +3,7 @@
 /* eslint-disable no-new */
 /* eslint-disable no-restricted-globals */
 
+import { DateTime } from 'luxon'
 import * as govukFrontend from 'govuk-frontend'
 import * as mojFrontend from '@ministryofjustice/frontend'
 import './appInsights'
@@ -337,6 +338,84 @@ const recentCaseDisplay = () => {
   }
 }
 
+const serviceAlert = () => {
+  const alert = document.querySelector('[data-module="serviceAlert"]')
+
+  if (alert) {
+    const dateInput = document.querySelector('.moj-js-datepicker-input')
+    const startInput = document.querySelector('[data-qa="startTime"] input')
+    const status = document.querySelector('[data-qa="serviceAlertStatus"]')
+
+    const showAlert = (show = false) => {
+      const display = show ? 'block' : 'none'
+      let statusMessage = ''
+      const displayedStatus = 'Date selected is in the past, service alert displayed'
+      const hiddenStatus = 'Date selected is today or in the future, service banner hidden'
+      if (show && (status.innerText === hiddenStatus || !status.innerText)) {
+        statusMessage = displayedStatus
+      }
+      if (!show && status.innerText === displayedStatus) {
+        statusMessage = hiddenStatus
+      }
+      if (!show) {
+        alert.classList.remove('display-block')
+      } else {
+        alert.classList.add('display-block')
+      }
+      alert.style.display = display
+      if (statusMessage) {
+        status.innerText = statusMessage
+      }
+    }
+
+    const isTimeInPast = time => {
+      const now = DateTime.now()
+      const { day, month, year } = now
+      const appointmentTime = time.set({
+        year,
+        month,
+        day,
+      })
+      return appointmentTime < now
+    }
+
+    const handleStartTimeChange = event => {
+      const time = DateTime.fromFormat(event.target.value, 'H:mm')
+      if (time.isValid) {
+        showAlert(isTimeInPast(time))
+      } else {
+        showAlert(false)
+      }
+    }
+
+    const handleDateChange = event => {
+      const { value } = event.target
+      const dt = DateTime.fromFormat(value, 'd/M/yyyy')
+      if (dt.isValid) {
+        if (!dt.hasSame(DateTime.now(), 'day')) {
+          showAlert(dt < DateTime.now())
+        }
+        if (dt.hasSame(DateTime.now(), 'day')) {
+          if (startInput.value) {
+            const time = DateTime.fromFormat(dateInput.value, 'H:mm')
+            if (time.isValid) {
+              showAlert(isTimeInPast(time))
+            }
+          } else {
+            showAlert(false)
+          }
+          startInput.addEventListener('keyup', handleStartTimeChange)
+        }
+      } else {
+        showAlert(false)
+      }
+    }
+
+    dateInput.addEventListener('keyup', handleDateChange)
+    dateInput.addEventListener('change', handleDateChange)
+  }
+}
+
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
@@ -344,3 +423,4 @@ attendanceSelectors()
 homeSearch()
 crissHeaders()
 recentCaseDisplay()
+serviceAlert()
