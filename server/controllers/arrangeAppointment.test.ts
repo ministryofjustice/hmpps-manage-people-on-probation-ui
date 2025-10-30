@@ -493,7 +493,6 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
         crn,
         id: uuid,
-        _minDate: '1/7/2025',
         _maxDate: '31/12/2199',
         change: undefined,
         showValidation: false,
@@ -595,7 +594,6 @@ describe('controllers/arrangeAppointment', () => {
         change: mockReq.query.change,
         showValidation: false,
         personRisks: undefined,
-        _minDate: '1/7/2025',
         _maxDate: '31/12/2199',
       })
     })
@@ -628,7 +626,6 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
         crn,
         id: uuid,
-        _minDate: '09/7/2025',
         _maxDate: '31/12/2199',
         change: undefined,
         showValidation: false,
