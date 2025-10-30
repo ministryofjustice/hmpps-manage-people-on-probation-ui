@@ -7,9 +7,6 @@
         "queryParameters": {
           "size": {
             "equalTo": "10"
-          },
-          "page": {
-            "equalTo": "0"
           }
         }
       },

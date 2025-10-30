@@ -9,9 +9,6 @@ const stubUserNoCaseload = (): SuperAgentRequest =>
         size: {
           equalTo: '10',
         },
-        page: {
-          equalTo: '0',
-        },
       },
     },
     response: {
@@ -67,9 +64,6 @@ const stubUserNoStaffRecord = (): SuperAgentRequest =>
       queryParameters: {
         size: {
           equalTo: '10',
-        },
-        page: {
-          equalTo: '0',
         },
       },
     },
