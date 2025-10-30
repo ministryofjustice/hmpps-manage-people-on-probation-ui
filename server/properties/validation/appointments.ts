@@ -76,11 +76,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Appointment date is not valid',
         },
         {
-          validator: isTodayOrLater,
-          msg: 'Date must be today or in the future',
-          log: 'Date must be today or in the future',
-        },
-        {
           validator: isNotEarlierThan,
           msg: 'The date must not be later than 31/12/2199',
           log: 'The date must not be later than 31/12/2199',
@@ -100,12 +95,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: timeIsValid24HourFormat,
           msg: 'Enter a time in the 24-hour format, for example 16:30',
           log: 'Enter a time in the 24-hour format, for example 16:30',
-          crossField: `[appointments][${crn}][${id}][date]`,
-        },
-        {
-          validator: timeIsNowOrInFuture,
-          msg: 'The start time must be now or in the future',
-          log: 'The start time must be now or in the future',
           crossField: `[appointments][${crn}][${id}][date]`,
         },
       ],
