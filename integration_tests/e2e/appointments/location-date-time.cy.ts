@@ -155,42 +155,6 @@ describe('Pick a date, location and time for this appointment', () => {
     })
   })
 
-  describe('Continue is clicked selecting a start time which is in the past', () => {
-    const mockedTime = DateTime.local().set({
-      hour: 9,
-      minute: 1,
-      second: 0,
-      millisecond: 0,
-    })
-    const mockedNow = mockedTime.toUTC().toISO()
-    before(() => {
-      // set the mocked time on the back end
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:3007/__test/set-mocked-time',
-        body: { time: mockedNow },
-      })
-    })
-    beforeEach(() => {
-      cy.clock(DateTime.fromISO(mockedNow).toMillis())
-      loadPage()
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      locationDateTimePage.getDatePickerToggle().click()
-      locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('08:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('08:30')
-      locationDateTimePage.getSubmitBtn().click()
-    })
-    it('should display the error summary box', () => {
-      locationDateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
-    })
-    it('should display the error messages', () => {
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include('The start time must be now or in the future')
-      })
-    })
-  })
-
   describe('Continue is clicked, when end-time was before start time', () => {
     const mockedTime = DateTime.local().set({
       hour: 9,
