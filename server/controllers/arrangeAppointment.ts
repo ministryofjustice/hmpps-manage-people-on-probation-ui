@@ -10,7 +10,6 @@ import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
 import { findUncompleted } from '../utils/findUncompleted'
-import { getMinMaxDates } from '../utils/getMinMaxDates'
 import MasApiClient from '../data/masApiClient'
 
 const routes = [
@@ -238,14 +237,14 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!locations?.length && appointment.type?.isLocationRequired) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
-      const { _minDate, _maxDate } = getMinMaxDates()
+      // eslint-disable-next-line no-underscore-dangle
+      const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personRisks = await masClient.getPersonRiskFlags(crn)
       return res.render(`pages/arrange-appointment/location-date-time`, {
         crn,
         id,
-        _minDate,
         _maxDate,
         errors,
         change,
