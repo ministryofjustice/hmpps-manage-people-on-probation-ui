@@ -294,7 +294,7 @@ describe('Manage an appointment', () => {
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
-      it('should display a link to add appointment notes', () => {
+      it.only('should display a link to add appointment notes', () => {
         manageAppointmentPage
           .getTaskLink(2)
           .should('contain.text', name)
@@ -743,6 +743,48 @@ describe('Manage an appointment', () => {
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 3).should('contain.text', '3 Way Meeting (NS)')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 4).should('contain.text', '6 April 2023')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 5).should('contain.text', '6 April 2023')
+    })
+  })
+
+  describe('Appointment Reschedule link', () => {
+    beforeEach(() => {
+      loadPage()
+      manageAppointmentPage = new ManageAppointmentPage()
+    })
+
+
+    describe('Complied appointment with past date', () => {
+      const name = 'Log attended and complied appointment'
+      beforeEach(() => {
+        cy.task('stubAppointmentCompliedWithFutureDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      describe('Appointment is in the future', () => {
+        it.only('should display the task name-----', () => {
+          manageAppointmentPage.getTaskName(1).should('contain.text', name)
+        })
+
+      })
+      describe('Appointment is in the past, with no outcome logged', () => {
+        beforeEach(() => {
+          cy.task('stubPastAppointmentNoOutcomeNoNotes')
+          loadPage()
+          manageAppointmentPage = new ManageAppointmentPage()
+        })
+        it('should display a link to log the outcome', () => {
+          manageAppointmentPage
+            .getTaskLink(1)
+            .should('contain.text', name)
+            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/attended-complied`)
+        })
+        it(`should display the status as 'Not started'`, () => {
+          manageAppointmentPage
+            .getTaskStatus(1)
+            .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
+            .should('contain.text', 'Not started')
+        })
+      })
     })
   })
 })

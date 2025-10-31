@@ -220,17 +220,13 @@
       },
       actions: {
         items: [
-          {
-            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
-            text: "Change on NDelius",
-            visuallyHiddenText: "(opens in new tab)",
-            attributes: {
-              'target': '_blank',
-              'rel': 'external noopener noreferrer'
+            {
+                href: "/",
+                text: "Reschedule",
+                visuallyHiddenText: ""
             }
-          }
         ]
-      } if not appointment.deliusManaged
+    } if canReschedule and not appointment.deliusManaged
     },
     {
       key: {
