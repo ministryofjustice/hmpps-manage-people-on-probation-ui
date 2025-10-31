@@ -341,67 +341,70 @@ const serviceAlert = () => {
     const dateInput = document.querySelector('.moj-js-datepicker-input')
     const startInput = document.querySelector('[data-qa="startTime"] input')
     const status = document.querySelector('[data-qa="serviceAlertStatus"]')
+    const dismissLink = alert.querySelector('.moj-alert__dismiss')
+    let dismissed = false
+    const handleDismiss = async () => {
+      await fetch('/alert/dismiss', { method: 'POST' })
+    }
 
     const showAlert = (show = false) => {
-      const display = show ? 'block' : 'none'
-      let statusMessage = ''
-      const displayedStatus = 'Date selected is in the past, service alert displayed'
-      const hiddenStatus = 'Date selected is today or in the future, service banner hidden'
-      if (show && (status.innerText === hiddenStatus || !status.innerText)) {
-        statusMessage = displayedStatus
-      }
-      if (!show && status.innerText === displayedStatus) {
-        statusMessage = hiddenStatus
-      }
-      if (!show) {
-        alert.classList.remove('display-block')
-      } else {
-        alert.classList.add('display-block')
-      }
-      alert.style.display = display
-      if (statusMessage) {
-        status.innerText = statusMessage
+      if (!dismissed) {
+        let statusMessage = ''
+        const displayedStatus = 'Date selected is in the past, service alert displayed'
+        const hiddenStatus = 'Date selected is today or in the future, service banner hidden'
+        if (show && (status.innerText === hiddenStatus || !status.innerText)) {
+          statusMessage = displayedStatus
+        }
+        if (!show && status.innerText === displayedStatus) {
+          statusMessage = hiddenStatus
+        }
+        if (!show) {
+          alert.classList.add('display-none')
+          dismissLink.removeEventListener('click', handleDismiss)
+        } else {
+          alert.classList.remove('display-none')
+          dismissLink.addEventListener('click', handleDismiss)
+        }
+        if (statusMessage) {
+          status.innerText = statusMessage
+        }
       }
     }
 
-    const isTimeInPast = time => {
-      const now = DateTime.now()
-      const { day, month, year } = now
-      const appointmentTime = time.set({
-        year,
-        month,
-        day,
-      })
-      return appointmentTime < now
-    }
-
-    const handleStartTimeChange = event => {
+    const handleStartTimeChange = async event => {
       const time = DateTime.fromFormat(event.target.value, 'H:mm')
       if (time.isValid) {
-        showAlert(isTimeInPast(time))
+        handleRequest()
       } else {
         showAlert(false)
       }
     }
 
-    const handleDateChange = event => {
-      const { value } = event.target
-      const dt = DateTime.fromFormat(value, 'd/M/yyyy')
-      if (dt.isValid) {
-        if (!dt.hasSame(DateTime.now(), 'day')) {
-          showAlert(dt < DateTime.now())
-        }
-        if (dt.hasSame(DateTime.now(), 'day')) {
-          if (startInput.value) {
-            const time = DateTime.fromFormat(dateInput.value, 'H:mm')
-            if (time.isValid) {
-              showAlert(isTimeInPast(time))
-            }
-          } else {
-            showAlert(false)
-          }
+    const handleRequest = async (dateEvent = false) => {
+      const [day, month, year] = dateInput.value.split('/')
+      const response = await fetch('/appointment/is-in-past', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ date: `${year}-${month}-${day}`, time: startInput.value }),
+      })
+      const { isInPast, isToday, alertDismissed } = await response.json()
+      dismissed = alertDismissed
+      if (dateEvent) {
+        startInput.removeEventListener('keyup', handleStartTimeChange)
+        if (isToday) {
           startInput.addEventListener('keyup', handleStartTimeChange)
         }
+      }
+      showAlert(isInPast)
+    }
+
+    const handleDateChange = async () => {
+      const { value } = dateInput
+      const dt = DateTime.fromFormat(value, 'd/M/yyyy')
+      if (dt.isValid) {
+        handleRequest(true)
       } else {
         showAlert(false)
       }
@@ -409,6 +412,7 @@ const serviceAlert = () => {
 
     dateInput.addEventListener('keyup', handleDateChange)
     dateInput.addEventListener('change', handleDateChange)
+    handleDateChange()
   }
 }
 
