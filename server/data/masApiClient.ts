@@ -43,6 +43,7 @@ import {
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 interface GetUserScheduleProps {
   username: string
@@ -430,5 +431,9 @@ export default class MasApiClient extends RestClient {
       path: '/alerts',
       data: { alertIds },
     })
+  }
+
+  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
+    return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 }
