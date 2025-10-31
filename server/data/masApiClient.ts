@@ -41,6 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 interface GetUserScheduleProps {
   username: string
@@ -398,5 +399,9 @@ export default class MasApiClient extends RestClient {
 
   async getUserDetails(username: string): Promise<MasUserDetails | null> {
     return this.get({ path: `/user/${username}`, handle404: true })
+  }
+
+  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
+    return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 }

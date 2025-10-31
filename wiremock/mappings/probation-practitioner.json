@@ -1,0 +1,32 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/case/.*/probation-practitioner",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "code": "N56A048",
+          "name": {
+            "forename": "Ambuj",
+            "surname": "Pathak"
+          },
+          "provider": {
+            "code": "N56",
+            "description": "East of England"
+          },
+          "team": {
+            "code": "N56DTX",
+            "description": "Default Designated Transfer Team"
+          },
+          "unallocated": false
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
