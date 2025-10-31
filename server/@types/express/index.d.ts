@@ -31,6 +31,7 @@ declare module 'express-session' {
     data?: Data
     errors?: Errors
     errorMessages?: Record<string, string>
+    alertDismissed?: boolean
     cache?: {
       activityLog?: ActivityLogCache
       uploadedFiles?: FileCache[]
