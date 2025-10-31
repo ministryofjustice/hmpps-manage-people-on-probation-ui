@@ -497,6 +497,8 @@ describe('controllers/arrangeAppointment', () => {
         change: undefined,
         showValidation: false,
         personRisks: undefined,
+        alertDismissed: false,
+        isInPast: false,
       })
     })
     it('If session has errors, it should delete the errors', async () => {
@@ -593,6 +595,8 @@ describe('controllers/arrangeAppointment', () => {
         errors: null,
         change: mockReq.query.change,
         showValidation: false,
+        isInPast: false,
+        alertDismissed: false,
         personRisks: undefined,
         _maxDate: '31/12/2199',
       })
@@ -629,6 +633,8 @@ describe('controllers/arrangeAppointment', () => {
         _maxDate: '31/12/2199',
         change: undefined,
         showValidation: false,
+        alertDismissed: false,
+        isInPast: false,
         personRisks: undefined,
       })
     })
