@@ -2,7 +2,15 @@ import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Request } from 'express'
 import { Controller } from '../@types'
-import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import {
+  dateIsInPast,
+  getDataValue,
+  getPersonLevelTypes,
+  isNumericString,
+  isValidCrn,
+  isValidUUID,
+  setDataValue,
+} from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
@@ -217,9 +225,19 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getLocationDateTime: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
+      const { data, alertDismissed = false } = req.session
+      console.log({ alertDismissed })
       const { change, validation } = req.query
       const showValidation = validation === 'true'
+      const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
+      const appointmentStartTime = getDataValue(data, ['appointments', crn, id, 'start'])
+      let isInPast = false
+      if (appointmentDate) {
+        const dt = DateTime.fromFormat(appointmentDate, 'd/M/yyyy')
+        if (dt.isValid) {
+          ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), appointmentStartTime))
+        }
+      }
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
@@ -250,6 +268,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         change,
         showValidation,
         personRisks,
+        isInPast,
+        alertDismissed,
       })
     }
   },

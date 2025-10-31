@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes } from '../../utils'
+import { dateIsInPast, getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
@@ -11,12 +11,33 @@ import { getMockedTime } from '../../routes/testRoutes'
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
-  const { data } = session
+  const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
+  const date = body?.appointments?.[crn]?.[id]?.date
+  const start = body?.appointments?.[crn]?.[id]?.start
+  let isInPast = false
+  if (date) {
+    const dt = DateTime.fromFormat(date, 'd/M/yyyy')
+    if (dt.isValid) {
+      ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), start))
+    }
+  }
+  const localParams: LocalParams = {
+    crn,
+    id,
+    body,
+    contactId,
+    actionType,
+    personLevel,
+    maxCharCount,
+    back,
+    change,
+    isInPast,
+    alertDismissed,
+  }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
   let render = `pages/${[

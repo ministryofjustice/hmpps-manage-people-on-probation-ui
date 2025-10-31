@@ -17,7 +17,7 @@ import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
-import { HmppsAuthClient } from '../data'
+import { dateIsInPast } from '../utils'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -141,6 +141,16 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
   )
+  router.post('/alert/dismiss', (req, res) => {
+    req.session.alertDismissed = true
+    return res.json({ success: true })
+  })
+  router.post('/appointment/is-in-past', (req, res) => {
+    const { date, time = '' } = req.body
+    const alertDismissed = req?.session?.alertDismissed
+    const { isInPast, isToday } = dateIsInPast(date, time)
+    return res.json({ isInPast, isToday, alertDismissed })
+  })
 }
 
 export default arrangeAppointmentRoutes

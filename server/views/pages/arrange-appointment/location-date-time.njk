@@ -162,7 +162,7 @@
     }) }}
     {% endif %}
     <h3 class="govuk-heading-m">Enter the date and time of the appointment</h3>
-    <div data-module="serviceAlert" class="display-none">
+    <div data-module="serviceAlert" class="{% if (isInPast == false) or (isInPast == true and alertDismissed == true) %}display-none{% endif %}">
         {{ mojAlert({
   variant: "information",
   title: "You can only use this service to log attended and complied outcomes.",
