@@ -35,6 +35,7 @@ describe('utils/convertToTitleCase', () => {
     ['Leading spaces', '  RobeRT', '  Robert'],
     ['Trailing spaces', 'RobeRT  ', 'Robert  '],
     ['Hyphenated', 'Robert-John SmiTH-jONes-WILSON', 'Robert-John Smith-Jones-Wilson'],
+    ['Acronym in brackets', 'robert smith (PS-PSO)', 'Robert Smith (PS-PSO)'],
   ])('%s convertToTitleCase(%s, %s)', (_: string, a: string, expected: string) => {
     expect(convertToTitleCase(a)).toEqual(expected)
   })

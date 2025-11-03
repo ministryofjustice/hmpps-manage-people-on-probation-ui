@@ -3,7 +3,7 @@ import superagent, { SuperAgentRequest } from 'superagent'
 const stubNoAllocatedCOM = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
-      urlPattern: '/case/.*/probation-practitioner',
+      urlPattern: '/mas/case/.*/probation-practitioner',
       method: 'GET',
     },
     response: {
