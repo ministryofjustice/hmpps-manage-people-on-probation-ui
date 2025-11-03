@@ -2,11 +2,11 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
+import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { DateTime } from 'luxon'
 import {
   toRoshWidget,
   toPredictors,
@@ -184,7 +184,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       )
 
       const canReschedule: boolean = canAppointmentReschedule(personAppointment)
-      
+
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
@@ -194,6 +194,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         nextAppointment,
         nextAppointmentIsAtHome,
         canReschedule,
+        contactId,
       })
     }
   },

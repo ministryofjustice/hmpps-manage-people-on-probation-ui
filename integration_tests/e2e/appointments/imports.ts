@@ -463,16 +463,11 @@ export const checkAppointmentDetails = (
         .getAppointmentDetailsListItem(index, 'actions')
         .find('a')
         .should('contain.text', 'Reschedule')
-        .should(
-          'have.attr',
-          'href',
-          '/',
-        )
+        .should('have.attr', 'href', `/case/${crn}/appointment/6/reschedule-appointment`)
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
   })
-
 
   it('should display the full location address', () => {
     const index = deliusManaged && hasOutcome ? 3 : 2
