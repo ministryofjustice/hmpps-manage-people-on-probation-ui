@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/case/.*/probation-practitioner",
+        "urlPattern": "/mas/case/.*/probation-practitioner",
         "method": "GET"
       },
       "response": {
@@ -15,13 +15,14 @@
           },
           "provider": {
             "code": "N56",
-            "description": "East of England"
+            "name": "East of England"
           },
           "team": {
             "code": "N56DTX",
             "description": "Default Designated Transfer Team"
           },
-          "unallocated": false
+          "unallocated": false,
+          "username": "ambuj-pathak"
         },
         "headers": {
           "Content-Type": "application/json"

@@ -37,16 +37,19 @@ export interface CaseloadResponse {
 export interface Team {
   description: string
   code: string
+  selected?: string
 }
 
 export interface Provider {
   code: string
   name: string
+  selected?: string
 }
 
 export interface User {
   username: string
   nameAndRole: string
+  selected?: string
 }
 
 export interface Location {

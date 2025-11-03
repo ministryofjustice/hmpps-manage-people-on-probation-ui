@@ -2,7 +2,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
-import { getDataValue, setDataValue } from '../utils'
+import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 
 export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -24,34 +24,78 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       selectedTeam = teamCode
     }
 
-    const { defaultUserDetails, providers, teams, users } = await masClient.getUserProviders(
-      username,
-      selectedRegion,
-      selectedTeam,
-    )
+    const [{ defaultUserDetails, providers, teams, users }, probationPractitioner] = await Promise.all([
+      masClient.getUserProviders(username, selectedRegion, selectedTeam),
+      masClient.getProbationPractitioner(crn),
+    ])
+    let providerOptions = providers
+    let teamOptions = teams
+    let userOptions = users
 
+    const defaultUser = probationPractitioner?.unallocated
+      ? defaultUserDetails
+      : {
+          username: probationPractitioner?.username,
+          homeArea: probationPractitioner.provider.name,
+          team: probationPractitioner.team.description,
+        }
+
+    if (
+      !providers.some(provider => provider.code === probationPractitioner.provider.code) &&
+      !probationPractitioner.unallocated
+    ) {
+      providerOptions = [...providers, probationPractitioner.provider]
+    }
+    let includePractitionerTeamOption =
+      !teams.some(team => team.code === probationPractitioner.team.code) && !probationPractitioner.unallocated
+    if (selectedRegion && includePractitionerTeamOption) {
+      includePractitionerTeamOption = probationPractitioner.provider.code === selectedRegion
+    }
+    if (includePractitionerTeamOption) {
+      teamOptions = [...teams, probationPractitioner.team]
+    }
+    let includePractitionerUserOption =
+      probationPractitioner?.username &&
+      !users.some(user => user.username.toLowerCase() === probationPractitioner.username.toLowerCase())
+    if (includePractitionerUserOption && selectedRegion) {
+      includePractitionerUserOption = probationPractitioner.provider.code === selectedRegion
+    }
+    if (includePractitionerUserOption && selectedTeam) {
+      includePractitionerUserOption = probationPractitioner.team.code === selectedTeam
+    }
+    if (includePractitionerUserOption) {
+      const {
+        username: ppUsername,
+        name: { forename, surname },
+      } = probationPractitioner
+      userOptions = [...users, { username: ppUsername, nameAndRole: `${forename} ${surname} (COM)` }]
+    }
     let displayedProviders: Provider[]
     let displayedTeams: Team[]
     let displayedUsers: User[]
 
     if (req.method === 'GET') {
       if (selectedRegion || back) {
-        displayedProviders = providers.map(provider => {
+        displayedProviders = providerOptions.map(provider => {
           if (provider.code === selectedRegion) {
             return { code: provider.code, name: provider.name, selected: 'selected' }
           }
           return { code: provider.code, name: provider.name }
         })
-        displayedTeams = teams.map(team => {
+
+        displayedTeams = teamOptions.map(team => {
           if (team.code === selectedTeam) {
             return { description: team.description, code: team.code, selected: 'selected' }
           }
           return { description: team.description, code: team.code }
         })
-        displayedUsers = users
+        displayedUsers = userOptions.map(user => ({
+          username: user.username,
+          nameAndRole: convertToTitleCase(user.nameAndRole),
+        }))
       } else {
-        displayedProviders = providers.map(provider => {
-          if (provider.name === defaultUserDetails.homeArea) {
+        displayedProviders = providerOptions.map(provider => {
+          if (provider.name === defaultUser.homeArea) {
             setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], provider.code)
             return { code: provider.code, name: provider.name, selected: 'selected' }
           }
@@ -61,8 +105,8 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
           setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], displayedProviders[0].code)
         }
 
-        displayedTeams = teams.map(team => {
-          if (team.description === defaultUserDetails.team) {
+        displayedTeams = teamOptions.map(team => {
+          if (team.description === defaultUser.team) {
             setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], team.code)
             return { description: team.description, code: team.code, selected: 'selected' }
           }
@@ -72,8 +116,8 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
           setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], displayedTeams[0].code)
         }
 
-        displayedUsers = users.map(user => {
-          if (user.username.toLowerCase() === defaultUserDetails.username.toLowerCase()) {
+        displayedUsers = userOptions.map(user => {
+          if (user.username.toLowerCase() === defaultUser.username.toLowerCase()) {
             setDataValue(data, ['appointments', crn, id, 'user', 'username'], user.username)
             return { username: user.username, nameAndRole: user.nameAndRole, selected: 'selected' }
           }
@@ -108,7 +152,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     res.locals.userProviders = displayedProviders
     res.locals.userTeams = displayedTeams
     res.locals.userStaff = displayedUsers
-    res.locals.defaultUser = defaultUserDetails
+    res.locals.defaultUser = defaultUser
     res.locals.providerCode = providerCode ?? ''
     res.locals.teamCode = teamCode ?? ''
     return next()

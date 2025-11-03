@@ -1,236 +1,322 @@
-import httpMocks from 'node-mocks-http'
+import httpMocks, { RequestMethod } from 'node-mocks-http'
 import { getWhoAttends } from './getWhoAttends'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import { AppResponse } from '../models/Locals'
-import { UserProviders } from '../data/model/caseload'
+import { mockAppResponse, probationPractitioner, userProviders } from '../controllers/mocks'
+import { ProbationPractitioner } from '../models/CaseDetail'
+import { convertToTitleCase } from '../utils'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
-
+const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+const nextSpy = jest.fn()
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
-const username = 'user-1'
-
-const unmatchedUserDetails = {
-  username: 'wrong',
-  homeArea: 'wrong',
-  team: 'wrong',
-}
-const matchedUserDetails = {
-  username: 'PETER-PARKER',
-  homeArea: 'London',
-  team: 'Ascot House Approved Premises',
-}
-
-const rest = {
-  providers: [
-    {
-      code: 'N50',
-      name: 'Greater Manchester',
-    },
-    {
-      code: 'N07',
-      name: 'London',
-    },
-    {
-      code: 'N54',
-      name: 'North East Region',
-    },
-  ],
-  teams: [
-    {
-      description: 'A P Central Admissions Unit',
-      code: 'N50CAU',
-    },
-    {
-      description: 'Ascot House Approved Premises',
-      code: 'N50AHA',
-    },
-    {
-      description: 'Atherton Court',
-      code: 'N50ACT',
-    },
-  ],
-  users: [
-    {
-      username: 'peter-parker',
-      name: 'peter parker (PS-PSO)',
-    },
-    {
-      username: 'jon-smith',
-      name: 'jon smith (PS-PSO)',
-    },
-  ],
-}
-
-const mockAPIResponse = {
-  ...rest,
-  defaultUserDetails: matchedUserDetails,
-} as any
-const mockAPIResponseUnmatched = {
-  ...rest,
-  defaultUserDetails: unmatchedUserDetails,
-} as any
-
-const expectedSession = {
-  providers: [
-    {
-      code: 'N50',
-      name: 'Greater Manchester',
-    },
-    {
-      code: 'N07',
-      name: 'London',
-      selected: 'selected',
-    },
-    {
-      code: 'N54',
-      name: 'North East Region',
-    },
-  ],
-} as any
-
-const res = {
-  locals: {
-    user: {
-      username,
-    },
-  },
-  redirect: jest.fn().mockReturnThis(),
-} as unknown as AppResponse
-
-const hmppsAuthClient = new HmppsAuthClient(tokenStore)
-
 describe('/middleware/getWhoAttends()', () => {
-  const nextSpy = jest.fn()
+  const crn = 'X000001'
+  const uuid = 'a4615940-2808-4ab5-a8e0-feddecb8ae1a'
+  const username = 'user-1'
+  const providerCode = 'N56'
+  const teamCode = 'N56XXXX'
+  const nameAndRole = `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (COM)`
 
-  const spy = jest
+  const buildRequest = ({
+    req = {},
+    params = {},
+    query = {},
+    user = {},
+    data = {},
+  } = {}): httpMocks.MockRequest<any> => {
+    const request = {
+      method: 'GET' as RequestMethod,
+      params: {
+        crn,
+        id: uuid,
+        ...params,
+      },
+      query: {
+        ...query,
+      },
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [uuid]: {
+                user: {
+                  providerCode,
+                  teamCode,
+                  ...user,
+                },
+              },
+            },
+          },
+          ...data,
+        },
+      },
+      ...req,
+    }
+    return httpMocks.createRequest(request)
+  }
+
+  const res = mockAppResponse({ user: { username } })
+
+  const getUserProvidersSpy = jest
     .spyOn(MasApiClient.prototype, 'getUserProviders')
-    .mockImplementation((user, regionCode, teamCode): Promise<UserProviders> => {
-      if (user === 'user-1') {
-        return Promise.resolve(mockAPIResponse)
-      }
-      return Promise.resolve(mockAPIResponseUnmatched)
-    })
+    .mockImplementation(() => Promise.resolve(userProviders))
+  const getProbationPractitionerSpy = jest
+    .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+    .mockImplementation(() => Promise.resolve(probationPractitioner))
 
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
 
-  describe('If defaults do not match userProviders ', () => {
-    const mockRes = {
-      locals: {
-        user: {
-          username: 'not',
-        },
-      },
-      redirect: jest.fn().mockReturnThis(),
-    } as unknown as AppResponse
-    const req = httpMocks.createRequest({
-      session: {
-        data: {
-          providers: {
-            'user-1': mockAPIResponse.providers,
-          },
-        },
-      },
+  describe('providerCode or back query parameter does not exist in url', () => {
+    const req = buildRequest()
+    beforeEach(() => {
+      getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
-    beforeEach(async () => {
-      await getWhoAttends(hmppsAuthClient)(req, mockRes, nextSpy)
-    })
-    it('should fetch the user providers from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith('not', undefined, undefined)
-      expect(req.session.data.providers).toEqual({
-        ...req.session.data.providers,
-      })
-    })
-    it('should assign the user providers to res.locals', () => {
-      expect(res.locals.userProviders).toEqual(undefined)
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalled()
+    const { providerCode: sessionProviderCode, teamCode: sessionTeamCode } =
+      req.session.data.appointments[crn][uuid].user
+    it('should get selected region and team from the session', () => {
+      expect(getUserProvidersSpy).toHaveBeenCalledWith(username, sessionProviderCode, sessionTeamCode)
     })
   })
-  describe('If current user providers do not exist in session', () => {
-    const req = httpMocks.createRequest({
-      session: {
-        data: {
-          providers: {
-            'user-2': mockAPIResponse.providers,
-          },
-        },
-      },
+  describe('back query parameter exists in url', () => {
+    const req = buildRequest({ query: { back: '/back/url' } })
+    beforeEach(() => {
+      getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
-    beforeEach(async () => {
-      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
-    })
-    it('should fetch the user providers from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
-      expect(req.session.data.providers).toEqual({
-        ...req.session.data.providers,
-        [username]: expectedSession.providers,
-      })
-    })
-    it('should assign the user providers to res.locals', () => {
-      expect(res.locals.userProviders).toEqual(req.session.data.providers[username])
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalled()
+    const { providerCode: sessionProviderCode, teamCode: sessionTeamCode } =
+      req.session.data.appointments[crn][uuid].user
+    it('should get selected region and team from the session', () => {
+      expect(getUserProvidersSpy).toHaveBeenCalledWith(username, sessionProviderCode, sessionTeamCode)
     })
   })
-  describe('If current user providers exists in session', () => {
-    const req = httpMocks.createRequest({
-      session: {
-        data: {
-          providers: {
-            [username]: mockAPIResponse.providers,
-          },
-        },
-      },
+  describe('providerCode exists in query string of url', () => {
+    const req = buildRequest({ query: { providerCode, teamCode } })
+    beforeEach(() => {
+      getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
-    beforeEach(async () => {
-      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+    it('should get selected region and team from the session', () => {
+      expect(getUserProvidersSpy).toHaveBeenCalledWith(username, providerCode, teamCode)
     })
-    it('should fetch the user providers from the api and assign to session', () => {
-      expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
-      expect(req.session.data.providers).toEqual({
-        ...req.session.data.providers,
-        [username]: expectedSession.providers,
+  })
+  describe('GET request', () => {
+    describe('Probation practitioner allocated', () => {
+      describe('selected providerCode and teamCode do not match probation practitioner', () => {
+        const req = buildRequest({
+          query: { providerCode: 'N11', teamCode: 'N11XXX' },
+        })
+        beforeEach(() => {
+          jest
+            .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+            .mockImplementationOnce(() => Promise.resolve(probationPractitioner))
+          getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+        })
+        it('should save the providers, teams and staff to req.session.data', () => {
+          expect(req.session.data).toStrictEqual({
+            ...req.session.data,
+            providers: {
+              [username]: [...userProviders.providers, { ...probationPractitioner.provider }],
+            },
+            teams: {
+              [username]: [...userProviders.teams],
+            },
+            staff: {
+              [username]: [
+                ...userProviders.users.map(user => ({
+                  username: user.username,
+                  nameAndRole: convertToTitleCase(user.nameAndRole),
+                })),
+              ],
+            },
+          })
+        })
+        it('should save the correct providers to locals and select the practitioners region as the selected option', () => {
+          expect(res.locals.userProviders).toStrictEqual([
+            ...userProviders.providers,
+            { ...probationPractitioner.provider },
+          ])
+        })
+        it('should save the correct teams to locals and select the practitioners team as the selected option', () => {
+          expect(res.locals.userTeams).toStrictEqual([...userProviders.teams])
+        })
+        it('should save the correct staff to locals and select the practitioners user as the selected option', () => {
+          expect(res.locals.userStaff).toStrictEqual([
+            ...userProviders.users.map(user => ({
+              username: user.username,
+              nameAndRole: convertToTitleCase(user.nameAndRole),
+            })),
+          ])
+        })
+        it('should save the correct default user details to locals', () => {
+          expect(res.locals.defaultUser).toStrictEqual({
+            username: probationPractitioner.username,
+            homeArea: probationPractitioner.provider.name,
+            team: probationPractitioner.team.description,
+          })
+        })
+        it('should save the selected providerCode and teamCode to locals', () => {
+          expect(res.locals.providerCode).toEqual(req.query.providerCode)
+          expect(res.locals.teamCode).toEqual(req.query.teamCode)
+        })
+        it('should call next()', () => {
+          expect(nextSpy).toHaveBeenCalled()
+        })
+      })
+      describe('selected providerCode and teamCode match probation practitioner', () => {
+        const req = buildRequest({
+          query: { providerCode: probationPractitioner.provider.code, teamCode: probationPractitioner.team.code },
+        })
+        beforeEach(() => {
+          jest
+            .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+            .mockImplementationOnce(() => Promise.resolve(probationPractitioner))
+          getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+        })
+        it('should save the providers, teams and staff to req.session.data', () => {
+          expect(req.session.data).toStrictEqual({
+            ...req.session.data,
+            providers: {
+              [username]: [...userProviders.providers, { ...probationPractitioner.provider, selected: 'selected' }],
+            },
+            teams: {
+              [username]: [...userProviders.teams, { ...probationPractitioner.team, selected: 'selected' }],
+            },
+            staff: {
+              [username]: [
+                ...userProviders.users.map(user => ({
+                  username: user.username,
+                  nameAndRole: convertToTitleCase(user.nameAndRole),
+                })),
+                {
+                  username: probationPractitioner.username,
+                  nameAndRole,
+                },
+              ],
+            },
+          })
+        })
+        it('should save the correct providers to locals and select the practitioners region as the selected option', () => {
+          expect(res.locals.userProviders).toStrictEqual([
+            ...userProviders.providers,
+            { ...probationPractitioner.provider, selected: 'selected' },
+          ])
+        })
+        it('should save the correct teams to locals and select the practitioners team as the selected option', () => {
+          expect(res.locals.userTeams).toStrictEqual([
+            ...userProviders.teams,
+            { ...probationPractitioner.team, selected: 'selected' },
+          ])
+        })
+        it('should save the correct staff to locals and select the practitioners user as the selected option', () => {
+          expect(res.locals.userStaff).toStrictEqual([
+            ...userProviders.users.map(user => ({
+              username: user.username,
+              nameAndRole: convertToTitleCase(user.nameAndRole),
+            })),
+            {
+              username: probationPractitioner.username,
+              nameAndRole,
+            },
+          ])
+        })
       })
     })
-    it('should assign the existing session user providers to res.locals', () => {
-      expect(res.locals.userProviders).toEqual(req.session.data.providers[username])
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalled()
+    describe('Probation practitioner unallocated', () => {
+      const req = buildRequest()
+      const mockUnallocatedPractitionerResponse: ProbationPractitioner = {
+        ...probationPractitioner,
+        unallocated: true,
+      }
+      beforeEach(() => {
+        const spy = jest
+          .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+          .mockImplementationOnce(() => Promise.resolve(mockUnallocatedPractitionerResponse))
+        getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should save the providers, teams and staff to req.session.data', () => {
+        expect(req.session.data).toStrictEqual({
+          ...req.session.data,
+          providers: {
+            [username]: [...userProviders.providers],
+          },
+          teams: {
+            [username]: [...userProviders.teams],
+          },
+          staff: {
+            [username]: [
+              ...userProviders.users.map(user => ({
+                username: user.username,
+                nameAndRole: convertToTitleCase(user.nameAndRole),
+              })),
+            ],
+          },
+        })
+      })
+      it('should save the correct providers to locals and select the default region as the selected option', () => {
+        expect(res.locals.userProviders).toStrictEqual([
+          userProviders.providers[0],
+          { ...userProviders.providers[1] },
+          userProviders.providers[2],
+        ])
+      })
+      it('should save the correct teams to locals and select the default team as the selected option', () => {
+        expect(res.locals.userTeams).toStrictEqual([
+          userProviders.teams[0],
+          { ...userProviders.teams[1] },
+          userProviders.teams[2],
+        ])
+      })
+      it('should save the correct staff to locals and select the default user as the selected option', () => {
+        expect(res.locals.userStaff).toStrictEqual([
+          {
+            ...userProviders.users[0],
+            nameAndRole: convertToTitleCase(userProviders.users[0].nameAndRole),
+          },
+          { ...userProviders.users[1], nameAndRole: convertToTitleCase(userProviders.users[1].nameAndRole) },
+        ])
+      })
+      it('should save the correct default user details to locals', () => {
+        expect(res.locals.defaultUser).toStrictEqual(userProviders.defaultUserDetails)
+      })
     })
   })
 
-  describe('back link selected', () => {
-    const req = httpMocks.createRequest({
-      session: {
-        data: {
-          providers: {
-            [username]: mockAPIResponse.providers,
-          },
+  describe('POST request', () => {
+    const req = buildRequest({
+      data: {
+        providers: {
+          [username]: [...userProviders.providers, { ...probationPractitioner.provider }],
+        },
+        teams: {
+          [username]: [...userProviders.teams, { ...probationPractitioner.team }],
+        },
+        staff: {
+          [username]: [
+            ...userProviders.users,
+            {
+              username: probationPractitioner.username,
+              nameAndRole,
+            },
+          ],
         },
       },
-      query: {
-        back: 'attendance',
-      },
     })
-    beforeEach(async () => {
-      await getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
+    beforeEach(() => {
+      getWhoAttends(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should fetch the user providers from session', () => {
-      expect(spy).toHaveBeenCalledWith(username, undefined, undefined)
-      expect(req.session.data.providers).toEqual({
-        ...req.session.data.providers,
-        [username]: mockAPIResponse.providers,
-      })
+    it('should save the correct providers to locals', () => {
+      expect(res.locals.userProviders).toEqual(req.session.data.providers[username])
+    })
+    it('should save the correct teams to locals', () => {
+      expect(res.locals.userTeams).toEqual(req.session.data.teams[username])
+    })
+    it('should save the correct staff to locals', () => {
+      expect(res.locals.userStaff).toEqual(req.session.data.staff[username])
     })
   })
 })
