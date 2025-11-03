@@ -265,7 +265,8 @@ describe('controllers/appointments', () => {
         nextAppointmentIsAtHome: true,
         queryParams: ['view=default'],
         url: '',
-        canReschedule: false,
+        canReschedule: true,
+        contactId: '1234',
       })
     })
 

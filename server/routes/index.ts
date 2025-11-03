@@ -16,6 +16,7 @@ import accessibilityRoutes from './accessibilityRoutes'
 import interventionsRoutes from './interventions'
 import arrangeAppointmentRoutes from './arrangeAppointment'
 import documentsRoutes from './documents'
+import rescheduleAppointmentRoutes from './rescheduleAppointments'
 
 export default function routes(router: Router, services: Services): Router {
   home(router, services)
@@ -31,6 +32,7 @@ export default function routes(router: Router, services: Services): Router {
   accessibilityRoutes(router)
   interventionsRoutes(router, services)
   arrangeAppointmentRoutes(router, services)
+  rescheduleAppointmentRoutes(router, services)
   documentsRoutes(router, services)
   return router
 }
