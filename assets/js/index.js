@@ -335,85 +335,112 @@ const recentCaseDisplay = () => {
   }
 }
 
-const serviceAlert = () => {
-  const alert = document.querySelector('[data-module="serviceAlert"]')
+class ServiceAlert {
+  constructor() {
+    this.alert = document.querySelector('[data-module="serviceAlert"]')
 
-  if (alert) {
-    const dateInput = document.querySelector('.moj-js-datepicker-input')
-    const startInput = document.querySelector('[data-qa="startTime"] input')
-    const status = document.querySelector('[data-qa="serviceAlertStatus"]')
-    const dismissLink = alert.querySelector('.moj-alert__dismiss')
-    let dismissed = false
-    const handleDismiss = async () => {
-      await fetch('/alert/dismiss', { method: 'POST' })
+    if (!this.alert) return
+
+    this.dateInput = document.querySelector('.moj-js-datepicker-input')
+    this.startInput = document.querySelector('[data-qa="startTime"] input')
+    this.status = document.querySelector('[data-qa="serviceAlertStatus"]')
+    this.dismissLink = this.alert.querySelector('.moj-alert__dismiss')
+    this.dismissed = false
+
+    this.handleDismiss = this.handleDismiss.bind(this)
+    this.showAlert = this.showAlert.bind(this)
+    this.handleStartTimeChange = this.handleStartTimeChange.bind(this)
+    this.handleRequest = this.handleRequest.bind(this)
+    this.handleDateChange = this.handleDateChange.bind(this)
+
+    this.init()
+  }
+
+  init() {
+    if (!this.alert.classList.contains('display-none')) {
+      this.dismissLink.addEventListener('click', this.handleDismiss)
     }
 
-    const showAlert = (show = false) => {
-      if (!dismissed) {
-        let statusMessage = ''
-        const displayedStatus = 'Date selected is in the past, service alert displayed'
-        const hiddenStatus = 'Date selected is today or in the future, service banner hidden'
-        if (show && (status.innerText === hiddenStatus || !status.innerText)) {
-          statusMessage = displayedStatus
-        }
-        if (!show && status.innerText === displayedStatus) {
-          statusMessage = hiddenStatus
-        }
-        if (!show) {
-          alert.classList.add('display-none')
-          dismissLink.removeEventListener('click', handleDismiss)
-        } else {
-          alert.classList.remove('display-none')
-          dismissLink.addEventListener('click', handleDismiss)
-        }
-        if (statusMessage) {
-          status.innerText = statusMessage
-        }
+    if (this.dateInput) {
+      this.dateInput.addEventListener('keyup', this.handleDateChange)
+      this.dateInput.addEventListener('change', this.handleDateChange)
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async handleDismiss() {
+    await fetch('/alert/dismiss', { method: 'POST' })
+  }
+
+  showAlert(show = false) {
+    if (this.dismissed) return
+
+    let statusMessage = ''
+    const displayedStatus = 'Date selected is in the past, service alert displayed'
+    const hiddenStatus = 'Date selected is today or in the future, service banner hidden'
+
+    if (show && (this.status.innerText === hiddenStatus || !this.status.innerText)) {
+      statusMessage = displayedStatus
+    }
+
+    if (!show && this.status.innerText === displayedStatus) {
+      statusMessage = hiddenStatus
+    }
+
+    if (!show) {
+      this.alert.classList.add('display-none')
+      this.dismissLink.removeEventListener('click', this.handleDismiss)
+    } else {
+      this.alert.classList.remove('display-none')
+      this.dismissLink.addEventListener('click', this.handleDismiss)
+    }
+
+    if (statusMessage) {
+      this.status.innerText = statusMessage
+    }
+  }
+
+  async handleStartTimeChange(event) {
+    const time = DateTime.fromFormat(event.target.value, 'H:mm')
+    if (time.isValid) {
+      await this.handleRequest()
+    } else {
+      this.showAlert(false)
+    }
+  }
+
+  async handleRequest(dateEvent = false) {
+    const [day, month, year] = this.dateInput.value.split('/')
+    const response = await fetch('/appointment/is-in-past', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date: `${year}-${month}-${day}`,
+        time: this.startInput.value,
+      }),
+    })
+
+    const { isInPast, isToday, alertDismissed } = await response.json()
+    this.dismissed = alertDismissed
+
+    if (dateEvent) {
+      this.startInput.removeEventListener('keyup', this.handleStartTimeChange)
+      if (isToday) {
+        this.startInput.addEventListener('keyup', this.handleStartTimeChange)
       }
     }
 
-    const handleStartTimeChange = async event => {
-      const time = DateTime.fromFormat(event.target.value, 'H:mm')
-      if (time.isValid) {
-        handleRequest()
-      } else {
-        showAlert(false)
-      }
-    }
+    this.showAlert(isInPast)
+  }
 
-    const handleRequest = async (dateEvent = false) => {
-      const [day, month, year] = dateInput.value.split('/')
-      const response = await fetch('/appointment/is-in-past', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ date: `${year}-${month}-${day}`, time: startInput.value }),
-      })
-      const { isInPast, isToday, alertDismissed } = await response.json()
-      dismissed = alertDismissed
-      if (dateEvent) {
-        startInput.removeEventListener('keyup', handleStartTimeChange)
-        if (isToday) {
-          startInput.addEventListener('keyup', handleStartTimeChange)
-        }
-      }
-      showAlert(isInPast)
+  async handleDateChange() {
+    const { value } = this.dateInput
+    const dt = DateTime.fromFormat(value, 'd/M/yyyy')
+    if (dt.isValid) {
+      await this.handleRequest(true)
+    } else {
+      this.showAlert(false)
     }
-
-    const handleDateChange = async () => {
-      const { value } = dateInput
-      const dt = DateTime.fromFormat(value, 'd/M/yyyy')
-      if (dt.isValid) {
-        handleRequest(true)
-      } else {
-        showAlert(false)
-      }
-    }
-
-    dateInput.addEventListener('keyup', handleDateChange)
-    dateInput.addEventListener('change', handleDateChange)
-    handleDateChange()
   }
 }
 
@@ -425,4 +452,4 @@ homeSearch()
 crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
-serviceAlert()
+new ServiceAlert()
