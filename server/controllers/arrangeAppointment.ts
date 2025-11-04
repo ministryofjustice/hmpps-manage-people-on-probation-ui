@@ -226,7 +226,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
-      console.log({ alertDismissed })
       const { change, validation } = req.query
       const showValidation = validation === 'true'
       const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
