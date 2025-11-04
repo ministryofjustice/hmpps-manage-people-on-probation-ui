@@ -91,7 +91,8 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
         })
         displayedUsers = userOptions.map(user => ({
           username: user.username,
-          nameAndRole: convertToTitleCase(user.nameAndRole),
+          // eslint-disable-next-line no-useless-escape
+          nameAndRole: convertToTitleCase(user.nameAndRole, [], /[\(\)]/),
         }))
       } else {
         displayedProviders = providerOptions.map(provider => {

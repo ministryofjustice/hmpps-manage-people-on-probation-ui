@@ -9,6 +9,8 @@ import { convertToTitleCase } from '../utils'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+// eslint-disable-next-line no-useless-escape
+const regex = /[\(\)]/
 const nextSpy = jest.fn()
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -129,7 +131,7 @@ describe('/middleware/getWhoAttends()', () => {
               [username]: [
                 ...userProviders.users.map(user => ({
                   username: user.username,
-                  nameAndRole: convertToTitleCase(user.nameAndRole),
+                  nameAndRole: convertToTitleCase(user.nameAndRole, [], regex),
                 })),
               ],
             },
@@ -148,7 +150,7 @@ describe('/middleware/getWhoAttends()', () => {
           expect(res.locals.userStaff).toStrictEqual([
             ...userProviders.users.map(user => ({
               username: user.username,
-              nameAndRole: convertToTitleCase(user.nameAndRole),
+              nameAndRole: convertToTitleCase(user.nameAndRole, [], regex),
             })),
           ])
         })
@@ -190,7 +192,7 @@ describe('/middleware/getWhoAttends()', () => {
               [username]: [
                 ...userProviders.users.map(user => ({
                   username: user.username,
-                  nameAndRole: convertToTitleCase(user.nameAndRole),
+                  nameAndRole: convertToTitleCase(user.nameAndRole, [], regex),
                 })),
                 {
                   username: probationPractitioner.username,
@@ -216,7 +218,7 @@ describe('/middleware/getWhoAttends()', () => {
           expect(res.locals.userStaff).toStrictEqual([
             ...userProviders.users.map(user => ({
               username: user.username,
-              nameAndRole: convertToTitleCase(user.nameAndRole),
+              nameAndRole: convertToTitleCase(user.nameAndRole, [], regex),
             })),
             {
               username: probationPractitioner.username,
@@ -251,7 +253,7 @@ describe('/middleware/getWhoAttends()', () => {
             [username]: [
               ...userProviders.users.map(user => ({
                 username: user.username,
-                nameAndRole: convertToTitleCase(user.nameAndRole),
+                nameAndRole: convertToTitleCase(user.nameAndRole, [], regex),
               })),
             ],
           },
@@ -275,9 +277,9 @@ describe('/middleware/getWhoAttends()', () => {
         expect(res.locals.userStaff).toStrictEqual([
           {
             ...userProviders.users[0],
-            nameAndRole: convertToTitleCase(userProviders.users[0].nameAndRole),
+            nameAndRole: convertToTitleCase(userProviders.users[0].nameAndRole, [], regex),
           },
-          { ...userProviders.users[1], nameAndRole: convertToTitleCase(userProviders.users[1].nameAndRole) },
+          { ...userProviders.users[1], nameAndRole: convertToTitleCase(userProviders.users[1].nameAndRole, [], regex) },
         ])
       })
       it('should save the correct default user details to locals', () => {
