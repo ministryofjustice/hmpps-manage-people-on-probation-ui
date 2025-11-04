@@ -45,10 +45,19 @@ describe('Arrange an appointment', () => {
             .should('contain.text', toSentenceCase(mockAppointmentTypes[i - 1].description))
           typePage.getRadio('type', i).should('not.be.checked')
         }
-
+        cy.get('[data-qa="attendee"] h2').should('contain.text', 'Who will attend the appointment?')
+        cy.get('[data-qa="attendee"] p:nth-of-type(1)').should(
+          'contain.text',
+          'You can attend or book for someone else',
+        )
+        cy.get('[data-qa="attendeeDetails"]').should(
+          'contain.text',
+          'Ambuj Pathak (COM) (Default Designated Transfer Team, East of England)',
+        )
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
       })
+
       describe('Continue is clicked without first selecting a type', () => {
         beforeEach(() => {
           loadPage()
@@ -172,25 +181,77 @@ describe('Arrange an appointment', () => {
       })
     })
   })
+
   describe('Changing the attendee', () => {
+    const defaultUser = 'Tony Pan (PS-PSO) (Automation SPG, London)'
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
-      typePage.getElement('.govuk-link').click()
     })
     it('should render the attendee page', () => {
+      cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.checkOnPage()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N56')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N56DTX')
+      cy.get('[data-qa="username"]').should('have.value', 'ambuj-pathak')
+      cy.get('[data-qa="providerCode"]').select('N07')
+      cy.get('[data-qa="teamCode"]')
+        .find('option')
+        .then(options => {
+          const values = Array.from(options, option => option.value)
+          expect(values).not.to.include('N56DTX')
+        })
+      cy.get('[data-qa="username"]')
+        .find('option')
+        .then(options => {
+          const values = Array.from(options, option => option.value)
+          expect(values).not.to.include('ambuj-pathak')
+        })
+      cy.get('[data-qa="teamCode"]').select('N07CHT')
+      cy.get('[data-qa="username"]').select('tony-pan')
+      attendancePage.getSubmitBtn().click()
+      typePage = new AppointmentTypePage()
+      typePage.checkOnPage()
+      cy.get('[data-qa="attendeeDetails').should('contain.text', defaultUser)
+      typePage.getRadio('type', 2).click()
+      typePage.getSubmitBtn().click()
+      locationPage.getBackLink().click()
+      cy.get('[data-qa="attendeeDetails').should('contain.text', defaultUser)
     })
     it('backlink should return to type-attendee page', () => {
+      loadPage()
+      cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.getBackLink().click()
       typePage.checkOnPage()
     })
-    it('submitting should return to type-attendee page', () => {
-      attendancePage = new AttendancePage()
+  })
+
+  describe('Probation practitioner not allocated', () => {
+    beforeEach(() => {
+      cy.task('stubNoAllocatedCOM')
+      loadPage()
+    })
+    it('should list the default user as the attendee', () => {
+      cy.get('[data-qa="attendeeDetails"]').should(
+        'contain.text',
+        'Peter Parker (PS-PSO) (Automated Allocation Team, London)',
+      )
+    })
+    it('should update the default user', () => {
+      cy.get('[data-qa="attendee"] a').click()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
+      cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
+      cy.get('[data-qa="providerCode"]').select('N54')
+      cy.get('[data-qa="teamCode"]').select('N07HPT')
+      cy.get('[data-qa="username"]').select('terry-jones')
       attendancePage.getSubmitBtn().click()
-      typePage.checkOnPage()
+      cy.get('[data-qa="attendeeDetails"]').should(
+        'contain.text',
+        'Terry Jones (PS-PSO) (Homelessness Prevention Team,, North East Region',
+      )
     })
   })
 })
