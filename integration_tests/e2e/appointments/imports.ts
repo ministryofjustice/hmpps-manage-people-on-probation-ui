@@ -1,7 +1,5 @@
 import 'cypress-plugin-tab'
 import { DateTime } from 'luxon'
-import AppointmentDateTimePage from '../../pages/appointments/date-time.page'
-import AppointmentLocationPage from '../../pages/appointments/location.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
@@ -14,6 +12,7 @@ import { dateWithYear } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import Page from '../../pages/page'
 
 export const crn = 'X778160'
@@ -89,29 +88,25 @@ export const completeAttendancePage = () => {
   attendancePage.getSubmitBtn().click()
 }
 
-export const completeLocationPage = (index = 1, crnOverride = '') => {
+export const completeLocationDateTimePage = (index = 1, crnOverride = '', uuidOveride = '', next = false) => {
   const suffix = index > 1 ? `-${index}` : ''
-  const locationPage = new AppointmentLocationPage()
-  locationPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-user-locationCode${suffix}`).click()
-  locationPage.getSubmitBtn().click()
-}
-
-export const completeDateTimePage = (crnOverride = '', uuidOveride = '', next = false) => {
-  const dateTimePage = new AppointmentDateTimePage()
-  dateTimePage.getDatePickerToggle().click()
+  const locationDateTimePage = new AppointmentLocationDateTimePage()
+  locationDateTimePage.getDatePickerToggle().click()
   if (next) {
-    dateTimePage.getNextDayButton().click()
+    locationDateTimePage.getNextDayButton().click()
   } else {
-    dateTimePage.getActiveDayButton().click()
+    locationDateTimePage.getActiveDayButton().click()
   }
-  dateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
-  dateTimePage
+  locationDateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
+  locationDateTimePage
     .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-end`)
     .focus()
     .type(endTime)
-  // Ignore warnings on second click
-  dateTimePage.getSubmitBtn().click()
-  dateTimePage.getSubmitBtn().click()
+  locationDateTimePage
+    .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-user-locationCode${suffix}`)
+    .click()
+  locationDateTimePage.getSubmitBtn().click()
+  locationDateTimePage.getSubmitBtn().click()
 }
 
 export const completeSupportingInformationPage = (notes = true, crnOverride = '', uuidOveride = '') => {
@@ -186,7 +181,10 @@ export const completeNextAppointmentPage = (index = 1) => {
   nextAppointmentPage.getSubmitBtn().click()
 }
 
-export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+export const checkAppointmentSummary = (
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+  repeatingEnabled = false,
+) => {
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
   page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned office visit (NS)')
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('not.have.text', 'VISOR report')
@@ -221,19 +219,28 @@ export const checkAppointmentSummary = (page: AppointmentCheckYourAnswersPage | 
     page.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   }
 
-  page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
+  const index = repeatingEnabled ? 1 : 0
+  if (repeatingEnabled) {
+    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
+    page
+      .getSummaryListRow(6)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
+  }
   page
-    .getSummaryListRow(6)
-    .find('.govuk-summary-list__value')
-    .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
-  page.getSummaryListRow(7).find('.govuk-summary-list__key').should('contain.text', 'Supporting information')
+    .getSummaryListRow(6 + index)
+    .find('.govuk-summary-list__key')
+    .should('contain.text', 'Supporting information')
   page
-    .getSummaryListRow(7)
+    .getSummaryListRow(6 + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Not entered' : 'Some notes')
-  page.getSummaryListRow(8).find('.govuk-summary-list__key').should('contain.text', 'Sensitivity')
   page
-    .getSummaryListRow(8)
+    .getSummaryListRow(7 + index)
+    .find('.govuk-summary-list__key')
+    .should('contain.text', 'Sensitivity')
+  page
+    .getSummaryListRow(7 + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Not entered' : 'Yes')
 }
@@ -245,7 +252,7 @@ export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeA
   typePage.getSubmitBtn().click()
   if (page instanceof ArrangeAnotherAppointmentPage) {
     getUuid().then(pageUuid => {
-      completeDateTimePage('', pageUuid, true)
+      completeLocationDateTimePage(1, '', pageUuid, true)
       completeSupportingInformationPage(true, '', pageUuid)
     })
   }
@@ -260,7 +267,7 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-requirementId`).click()
     sentencePage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeDateTimePage('', pageUuid, true)
+      completeLocationDateTimePage(1, '', pageUuid, true)
       completeSupportingInformationPage(true, '', pageUuid)
     }
     page.checkOnPage()
@@ -274,12 +281,18 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
 
 export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   page.getSummaryListRow(4).find('.govuk-link').click()
-  const locationPage = new AppointmentLocationPage()
+  const locationPage = new AppointmentLocationDateTimePage()
   locationPage.getRadio('locationCode', 2).click()
+  locationPage.getDatePickerToggle().click()
+  locationPage.getNextDayButton().click()
+  getUuid().then(uuidOveride => {
+    locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).type(startTime)
+    locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().type(endTime)
+  })
+  locationPage.getSubmitBtn().click()
   locationPage.getSubmitBtn().click()
   if (page instanceof ArrangeAnotherAppointmentPage) {
     getUuid().then(pageUuid => {
-      completeDateTimePage('', pageUuid, true)
       completeSupportingInformationPage(true, '', pageUuid)
     })
   }
@@ -299,8 +312,11 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
       const changedStart = '09:30'
       const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
-      const dateTimePage = new AppointmentDateTimePage()
+      const dateTimePage = new AppointmentLocationDateTimePage()
       dateTimePage.getDatePickerToggle().click()
+      if (newDate.month > DateTime.now().month) {
+        cy.get('.moj-js-datepicker-next-month').click()
+      }
       cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).clear()
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).type(changedStart)
@@ -334,7 +350,7 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
     repeatingPage.getElement(`#appointments-${crn}-${pageUuid}-repeating-2`).click()
     repeatingPage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeDateTimePage('', pageUuid, true)
+      completeLocationDateTimePage(1, '', pageUuid, true)
       completeSupportingInformationPage(true, '', pageUuid)
     }
     page.checkOnPage()
@@ -355,32 +371,32 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
 
 export const checkUpdateNotes = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
-    page.getSummaryListRow(7).find('.govuk-link').click()
+    page.getSummaryListRow(6).find('.govuk-link').click()
     const updatedNotes = 'Some updated notes'
     const notePage = new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-notes`).focus().clear().type(updatedNotes)
     notePage.getSubmitBtn().click()
     page.checkOnPage()
-    page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
+    page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
   })
 }
 
 export const checkUpdateSensitivity = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
   getUuid().then(pageUuid => {
-    page.getSummaryListRow(8).find('.govuk-link').click()
+    page.getSummaryListRow(7).find('.govuk-link').click()
     const notePage = new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()
     notePage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeDateTimePage('', pageUuid, true)
+      completeLocationDateTimePage(1, '', pageUuid, true)
     }
     page.checkOnPage()
-    page.getSummaryListRow(8).find('.govuk-summary-list__value').should('contain.text', 'No')
+    page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No')
   })
 }
 
 export const checkUpdateBackLinkRefresh = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  const pages = [5, 8]
+  const pages = [5, 7]
   cy.wrap(pages).each((index: number) => {
     page.getSummaryListRow(index).find('.govuk-link').click()
     page.getSubmitBtn().click()
