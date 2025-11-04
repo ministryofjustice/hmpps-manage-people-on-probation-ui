@@ -4,7 +4,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
-import { getDataValue } from '../utils'
+import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 
@@ -110,7 +110,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           forename: eventId === 'PERSON_LEVEL_CONTACT' ? forename : null,
         },
         attending: {
-          name: selectedUser,
+          // eslint-disable-next-line no-useless-escape
+          name: convertToTitleCase(selectedUser, [], /[\(\)]/),
           team: selectedTeam,
           region: selectedRegion,
         },
