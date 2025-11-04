@@ -53,21 +53,8 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateLocation = (): void => {
-    if (baseUrl.includes('/location')) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'location',
-        }),
-      )
-    }
-  }
-
-  const validateDateTime = (): void => {
-    if (baseUrl.includes('/date-time')) {
+  const validateLocationDateTime = (): void => {
+    if (baseUrl.includes('/location-date-time')) {
       localParams._minDate = req.body._minDate
       localParams._maxDate = req.body._maxDate
       const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
@@ -76,7 +63,7 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
-          page: 'datetime',
+          page: 'location-date-time',
         }),
         { now },
       )
@@ -194,8 +181,7 @@ const appointments: Route<void> = (req, res, next) => {
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
-  validateLocation()
-  validateDateTime()
+  validateLocationDateTime()
   validateRepeating()
   validateSupportingInformation()
   validateNextAppointment()

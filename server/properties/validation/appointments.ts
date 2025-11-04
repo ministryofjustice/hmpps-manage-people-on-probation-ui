@@ -58,18 +58,8 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
 
-    [`[appointments][${crn}][${id}][user][locationCode]`]: {
-      optional: page !== 'location',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select an appointment location',
-          log: 'Location not selected',
-        },
-      ],
-    },
     [`[appointments][${crn}][${id}][date]`]: {
-      optional: page !== 'datetime',
+      optional: page !== 'location-date-time',
       checks: [
         {
           validator: isNotEmpty,
@@ -99,7 +89,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
-      optional: page !== 'datetime',
+      optional: page !== 'location-date-time',
       checks: [
         {
           validator: isNotEmpty,
@@ -121,7 +111,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][end]`]: {
-      optional: page !== 'datetime',
+      optional: page !== 'location-date-time',
       checks: [
         {
           validator: isNotEmpty,
@@ -142,6 +132,18 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+
+    [`[appointments][${crn}][${id}][user][locationCode]`]: {
+      optional: page !== 'location-date-time',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an appointment location',
+          log: 'Location not selected',
+        },
+      ],
+    },
+
     [`[appointments][${crn}][${id}][repeating]`]: {
       optional: page !== 'repeating',
       checks: [

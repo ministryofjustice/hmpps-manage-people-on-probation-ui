@@ -119,8 +119,10 @@ export default class RestClient {
       raw = false,
       retry = false,
       handle404 = false,
+      handle500 = false,
       file,
       isMultipart = false,
+      errorMessageFor500 = '',
     }: RequestWithBody,
   ): Promise<Response> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
@@ -166,6 +168,14 @@ export default class RestClient {
       return raw ? (result as Response) : result.body
     } catch (error) {
       if (handle404 && error.response?.status === 404) return null
+      if (handle500 && error?.response?.status === 500) {
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({ text: errorMessageFor500 })
+        error.response.errors = warnings
+        JSON.stringify(error.response)
+        logger.info('Handling 500 : ', error.response)
+        return error.response
+      }
       const sanitisedError = sanitiseError(error)
       logger.warn(
         { ...sanitisedError },

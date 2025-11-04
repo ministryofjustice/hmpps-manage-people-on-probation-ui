@@ -33,10 +33,12 @@ if ($multifileUpload) {
     headers: {
       'CSRF-Token': window.csrfToken,
     },
-    uploadFileEntryHook: uploadEntry,
-    uploadFileExitHook: uploadExit,
-    fileDeleteHook: deleteExit,
-    uploadFileErrorHook: errorHook,
+    hooks: {
+      entryHook: uploadEntry,
+      exitHook: uploadExit,
+      deleteHook: deleteExit,
+      errorHook: uploadErrorHook,
+    },
   })
 
   function continueButtonEnabled(enabled) {
@@ -86,7 +88,7 @@ if ($multifileUpload) {
     }
   }
 
-  function errorHook({ handle, file, errorMessage, textStatus, errorThrown }) {
+  function uploadErrorHook({ handle, file, errorMessage, textStatus, errorThrown }) {
     const message = errorMessage || textStatus || errorThrown
     const item = $(handle.getFileRowHtml(file))
 

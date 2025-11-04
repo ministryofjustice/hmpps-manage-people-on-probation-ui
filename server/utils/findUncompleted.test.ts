@@ -42,7 +42,7 @@ describe('utils/findUncompleted', () => {
       type: null,
     }
     expect(findUncompleted(session, crn, id, change)).toBe(
-      `/case/${crn}/arrange-appointment/${id}/type?change=${change}`,
+      `/case/${crn}/arrange-appointment/${id}/type-attendance?change=${change}`,
     )
   })
   it('returns attendance url if no user info (and previous conditions not met)', () => {
@@ -66,7 +66,7 @@ describe('utils/findUncompleted', () => {
       },
     }
     expect(findUncompleted(session, crn, id, change)).toBe(
-      `/case/${crn}/arrange-appointment/${id}/location?change=${change}`,
+      `/case/${crn}/arrange-appointment/${id}/location-date-time?change=${change}`,
     )
   })
   it('returns date-time url if no date-time (and previous conditions not met)', () => {
@@ -75,7 +75,7 @@ describe('utils/findUncompleted', () => {
       date: null,
     }
     expect(findUncompleted(session, crn, id, change)).toBe(
-      `/case/${crn}/arrange-appointment/${id}/date-time?change=${change}`,
+      `/case/${crn}/arrange-appointment/${id}/location-date-time?change=${change}`,
     )
   })
   it('returns supporting information if no sensitivity (and previous conditions not met)', () => {

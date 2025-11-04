@@ -8,6 +8,7 @@ import { getWiremockData, Wiremock } from '../../utils'
 import { checkPopHeader, completeSentencePage } from './imports'
 import { toSentenceCase } from '../../../server/utils'
 import AttendancePage from '../../pages/appointments/attendance.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
 const mockData = mockResponse as Wiremock
 
@@ -23,6 +24,7 @@ const loadPage = () => {
 describe('Arrange an appointment', () => {
   let typePage: AppointmentTypePage
   let attendancePage: AttendancePage
+  let locationPage: AppointmentLocationDateTimePage
   afterEach(() => {
     cy.task('resetMocks')
   })
@@ -73,12 +75,12 @@ describe('Arrange an appointment', () => {
       describe('Type is selected, and continue is clicked', () => {
         beforeEach(() => {
           loadPage()
-          typePage.getElement(`#appointments-${crn}-${uuid}-type`).click()
+          typePage.getRadio('type', 2).click()
           typePage.getSubmitBtn().click()
         })
-        it('should redirect to the attendance page', () => {
-          attendancePage = new AttendancePage()
-          attendancePage.checkOnPage()
+        it('should redirect to the location page', () => {
+          locationPage = new AppointmentLocationDateTimePage()
+          locationPage.checkOnPage()
         })
       })
     })
@@ -129,13 +131,13 @@ describe('Arrange an appointment', () => {
         describe('Type and VISOR are selected, and continue is clicked', () => {
           beforeEach(() => {
             loadPage()
-            typePage.getElement(`#appointments-${crn}-${uuid}-type`).click()
+            typePage.getRadio('type', 2).click()
             typePage.getElement(`#appointments-${crn}-${uuid}-visorReport`).click()
             typePage.getSubmitBtn().click()
           })
-          it('should redirect to the attendance page', () => {
-            attendancePage = new AttendancePage()
-            attendancePage.checkOnPage()
+          it('should redirect to the location page', () => {
+            locationPage = new AppointmentLocationDateTimePage()
+            locationPage.checkOnPage()
           })
         })
       })
@@ -168,6 +170,27 @@ describe('Arrange an appointment', () => {
         typePage.getSubmitBtn().click()
         cy.get(`[data-qa="type"] .govuk-radios__item`).find('input').should('have.length', 2)
       })
+    })
+  })
+  describe('Changing the attendee', () => {
+    beforeEach(() => {
+      loadPage()
+      typePage = new AppointmentTypePage()
+      typePage.getElement('.govuk-link').click()
+    })
+    it('should render the attendee page', () => {
+      attendancePage = new AttendancePage()
+      attendancePage.checkOnPage()
+    })
+    it('backlink should return to type-attendee page', () => {
+      attendancePage = new AttendancePage()
+      attendancePage.getBackLink().click()
+      typePage.checkOnPage()
+    })
+    it('submitting should return to type-attendee page', () => {
+      attendancePage = new AttendancePage()
+      attendancePage.getSubmitBtn().click()
+      typePage.checkOnPage()
     })
   })
 })

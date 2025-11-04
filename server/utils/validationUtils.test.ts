@@ -382,11 +382,14 @@ describe(`validates appointment repeat request with spec when no repeating optio
   })
 })
 
-describe('validates appointment date time request with spec', () => {
+describe('validates appointment location and date time page request with spec', () => {
   const testRequest = {
     appointments: {
       [crn]: {
         [id]: {
+          user: {
+            locationCode: 'code',
+          },
           date: '21/11/2',
           start: '09:00',
           end: '09:30',
@@ -400,7 +403,7 @@ describe('validates appointment date time request with spec', () => {
   const args = {
     crn,
     id,
-    page: 'datetime',
+    page: 'location-date-time',
   }
   const spec = appointmentsValidation(args)
   it('should return the correct validation errors', () => {
