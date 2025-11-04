@@ -5,7 +5,7 @@
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
 {% block form %}
-
+  {% include "../../partials/_log-outcomes-alert.njk" %}
   {{ govukCheckboxes({
     idPrefix: 'outcomeRecorded',
     name: 'outcomeRecorded',

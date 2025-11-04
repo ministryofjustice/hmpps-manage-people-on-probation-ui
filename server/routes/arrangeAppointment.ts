@@ -150,6 +150,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
   router.post('/alert/dismiss', (req, res) => {
     req.session.alertDismissed = true
+    console.log({ dismissed: req.session.alertDismissed })
     return res.json({ success: true })
   })
   router.post('/appointment/is-in-past', (req, res) => {

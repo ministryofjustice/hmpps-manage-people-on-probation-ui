@@ -162,16 +162,7 @@
     }) }}
     {% endif %}
     <h3 class="govuk-heading-m">Enter the date and time of the appointment</h3>
-    <div data-module="serviceAlert" class="{% if (isInPast == false) or (isInPast == true and alertDismissed == true) %}display-none{% endif %}">
-        {{ mojAlert({
-  variant: "information",
-  title: "You can only use this service to log attended and complied outcomes.",
-  showTitleAsHeading: false,
-  dismissible: true,
-  html: 'You can only use this service to log attended and complied outcomes.<br><a href="#" target="_blank" rel="external noopener noreferrer">Use NDelius to arrange an appointment in the past with another outcome</a>.'
-}) }}
-    </div>
-    <span data-qa="serviceAlertStatus" class="govuk-visually-hidden" aria-live="polite"></span>
+    {% include "../../partials/_log-outcomes-alert.njk" %}
     {{ mojDatePicker({
     label: {
         text: "Date"
