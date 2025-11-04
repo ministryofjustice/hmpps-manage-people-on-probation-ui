@@ -234,6 +234,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      const { alertDismissed = false } = req.session
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
@@ -242,8 +243,11 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+
       res.render('pages/appointments/attended-complied', {
         crn,
+        alertDismissed,
+        isInPast: true,
       })
     }
   },
