@@ -340,6 +340,8 @@ describe('controllers/appointments', () => {
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
         crn,
+        alertDismissed: false,
+        isInPast: true,
       })
     })
   })
