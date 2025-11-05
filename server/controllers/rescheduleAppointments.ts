@@ -39,8 +39,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       }
       const { validation } = req.query
       const showValidation = validation === 'true'
-      const { data } = req.session
-      const { crn, id } = req.params as Record<string, string>
+      const { crn, id, contactId } = req.params as Record<string, string>
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-sensitivity`]: 'Select if appointment includes sensitive information',
@@ -50,8 +49,6 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
             'Select who is rescheduling this appointment',
         }
       }
-
-      const contactId = getDataValue(data, ['appointments', crn, id, 'contactId'])
       const token = await _hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
@@ -79,6 +76,9 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
+      /*      if (req.session?.data?.appointments?.[crn]?.[id]) {
+        delete req.session.data.appointments[crn][id]
+      } */
       const redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
       return res.redirect(redirect)
     }

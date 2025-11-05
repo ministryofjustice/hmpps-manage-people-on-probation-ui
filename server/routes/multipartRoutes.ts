@@ -35,7 +35,7 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
   )
 
   router.post(
-    '/case/:crn/reschedule-appointment/:id',
+    '/case/:crn/appointments/reschedule-appointment/:contactId/:id',
     upload.array('documents'),
     autoStoreMultiformSessionData(hmppsAuthClient),
     cacheUploadedFiles,
