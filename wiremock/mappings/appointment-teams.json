@@ -1,0 +1,116 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/appointment/teams/provider/.*",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "teams": [
+            {
+              "description": "Automated Allocation Team",
+              "code": "N07AAT"
+            },
+            {
+              "description": "Automation SPG",
+              "code": "N07CHT"
+            },
+            {
+              "description": "Automation Test No Location Warning",
+              "code": "N07IVH"
+            },
+            {
+              "description": "Bexley\\Bromley SP TEST1",
+              "code": "N07SP1"
+            },
+            {
+              "description": "CP South 1",
+              "code": "N07LCA"
+            },
+            {
+              "description": "CP South Legacy Caseload",
+              "code": "N07LCC"
+            },
+            {
+              "description": "CRC Created",
+              "code": "N07PRC"
+            },
+            {
+              "description": "Default Designated Transfer Team",
+              "code": "N07DTX"
+            },
+            {
+              "description": "Diary Team",
+              "code": "N07T05"
+            },
+            {
+              "description": "Error Handling Team",
+              "code": "N07EHT"
+            },
+            {
+              "description": "Homelessness Prevention Team,",
+              "code": "N07HPT"
+            },
+            {
+              "description": "Inactive Team(N07)",
+              "code": "N07IAV"
+            },
+            {
+              "description": "OMU A",
+              "code": "N07T01"
+            },
+            {
+              "description": "OMU B",
+              "code": "N07T02"
+            },
+            {
+              "description": "OMU C",
+              "code": "N07T03"
+            },
+            {
+              "description": "OMU D",
+              "code": "N07T04"
+            },
+            {
+              "description": "Test Approved Premises Team",
+              "code": "N07APR"
+            },
+            {
+              "description": "Test team",
+              "code": "N07001"
+            },
+            {
+              "description": "Test Team 02",
+              "code": "N07TES"
+            },
+            {
+              "description": "Test Team Default Location",
+              "code": "N07GTT"
+            },
+            {
+              "description": "test team lowercase",
+              "code": "N07707"
+            },
+            {
+              "description": "Testing Inactive Team",
+              "code": "N07ZTF"
+            },
+            {
+              "description": "Tiering Service",
+              "code": "N07UTS"
+            },
+            {
+              "description": "Unallocated Team(N07)",
+              "code": "N07UAT"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

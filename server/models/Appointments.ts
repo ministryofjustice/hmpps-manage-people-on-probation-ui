@@ -6,13 +6,15 @@ export type YesNo = '' | 'Yes' | 'No'
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
+export interface AppointmentSessionUser {
+  providerCode?: string
+  teamCode?: string
+  username?: string
+  locationCode?: string
+}
+
 export interface AppointmentSession {
-  user?: {
-    providerCode?: string
-    teamCode?: string
-    username?: string
-    locationCode?: string
-  }
+  user?: AppointmentSessionUser
   temp?: {
     providerCode?: string
     teamCode?: string

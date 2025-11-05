@@ -93,7 +93,8 @@ describe('/middleware/getAppointment', () => {
         user: {
           username: 'user-1',
         },
-        defaultUser: {
+        attendingUser: {
+          staffCode: '',
           homeArea: '',
           team: '',
           username: '',

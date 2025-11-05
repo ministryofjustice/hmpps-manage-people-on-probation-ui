@@ -80,14 +80,12 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
       const users: User[] = getDataValue(data, ['staff', loggedInUsername])
 
-      const selectedRegion =
-        providerCode && providers ? providers.find(r => r.code === providerCode)?.name : res.locals.defaultUser.homeArea
-      const selectedTeam =
-        teamCode && teams ? teams.find(team => team.code === teamCode)?.description : res.locals.defaultUser.team
+      const selectedRegion = res.locals.attendingUser.homeArea
+      const selectedTeam = res.locals.attendingUser.team
       const selectedUser =
         staffId && users
           ? users.find(user => user.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
-          : res.locals.defaultUser.username
+          : res.locals.attendingUser.username
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {
