@@ -4,20 +4,20 @@ import logger from '../../logger'
 
 export default function getFrontendComponents(probationComponentsService: ProbationComponentsService): RequestHandler {
   return async (req, res, next) => {
-    // Check if FE components are already cached in the session
-    const cached = (req.session as any)?.feComponents
-    if (cached?.header && cached?.footer) {
-      res.locals.feComponents = cached
-      return next()
-    }
 
-    // Only fetch components if a user token is available
-    const token: string | undefined = res.locals?.user?.token
-    if (!token) {
-      // skip fetching
-      return next()
-    }
+      // Check if FE components are already cached in the session
+      const cached = (req.session as any)?.feComponents
+      if (cached?.header && cached?.footer) {
+        res.locals.feComponents = cached
+        return next()
+      }
 
+      // Only fetch components if a user token is available
+      const token: string | undefined = res.locals?.user?.token
+      if (!token) {
+        // skip fetching
+        return next()
+      }
     let header: any
     let footer: any
     try {
@@ -36,11 +36,12 @@ export default function getFrontendComponents(probationComponentsService: Probat
       jsIncludes: [...(header?.javascript || []), ...(footer?.javascript || [])],
     }
 
-    if (req?.session) {
-      ;(req.session as any).feComponents = res.locals.feComponents
-    }
+      if (req?.session) {
+        ;(req.session as any).feComponents = res.locals.feComponents
+      }
 
-    return next()
+      return next()
+
   }
 }
 
