@@ -179,7 +179,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== 'supporting-information',
+      optional: page !== 'supporting-information' && page !== 'reschedule-appointment',
       checks: [
         {
           validator: isNotEmpty,
@@ -218,6 +218,21 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][reason]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isValidCharCount,
+          msg: `Reason must be ${maxCharCount} characters or less`,
+          log: `Reason exceeds maximum character length`,
+        },
+        {
+          validator: isNotEmpty,
+          msg: 'Explain why this appointment is being rescheduled',
+          log: 'Explain why this appointment is being rescheduled not provided',
+        },
+      ],
+    },
     sensitive: {
       optional: page !== 'add-note',
       checks: [
@@ -225,6 +240,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select whether or not the appointment note contains sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][whoNeedsToReschedule]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select who is rescheduling this appointment',
+          log: 'Select who is rescheduling this appointment not selected',
         },
       ],
     },

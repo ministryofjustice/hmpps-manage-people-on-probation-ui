@@ -1,43 +1,86 @@
-import { v4 as uuidv4 } from 'uuid'
-import { Controller } from '../@types'
-import { isValidCrn, isValidUUID } from '../utils'
+import { Controller, FileCache } from '../@types'
+import { getDataValue, isValidCrn } from '../utils'
 
-import { renderError } from '../middleware'
+import { cloneAppointment, cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 
-const routes = ['redirectToRescheduleAppointment', 'getRescheduleAppointment'] as const
+const routes = ['redirectToRescheduleAppointment', 'getRescheduleAppointment', 'postRescheduleAppointment'] as const
 
 const rescheduleAppointmentController: Controller<typeof routes, void> = {
   redirectToRescheduleAppointment: () => {
     return async (req, res) => {
-      const uuid = uuidv4()
       const { crn, contactId } = req.params
-      const { back } = req.query
-      if (!isValidCrn(crn) || !isValidUUID(uuid)) {
+      if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      if (back) {
-        return res.redirect(`/case/${crn}/reschedule-appointment/${uuid}/reschedule/${contactId}?back=${back}`)
-      }
-      return res.redirect(`/case/${crn}/reschedule-appointment/${uuid}/reschedule/${contactId}`)
+      const { nextAppointmentSession } = res.locals
+      const redirect = cloneAppointment(nextAppointmentSession)(req, res)
+      return res.redirect(redirect)
     }
   },
   getRescheduleAppointment: _hmppsAuthClient => {
-    const { maxCharCount } = config
     return async (req, res) => {
-      const { crn, id, contactId } = req.params as Record<string, string>
+      let uploadedFiles: FileCache[] = []
+      let errorMessages: Record<string, string> = null
+      let body = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
+      }
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        res.locals.errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
+      if (req?.session?.body) {
+        body = req.session.body
+        delete req.session.body
+      }
+      const { validation } = req.query
+      const showValidation = validation === 'true'
+      const { data } = req.session
+      const { crn, id } = req.params as Record<string, string>
+      if (showValidation) {
+        res.locals.errorMessages = {
+          [`appointments-${crn}-${id}-sensitivity`]: 'Select if appointment includes sensitive information',
+          [`appointments-${crn}-${id}-rescheduleAppointment-reason`]:
+            'Explain why this appointment is being rescheduled',
+          [`appointments-${crn}-${id}-rescheduleAppointment-whoNeedsToReschedule`]:
+            'Select who is rescheduling this appointment',
+        }
+      }
+
+      const contactId = getDataValue(data, ['appointments', crn, id, 'contactId'])
       const token = await _hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { username } = res.locals.user
       const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
+      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+
       res.render('pages/appointments/reschedule-appointment', {
         crn,
-        id,
         maxCharCount,
         personAppointment,
         contactId,
+        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
+        maxFileSize,
+        fileUploadLimit,
+        body,
+        uploadedFiles,
+        id,
+        showValidation,
+        errorMessages,
       })
+    }
+  },
+  postRescheduleAppointment: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn)) {
+        return renderError(404)(req, res)
+      }
+      const redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      return res.redirect(redirect)
     }
   },
 }

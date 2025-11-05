@@ -13,7 +13,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
   )
 
   router.get(
-    '/case/:crn/reschedule-appointment/:id/reschedule/:contactId',
+    '/case/:crn/reschedule-appointment/:id',
     controllers.rescheduleAppointments.getRescheduleAppointment(hmppsAuthClient),
   )
 }

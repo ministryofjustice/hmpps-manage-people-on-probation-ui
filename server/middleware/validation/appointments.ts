@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes } from '../../utils'
+import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
@@ -19,6 +19,7 @@ const appointments: Route<void> = (req, res, next) => {
   const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
+  let isReschedulePage = false
   let render = `pages/${[
     url
       .split('?')[0]
@@ -178,6 +179,22 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateReschedule = () => {
+    if (baseUrl.includes(`/case/${crn}/reschedule-appointment/${id}`)) {
+      isReschedulePage = true
+      render = `pages/appointments/reschedule-appointment`
+      errorMessages = validateWithSpec(
+        unflattenBracketKeys(req.body),
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'reschedule-appointment',
+          maxCharCount,
+        }),
+      )
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
@@ -188,9 +205,10 @@ const appointments: Route<void> = (req, res, next) => {
   validateRecordAnOutcome()
   validateAttendedComplied()
   validateAddNote()
+  validateReschedule()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    if (isAddNotePage) {
+    if (isAddNotePage || isReschedulePage) {
       req.session.errorMessages = errorMessages
       req.session.body = body
       return res.redirect(req.url)
