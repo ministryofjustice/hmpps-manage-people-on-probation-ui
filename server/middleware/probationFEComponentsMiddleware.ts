@@ -4,8 +4,7 @@ import logger from '../../logger'
 
 export default function getFrontendComponents(probationComponentsService: ProbationComponentsService): RequestHandler {
   return async (req, res, next) => {
-    try {
-      // Check if FE components are already cached in the session
+     // Check if FE components are already cached in the session
       const cached = (req.session as any)?.feComponents
       if (cached?.header && cached?.footer) {
         res.locals.feComponents = cached
@@ -20,7 +19,13 @@ export default function getFrontendComponents(probationComponentsService: Probat
       }
 
       // Not cached: fetch from backend and cache in session
+    try {
       const { header, footer } = await probationComponentsService.getProbationFEComponents(['header', 'footer'], token)
+      } catch (error) {
+      logger.info(error, 'Failed to fetch probation front end components')
+      // will display fallback pages
+      return next()
+    }
       res.locals.feComponents = {
         header: replaceHashWithSlash(header.html),
         footer: footer.html,
@@ -33,11 +38,7 @@ export default function getFrontendComponents(probationComponentsService: Probat
       }
 
       return next()
-    } catch (error) {
-      logger.info(error, 'Failed to fetch probation front end components')
-      // will display fallback pages
-      return next()
-    }
+    
   }
 }
 
