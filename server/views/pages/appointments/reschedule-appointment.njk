@@ -1,6 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Reschedule an appointment' %}
-{% set headerPersonNameForename = personalDetails.name.forename  %}
+{% set headerPersonNameForename = personAppointment.personSummary.name.forename  %}
 {% set apptDetails = personAppointment.appointment  %}
 {% set officerName = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname  %}
 {% set officerStaffCode = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname  %}
@@ -12,8 +12,6 @@
 {% set submitButtonId = 'continueButton' %}
 {% block form %}
     {{ govukRadios({
-        name: 'sensitive',
-        id: 'sensitive',
         fieldset: {
             legend: {
                 text: 'Who needs to reschedule this appointment',
@@ -31,14 +29,14 @@
         },
         items: [
             {
-                value: 'PER',
-                text: headerPersonName.split(' ')[0],
+                value: 'POP',
+                text: headerPersonNameForename.split(' ')[0],
                 hint: {
                     text: "They should give 48 hours notice and provide evidence."
                 }
             },
             {
-                value: 'PS',
+                value: 'SERVICE',
                 text: "Probation Service",
                 hint: {
                     text: "Inculudes changes to probation practitioner availablity."
@@ -48,10 +46,8 @@
         errorMessage: {
             text: "Please select an option"
         }  if errorMessages.whoNeedsToReschedule
-    }) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','whoNeedsToReschedule' ])      ) }}
     {{ govukCharacterCount({
-        id: "notes",
-        name: "notes",
         rows: '10',
         maxlength: maxCharCount,
         label: {
@@ -61,30 +57,28 @@
         },
         classes: "",
         formGroup: {
-            attributes: { "data-qa": "notes"}
+            attributes: { "data-qa": "reason"}
         },
-        value: body.notes,
+        value: body.reason,
         errorMessage: {
-            text: 'Note must be ' + maxCharCount + ' characters or less'
-        }  if errorMessages.notes
-    }) }}
+            text: 'Reason must be ' + maxCharCount + ' characters or less'
+        }  if errorMessages.reason
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','reason' ])      ) }}
 
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
-
     {% set uploadHtml %}
     <div class="govuk-grid-row govuk-body">
         <div class="govuk-grid-column-full">
-
             {{ govukFileUpload({
                 id: "file-upload-1",
                 name: "file",
                 classes: 'moj-multi-file-upload__input',
                 label: {
                     text: "Upload any supporting documents",
-                    hint: {
-                        text: "HINTTTT"
-                    },
                     classes: 'govuk-label--m'
+                },
+                hint: {
+                    text: "For example, a sick note."
                 },
                 attributes: { multiple: '' }
             }) }}
@@ -100,9 +94,6 @@
         id: "file-upload-1",
         name: "fileName",
         label: { text: "Upload or drag and drop documents" },
-        hint: {
-            text: "hintText"
-        },
         uploadedFiles: {
             heading: { text: 'Files added' },
             items: uploadedFiles
@@ -110,16 +101,7 @@
         uploadHtml: uploadHtml
     }) }}
 
-
-
-
-
-
-
-
     {{ govukRadios({
-        name: 'sensitive',
-        id: 'sensitive',
         fieldset: {
             legend: {
                 text: 'Does this contact include sensitive information?',
@@ -148,6 +130,6 @@
         errorMessage: {
             text: "Please select an option"
         }  if errorMessages.sensitive
-    }) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
 {% endblock %}
 
