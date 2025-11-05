@@ -1,6 +1,6 @@
 {% set notes = '' %}
-{% set hasNote = appointment.appointmentNote and appointment.hasOutcome == false %}
-{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome == false %}
+{% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
