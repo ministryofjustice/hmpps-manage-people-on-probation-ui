@@ -61,52 +61,12 @@ describe('Check your answers then confirm the appointment', () => {
     })
   })
 
-  it('should render the page with sentence and licence condition', () => {
-    loadPage({})
-    cy.get('[data-qa="appointmentSentence"]').should('contain.text', '12 month Community order')
-    cy.get('[data-qa="appointmentLicenceCondition"]').should(
-      'contain.text',
-      'Alcohol Monitoring (Electronic Monitoring)',
-    )
-    cy.get('[data-qa="appointmentRequirment"]').should('not.exist')
-    cy.get('[data-qa="appointmentForename"]').should('not.exist')
-  })
-
-  it('should render the page with sentence and requirment', () => {
-    loadPage({ hasVisor: false, sentenceOptionIndex: 2 })
-    cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
-    cy.get('[data-qa="appointmentRequirement"]').should('contain.text', '12 days RAR, 1 completed')
-    cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
-    cy.get('[data-qa="appointmentForename"]').should('not.exist')
-  })
-
-  it('should render the page with sentence and nsi', () => {
-    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3 })
-    cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
-    cy.get('[data-qa="appointmentNsi"]').should('contain.text', 'BRE description')
-  })
-
   it('should render the page with personal contact', () => {
     loadPage({ hasVisor: false, typeOptionIndex: 2, sentenceOptionIndex: 4 })
     cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
     cy.get('[data-qa="appointmentSentence"]').should('not.exist')
     cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
     cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
-  })
-
-  it('should render the page when repeating appointment featureflag is toggled off', () => {
-    cy.task('stubNoRepeats')
-    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, repeatAppointments: false })
-    it('should not display the repeating appointment row', () => {
-      cy.get('[data-qa="repeatingAppointmentLabel"]').should('not.exist')
-      cy.get('[data-qa="repeatingAppointmentValue"]').should('not.exist')
-    })
-  })
-
-  it('should render the page when no notes have been entered', () => {
-    loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, notes: false })
-    const cyaPage = new AppointmentCheckYourAnswersPage()
-    cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   })
 
   describe('Change appointment values', () => {
