@@ -44,6 +44,7 @@ import {
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
+import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 
 interface GetUserScheduleProps {
   username: string
@@ -345,6 +346,14 @@ export default class MasApiClient extends RestClient {
     const teamQueryParam = teamCode ? `&team=${teamCode}` : ''
     const queryParameters = regionCode ? `?region=${regionCode}${teamQueryParam}` : ''
     return this.get({ path: `/user/${username}/providers${queryParameters}`, handle404: true })
+  }
+
+  async getTeamsByProvider(providerCode: string): Promise<AppointmentTeams> {
+    return this.get({ path: `/appointment/teams/provider/${providerCode}` })
+  }
+
+  async getStaffByTeam(teamCode: string): Promise<AppointmentStaff> {
+    return this.get({ path: `/appointment/staff/team/${teamCode}` })
   }
 
   async getUserLocations(username: string): Promise<UserLocations> {
