@@ -18,24 +18,6 @@
         {% endset %}
         {% set requirements = (requirements.push({text: requirement.description, hint: {html: licenceTag}, value: requirement.id}), requirements) %}
       {% endfor %}
-      {% set sentenceReveal %}
-      {{ govukRadios({
-    formGroup: {
-      classes: 'govuk-!-margin-top-4'
-    },
-    fieldset: {
-      legend: {
-        text: "Which requirement is this appointment for? (optional)",
-        isPageHeading: false,
-        classes: "govuk-fieldset__legend--s"
-      },
-      attributes: {
-        'data-qa': 'requirementId'
-      }
-    },
-    items: requirements
-} | decorateFormAttributes(['appointments', crn, id, 'requirementId'])) }}
-      {% endset -%}
     {% endif %}
     {% if sentence.licenceConditions.length %}
       {% set licenceConditions = [] %}
@@ -48,48 +30,6 @@
         {% endset %}
         {% set licenceConditions = (licenceConditions.push({text: licenceCondition.mainDescription, hint: {html: licenceTag}, value: licenceCondition.id}), licenceConditions) %}
       {% endfor %}
-      {% set sentenceReveal %}
-      {{ govukRadios({
-       formGroup: {
-          classes: 'govuk-!-margin-top-4'
-        },
-        fieldset: {
-      legend: {
-        text: "Which licence condition is this appointment for? (optional)",
-        isPageHeading: false,
-        classes: "govuk-fieldset__legend--s"
-      },
-      attributes: {
-        'data-qa': 'licenceConditionId'
-      }
-    },
-    items: licenceConditions
-} | decorateFormAttributes(['appointments', crn, id, 'licenceConditionId'])) }}
-      {% endset -%}
-    {% endif %}
-    {% if sentence.nsis.length %}
-      {% set nsis = [] %}
-      {% for nsi in sentence.nsis %}
-        {% set nsis = (nsis.push({text: nsi.description, value: nsi.id}), nsis) %}
-      {% endfor %}
-      {% set sentenceReveal %}
-      {{ govukRadios({
-       formGroup: {
-          classes: 'govuk-!-margin-top-4'
-        },
-    fieldset: {
-      legend: {
-        text: "Which nsi is this appointment for? (optional)",
-        isPageHeading: false,
-        classes: "govuk-fieldset__legend--s"
-      },
-      attributes: {
-        'data-qa': 'nsiId'
-      }
-    },
-    items: nsis
-} | decorateFormAttributes(['appointments', crn, id, 'nsiId'])) }}
-      {% endset -%}
     {% endif %}
     {% if sentence.order.description %}
       {% set hintText = '' %}
