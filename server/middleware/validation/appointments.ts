@@ -180,7 +180,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateReschedule = () => {
-    if (baseUrl.includes(`/case/${crn}/reschedule-appointment/${id}`)) {
+    if (baseUrl.includes(`/case/${crn}/appointments/reschedule-appointment/${contactId}/${id}`)) {
       isReschedulePage = true
       render = `pages/appointments/reschedule-appointment`
       errorMessages = validateWithSpec(
