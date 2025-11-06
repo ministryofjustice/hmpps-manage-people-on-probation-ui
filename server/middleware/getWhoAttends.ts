@@ -73,7 +73,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
         }
 
         displayedUsers = users.map(user => {
-          if (user.username.toUpperCase() === defaultUserDetails.username) {
+          if (user.username.toLowerCase() === defaultUserDetails.username.toLowerCase()) {
             setDataValue(data, ['appointments', crn, id, 'user', 'username'], user.username)
             return { username: user.username, nameAndRole: user.nameAndRole, selected: 'selected' }
           }

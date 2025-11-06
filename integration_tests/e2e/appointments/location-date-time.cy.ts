@@ -1,10 +1,9 @@
 import { DateTime } from 'luxon'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import { completeAttendancePage, completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
-import AttendancePage from '../../pages/appointments/attendance.page'
+import { completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
-import Page from '../../pages/page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
+import AppointmentTypePage from '../../pages/appointments/type.page'
 
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
@@ -116,9 +115,9 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage.getBackLink().click()
     })
-    it('should render the sentence page', () => {
-      const attendancePage = new AttendancePage()
-      attendancePage.checkOnPage()
+    it('should render the appointmentType page', () => {
+      const appointmentTypePage = new AppointmentTypePage()
+      appointmentTypePage.checkOnPage()
     })
   })
 
