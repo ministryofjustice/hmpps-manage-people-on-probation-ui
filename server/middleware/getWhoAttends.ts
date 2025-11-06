@@ -25,26 +25,28 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     let selectedRegion = providerCodeQuery ?? getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
     let selectedTeam = teamCodeQuery ?? getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
     let selectedUser = getDataValue(data, ['appointments', crn, id, 'user', 'username'])
+    if (!selectedRegion) {
+      selectedRegion = hasAllocatedPractitioner
+        ? probationPractitioner.provider.code
+        : providers.find(provider => provider.name.toLowerCase() === defaultUserDetails.homeArea.toLowerCase())?.code
+    }
 
     let { teams } = await masClient.getTeamsByProvider(selectedRegion)
 
-    const practitionerTeamFound = teams.some(team => team.code === probationPractitioner.team.code)
-
-    if (!selectedRegion) {
-      selectedRegion =
-        hasAllocatedPractitioner && practitionerTeamFound
-          ? probationPractitioner.provider.code
-          : providers.find(provider => provider.name.toLowerCase() === defaultUserDetails.homeArea.toLowerCase())?.code
+    if (!selectedTeam && !providerCodeQuery) {
+      selectedTeam = hasAllocatedPractitioner
+        ? probationPractitioner.team.code
+        : teams.find(team => team.description.toLowerCase() === defaultUserDetails.team.toLowerCase())?.code
     }
 
-    if (!selectedTeam) {
-      selectedTeam =
-        hasAllocatedPractitioner && practitionerTeamFound
-          ? probationPractitioner.team.code
-          : teams.find(team => team.description.toLowerCase() === defaultUserDetails.team.toLowerCase())?.code
+    if (providerCodeQuery && !teamCodeQuery) {
+      selectedTeam = teams[0].code
     }
-
     let { users } = await masClient.getStaffByTeam(selectedTeam)
+
+    if (providerCodeQuery) {
+      selectedUser = users[0].username
+    }
 
     if (
       hasAllocatedPractitioner &&
@@ -53,12 +55,17 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       const { code, name } = probationPractitioner.provider
       providers = [...providers, { code, name }]
     }
-    if (hasAllocatedPractitioner && !teams.some(team => team.code === probationPractitioner.team.code)) {
+    if (
+      hasAllocatedPractitioner &&
+      selectedRegion === probationPractitioner.provider.code &&
+      !teams.some(team => team.code === probationPractitioner.team.code)
+    ) {
       const { description, code } = probationPractitioner.team
       teams = [...teams, { description, code }]
     }
     if (
       hasAllocatedPractitioner &&
+      selectedTeam === probationPractitioner.team.code &&
       !users.some(user => user.username.toLowerCase() === probationPractitioner.username.toLowerCase())
     ) {
       users = [
@@ -76,8 +83,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     }
 
     if (!selectedUser) {
-      selectedUser =
-        hasAllocatedPractitioner && practitionerTeamFound ? probationPractitioner.username : defaultUserDetails.username
+      selectedUser = hasAllocatedPractitioner ? probationPractitioner.username : defaultUserDetails.username
     }
 
     const attendingUserInSession: AppointmentSessionUser = getDataValue(data, ['appointments', crn, id, 'user'])
@@ -95,7 +101,7 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       }
       attendingUser = {
         staffCode: users.find(user => user?.username?.toLowerCase() === attendingUserInSession?.username?.toLowerCase())
-          ?.username,
+          ?.staffCode,
         username: attendingUserInSession?.username,
         homeArea,
         team: teamName,
@@ -129,6 +135,8 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUser.username)
     }
 
+    /* Drop down options */
+
     const providerOptions = providers.map(provider => {
       const { code, name } = provider
       const option: Provider = { code, name }
@@ -138,7 +146,10 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       return option
     })
 
-    const teamOptions = teams.map(team => {
+    let userOptions: User[] = []
+    let teamOptions: Team[] = []
+
+    teamOptions = teams.map(team => {
       const { code, description } = team
       const option: Team = { code, description }
       if (code === selectedTeam) {
@@ -147,17 +158,33 @@ export const getWhoAttends = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       return option
     })
 
-    const userOptions = users.map(user => {
-      const { username: staffUsername, nameAndRole } = user
+    userOptions = users.map(user => {
+      const { username: staffUsername, nameAndRole, staffCode } = user
       const option: User = {
         username: staffUsername,
         nameAndRole: convertToTitleCase(nameAndRole, [], regexIgnoreValuesInParentheses),
+        staffCode,
       }
       if (staffUsername.toLowerCase() === selectedUser.toLowerCase()) {
         option.selected = 'selected'
       }
       return option
     })
+
+    if (
+      hasAllocatedPractitioner &&
+      selectedRegion === probationPractitioner.provider.code &&
+      !userProviders.some(provider => provider.code === selectedRegion)
+    ) {
+      const {
+        username: ppUsername,
+        code: staffCode,
+        name: { forename, surname },
+        team: { code, description },
+      } = probationPractitioner
+      teamOptions = [{ code, description, selected: 'selected' }]
+      userOptions = [{ username: ppUsername, nameAndRole: `${forename} ${surname}`, staffCode, selected: 'selected' }]
+    }
 
     req.session.data = {
       ...(req?.session?.data ?? {}),

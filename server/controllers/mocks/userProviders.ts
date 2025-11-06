@@ -3,8 +3,9 @@ import { UserProviders } from '../../data/model/caseload'
 export const userProviders: UserProviders = {
   defaultUserDetails: {
     username: 'peter-parker',
-    homeArea: 'London',
-    team: 'Automated Allocation Team',
+    homeArea: 'North East Region',
+    team: 'Automation SPG',
+    staffCode: 'N07B722',
   },
   providers: [
     {
@@ -22,26 +23,37 @@ export const userProviders: UserProviders = {
   ],
   teams: [
     {
-      description: 'A P Central Admissions Unit',
-      code: 'N50CAU',
+      description: 'Automated Allocation Team',
+      code: 'N07AAT',
     },
     {
-      description: 'Ascot House Approved Premises',
-      code: 'N50AHA',
+      description: 'Automation SPG',
+      code: 'N07CHT',
     },
     {
-      description: 'Atherton Court',
-      code: 'N50ACT',
+      description: 'Automation Test No Location Warning',
+      code: 'N07IVH',
+    },
+    {
+      description: 'Bexley\\Bromley SP TEST1',
+      code: 'N07SP1',
     },
   ],
   users: [
     {
+      staffCode: 'N07B722',
       username: 'peter-parker',
-      nameAndRole: 'peter parker (PS-PSO)',
+      nameAndRole: 'Peter Parker (PS - Other)',
     },
     {
-      username: 'jon-smith',
-      nameAndRole: 'jon smith (PS-PSO)',
+      staffCode: 'N57A054',
+      username: 'IainChambers',
+      nameAndRole: 'Iain Chambers (PS - Other)',
+    },
+    {
+      staffCode: 'N07B795',
+      username: 'DeborahFern',
+      nameAndRole: 'Deborah Fern (PS - Other)',
     },
   ],
 }

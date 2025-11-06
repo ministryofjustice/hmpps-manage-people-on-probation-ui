@@ -1,19 +1,19 @@
 import { ProbationPractitioner } from '../../models/CaseDetail'
 
 export const probationPractitioner: ProbationPractitioner = {
-  code: 'N56A048',
+  code: 'N07B795',
   name: {
-    forename: 'Ambuj',
-    surname: 'Pathak',
+    forename: 'Deborah',
+    surname: 'Fern',
   },
   provider: {
-    code: 'N56',
-    name: 'East of England',
+    code: 'N07',
+    name: 'London',
   },
   team: {
-    code: 'N56DTX',
-    description: 'Default Designated Transfer Team',
+    code: 'N07AAT',
+    description: 'Automated Allocation Team',
   },
   unallocated: false,
-  username: 'ambuj-pathak',
+  username: 'DeborahFern',
 }
