@@ -3,6 +3,10 @@ import AuthSignInPage from '../pages/authSignIn'
 import Page from '../pages/page'
 
 context('Sign In', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+    cy.task('stubDisableProbFEComponent')
+  })
   afterEach(() => {
     cy.task('resetMocks')
   })
