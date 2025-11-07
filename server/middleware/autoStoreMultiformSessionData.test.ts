@@ -28,7 +28,7 @@ describe('/middleware/autoStoreMultiformSessionData', () => {
   it('parses multipart keys and updates session data accordingly', async () => {
     const req = httpMocks.createRequest({
       method: 'POST',
-      url: `/case/${crn}/reschedule-appointment/${id}`,
+      url: `/case/${crn}/reschedule/${id}`,
       params: {
         crn,
         id,

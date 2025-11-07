@@ -122,6 +122,7 @@ export interface RescheduleAppointment {
   whoNeedsToReschedule?: string
   reason?: string
   files?: string[]
+  sensitivity?: YesNo
 }
 
 export interface AppointmentChecks {

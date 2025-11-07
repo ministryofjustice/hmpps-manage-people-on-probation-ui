@@ -463,7 +463,7 @@ export const checkAppointmentDetails = (
         .getAppointmentDetailsListItem(index, 'actions')
         .find('a')
         .should('contain.text', 'Reschedule')
-        .should('have.attr', 'href', `/case/${crn}/appointment/6/reschedule-appointment`)
+        .should('have.attr', 'href', `/case/${crn}/appointment/6/reschedule`)
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }

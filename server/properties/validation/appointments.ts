@@ -179,7 +179,17 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== 'supporting-information' && page !== 'reschedule-appointment',
+      optional: page !== 'supporting-information',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if appointment includes sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
+      optional: page !== 'reschedule-appointment',
       checks: [
         {
           validator: isNotEmpty,

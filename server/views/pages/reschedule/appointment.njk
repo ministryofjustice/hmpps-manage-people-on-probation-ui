@@ -39,19 +39,16 @@
                 value: 'SERVICE',
                 text: "Probation Service",
                 hint: {
-                    text: "Inculudes changes to probation practitioner availablity."
+                    text: "Includes changes to probation practitioner availability."
                 }
             }
-        ],
-        errorMessage: {
-            text: "Please select an option"
-        }  if errorMessages.whoNeedsToReschedule
+        ]
     } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','whoNeedsToReschedule' ])      ) }}
     {{ govukCharacterCount({
         rows: '10',
         maxlength: maxCharCount,
         label: {
-            text: "Why is this appointment being rescheculed?",
+            text: "Why is this appointment being rescheduled?",
             classes: "govuk-fieldset__legend govuk-fieldset__legend--m",
             isPageHeading: true
         },
@@ -59,10 +56,7 @@
         formGroup: {
             attributes: { "data-qa": "reason"}
         },
-        value: body.reason,
-        errorMessage: {
-            text: 'Reason must be ' + maxCharCount + ' characters or less'
-        }  if errorMessages.reason
+        value: body.reason
     } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','reason' ])      ) }}
 
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
@@ -126,10 +120,7 @@
                 value: 'No',
                 text: "No, it is not sensitive"
             }
-        ],
-        errorMessage: {
-            text: "Please select an option"
-        }  if errorMessages.sensitive
-    } | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }}
+        ]
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }}
 {% endblock %}
 
