@@ -1,0 +1,58 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/appointment/X778160/overdue-outcomes",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "content": [
+            {
+              "id": 11,
+              "type": {
+                "code": "DGTSLC",
+                "description": "Drug Test (Licence Condition)"
+              },
+              "date": "2024-05-29",
+              "start": "12:45:02"
+            },
+            {
+              "id": 2507235916,
+              "type": {
+                "code": "AL003",
+                "description": "AL Contact Type for RAR"
+              },
+              "date": "2024-04-26",
+              "start": "09:00:00"
+            },
+            {
+              "id": 2507235917,
+              "type": {
+                "code": "AL003",
+                "description": "AL Contact Type for RAR"
+              },
+              "date": "2024-04-19",
+              "start": "09:00:00"
+            },
+            {
+              "id": 2509486129,
+              "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:3057e3e6-9b57-4046-a2dd-eb11569b14c1",
+              "type": {
+                "code": "C084",
+                "description": "3 Way Meeting (NS)"
+              },
+              "date": "2025-07-10",
+              "start": "09:00:00",
+              "end": "09:15:00"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

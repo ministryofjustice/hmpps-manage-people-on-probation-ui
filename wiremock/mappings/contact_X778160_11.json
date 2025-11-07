@@ -1,0 +1,62 @@
+{
+  "request": {
+    "urlPattern": "/mas/schedule/X778160/appointment/11",
+    "method": "GET"
+  },
+  "response": {
+    "status": 200,
+    "jsonBody": {
+      "personSummary": {
+        "name": {
+          "forename": "Eula",
+          "surname": "Schmeler"
+        },
+        "crn": "X000001",
+        "dateOfBirth": "1979-08-18"
+      },
+      "appointment": {
+        "id": 11,
+        "type": "Phone call",
+        "description": "",
+        "startDateTime": "2044-12-22T09:15:00.382936Z",
+        "endDateTime": "2044-12-22T09:30:00.382936Z",
+        "rarToolKit": "Choices and Changes",
+        "rarCategory": "Stepping Stones",
+        "isSensitive": false,
+        "hasOutcome": false,
+        "isInPast": true,
+        "wasAbsent": true,
+        "appointmentNotes": [
+          {
+            "id": 0,
+            "note": "Phone call from Stuart to say that he is sorry for not attending. He sounded under the influence of alcohol. He has recently heard that his ex partner is getting remarried and stated that he “went on a bit of a bender” He states that he has not attempted to contact the victim but I will make enquiries with the police to confirm this as given that he is audibly drunk i don't think i can take his word for it. I asked him to come in and see me at 9am in the morning and reiterated that if he turns up drunk I will have to mark that as another failure to comply due to behavioural issues. This will result in him being in breach of his order. I reiterated that up until now he has been doing so well with his probation and it’s really important he remember and make use of all the tools and techniques we had discussed during his RAR sessions.\n\nHe agreed to see me at 9am as his next shift at Timpsons isn’t until the afternoon. He apologized many times for “letting me down” and has confirmed that he has put a reminder on his phone about the meeting."
+          },
+          {
+            "id": 1,
+            "createdBy": "Tom Brady",
+            "createdByDate": "2024-10-29",
+            "note": "Email sent to Stuart",
+            "hasNoteBeenTruncated": true
+          }
+        ],
+        "isAppointment": false,
+        "isCommunication": true,
+        "isPhoneCallFromPop": true,
+        "officer": {
+          "name": {
+            "forename": "Terry",
+            "surname": "Jones"
+          }
+        },
+        "lastUpdated": "2023-03-20",
+        "lastUpdatedBy": {
+          "forename": "Paul",
+          "surname": "Smith"
+        }
+      }
+    },
+    "headers": {
+      "Content-Type": "application/json"
+    }
+  }
+}
