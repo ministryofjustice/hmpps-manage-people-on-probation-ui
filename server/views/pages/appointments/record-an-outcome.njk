@@ -8,9 +8,9 @@
 {% set backLink = '/case/' + crn %}
 {% block form %}
     {% set appointmentRadioItems = [] %}
-    {% for appointment in getAppointmentsToAction(personSchedule.appointments, actionType) %}
+    {% for appointment in contactResponse.content %}
         {% set appointmentRadioItems = (appointmentRadioItems.push({
-            html: '<strong>' + appointment.type + '</strong><br />' + appointment.startDateTime | dateWithDayAndWithoutYear + ' from ' + timeFromTo(appointment.startDateTime, appointment.endDateTime),
+            html: '<strong>' + appointment.type.description + '</strong><br />' + appointment.date | dateWithDayAndWithoutYear + ' from ' + timeFromTo(appointment.start, appointment.end),
             value: appointment.id,
             checked: contactId == appointment.id
         }), appointmentRadioItems) %}

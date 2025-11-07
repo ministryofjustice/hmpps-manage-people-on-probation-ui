@@ -9,7 +9,7 @@ import {
   getSentences,
   getUserProviders,
   getNextComAppointment,
-  getPersonSchedule,
+  getOverdueOutcomes,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
@@ -24,7 +24,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
 
   post('/case/:crn/appointments', controllers.appointments.postAppointments(hmppsAuthClient))
 
-  router.all('/case/:crn/record-an-outcome/:actionType', [getPersonSchedule(hmppsAuthClient)])
+  router.all('/case/:crn/record-an-outcome/:actionType', [getOverdueOutcomes(hmppsAuthClient)])
   router.get('/case/:crn/record-an-outcome/:actionType', controllers.appointments.getRecordAnOutcome(hmppsAuthClient))
 
   router.post(

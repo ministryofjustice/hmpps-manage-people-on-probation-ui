@@ -42,6 +42,7 @@ import {
   MasUserDetails,
 } from '../models/Appointments'
 import { UserAlerts, ClearAlertsResponse } from '../models/Alerts'
+import { ContactResponse } from './model/overdueOutcomes'
 
 interface GetUserScheduleProps {
   username: string
@@ -60,6 +61,10 @@ export default class MasApiClient extends RestClient {
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
     const queryParam = `?sentenceNumber=${sentenceNumber}`
     return this.get({ path: `/overview/${crn}${queryParam}`, handle404: false })
+  }
+
+  async getOverdueOutcomes(crn: string): Promise<ContactResponse | null> {
+    return this.get({ path: `/appointment/${crn}/overdue-outcomes`, handle404: false })
   }
 
   async getSentenceDetails(crn: string, queryParam = ''): Promise<SentenceDetails | null> {
