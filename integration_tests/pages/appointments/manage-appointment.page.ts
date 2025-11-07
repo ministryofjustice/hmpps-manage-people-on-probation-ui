@@ -63,4 +63,6 @@ export default class ManageAppointmentPage extends Page {
   }
 
   getLastUpdated = () => cy.get('[data-qa="lastUpdated"]')
+
+  getPageHeading = () => cy.get('[data-qa="pageHeading"]')
 }

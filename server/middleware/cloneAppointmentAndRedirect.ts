@@ -38,6 +38,7 @@ export const cloneAppointment = (appointmentToClone: AppointmentSession) => {
       whoNeedsToReschedule: null,
       reason: null,
       files: null,
+      sensitivity: null,
     }
     const clonedAppt: AppointmentSession = {
       ...appointmentToClone,
@@ -56,6 +57,6 @@ export const cloneAppointment = (appointmentToClone: AppointmentSession) => {
       rescheduleAppointment,
     }
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
-    return `/case/${crn}/appointments/reschedule-appointment/${contactId}/${uuid}`
+    return `/case/${crn}/appointments/reschedule/${contactId}/${uuid}`
   }
 }

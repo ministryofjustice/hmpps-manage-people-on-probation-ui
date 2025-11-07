@@ -1,11 +1,16 @@
 import { Controller, FileCache } from '../@types'
-import { getDataValue, isValidCrn } from '../utils'
+import { getDataValue, isValidCrn, setDataValue } from '../utils'
 
 import { cloneAppointment, cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 
-const routes = ['redirectToRescheduleAppointment', 'getRescheduleAppointment', 'postRescheduleAppointment'] as const
+const routes = [
+  'redirectToRescheduleAppointment',
+  'getRescheduleAppointment',
+  'postRescheduleAppointment',
+  'getRescheduleCheckYourAnswer',
+] as const
 
 const rescheduleAppointmentController: Controller<typeof routes, void> = {
   redirectToRescheduleAppointment: () => {
@@ -53,8 +58,9 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
-
-      res.render('pages/appointments/reschedule-appointment', {
+      setDataValue(req.session.data, ['appointments', crn, id, 'type'], personAppointment.appointment.type)
+      setDataValue(req.session.data, ['appointments', crn, id, 'eventId'], personAppointment.appointment.eventId)
+      res.render('pages/reschedule/appointment', {
         crn,
         maxCharCount,
         personAppointment,
@@ -72,15 +78,27 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
   },
   postRescheduleAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id, contactId } = req.params
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
       /*      if (req.session?.data?.appointments?.[crn]?.[id]) {
         delete req.session.data.appointments[crn][id]
       } */
-      const redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
+      const redirect = `/case/${crn}/appointments/reschedule/${contactId}/${id}/check-answers`
       return res.redirect(redirect)
+      // return res.render('pages/appointments/reschedule-check-your-answers',{})
+    }
+  },
+  getRescheduleCheckYourAnswer: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, contactId } = req.params
+
+      res.render('pages/reschedule/check-your-answers', {
+        crn,
+        id,
+        contactId,
+      })
     }
   },
 }
