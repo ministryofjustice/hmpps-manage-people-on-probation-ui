@@ -42,6 +42,8 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         body = req.session.body
         delete req.session.body
       }
+
+      const per = res.locals.personAppointment
       const { validation } = req.query
       const showValidation = validation === 'true'
       const { crn, id, contactId } = req.params as Record<string, string>
@@ -54,16 +56,11 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
             'Select who is rescheduling this appointment',
         }
       }
-      const token = await _hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const [personAppointment] = await Promise.all([masClient.getPersonAppointment(crn, contactId)])
+
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
-      setDataValue(req.session.data, ['appointments', crn, id, 'type'], personAppointment.appointment.type)
-      setDataValue(req.session.data, ['appointments', crn, id, 'eventId'], personAppointment.appointment.eventId)
       res.render('pages/reschedule/appointment', {
         crn,
         maxCharCount,
-        personAppointment,
         contactId,
         validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
         maxFileSize,
