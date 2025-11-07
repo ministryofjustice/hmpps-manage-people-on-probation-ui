@@ -79,7 +79,7 @@
             "priorBreachesOnCurrentOrderCount": 1,
             "failureToComplyCount": 3
           },
-          "registrations": ["Restraining Order", "Domestic Abuse Perpetrator", "Risk to Known Adult"]
+          "registrations": ["Restraining Order", "Domestic Abuse Perpetrator", "Risk to Known Adult","visor"]
         },
         "headers": {
           "Content-Type": "application/json"
