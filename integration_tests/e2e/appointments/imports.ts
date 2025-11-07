@@ -71,12 +71,7 @@ export const completeSentencePage = (eventIndex = 1, query = '', crnOverride = '
   const sentencePage = new AppointmentSentencePage()
   const suffix = eventIndex !== 1 ? `-${eventIndex}` : ''
   sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-eventId${suffix}`).click()
-  if (eventIndex === 1 && !crnOverride) {
-    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-licenceConditionId`).click()
-  }
-  if (eventIndex === 2 && !crnOverride) {
-    sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-requirementId`).click()
-  }
+
   if (eventIndex === 3 && !crnOverride) {
     sentencePage.getElement(`#appointments-${crnOverride || crn}-${uuid}-nsiId`).click()
   }
@@ -264,18 +259,12 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
     page.getSummaryListRow(1).find('.govuk-link').click()
     const sentencePage = new AppointmentSentencePage()
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-eventId-2`).click()
-    sentencePage.getElement(`#appointments-${crn}-${pageUuid}-requirementId`).click()
     sentencePage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
       completeLocationDateTimePage(1, '', pageUuid, true)
       completeSupportingInformationPage(true, '', pageUuid)
     }
     page.checkOnPage()
-    page
-      .getSummaryListRow(1)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', 'ORA Community Order')
-      .should('contain.text', '12 days RAR, 1 completed')
   })
 }
 

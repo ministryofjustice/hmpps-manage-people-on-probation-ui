@@ -1,10 +1,12 @@
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% set appointment = entry %}
+{% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
+{% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?' + queryParams + '&back=' + baseUrl if entry.isAppointment else '/case/' + crn + '/activity/' + entry.id + '?' + queryParams %}
 
 {% set titleHtml %}
 <span class="govuk-heading-s govuk-!-margin-bottom-0">
-  <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?back={{ url }}">{{ entry.type | toSentenceCase }} at {{ entry.startDateTime | govukTime }}
+  <a href="{{link}}">{{ entry.type | toSentenceCase }} at {{ entry.startDateTime | govukTime }}
     <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
 </span>
 {% endset %}

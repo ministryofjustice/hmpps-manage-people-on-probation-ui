@@ -5,8 +5,7 @@
   pageHeading: [appointment.type, 'note']}) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
   '' %}
-{% set backLink = back if back else 
-  '/case/' + crn + '/appointments/appointment/' + contactId + '/manage' %}
+{% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
 {% set hasAppointmentStartTimePassed = isInThePast(appointment.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = appointment.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% block beforeContent %}
@@ -51,7 +50,7 @@
 
   {{ appSummaryCard({
   attributes: {'data-qa': 'appointmentDetailsCard'},
-  titleText: 'Appointment details',
+  titleText: 'Appointment details' if appointment.isAppointment else 'Details',
   headingLevel: '3',
   classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
   html: appointmentDetails

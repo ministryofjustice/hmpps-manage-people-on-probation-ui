@@ -5,7 +5,7 @@ context('Staff contacts', () => {
   it('Staff contacts page is rendered', () => {
     cy.visit('/case/X000001/personal-details/staff-contacts')
     const page = Page.verifyOnPage(StaffContacts)
-    cy.get('h3').eq(0).should('contain.text', 'Current contacts')
+    cy.get('h3').eq(1).should('contain.text', 'Current contacts')
     cy.get('h4').eq(0).should('contain.text', 'Arhsimna Xolfo')
     page.assertPageElementAtIndexWithin('dl', 0, 'dt', 0, 'Role')
     page.assertPageElementAtIndexWithin('dl', 0, 'dd', 0, 'Community Offender Manager (COM) (responsible officer)')
@@ -34,7 +34,7 @@ context('Staff contacts', () => {
     page.assertPageElementAtIndexWithin('dl', 1, 'dt', 4, 'Allocated from')
     page.assertPageElementAtIndexWithin('dl', 1, 'dd', 4, '12 January 2025')
 
-    cy.get('h3').eq(1).should('contain.text', 'Previous contacts')
+    cy.get('h3').eq(2).should('contain.text', 'Previous contacts')
 
     cy.get('h4').eq(2).should('contain.text', 'Yrhreender Hanandra')
     page.assertPageElementAtIndexWithin('dl', 2, 'dt', 0, 'Role')

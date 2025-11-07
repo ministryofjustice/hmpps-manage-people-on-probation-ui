@@ -1,0 +1,771 @@
+/* assets/scss/header.scss */
+.govuk-width-container {
+  max-width: 1170px;
+  margin-right: 15px;
+  margin-left: 15px;
+}
+@supports (margin: max(calc(0px))) {
+  .govuk-width-container {
+    margin-right: max(15px, calc(15px + env(safe-area-inset-right)));
+    margin-left: max(15px, calc(15px + env(safe-area-inset-left)));
+  }
+}
+@media (min-width: 40.0625em) {
+  .govuk-width-container {
+    margin-right: 30px;
+    margin-left: 30px;
+  }
+  @supports (margin: max(calc(0px))) {
+    .govuk-width-container {
+      margin-right: max(30px, calc(15px + env(safe-area-inset-right)));
+      margin-left: max(30px, calc(15px + env(safe-area-inset-left)));
+    }
+  }
+}
+@media (min-width: 1230px) {
+  .govuk-width-container {
+    margin-right: auto;
+    margin-left: auto;
+  }
+  @supports (margin: max(calc(0px))) {
+    .govuk-width-container {
+      margin-right: auto;
+      margin-left: auto;
+    }
+  }
+}
+.probation-common-external-header {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: #0b0c0c;
+  color: #ffffff;
+}
+.probation-common-external-header__container {
+  max-width: 1170px;
+  margin-right: 15px;
+  margin-left: 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+@supports (margin: max(calc(0px))) {
+  .probation-common-external-header__container {
+    margin-right: max(15px, calc(15px + env(safe-area-inset-right)));
+    margin-left: max(15px, calc(15px + env(safe-area-inset-left)));
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__container {
+    margin-right: 30px;
+    margin-left: 30px;
+  }
+  @supports (margin: max(calc(0px))) {
+    .probation-common-external-header__container {
+      margin-right: max(30px, calc(15px + env(safe-area-inset-right)));
+      margin-left: max(30px, calc(15px + env(safe-area-inset-left)));
+    }
+  }
+}
+@media (min-width: 1230px) {
+  .probation-common-external-header__container {
+    margin-right: auto;
+    margin-left: auto;
+  }
+  @supports (margin: max(calc(0px))) {
+    .probation-common-external-header__container {
+      margin-right: auto;
+      margin-left: auto;
+    }
+  }
+}
+.probation-common-external-header__logo {
+  margin-right: 10px;
+  position: relative;
+  top: -2px;
+  fill: #ffffff;
+}
+.probation-common-external-header__title {
+  padding-right: 15px;
+  display: flex;
+  align-items: center;
+}
+.probation-common-external-header__title__organisation-name {
+  margin-right: 10px;
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 700;
+  font-size: 1.125rem;
+  line-height: 1.1111111111;
+  display: flex;
+  align-items: center;
+}
+@font-face {
+  font-family: 'GDS Transport';
+  font-style: normal;
+  font-weight: normal;
+  src:
+    url(/assets/fonts/light-94a07e06a1-v2.woff2) format('woff2'),
+    url(/assets/fonts/light-f591b13f7d-v2.woff) format('woff');
+  font-display: fallback;
+}
+@font-face {
+  font-family: 'GDS Transport';
+  font-style: normal;
+  font-weight: bold;
+  src:
+    url(/assets/fonts/bold-b542beb274-v2.woff2) format('woff2'),
+    url(/assets/fonts/bold-affa96571d-v2.woff) format('woff');
+  font-display: fallback;
+}
+@media print {
+  .probation-common-external-header__title__organisation-name {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__title__organisation-name {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+}
+@media print {
+  .probation-common-external-header__title__organisation-name {
+    font-size: 18pt;
+    line-height: 1.15;
+  }
+}
+.probation-common-external-header__title__service-name {
+  margin-right: 10px;
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 1.125rem;
+  line-height: 1.1111111111;
+  display: none;
+}
+@media print {
+  .probation-common-external-header__title__service-name {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__title__service-name {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+}
+@media print {
+  .probation-common-external-header__title__service-name {
+    font-size: 18pt;
+    line-height: 1.15;
+  }
+}
+@media (min-width: 48.0625em) {
+  .probation-common-external-header__title__service-name {
+    display: flex;
+    align-items: center;
+  }
+}
+.probation-common-external-header__link {
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+  text-underline-offset: 0.1em;
+}
+@media print {
+  .probation-common-external-header__link {
+    font-family: sans-serif;
+  }
+}
+.probation-common-external-header__link:hover {
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+  -webkit-text-decoration-skip-ink: none;
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: none;
+  text-decoration-skip: none;
+}
+.probation-common-external-header__link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow:
+    0 -2px #ffdd00,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+@supports not (text-wrap: balance) {
+  .probation-common-external-header__link:focus {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}
+.probation-common-external-header__link:link {
+  color: #1d70b8;
+}
+.probation-common-external-header__link:visited {
+  color: #4c2c92;
+}
+.probation-common-external-header__link:hover {
+  color: #003078;
+}
+.probation-common-external-header__link:active {
+  color: #0b0c0c;
+}
+.probation-common-external-header__link:focus {
+  color: #0b0c0c;
+}
+.probation-common-external-header__link:link,
+.probation-common-external-header__link:visited,
+.probation-common-external-header__link:active {
+  color: #ffffff;
+  text-decoration: none;
+}
+.probation-common-external-header__link:hover {
+  text-decoration: underline;
+}
+.probation-common-external-header__link:focus {
+  color: #0b0c0c;
+}
+.probation-common-external-header__link:focus svg {
+  fill: #0b0c0c;
+}
+.probation-common-external-header__link__sub-text {
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.1428571429;
+  display: none;
+}
+@media print {
+  .probation-common-external-header__link__sub-text {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__link__sub-text {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+}
+@media print {
+  .probation-common-external-header__link__sub-text {
+    font-size: 14pt;
+    line-height: 1.2;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__link__sub-text {
+    display: block;
+  }
+}
+.probation-common-external-header__navigation {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__navigation {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+.probation-common-external-header__navigation__item {
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 1rem;
+  line-height: 1.25;
+  margin-bottom: 5px;
+  text-align: right;
+}
+@media print {
+  .probation-common-external-header__navigation__item {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__navigation__item {
+    font-size: 1.1875rem;
+    line-height: 1.3157894737;
+  }
+}
+@media print {
+  .probation-common-external-header__navigation__item {
+    font-size: 14pt;
+    line-height: 1.15;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-external-header__navigation__item {
+    margin-right: 15px;
+    padding-right: 15px;
+    margin-bottom: 0;
+    border-right: 1px solid #ffffff;
+  }
+}
+@media (min-width: 40.0625em) and (min-width: 40.0625em) {
+  .probation-common-external-header__navigation__item {
+    margin-right: 20px;
+  }
+}
+@media (min-width: 40.0625em) and (min-width: 40.0625em) {
+  .probation-common-external-header__navigation__item {
+    padding-right: 20px;
+  }
+}
+.probation-common-external-header__navigation__item a {
+  display: inline-block;
+}
+.probation-common-external-header__navigation__item:last-child {
+  margin-right: 0;
+  border-right: 0;
+  padding-right: 0;
+}
+@media print {
+  .probation-common-external-header {
+    display: none;
+  }
+}
+.probation-common-header {
+  background-color: #0b0c0c;
+  color: #ffffff;
+}
+.probation-common-header [hidden] {
+  display: none !important;
+}
+.probation-common-header__logo {
+  margin-right: 15px;
+  position: relative;
+  top: -2px;
+  fill: #ffffff;
+  padding: 15px 0;
+}
+.probation-common-header__title {
+  display: flex;
+}
+.probation-common-header__title__organisation-name {
+  margin-right: 10px;
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 700;
+  font-size: 1.125rem;
+  line-height: 1.1111111111;
+  display: flex;
+  align-items: center;
+}
+@media print {
+  .probation-common-header__title__organisation-name {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-header__title__organisation-name {
+    font-size: 1.5rem;
+    line-height: 1.25;
+  }
+}
+@media print {
+  .probation-common-header__title__organisation-name {
+    font-size: 18pt;
+    line-height: 1.15;
+  }
+}
+.probation-common-header__title .govuk-tag {
+  margin: auto 0;
+}
+@media (max-width: 61.5625em) {
+  .probation-common-header__title .govuk-tag {
+    display: none;
+  }
+}
+.probation-common-header__submenu-link {
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+}
+@media print {
+  .probation-common-header__submenu-link {
+    font-family: sans-serif;
+  }
+}
+.probation-common-header__submenu-link:hover {
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+  -webkit-text-decoration-skip-ink: none;
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: none;
+  text-decoration-skip: none;
+}
+.probation-common-header__submenu-link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow:
+    0 -2px #ffdd00,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+@supports not (text-wrap: balance) {
+  .probation-common-header__submenu-link:focus {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}
+.probation-common-header__submenu-link:link {
+  color: #1d70b8;
+}
+.probation-common-header__submenu-link:visited {
+  color: #1d70b8;
+}
+.probation-common-header__submenu-link:hover {
+  color: #003078;
+}
+.probation-common-header__submenu-link:active {
+  color: #0b0c0c;
+}
+.probation-common-header__submenu-link:focus {
+  color: #0b0c0c;
+}
+.probation-common-header__link {
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.0625rem);
+  text-underline-offset: 0.1578em;
+}
+@media print {
+  .probation-common-header__link {
+    font-family: sans-serif;
+  }
+}
+.probation-common-header__link:hover {
+  text-decoration-thickness: max(3px, 0.1875rem, 0.12em);
+  -webkit-text-decoration-skip-ink: none;
+  text-decoration-skip-ink: none;
+  -webkit-text-decoration-skip: none;
+  text-decoration-skip: none;
+}
+.probation-common-header__link:focus {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  box-shadow:
+    0 -2px #ffdd00,
+    0 4px #0b0c0c;
+  text-decoration: none;
+}
+@supports not (text-wrap: balance) {
+  .probation-common-header__link:focus {
+    -webkit-box-decoration-break: clone;
+    box-decoration-break: clone;
+  }
+}
+.probation-common-header__link:link {
+  color: #1d70b8;
+}
+.probation-common-header__link:visited {
+  color: #4c2c92;
+}
+.probation-common-header__link:hover {
+  color: #003078;
+}
+.probation-common-header__link:active {
+  color: #0b0c0c;
+}
+.probation-common-header__link:focus {
+  color: #0b0c0c;
+}
+.probation-common-header__link:link,
+.probation-common-header__link:visited,
+.probation-common-header__link:active {
+  color: #ffffff;
+  text-decoration: none;
+  font-weight: normal;
+}
+.probation-common-header__link:focus {
+  color: #0b0c0c;
+  box-shadow: none;
+}
+.probation-common-header__link:focus:after {
+  background: #0b0c0c;
+  content: '';
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  right: 15px;
+  top: auto;
+}
+.probation-common-header__link:focus svg {
+  fill: #0b0c0c;
+}
+.probation-common-header__link:hover {
+  text-decoration: underline;
+}
+.probation-common-header__button-width-container {
+  position: relative;
+}
+@media (min-width: 57.8125em) {
+  .probation-common-header__button-container {
+    position: absolute;
+    right: 0;
+    top: -70px;
+    background-color: #0b0c0c;
+  }
+}
+.probation-common-header__navigation {
+  height: 70px;
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  flex-direction: row;
+  align-items: center;
+}
+.probation-common-header__navigation__item {
+  height: 100%;
+  position: relative;
+}
+.probation-common-header__navigation__item > button,
+.probation-common-header__navigation__item > a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+  background: #0b0c0c;
+  font-family: 'GDS Transport', arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.1428571429;
+  height: 100%;
+  overflow: hidden;
+}
+@media print {
+  .probation-common-header__navigation__item > button,
+  .probation-common-header__navigation__item > a {
+    font-family: sans-serif;
+  }
+}
+@media (min-width: 40.0625em) {
+  .probation-common-header__navigation__item > button,
+  .probation-common-header__navigation__item > a {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+}
+@media print {
+  .probation-common-header__navigation__item > button,
+  .probation-common-header__navigation__item > a {
+    font-size: 14pt;
+    line-height: 1.2;
+  }
+}
+.probation-common-header__navigation__item > button:hover,
+.probation-common-header__navigation__item > a:hover {
+  color: #b1b4b6 !important;
+}
+.probation-common-header__navigation__item > button:hover:after,
+.probation-common-header__navigation__item > a:hover:after {
+  background: #b1b4b6;
+  content: '';
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  right: 15px;
+  top: auto;
+}
+.probation-common-header__navigation__item > button.probation-common-header__menu-toggle,
+.probation-common-header__navigation__item > a.probation-common-header__menu-toggle {
+  padding: 10px 0px;
+}
+.probation-common-header__navigation__item > button.probation-common-header__menu-toggle > span,
+.probation-common-header__navigation__item > a.probation-common-header__menu-toggle > span {
+  height: 100%;
+  padding: 0 15px;
+  border-left: 1px solid #ffffff;
+  display: flex;
+  align-items: center;
+}
+.probation-common-header__navigation__item > button.probation-common-header__menu-toggle > span:before,
+.probation-common-header__navigation__item > a.probation-common-header__menu-toggle > span:before {
+  -webkit-transform: translateY(-35%) rotate(45deg) scale(1);
+  -ms-transform: translateY(-35%) rotate(45deg) scale(1);
+  transform: translateY(-35%) rotate(45deg) scale(1);
+  border-bottom: 2px solid #ffffff;
+  border-right: 2px solid #ffffff;
+  content: '';
+  display: inline-block;
+  height: 8px;
+  margin: 3px 15px 0 3px;
+  vertical-align: middle;
+  width: 8px;
+}
+.probation-common-header__navigation__item > button.probation-common-header__menu-toggle svg,
+.probation-common-header__navigation__item > a.probation-common-header__menu-toggle svg {
+  margin: 0 15px 0 0;
+}
+.probation-common-header__navigation__item > button.probation-common-header__menu-toggle:hover > span:before,
+.probation-common-header__navigation__item > a.probation-common-header__menu-toggle:hover > span:before {
+  border-bottom: 2px solid #b1b4b6;
+  border-right: 2px solid #b1b4b6;
+}
+.probation-common-header__navigation__item > button.probation-common-header__toggle-open,
+.probation-common-header__navigation__item > a.probation-common-header__toggle-open {
+  background: #f3f2f1;
+  color: #1d70b8;
+}
+.probation-common-header__navigation__item > button.probation-common-header__toggle-open > span:before,
+.probation-common-header__navigation__item > a.probation-common-header__toggle-open > span:before {
+  -webkit-transform: translateY(0%) rotate(225deg) scale(1);
+  -ms-transform: translateY(0%) rotate(225deg) scale(1);
+  transform: translateY(0%) rotate(225deg) scale(1);
+  border-bottom: 2px solid #1d70b8;
+  border-right: 2px solid #1d70b8;
+}
+.probation-common-header__navigation__item > button.probation-common-header__toggle-open > span:after,
+.probation-common-header__navigation__item > a.probation-common-header__toggle-open > span:after {
+  background: #1d70b8;
+  content: '';
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  right: 15px;
+  top: auto;
+}
+.probation-common-header__navigation__item > button.probation-common-header__toggle-open:hover,
+.probation-common-header__navigation__item > a.probation-common-header__toggle-open:hover {
+  color: #505a5f !important;
+}
+.probation-common-header__navigation__item > button:focus-visible,
+.probation-common-header__navigation__item > a:focus-visible {
+  outline: 3px solid transparent;
+  color: #0b0c0c;
+  background-color: #ffdd00;
+  text-decoration: none;
+  box-shadow: none;
+}
+.probation-common-header__navigation__item > button:focus-visible:after,
+.probation-common-header__navigation__item > a:focus-visible:after {
+  background: #0b0c0c;
+  content: '';
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  right: 15px;
+  top: auto;
+}
+.probation-common-header__navigation__item > button:focus-visible > span:before,
+.probation-common-header__navigation__item > a:focus-visible > span:before {
+  border-bottom: 2px solid #0b0c0c;
+  border-right: 2px solid #0b0c0c;
+}
+.probation-common-header__navigation__item.item-open + div > button > span,
+.probation-common-header__navigation__item.item-open + div > a > span {
+  border-left: 1px solid transparent;
+}
+.probation-common-header .probation-common-header__user-menu {
+  position: relative;
+  z-index: 10000000;
+  padding: 15px;
+  background: #f3f2f1;
+}
+.probation-common-header .probation-common-header__user-menu a {
+  font-weight: 700;
+  display: block;
+  margin-bottom: 15px;
+}
+.probation-common-header__pushdown-menu {
+  padding: 30px 0 60px 0;
+  background: #f3f2f1;
+}
+.probation-common-header__icon-link-wrapper {
+  position: relative;
+  height: 100%;
+  display: flex;
+}
+.probation-common-header__icon-link-wrapper img,
+.probation-common-header__icon-link-wrapper svg {
+  margin: 0 15px 0 0;
+}
+.probation-common-header__icon-link-wrapper a {
+  padding: 10px 0;
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+}
+.probation-common-header__icon-link-wrapper a > span {
+  height: 100%;
+  padding: 0 15px;
+  border-left: 1px solid #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.probation-common-header__icon-link-wrapper a:hover {
+  color: #b1b4b6 !important;
+  text-decoration: none;
+}
+.probation-common-header__icon-link-wrapper a:hover:after {
+  background: #b1b4b6;
+  content: '';
+  height: 3px;
+  position: absolute;
+  bottom: 0;
+  left: 15px;
+  right: 15px;
+  top: auto;
+}
+.probation-common-header__services-menu ul {
+  width: 100%;
+  display: grid;
+  gap: 15px 15px;
+  justify-items: start;
+  font-weight: bold;
+  margin-bottom: 0;
+}
+@media (min-width: 40.0625em) {
+  .probation-common-header__services-menu ul {
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-auto-flow: column;
+  }
+}
+.probation-common-header__user-menu-link {
+  width: 181px;
+}
+.probation-common-header__services-menu-link {
+  width: 107px;
+}
+.probation-common-header__menu-toggle-label {
+  display: block;
+  text-align: left;
+}
+@media print {
+  .probation-common-header {
+    display: none;
+  }
+}
+/*! Copyright (c) 2011 by Margaret Calvert & Henrik Kubel. All rights reserved. The font has been customised for exclusive use on gov.uk. This cut is not commercially available. */
+/*# sourceMappingURL=header.css.map */

@@ -1,10 +1,12 @@
 {% set hasOutcomeBeenConfirmed = entry.didTheyComply === true or entry.rescheduled === true %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
+{% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?' + queryParams + '&back=' + baseUrl if entry.isAppointment else '/case/' + crn + '/activity/' + entry.id + '?' + queryParams %}
 
 {% set titleHtml %}
 <p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
-      <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?back={{ url }}">
+      <a href="{{ link }}">
             {% if entry.isAppointment === true %}
                   {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
                   {{ entry.type | toSentenceCase }} at&nbsp;{{ entry.startDateTime | govukTime }}
