@@ -51,7 +51,8 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         req.session.caseFilter,
       )
       const { filter } = args
-      const { url } = req
+      let { url } = req
+      url = encodeURIComponent(url)
       let newCaseload = caseload
       const currentNavSection = 'yourCases'
       await auditService.sendAuditMessage({

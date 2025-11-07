@@ -263,7 +263,6 @@ describe('controllers/appointments', () => {
         back: undefined,
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
-        queryParams: ['view=default'],
         url: '',
       })
     })
@@ -651,7 +650,6 @@ describe('controllers/appointments', () => {
         crn,
         contactId,
         back: undefined,
-        queryParams: ['view=default'],
       })
     })
   })
