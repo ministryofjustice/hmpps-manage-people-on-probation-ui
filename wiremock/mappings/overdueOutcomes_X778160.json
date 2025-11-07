@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas/appointment/X778160/overdue-outcomes",
+        "urlPathPattern": "/mas/appointment/.*/overdue-outcomes",
         "method": "GET"
       },
       "response": {
