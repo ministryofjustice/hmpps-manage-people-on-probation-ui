@@ -15,8 +15,10 @@ import {
   mockAppResponse,
   mockRisks,
   mockPredictors,
+  mockPersonAppointment,
 } from './mocks'
 import { checkAuditMessage } from './testutils'
+import { getPersonAppointment } from '../middleware'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -60,6 +62,10 @@ const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplemen
 const getPredictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
+
+const getPersonAppointmentSpy = jest
+  .spyOn(MasApiClient.prototype, 'getPersonAppointment')
+  .mockImplementation(() => Promise.resolve(mockPersonAppointment))
 
 const req = httpMocks.createRequest({
   params: {
@@ -155,6 +161,26 @@ describe('/controllers/activityLogController', () => {
         url: req.url,
         resultsStart: 1,
         resultsEnd: 1,
+      })
+    })
+  })
+  describe('getActivity', () => {
+    beforeEach(async () => {
+      await controllers.activityLog.getActivity(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG_DETAIL', uuidv4(), crn, 'CRN')
+    it('should request the person appointment note', () => {
+      expect(getPersonAppointmentSpy).toHaveBeenCalledWith(crn, id)
+    })
+    it('should render the activity page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/appointment', {
+        personAppointment: mockPersonAppointment,
+        crn,
+        id,
+        back: undefined,
+        queryParams: ['view=default'],
+        isActivityLog: true,
+        url: '',
       })
     })
   })

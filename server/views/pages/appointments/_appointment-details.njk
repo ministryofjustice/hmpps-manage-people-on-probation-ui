@@ -1,6 +1,6 @@
 {% set notes = '' %}
-{% set hasNote = appointment.appointmentNote and appointment.hasOutcome == false %}
-{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome == false %}
+{% set hasNote = appointment.appointmentNote and appointment.hasOutcome != true %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 and appointment.hasOutcome != true %}
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
@@ -8,6 +8,7 @@
     {% endif %}
   {% endfor %}
 {% endif %}
+{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
   rows: [
@@ -31,7 +32,7 @@
       }
     } if appointment.rearrangeOrCancelReason,
     {
-      key: { html: '<span data-qa="typeLabel">Type of appointment</span>' },
+      key: { html: '<span data-qa="typeLabel">' + headings[0] + '</span>' },
       value: { html: '<span data-qa="typeValue">' + appointment.type + '</span>' }
     },
     {
@@ -71,7 +72,7 @@
       value: { html: '<span data-qa="dateAddedValue">' + appointment.appointmentNote.createdByDate | dateWithYear + '</span>' }
     } if appointment.appointmentNote.createdByDate and hasNote,
     {
-      key: { html: '<span data-qa="notesLabel">Appointment notes</span>' },
+      key: { html: '<span data-qa="notesLabel">' + headings[1] + '</span>' },
       value: { html: '<span data-qa="notesValue">' + notes + '</span>' }
     } if hasNotes and not hasNote,
     {
