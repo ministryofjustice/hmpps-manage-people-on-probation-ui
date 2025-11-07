@@ -1,6 +1,6 @@
 {
   "request": {
-    "urlPattern": "/mas/schedule/X778160/appointment/11",
+    "urlPattern": "/mas/schedule/.*/appointment/11",
     "method": "GET"
   },
   "response": {
