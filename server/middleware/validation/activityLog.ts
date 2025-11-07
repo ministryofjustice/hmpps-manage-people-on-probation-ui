@@ -6,7 +6,8 @@ import { Route } from '../../@types'
 
 const activityLog: Route<void> = (req, res, next): void => {
   let errorMessages: Record<string, string> = {}
-  const { url } = req
+  let { url } = req
+  url = encodeURIComponent(url)
   if (Object.keys(req.query).length === 0 && req.method === 'GET') {
     delete req.session.errorMessages
   }
