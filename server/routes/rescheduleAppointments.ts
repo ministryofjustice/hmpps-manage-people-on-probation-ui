@@ -8,6 +8,7 @@ import {
   getAppointmentTypes,
   getOfficeLocationsByTeamAndProvider,
   getPersonalDetails,
+  getPersonAppointment,
   getSentences,
   getWhoAttends,
 } from '../middleware'
@@ -23,6 +24,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
 
   router.get(
     '/case/:crn/appointments/reschedule/:contactId/:id',
+    getPersonAppointment(hmppsAuthClient),
     controllers.rescheduleAppointments.getRescheduleAppointment(hmppsAuthClient),
   )
 
