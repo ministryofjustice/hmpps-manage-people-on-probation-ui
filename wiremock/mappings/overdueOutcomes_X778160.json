@@ -10,42 +10,24 @@
         "jsonBody": {
           "content": [
             {
-              "id": 11,
+              "id": 5,
               "type": {
                 "code": "DGTSLC",
-                "description": "Drug Test (Licence Condition)"
+                "description": "Phone call"
               },
-              "date": "2024-05-29",
-              "start": "12:45:02"
+              "date": "2024-03-21",
+              "start": "10:15:00",
+              "end": "10:30:00"
             },
             {
-              "id": 2507235916,
+              "id": 6,
               "type": {
                 "code": "AL003",
-                "description": "AL Contact Type for RAR"
+                "description": "Other call"
               },
-              "date": "2024-04-26",
-              "start": "09:00:00"
-            },
-            {
-              "id": 2507235917,
-              "type": {
-                "code": "AL003",
-                "description": "AL Contact Type for RAR"
-              },
-              "date": "2024-04-19",
-              "start": "09:00:00"
-            },
-            {
-              "id": 2509486129,
-              "externalReference": "urn:uk:gov:hmpps:manage-supervision-service:appointment:3057e3e6-9b57-4046-a2dd-eb11569b14c1",
-              "type": {
-                "code": "C084",
-                "description": "3 Way Meeting (NS)"
-              },
-              "date": "2025-07-10",
-              "start": "09:00:00",
-              "end": "09:15:00"
+              "date": "2024-02-21",
+              "start": "10:15:00",
+              "end": "10:30:00"
             }
           ]
         },
