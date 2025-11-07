@@ -161,6 +161,8 @@ export interface LocalParams {
   actionType?: string
   back?: string
   change?: string
+  isInPast?: boolean
+  alertDismissed?: boolean
 }
 
 export interface MasUserDetails {
