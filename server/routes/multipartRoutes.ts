@@ -5,7 +5,7 @@ import { Services } from '../services'
 import {
   getPersonalDetails,
   getPersonAppointment,
-  autoStoreMultiformSessionData,
+  autoStoreMultipartFormSessionData,
   getAppointmentTypes,
   getSentences,
   constructNextAppointmentSession,
@@ -45,7 +45,7 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/appointments/reschedule/:contactId/:id',
     upload.array('documents'),
-    autoStoreMultiformSessionData(hmppsAuthClient),
+    autoStoreMultipartFormSessionData(hmppsAuthClient),
     cacheUploadedFiles,
     validate.appointments,
     getAppointmentTypes(hmppsAuthClient),

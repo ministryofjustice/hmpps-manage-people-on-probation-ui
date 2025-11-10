@@ -9,7 +9,7 @@ const id = '19a88188-6013-43a7-bb4d-6e338516818f'
 const res = {
   locals: {
     user: {
-      username: 'user-1',
+      username: 'userId',
     },
   },
   redirect: jest.fn().mockReturnThis(),
@@ -368,6 +368,107 @@ describe('/middleware/autoStoreSessionData', () => {
         username: 'USER1',
         locationCode: '2500035096',
       })
+    })
+  })
+})
+
+describe('/middleware/autoStoreSessionData additional coverage for resetSentenceSession and deleteValues', () => {
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe('does not reset when URL does not include /sentence', () => {
+    const req = httpMocks.createRequest({
+      params: { crn, id },
+      url: `/case/${crn}/arrange-appointment/${id}`,
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                licenceConditionId: 'lcId',
+                requirementId: 'rId',
+                nsiId: 'nsId',
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'token',
+        appointments: {
+          [crn]: {
+            [id]: {
+              // selecting a licence condition would normally trigger deletions
+              licenceConditionId: 'lcId',
+            },
+          },
+        },
+      },
+    })
+
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+
+    it('should not delete any of the sentence-related ids when not on sentence URL', () => {
+      expect(req.session.data.appointments[crn][id]).toMatchObject({
+        type: 'COAI',
+        licenceConditionId: 'lcId', // updated via merge
+        requirementId: 'rId',
+        nsiId: 'nsId',
+      })
+    })
+
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('deleteValues is a no-op for missing keys', () => {
+    const req = httpMocks.createRequest({
+      params: { crn, id },
+      url: `/case/${crn}/arrange-appointment/${id}/sentence`,
+      session: {
+        data: {
+          appointments: {
+            [crn]: {
+              [id]: {
+                type: 'COAI',
+                // only requirementId exists; nsiId is missing to exercise the false branch in deleteValues
+                requirementId: 'R-ONLY',
+              },
+            },
+          },
+        },
+      },
+      body: {
+        _csrf: 'token',
+        appointments: {
+          [crn]: {
+            [id]: {
+              // selecting a licence condition should delete requirementId and nsiId
+              licenceConditionId: 'L-NEW',
+            },
+          },
+        },
+      },
+    })
+
+    beforeEach(() => {
+      autoStoreSessionData(hmppsAuthClient)(req, res, nextSpy)
+    })
+
+    it('should delete existing requirementId and safely ignore missing nsiId', () => {
+      expect(req.session.data.appointments[crn][id].licenceConditionId).toBe('L-NEW')
+      expect(req.session.data.appointments[crn][id].requirementId).toBeUndefined()
+      // nsiId did not exist in session; ensure it remains undefined and no errors occurred
+      expect(req.session.data.appointments[crn][id].nsiId).toBeUndefined()
+    })
+
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
     })
   })
 })

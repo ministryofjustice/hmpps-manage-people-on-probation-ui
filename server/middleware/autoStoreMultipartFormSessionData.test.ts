@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { autoStoreMultiformSessionData } from './autoStoreMultiformSessionData'
+import { autoStoreMultipartFormSessionData } from './autoStoreMultipartFormSessionData'
 import type { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 
@@ -41,7 +41,7 @@ describe('/middleware/autoStoreMultiformSessionData', () => {
       },
     })
 
-    await autoStoreMultiformSessionData(hmppsAuthClient)(req, res, nextSpy)
+    await autoStoreMultipartFormSessionData(hmppsAuthClient)(req, res, nextSpy)
 
     // Session data should be updated with nested body
     expect(req.session.data.appointments[crn][id]).toEqual(
