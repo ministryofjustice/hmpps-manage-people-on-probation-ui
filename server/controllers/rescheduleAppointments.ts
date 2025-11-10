@@ -1,9 +1,9 @@
+import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
-import { getDataValue, isValidCrn, setDataValue } from '../utils'
+import { isValidCrn } from '../utils'
 
-import { cloneAppointment, cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
-import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'redirectToRescheduleAppointment',
@@ -19,9 +19,9 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      const { nextAppointmentSession } = res.locals
-      const redirect = cloneAppointment(nextAppointmentSession)(req, res)
-      return res.redirect(redirect)
+      // New id for reschedule appointment journey
+      const uuid = uuidv4()
+      return res.redirect(`/case/${crn}/appointments/reschedule/${contactId}/${uuid}`)
     }
   },
   getRescheduleAppointment: _hmppsAuthClient => {
@@ -79,22 +79,19 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      /*      if (req.session?.data?.appointments?.[crn]?.[id]) {
-        delete req.session.data.appointments[crn][id]
-      } */
-      const redirect = `/case/${crn}/appointments/reschedule/${contactId}/${id}/check-answers`
-      return res.redirect(redirect)
-      // return res.render('pages/appointments/reschedule-check-your-answers',{})
+      const { nextAppointmentSession } = res.locals
+      return cloneAppointmentAndRedirect(nextAppointmentSession, 'RESCHEDULE')(req, res)
     }
   },
   getRescheduleCheckYourAnswer: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id, contactId } = req.params
-
+      const { url } = req
       res.render('pages/reschedule/check-your-answers', {
         crn,
         id,
         contactId,
+        url,
       })
     }
   },

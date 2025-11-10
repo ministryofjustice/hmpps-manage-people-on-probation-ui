@@ -2,7 +2,15 @@ import multer from 'multer'
 import { type Router } from 'express'
 import controllers from '../controllers'
 import { Services } from '../services'
-import { getPersonalDetails, getPersonAppointment, autoStoreMultiformSessionData } from '../middleware'
+import {
+  getPersonalDetails,
+  getPersonAppointment,
+  autoStoreMultiformSessionData,
+  getAppointmentTypes,
+  getSentences,
+  constructNextAppointmentSession,
+  getUserProviders,
+} from '../middleware'
 import validate from '../middleware/validation/index'
 import { cacheUploadedFiles } from '../middleware/cacheUploadedFiles'
 import config from '../config'
@@ -40,6 +48,11 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
     autoStoreMultiformSessionData(hmppsAuthClient),
     cacheUploadedFiles,
     validate.appointments,
+    getAppointmentTypes(hmppsAuthClient),
+    getSentences(hmppsAuthClient),
+    getPersonAppointment(hmppsAuthClient),
+    constructNextAppointmentSession,
+    getUserProviders(hmppsAuthClient),
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
   )
   router.post(

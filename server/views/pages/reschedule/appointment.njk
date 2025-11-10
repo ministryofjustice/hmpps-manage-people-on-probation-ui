@@ -11,6 +11,7 @@
 {% set multipartForm = true %}
 {% set submitButtonId = 'continueButton' %}
 {% block form %}
+    <input type="hidden" name="nextAppointment" value="RESCHEDULE">
     {{ govukRadios({
         fieldset: {
             legend: {
