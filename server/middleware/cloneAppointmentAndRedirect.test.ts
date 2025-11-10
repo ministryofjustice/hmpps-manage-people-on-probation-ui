@@ -94,4 +94,28 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     expect(mockedSetDataValue).toHaveBeenCalledWith(req.session.data, ['appointments', crn, uuid], expectedClone)
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
   })
+
+  it('should reuse existing id and redirect to reschedule check answers when apptType is RESCHEDULE', () => {
+    const { req: request, res: response } = setup()
+    const crn2 = request.params.crn
+    request.params.id = 'APPT123'
+    request.params.contactId = 'C9876'
+    const redirectSpy2 = jest.spyOn(response, 'redirect')
+
+    const expectedCloneReschedule = {
+      ...expectedClone,
+      uuid: request.params.id,
+    }
+
+    cloneAppointmentAndRedirect(mockAppt, 'RESCHEDULE')(request, response)
+
+    expect(mockedSetDataValue).toHaveBeenCalledWith(
+      request.session.data,
+      ['appointments', crn2, request.params.id],
+      expectedCloneReschedule,
+    )
+    expect(redirectSpy2).toHaveBeenCalledWith(
+      `/case/${crn2}/appointments/reschedule/${request.params.contactId}/${request.params.id}/check-answers`,
+    )
+  })
 })

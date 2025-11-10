@@ -141,7 +141,6 @@ describe('Reschedule Appointment', () => {
       .getElement(`.govuk-error-message`)
       .should('contain.text', 'Select if appointment includes sensitive information')
     rescheduleAppointmentPage.getErrorSummaryLink(0).click()
-    // rescheduleAppointmentPage.getElement(`[data-qa=sensitiveInformation]`).should('be.focused')
   })
 
   it('should display validation errors if note is more than 4000 character', () => {
