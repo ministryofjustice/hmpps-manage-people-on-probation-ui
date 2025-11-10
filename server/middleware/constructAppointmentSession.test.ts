@@ -30,6 +30,13 @@ const mockTypes: AppointmentType[] = [
 const crn = 'X000001'
 const username = 'user-1'
 
+const rescheduleAppointment = {
+  whoNeedsToReschedule: 'POP',
+  reason: 'why appointment needs to be rescheduled',
+  files: ['file1', 'file2'],
+  sensitivity: 'YES',
+}
+
 const mockSentences: Sentence[] = [
   {
     id: 49,
@@ -420,5 +427,107 @@ describe('/middleware/constructAppointmentSession', () => {
         user: { username: 'tony-pan', teamCode: 'N07CHT', providerCode: 'N07', locationCode: '' },
       }),
     )
+  })
+
+  it('should include rescheduleAppointment when selection is RESCHEDULE and session has reschedule data', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'RESCHEDULE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                rescheduleAppointment,
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toBeDefined()
+    expect(res.locals.nextAppointmentSession.rescheduleAppointment).toEqual(rescheduleAppointment)
+  })
+
+  it('should not include rescheduleAppointment when selection is RESCHEDULE but no reschedule data in session', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'RESCHEDULE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                // no rescheduleAppointment here
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toBeDefined()
+    expect(res.locals.nextAppointmentSession).not.toHaveProperty('rescheduleAppointment')
+  })
+
+  it('should not include rescheduleAppointment when selection is KEEP_TYPE even if reschedule data exists', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'KEEP_TYPE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                rescheduleAppointment,
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toBeDefined()
+    expect(res.locals.nextAppointmentSession).not.toHaveProperty('rescheduleAppointment')
   })
 })

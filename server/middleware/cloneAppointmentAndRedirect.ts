@@ -4,11 +4,17 @@ import { AppointmentSession, RescheduleAppointment } from '../models/Appointment
 import { AppResponse } from '../models/Locals'
 import { setDataValue } from '../utils'
 
-export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession) => {
+export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSession, apptType?: string) => {
   return (req: Request, res: AppResponse): void => {
-    const uuid = uuidv4()
+    let uuid = uuidv4()
     const { data } = req.session
-    const { crn } = req.params
+    const { crn, id, contactId } = req.params
+    // for next-appointment of type: 'KEEP_TYPE'
+    let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
+    if (apptType === 'RESCHEDULE') {
+      uuid = id
+      redirectURL = `/case/${crn}/appointments/reschedule/${contactId}/${id}/check-answers`
+    }
     const clonedAppt: AppointmentSession = {
       ...appointmentToClone,
       uuid,
@@ -24,39 +30,6 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       sensitivity: null,
     }
     setDataValue(data, ['appointments', crn, uuid], clonedAppt)
-    return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`)
-  }
-}
-
-export const cloneAppointment = (appointmentToClone: AppointmentSession) => {
-  return (req: Request, res: AppResponse): string => {
-    const uuid = uuidv4()
-    const { data } = req.session
-    const { crn, contactId } = req.params
-
-    const rescheduleAppointment: RescheduleAppointment = {
-      whoNeedsToReschedule: null,
-      reason: null,
-      files: null,
-      sensitivity: null,
-    }
-    const clonedAppt: AppointmentSession = {
-      ...appointmentToClone,
-      uuid,
-      date: '',
-      start: '',
-      end: '',
-      repeatingDates: [] as string[],
-      until: '',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
-      repeating: 'No',
-      notes: null,
-      sensitivity: null,
-      contactId,
-      rescheduleAppointment,
-    }
-    setDataValue(data, ['appointments', crn, uuid], clonedAppt)
-    return `/case/${crn}/appointments/reschedule/${contactId}/${uuid}`
+    return res.redirect(redirectURL)
   }
 }
