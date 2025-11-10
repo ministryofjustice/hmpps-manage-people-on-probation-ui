@@ -39,6 +39,8 @@ export interface AppointmentSession {
   sensitivity?: YesNo
   backendId?: number
   outcomeRecorded?: boolean
+  contactId?: string
+  rescheduleAppointment?: RescheduleAppointment
 }
 
 export interface AppointmentType {
@@ -114,6 +116,13 @@ export interface AppointmentPatch {
   notes?: string
   files?: string[]
   sensitive?: boolean
+}
+
+export interface RescheduleAppointment {
+  whoNeedsToReschedule?: string
+  reason?: string
+  files?: string[]
+  sensitivity?: YesNo
 }
 
 export interface AppointmentChecks {

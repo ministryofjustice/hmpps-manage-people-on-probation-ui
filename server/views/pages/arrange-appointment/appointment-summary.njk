@@ -166,11 +166,16 @@
      ] 
      } if showAction }
 ] }) }}
-    {{ govukButton({
-      html: buttonText,
-      attributes: {
-        'data-qa': 'submit-btn'
-      }
-    }) }}
+    <div class="govuk-button-group">
+        {{ govukButton({
+          html: buttonText,
+          attributes: {
+            'data-qa': 'submit-btn'
+          }
+        }) }}
+        {% if  showAnchorLink === true %}
+           <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink"> {{ formAnchorText }}</a>
+        {% endif %}
+    </div>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 </form>

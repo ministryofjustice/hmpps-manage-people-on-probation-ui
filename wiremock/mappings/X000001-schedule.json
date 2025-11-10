@@ -750,9 +750,9 @@
                 "forename": "Terry",
                 "surname": "Jones"
               },
-              "teamCode": "1234",
-              "providerCode": "1234",
-              "username": "TerryJones"
+              "teamCode": "N07AAT",
+              "providerCode": "N07",
+              "username": "terry-jones"
             },
             "isInitial": true,
             "isNationalStandard": true,
