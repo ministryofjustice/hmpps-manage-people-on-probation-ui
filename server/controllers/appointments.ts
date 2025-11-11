@@ -26,6 +26,7 @@ const routes = [
   'getAllUpcomingAppointments',
   'postAppointments',
   'getRecordAnOutcome',
+  'getRecordAnOutcomeForEvidence',
   'postRecordAnOutcome',
   'getAttendedComplied',
   'postAttendedComplied',
@@ -193,8 +194,8 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, actionType } = req.params
-
+      const { crn } = req.params
+      const actionType = 'outcome'
       const { contactId } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
@@ -211,6 +212,28 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
+
+  getRecordAnOutcomeForEvidence: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      const actionType = 'evidence'
+      const { contactId } = req.query
+      await auditService.sendAuditMessage({
+        action: 'VIEW_RECORD_AN_OUTCOME',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      res.render('pages/appointments/record-an-outcome', {
+        crn,
+        actionType,
+        contactId,
+      })
+    }
+  },
+
   postRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, actionType } = req.params
