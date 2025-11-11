@@ -67,6 +67,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/appointment/${crn}/overdue-outcomes`, handle404: false })
   }
 
+  async getAppointmentsNeedingEvidence(crn: string): Promise<ContactResponse | null> {
+    return this.get({ path: `/appointment/${crn}/overdue-outcomes-evidence`, handle404: false })
+  }
+
   async getSentenceDetails(crn: string, queryParam = ''): Promise<SentenceDetails | null> {
     return this.get({ path: `/sentence/${crn}${queryParam}`, handle404: false })
   }
