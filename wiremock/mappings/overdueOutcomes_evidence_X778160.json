@@ -1,0 +1,30 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/appointment/.*/overdue-outcomes-evidence",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "content": [
+            {
+              "id": 5,
+              "type": {
+                "code": "DGTSLC",
+                "description": "Phone call"
+              },
+              "date": "2024-03-21",
+              "start": "10:15:00",
+              "end": "10:30:00"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
