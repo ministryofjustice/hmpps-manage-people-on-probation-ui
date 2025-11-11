@@ -29,7 +29,10 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   router.get('/case/:crn/record-an-outcome/outcome', controllers.appointments.getRecordAnOutcome(hmppsAuthClient))
 
   router.all('/case/:crn/record-an-outcome/evidence', [getAppointmentsNeedingEvidence(hmppsAuthClient)])
-  router.get('/case/:crn/record-an-outcome/evidence', controllers.appointments.getRecordAnOutcome(hmppsAuthClient))
+  router.get(
+    '/case/:crn/record-an-outcome/evidence',
+    controllers.appointments.getRecordAnOutcomeForEvidence(hmppsAuthClient),
+  )
 
   router.post(
     '/case/:crn/record-an-outcome/:actionType',
