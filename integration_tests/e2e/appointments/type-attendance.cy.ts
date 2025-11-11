@@ -25,7 +25,7 @@ describe('Arrange an appointment', () => {
   let typePage: AppointmentTypePage
   let attendancePage: AttendancePage
   let locationPage: AppointmentLocationDateTimePage
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
   describe('What appointment are you arranging?', () => {
@@ -52,7 +52,7 @@ describe('Arrange an appointment', () => {
         )
         cy.get('[data-qa="attendeeDetails"]').should(
           'contain.text',
-          'Ambuj Pathak (COM) (Default Designated Transfer Team, East of England)',
+          'Deborah Fern (PS - Other) (Automated Allocation Team, London)',
         )
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
@@ -183,7 +183,7 @@ describe('Arrange an appointment', () => {
   })
 
   describe('Changing the attendee', () => {
-    const defaultUser = 'Tony Pan (PS-PSO) (Automation SPG, London)'
+    const expectedUser = 'Iain Chambers (PS - Other) (Automation SPG, Greater Manchester)'
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
@@ -192,32 +192,20 @@ describe('Arrange an appointment', () => {
       cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.checkOnPage()
-      cy.get('[data-qa="providerCode"]').should('have.value', 'N56')
-      cy.get('[data-qa="teamCode"]').should('have.value', 'N56DTX')
-      cy.get('[data-qa="username"]').should('have.value', 'ambuj-pathak')
-      cy.get('[data-qa="providerCode"]').select('N07')
-      cy.get('[data-qa="teamCode"]')
-        .find('option')
-        .then(options => {
-          const values = Array.from(options, option => option.value)
-          expect(values).not.to.include('N56DTX')
-        })
-      cy.get('[data-qa="username"]')
-        .find('option')
-        .then(options => {
-          const values = Array.from(options, option => option.value)
-          expect(values).not.to.include('ambuj-pathak')
-        })
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
+      cy.get('[data-qa="username"]').should('have.value', 'DeborahFern')
+      cy.get('[data-qa="providerCode"]').select('N50')
       cy.get('[data-qa="teamCode"]').select('N07CHT')
-      cy.get('[data-qa="username"]').select('tony-pan')
+      cy.get('[data-qa="username"]').select('IainChambers')
       attendancePage.getSubmitBtn().click()
       typePage = new AppointmentTypePage()
       typePage.checkOnPage()
-      cy.get('[data-qa="attendeeDetails').should('contain.text', defaultUser)
+      cy.get('[data-qa="attendeeDetails').should('contain.text', expectedUser)
       typePage.getRadio('type', 2).click()
       typePage.getSubmitBtn().click()
       locationPage.getBackLink().click()
-      cy.get('[data-qa="attendeeDetails').should('contain.text', defaultUser)
+      cy.get('[data-qa="attendeeDetails').should('contain.text', expectedUser)
     })
     it('backlink should return to type-attendee page', () => {
       loadPage()
@@ -236,7 +224,7 @@ describe('Arrange an appointment', () => {
     it('should list the default user as the attendee', () => {
       cy.get('[data-qa="attendeeDetails"]').should(
         'contain.text',
-        'Peter Parker (PS-PSO) (Automated Allocation Team, London)',
+        'Peter Parker (PS - Other) (Automated Allocation Team, London)',
       )
     })
     it('should update the default user', () => {
@@ -246,12 +234,47 @@ describe('Arrange an appointment', () => {
       cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
       cy.get('[data-qa="providerCode"]').select('N54')
       cy.get('[data-qa="teamCode"]').select('N07HPT')
-      cy.get('[data-qa="username"]').select('terry-jones')
+      cy.get('[data-qa="username"]').select('IainChambers')
       attendancePage.getSubmitBtn().click()
       cy.get('[data-qa="attendeeDetails"]').should(
         'contain.text',
-        'Terry Jones (PS-PSO) (Homelessness Prevention Team,, North East Region',
+        'Iain Chambers (PS - Other) (Homelessness Prevention Team,, North East Region)',
       )
+    })
+  })
+
+  describe('User does not have provider access for allocated probation practitioner', () => {
+    beforeEach(() => {
+      cy.task('stubNoAllocatedProbationPractitionerProviderAccess')
+      loadPage()
+      cy.get('[data-qa="attendee"] a').click()
+    })
+    it('should include the probation practitioner provider option', () => {
+      cy.get('[data-qa="providerCode"]')
+        .find('option')
+        .should('have.length', 3)
+        .then(options => {
+          expect(options[0].text).to.eq('Greater Manchester')
+          expect(options[1].text).to.eq('North East Region')
+          expect(options[2].text).to.eq('London')
+        })
+      cy.get('[data-qa="providerCode"]').select('N07')
+    })
+    it('should only include the probation practioner team option', () => {
+      cy.get('[data-qa="teamCode"]')
+        .find('option')
+        .should('have.length', 1)
+        .then(options => {
+          expect(options[0].text).to.eq('Automated Allocation Team')
+        })
+    })
+    it('should only include the probation practioner user option', () => {
+      cy.get('[data-qa="username"]')
+        .find('option')
+        .should('have.length', 1)
+        .then(options => {
+          expect(options[0].text).to.eq('Deborah Fern')
+        })
     })
   })
 })
