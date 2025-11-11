@@ -12,10 +12,10 @@
             {
               "id": 5,
               "type": {
-                "code": "DGTSLC",
-                "description": "Phone call"
+                "code": "COVC",
+                "description": "Planned Video Contact (NS)"
               },
-              "date": "2024-03-21",
+              "date": "2024-02-12",
               "start": "10:15:00",
               "end": "10:30:00"
             }
