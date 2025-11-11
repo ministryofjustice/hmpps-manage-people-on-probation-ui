@@ -9,20 +9,21 @@ const stubNoAllocatedCOM = (): SuperAgentRequest =>
     response: {
       status: 200,
       jsonBody: {
-        code: 'N56A048',
+        code: 'N07B795',
         name: {
-          forename: 'Ambuj',
-          surname: 'Pathak',
+          forename: 'Deborah',
+          surname: 'Fern',
         },
         provider: {
-          code: 'N56',
-          description: 'East of England',
+          code: 'N07',
+          name: 'London',
         },
         team: {
-          code: 'N56DTX',
-          description: 'Default Designated Transfer Team',
+          code: 'N07AAT',
+          description: 'Automated Allocation Team',
         },
         unallocated: true,
+        username: 'DeborahFern',
       },
       headers: {
         'Content-Type': 'application/json',
