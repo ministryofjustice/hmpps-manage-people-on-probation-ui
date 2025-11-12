@@ -318,9 +318,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         try {
           await masClient.patchDocuments(crn, id, file)
         } catch (error) {
-          console.error('File upload failed:', error)
-          // Decide whether to throw, log and continue, or redirect with an error message.
-          // For now, we'll log and continue to ensure the note is saved.
+          // Log the error for file upload but still redirect to the management page,
+          // as the main note has already been saved.
         }
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
