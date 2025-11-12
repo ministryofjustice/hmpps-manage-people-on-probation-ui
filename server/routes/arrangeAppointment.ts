@@ -89,6 +89,18 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
 
   router.get(
+    '/case/:crn/arrange-appointment/:id/attended-complied',
+    redirectWizard(['eventId', 'type', 'date']),
+    controllers.arrangeAppointments.getAttendedComplied(),
+  )
+
+  router.post(
+    '/case/:crn/arrange-appointment/:id/attended-complied',
+    validate.appointments,
+    controllers.arrangeAppointments.postAttendedComplied(),
+  )
+
+  router.get(
     '/case/:crn/arrange-appointment/:id/repeating',
     redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getRepeating(),
@@ -143,7 +155,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
   router.post('/alert/dismiss', (req, res) => {
     req.session.alertDismissed = true
-    console.log({ dismissed: req.session.alertDismissed })
     return res.json({ success: true })
   })
   router.post('/appointment/is-in-past', (req, res) => {

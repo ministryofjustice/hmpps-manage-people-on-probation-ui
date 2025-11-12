@@ -149,7 +149,7 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getTaskLink(1)
             .should('contain.text', name)
-            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/attended-complied`)
+            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/record-outcome`)
         })
         it(`should display the status as 'Not started'`, () => {
           manageAppointmentPage
