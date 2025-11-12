@@ -182,22 +182,19 @@ describe('Arrange an appointment', () => {
     })
   })
 
-  describe('Changing the attendee', () => {
-    const expectedUser = 'Iain Chambers (PS - Other) (Automation SPG, Greater Manchester)'
+  describe('Changing the probation practitioner attendee back to default user', () => {
+    const expectedUser = 'Peter Parker (PS - Other) (Automated Allocation Team, London)'
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
     })
-    it('should render the attendee page', () => {
+    it('should render the attendee page with the default user selected', () => {
       cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.checkOnPage()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
       cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
-      cy.get('[data-qa="username"]').should('have.value', 'DeborahFern')
-      cy.get('[data-qa="providerCode"]').select('N50')
-      cy.get('[data-qa="teamCode"]').select('N07CHT')
-      cy.get('[data-qa="username"]').select('IainChambers')
+      cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
       attendancePage.getSubmitBtn().click()
       typePage = new AppointmentTypePage()
       typePage.checkOnPage()
@@ -240,41 +237,6 @@ describe('Arrange an appointment', () => {
         'contain.text',
         'Iain Chambers (PS - Other) (Homelessness Prevention Team,, North East Region)',
       )
-    })
-  })
-
-  describe('User does not have provider access for allocated probation practitioner', () => {
-    beforeEach(() => {
-      cy.task('stubNoAllocatedProbationPractitionerProviderAccess')
-      loadPage()
-      cy.get('[data-qa="attendee"] a').click()
-    })
-    it('should include the probation practitioner provider option', () => {
-      cy.get('[data-qa="providerCode"]')
-        .find('option')
-        .should('have.length', 3)
-        .then(options => {
-          expect(options[0].text).to.eq('Greater Manchester')
-          expect(options[1].text).to.eq('North East Region')
-          expect(options[2].text).to.eq('London')
-        })
-      cy.get('[data-qa="providerCode"]').select('N07')
-    })
-    it('should only include the probation practioner team option', () => {
-      cy.get('[data-qa="teamCode"]')
-        .find('option')
-        .should('have.length', 1)
-        .then(options => {
-          expect(options[0].text).to.eq('Automated Allocation Team')
-        })
-    })
-    it('should only include the probation practioner user option', () => {
-      cy.get('[data-qa="username"]')
-        .find('option')
-        .should('have.length', 1)
-        .then(options => {
-          expect(options[0].text).to.eq('Deborah Fern')
-        })
     })
   })
 })

@@ -15,87 +15,57 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
 
-    let { providers: userProviders } = await masClient.getUserProviders(username)
+    const { defaultUserDetails, providers } = await masClient.getUserProviders(username)
     const {
-      username: usernameSession,
       providerCode: providerCodeSession,
       teamCode: teamCodeSession,
+      username: usernameSession,
     } = getDataValue(data, ['appointments', crn, id, 'user'])
 
-    const selectedProvider: string = providerCodeQuery ?? providerCodeSession ?? userProviders[0].code
-
-    let { teams } = await masClient.getTeamsByProvider(selectedProvider)
-
-    let selectedTeam = teamCodeQuery ?? teamCodeSession ?? teams[0].code
-
-    let { users } = await masClient.getStaffByTeam(selectedTeam)
-
-    let selectedUser = !providerCodeQuery && !teamCodeQuery && usernameSession ? usernameSession : users[0].username
+    const defaultProvider = providers.find(
+      provider => provider.name.toLowerCase() === defaultUserDetails.homeArea.toLowerCase(),
+    )?.code
 
     const probationPractitioner = await masClient.getProbationPractitioner(crn)
 
-    const userHasPractitionerProviderAccess = userProviders.some(
-      provider => provider.code === probationPractitioner.provider.code,
-    )
+    let selectedProvider: string = providerCodeQuery ?? providerCodeSession ?? defaultProvider
+    if (selectedProvider === probationPractitioner.provider.code) {
+      selectedProvider = defaultProvider
+    }
+    const { teams } = await masClient.getTeamsByProvider(selectedProvider)
+    const defaultTeam = teams.find(
+      team => team.description.toLowerCase() === defaultUserDetails.team.toLowerCase(),
+    )?.code
 
-    if (probationPractitioner.unallocated === false) {
-      if (!userProviders.some(provider => provider.code === probationPractitioner.provider.code)) {
-        userProviders = [...userProviders, probationPractitioner.provider]
-      }
-      if (
-        !teams.some(team => team.code === probationPractitioner.team.code) &&
-        selectedProvider === probationPractitioner.provider.code
-      ) {
-        teams = [...teams, probationPractitioner.team]
-      }
-      if (
-        !users.some(user => user.username.toLowerCase() === probationPractitioner.username.toLowerCase()) &&
-        selectedProvider === probationPractitioner.provider.code
-      ) {
-        const {
-          code: staffCode,
-          username: ppUsername,
-          name: { forename, surname },
-        } = probationPractitioner
-        users = [
-          ...users,
-          { staffCode, username: ppUsername, nameAndRole: convertToTitleCase(`${forename} ${surname}`) },
-        ]
-      }
+    let selectedTeam = teamCodeQuery ?? teamCodeSession ?? defaultTeam
 
-      req.session.data = {
-        ...(req?.session?.data ?? {}),
-        providers: {
-          ...(req?.session?.data?.providers ?? {}),
-          [username]: userProviders,
-        },
-        teams: {
-          ...(req?.session?.data?.teams ?? {}),
-          [username]: teams,
-        },
-        staff: {
-          ...(req?.session?.data?.staff ?? {}),
-          [username]: users.map(user => ({
-            ...user,
-            nameAndRole: convertToTitleCase(user.nameAndRole, [], regexIgnoreValuesInParentheses),
-          })),
-        },
-      }
+    if (selectedTeam === probationPractitioner.team.code) {
+      selectedTeam = defaultTeam
     }
 
-    if (selectedProvider === probationPractitioner.provider.code && !userHasPractitionerProviderAccess) {
-      teams = [{ ...probationPractitioner.team }]
-      const {
-        code: staffCode,
-        username: ppUsername,
-        name: { forename, surname },
-      } = probationPractitioner
-      users = [{ staffCode, username: ppUsername, nameAndRole: `${forename} ${surname}` }]
-      selectedTeam = probationPractitioner.team.code
-      selectedUser = probationPractitioner.username
+    if (providerCodeQuery && !teamCodeQuery) {
+      selectedTeam = teams[0].code
     }
 
-    const providerOptions = userProviders.map(provider => {
+    let selectedUser = usernameSession ?? defaultUserDetails.username
+
+    if (selectedUser.toLowerCase() === probationPractitioner.username.toLowerCase()) {
+      selectedUser = defaultUserDetails.username
+    }
+
+    if (selectedProvider === probationPractitioner.provider.code) {
+      selectedProvider = defaultProvider
+      selectedTeam = defaultTeam
+      selectedUser = defaultUserDetails.username
+    }
+
+    const { users } = await masClient.getStaffByTeam(selectedTeam)
+
+    if (providerCodeQuery) {
+      selectedUser = users[0].username
+    }
+
+    const providerOptions = providers.map(provider => {
       const { code, name } = provider
       const option: Provider = { code, name }
       if (code === selectedProvider) {
