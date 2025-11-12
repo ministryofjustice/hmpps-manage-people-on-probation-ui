@@ -298,6 +298,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { notes, sensitive } = req.body
+      const file = req.file as Express.Multer.File // <--- GET SINGLE FILE HERE
       const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -312,6 +313,15 @@ const appointmentsController: Controller<typeof routes, void> = {
         delete req.session.data.appointments[crn][id].outcomeRecorded
       }
       await masClient.patchAppointment(body)
+
+      if (file) {
+        try {
+          await masClient.patchDocuments(crn, id, file)
+        } catch (error) {
+          // Log the error for file upload but still redirect to the management page,
+          // as the main note has already been saved.
+        }
+      }
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
