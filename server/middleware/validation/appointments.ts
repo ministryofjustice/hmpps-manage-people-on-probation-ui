@@ -138,6 +138,20 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateAttendedComplied = () => {
+    if (req.url.includes(`/case/${crn}/arrange-appointment/${id}/attended-complied`)) {
+      render = `pages/appointments/attended-complied`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'attended-complied',
+        }),
+      )
+    }
+  }
+
+  const validateManageAttendedComplied = () => {
     if (req.url.includes(`appointment/${contactId}/attended-complied`)) {
       render = `pages/appointments/attended-complied`
       errorMessages = validateWithSpec(
@@ -208,6 +222,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateNextAppointment()
   validateRecordAnOutcome()
   validateAttendedComplied()
+  validateManageAttendedComplied()
   validateAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages

@@ -25,7 +25,7 @@ export interface AppointmentsValidationArgs {
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue, notes, maxCharCount } = args
+  const { crn, id, contactId, page, visor, repeatingValue, notes, maxCharCount } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -225,6 +225,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select whether or not the appointment note contains sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcomeRecorded]`]: {
+      optional: page !== 'attended-complied' && !contactId,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if they attended and complied',
+          log: 'Attended and complied not selected',
         },
       ],
     },
