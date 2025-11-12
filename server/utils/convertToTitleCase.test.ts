@@ -42,4 +42,14 @@ describe('utils/convertToTitleCase', () => {
     const str = 'Initial appointment - in office (NS)'
     expect(convertToTitleCase(str, ['(NS)', '(Non', 'NS)', '-'])).toEqual('Initial Appointment - In Office (NS)')
   })
+  it('should ignore any words matching regex', () => {
+    const tests = [
+      ['robert smith (PS - Other)', 'Robert Smith (PS - Other)'],
+      ['robert smith (PS-PSO)', 'Robert Smith (PS-PSO)'],
+    ]
+    for (const [test, expected] of tests) {
+      // eslint-disable-next-line no-useless-escape
+      expect(convertToTitleCase(test, [], /[\(\)]/)).toEqual(expected)
+    }
+  })
 })

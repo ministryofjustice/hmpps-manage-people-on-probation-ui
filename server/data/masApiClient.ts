@@ -41,6 +41,8 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
+import { ProbationPractitioner } from '../models/CaseDetail'
+import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 
 interface GetUserScheduleProps {
   username: string
@@ -340,6 +342,14 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/providers${queryParameters}`, handle404: true })
   }
 
+  async getTeamsByProvider(providerCode: string): Promise<AppointmentTeams> {
+    return this.get({ path: `/appointment/teams/provider/${providerCode}` })
+  }
+
+  async getStaffByTeam(teamCode: string): Promise<AppointmentStaff> {
+    return this.get({ path: `/appointment/staff/team/${teamCode}` })
+  }
+
   async getUserLocations(username: string): Promise<UserLocations> {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
@@ -398,5 +408,9 @@ export default class MasApiClient extends RestClient {
 
   async getUserDetails(username: string): Promise<MasUserDetails | null> {
     return this.get({ path: `/user/${username}`, handle404: true })
+  }
+
+  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
+    return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 }

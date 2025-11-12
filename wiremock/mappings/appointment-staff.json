@@ -1,0 +1,120 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/appointment/staff/team/.*",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "users": [
+            {
+              "staffCode": "N07B722",
+              "username": "peter-parker",
+              "nameAndRole": "Peter Parker (PS - Other)"
+            },
+            {
+              "staffCode": "N57A054",
+              "username": "IainChambers",
+              "nameAndRole": "Iain Chambers (PS - Other)"
+            },
+            {
+              "staffCode": "N07B786",
+              "username": "AmardeepChimber",
+              "nameAndRole": "Amardeep Chimber (PS - Other)"
+            },
+            {
+              "staffCode": "N07B897",
+              "username": "Anand.Elangovan",
+              "nameAndRole": "Anand Elangovan (PS - Other)"
+            },
+            {
+              "staffCode": "N07B787",
+              "username": "tkexpired",
+              "nameAndRole": "tk expired (CRC - Additional Grade)"
+            },
+            {
+              "staffCode": "N07B795",
+              "username": "DeborahFern",
+              "nameAndRole": "Deborah Fern (PS - Other)"
+            },
+            {
+              "staffCode": "N07B794",
+              "username": "JamesForster",
+              "nameAndRole": "James Forster (PS - Other)"
+            },
+            {
+              "staffCode": "N07B738",
+              "username": "ThomasGeraghty",
+              "nameAndRole": "Thomas Geraghty (PS - Other)"
+            },
+            {
+              "staffCode": "N07B899",
+              "username": "mairegrant",
+              "nameAndRole": "maire grant (PS - Other)"
+            },
+            {
+              "staffCode": "N07B792",
+              "username": "MaryamHassan",
+              "nameAndRole": "Maryam Hassan (PS - Other)"
+            },
+            {
+              "staffCode": "N07B743",
+              "username": "PaulMcPhee",
+              "nameAndRole": "Paul McPhee (PS - PO)"
+            },
+            {
+              "staffCode": "N07B898",
+              "username": "NeilMills",
+              "nameAndRole": "Neil Mills (PS - PO)"
+            },
+            {
+              "staffCode": "N07B793",
+              "username": "AbdirizakObsiye",
+              "nameAndRole": "Abdirizak Obsiye (PS - Other)"
+            },
+            {
+              "staffCode": "N07B736",
+              "username": "SwethaPalreddy",
+              "nameAndRole": "swetha palreddy (PS - Other)"
+            },
+            {
+              "staffCode": "N07B901",
+              "username": "lee.porter",
+              "nameAndRole": "Lee Porter (PS - Other)"
+            },
+            {
+              "staffCode": "N55A032",
+              "username": "LyndseyPotter",
+              "nameAndRole": "Lyndsey Potter (NPS - Other)"
+            },
+            {
+              "staffCode": "N07B791",
+              "username": "MarcinPrzybyla",
+              "nameAndRole": "Marcin Przybyla (PS - Other)"
+            },
+            {
+              "staffCode": "N07B733",
+              "username": "MARD_SUPPORT",
+              "nameAndRole": "Make Support User (PS - Other)"
+            },
+            {
+              "staffCode": "N07B739",
+              "username": "jsftest",
+              "nameAndRole": "jsf test (CRC - Additional Grade)"
+            },
+            {
+              "staffCode": "N07B825",
+              "username": "Test_Hrishi_New",
+              "nameAndRole": "Test_Hrishi_New Test (PS - Other)"
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
