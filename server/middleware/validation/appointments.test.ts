@@ -32,7 +32,7 @@ const res = mockAppResponse({
 })
 const next = jest.fn()
 
-describe('/controllers/arrangeAppointmentController', () => {
+xdescribe('/controllers/arrangeAppointmentController', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })

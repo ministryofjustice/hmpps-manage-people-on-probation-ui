@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Request } from 'express'
 import { Controller } from '../@types'
 import {
+  convertToTitleCase,
   dateIsInPast,
   getDataValue,
   getPersonLevelTypes,
@@ -30,6 +31,8 @@ const routes = [
   'postWhoWillAttend',
   'getLocationDateTime',
   'postLocationDateTime',
+  'getAttendedComplied',
+  'postAttendedComplied',
   'getLocationNotInList',
   'getRepeating',
   'postRepeating',
@@ -301,10 +304,17 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       let nextPage = repeatAppointmentsEnabled ? `repeating` : `supporting-information`
+      const dt = DateTime.fromFormat(appointment.date, 'yyyy-M-d')
+
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/${nextPage}`
+      let isInPast = false
+      if (dt.isValid) {
+        ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), appointment.start))
+        if (isInPast) redirect = `/case/${crn}/arrange-appointment/${id}/attended-complied`
+      }
       if (change && nextPage !== 'location-not-in-list') {
         redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
       }
@@ -312,6 +322,44 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         redirect = `${redirect}?change=${change}`
       }
       return res.redirect(redirect)
+    }
+  },
+  getAttendedComplied: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { alertDismissed = false, data } = req.session
+      const {
+        type: { description },
+        attending: { name },
+      } = res.locals.appointment
+
+      const [officerForename, officerSurname] = name.split(' ')
+      const path = ['appointments', crn, id]
+      const appointmentSession = getDataValue<AppointmentSession>(data, path)
+      const startDateTime = appointmentSession.date
+      const appointment = {
+        type: description,
+        officer: {
+          name: { forename: convertToTitleCase(officerForename), surname: convertToTitleCase(officerSurname) },
+        },
+        startDateTime,
+      }
+      const { forename } = res.locals.case.name
+
+      res.render('pages/appointments/attended-complied', {
+        crn,
+        id,
+        alertDismissed,
+        isInPast: true,
+        appointment,
+        forename: convertToTitleCase(forename),
+      })
+    }
+  },
+  postAttendedComplied: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.render(`/case/${crn}/arrange-appointment/${id}/supporting-information`)
     }
   },
   getLocationNotInList: () => {
