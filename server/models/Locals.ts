@@ -98,6 +98,7 @@ interface Locals {
   uploadedFiles?: FileCache[]
   defaultUser?: { username: string; homeArea: string; team: string }
   sentencePlan?: SentencePlan
+  alertsCount?: string
 }
 
 export interface AppResponse extends Response {
