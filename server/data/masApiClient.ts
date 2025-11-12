@@ -41,6 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
+import { UserAlerts } from '../models/Alerts'
 
 interface GetUserScheduleProps {
   username: string
@@ -398,5 +399,18 @@ export default class MasApiClient extends RestClient {
 
   async getUserDetails(username: string): Promise<MasUserDetails | null> {
     return this.get({ path: `/user/${username}`, handle404: true })
+  }
+
+  async getUserAlerts(page?: number): Promise<UserAlerts> {
+    let pageQuery = '?size=10'
+    if (page) {
+      pageQuery = `${pageQuery}&page=${page}`
+    }
+    return this.get({ path: `/alerts${pageQuery}`, handle404: true })
+  }
+
+  async getUserAlertsCount(): Promise<number> {
+    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true })
+    return response.totalResults
   }
 }
