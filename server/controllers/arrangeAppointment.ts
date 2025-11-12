@@ -242,7 +242,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const appointmentStartTime = getDataValue(data, ['appointments', crn, id, 'start'])
       let isInPast = false
       if (appointmentDate) {
-        const dt = DateTime.fromFormat(appointmentDate, 'd/M/yyyy')
+        const dt = DateTime.fromFormat(appointmentDate, 'yyyy-M-d')
         if (dt.isValid) {
           ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), appointmentStartTime))
         }

@@ -1,10 +1,18 @@
 import { DateTime } from 'luxon'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import { completeSentencePage, completeTypePage, crn, uuid, checkPopHeader } from './imports'
+import {
+  completeSentencePage,
+  completeTypePage,
+  crn,
+  uuid,
+  checkPopHeader,
+  completeSupportingInformationPage,
+} from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
@@ -372,14 +380,6 @@ describe('Pick a date, location and time for this appointment', () => {
       second: 0,
       millisecond: 0,
     })
-    const mockedNow = mockedTime.toUTC().toISO()
-    before(() => {
-      cy.request({
-        method: 'POST',
-        url: 'http://localhost:3007/__test/set-mocked-time',
-        body: { time: mockedNow },
-      })
-    })
     beforeEach(() => {
       cy.clock(mockedTime.toMillis())
       cy.intercept('POST', '/appointment/is-in-past', {
@@ -418,6 +418,63 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should not display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
       cy.get('[data-module="serviceAlert"]').should('not.be.visible')
+    })
+  })
+  describe('Date in the past is selected', () => {
+    const mockedTime = DateTime.local().set({
+      hour: 9,
+      minute: 1,
+      second: 0,
+      millisecond: 0,
+    })
+    const now = DateTime.now()
+    const yesterday = now.minus({ days: 1 })
+    const yesterdayIsInCurrentMonth = yesterday.month === now.month
+
+    const selectPastDate = () => {
+      locationDateTimePage.getDatePickerToggle().click()
+      if (!yesterdayIsInCurrentMonth) {
+        cy.get('.moj-js-datepicker-prev-month').click()
+      }
+      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+    }
+
+    beforeEach(() => {
+      cy.clock(mockedTime.toMillis())
+      cy.intercept('POST', '/appointment/is-in-past', {
+        statusCode: 200,
+        body: { isInPast: true },
+      }).as('isInPast')
+      loadPage()
+    })
+    it('should persist the log an outcome alert banner when form is submitted with validation errors', () => {
+      selectPastDate()
+      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      locationDateTimePage.getSubmitBtn().click()
+      cy.get('[data-module="serviceAlert"]').should('be.visible')
+    })
+    it('should persist the log an outcome alert banner when valid form is submitted and back link is clicked', () => {
+      selectPastDate()
+      locationDateTimePage.getElementInput(`startTime`).type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      notePage = new AppointmentNotePage()
+      notePage.getBackLink().click()
+      cy.get('[data-module="serviceAlert"]').should('be.visible')
+    })
+    it('should persist the log an outcome banner when change link is clicked on check your answers page', () => {
+      selectPastDate()
+      locationDateTimePage.getElementInput(`startTime`).type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      completeSupportingInformationPage()
+      const page = new AppointmentCheckYourAnswersPage()
+      page.getSummaryListRow(5).find('.govuk-link').click()
+      cy.get('[data-module="serviceAlert"]').should('be.visible')
     })
   })
 
