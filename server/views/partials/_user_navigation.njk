@@ -19,6 +19,12 @@
                             <a class="moj-primary-navigation__link" {% if search %}aria-current="search"{% endif %}
                                href="/search">Search</a>
                         </li>
+                        {% if flags.enableAlertsPage === true %}
+                        <li class="moj-primary-navigation__item">
+                            <a class="moj-primary-navigation__link" {% if search %}aria-current="search"{% endif %}
+                               href="/alerts">Alerts</a>
+                        </li>
+                        {% endif %}
                     </ul>
                 </nav>
             </div>

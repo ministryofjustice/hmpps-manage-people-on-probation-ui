@@ -13,6 +13,7 @@ import documentController from './documents'
 import accessibilityController from './accessibility'
 import searchController from './search'
 import fileUploadController from './fileUpload'
+import alertsController from './alerts'
 
 export default {
   caseload: caseloadController,
@@ -30,4 +31,5 @@ export default {
   accessibility: accessibilityController,
   search: searchController,
   fileUpload: fileUploadController,
+  alerts: alertsController,
 }
