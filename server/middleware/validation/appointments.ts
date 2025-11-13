@@ -145,7 +145,7 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
-          page: 'attended-complied',
+          page: `arrange-appointment/${id}/attended-complied`,
         }),
       )
     }
@@ -160,7 +160,7 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           contactId,
-          page: 'attended-complied',
+          page: `appointment/${contactId}/attended-complied`,
         }),
       )
     }
