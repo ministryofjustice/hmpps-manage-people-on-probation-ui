@@ -229,17 +229,17 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][outcomeRecorded]`]: {
-      optional: page !== 'attended-complied' && !contactId,
+      optional: page !== `arrange-appointment/${id}/attended-complied`,
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select if they attended and complied',
+          msg: `Select if they attended and complied`,
           log: 'Attended and complied not selected',
         },
       ],
     },
     outcomeRecorded: {
-      optional: page !== 'attended-complied',
+      optional: page !== `appointments/${contactId}/attended-complied`,
       checks: [
         {
           validator: isNotEmpty,
