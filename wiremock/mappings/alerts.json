@@ -28,7 +28,7 @@
                 },
                 "code": "STMOR01"
               },
-              "riskLevel": "MEDIUM ROSH"
+              "riskLevel": "MEDIUM"
             },
             {
               "id": 2,
@@ -48,7 +48,7 @@
                 },
                 "code": "JFROS01"
               },
-              "riskLevel": "HIGH ROSH"
+              "riskLevel": "HIGH"
             },
             {
               "id": 3,
@@ -68,7 +68,7 @@
                 },
                 "code": "TNIXO01"
               },
-              "riskLevel": "MEDIUM ROSH"
+              "riskLevel": "MEDIUM"
             },
             {
               "id": 4,
@@ -88,7 +88,7 @@
                 },
                 "code": "DSABA01"
               },
-              "riskLevel": "HIGH ROSH"
+              "riskLevel": "HIGH"
             },
             {
               "id": 5,
@@ -108,7 +108,7 @@
                 },
                 "code": "MKHAN01"
               },
-              "riskLevel": "LOW ROSH"
+              "riskLevel": "LOW"
             },
             {
               "id": 6,
@@ -128,7 +128,7 @@
                 },
                 "code": "PANGE01"
               },
-              "riskLevel": "VERY HIGH ROSH"
+              "riskLevel": "VERY HIGH"
             },
             {
               "id": 7,
@@ -148,7 +148,7 @@
                 },
                 "code": "SCOLL01"
               },
-              "riskLevel": "LOW ROSH"
+              "riskLevel": "LOW"
             },
             {
               "id": 8,
@@ -168,7 +168,7 @@
                 },
                 "code": "DTHOM01"
               },
-              "riskLevel": "MEDIUM ROSH"
+              "riskLevel": "MEDIUM"
             },
             {
               "id": 9,
@@ -188,7 +188,7 @@
                 },
                 "code": "EWILS01"
               },
-              "riskLevel": "HIGH ROSH"
+              "riskLevel": "HIGH"
             },
             {
               "id": 10,
@@ -208,7 +208,7 @@
                 },
                 "code": "MROBE01"
               },
-              "riskLevel": "VERY HIGH ROSH"
+              "riskLevel": "VERY HIGH"
             }
           ],
           "totalResults": 25,
