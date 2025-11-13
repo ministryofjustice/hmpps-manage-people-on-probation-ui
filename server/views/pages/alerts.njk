@@ -17,7 +17,7 @@
                     Showing {{ ((alertsData.page) * alertsData.size) + 1 }} to {{ ((alertsData.page) * alertsData.size) + alertsData.content.length }} of {{ alertsData.totalResults }} results
                 </p>
 
-                <form method="post" action="/alerts/clear-selected">
+                <form method="post" action="/alerts/clear-selected" id="alerts-form">
 
                     <table class="govuk-table" data-module="moj-sortable-table" data-qa="alertsTable">
                         <thead class="govuk-table__head">
