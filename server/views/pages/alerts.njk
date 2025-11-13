@@ -90,7 +90,7 @@
                                     <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
                                 </td>
 
-                                <td class="govuk-table__cell" data-sort-value="{{ alert.riskLevel or '' }}" data-qa="alertRisk">
+                                <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ alert.riskLevel or '' }}" data-qa="alertRisk">
                                     {% if alert.riskLevel %}
                                         <div class="predictor-timeline-item predictor-timeline-item--{{ alert.riskLevel | lower | replace(' ', '-') }}">
                                     <span class="predictor-timeline-item__level">
@@ -117,7 +117,7 @@
                                     {% endif %}
                                 </td>
 
-                                <td class="govuk-table__cell" data-qa="alertActions">
+                                <td class="govuk-table__cell table-header--narrow" data-qa="alertActions">
                                     <a href="{{ deliusDeepLinkUrl('Contact', alert.crn, alert.id) }}"
                                        class="govuk-link"
                                        target="_blank"
