@@ -1,12 +1,13 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
-import { dateIsInPast, getDataValue, getPersonLevelTypes } from '../../utils'
+import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
+import { appointmentDateIsInPast, getAttendedCompliedProps } from '../../controllers/arrangeAppointment'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
@@ -16,16 +17,8 @@ const appointments: Route<void> = (req, res, next) => {
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const date = body?.appointments?.[crn]?.[id]?.date
-  const start = body?.appointments?.[crn]?.[id]?.start
-  let isInPast = false
-  if (date) {
-    const dt = DateTime.fromFormat(date, 'd/M/yyyy')
-    if (dt.isValid) {
-      ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), start))
-    }
-  }
-  const localParams: LocalParams = {
+
+  let localParams: LocalParams = {
     crn,
     id,
     body,
@@ -35,8 +28,13 @@ const appointments: Route<void> = (req, res, next) => {
     maxCharCount: maxCharCount as number,
     back,
     change,
-    isInPast,
     alertDismissed,
+  }
+  if (req.url.includes(`/arrange-appointment/${id}/attended-complied`)) {
+    localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
+  }
+  if (['/attended-complied', '/location-date-time'].some(urlPart => req.url.includes(urlPart))) {
+    localParams = { ...localParams, isInPast: appointmentDateIsInPast(req) }
   }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
