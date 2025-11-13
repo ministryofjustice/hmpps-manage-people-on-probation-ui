@@ -10,4 +10,5 @@ export class FeatureFlags {
   enableSanIndicator?: boolean = undefined
   enableOutlookEvent?: boolean = undefined
   enableProbFEComponent?: boolean = undefined
+  enableAlertsPage?: boolean = undefined
 }
