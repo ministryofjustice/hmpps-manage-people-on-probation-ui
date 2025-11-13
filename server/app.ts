@@ -29,7 +29,7 @@ import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
 import testRoutes from './routes/testRoutes'
 import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
-import { getAlerts } from './middleware/getAlerts'
+import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -58,7 +58,7 @@ export default function createApp(services: Services): express.Application {
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
-  app.use(getAlerts(services))
+  app.use(getUserAlertsCount(services))
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
   // Routes that use multer for multipart upload must be registered before csrf executes
   const router = Router()
