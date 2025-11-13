@@ -1,3 +1,4 @@
+import { type AttendedCompliedAppointment } from '../controllers/arrangeAppointment'
 import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
@@ -154,6 +155,8 @@ export interface LocalParams {
   change?: string
   isInPast?: boolean
   alertDismissed?: boolean
+  forename?: string
+  appointment?: AttendedCompliedAppointment
 }
 
 export interface MasUserDetails {
