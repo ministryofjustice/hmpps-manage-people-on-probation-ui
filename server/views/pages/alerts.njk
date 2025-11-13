@@ -14,7 +14,7 @@
 
             {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
                 <p class="govuk-body" data-qa="alertsCount">
-                    Showing {{ ((alertsData.page) * alertsData.size) + 1 }} to {{ ((alertsData.page) * alertsData.size) + alertsData.content.length }} of {{ alertsData.totalResults }} results
+                    Showing <b>{{ ((alertsData.page) * alertsData.size) + 1 }}</b> to <b>{{ ((alertsData.page) * alertsData.size) + alertsData.content.length }}</b> of <b>{{ alertsData.totalResults }}</b> results
                 </p>
 
                 <form method="post" action="/alerts/clear-selected" id="alerts-form">
