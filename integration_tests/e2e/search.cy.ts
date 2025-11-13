@@ -11,5 +11,8 @@ context('Search', () => {
     page.getNavigationLink(2).should('not.have.attr', 'aria-current', 'cases')
     page.getNavigationLink(3).should('contain.text', 'Search')
     page.getNavigationLink(3).should('have.attr', 'aria-current', 'search')
+    page.getNavigationLink(4).should('contain.text', 'Alerts')
+    page.getNavigationLink(4).get('.moj-notification-badge').should('contain.text', 12)
+    page.getNavigationLink(4).should('not.have.attr', 'aria-current', 'alerts')
   })
 })

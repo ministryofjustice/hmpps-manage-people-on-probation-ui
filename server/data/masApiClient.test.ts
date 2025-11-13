@@ -307,6 +307,8 @@ describe('masApiClient', () => {
       ['getUserAccess', '/user/USER/access/X000001', () => masApiClient.getUserAccess('USER', 'X000001')],
       ['checkUserAccess', '/user/USER/access', () => masApiClient.checkUserAccess('USER', []), 'post'],
       ['getDeliusRoles', '/user/USER', () => masApiClient.getDeliusRoles('USER')],
+      ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
+      ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {

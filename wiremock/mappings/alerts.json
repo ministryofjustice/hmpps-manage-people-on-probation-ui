@@ -1,0 +1,43 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/alerts",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "content": [
+            {
+              "id": 0,
+              "type": {
+                "description": "string",
+                "editable": true
+              },
+              "crn": "string",
+              "date": "2025-11-12",
+              "description": "string",
+              "notes": "string",
+              "officer": {
+                "name": {
+                  "forename": "string",
+                  "middleName": "string",
+                  "surname": "string"
+                },
+                "code": "string"
+              }
+            }
+          ],
+          "totalResults": 12,
+          "totalPages": 0,
+          "page": 0,
+          "size": 0
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}
