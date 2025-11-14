@@ -16,7 +16,6 @@ const alertsController: Controller<typeof routes, void> = {
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(pageNumber, sortBy, sortOrder as 'asc' | 'desc')
 
-      // Build sort query string for pagination links
       let sortQueryString = ''
       if (sortBy) {
         sortQueryString += `&sortBy=${sortBy}`
