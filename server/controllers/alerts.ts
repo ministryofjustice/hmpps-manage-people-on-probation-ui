@@ -16,7 +16,6 @@ const alertsController: Controller<typeof routes, void> = {
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(pageNumber, sortBy, sortOrder as 'asc' | 'desc')
 
-      // Build sort query string for pagination links
       let sortQueryString = ''
       if (sortBy) {
         sortQueryString += `&sortBy=${sortBy}`
@@ -46,7 +45,6 @@ const alertsController: Controller<typeof routes, void> = {
         return
       }
 
-      // Convert to array of numbers
       const alertIds = Array.isArray(selectedAlerts)
         ? selectedAlerts.map((id: string) => parseInt(id, 10))
         : [parseInt(selectedAlerts, 10)]
