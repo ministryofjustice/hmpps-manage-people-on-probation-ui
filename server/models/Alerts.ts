@@ -9,6 +9,7 @@ export interface UserAlertsContent {
   id: number
   type: UserAlertsType
   crn: string
+  name: string
   date: string
   description?: string
   notes?: string
