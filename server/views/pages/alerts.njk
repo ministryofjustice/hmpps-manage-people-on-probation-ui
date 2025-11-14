@@ -1,3 +1,234 @@
 {% extends "../partials/layout.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "moj/components/badge/macro.njk" import mojBadge %}
 
-{% set alerts = {} %}
+{% set alerts = true %}
+
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l" data-qa="pageHeading">Alerts</h1>
+
+            {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
+                <p class="govuk-body" data-qa="alertsCount">
+                    Showing <b>{{ ((alertsData.page) * alertsData.size) + 1 }}</b> to <b>{{ ((alertsData.page) * alertsData.size) + alertsData.content.length }}</b> of <b>{{ alertsData.totalResults }}</b> results
+                </p>
+
+                <form method="post" action="/alerts/clear-selected" id="alerts-form">
+
+                    <table class="govuk-table" data-module="moj-sortable-table" data-qa="alertsTable">
+                        <thead class="govuk-table__head">
+                        <tr class="govuk-table__row">
+                            <th scope="col" class="govuk-table__header">
+                                <span class="govuk-visually-hidden">Select</span>
+                            </th>
+
+                            <th scope="col" class="govuk-table__header govuk-table__header--sortable" aria-sort="none" data-sort-column="date" data-qa="dateHeader">
+                                <button type="button" class="sort-button" data-sort="date">
+                                    Date
+                                    <span class="sort-indicator" aria-hidden="true"></span>
+                                </button>
+                            </th>
+
+                            <th scope="col" class="govuk-table__header govuk-table__header--sortable" aria-sort="none" data-sort-column="person" data-qa="personHeader">
+                                <button type="button" class="sort-button" data-sort="person">
+                                    Name / CRN
+                                    <span class="sort-indicator" aria-hidden="true"></span>
+                                </button>
+                            </th>
+
+                            <th scope="col" class="govuk-table__header table-header--narrow govuk-table__header--sortable" aria-sort="none" data-sort-column="risk" data-qa="riskHeader">
+                                <button type="button" class="sort-button" data-sort="risk">
+                                    Risk
+                                    <span class="sort-indicator" aria-hidden="true"></span>
+                                </button>
+                            </th>
+
+                            <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-table__header--sortable" aria-sort="none" data-sort-column="activity" data-qa="activityHeader">
+                                <button type="button" class="sort-button" data-sort="activity">
+                                    Activity
+                                    <span class="sort-indicator" aria-hidden="true"></span>
+                                </button>
+                            </th>
+
+                            <th scope="col" class="govuk-table__header table-header--narrow" data-qa="actionsHeader">
+                                Update on NDelius (opens in new tab)
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody class="govuk-table__body">
+                        {% for alert in alertsData.content %}
+                            <tr class="govuk-table__row" data-qa="alertRow-{{ loop.index }}">
+
+                                <td class="govuk-table__cell table-cell--checkbox">
+                                    <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                        <div class="govuk-checkboxes__item">
+                                            <input class="govuk-checkboxes__input alert-checkbox"
+                                                   id="alert-{{ alert.id }}"
+                                                   name="selectedAlerts"
+                                                   type="checkbox"
+                                                   value="{{ alert.id }}"
+                                                   aria-label="Select alert for {{ alert.officer.name.forename }} {{ alert.officer.name.surname }} on {{ alert.date | dateWithYear }}">
+                                            <label class="govuk-label govuk-checkboxes__label" for="alert-{{ alert.id }}">
+                                                <span class="govuk-visually-hidden">Select alert</span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </td>
+
+                                <td class="govuk-table__cell" data-sort-value="{{ alert.date }}" data-qa="alertDate">
+                                    {{ alert.date | dateWithYear }}
+                                </td>
+
+                                <td class="govuk-table__cell" data-sort-value="{{ alert.officer.name.surname }}, {{ alert.officer.name.forename }}" data-qa="alertPerson">
+                                    <a href="/case/{{ alert.crn }}" class="govuk-!-font-weight-bold govuk-link govuk-link--no-visited-state">
+                                        {{ alert.officer.name.surname }}, {{ alert.officer.name.forename }}
+                                    </a>
+                                    <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
+                                </td>
+
+                                <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ alert.riskLevel or '' }}" data-qa="alertRisk">
+                                    {% if alert.riskLevel %}
+                                        <div class="predictor-timeline-item predictor-timeline-item--{{ alert.riskLevel | lower | replace(' ', '-') }}">
+                                    <span class="predictor-timeline-item__level">
+                                        <strong>ROSH</strong> {{ alert.riskLevel | upper }}
+                                    </span>
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <td class="govuk-table__cell govuk-!-width-one-third" data-sort-value="{{ alert.type.description }}" data-qa="alertActivity">
+                                    <p><a href="/case/{{ alert.crn }}/activity-log/contact/{{ alert.id }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
+                                            {{ alert.type.description }}
+                                        </a></p>
+
+                                    {% if alert.description or alert.notes %}
+                                        {{ govukDetails({
+                                            summaryText: "More information",
+                                            classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
+                                            attributes: {
+                                                "data-qa": "moreInfo-" + alert.id
+                                            },
+                                            html: renderAlertDetails(alert)
+                                        }) }}
+                                    {% endif %}
+                                </td>
+
+                                <td class="govuk-table__cell table-header--narrow" data-qa="alertActions">
+                                    <a href="{{ deliusDeepLinkUrl('Contact', alert.crn, alert.id) }}"
+                                       class="govuk-link"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       data-qa="updateInNDelius-{{ alert.id }}">
+                                        Update
+                                        <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+
+                    <div class="govuk-button-group govuk-!-margin-top-4">
+                        <button type="submit"
+                                class="govuk-button"
+                                data-module="govuk-button"
+                                id="clear-selected-alerts"
+                                data-qa="clearSelectedAlerts">
+                            Clear selected alerts
+                        </button>
+                        <button type="button"
+                                class="govuk-button govuk-button--secondary"
+                                data-module="govuk-button"
+                                id="select-all-alerts"
+                                data-qa="selectAllAlertsBtn">
+                            Select all alerts on this page
+                        </button>
+                    </div>
+                </form>
+
+                {% if alertsData.totalPages > 1 %}
+                    <nav class="moj-pagination" aria-label="Pagination" data-qa="pagination">
+                        <ul class="moj-pagination__list">
+                            {% if alertsData.page > 0 %}
+                                <li class="moj-pagination__item moj-pagination__item--prev">
+                                    <a class="moj-pagination__link" href="?page={{ alertsData.page - 1 }}{{ sortQueryString }}" data-qa="previousPage">
+                                        <svg class="moj-pagination__icon" xmlns="http://www.w3.org/2000/svg" height="13" width="17" viewBox="0 0 17 13">
+                                            <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
+                                        </svg>
+                                        <span class="moj-pagination__link-label">Previous<span class="govuk-visually-hidden"> page</span></span>
+                                    </a>
+                                </li>
+                            {% endif %}
+
+                            {% set startPage = 0 %}
+                            {% if alertsData.page > 0 %}
+                                {% set startPage = alertsData.page - 1 %}
+                            {% endif %}
+                            {% set endPage = alertsData.totalPages - 1 %}
+                            {% if alertsData.page < alertsData.totalPages - 1 %}
+                                {% set endPage = alertsData.page + 1 %}
+                            {% endif %}
+
+                            {% for pageNum in range(startPage, endPage + 1) %}
+                                <li class="moj-pagination__item {% if pageNum == alertsData.page %}moj-pagination__item--active{% endif %}" data-qa="page-{{ pageNum + 1 }}">
+                                    {% if pageNum == alertsData.page %}
+                                        <span class="moj-pagination__link" aria-current="page">{{ pageNum + 1 }}</span>
+                                    {% else %}
+                                        <a class="moj-pagination__link" href="?page={{ pageNum }}{{ sortQueryString }}" aria-label="Page {{ pageNum + 1 }}">{{ pageNum + 1 }}</a>
+                                    {% endif %}
+                                </li>
+                            {% endfor %}
+
+                            {% if alertsData.page < alertsData.totalPages - 1 %}
+                                <li class="moj-pagination__item moj-pagination__item--next">
+                                    <a class="moj-pagination__link" href="?page={{ alertsData.page + 1 }}{{ sortQueryString }}" data-qa="nextPage">
+                                        <span class="moj-pagination__link-label">Next<span class="govuk-visually-hidden"> page</span></span>
+                                        <svg class="moj-pagination__icon" xmlns="http://www.w3.org/2000/svg" height="13" width="17" viewBox="0 0 17 13">
+                                            <path d="m10.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
+                                        </svg>
+                                    </a>
+                                </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                {% endif %}
+
+            {% else %}
+                <div class="govuk-panel govuk-panel--confirmation" data-qa="noAlertsPanel">
+                    <div class="govuk-panel__body">
+                        You have no alerts at this time
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% macro renderAlertDetails(alert) %}
+    <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
+        {% if alert.description %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Description</dt>
+                <dd class="govuk-summary-list__value" data-qa="alertDescription-{{ alert.id }}">
+                    {{ alert.description }}
+                </dd>
+            </div>
+        {% endif %}
+
+        {% if alert.notes %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Notes</dt>
+                <dd class="govuk-summary-list__value" data-qa="alertNotes-{{ alert.id }}">
+                    {{ alert.notes | slice(0, 500) }}{% if alert.notes | length > 500 %}...{% endif %}
+                </dd>
+            </div>
+        {% endif %}
+    </dl>
+    <a href="/case/{{ alert.crn }}/activity-log/contact/{{ alert.id }}" class="govuk-link" data-qa="viewMoreLink-{{ alert.id }}">
+        Open the activity to view more
+    </a>
+{% endmacro %}

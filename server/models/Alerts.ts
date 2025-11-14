@@ -13,6 +13,7 @@ export interface UserAlertsContent {
   description?: string
   notes?: string
   officer: Officer
+  riskLevel?: 'VERY HIGH ROSH' | 'HIGH ROSH' | 'MEDIUM ROSH' | 'LOW ROSH'
 }
 
 export interface UserAlerts {
@@ -21,4 +22,13 @@ export interface UserAlerts {
   totalPages: number
   page: number
   size: number
+}
+
+export interface ClearAlertsRequest {
+  alertIds: number[]
+}
+
+export interface ClearAlertsResponse {
+  success: boolean
+  clearedCount: number
 }
