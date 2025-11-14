@@ -17,7 +17,6 @@ const appointments: Route<void> = (req, res, next) => {
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-
   let localParams: LocalParams = {
     crn,
     id,
@@ -35,6 +34,13 @@ const appointments: Route<void> = (req, res, next) => {
   }
   if (['/attended-complied', '/location-date-time'].some(urlPart => req.url.includes(urlPart))) {
     localParams = { ...localParams, isInPast: appointmentDateIsInPast(req) }
+  }
+  if (
+    [`/arrange-appointment/${id}/attended-complied`, `/arrange-appointment/${id}/add-note`].some(urlPart =>
+      req.url.includes(urlPart),
+    )
+  ) {
+    localParams = { ...localParams, useDecorator: true }
   }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
@@ -195,6 +201,24 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateAddNote = () => {
+    if (baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/add-note`)) {
+      console.log(req.body)
+      isAddNotePage = true
+      render = `pages/appointments/add-note`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: `arrange-appointment/${id}/add-note`,
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount,
+        }),
+      )
+    }
+  }
+
+  const validateManageAddNote = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
       render = `pages/appointments/add-note`
@@ -203,7 +227,7 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
-          page: 'add-note',
+          page: `appointment/${contactId}/add-note`,
           notes: req.body.notes,
           maxCharCount,
         }),
@@ -222,6 +246,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateAttendedComplied()
   validateManageAttendedComplied()
   validateAddNote()
+  validateManageAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     if (isAddNotePage) {

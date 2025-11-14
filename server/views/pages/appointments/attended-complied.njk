@@ -1,11 +1,9 @@
 {% extends "../_form.njk" %}
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
-{% set decoratorName = decoratorName | default(['appointments', crn, id, 'outcomeRecorded']) %}
-{% block form %}
-  {% include "../../partials/_log-outcomes-alert.njk" %}
-  {{ govukCheckboxes({
-    classes: "govuk-checkboxes--small",
+
+{% set config = {
+   classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
         html: '<span data-qa="pageHeading">Confirm if ' + forename + ' attended and complied</span>',
@@ -26,7 +24,24 @@
       text: "Yes, " + forename + " attended and complied"
     }
     ]
-  } | decorateFormAttributes(decoratorName)) }}
+} %}
+{% if errorMessages.outcomeRecorded %}
+  {% set errorMsg = {
+    text: "Note must be " + maxCharCount + " characters or less"
+  } %}
+{% else %}
+  {% set errorMsg = null %}
+{% endif %}
+{% if not useDecorator %}
+  {% set config = config | merge({id: "outcomeRecorded", idPrefix: "outcomeRecorded", name: "outcomeRecorded", value: body.notes, errorMessage: errorMsg}) %}
+{% endif %}
+{% if useDecorator %}
+  {% set config = config | decorateFormAttributes(['appointments', crn, id, 'outcomeRecorded']) %}
+{% endif %}
+
+{% block form %}
+  {% include "../../partials/_log-outcomes-alert.njk" %}
+  {{ govukCheckboxes(config) }}
 
   <div class="govuk-button-group">
     {{ govukButton({
@@ -35,7 +50,7 @@
       'data-qa': 'submit-btn'
     }
   }) }}
-    <a class="govuk-link" href="/case/{{crn}}/appointments/appointment/{{appointment.id}}/manage">Cancel and go back</a>
+    <a class="govuk-link" href="{{ cancelLink | default('/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage') }}">Cancel and go back</a>
   </div>
 
 {% endblock %}

@@ -2,7 +2,7 @@ import multer from 'multer'
 import { type Router } from 'express'
 import controllers from '../controllers'
 import { Services } from '../services'
-import { getPersonalDetails, getPersonAppointment } from '../middleware'
+import { getPersonalDetails, getPersonAppointment, redirectWizard } from '../middleware'
 import validate from '../middleware/validation/index'
 import { cacheUploadedFiles } from '../middleware/cacheUploadedFiles'
 import config from '../config'
@@ -42,6 +42,19 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
     '/appointments/file/delete',
     upload.single('file'),
     controllers.fileUpload.postDeleteFile(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/add-note',
+    redirectWizard(['eventId', 'type', 'date', 'outcomeRecorded']),
+    controllers.arrangeAppointments.getAddNote(),
+  )
+
+  router.post(
+    '/case/:crn/arrange-appointment/:id/add-note',
+    upload.array('documents'),
+    cacheUploadedFiles,
+    validate.appointments,
+    controllers.arrangeAppointments.postAddNote(),
   )
   return router
 }
