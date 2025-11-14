@@ -8,7 +8,7 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/" + crn + "/appointments/appointment/" + contactId + '/manage'  %}
 {% set formAnchorText = 'Cancel and go back' %}
-{% set multipartForm = true %}
+{#{% set multipartForm = true %}#}
 {% set submitButtonId = 'continueButton' %}
 {% block form %}
     <input type="hidden" name="nextAppointment" value="RESCHEDULE">
@@ -45,7 +45,7 @@
             }
         ]
     } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','whoNeedsToReschedule' ])      ) }}
-    {{ govukCharacterCount({
+  {#  {{ govukCharacterCount({
         rows: '10',
         maxlength: maxCharCount,
         label: {
@@ -122,6 +122,6 @@
                 text: "No, it is not sensitive"
             }
         ]
-    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }} #}
 {% endblock %}
 

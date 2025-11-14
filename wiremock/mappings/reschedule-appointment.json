@@ -1,0 +1,20 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/appointments/.*/recreate",
+        "method": "PUT"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": 1,
+          "externalReference": "reschedule-pt-ref-1"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

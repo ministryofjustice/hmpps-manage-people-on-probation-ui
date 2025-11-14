@@ -9,6 +9,7 @@ export const getPersonAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Pr
     const masClient = new MasApiClient(token)
     const response = await masClient.getPersonAppointment(crn, contactId)
     res.locals.personAppointment = response
+    console.dir(response, { depth: null })
     return next()
   }
 }

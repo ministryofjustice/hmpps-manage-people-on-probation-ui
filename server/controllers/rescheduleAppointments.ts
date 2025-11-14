@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
-import { isValidCrn } from '../utils'
+import { isValidCrn, isValidUUID } from '../utils'
 
 import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
@@ -43,7 +43,6 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         delete req.session.body
       }
 
-      const per = res.locals.personAppointment
       const { validation } = req.query
       const showValidation = validation === 'true'
       const { crn, id, contactId } = req.params as Record<string, string>
@@ -75,8 +74,8 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
   },
   postRescheduleAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, contactId } = req.params
-      if (!isValidCrn(crn)) {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const { nextAppointmentSession } = res.locals

@@ -307,6 +307,19 @@ describe('masApiClient', () => {
       ['getUserAccess', '/user/USER/access/X000001', () => masApiClient.getUserAccess('USER', 'X000001')],
       ['checkUserAccess', '/user/USER/access', () => masApiClient.checkUserAccess('USER', []), 'post'],
       ['getDeliusRoles', '/user/USER', () => masApiClient.getDeliusRoles('USER')],
+      [
+        'putRescheduleAppointment',
+        '/appointments/1/recreate',
+        () =>
+          masApiClient.putRescheduleAppointment('1', {
+            date: '2024-01-01',
+            startTime: '10:00',
+            endTime: '11:00',
+            requestedBy: 'USER',
+            uuid: 'uuid',
+          }),
+        'put',
+      ],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {
@@ -314,6 +327,9 @@ describe('masApiClient', () => {
       }
       if (method === 'post') {
         fakeMasApiClient.post(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+      }
+      if (method === 'put') {
+        fakeMasApiClient.put(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
       }
 
       const output = await func()

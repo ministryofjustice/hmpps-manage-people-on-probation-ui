@@ -115,7 +115,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
       expectedCloneReschedule,
     )
     expect(redirectSpy2).toHaveBeenCalledWith(
-      `/case/${crn2}/appointments/reschedule/${request.params.contactId}/${request.params.id}/check-answers`,
+      `/case/${crn2}/appointments/reschedule/${request.params.contactId}/${request.params.id}/check-your-answers`,
     )
   })
 })

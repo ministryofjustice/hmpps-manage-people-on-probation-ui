@@ -22,3 +22,20 @@ export interface OutlookEventResponse {
   endDate: string
   attendees: string[]
 }
+
+export interface RescheduleEventRequest {
+  rescheduledEventRequest: EventRequest
+  oldSupervisionAppointmentUrn: string
+}
+
+export interface EventRequest {
+  emailAddress: string
+  name: string
+}
+
+export interface EventResponse {
+  id?: string
+  subject: string
+  startDate: string
+  endDate: string
+}
