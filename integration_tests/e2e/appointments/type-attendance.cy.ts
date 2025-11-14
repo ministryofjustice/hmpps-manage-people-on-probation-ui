@@ -1,11 +1,18 @@
 import Page from '../../pages/page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import 'cypress-plugin-tab'
 import mockResponse from '../../../wiremock/mappings/appointment-types.json'
 import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
-import { checkPopHeader, completeSentencePage } from './imports'
+import {
+  checkPopHeader,
+  completeLocationDateTimePage,
+  completeSentencePage,
+  completeSupportingInformationPage,
+  completeTypePage,
+} from './imports'
 import { toSentenceCase } from '../../../server/utils'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
@@ -50,10 +57,7 @@ describe('Arrange an appointment', () => {
           'contain.text',
           'You can attend or book for someone else',
         )
-        cy.get('[data-qa="attendeeDetails"]').should(
-          'contain.text',
-          'Deborah Fern (PS - Other) (Automated Allocation Team, London)',
-        )
+        cy.get('[data-qa="attendeeDetails"]').should('contain.text', 'Deborah Fern (Automated Allocation Team, London)')
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
       })
@@ -183,7 +187,7 @@ describe('Arrange an appointment', () => {
   })
 
   describe('Changing the probation practitioner attendee back to default user', () => {
-    const expectedUser = 'Peter Parker (PS - Other) (Automated Allocation Team, London)'
+    const expectedUser = 'Peter Parker (PS-PSO) (Automated Allocation Team, London)'
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
@@ -221,10 +225,11 @@ describe('Arrange an appointment', () => {
     it('should list the default user as the attendee', () => {
       cy.get('[data-qa="attendeeDetails"]').should(
         'contain.text',
-        'Peter Parker (PS - Other) (Automated Allocation Team, London)',
+        'Peter Parker (PS-PSO) (Automated Allocation Team, London)',
       )
     })
     it('should update the default user', () => {
+      const changedUser = 'Iain Chambers (PS - Other) (Homelessness Prevention Team,, North East Region)'
       cy.get('[data-qa="attendee"] a').click()
       cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
       cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
@@ -233,10 +238,24 @@ describe('Arrange an appointment', () => {
       cy.get('[data-qa="teamCode"]').select('N07HPT')
       cy.get('[data-qa="username"]').select('IainChambers')
       attendancePage.getSubmitBtn().click()
-      cy.get('[data-qa="attendeeDetails"]').should(
-        'contain.text',
-        'Iain Chambers (PS - Other) (Homelessness Prevention Team,, North East Region)',
-      )
+      cy.get('[data-qa="attendeeDetails"]').should('contain.text', changedUser)
+      completeTypePage()
+      completeLocationDateTimePage()
+      completeSupportingInformationPage()
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', changedUser)
+      cyaPage.getSummaryListRow(3).find('.govuk-link').click()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N54')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07HPT')
+      cy.get('[data-qa="username"]').should('have.value', 'IainChambers')
+      cy.get('[data-qa="providerCode"]').select('N07')
+      cy.get('[data-qa="teamCode"]').select('N07AAT')
+      cy.get('[data-qa="username"]').select('peter-parker')
+      attendancePage.getSubmitBtn().click()
+      cyaPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'Peter Parker (PS-PSO) (Automated Allocation Team, London)')
     })
   })
 })

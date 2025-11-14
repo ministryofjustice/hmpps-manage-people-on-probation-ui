@@ -15,57 +15,51 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
 
-    const { defaultUserDetails, providers } = await masClient.getUserProviders(username)
-    const {
-      providerCode: providerCodeSession,
-      teamCode: teamCodeSession,
-      username: usernameSession,
-    } = getDataValue(data, ['appointments', crn, id, 'user'])
+    const [{ defaultUserDetails, providers, teams: defaultTeams }, probationPractitioner] = await Promise.all([
+      masClient.getUserProviders(username),
+      masClient.getProbationPractitioner(crn),
+    ])
+
+    const providerCodeSession = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])
+    const teamCodeSession = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode'])
+    const usernameSession = getDataValue(data, ['appointments', crn, id, 'user', 'username'])
 
     const defaultProvider = providers.find(
       provider => provider.name.toLowerCase() === defaultUserDetails.homeArea.toLowerCase(),
     )?.code
 
-    const probationPractitioner = await masClient.getProbationPractitioner(crn)
-
     let selectedProvider: string = providerCodeQuery ?? providerCodeSession ?? defaultProvider
     if (selectedProvider === probationPractitioner.provider.code) {
       selectedProvider = defaultProvider
     }
+
     const { teams } = await masClient.getTeamsByProvider(selectedProvider)
-    const defaultTeam = teams.find(
+
+    const defaultTeam = defaultTeams.find(
       team => team.description.toLowerCase() === defaultUserDetails.team.toLowerCase(),
     )?.code
 
-    let selectedTeam = teamCodeQuery ?? teamCodeSession ?? defaultTeam
-
+    let selectedTeam = teamCodeQuery ?? teamCodeSession
     if (selectedTeam === probationPractitioner.team.code) {
       selectedTeam = defaultTeam
     }
-
-    if (providerCodeQuery && !teamCodeQuery) {
-      selectedTeam = teams[0].code
+    if (!selectedTeam) {
+      if (selectedProvider === defaultProvider) {
+        selectedTeam = defaultTeam
+      } else {
+        selectedTeam = teams[0].code
+      }
     }
 
-    let selectedUser = usernameSession ?? defaultUserDetails.username
+    const { users } = await masClient.getStaffByTeam(selectedTeam)
+
+    let selectedUser = usernameSession ?? defaultUserDetails.username ?? users[0].username
 
     if (selectedUser.toLowerCase() === probationPractitioner.username.toLowerCase()) {
       selectedUser = defaultUserDetails.username
     }
 
-    if (selectedProvider === probationPractitioner.provider.code) {
-      selectedProvider = defaultProvider
-      selectedTeam = defaultTeam
-      selectedUser = defaultUserDetails.username
-    }
-
-    const { users } = await masClient.getStaffByTeam(selectedTeam)
-
-    if (providerCodeQuery) {
-      selectedUser = users[0].username
-    }
-
-    const providerOptions = providers.map(provider => {
+    let providerOptions = providers.map(provider => {
       const { code, name } = provider
       const option: Provider = { code, name }
       if (code === selectedProvider) {
@@ -74,7 +68,9 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       return option
     })
 
-    const teamOptions = teams.map(team => {
+    providerOptions = providerOptions.sort((a, b) => a.name.localeCompare(b.name, undefined, { sensitivity: 'base' }))
+
+    let teamOptions = teams.map(team => {
       const { code, description } = team
       const option: Team = { code, description }
       if (code === selectedTeam) {
@@ -83,7 +79,11 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       return option
     })
 
-    const userOptions = users.map(user => {
+    teamOptions = teamOptions.sort((a, b) =>
+      a.description.localeCompare(b.description, undefined, { sensitivity: 'base' }),
+    )
+
+    let userOptions = users.map(user => {
       const { username: staffUsername, nameAndRole, staffCode } = user
       const option: User = {
         username: staffUsername,
@@ -95,6 +95,10 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       return option
     })
+
+    userOptions = userOptions.sort((a, b) =>
+      a.nameAndRole.localeCompare(b.nameAndRole, undefined, { sensitivity: 'base' }),
+    )
 
     res.locals.userProviders = providerOptions
     res.locals.userTeams = teamOptions
