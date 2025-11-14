@@ -159,6 +159,7 @@ export interface LocalParams {
   alertDismissed?: boolean
   forename?: string
   appointment?: AttendedCompliedAppointment
+  useDecorator?: boolean
 }
 
 export interface MasUserDetails {
