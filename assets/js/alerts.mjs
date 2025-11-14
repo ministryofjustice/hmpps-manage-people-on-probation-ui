@@ -1,6 +1,4 @@
-/* eslint-disable no-console */
-
-export const setupAlertsPage = () => {
+const setupAlertsPage = () => {
   const selectAllButton = document.getElementById('select-all-alerts')
   const clearSelectedButton = document.getElementById('clear-selected-alerts')
   const alertCheckboxes = document.querySelectorAll('.alert-checkbox')
@@ -16,6 +14,7 @@ export const setupAlertsPage = () => {
     selectAllButton.addEventListener('click', () => {
       const areAllSelected = Array.from(alertCheckboxes).every(checkbox => checkbox.checked)
       alertCheckboxes.forEach(checkbox => {
+        // eslint-disable-next-line no-param-reassign
         checkbox.checked = !areAllSelected
       })
       toggleClearButton()
@@ -29,3 +28,5 @@ export const setupAlertsPage = () => {
     })
   }
 }
+
+export default setupAlertsPage
