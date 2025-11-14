@@ -169,7 +169,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][notes]`]: {
-      optional: page !== 'supporting-information' || (page === 'supporting-information' && notes.trim() === ''),
+      optional:
+        !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) ||
+        (!['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) && notes.trim() === ''),
       checks: [
         {
           validator: isValidCharCount,
@@ -179,7 +181,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== 'supporting-information',
+      optional: !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page),
       checks: [
         {
           validator: isNotEmpty,
@@ -209,7 +211,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     notes: {
-      optional: page !== 'add-note' || (page === 'add-note' && notes.trim() === ''),
+      optional:
+        page !== `appointment/${contactId}/add-note` ||
+        (page === `appointment/${contactId}/add-note` && notes.trim() === ''),
       checks: [
         {
           validator: isValidCharCount,
@@ -219,7 +223,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     sensitive: {
-      optional: page !== 'add-note',
+      optional: page !== `appointment/${contactId}/add-note`,
       checks: [
         {
           validator: isNotEmpty,
