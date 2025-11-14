@@ -40,6 +40,8 @@ import {
   NextAppointmentResponse,
   AppointmentsPostResponse,
   MasUserDetails,
+  RescheduleAppointmentResponse,
+  RescheduleAppointmentRequestBody,
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
@@ -300,6 +302,16 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,
+    })
+  }
+
+  async putRescheduleAppointment(
+    id: string,
+    body: RescheduleAppointmentRequestBody,
+  ): Promise<RescheduleAppointmentResponse> {
+    return this.put({
+      data: body,
+      path: `/appointments/${id}/recreate`,
     })
   }
 

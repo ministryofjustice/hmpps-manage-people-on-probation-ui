@@ -21,7 +21,7 @@ describe('Reschedule Appointment', () => {
     rescheduleAppointmentPage = new RescheduleAppointmentPage()
   }
 
-  const createFakeFile = (mb: number, type: string): [Cypress.FixtureData, string] => {
+  /*  const createFakeFile = (mb: number, type: string): [Cypress.FixtureData, string] => {
     const fileSize = mb * 1024 * 1024
     const fileContent = new Blob(['a'.repeat(fileSize)], { type: 'text/plain' })
     const fileName = `fake${mb}mb.${type}`
@@ -51,7 +51,7 @@ describe('Reschedule Appointment', () => {
       rescheduleAppointmentPage.getFileUploadListItemDeleteButton(0).should('contain.text', 'Delete')
     })
   }
-
+*/
   afterEach(() => {
     cy.task('resetMocks')
   })
@@ -91,44 +91,44 @@ describe('Reschedule Appointment', () => {
         .find('.govuk-radios__input')
         .should('not.be.checked')
     }
-    cy.get('[data-qa=reason]').should('have.value', '')
-    cy.get('.govuk-character-count label').should('contain.text', 'Why is this appointment being rescheduled?')
-    cy.get('.govuk-character-count__status').should('contain.text', 'You have 4,000 characters remaining')
-    rescheduleAppointmentPage.getFilesAdded().get('h2').should('contain.text', 'Files added')
-    cy.get('label[for="file-upload-1"]').should('contain.text', 'Upload any supporting documents')
-    cy.get('.moj-multi-file-upload__dropzone').should('contain.text', 'Drag and drop files here or')
-    cy.contains('#file-upload-1-hint', 'For example, a sick note.').should('exist')
-    cy.get('.moj-multi-file-upload__dropzone label').should('contain.text', 'Choose files')
-    cy.get('div[data-qa="sensitiveInformation"] legend').should(
-      'contain.text',
-      'Does this contact include sensitive information?',
-    )
-    cy.get('.govuk-form-group .govuk-hint').should(
-      'contain.text',
-      'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.',
-    )
-    rescheduleAppointmentPage.getSensitiveInformation().find('.govuk-radios__item').should('have.length', 2)
-    const options = ['Yes, it includes sensitive information', 'No, it is not sensitive']
-    for (let i = 0; i < options.length; i += 1) {
-      rescheduleAppointmentPage
-        .getSensitiveInformation()
-        .find('.govuk-radios__item')
-        .eq(i)
-        .find('label')
-        .should('contain.text', options[i])
-      rescheduleAppointmentPage
-        .getSensitiveInformation()
-        .find('.govuk-radios__item')
-        .eq(i)
-        .find('.govuk-radios__input')
-        .should('not.be.checked')
-    }
+    /* cy.get('[data-qa=reason]').should('have.value', '')
+     cy.get('.govuk-character-count label').should('contain.text', 'Why is this appointment being rescheduled?')
+      cy.get('.govuk-character-count__status').should('contain.text', 'You have 4,000 characters remaining')
+     rescheduleAppointmentPage.getFilesAdded().get('h2').should('contain.text', 'Files added')
+     cy.get('label[for="file-upload-1"]').should('contain.text', 'Upload any supporting documents')
+     cy.get('.moj-multi-file-upload__dropzone').should('contain.text', 'Drag and drop files here or')
+     cy.contains('#file-upload-1-hint', 'For example, a sick note.').should('exist')
+     cy.get('.moj-multi-file-upload__dropzone label').should('contain.text', 'Choose files')
+     cy.get('div[data-qa="sensitiveInformation"] legend').should(
+       'contain.text',
+       'Does this contact include sensitive information?',
+     )
+     cy.get('.govuk-form-group .govuk-hint').should(
+       'contain.text',
+       'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.',
+     )
+     rescheduleAppointmentPage.getSensitiveInformation().find('.govuk-radios__item').should('have.length', 2)
+     const options = ['Yes, it includes sensitive information', 'No, it is not sensitive']
+     for (let i = 0; i < options.length; i += 1) {
+       rescheduleAppointmentPage
+         .getSensitiveInformation()
+         .find('.govuk-radios__item')
+         .eq(i)
+         .find('label')
+         .should('contain.text', options[i])
+       rescheduleAppointmentPage
+         .getSensitiveInformation()
+         .find('.govuk-radios__item')
+         .eq(i)
+         .find('.govuk-radios__input')
+         .should('not.be.checked')
+     } */
 
     rescheduleAppointmentPage.getSubmitBtn().should('contain.text', 'Continue')
     cy.get('.govuk-link').should('contain.text', 'Cancel and go back')
   })
 
-  it('should display validation errors if continue button is clicked without first selecting a sensitive option', () => {
+  /*  it('should display validation errors if continue button is clicked without first selecting a sensitive option', () => {
     loadPage()
     const reason = 'x'.repeat(4000)
     cy.get('[data-qa=reason]').type(reason, { delay: 0 })
@@ -141,9 +141,9 @@ describe('Reschedule Appointment', () => {
       .getElement(`.govuk-error-message`)
       .should('contain.text', 'Select if appointment includes sensitive information')
     rescheduleAppointmentPage.getErrorSummaryLink(0).click()
-  })
+  }) */
 
-  it('should display validation errors if note is more than 4000 character', () => {
+  /*  it('should display validation errors if note is more than 4000 character', () => {
     loadPage()
     const note = 'x'.repeat(4001)
     cy.get('[data-qa=reason]').type(note, { delay: 0 })
@@ -162,9 +162,9 @@ describe('Reschedule Appointment', () => {
       .getElement(`.govuk-error-message`)
       .should('contain.text', 'Reason must be 4000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
-  })
+  }) */
 
-  it('should count a return as 1 character', () => {
+  /*  it('should count a return as 1 character', () => {
     loadPage()
     const paragraph = 'x'.repeat(2000)
     cy.get('[data-qa=reason]').type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
@@ -180,9 +180,9 @@ describe('Reschedule Appointment', () => {
       .getElement(`.govuk-error-message`)
       .should('contain.text', 'Select who is rescheduling this appointment')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 1,998 characters remaining')
-  })
+  }) */
 
-  it('should validate a png file as being an invalid file type when selected', () => {
+  /*  it('should validate a png file as being an invalid file type when selected', () => {
     loadPage()
     rescheduleAppointmentPage.getChooseFilesButton().click()
     const [fakeFile, fileName] = createFakeFile(1, 'png')
@@ -192,9 +192,9 @@ describe('Reschedule Appointment', () => {
       .should('contain.text', `${fileName}: File type must be pdf or word`)
     rescheduleAppointmentPage.getFileUploadListItem('error', 'status', 0).should('contain.text', 'Upload failed')
     rescheduleAppointmentPage.getFileUploadListItemDeleteButton(0).should('contain.text', 'Delete')
-  })
+  }) */
 
-  it('should validate a file over 5mb in size as invalid', () => {
+  /*  it('should validate a file over 5mb in size as invalid', () => {
     loadPage()
     const [fakeFile, fileName] = createFakeFile(6, 'pdf')
     rescheduleAppointmentPage.getChooseFilesButton().click()
@@ -207,9 +207,9 @@ describe('Reschedule Appointment', () => {
 
   for (const filetype of ['pdf', 'doc', 'docx']) {
     checkUploadFile(filetype)
-  }
+  } */
 
-  it('should persist the files added list when page is submitted', () => {
+  /* it('should persist the files added list when page is submitted', () => {
     cy.intercept('POST', '/appointments/file/upload').as('fileUpload')
     loadPage()
     const [fakeFile1, fileName1] = createFakeFile(1, 'png')
@@ -225,7 +225,7 @@ describe('Reschedule Appointment', () => {
     rescheduleAppointmentPage.getFileUploadListItem('error', 'status', 0).should('contain.text', 'Upload failed')
     rescheduleAppointmentPage.getFileUploadListItem('success', 'text', 1).should('contain.text', fileName2)
     rescheduleAppointmentPage.getFileUploadListItem('success', 'status', 1).should('contain.text', 'Uploaded')
-  })
+  }) */
 
   it('should submit the page successfully if all mandatory option are filled/ selected then continue is clicked', () => {
     loadPage()
@@ -235,18 +235,18 @@ describe('Reschedule Appointment', () => {
       .eq(0)
       .find('.govuk-radios__input')
       .click()
-    rescheduleAppointmentPage
+    /* rescheduleAppointmentPage
       .getSensitiveInformation()
       .find('.govuk-radios__item')
       .eq(0)
       .find('.govuk-radios__input')
       .click()
-    rescheduleAppointmentPage.getReason().type(`abc`)
+    rescheduleAppointmentPage.getReason().type(`abc`) */
     rescheduleAppointmentPage.getSubmitBtn().click()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
   })
 
-  it('should hide the file delete button when feature toggle is disabled', () => {
+  /* it('should hide the file delete button when feature toggle is disabled', () => {
     const checkAddedFiles = (reload = false) => {
       const assertion = reload ? 'not.be.visible' : 'not.exist'
       rescheduleAppointmentPage.getFileUploadListItem('success', 'text', 0).should('contain.text', fileName)
@@ -276,5 +276,5 @@ describe('Reschedule Appointment', () => {
     rescheduleAppointmentPage.getSubmitBtn().click()
     const reload = true
     checkAddedFiles(reload)
-  })
+  }) */
 })

@@ -13,7 +13,7 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
     let redirectURL = `/case/${crn}/arrange-appointment/${uuid}/arrange-another-appointment`
     if (apptType === 'RESCHEDULE') {
       uuid = id
-      redirectURL = `/case/${crn}/appointments/reschedule/${contactId}/${id}/check-answers`
+      redirectURL = `/case/${crn}/appointments/reschedule/${contactId}/${id}/check-your-answers`
     }
     const clonedAppt: AppointmentSession = {
       ...appointmentToClone,

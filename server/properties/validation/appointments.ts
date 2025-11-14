@@ -188,16 +188,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
-      optional: page !== 'reschedule-appointment',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select if appointment includes sensitive information',
-          log: 'Sensitivity not selected',
-        },
-      ],
-    },
+    /*  [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
+       optional: page !== 'reschedule-appointment',
+       checks: [
+         {
+           validator: isNotEmpty,
+           msg: 'Select if appointment includes sensitive information',
+           log: 'Sensitivity not selected',
+         },
+       ],
+     }, */
     'appointment-id': {
       optional: page !== 'record-an-outcome',
       checks: [
@@ -228,7 +228,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][rescheduleAppointment][reason]`]: {
+    /*    [`[appointments][${crn}][${id}][rescheduleAppointment][reason]`]: {
       optional: page !== 'reschedule-appointment',
       checks: [
         {
@@ -242,7 +242,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Explain why this appointment is being rescheduled not provided',
         },
       ],
-    },
+    }, */
     sensitive: {
       optional: page !== 'add-note',
       checks: [

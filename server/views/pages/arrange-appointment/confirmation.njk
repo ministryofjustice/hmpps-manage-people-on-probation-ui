@@ -16,7 +16,7 @@
 {% for appointmentDate in appointment.repeatingDates %}
     {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
 {% endfor %}
-{% set title = 'Appointment arranged' %}
+{% set title = "Appointment rescheduled" if appointmentType == "RESCHEDULE" else "Appointment arranged" %}
 {% set appointmentDatesHtml %}
 {% for appointmentDate in appointmentDates %}
    {% if loop.index > 1 %}<br>{% endif %}

@@ -13,12 +13,13 @@ import {
 } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
 import { renderError, postAppointments } from '../middleware'
-import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
+import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
 import { findUncompleted } from '../utils/findUncompleted'
 import MasApiClient from '../data/masApiClient'
+import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
 
 const routes = [
   'redirectToSentence',
@@ -45,7 +46,7 @@ const routes = [
 
 export const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
   const { data } = req.session
-  const { crn, id } = req.params as Record<string, string>
+  const { crn, id, contactId } = req.params as Record<string, string>
   if (!isValidCrn(crn) || !isValidUUID(id)) {
     return renderError(404)(req, res)
   }
@@ -67,16 +68,25 @@ export const appointmentSummary = async (req: Request, res: AppResponse, client:
     sensitivity: 'supporting-information',
   }
   const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
-  const baseUrl = `/case/${crn}/arrange-appointment/${id}`
+  let baseUrl = `/case/${crn}/arrange-appointment/${id}`
+  let backendId
   for (const [k, v] of Object.entries(mapping)) {
     const value = requiredValues[k as keyof typeof requiredValues]
     if (!value) {
       return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
     }
   }
-  const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
+  if (req.url.includes('reschedule')) {
+    baseUrl = `/case/${crn}/appointments/reschedule/${contactId}/${id}`
+    const response: RescheduleAppointmentResponse = await postRescheduleAppointments(client)(req, res)
+    backendId = response?.id
+  } else {
+    const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
+    backendId = response.appointments[response.appointments.length - 1].id
+  }
   // setting backendId (part of AppointmentSession ) to create 'anotherAppointment' link in confirmation.njk
-  setDataValue(data, ['appointments', crn, id, 'backendId'], response.appointments[response.appointments.length - 1].id)
+  setDataValue(data, ['appointments', crn, id, 'backendId'], backendId)
+
   return res.redirect(`${baseUrl}/confirmation`)
 }
 
@@ -463,7 +473,18 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
       delete req.session.data.isOutLookEventFailed
-      return res.render(`pages/arrange-appointment/confirmation`, { crn, backendId, isOutLookEventFailed })
+      let appointmentType
+      if (req.url.includes('reschedule')) {
+        appointmentType = 'RESCHEDULE'
+        // delete data.appointments[crn][id]
+      }
+
+      return res.render(`pages/arrange-appointment/confirmation`, {
+        crn,
+        backendId,
+        isOutLookEventFailed,
+        appointmentType,
+      })
     }
   },
   postConfirmation: () => {

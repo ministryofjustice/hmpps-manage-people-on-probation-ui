@@ -12,6 +12,7 @@ export interface AppointmentSession {
     teamCode?: string
     username?: string
     locationCode?: string
+    staffCode?: string
   }
   temp?: {
     providerCode?: string
@@ -102,6 +103,26 @@ export interface AppointmentRequestBody {
   notes?: string
   sensitive?: boolean
   visorReport?: boolean
+}
+
+export interface RescheduleAppointmentRequestBody {
+  date: string
+  startTime: string
+  endTime: string
+  staffCode?: string
+  teamCode?: string
+  locationCode?: string
+  rescheduleNotes?: string
+  notes?: string
+  rescheduleSensitive?: boolean
+  sensitive?: boolean
+  sendToVisor?: boolean
+  requestedBy: string
+  uuid: string
+}
+export interface RescheduleAppointmentResponse {
+  id: number
+  externalReference: string
 }
 
 export interface CheckAppointment {
