@@ -94,8 +94,9 @@ const checkDefaultUserSelection = () => {
   })
   it('should create the correct user options', () => {
     expect(res.locals.userStaff).toStrictEqual([
+      appointmentStaff.users[2],
+      appointmentStaff.users[1],
       { ...appointmentStaff.users[0], selected: 'selected' },
-      ...appointmentStaff.users.slice(1),
     ])
   })
   it('should set res.locals.providerCode as the default user provider', () => {
@@ -150,7 +151,7 @@ describe('/middleware/getUserOptions()', () => {
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
     })
     it('should create the correct provider options', () => {
-      expect(res.locals.userProviders).toStrictEqual([
+      expect(res.locals.userProviders).toEqual([
         { ...userProviders.providers[0], selected: 'selected' },
         ...userProviders.providers.slice(1),
       ])
@@ -164,9 +165,9 @@ describe('/middleware/getUserOptions()', () => {
     })
     it('should create the correct user options', () => {
       expect(res.locals.userStaff).toStrictEqual([
-        appointmentStaff.users[0],
-        { ...appointmentStaff.users[1], selected: 'selected' },
         appointmentStaff.users[2],
+        { ...appointmentStaff.users[1], selected: 'selected' },
+        appointmentStaff.users[0],
       ])
     })
     it('should set res.locals.providerCode as the session user provider', () => {
@@ -258,8 +259,9 @@ describe('/middleware/getUserOptions()', () => {
     })
     it('should create the correct user options', () => {
       expect(res.locals.userStaff).toStrictEqual([
+        appointmentStaff.users[2],
+        appointmentStaff.users[1],
         { ...appointmentStaff.users[0], selected: 'selected' },
-        ...appointmentStaff.users.slice(1),
       ])
     })
     it('should set res.locals.providerCode as the provider code in the request url query', () => {
@@ -315,8 +317,9 @@ describe('/middleware/getUserOptions()', () => {
     })
     it('should create the correct user options', () => {
       expect(res.locals.userStaff).toStrictEqual([
+        appointmentStaff.users[2],
+        appointmentStaff.users[1],
         { ...appointmentStaff.users[0], selected: 'selected' },
-        ...appointmentStaff.users.slice(1),
       ])
     })
     it('should set res.locals.providerCode as the provider code in the request url query', () => {

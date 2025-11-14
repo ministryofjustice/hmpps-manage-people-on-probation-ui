@@ -12,6 +12,7 @@ import {
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { setDataValue } from '../utils'
 import { getDefaultUser } from './getDefaultUser'
+import { Provider, Team, User } from '../data/model/caseload'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -35,6 +36,8 @@ const uuid = 'a4615940-2808-4ab5-a8e0-feddecb8ae1a'
 const username = 'user-1'
 const providerCode = 'N50'
 const teamCode = 'N07IVH'
+const defaultUserProviderCode = 'N54'
+const defaultUserTeamCode = 'N07CHT'
 
 const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} } = {}): httpMocks.MockRequest<any> => {
   const request = {
@@ -60,6 +63,15 @@ const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} 
               },
             },
           },
+        },
+        providers: {
+          [username]: [] as Provider[],
+        },
+        teams: {
+          [username]: [] as Team[],
+        },
+        staff: {
+          [username]: [] as User[],
         },
         ...data,
       },
@@ -91,62 +103,35 @@ describe('/middleware/getDefaultUser()', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
-  describe('Attending user does not exist in appointment session', () => {
+
+  it('should request user providers and allocated probation practitioner from api', async () => {
+    const req = buildRequest()
+    await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
+    expect(getUserProvidersSpy).toHaveBeenCalledWith(username)
+    expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+  })
+
+  it('should return null if no next in parameters', async () => {
+    const req = buildRequest()
+    expect(await getDefaultUser(hmppsAuthClient)(req, res)).toEqual(null)
+  })
+
+  describe('Attending user does not exist in session', () => {
     const req = buildRequest({ user: { providerCode: undefined, teamCode: undefined, username: undefined } })
     const { data } = req.session
     describe('Probation practitioner is allocated', () => {
-      describe('Practitioner exists in user providers staff', () => {
-        beforeEach(async () => {
-          await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
-        })
-        it('should request user providers from api', () => {
-          expect(getUserProvidersSpy).toHaveBeenCalledWith(username)
-        })
-        it('should request allocated probation practitioner from api', () => {
-          expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-        })
-        it('should request the provider teams from the api', () => {
-          expect(getTeamsByProviderSpy).toHaveBeenCalledWith(probationPractitioner.provider.code)
-        })
-        it('should request the provider users from the api', () => {
-          expect(getStaffByTeamSpy).toHaveBeenCalledWith(probationPractitioner.team.code)
-        })
-        it('should set the practitioner as the default user', () => {
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            1,
-            data,
-            ['appointments', crn, uuid, 'user', 'providerCode'],
-            probationPractitioner.provider.code,
-          )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            2,
-            data,
-            ['appointments', crn, uuid, 'user', 'teamCode'],
-            probationPractitioner.team.code,
-          )
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            3,
-            data,
-            ['appointments', crn, uuid, 'user', 'username'],
-            probationPractitioner.username,
-          )
-
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(4, data, ['providers', username], userProviders.providers)
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(5, data, ['teams', username], appointmentTeams.teams)
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['staff', username], appointmentStaff.users)
-        })
-        it('should call next()', () => {
-          expect(nextSpy).toHaveBeenCalledTimes(1)
-        })
-      })
-
-      describe('Practitioner does not exist in user providers staff', () => {
-        const mock = { ...userProviders, users: [userProviders.users[0], userProviders.users[1]] }
+      describe('Probation practitioner region, team and user does not exist in logged in user providers', () => {
+        const mock = {
+          ...userProviders,
+          providers: [...userProviders.providers.slice(0, 1), ...userProviders.providers.slice(2)],
+          teams: [...userProviders.teams.slice(1)],
+          users: [...userProviders.users.slice(0, 2)],
+        }
         beforeEach(async () => {
           jest.spyOn(MasApiClient.prototype, 'getUserProviders').mockImplementationOnce(() => Promise.resolve(mock))
           await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
         })
-        it('should set the default user as the practitioner', () => {
+        it('should save the correct session values', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             1,
             data,
@@ -165,13 +150,54 @@ describe('/middleware/getDefaultUser()', () => {
             ['appointments', crn, uuid, 'user', 'username'],
             probationPractitioner.username,
           )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            4,
+            data,
+            ['providers', username],
+            [...mock.providers, probationPractitioner.provider],
+          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            5,
+            data,
+            ['teams', username],
+            [...mock.teams, probationPractitioner.team],
+          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            6,
+            req.session.data,
+            ['staff', username],
+            [
+              ...mock.users,
+              {
+                staffCode: probationPractitioner.code,
+                username: probationPractitioner.username,
+                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
+              },
+            ],
+          )
+          expect(nextSpy).toHaveBeenCalledTimes(1)
+        })
+      })
+      describe('Probation practitioner region, team and user does exist in logged in user providers', () => {
+        beforeEach(async () => {
+          await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
+        })
+        it('should save the user providers to session', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(4, data, ['providers', username], userProviders.providers)
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(5, data, ['teams', username], appointmentTeams.teams)
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['staff', username], appointmentStaff.users)
+        })
+        it('should save the user teams to session', () => {
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(5, data, ['teams', username], userProviders.teams)
+        })
+        it('should save the user staff to session', () => {
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['staff', username], userProviders.users)
         })
       })
     })
+  })
 
+  describe('Attending user does not exist in session', () => {
+    const req = buildRequest({ user: { providerCode: undefined, teamCode: undefined, username: undefined } })
+    const { data } = req.session
     describe('Probation practitioner is not allocated', () => {
       const mock: ProbationPractitioner = { ...probationPractitioner, unallocated: true }
       beforeEach(async () => {
@@ -180,24 +206,18 @@ describe('/middleware/getDefaultUser()', () => {
           .mockImplementationOnce(() => Promise.resolve(mock))
         await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
       })
-      it('should request the provider teams from the api', () => {
-        expect(getTeamsByProviderSpy).toHaveBeenCalledWith('N54')
-      })
-      it('should request the provider users from the api', () => {
-        expect(getStaffByTeamSpy).toHaveBeenCalledWith('N07CHT')
-      })
-      it('should set the default user', () => {
+      it('should set the attending user as the default user', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           1,
           data,
           ['appointments', crn, uuid, 'user', 'providerCode'],
-          'N54',
+          defaultUserProviderCode,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           2,
           data,
           ['appointments', crn, uuid, 'user', 'teamCode'],
-          'N07CHT',
+          defaultUserTeamCode,
         )
         expect(mockSetDataValue).toHaveBeenNthCalledWith(
           3,
@@ -205,23 +225,112 @@ describe('/middleware/getDefaultUser()', () => {
           ['appointments', crn, uuid, 'user', 'username'],
           userProviders.defaultUserDetails.username,
         )
+        expect(nextSpy).toHaveBeenCalledTimes(1)
+      })
+      it('should save the user providers to session', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(4, data, ['providers', username], userProviders.providers)
+      })
+      it('should save the user teams to session', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(5, data, ['teams', username], userProviders.teams)
+      })
+      it('should save the user staff to session', () => {
         expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['staff', username], userProviders.users)
       })
     })
   })
 
-  describe('Attending user exists in appointment session', () => {
-    const req = buildRequest()
-    beforeEach(async () => {
-      await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
+  describe('Attending user does exist in session', () => {
+    describe('attendee is probation practitioner', () => {
+      const req = buildRequest({
+        user: {
+          providerCode: probationPractitioner.provider.code,
+          teamCode: probationPractitioner.team.code,
+          username: probationPractitioner.username,
+        },
+      })
+      const { data } = req.session
+
+      describe('Probation practitioner region, team and user does not exist in logged in user providers', () => {
+        const mockUserProviders = {
+          ...userProviders,
+          providers: [...userProviders.providers.slice(0, 1), ...userProviders.providers.slice(2)],
+        }
+        const mockAppointmentTeams = { teams: [...appointmentTeams.teams.slice(1)] }
+        const mockAppointmentStaff = { users: [...appointmentStaff.users.slice(0, 2)] }
+
+        beforeEach(async () => {
+          jest
+            .spyOn(MasApiClient.prototype, 'getUserProviders')
+            .mockImplementationOnce(() => Promise.resolve(mockUserProviders))
+          jest
+            .spyOn(MasApiClient.prototype, 'getTeamsByProvider')
+            .mockImplementationOnce(() => Promise.resolve(mockAppointmentTeams))
+          jest
+            .spyOn(MasApiClient.prototype, 'getStaffByTeam')
+            .mockImplementationOnce(() => Promise.resolve(mockAppointmentStaff))
+          await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
+        })
+        it('should request the teams from the api', () => {
+          expect(getTeamsByProviderSpy).toHaveBeenCalledWith(probationPractitioner.provider.code)
+        })
+        it('should request the staff from the api', () => {
+          expect(getStaffByTeamSpy).toHaveBeenCalledWith(probationPractitioner.team.code)
+        })
+        it('should save the correct session values', () => {
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            1,
+            data,
+            ['providers', username],
+            [...mockUserProviders.providers, probationPractitioner.provider],
+          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            2,
+            data,
+            ['teams', username],
+            [...mockAppointmentTeams.teams, probationPractitioner.team],
+          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            3,
+            req.session.data,
+            ['staff', username],
+            [
+              ...mockAppointmentStaff.users,
+              {
+                staffCode: probationPractitioner.code,
+                username: probationPractitioner.username,
+                nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
+              },
+            ],
+          )
+          expect(nextSpy).toHaveBeenCalledTimes(1)
+        })
+      })
     })
-    it('should not set any session values', () => {
-      expect(mockSetDataValue).not.toHaveBeenCalled()
-    })
-    it('should call next()', () => {
-      expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  describe('Attending user does exist in session', () => {
+    describe('attendee is not probation practitioner', () => {
+      const req = buildRequest()
+      const { data } = req.session
+      beforeEach(async () => {
+        await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
+      })
+      it('should request the teams from the api', () => {
+        expect(getTeamsByProviderSpy).toHaveBeenCalledWith(providerCode)
+      })
+      it('should request the staff from the api', () => {
+        expect(getStaffByTeamSpy).toHaveBeenCalledWith(teamCode)
+      })
+      it('should save the correct session values', () => {
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(1, data, ['providers', username], [...userProviders.providers])
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(2, data, ['teams', username], [...appointmentTeams.teams])
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(
+          3,
+          req.session.data,
+          ['staff', username],
+          [...appointmentStaff.users],
+        )
+      })
     })
   })
 })

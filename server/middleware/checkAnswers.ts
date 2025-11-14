@@ -3,7 +3,7 @@ import { getDataValue, getPersonLevelTypes, setDataValue } from '../utils'
 import { AppResponse } from '../models/Locals'
 import { AppointmentSession } from '../models/Appointments'
 
-export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction) => {
+export const checkAnswers = (req: Request, res: AppResponse, next?: NextFunction) => {
   const { change } = req.query
   if (change) {
     const { data } = req.session
@@ -42,5 +42,8 @@ export const checkAnswers = (req: Request, res: AppResponse, next: NextFunction)
     }
     setDataValue(data, ['appointments', crn, id], session)
   }
-  return next()
+  if (next) {
+    return next()
+  }
+  return null
 }
