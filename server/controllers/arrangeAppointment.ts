@@ -46,6 +46,8 @@ const routes = [
   'postConfirmation',
   'getArrangeAnotherAppointment',
   'postArrangeAnotherAppointment',
+  'getAddNote',
+  'postAddNote',
 ] as const
 
 export interface AttendedCompliedAppointment {
@@ -378,20 +380,23 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { alertDismissed = false, data } = req.session
       const { forename, appointment } = getAttendedCompliedProps(req, res)
+      console.log({ forename, appointment })
       res.render('pages/appointments/attended-complied', {
         crn,
         id,
         alertDismissed,
         isInPast: true,
         appointment,
+        cancelLink: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
         forename: convertToTitleCase(forename),
+        useDecorator: true,
       })
     }
   },
   postAttendedComplied: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      return res.render(`/case/${crn}/arrange-appointment/${id}/supporting-information`)
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/add-note`)
     }
   },
   getLocationNotInList: () => {
@@ -399,6 +404,21 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params as Record<string, string>
       const { change = undefined, noLocations = '' } = req.query
       return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id, noLocations, change })
+    }
+  },
+  getAddNote: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.render('pages/appointments/add-note', { crn, id, useDecorator: true })
+    }
+  },
+  postAddNote: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isNumericString(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
   getRepeating: () => {
@@ -488,6 +508,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           [`appointments-${crn}-${id}-sensitivity`]: 'Select the sensitivity of the appointment',
         }
       }
+      const isInPast = appointmentDateIsInPast(req)
       const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
       const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
       return res.render(`pages/arrange-appointment/supporting-information`, {
@@ -497,6 +518,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         change,
         showValidation,
         maxCharCount,
+        isInPast,
       })
     }
   },
