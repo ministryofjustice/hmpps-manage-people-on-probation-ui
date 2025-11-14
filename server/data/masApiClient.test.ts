@@ -309,6 +309,13 @@ describe('masApiClient', () => {
       ['getDeliusRoles', '/user/USER', () => masApiClient.getDeliusRoles('USER')],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
       ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
+      [
+        'getUserAlerts (full params)',
+        '/alerts?size=10&page=1&sortBy=date&sortOrder=asc',
+        () => masApiClient.getUserAlerts(1, 'date', 'asc'),
+      ],
+      ['getUserAlerts (minimal)', '/alerts?size=10', () => masApiClient.getUserAlerts()],
+      ['clearAlerts', '/alerts/clear', () => masApiClient.clearAlerts([1, 2, 3]), 'post'],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {

@@ -41,7 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
-import { UserAlerts } from '../models/Alerts'
+import { UserAlerts, ClearAlertsResponse } from '../models/Alerts'
 
 interface GetUserScheduleProps {
   username: string
@@ -401,10 +401,16 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}`, handle404: true })
   }
 
-  async getUserAlerts(page?: number): Promise<UserAlerts> {
+  async getUserAlerts(page?: number, sortBy?: string, sortOrder?: 'asc' | 'desc'): Promise<UserAlerts> {
     let pageQuery = '?size=10'
-    if (page) {
+    if (page !== undefined) {
       pageQuery = `${pageQuery}&page=${page}`
+    }
+    if (sortBy) {
+      pageQuery = `${pageQuery}&sortBy=${sortBy}`
+    }
+    if (sortOrder) {
+      pageQuery = `${pageQuery}&sortOrder=${sortOrder}`
     }
     return this.get({ path: `/alerts${pageQuery}`, handle404: true })
   }
@@ -412,5 +418,12 @@ export default class MasApiClient extends RestClient {
   async getUserAlertsCount(): Promise<number> {
     const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true })
     return response.totalResults
+  }
+
+  async clearAlerts(alertIds: number[]): Promise<ClearAlertsResponse> {
+    return this.post({
+      path: '/alerts/clear',
+      data: { alertIds },
+    })
   }
 }
