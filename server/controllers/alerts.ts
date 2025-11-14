@@ -6,7 +6,7 @@ const routes = ['getAlerts', 'clearSelectedAlerts'] as const
 
 const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
-    return async (req, res, next) => {
+    return async (req, res) => {
       const { user } = res.locals
       const { page = '0', sortBy, sortOrder } = req.query as Record<string, string>
       const pageNumber = parseInt(page, 10)
@@ -42,8 +42,8 @@ const alertsController: Controller<typeof routes, void> = {
       const { selectedAlerts } = req.body
 
       if (!selectedAlerts || selectedAlerts.length === 0) {
-        res.status(400).json({ error: 'No alerts selected' })
-        return
+        res.locals.alertsCleared = { error: true, message: `Select an alert to clear it` }
+        return next()
       }
 
       // Convert to array of numbers
@@ -54,12 +54,10 @@ const alertsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
 
-      const response = await masClient.clearAlerts(alertIds)
+      await masClient.clearAlerts(alertIds)
+      res.locals.alertsCleared = { error: false, message: `${alertIds.length} alert(s) cleared successfully` }
 
-      res.json({
-        success: true,
-        message: `${response.clearedCount} alert(s) cleared successfully`,
-      })
+      return next()
     }
   },
 }

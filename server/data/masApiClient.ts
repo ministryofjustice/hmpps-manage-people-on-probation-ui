@@ -421,8 +421,8 @@ export default class MasApiClient extends RestClient {
   }
 
   async clearAlerts(alertIds: number[]): Promise<ClearAlertsResponse> {
-    return this.post({
-      path: '/alerts/clear',
+    return this.put({
+      path: '/alerts',
       data: { alertIds },
     })
   }

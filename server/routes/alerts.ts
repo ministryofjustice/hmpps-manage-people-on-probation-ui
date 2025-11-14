@@ -9,5 +9,9 @@ export default function alertsRoutes(router: Router, { hmppsAuthClient }: Servic
   const post = (path: string | string[], handler: Route<void>) => router.post(path, asyncMiddleware(handler))
 
   get('/alerts', controllers.alerts.getAlerts(hmppsAuthClient))
-  post('/alerts/clear', controllers.alerts.clearSelectedAlerts(hmppsAuthClient))
+  router.post(
+    '/alerts',
+    controllers.alerts.clearSelectedAlerts(hmppsAuthClient),
+    controllers.alerts.getAlerts(hmppsAuthClient),
+  )
 }
