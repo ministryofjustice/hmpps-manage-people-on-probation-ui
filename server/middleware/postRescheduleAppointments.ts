@@ -42,9 +42,7 @@ export const postRescheduleAppointments = (
       sensitive: sensitivity === 'Yes',
       sendToVisor: visorReport === 'Yes',
     }
-    console.log(body)
     const response = await masClient.putRescheduleAppointment(contactId, body)
-    console.dir(response, { depth: null })
 
     /*
         const userDetails = await masClient.getUserDetails(username)
