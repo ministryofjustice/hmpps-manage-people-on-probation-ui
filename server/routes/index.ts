@@ -17,6 +17,7 @@ import interventionsRoutes from './interventions'
 import arrangeAppointmentRoutes from './arrangeAppointment'
 import documentsRoutes from './documents'
 import alertsRoutes from './alerts'
+import checkInsRoutes from './check-ins'
 
 export default function routes(router: Router, services: Services): Router {
   home(router, services)
@@ -34,5 +35,6 @@ export default function routes(router: Router, services: Services): Router {
   arrangeAppointmentRoutes(router, services)
   documentsRoutes(router, services)
   alertsRoutes(router, services)
+  checkInsRoutes(router, services)
   return router
 }

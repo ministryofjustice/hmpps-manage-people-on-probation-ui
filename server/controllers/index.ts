@@ -14,6 +14,7 @@ import accessibilityController from './accessibility'
 import searchController from './search'
 import fileUploadController from './fileUpload'
 import alertsController from './alerts'
+import checkInsController from './check-ins'
 
 export default {
   caseload: caseloadController,
@@ -32,4 +33,5 @@ export default {
   search: searchController,
   fileUpload: fileUploadController,
   alerts: alertsController,
+  checkIns: checkInsController,
 }

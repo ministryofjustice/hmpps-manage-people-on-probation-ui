@@ -11,4 +11,5 @@ export class FeatureFlags {
   enableOutlookEvent?: boolean = undefined
   enableProbFEComponent?: boolean = undefined
   enableAlertsPage?: boolean = undefined
+  enableESuperVision?: boolean = undefined
 }
