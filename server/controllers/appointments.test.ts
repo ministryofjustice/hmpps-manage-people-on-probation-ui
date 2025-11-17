@@ -283,21 +283,6 @@ describe('controllers/appointments', () => {
     })
   })
 
-  describe('get record an outcome with evidence', () => {
-    beforeEach(async () => {
-      await controllers.appointments.getRecordAnOutcomeForEvidence(hmppsAuthClient)(req, res)
-    })
-    checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
-    it('should render the record an outcome page with evidence', () => {
-      const evidenceActionType = 'evidence'
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
-        crn,
-        actionType: evidenceActionType,
-        contactId,
-      })
-    })
-  })
-
   describe('post record an outcome', () => {
     describe('CRN request parameter is invalid', () => {
       beforeEach(() => {

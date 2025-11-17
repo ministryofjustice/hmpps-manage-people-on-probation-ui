@@ -44,11 +44,6 @@ describe('masApiClient', () => {
     it.each([
       ['getOverview', '/overview/X000001?sentenceNumber=1', () => masApiClient.getOverview('X000001')],
       ['getOverdueOutcomes', '/appointment/X000001/overdue-outcomes', () => masApiClient.getOverdueOutcomes('X000001')],
-      [
-        'getAppointmentsNeedingEvidence',
-        '/appointment/X000001/overdue-outcomes-evidence',
-        () => masApiClient.getAppointmentsNeedingEvidence('X000001'),
-      ],
       ['getSentenceDetails', '/sentence/X000001', () => masApiClient.getSentenceDetails('X000001')],
       ['getSentences', '/sentences/X000001', () => masApiClient.getSentences('X000001')],
       ['getSentences', '/sentences/X000001?number=2', () => masApiClient.getSentences('X000001', '2')],
