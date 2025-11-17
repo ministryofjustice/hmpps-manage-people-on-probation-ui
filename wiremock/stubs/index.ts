@@ -14,6 +14,7 @@ import activityLog from './activityLog'
 import risk from './risk'
 import supervisionAppointmentClient from './supervisionAppointmentClient'
 import probationFEIntegration from './probationFEIntegration'
+import alerts from './alerts'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -32,4 +33,5 @@ export default {
   ...risk,
   ...supervisionAppointmentClient,
   ...probationFEIntegration,
+  ...alerts,
 }
