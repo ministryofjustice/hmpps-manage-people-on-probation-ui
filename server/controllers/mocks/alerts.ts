@@ -1,4 +1,4 @@
-import { UserAlerts, ClearAlertsResponse, UserAlertsContent } from '../../models/Alerts'
+import { UserAlerts, UserAlertsContent } from '../../models/Alerts'
 import { Officer } from '../../data/model/schedule'
 
 const mockName = {
@@ -22,6 +22,7 @@ export const mockAlertsContent: UserAlertsContent[] = [
     date: '2025-11-10T10:00:00Z',
     description: 'Test Alert 1',
     officer: mockOfficer,
+    name: mockName,
     riskLevel: 'HIGH ROSH',
   },
   {
@@ -30,6 +31,7 @@ export const mockAlertsContent: UserAlertsContent[] = [
     crn: 'X000002',
     date: '2025-11-09T09:00:00Z',
     officer: mockOfficer,
+    name: mockName,
   },
 ]
 
@@ -41,10 +43,7 @@ export const mockUserAlerts: UserAlerts = {
   size: 10,
 } as unknown as UserAlerts
 
-export const mockClearAlertsSuccess: ClearAlertsResponse = {
-  success: true,
-  clearedCount: 2,
-}
+export const mockClearAlertsSuccess = {}
 
 export const defaultUser = {
   username: 'testuser',

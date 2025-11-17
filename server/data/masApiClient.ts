@@ -41,7 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
-import { UserAlerts, ClearAlertsResponse } from '../models/Alerts'
+import { UserAlerts } from '../models/Alerts'
 
 interface GetUserScheduleProps {
   username: string
@@ -420,7 +420,7 @@ export default class MasApiClient extends RestClient {
     return response.totalResults
   }
 
-  async clearAlerts(alertIds: number[]): Promise<ClearAlertsResponse> {
+  async clearAlerts(alertIds: number[]) {
     return this.put({
       path: '/alerts',
       data: { alertIds },
