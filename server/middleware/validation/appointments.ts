@@ -29,9 +29,7 @@ const appointments: Route<void> = (req, res, next) => {
     change,
     alertDismissed,
   }
-  if (req.url.includes(`/arrange-appointment/${id}/attended-complied`)) {
-    localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
-  }
+
   if (['/attended-complied', '/location-date-time'].some(urlPart => req.url.includes(urlPart))) {
     localParams = { ...localParams, isInPast: appointmentDateIsInPast(req) }
   }
@@ -40,7 +38,7 @@ const appointments: Route<void> = (req, res, next) => {
       req.url.includes(urlPart),
     )
   ) {
-    localParams = { ...localParams, useDecorator: true }
+    localParams = { ...localParams, useDecorator: true, ...getAttendedCompliedProps(req, res) }
   }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
@@ -202,7 +200,6 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateAddNote = () => {
     if (baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/add-note`)) {
-      console.log(req.body)
       isAddNotePage = true
       render = `pages/appointments/add-note`
       errorMessages = validateWithSpec(
@@ -249,11 +246,13 @@ const appointments: Route<void> = (req, res, next) => {
   validateManageAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    if (isAddNotePage) {
-      req.session.errorMessages = errorMessages
-      req.session.body = body
-      return res.redirect(req.url)
-    }
+    // if (isAddNotePage) {
+    //   req.session.errorMessages = errorMessages
+    //   req.session.body = body
+    //   console.log('is add note page, redirecting....')
+    //   console.log('req.session.errorMessages=', req.session.errorMessages)
+    //   return res.redirect(req.url)
+    // }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()
