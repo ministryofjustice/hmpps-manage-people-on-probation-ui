@@ -1,7 +1,6 @@
 {
   "mappings": [
     {
-      "priority": 1,
       "request": {
         "urlPattern": "/mas/alerts(\\?.*)?",
         "method": "GET"
