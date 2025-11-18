@@ -7,7 +7,7 @@ context('Appointment', () => {
     cy.task('stubEnableESuperVision')
     cy.visit('/case/X000001/appointments')
 
-    let page = Page.verifyOnPage(AppointmentsPage)
+    const page = Page.verifyOnPage(AppointmentsPage)
 
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Eula Schmeler')
