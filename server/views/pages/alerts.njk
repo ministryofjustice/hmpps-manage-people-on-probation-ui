@@ -80,9 +80,9 @@
                                     {{ alert.date | dateWithYear }}
                                 </td>
 
-                                <td class="govuk-table__cell" data-sort-value="{{ alert.officer.name.surname }}, {{ alert.officer.name.forename }}" data-qa="alertPerson">
+                                <td class="govuk-table__cell" data-sort-value="{{ alert.name.surname }}, {{ alert.name.forename }}" data-qa="alertPerson">
                                     <a href="/case/{{ alert.crn }}" class="govuk-!-font-weight-bold govuk-link govuk-link--no-visited-state">
-                                        {{ alert.officer.name.surname }}, {{ alert.officer.name.forename }}
+                                        {{ alert.name.surname }}, {{ alert.name.forename }}
                                     </a>
                                     <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
                                 </td>
