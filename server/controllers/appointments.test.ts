@@ -75,7 +75,6 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
   typeof cloneAppointmentAndRedirect
 >
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
-
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -275,9 +274,10 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
+      const outcomeActionType = 'outcome'
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-an-outcome', {
         crn,
-        actionType,
+        actionType: outcomeActionType,
         contactId,
       })
     })
