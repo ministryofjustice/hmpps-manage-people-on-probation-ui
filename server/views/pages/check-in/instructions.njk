@@ -1,8 +1,9 @@
 {% extends "../_form.njk" %}
 {% set title = "How you can use online check ins" %}
 {% set showAnchorLink = true %}
-{% set formAnchorLink = "/case/"+ crn  +"/appointments" %}
+{% set formAnchorLink = "/case/"+  crn  +"/appointments" %}
 {% set formAnchorText = "Cancel" %}
+{% set hideButton = true %}
 {% block beforeContent %}{% endblock %}
 {% block form %}
     <div class="govuk-grid-row">
@@ -96,5 +97,19 @@
 
         </div>
     </div>
+    <form method="post" autocomplete="off" action="{{ paths.current  }}">
+        <div class="govuk-button-group">
+           {# {{ govukButton({
+                html: buttonText,
+                attributes: {
+                    'data-qa': 'submit-btn'
+                }
+            }) }}#}
+            <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink">
+                {{ formAnchorText }}
+            </a>
+        </div>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    </form>
 
 {% endblock %}

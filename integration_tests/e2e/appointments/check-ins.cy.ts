@@ -23,6 +23,6 @@ context('Appointment', () => {
     const instructionsPage = new InstructionsPage()
     instructionsPage.checkOnPage()
     instructionsPage.getElement('[data-qa="formAnchorLink"]').click()
-    page = Page.verifyOnPage(AppointmentsPage)
+    Page.verifyOnPage(AppointmentsPage)
   })
 })
