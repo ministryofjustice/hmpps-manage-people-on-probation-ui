@@ -15,6 +15,7 @@ import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
+import { ContactResponse } from '../data/model/overdueOutcomes'
 
 export interface AppointmentLocals {
   meta: {
@@ -99,6 +100,7 @@ interface Locals {
   defaultUser?: { username: string; homeArea: string; team: string }
   sentencePlan?: SentencePlan
   alertsCount?: string
+  contactResponse?: ContactResponse
 }
 
 export interface AppResponse extends Response {
