@@ -1,0 +1,256 @@
+import superagent, { SuperAgentRequest } from 'superagent'
+
+const stubNoUserAlerts = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/alerts(\\?.*)?',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        content: [],
+        totalResults: 0,
+        totalPages: 0,
+        page: 0,
+        size: 10,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubUserAlertsWithData = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/mas/alerts(\\?.*)?',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        content: [
+          {
+            id: 1,
+            type: {
+              description: 'Email/Text from offender',
+              editable: true,
+            },
+            crn: 'X000001',
+            date: '2025-07-10',
+            description: 'Email from offending community team',
+            notes:
+              'Some notes about the contact with detailed information regarding the email correspondence. Person requested change to appointment time.',
+            officer: {
+              name: {
+                forename: 'Caroline',
+                middleName: '',
+                surname: 'Wolff',
+              },
+              code: 'STMOR01',
+            },
+            riskLevel: 'MEDIUM',
+          },
+          {
+            id: 2,
+            type: {
+              description: 'Appointment attendance failure',
+              editable: true,
+            },
+            crn: 'X000002',
+            date: '2025-07-10',
+            description: 'Failed to attend scheduled appointment',
+            notes:
+              'Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.',
+            officer: {
+              name: {
+                forename: 'Caroline',
+                middleName: '',
+                surname: 'Wolff',
+              },
+              code: 'JFROS01',
+            },
+            riskLevel: 'HIGH',
+          },
+          {
+            id: 3,
+            type: {
+              description: 'MAPPA meeting',
+              editable: false,
+            },
+            crn: 'X777916',
+            date: '2025-07-10',
+            description: 'Multi-agency meeting scheduled',
+            notes:
+              'MAPPA level 2 meeting to discuss risk management strategies and information sharing between agencies.',
+            officer: {
+              name: {
+                forename: 'Wendell',
+                middleName: '',
+                surname: 'Dooley',
+              },
+              code: 'TNIXO01',
+            },
+            riskLevel: 'MEDIUM',
+          },
+          {
+            id: 4,
+            type: {
+              description: 'Drug Test (DRR)',
+              editable: true,
+            },
+            crn: 'X778160',
+            date: '2025-07-09',
+            description: 'Drug test positive result',
+            notes:
+              'Test results showed positive for cannabis. Follow-up appointment required to discuss treatment options and review compliance.',
+            officer: {
+              name: {
+                forename: 'Alton',
+                middleName: '',
+                surname: 'Berge',
+              },
+              code: 'DSABA01',
+            },
+            riskLevel: 'HIGH',
+          },
+          {
+            id: 5,
+            type: {
+              description: 'Arrest incident',
+              editable: false,
+            },
+            crn: 'X801756',
+            date: '2025-07-09',
+            description: 'Person arrested for breach of the peace',
+            notes:
+              'Arrested on Saturday night following an incident at a local pub. Custody suite notified probation immediately. Person remanded.',
+            officer: {
+              name: {
+                forename: 'Kari',
+                middleName: '',
+                surname: 'Kari',
+              },
+              code: 'MKHAN01',
+            },
+            riskLevel: 'LOW',
+          },
+          {
+            id: 6,
+            type: {
+              description: 'AP - medication not in possession',
+              editable: true,
+            },
+            crn: 'X000001',
+            date: '2025-07-08',
+            description: 'Prescribed medication not found during search',
+            notes:
+              'Regular medication not in possession during routine room search. Health team contacted to verify prescription status and arrange replacement medication.',
+            officer: {
+              name: {
+                forename: 'Pavel',
+                middleName: '',
+                surname: 'Angelis',
+              },
+              code: 'PANGE01',
+            },
+            riskLevel: 'VERY HIGH',
+          },
+          {
+            id: 7,
+            type: {
+              description: 'Home visit',
+              editable: true,
+            },
+            crn: 'X000002',
+            date: '2025-07-08',
+            description: 'Unannounced home visit completed',
+            notes:
+              'Home visit conducted as per supervision plan. Person was present and cooperative during the visit. Living conditions were satisfactory.',
+            officer: {
+              name: {
+                forename: 'Sarah',
+                middleName: 'Jane',
+                surname: 'Collins',
+              },
+              code: 'SCOLL01',
+            },
+            riskLevel: 'LOW',
+          },
+          {
+            id: 8,
+            type: {
+              description: 'Breach proceedings',
+              editable: false,
+            },
+            crn: 'X000002',
+            date: '2025-07-07',
+            description: 'Breach proceedings initiated',
+            notes:
+              'Breach proceedings started due to multiple missed appointments without acceptable reason. Court date to be scheduled within 14 days.',
+            officer: {
+              name: {
+                forename: 'David',
+                middleName: 'Andrew',
+                surname: 'Thompson',
+              },
+              code: 'DTHOM01',
+            },
+            riskLevel: 'MEDIUM',
+          },
+          {
+            id: 9,
+            type: {
+              description: 'Risk assessment review',
+              editable: true,
+            },
+            crn: 'X000002',
+            date: '2025-07-07',
+            description: 'Annual risk assessment due',
+            notes:
+              'Risk assessment review is due this week. All relevant documents and information gathered for the assessment. Previous score was Medium.',
+            officer: {
+              name: {
+                forename: 'Emma',
+                middleName: '',
+                surname: 'Wilson',
+              },
+              code: 'EWILS01',
+            },
+            riskLevel: 'HIGH',
+          },
+          {
+            id: 10,
+            type: {
+              description: 'Safeguarding concern',
+              editable: false,
+            },
+            crn: 'X000002',
+            date: '2025-07-06',
+            description: 'Safeguarding issue identified',
+            notes:
+              'Safeguarding concern raised regarding vulnerable adult in household. Multi-agency referral submitted and case conference scheduled for next week.',
+            officer: {
+              name: {
+                forename: 'Michael',
+                middleName: 'James',
+                surname: 'Roberts',
+              },
+              code: 'MROBE01',
+            },
+            riskLevel: 'VERY HIGH',
+          },
+        ],
+        totalResults: 12,
+        totalPages: 3,
+        page: 0,
+        size: 10,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+export default { stubNoUserAlerts, stubUserAlertsWithData }

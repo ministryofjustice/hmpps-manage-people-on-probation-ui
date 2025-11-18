@@ -41,11 +41,8 @@
                                 </button>
                             </th>
 
-                            <th scope="col" class="govuk-table__header table-header--narrow govuk-table__header--sortable" aria-sort="none" data-sort-column="risk" data-qa="riskHeader">
-                                <button type="button" class="sort-button" data-sort="risk">
-                                    Risk
-                                    <span class="sort-indicator" aria-hidden="true"></span>
-                                </button>
+                            <th scope="col" class="govuk-table__header table-header--narrow" data-qa="riskHeader">
+                                Risk
                             </th>
 
                             <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-table__header--sortable" aria-sort="none" data-sort-column="activity" data-qa="activityHeader">
@@ -84,9 +81,9 @@
                                     {{ alert.date | dateWithYear }}
                                 </td>
 
-                                <td class="govuk-table__cell" data-sort-value="{{ alert.officer.name.surname }}, {{ alert.officer.name.forename }}" data-qa="alertPerson">
+                                <td class="govuk-table__cell" data-sort-value="{{ alert.name.surname }}, {{ alert.name.forename }}" data-qa="alertPerson">
                                     <a href="/case/{{ alert.crn }}" class="govuk-!-font-weight-bold govuk-link govuk-link--no-visited-state">
-                                        {{ alert.officer.name.surname }}, {{ alert.officer.name.forename }}
+                                        {{ alert.name.surname }}, {{ alert.name.forename }}
                                     </a>
                                     <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
                                 </td>
@@ -218,11 +215,7 @@
                 {% endif %}
 
             {% else %}
-                <div class="govuk-panel govuk-panel--confirmation" data-qa="noAlertsPanel">
-                    <div class="govuk-panel__body">
-                        You have no alerts at this time
-                    </div>
-                </div>
+                <p>You do not have any alerts.</p>
             {% endif %}
         </div>
     </div>
