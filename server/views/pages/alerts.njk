@@ -40,11 +40,8 @@
                                 </button>
                             </th>
 
-                            <th scope="col" class="govuk-table__header table-header--narrow govuk-table__header--sortable" aria-sort="none" data-sort-column="risk" data-qa="riskHeader">
-                                <button type="button" class="sort-button" data-sort="risk">
-                                    Risk
-                                    <span class="sort-indicator" aria-hidden="true"></span>
-                                </button>
+                            <th scope="col" class="govuk-table__header table-header--narrow" data-qa="riskHeader">
+                                Risk
                             </th>
 
                             <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-table__header--sortable" aria-sort="none" data-sort-column="activity" data-qa="activityHeader">
@@ -198,11 +195,7 @@
                 {% endif %}
 
             {% else %}
-                <div class="govuk-panel govuk-panel--confirmation" data-qa="noAlertsPanel">
-                    <div class="govuk-panel__body">
-                        You have no alerts at this time
-                    </div>
-                </div>
+                <p>You do not have any alerts.</p>
             {% endif %}
         </div>
     </div>
