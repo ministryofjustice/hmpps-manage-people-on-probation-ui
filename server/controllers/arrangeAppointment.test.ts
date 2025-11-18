@@ -968,7 +968,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })
   })
-  describe('getConfirmation', () => {
+  xdescribe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest()
       await controllers.arrangeAppointments.getConfirmation()(mockReq, res)

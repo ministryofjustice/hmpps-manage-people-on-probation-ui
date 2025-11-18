@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Request as ExpressRequest } from 'express'
-import { Controller } from '../@types'
+import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
   dateIsInPast,
@@ -380,7 +380,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { alertDismissed = false, data } = req.session
       const { forename, appointment } = getAttendedCompliedProps(req, res)
-      console.log({ forename, appointment })
       res.render('pages/appointments/attended-complied', {
         crn,
         id,
@@ -409,13 +408,45 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getAddNote: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      return res.render('pages/appointments/add-note', { crn, id, useDecorator: true })
+      let uploadedFiles: FileCache[] = []
+      let errorMessages = null
+      let body = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
+      }
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
+      if (req?.session?.body) {
+        body = req.session.body
+        delete req.session.body
+      }
+      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+
+      const { forename, appointment } = getAttendedCompliedProps(req, res)
+
+      return res.render('pages/appointments/add-note', {
+        crn,
+        id,
+        useDecorator: true,
+        errorMessages,
+        body,
+        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
+        maxFileSize,
+        fileUploadLimit,
+        uploadedFiles,
+        maxCharCount,
+        forename,
+        appointment,
+      })
     }
   },
   postAddNote: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      if (!isValidCrn(crn) || !isNumericString(id)) {
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
@@ -564,13 +595,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
+      const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
-      return res.render(`pages/arrange-appointment/confirmation`, { crn, backendId, isOutLookEventFailed })
+      return res.render(`pages/arrange-appointment/confirmation`, { crn, backendId, isInPast, isOutLookEventFailed })
     }
   },
   postConfirmation: () => {
     return async (req, res) => {
-      const { data } = req.session
       const { url } = req
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {

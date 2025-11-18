@@ -13,8 +13,8 @@
         {% endif %}
     {% endfor %}
 {% endif %}
-
-{% set notesConfig = {
+{% block form %}
+    {% set notesConfig = {
     rows: '10',
     maxlength: maxCharCount,
     classes: "",
@@ -22,21 +22,21 @@
         attributes: { "data-qa": "notes" }
     }
 } %}
-{% if errorMessages.notes %}
-    {% set errorMsgNotes = {
-        text: "Note must be " + maxCharCount + " characters or less"
-    } %}
-{% else %}
-    {% set errorMsgNotes = null %}
-{% endif %}
-{% if not useDecorator %}
-    {% set notesConfig = notesConfig | merge({id: "notes", name: "notes", value: body.notes, errorMessage: errorMsgNotes}) %}
-{% endif %}
-{% if useDecorator %}
-    {% set notesConfig = notesConfig | decorateFormAttributes(['appointments', crn, id, 'notes']) %}
-{% endif %}
+    {% if errorMessages.notes %}
+        {% set errorMsgNotes = {
+            text: "Note must be " + maxCharCount + " characters or less"
+        } %}
+    {% else %}
+        {% set errorMsgNotes = null %}
+    {% endif %}
+    {% if not useDecorator %}
+        {% set notesConfig = notesConfig | merge({id: "notes", name: "notes", value: body.notes, errorMessage: errorMsgNotes}) %}
+    {% endif %}
+    {% if useDecorator %}
+        {% set notesConfig = notesConfig | decorateFormAttributes(['appointments', crn, id, 'notes']) %}
+    {% endif %}
 
-{% set sensitivityConfig = {
+    {% set sensitivityConfig = {
     fieldset: {
         legend: {
             text: 'Does this appointment include sensitive information?',
@@ -63,22 +63,21 @@
         }        
     ]
 } %}
-{% if errorMessages.sensitive %}
-    {% set errorMsgSensitivity = {
-        text: "Note must be " + maxCharCount + " characters or less"
-    } %}
-{% else %}
-    {% set errorMsgSensitivity = null %}
-{% endif %}
-{% if not useDecorator %}
-    {% set sensitivityConfig = sensitivityConfig | merge({name: 'sensitive', id: 'sensitive', errorMessage: errorMsgSensitivity}) %}
-{% endif %}
+    {% if errorMessages.sensitivity %}
+        {% set errorMsgSensitivity = {
+            text: errorMessages.sensitivity
+        } %}
+    {% else %}
+        {% set errorMsgSensitivity = null %}
+    {% endif %}
+    {% if not useDecorator %}
+        {% set sensitivityConfig = sensitivityConfig | merge({name: 'sensitivity', id: 'sensitivity', errorMessage: errorMsgSensitivity}) %}
+    {% endif %}
 
-{% if useDecorator %}
-    {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', crn, id, 'sensitivity']) %}
-{% endif %}
+    {% if useDecorator %}
+        {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', crn, id, 'sensitivity']) %}
+    {% endif %}
 
-{% block form %}
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
     {{ govukDetails({
                           classes: 'govuk-!-margin-bottom-6',
@@ -139,5 +138,32 @@
                         uploadHtml: uploadHtml
                     }) }}
 
+    {# {{ govukRadios({
+    fieldset: {
+        legend: {
+            text: 'Does this appointment include sensitive information?',
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+        }
+    },
+    formGroup: {
+        attributes: {
+            'data-qa': 'sensitiveInformation'
+        }
+    },
+    hint: {
+        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+    },
+    items: [
+        {
+            value: 'Yes',
+            text: "Yes, it includes sensitive information"
+        },
+        {
+            value: 'No',
+            text: "No, it is not sensitive"
+        }
+    ]
+} | decorateFormAttributes(['appointments', crn, id, 'sensitivity'])) }} #}
     {{ govukRadios(sensitivityConfig) }}
 {% endblock %}
