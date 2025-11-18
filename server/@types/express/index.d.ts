@@ -36,6 +36,7 @@ declare module 'express-session' {
       activityLog?: ActivityLogCache
       uploadedFiles?: FileCache[]
     }
+    body?: Record<string, any>
   }
 
   interface DocumentFilters {
