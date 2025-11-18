@@ -42,6 +42,13 @@ export const getUuid = () => {
   })
 }
 
+export const getCheckinUuid = () => {
+  return cy.url().then(currentUrl => {
+    const split = currentUrl.split('?')[0].split('/')
+    return split[split.length - 3]
+  })
+}
+
 export const getCrn = () => {
   return cy.url().then(currentUrl => {
     const split = currentUrl.split('?')[0].split('/')

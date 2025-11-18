@@ -3,8 +3,7 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn  +"/appointments" %}
 {% set formAnchorText = "Cancel" %}
-{% set hideButton = true %}
-{% block beforeContent %}{% endblock %}
+{% set backLink =  '/case/' + crn + '/appointments' %}
 {% block form %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
@@ -97,19 +96,4 @@
 
         </div>
     </div>
-    <form method="post" autocomplete="off" action="{{ paths.current  }}">
-        <div class="govuk-button-group">
-           {# {{ govukButton({
-                html: buttonText,
-                attributes: {
-                    'data-qa': 'submit-btn'
-                }
-            }) }}#}
-            <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink">
-                {{ formAnchorText }}
-            </a>
-        </div>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-    </form>
-
 {% endblock %}
