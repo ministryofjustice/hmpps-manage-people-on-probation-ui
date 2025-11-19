@@ -9,6 +9,8 @@ const alertsController: Controller<typeof routes, void> = {
     return async (req, res, next) => {
       const { user } = res.locals
       const { page = '0', sortBy, sortOrder } = req.query as Record<string, string>
+      let { url } = req
+      url = encodeURIComponent(url)
       const pageNumber = parseInt(page, 10)
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
@@ -24,12 +26,8 @@ const alertsController: Controller<typeof routes, void> = {
         sortQueryString += `&sortOrder=${sortOrder}`
       }
 
-      console.log(alertsData)
-      for (let i = 0; i < alertsData.content.length; i += 1) {
-        console.log(alertsData.content[i].alertNotes)
-      }
-
       res.render('pages/alerts', {
+        url,
         alertsData,
         sortQueryString,
         currentSort: {

@@ -103,7 +103,7 @@
                                             {{ alert.type.description }}
                                         </a></p>
 
-                                    {% if alert.description or alert.alertNotes.length > 0 %}
+                                    {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
                                         {{ govukDetails({
                                             summaryText: "More information",
                                             classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
@@ -224,18 +224,21 @@
 {% macro renderAlertDetails(alert) %}
     {% if alert.description %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">Description</span>
-        <div data-qa="alertDescription-{{ alert.id }}">
+        <div class={{"govuk-!-margin-bottom-5" if alert.alertNotes.length > 0 or alert.alertNote else ""}} data-qa="alertDescription-{{ alert.id }}">
             {{ alert.description }}
         </div>
     {% endif %}
 
-    {% if alert.alertNotes.length > 0 %}
+    {% if alert.alertNotes.length > 0 or alert.alertNote %}
         {% set notes = '' %}
         {% for note in alert.alertNotes %}
             {% if note.note %}
-                {% set notes = notes.concat(appNote(note, '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage/note/' + appointmentNote.id + '?category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page + '&back=' + baseUrl)) %}
+                {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/alert/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
             {% endif %}
         {% endfor  %}
+        {% if alert.alertNote %}
+            {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/alert/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
+        {% endif %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">Notes</span>
         <div data-qa="alertNotes-{{ alert.id }}">
             {{ notes | safe }}

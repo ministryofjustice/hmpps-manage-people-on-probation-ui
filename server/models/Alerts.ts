@@ -13,6 +13,7 @@ export interface UserAlertsContent {
   date: string
   description?: string
   alertNotes?: Note[]
+  alertNote?: Note
   officer: Officer
   riskLevel?: 'VERY HIGH ROSH' | 'HIGH ROSH' | 'MEDIUM ROSH' | 'LOW ROSH'
 }
