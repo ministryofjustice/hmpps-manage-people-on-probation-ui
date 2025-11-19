@@ -43,12 +43,12 @@ context('Appointment check-ins', () => {
     ])
 
     getCheckinUuid().then(uuid => {
-      dateFrequencyPage.getElement(`#appointments-X000001-${uuid}-checkins-date-error`).should($error => {
+      dateFrequencyPage.getElement(`#esupervision-X000001-${uuid}-checkins-date-error`).should($error => {
         expect($error.text().trim()).to.include(
           'Enter the date you would like the person to complete their first check in',
         )
       })
-      dateFrequencyPage.getElement(`#appointments-X000001-${uuid}-checkins-interval-error`).should($error => {
+      dateFrequencyPage.getElement(`#esupervision-X000001-${uuid}-checkins-interval-error`).should($error => {
         expect($error.text().trim()).to.include('Select how often you would like the person to check in')
       })
     })

@@ -16,7 +16,7 @@
             }
         },
         minDate: checkInMinDate
-    } | decorateFormAttributes(['appointments', crn, id, 'checkins', 'date'])) }}
+    } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'date'])) }}
 
     {{ govukRadios({
         fieldset: {
@@ -48,6 +48,6 @@
                 text: "Every 8 weeks"
             }
         ]
-    } | decorateFormAttributes(['appointments', crn, id, 'checkins', 'interval'])) }}
+    } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'interval'])) }}
 
 {% endblock %}

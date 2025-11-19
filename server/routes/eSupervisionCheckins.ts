@@ -16,7 +16,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   router.post(
     '/case/:crn/appointments/:id/check-in/date-frequency',
     autoStoreSessionData(hmppsAuthClient),
-    validate.appointments,
+    validate.eSuperVision,
     controllers.checkIns.postDateFrequencyPage(),
   )
 
