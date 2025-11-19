@@ -1,14 +1,11 @@
-import { DateTime } from 'luxon'
 import {
   isNotEmpty,
   isValidDate,
   isValidDateFormat,
   isStringNumber,
   timeIsNotLaterThan,
-  isTodayOrLater,
   isNotEarlierThan,
   isValidCharCount,
-  timeIsNowOrInFuture,
   timeIsValid24HourFormat,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
@@ -185,7 +182,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select if appointment includes sensitive information',
+          msg: 'Select whether or not the appointment note contains sensitive information',
           log: 'Sensitivity not selected',
         },
       ],
@@ -222,7 +219,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    sensitive: {
+    sensitivity: {
       optional: page !== `appointment/${contactId}/add-note`,
       checks: [
         {
@@ -243,7 +240,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     outcomeRecorded: {
-      optional: page !== `appointments/${contactId}/attended-complied`,
+      optional: page !== `appointment/${contactId}/attended-complied`,
       checks: [
         {
           validator: isNotEmpty,
