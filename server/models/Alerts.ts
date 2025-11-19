@@ -1,3 +1,4 @@
+import { Note } from '../data/model/note'
 import { Officer } from '../data/model/schedule'
 
 export interface UserAlertsType {
@@ -11,7 +12,7 @@ export interface UserAlertsContent {
   crn: string
   date: string
   description?: string
-  notes?: string
+  alertNotes?: Note[]
   officer: Officer
   riskLevel?: 'VERY HIGH ROSH' | 'HIGH ROSH' | 'MEDIUM ROSH' | 'LOW ROSH'
 }

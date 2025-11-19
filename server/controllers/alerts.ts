@@ -1,6 +1,6 @@
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
-import { UserAlerts } from '../models/Alerts'
+import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 
 const routes = ['getAlerts', 'clearSelectedAlerts'] as const
 
@@ -22,6 +22,11 @@ const alertsController: Controller<typeof routes, void> = {
       }
       if (sortOrder) {
         sortQueryString += `&sortOrder=${sortOrder}`
+      }
+
+      console.log(alertsData)
+      for (let i = 0; i < alertsData.content.length; i += 1) {
+        console.log(alertsData.content[i].alertNotes)
       }
 
       res.render('pages/alerts', {
