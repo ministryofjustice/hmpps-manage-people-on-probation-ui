@@ -2,7 +2,7 @@ import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 
-const routes = ['getAlerts', 'clearSelectedAlerts'] as const
+const routes = ['getAlerts', 'clearSelectedAlerts', 'getAlertsNote'] as const
 
 const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
@@ -34,6 +34,26 @@ const alertsController: Controller<typeof routes, void> = {
           column: sortBy,
           order: sortOrder,
         },
+      })
+    }
+  },
+
+  getAlertsNote: hmppsAuthClient => {
+    return async (req, res, next) => {
+      const { user } = res.locals
+      const { alertId, noteId } = req.params
+      const { back } = req.query
+
+      const token = await hmppsAuthClient.getSystemClientToken(user.username)
+      const masClient = new MasApiClient(token)
+
+      const alert: UserAlertsContent = await masClient.getAlertNote(alertId, noteId)
+
+      console.log(alert)
+
+      res.render('pages/alerts-note', {
+        alert,
+        back,
       })
     }
   },

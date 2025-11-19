@@ -1,0 +1,62 @@
+{% extends "../partials/layout.njk" %}
+{% set appointment = personAppointment.appointment %}
+{% set personSummary = personAppointment.personSummary %}
+{% set backLink = back if back else '/alerts/' %}
+{% block beforeContent %}
+  {% if backLink %}
+    {{ govukBackLink({
+    href: backLink
+  }) }}
+  {% endif %}
+{% endblock %}
+
+{% block content %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+        <span data-qa="alertTitle">{{ alert.type.description }}</span>
+      </h2>
+    </div>
+  </div>
+  
+  {% set alertDetails %}
+{{ govukSummaryList({
+  classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
+  rows: [
+    {
+      key: { html: '<span data-qa="alertCRNLabel">CRN</span>' },
+      value: { html: '<span data-qa="alertCRNValue">' + alert.crn + '</span>'}
+    },
+    {
+      key: { html: '<span data-qa="alertNameLabel">Name</span>' },
+      value: { html: '<span data-qa="alertNameValue">' + alert.forename + ' ' + alert.surname + '</span>'}
+    },
+    {
+      key: { html: '<span data-qa="alertDescriptionLabel">Description</span>' },
+      value: { html: '<span data-qa="alertDescriptionValue">' + alert.description + '</span>'}
+    } if alert.description,
+    {
+      key: { html: '<span data-qa="alertCreatedByLabel">Note CreatedBy</span>' },
+      value: { html: '<span data-qa="alertCreatedByValue">' + alert.alertNote.createdBy + '</span>'}
+    }, 
+    {
+      key: { html: '<span data-qa="alertCreatedByDateLabel">Note CreatedByDate</span>' },
+      value: { html: '<span data-qa="alertCreatedByDateValue">' + alert.alertNote.createdByDate + '</span>'}
+    } ,
+    {
+      key: { html: '<span data-qa="alertNoteLabel">Note</span>' },
+      value: { html: '<span data-qa="alertNoteValue">' + alert.alertNote.note + '</span>'}
+    }
+  ]
+  }) }}
+  {% endset %}
+
+  {{ appSummaryCard({
+  attributes: {'data-qa': 'alertDetailsCard'},
+  titleText: 'Details',
+  headingLevel: '3',
+  classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+  html: alertDetails
+}) }}
+
+{% endblock %}

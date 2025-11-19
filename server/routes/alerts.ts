@@ -10,4 +10,6 @@ export default function alertsRoutes(router: Router, { hmppsAuthClient }: Servic
 
   get('/alerts', controllers.alerts.getAlerts(hmppsAuthClient))
   post('/alerts/clear', controllers.alerts.clearSelectedAlerts(hmppsAuthClient))
+
+  get('/alerts/:alertId/notes/:noteId', controllers.alerts.getAlertsNote(hmppsAuthClient))
 }
