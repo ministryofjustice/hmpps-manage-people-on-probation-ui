@@ -16,6 +16,8 @@ import {
   checkUpdateSensitivity,
   checkUpdateSentence,
   checkUpdateType,
+  completeAttendedCompliedPage,
+  completeAddNotePage,
 } from './imports'
 import { statusErrors } from '../../../server/properties/statusErrors'
 
@@ -25,17 +27,24 @@ const loadPage = ({
   sentenceOptionIndex = 1,
   repeatAppointments = false,
   notes = true,
+  dateInPast = false,
 } = {}) => {
   if (repeatAppointments) {
     cy.task('stubRepeats')
   }
   completeSentencePage(sentenceOptionIndex, '')
   completeTypePage(typeOptionIndex, hasVisor)
-  completeLocationDateTimePage()
+  completeLocationDateTimePage({ dateInPast })
   if (repeatAppointments) {
     completeRepeatingPage()
   }
-  completeSupportingInformationPage(notes)
+  if (!dateInPast) {
+    completeSupportingInformationPage(notes)
+  }
+  if (dateInPast) {
+    completeAttendedCompliedPage()
+    completeAddNotePage()
+  }
 }
 
 describe('Check your answers then confirm the appointment', () => {
@@ -43,87 +52,191 @@ describe('Check your answers then confirm the appointment', () => {
     cy.task('resetMocks')
   })
 
-  it('should render the page', () => {
-    loadPage()
-    const cyaPage = new AppointmentCheckYourAnswersPage()
-    checkPopHeader('Alton Berge', true)
-    const showsProbationPractitioner = true
-    checkAppointmentSummary(cyaPage, showsProbationPractitioner)
-    cy.get('[data-qa="calendarInviteInset"]').should(
-      'contain.text',
-      `You'll receive a calendar invite for the appointment`,
-    )
-  })
-
-  it('should render the page with VISOR report', () => {
-    it('should display the visor report answer', () => {
-      cy.task('stubOverviewVisorRegistration')
-      loadPage({ hasVisor: true })
+  describe('Appointment date is in the future', () => {
+    it('should render the page', () => {
+      loadPage()
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'VISOR report')
-      cyaPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+      checkPopHeader('Alton Berge', true)
+      const showsProbationPractitioner = true
+      checkAppointmentSummary(cyaPage, showsProbationPractitioner)
+      cy.get('[data-qa="calendarInviteInset"]').should(
+        'contain.text',
+        `You'll receive a calendar invite for the appointment`,
+      )
+    })
+
+    it('should render the page with VISOR report', () => {
+      it('should display the visor report answer', () => {
+        cy.task('stubOverviewVisorRegistration')
+        loadPage({ hasVisor: true })
+        const cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'VISOR report')
+        cyaPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+      })
+    })
+
+    it('should render the page with sentence and licence condition', () => {
+      loadPage({})
+      cy.get('[data-qa="appointmentSentence"]').should('contain.text', '12 month Community order')
+      cy.get('[data-qa="appointmentLicenceCondition"]').should(
+        'contain.text',
+        'Alcohol Monitoring (Electronic Monitoring)',
+      )
+      cy.get('[data-qa="appointmentRequirment"]').should('not.exist')
+      cy.get('[data-qa="appointmentForename"]').should('not.exist')
+    })
+
+    it('should render the page with sentence and requirment', () => {
+      loadPage({ hasVisor: false, sentenceOptionIndex: 2 })
+      cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
+      cy.get('[data-qa="appointmentRequirement"]').should('contain.text', '12 days RAR, 1 completed')
+      cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
+      cy.get('[data-qa="appointmentForename"]').should('not.exist')
+    })
+
+    it('should render the page with sentence and nsi', () => {
+      loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3 })
+      cy.get('[data-qa="appointmentSentence"]').should('contain.text', 'ORA Community Order')
+      cy.get('[data-qa="appointmentNsi"]').should('contain.text', 'BRE description')
+    })
+
+    it('should render the page with personal contact', () => {
+      loadPage({ hasVisor: false, typeOptionIndex: 2, sentenceOptionIndex: 4 })
+      cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
+      cy.get('[data-qa="appointmentSentence"]').should('not.exist')
+      cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
+      cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
+    })
+
+    it('should render the page when repeating appointment featureflag is toggled off', () => {
+      cy.task('stubNoRepeats')
+      loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, repeatAppointments: false })
+      it('should not display the repeating appointment row', () => {
+        cy.get('[data-qa="repeatingAppointmentLabel"]').should('not.exist')
+        cy.get('[data-qa="repeatingAppointmentValue"]').should('not.exist')
+      })
+    })
+
+    it('should render the page when no notes have been entered', () => {
+      loadPage({ hasVisor: false, typeOptionIndex: 1, sentenceOptionIndex: 3, notes: false })
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
+    })
+
+    describe('Change appointment values', () => {
+      let cyaPage: AppointmentCheckYourAnswersPage
+      beforeEach(() => {
+        loadPage()
+        cyaPage = new AppointmentCheckYourAnswersPage()
+      })
+      it('should update the sentence when value is changed', () => {
+        checkUpdateSentence(cyaPage)
+      })
+      it('should update the type when value is changed', () => {
+        checkUpdateType(cyaPage)
+      })
+      it('should update the location when value is changed', () => {
+        checkUpdateLocation(cyaPage)
+      })
+      it('should update the date when value is changed', () => {
+        checkUpdateDateTime(cyaPage)
+      })
+      it('should update the notes when value is changed', () => {
+        checkUpdateNotes(cyaPage)
+      })
+      it('should update the sensitivity when value is changed', () => {
+        checkUpdateSensitivity(cyaPage)
+      })
+    })
+    describe('Confirm this appointment', () => {
+      let cyaPage: AppointmentCheckYourAnswersPage
+      beforeEach(() => {
+        loadPage()
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.getSubmitBtn().click()
+      })
+      it('should submit the appointment and redirect to the confirmation page', () => {
+        const confirmPage = new AppointmentConfirmationPage()
+        confirmPage.checkOnPage()
+      })
+    })
+    describe('Duplicate appointment', () => {
+      let cyaPage: AppointmentCheckYourAnswersPage
+      beforeEach(() => {
+        cy.task('stubAppointmentDuplicate')
+        loadPage()
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.getSubmitBtn().click()
+      })
+      it('should render the 409 error page', () => {
+        cy.get('h1').should('contain.text', statusErrors[409].title)
+        cy.get('[data-qa="errorMessage"]').should('contain.text', 'Go to the Manage people on probation homepage')
+        cy.get('[data-qa="homepageLink"]').click()
+        const homepage = new IndexPage()
+        homepage.checkOnPage()
+      })
     })
   })
 
-  it('should render the page with personal contact', () => {
-    loadPage({ hasVisor: false, typeOptionIndex: 2, sentenceOptionIndex: 4 })
-    cy.get('[data-qa="appointmentForename"]').should('contain.text', 'Alton')
-    cy.get('[data-qa="appointmentSentence"]').should('not.exist')
-    cy.get('[data-qa="appointmentRequirement"]').should('not.exist')
-    cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
+  describe('Appointment date is in the past', () => {
+    beforeEach(() => {
+      loadPage({ dateInPast: true })
+    })
+    it('should display the attended and complied row', () => {
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      checkAppointmentSummary(cyaPage, false, true)
+      it('should update the notes when value is changed', () => {
+        checkUpdateNotes(cyaPage)
+      })
+      it('should update the sensitivity when value is changed', () => {
+        checkUpdateSensitivity(cyaPage)
+      })
+    })
   })
+  describe('User updates the appointment date', () => {
+    let cyaPage: AppointmentCheckYourAnswersPage
 
-  describe('Change appointment values', () => {
-    let cyaPage: AppointmentCheckYourAnswersPage
-    beforeEach(() => {
-      loadPage()
+    const changeDate = (dateInPast = false) => {
+      loadPage({ dateInPast })
       cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
+    }
+
+    describe('changes future appointment to past appointment', () => {
+      beforeEach(() => {
+        changeDate()
+        completeLocationDateTimePage({ dateInPast: true })
+      })
     })
-    it('should update the sentence when value is changed', () => {
-      checkUpdateSentence(cyaPage)
+    describe('changes past appointment to future appointment', () => {
+      beforeEach(() => {
+        changeDate(true)
+        completeLocationDateTimePage()
+      })
     })
-    it('should update the type when value is changed', () => {
-      checkUpdateType(cyaPage)
+    describe('changes future appointment date to another date in the future', () => {
+      beforeEach(() => {
+        changeDate()
+        completeLocationDateTimePage()
+      })
     })
-    it('should update the location when value is changed', () => {
-      checkUpdateLocation(cyaPage)
+    describe('changes past appointment date to another date in the past', () => {
+      beforeEach(() => {
+        changeDate(true)
+        completeLocationDateTimePage({ dateInPast: true })
+      })
     })
-    it('should update the date when value is changed', () => {
-      checkUpdateDateTime(cyaPage)
+    describe('submits the same future appointment date', () => {
+      beforeEach(() => {
+        changeDate()
+        completeLocationDateTimePage()
+      })
     })
-    it('should update the notes when value is changed', () => {
-      checkUpdateNotes(cyaPage)
-    })
-    it('should update the sensitivity when value is changed', () => {
-      checkUpdateSensitivity(cyaPage)
-    })
-  })
-  describe('Confirm this appointment', () => {
-    let cyaPage: AppointmentCheckYourAnswersPage
-    beforeEach(() => {
-      loadPage()
-      cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.getSubmitBtn().click()
-    })
-    it('should submit the appointment and redirect to the confirmation page', () => {
-      const confirmPage = new AppointmentConfirmationPage()
-      confirmPage.checkOnPage()
-    })
-  })
-  describe('Duplicate appointment', () => {
-    let cyaPage: AppointmentCheckYourAnswersPage
-    beforeEach(() => {
-      cy.task('stubAppointmentDuplicate')
-      loadPage()
-      cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.getSubmitBtn().click()
-    })
-    it('should render the 409 error page', () => {
-      cy.get('h1').should('contain.text', statusErrors[409].title)
-      cy.get('[data-qa="errorMessage"]').should('contain.text', 'Go to the Manage people on probation homepage')
-      cy.get('[data-qa="homepageLink"]').click()
-      const homepage = new IndexPage()
-      homepage.checkOnPage()
+    describe('submits the same past appointment date', () => {
+      beforeEach(() => {
+        changeDate(true)
+        completeLocationDateTimePage({ dateInPast: true })
+      })
     })
   })
 })
