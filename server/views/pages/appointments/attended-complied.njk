@@ -1,6 +1,7 @@
 {% extends "../_form.njk" %}
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
+{% set headerPersonName = forename + ' ' + surname %}
 
 {% set config = {
    classes: "govuk-checkboxes--small",
@@ -27,7 +28,7 @@
 } %}
 {% if errorMessages.outcomeRecorded %}
   {% set errorMsg = {
-    text: "Note must be " + maxCharCount + " characters or less"
+    text: errorMessages.outcomeRecorded
   } %}
 {% else %}
   {% set errorMsg = null %}
@@ -50,7 +51,7 @@
       'data-qa': 'submit-btn'
     }
   }) }}
-    <a class="govuk-link" href="{{ cancelLink | default('/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage') }}">Cancel and go back</a>
+    <a class="govuk-link" href="{{ cancelLink | default('/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage') }}" data-qa="cancelGoBackLink">Cancel and go back</a>
   </div>
 
 {% endblock %}
