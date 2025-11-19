@@ -51,6 +51,7 @@ describe('alertsController', () => {
         alertsData: mockUserAlerts, // Uses imported mock
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
+        url: '%2Falerts',
       })
     })
 
@@ -68,6 +69,7 @@ describe('alertsController', () => {
         alertsData: mockUserAlerts,
         sortQueryString: '&sortBy=date&sortOrder=desc',
         currentSort: { column: 'date', order: 'desc' },
+        url: '%2Falerts',
       })
     })
   })
