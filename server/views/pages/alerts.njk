@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "moj/components/badge/macro.njk" import mojBadge %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
 
 {% set alerts = true %}
 
@@ -148,50 +149,69 @@
                 </form>
 
                 {% if alertsData.totalPages > 1 %}
-                    <nav class="moj-pagination" aria-label="Pagination" data-qa="pagination">
-                        <ul class="moj-pagination__list">
-                            {% if alertsData.page > 0 %}
-                                <li class="moj-pagination__item moj-pagination__item--prev">
-                                    <a class="moj-pagination__link" href="?page={{ alertsData.page - 1 }}{{ sortQueryString }}" data-qa="previousPage">
-                                        <svg class="moj-pagination__icon" xmlns="http://www.w3.org/2000/svg" height="13" width="17" viewBox="0 0 17 13">
-                                            <path d="m6.5938-0.0078125-6.7266 6.7266 6.7441 6.4062 1.377-1.449-4.1856-3.9768h12.896v-2h-12.984l4.2931-4.293-1.414-1.414z"></path>
-                                        </svg>
-                                        <span class="moj-pagination__link-label">Previous<span class="govuk-visually-hidden"> page</span></span>
-                                    </a>
-                                </li>
-                            {% endif %}
+                    {% set currentPage = alertsData.page or 0 %}
+                    {% set totalPages = alertsData.totalPages %}
 
-                            {% set startPage = 0 %}
-                            {% if alertsData.page > 0 %}
-                                {% set startPage = alertsData.page - 1 %}
-                            {% endif %}
-                            {% set endPage = alertsData.totalPages - 1 %}
-                            {% if alertsData.page < alertsData.totalPages - 1 %}
-                                {% set endPage = alertsData.page + 1 %}
-                            {% endif %}
+                    {% set sortFragment = sortQueryString | slice(1) if sortQueryString and sortQueryString.length > 0 else '' %}
+                    {% set url = "/alerts?" + sortFragment + ('&' if sortFragment else '') %}
 
-                            {% for pageNum in range(startPage, endPage + 1) %}
-                                <li class="moj-pagination__item {% if pageNum == alertsData.page %}moj-pagination__item--active{% endif %}" data-qa="page-{{ pageNum + 1 }}">
-                                    {% if pageNum == alertsData.page %}
-                                        <span class="moj-pagination__link" aria-current="page">{{ pageNum + 1 }}</span>
-                                    {% else %}
-                                        <a class="moj-pagination__link" href="?page={{ pageNum }}{{ sortQueryString }}" aria-label="Page {{ pageNum + 1 }}">{{ pageNum + 1 }}</a>
-                                    {% endif %}
-                                </li>
-                            {% endfor %}
+                    {% set paginationItems = [] %}
+                    {% set totalLinks = 3 %}
+                    {% if totalLinks > totalPages %}
+                        {% set totalLinks = totalPages %}
+                    {% endif %}
 
-                            {% if alertsData.page < alertsData.totalPages - 1 %}
-                                <li class="moj-pagination__item moj-pagination__item--next">
-                                    <a class="moj-pagination__link" href="?page={{ alertsData.page + 1 }}{{ sortQueryString }}" data-qa="nextPage">
-                                        <span class="moj-pagination__link-label">Next<span class="govuk-visually-hidden"> page</span></span>
-                                        <svg class="moj-pagination__icon" xmlns="http://www.w3.org/2000/svg" height="13" width="17" viewBox="0 0 17 13">
-                                            <path d="m10.107-0.0078125-1.4136 1.414 4.2926 4.293h-12.986v2h12.896l-4.1855 3.9766 1.377 1.4492 6.7441-6.4062-6.7246-6.7266z"></path>
-                                        </svg>
-                                    </a>
-                                </li>
-                            {% endif %}
-                        </ul>
-                    </nav>
+                    {% set start = 0 %}
+                    {% set end = start + totalLinks %}
+                    {% if currentPage > 0 %}
+                        {% set start = currentPage -1 %}
+                        {% set end = start + totalLinks %}
+                    {% endif %}
+                    {% if currentPage + 1 == totalPages %}
+                        {% set start = currentPage - (totalLinks -1) %}
+                        {% set end = totalPages %}
+                    {% endif %}
+
+                    {% if (totalPages > 3) and (currentPage != 0) and (start != 0) %}
+                        {% set paginationItems = (paginationItems.push(
+                            {
+                                number: 1,
+                                href: url + 'page=0'
+                            },
+                            {
+                                ellipsis: true
+                            }), paginationItems) %}
+                    {% endif %}
+
+                    {% for i in range(start , end) -%}
+                        {% set paginationItems = (paginationItems.push({
+                            number: i + 1,
+                            href: url + 'page=' + i,
+                            current: true if i == currentPage else false
+                        }), paginationItems) %}
+                    {% endfor %}
+
+                    {% if (totalPages > 3) and ((currentPage + 1) != totalPages) and (end !== totalPages) %}
+                        {% set paginationItems = (paginationItems.push(
+                            {
+                                ellipsis: true
+                            },
+                            {
+                                number: totalPages,
+                                href: url + 'page=' + (totalPages - 1)
+                            }
+                        ), paginationItems) %}
+                    {% endif %}
+
+                    {{ govukPagination({
+                        previous: {
+                            href: url + 'page=' + (currentPage - 1)
+                        } if currentPage > 0 and totalPages > 1,
+                        next: {
+                            href: url + 'page=' + (currentPage + 1)
+                        } if currentPage + 1 < totalPages and totalPages > 1,
+                        items: paginationItems
+                    }) }}
                 {% endif %}
 
             {% else %}
