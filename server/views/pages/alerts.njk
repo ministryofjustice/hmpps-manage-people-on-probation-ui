@@ -88,14 +88,12 @@
                                     <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
                                 </td>
 
-                                <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ alert.riskLevel or '' }}" data-qa="alertRisk">
-                                    {% if alert.riskLevel %}
-                                        <div class="predictor-timeline-item predictor-timeline-item--{{ alert.riskLevel | lower | replace(' ', '-') }}">
-                                    <span class="predictor-timeline-item__level">
-                                        <strong>ROSH</strong> {{ alert.riskLevel | upper }}
-                                    </span>
-                                        </div>
-                                    {% endif %}
+                                <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ risksWidget.overallRisk or '' }}" data-qa="alertRisk">
+
+                                    {% set risksWidget = crnToRiskWidgetMap[crn] %}
+
+                                        <div>{{ predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }) }}</div>
+
                                 </td>
 
                                 <td class="govuk-table__cell govuk-!-width-one-third" data-sort-value="{{ alert.type.description }}" data-qa="alertActivity">
@@ -244,4 +242,48 @@
     <a href="/case/{{ alert.crn }}/activity-log/contact/{{ alert.id }}" class="govuk-link" data-qa="viewMoreLink-{{ alert.id }}">
         Open the activity to view more
     </a>
+{% endmacro %}
+
+
+{% macro getOverallRiskLevelClass(level) %}
+    {% if level == 'VERY_HIGH' %}
+        rosh-widget--very-high
+        {% elif level == 'HIGH' %}
+        rosh-widget--high
+        {% elif level == 'MEDIUM' %}
+        rosh-widget--medium
+        {% elif level == 'LOW' %}
+        rosh-widget--low
+    {% endif %}
+{% endmacro %}
+
+{% macro getRiskLevelText(level) %}
+    {% if level == 'VERY_HIGH' %}
+        Very high
+        {% elif level == 'HIGH' %}
+        High
+        {% elif level == 'MEDIUM' %}
+        Medium
+        {% elif level == 'LOW' %}
+        Low
+    {% else  %}
+        N/A
+    {% endif %}
+{% endmacro %}
+
+{% macro getRiskLevelClass(level, overall) %}
+
+    {% if level == overall %}
+        {% if level == 'VERY_HIGH' %}
+            rosh--very-high
+            {% elif level == 'HIGH' %}
+            rosh--high
+            {% elif level == 'MEDIUM' %}
+            rosh--medium
+            {% elif level == 'LOW' %}
+            rosh--low
+        {% endif %}
+        {% elif level === undefined %}
+        govuk-hint
+    {% endif %}
 {% endmacro %}

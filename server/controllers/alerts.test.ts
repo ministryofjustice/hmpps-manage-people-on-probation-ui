@@ -3,11 +3,15 @@ import controllers from '.'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
+import ArnsApiClient from '../data/arnsApiClient'
+import * as Utils from '../utils'
 import { mockAppResponse } from './mocks'
 
-import { mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
+jest.mock('../data/arnsApiClient')
+jest.mock('../utils')
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -17,16 +21,53 @@ jest.mock('../data/hmppsAuthClient', () => {
 })
 jest.mock('../data/tokenStore/redisTokenStore')
 
+const mockRoshWidget = {
+  overallRisk: 'HIGH',
+  assessedOn: '2025-11-19',
+  risks: [{ riskTo: 'General Public', community: ['HIGH'], custody: ['MEDIUM'] }],
+} as any
+
+const mockCrnToRiskWidgetMap = { X123456: mockRoshWidget }
+
+const mockUserAlertsWithCrn = {
+  content: [
+    {
+      id: 1,
+      crn: 'X123456',
+      type: { description: 'Mock Type', editable: true },
+      date: '2025-10-26',
+      officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
+    },
+  ],
+  totalResults: 1,
+  totalPages: 1,
+  page: 0,
+  size: 10,
+}
+
+const mockRisksData = {
+  summary: {
+    overallRiskLevel: 'LOW',
+  },
+  assessedOn: '2025-11-19',
+} as any
+
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue('token-alerts')
 
 const getUserAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserAlerts')
-  .mockImplementation(() => Promise.resolve(mockUserAlerts)) // Use imported mock
+  .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn))
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
-  .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
+  .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess))
+
+const getRisksSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getRisks')
+  .mockImplementation(() => Promise.resolve(mockRisksData))
+
+const toRoshWidgetSpy = jest.spyOn(Utils, 'toRoshWidget').mockReturnValue(mockRoshWidget) // Returns the structurally correct DTO mock
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -47,8 +88,12 @@ describe('alertsController', () => {
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
       expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-        alertsData: mockUserAlerts, // Uses imported mock
+        alertsData: mockUserAlertsWithCrn,
+        crnToRiskWidgetMap: mockCrnToRiskWidgetMap,
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
       })
@@ -64,8 +109,12 @@ describe('alertsController', () => {
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
       expect(getUserAlertsSpy).toHaveBeenCalledWith(5, 'date', 'desc')
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-        alertsData: mockUserAlerts,
+        alertsData: mockUserAlertsWithCrn,
+        crnToRiskWidgetMap: mockCrnToRiskWidgetMap,
         sortQueryString: '&sortBy=date&sortOrder=desc',
         currentSort: { column: 'date', order: 'desc' },
       })
@@ -103,7 +152,7 @@ describe('alertsController', () => {
       const req = httpMocks.createRequest({
         method: 'POST',
         body: { selectedAlerts: ['456', '789'] },
-        url: '/alerts/clear',
+        url: '/alerts',
       })
       res.locals.user = defaultUser
 
