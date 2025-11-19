@@ -185,4 +185,10 @@ context('Overview', () => {
     page.getRowData('sentence11', 'order', 'Value').should('contain.text', 'No order details')
     page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'No requirements details')
   })
+
+  it('Overview page with very high risk to staff is rendered', () => {
+    cy.visit('/case/X778160')
+    const page = Page.verifyOnPage(OverviewPage)
+    page.getAlert().should('contain.text', 'is very high risk to staff')
+  })
 })
