@@ -49,8 +49,6 @@ const alertsController: Controller<typeof routes, void> = {
 
       const alert: UserAlertsContent = await masClient.getAlertNote(alertId, noteId)
 
-      console.log(alert)
-
       res.render('pages/alerts-note', {
         alert,
         back,
