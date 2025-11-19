@@ -42,6 +42,7 @@ import {
   MasUserDetails,
 } from '../models/Appointments'
 import { UserAlerts } from '../models/Alerts'
+import { ContactResponse } from './model/overdueOutcomes'
 
 interface GetUserScheduleProps {
   username: string
