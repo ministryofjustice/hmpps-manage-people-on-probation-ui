@@ -11,24 +11,12 @@ import { getMockedTime } from '../../routes/testRoutes'
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
-  const { checkInMinDate } = body
   const { data } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = {
-    crn,
-    id,
-    body,
-    contactId,
-    actionType,
-    personLevel,
-    maxCharCount,
-    back,
-    change,
-    checkInMinDate,
-  }
+  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
   let render = `pages/${[
@@ -190,20 +178,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateCheckins = () => {
-    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
-      render = `pages/check-in/date-frequency`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'date-frequency',
-        }),
-      )
-    }
-  }
-
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
@@ -214,7 +188,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateRecordAnOutcome()
   validateAttendedComplied()
   validateAddNote()
-  validateCheckins()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     if (isAddNotePage) {
