@@ -15,6 +15,7 @@ import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
+import { ContactResponse } from '../data/model/overdueOutcomes'
 
 export interface AppointmentLocals {
   meta: {
@@ -100,6 +101,7 @@ interface Locals {
   sentencePlan?: SentencePlan
   alertsCount?: string
   alertsCleared?: { error: boolean; message: string }
+  contactResponse?: ContactResponse
 }
 
 export interface AppResponse extends Response {

@@ -193,7 +193,8 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, actionType } = req.params
+      const { crn } = req.params
+      const actionType = 'outcome'
       const { contactId } = req.query
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
@@ -210,6 +211,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
+
   postRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, actionType } = req.params

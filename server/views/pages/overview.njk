@@ -6,7 +6,6 @@
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set appointmentsWithoutAnOutcomeCount = overview.appointmentsWithoutOutcome %}
-{% set waitingForEvidenceCount = overview.absencesWithoutEvidence %}
 {% set headerPersonName = overview.personalDetails.name.forename + ' ' + overview.personalDetails.name.surname %}
 {% set headerCRN = crn %}
 {% set headerDob = overview.personalDetails.dateOfBirth %}
@@ -135,7 +134,7 @@
       html: html
     }) }}
   {% endif %}
-  {% if appointmentsWithoutAnOutcomeCount > 0 or waitingForEvidenceCount > 0 %}
+  {% if appointmentsWithoutAnOutcomeCount > 0 %}
     {% set html %}
     <h2 class="govuk-heading-m">You have appointments that need attention</h2>
     <ul class="govuk-list govuk-!-margin-bottom-0">
@@ -143,12 +142,6 @@
         <li>
           <a href="/case/{{ crn }}/record-an-outcome/outcome">You need to record an outcome for {{ appointmentsWithoutAnOutcomeCount }}
             {{ 'appointment' if appointmentsWithoutAnOutcomeCount == 1 else 'appointments' }}</a>
-        </li>
-      {% endif %}
-      {% if waitingForEvidenceCount > 0 %}
-        <li>
-          <a href="/case/{{ crn }}/record-an-outcome/evidence">You have {{ waitingForEvidenceCount }}
-            {{ 'absence that is' if waitingForEvidenceCount == 1 else 'absences that are' }} waiting for evidence</a>
         </li>
       {% endif %}
     </ul>
