@@ -143,7 +143,6 @@ export interface LocalParams {
   id: string
   errors?: Errors
   body?: Record<string, string | string[]>
-  checkInMinDate?: string
   _minDate?: string
   _maxDate?: string
   contactId?: string
