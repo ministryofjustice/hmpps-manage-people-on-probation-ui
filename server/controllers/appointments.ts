@@ -20,6 +20,7 @@ import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
+import { getAttendedCompliedProps } from './arrangeAppointment'
 
 const routes = [
   'getAppointments',
@@ -228,15 +229,15 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { personSummary, appointment } = res.locals.personAppointment
-      const headerPersonName = `${personSummary.name.forename} ${personSummary.name.surname}`
-      const { forename } = personSummary.name
+      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const headerPersonName = `${forename} ${surname}`
       res.render('pages/appointments/attended-complied', {
         crn,
         alertDismissed,
         isInPast: true,
         headerPersonName,
         forename,
+        surname,
         appointment,
         decoratorName: 'outcomeRecorded',
       })
