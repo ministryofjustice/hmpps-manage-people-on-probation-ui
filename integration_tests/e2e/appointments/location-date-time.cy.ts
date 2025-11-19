@@ -6,6 +6,8 @@ import {
   crn,
   uuid,
   checkPopHeader,
+  completeAttendedCompliedPage,
+  completeAddNotePage,
   completeSupportingInformationPage,
 } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
@@ -13,6 +15,7 @@ import AppointmentLocationNotInListPage from '../../pages/appointments/location-
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
+import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
@@ -21,8 +24,10 @@ const loadPage = (typeOptionIndex = 1) => {
 
 describe('Pick a date, location and time for this appointment', () => {
   let locationDateTimePage: AppointmentLocationDateTimePage
+  let logOutcomePage: AttendancePage
   let locationNotInListPage: AppointmentLocationNotInListPage
   let notePage: AppointmentNotePage
+  let cyaPage: AppointmentCheckYourAnswersPage
   beforeEach(() => {
     cy.task('resetMocks')
   })
@@ -336,7 +341,7 @@ describe('Pick a date, location and time for this appointment', () => {
       cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
     })
     it('should display the log an outcome alert banner', () => {
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const tomorrow = now.plus({ days: 1 })
@@ -351,7 +356,7 @@ describe('Pick a date, location and time for this appointment', () => {
       }
       cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
       it('should hide the alert banner', () => {
-        cy.get('[data-module="serviceAlert"]').should('not.be.visible')
+        locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
       })
     })
   })
@@ -364,12 +369,12 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getDatePickerInput().type(`${yesterday.toFormat('d/M/yyyy')}`)
     })
     it('should display the log an outcome alert banner', () => {
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if a date is entered in the future', () => {
       const tomorrow = now.plus({ days: 1 }).toFormat('d/M/yyyy')
       locationDateTimePage.getDatePickerInput().clear().type(tomorrow)
-      cy.get('[data-module="serviceAlert"]').should('not.be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
 
@@ -393,7 +398,7 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
   })
   describe('Todays date is selected from the picker, and a start time in the future is entered', () => {
@@ -417,7 +422,7 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should not display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
-      cy.get('[data-module="serviceAlert"]').should('not.be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
   describe('Date in the past is selected', () => {
@@ -449,20 +454,22 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should persist the log an outcome alert banner when form is submitted with validation errors', () => {
       selectPastDate()
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
       locationDateTimePage.getSubmitBtn().click()
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
-    it('should persist the log an outcome alert banner when valid form is submitted and back link is clicked', () => {
+    it('should persist the log an outcome alert banner when past date is submitted and cancel and go back link is clicked from log an outcome page', () => {
       selectPastDate()
       locationDateTimePage.getElementInput(`startTime`).type('09:00')
       locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
-      notePage = new AppointmentNotePage()
-      notePage.getBackLink().click()
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      logOutcomePage = new AttendedCompliedPage()
+      logOutcomePage.checkOnPage()
+      logOutcomePage.getCancelGoBackLink().click()
+      locationDateTimePage.checkOnPage()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should persist the log an outcome banner when change link is clicked on check your answers page', () => {
       selectPastDate()
@@ -471,21 +478,26 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
-      completeSupportingInformationPage()
-      const page = new AppointmentCheckYourAnswersPage()
-      page.getSummaryListRow(5).find('.govuk-link').click()
-      cy.get('[data-module="serviceAlert"]').should('be.visible')
+      completeAttendedCompliedPage()
+      completeAddNotePage()
+      cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
   })
 
-  describe('All fields are selected, and continue is clicked', () => {
+  describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      const now = DateTime.now()
+      const tomorrow = now.plus({ days: 1 })
+      const tomorrowIsInCurrentMonth = tomorrow.month === now.month
       locationDateTimePage.getDatePickerToggle().click()
-      locationDateTimePage.getNextDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      if (!tomorrowIsInCurrentMonth) {
+        cy.get('.moj-js-datepicker-next-month').click()
+      }
+      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
@@ -501,9 +513,12 @@ describe('Pick a date, location and time for this appointment', () => {
         )
       locationDateTimePage.getSubmitBtn().click()
     })
-    it('should redirect to the supporting information page', () => {
+    it('should redirect to the supporting information, then cya page', () => {
       notePage = new AppointmentNotePage()
       notePage.checkOnPage()
+      completeSupportingInformationPage()
+      cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.checkOnPage()
     })
   })
 })

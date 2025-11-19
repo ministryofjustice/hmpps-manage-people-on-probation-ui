@@ -63,11 +63,15 @@ describe('Add supporting information (optional)', () => {
     cy.get('textarea').type('A test note')
     appointmentNotePage.getSubmitBtn().click()
     it('should display the error summary box', () => {
-      appointmentNotePage.checkErrorSummaryBox(['Select if appointment includes sensitive information'])
+      appointmentNotePage.checkErrorSummaryBox([
+        'Select whether or not the appointment note contains sensitive information',
+      ])
     })
     it('should display the error messages', () => {
       appointmentNotePage.getElement(`#appointments-${crn}-${uuid}-sensitivity-error`).should($error => {
-        expect($error.text().trim()).to.include('Select if appointment includes sensitive information')
+        expect($error.text().trim()).to.include(
+          'Select whether or not the appointment note contains sensitive information',
+        )
       })
     })
   })

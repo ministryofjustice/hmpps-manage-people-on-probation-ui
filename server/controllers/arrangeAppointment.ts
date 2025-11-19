@@ -4,7 +4,6 @@ import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
-  dateIsInPast,
   getDataValue,
   getPersonLevelTypes,
   isNumericString,
@@ -13,15 +12,15 @@ import {
   setDataValue,
 } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
-import { renderError, postAppointments } from '../middleware'
+import { renderError, postAppointments, findUncompleted, appointmentDateIsInPast } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
-import { findUncompleted } from '../utils/findUncompleted'
 import MasApiClient from '../data/masApiClient'
 import { Name } from '../data/model/personalDetails'
 import '../@types/express/index.d'
+import { Activity } from '../data/model/schedule'
 
 const routes = [
   'redirectToSentence',
@@ -61,50 +60,33 @@ export interface AttendedCompliedAppointment {
 export const getAttendedCompliedProps = (
   req: ExpressRequest,
   res: AppResponse,
-): { forename: string; appointment: AttendedCompliedAppointment } => {
-  const { crn, id } = req.params
+): { forename: string; surname: string; appointment: AttendedCompliedAppointment | Activity } => {
+  const { crn, id, contactId } = req.params
   const data = req?.session?.data
-  const {
-    type: { description },
-    attending: { name },
-  } = res.locals.appointment
-  const [officerForename, officerSurname] = name.split(' ')
-  const path = ['appointments', crn, id]
-  const appointmentSession = getDataValue<AppointmentSession>(data, path)
-  const startDateTime = appointmentSession.date
-  const appointment: AttendedCompliedAppointment = {
-    type: description,
-    officer: {
-      name: { forename: convertToTitleCase(officerForename), surname: convertToTitleCase(officerSurname) },
-    },
-    startDateTime,
-  }
-  const { forename } = res.locals.case.name
-  return { forename, appointment }
-}
-
-export const appointmentDateIsInPast = (req: ExpressRequest): boolean => {
-  const { crn, id } = req.params
-  let date: string
-  let start: string
-  let isInPast = false
-  let format: string
-  const { data } = req.session
-  if (req.method === 'POST' && req.body?.appointments?.[crn]?.[id]?.date) {
-    ;({ date, start } = req.body.appointments[crn][id])
-    format = 'd/M/yyyy'
-  }
-  if (!date) {
-    ;({ date, start } = getDataValue(data, ['appointments', crn, id]))
-    format = 'yyyy-M-d'
-  }
-  if (date) {
-    const dt = DateTime.fromFormat(date, format)
-    if (dt.isValid) {
-      ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), start))
+  let appointment: AttendedCompliedAppointment | Activity
+  const { forename, surname } = res.locals.case.name
+  if (contactId) {
+    ;({ appointment } = res.locals.personAppointment)
+  } else {
+    const description = res?.locals?.appointment?.type?.description
+    const name = res?.locals?.appointment?.attending?.name
+    let officerForename = ''
+    let officerSurname = ''
+    if (name) {
+      ;[officerForename, officerSurname] = name.split(' ')
+    }
+    const path = ['appointments', crn, id]
+    const appointmentSession = getDataValue<AppointmentSession>(data, path)
+    const startDateTime = appointmentSession?.date ?? ''
+    appointment = {
+      type: description,
+      officer: {
+        name: { forename: convertToTitleCase(officerForename), surname: convertToTitleCase(officerSurname) },
+      },
+      startDateTime,
     }
   }
-  return isInPast
+  return { forename, surname, appointment }
 }
 
 export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
@@ -197,7 +179,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
       let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance${queryParameters}`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -243,7 +225,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/location-date-time${query}`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -280,7 +262,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -300,6 +282,11 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           [`appointments-${crn}-${id}-end`]: 'Enter an end time',
           [`appointments-${crn}-${id}-user-locationCode`]: 'Select an appointment location',
         }
+      }
+      if (change) {
+        const date = getDataValue(data, ['appointments', crn, id, 'date'])
+        setDataValue(data, ['appointments', crn, id, 'temp', 'date'], date)
+        setDataValue(data, ['appointments', crn, id, 'temp', 'isInPast'], isInPast)
       }
       const errors = data?.errors
       const { appointment } = res.locals
@@ -355,9 +342,26 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       setDataValue(data, [...path, 'until'], until)
       setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
+      if (change) {
+        const originalDate = getDataValue(data, [...path, 'temp', 'date'])
+        const updatedDate = getDataValue(data, [...path, 'date'])
+        const originalDateWasInPast = getDataValue(data, [...path, 'temp', 'isInPast'])
+        const updatedDateIsInPast = appointmentDateIsInPast(req)
+        delete req.session.data.appointments[crn][id].temp.isInPast
+        delete req.session.data.appointments[crn][id].temp.date
+        const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
+        if (!retainOutcomeRecorded) {
+          setDataValue(data, [...path, 'outcomeRecorded'], null)
+        }
+        const retainNotesAndSensitivity = (!originalDateWasInPast && !updatedDateIsInPast) || retainOutcomeRecorded
+        if (!retainNotesAndSensitivity) {
+          setDataValue(data, [...path, 'notes'], null)
+          setDataValue(data, [...path, 'sensitivity'], null)
+        }
+      }
+
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       let nextPage = repeatAppointmentsEnabled ? `repeating` : `supporting-information`
-      const dt = DateTime.fromFormat(appointment.date, 'yyyy-M-d')
 
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
@@ -367,7 +371,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (appointmentDateIsInPast(req)) redirect = `/case/${crn}/arrange-appointment/${id}/attended-complied`
 
       if (change && nextPage !== 'location-not-in-list') {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       if (change && nextPage === 'location-not-in-list') {
         redirect = `${redirect}?change=${change}`
@@ -378,8 +382,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { alertDismissed = false, data } = req.session
-      const { forename, appointment } = getAttendedCompliedProps(req, res)
+      const { alertDismissed = false } = req.session
+      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
       res.render('pages/appointments/attended-complied', {
         crn,
         id,
@@ -388,6 +392,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         appointment,
         cancelLink: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
         forename: convertToTitleCase(forename),
+        surname: convertToTitleCase(surname),
         useDecorator: true,
       })
     }
@@ -523,7 +528,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -563,7 +568,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }

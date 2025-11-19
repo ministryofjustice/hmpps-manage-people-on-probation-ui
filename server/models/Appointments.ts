@@ -14,11 +14,6 @@ export interface AppointmentSession {
     username?: string
     locationCode?: string
   }
-  temp?: {
-    providerCode?: string
-    teamCode?: string
-    username?: string
-  }
   type?: string
   visorReport?: YesNo
   date?: string
@@ -40,6 +35,13 @@ export interface AppointmentSession {
   sensitivity?: YesNo
   backendId?: number
   outcomeRecorded?: YesNo
+  temp?: {
+    providerCode?: string
+    teamCode?: string
+    username?: string
+    isInPast?: boolean
+    date?: string
+  }
 }
 
 export interface AppointmentType {
@@ -156,7 +158,7 @@ export interface LocalParams {
   isInPast?: boolean
   alertDismissed?: boolean
   forename?: string
-  appointment?: AttendedCompliedAppointment
+  appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
 }
 

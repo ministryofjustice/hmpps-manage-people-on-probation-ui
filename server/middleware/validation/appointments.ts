@@ -3,11 +3,12 @@ import { DateTime } from 'luxon'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
+import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
-import { appointmentDateIsInPast, getAttendedCompliedProps } from '../../controllers/arrangeAppointment'
+import { getAttendedCompliedProps } from '../../controllers/arrangeAppointment'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
@@ -30,15 +31,20 @@ const appointments: Route<void> = (req, res, next) => {
     alertDismissed,
   }
 
-  if (['/attended-complied', '/location-date-time'].some(urlPart => req.url.includes(urlPart))) {
+  if (
+    [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
+  ) {
     localParams = { ...localParams, isInPast: appointmentDateIsInPast(req) }
+  }
+  if (req.url.includes('/attended-complied')) {
+    localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
   }
   if (
     [`/arrange-appointment/${id}/attended-complied`, `/arrange-appointment/${id}/add-note`].some(urlPart =>
       req.url.includes(urlPart),
     )
   ) {
-    localParams = { ...localParams, useDecorator: true, ...getAttendedCompliedProps(req, res) }
+    localParams = { ...localParams, useDecorator: true }
   }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
@@ -227,6 +233,7 @@ const appointments: Route<void> = (req, res, next) => {
           page: `appointment/${contactId}/add-note`,
           notes: req.body.notes,
           maxCharCount,
+          contactId,
         }),
       )
     }
@@ -246,13 +253,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateManageAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    // if (isAddNotePage) {
-    //   req.session.errorMessages = errorMessages
-    //   req.session.body = body
-    //   console.log('is add note page, redirecting....')
-    //   console.log('req.session.errorMessages=', req.session.errorMessages)
-    //   return res.redirect(req.url)
-    // }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

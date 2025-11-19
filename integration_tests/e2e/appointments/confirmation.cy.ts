@@ -1,12 +1,7 @@
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
-import AppointmentsPage from '../../pages/appointments'
-import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
-import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
-import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import {
   completeCYAPage,
-  completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
   completeSupportingInformationPage,
@@ -14,8 +9,6 @@ import {
   endTime,
   startTime,
   checkPopHeader,
-  completeNextAppointmentPage,
-  completeArrangeAnotherPage,
   completeLocationDateTimePage,
 } from './imports'
 import OverviewPage from '../../pages/overview'
@@ -24,7 +17,7 @@ import YourCasesPage from '../../pages/myCases'
 const loadPage = (crnOverride = '') => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
-  completeLocationDateTimePage(1, crnOverride)
+  completeLocationDateTimePage({ index: 1, crnOverride })
   completeSupportingInformationPage(true, crnOverride)
   completeCYAPage()
 }
