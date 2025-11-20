@@ -1,0 +1,114 @@
+{% extends "../../partials/case.njk" %}
+{% set currentSectionName = "Contact Preferences" %}
+{% set checkInPages = true %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/date-frequency' %}
+{% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
+{% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use <br/> online check ins." %}
+{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
+{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
+
+{% block beforeContent %}
+    {{ govukBreadcrumbs({
+        items: [
+            {
+                text: "< Back",
+                href: backLink
+            }
+        ]
+    }) }}
+
+{% endblock %}
+{% block pageContent %}
+
+    {% set contactDetails %}
+
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { html: '<span data-qa="mobileNumberLabel">Mobile number</span>' },
+                    value: { html: ('<span data-qa="mobileNumberValue" class="app-!-font-family-tabular">' + checkInMobile+ '</span>') if checkInMobile else '<span data-qa="mobileNumberValue">No mobile number</span>' },
+                    actions: {
+                    items: [{
+                        href:"#",
+                        text: "Change",
+                        visuallyHiddenText: "mobile number",
+                        attributes: {
+                            'data-qa': 'mobileNumberAction'
+                        }
+                    }]
+                }
+                },
+                {
+                    key: { html: '<span data-qa="emailAddressLabel">Email address</span>' },
+                    value: { html: '<span data-qa="emailAddressValue">' + checkInEmail+ '</span>' if checkInEmail else '<span data-qa="emailAddressValue">No email address</span>' },
+                    actions: {
+                    items: [{
+                        href:"#",
+                        text: "Change",
+                        visuallyHiddenText: "email address",
+                        attributes: {
+                            'data-qa': 'emailAddressAction'
+                        }
+                    }]
+                   }
+                }
+            ]
+        }) }}
+
+    {% endset %}
+
+    {{ appSummaryCard({
+        attributes: {'data-qa': 'contactDetailsCard'},
+        titleText: "Contact details",
+        headingLevel: 3,
+        classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+        html: contactDetails
+    }) }}
+    <div class="govuk-!-width-one-half">
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: radioLabel ,
+                        classes: "govuk-label--m govuk-!-font-weight-bold"
+                    }
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'checkInPreferredComs'
+                    }
+                },
+                hint: {
+                    html: radioHint
+                },
+                items: [
+                    {
+                        value: "TEXT",
+                        text: "Text message"
+                    },
+                    {
+                        value: "EMAIL",
+                        text: "Email"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'preferredComs'])) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                    html: "Continue",
+                    attributes: {
+                        'data-qa': 'submitBtn'
+                    }
+                }) }}
+
+            </div>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="checkInMobile" value="{{ checkInMobile }}">
+            <input type="hidden" name="checkInEmail" value="{{ checkInEmail }}">
+            <input type="hidden" name="{{ setMobile }}" value="{{ checkInMobile }}">
+            <input type="hidden" name="{{ setEmail }}" value="{{ checkInEmail }}">
+        </form>
+    </div>
+
+
+{% endblock %}

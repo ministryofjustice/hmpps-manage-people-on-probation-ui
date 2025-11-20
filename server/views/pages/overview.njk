@@ -121,8 +121,14 @@
 {% endblock %}
 
 {% block pageContent %}
-    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
-    {% if level and (level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
+
+    {% if 'very high' in (riskToStaff.levelDescription | lower) %}
+        {% set level = 'VERY_HIGH' %}
+    {% else %}
+        {% set level = riskToStaff.levelDescription or riskToStaff.level %}
+    {% endif %}
+
+    {% if level and (level | upper == 'VERY_HIGH' or level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
     {% set html %}
     <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
     {% endset %}
