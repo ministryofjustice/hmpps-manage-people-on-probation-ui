@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import { isValidCrn, isValidUUID } from '../utils'
 import { renderError } from '../middleware'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'getIntroPage',
@@ -10,6 +11,8 @@ const routes = [
   'postIntroPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
+  'postContactPreferencePage',
+  'getPhotoOptionsPage',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -70,7 +73,33 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/contact-preference.njk', { crn, id })
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+      const checkInMobile = personalDetails.mobileNumber
+      const checkInEmail = personalDetails.email
+      return res.render('pages/check-in/contact-preference.njk', { crn, id, checkInMobile, checkInEmail })
+    }
+  },
+
+  postContactPreferencePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/photo-options`)
+    }
+  },
+
+  getPhotoOptionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.render('pages/check-in/photo-options.njk', { crn, id })
     }
   },
 }

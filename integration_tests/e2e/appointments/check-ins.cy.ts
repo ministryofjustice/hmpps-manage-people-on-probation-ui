@@ -4,6 +4,7 @@ import InstructionsPage from '../../pages/check-ins/instructions'
 import DateFrequencyPage from '../../pages/check-ins/date-frequencey'
 import { getCheckinUuid } from './imports'
 import ContactPreferencePage from '../../pages/check-ins/contact-preference'
+import PhotoOptionsPage from '../../pages/check-ins/photo-options'
 
 const loadPage = () => {
   cy.task('stubEnableESuperVision')
@@ -68,5 +69,49 @@ context('Appointment check-ins', () => {
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
     contactPreferencePage.checkOnPage()
+  })
+
+  it('contact preference page should fail with validation errors', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage.getSubmitBtn().click()
+    getCheckinUuid().then(uuid => {
+      dateFrequencyPage.getElement(`#esupervision-X000001-${uuid}-checkins-preferredComs-error`).should($error => {
+        expect($error.text().trim()).to.include('Select how the person wants us to send a link to the service')
+      })
+    })
+  })
+
+  it('should able to submit contact preference details', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage
+      .getCheckInPreferredComs()
+      .find('.govuk-radios__item')
+      .eq(0)
+      .find('.govuk-radios__input')
+      .click()
+    contactPreferencePage.getSubmitBtn().click()
+
+    const photoOptionsPage = new PhotoOptionsPage()
+    photoOptionsPage.checkOnPage()
   })
 })

@@ -17,4 +17,6 @@ export interface LocalParams {
   checkInMinDate?: string
   back?: string
   change?: string
+  checkInMobile?: string
+  checkInEmail?: string
 }

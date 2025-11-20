@@ -3,6 +3,9 @@ import controllers from '.'
 import { mockAppResponse } from './mocks'
 import { isValidCrn, isValidUUID } from '../utils'
 import { renderError } from '../middleware'
+import HmppsAuthClient from '../data/hmppsAuthClient'
+import MasApiClient from '../data/masApiClient'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -26,6 +29,20 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
+jest.mock('../data/hmppsAuthClient', () => {
+  return jest.fn().mockImplementation(() => {
+    return {
+      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
+    }
+  })
+})
+
+const mockPersonalDetails = {} as PersonalDetails
+
+const getPersonalDetailsSpy = jest
+  .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+  .mockImplementation(() => Promise.resolve(mockPersonalDetails))
+
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
@@ -42,6 +59,7 @@ const baseReq = () =>
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 const redirectSpy = jest.spyOn(res, 'redirect')
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 
 describe('checkInsController', () => {
   beforeEach(() => {
@@ -190,7 +208,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.getContactPreferencePage(null as any)(req, res)
+      await controllers.checkIns.getContactPreferencePage(hmppsAuthClient)(req, res)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/contact-preference.njk', {
         crn,

@@ -7,7 +7,7 @@ import { LocalParams } from '../../models/ESupervision'
 const eSuperVision: Route<void> = (req, res, next) => {
   const { url, params, body } = req
   const { crn, id } = params
-  const { checkInMinDate } = body
+  const { checkInMinDate, checkInMobile, checkInEmail } = body
   const { back = '' } = req.query as Record<string, string>
   const localParams: LocalParams = {
     crn,
@@ -15,6 +15,8 @@ const eSuperVision: Route<void> = (req, res, next) => {
     body,
     back,
     checkInMinDate,
+    checkInEmail,
+    checkInMobile,
   }
   const baseUrl = req.url.split('?')[0]
   let render = `pages/${[
@@ -26,7 +28,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       .join('/'),
   ]}`
 
-  const validateCheckins = () => {
+  const validateDateFrequency = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
       render = `pages/check-in/date-frequency`
       errorMessages = validateWithSpec(
@@ -39,8 +41,24 @@ const eSuperVision: Route<void> = (req, res, next) => {
       )
     }
   }
+  const validateContactPreference = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/contact-preference`)) {
+      render = `pages/check-in/contact-preference`
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          checkInEmail,
+          checkInMobile,
+          page: 'contact-preference',
+        }),
+      )
+    }
+  }
   let errorMessages: Record<string, string> = {}
-  validateCheckins()
+  validateDateFrequency()
+  validateContactPreference()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
