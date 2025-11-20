@@ -7,8 +7,23 @@ import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
 import config from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
+export const hasAllDigits = (string: string) => /^\d+$/.test(string)
+
 export const isNotEmpty = (args: any[]) => {
   return !!args[0] && args[0] !== undefined
+}
+export const contactPrefEmailCheck = (args: any[]) => {
+  if (!args[0] || args[0] === 'TEXT') {
+    return true
+  }
+  return args[0] === 'EMAIL' && isEmail(args[1])
+}
+
+export const contactPrefMobileCheck = (args: any[]) => {
+  if (!args[0] || args[0] === 'EMAIL') {
+    return true
+  }
+  return args[0] === 'TEXT' && hasAllDigits(args[1])
 }
 
 export const isNumeric = (args: any[]) => /^[\d ]+$/.test(args[0])

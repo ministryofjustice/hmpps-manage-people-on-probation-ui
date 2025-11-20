@@ -21,6 +21,9 @@ import {
   timeIsNowOrInFuture,
   isValidCharCount,
   timeIsValid24HourFormat,
+  contactPrefEmailCheck,
+  hasAllDigits,
+  contactPrefMobileCheck,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -574,6 +577,71 @@ describe('isValidCharCount', () => {
       expect(timeIsValid24HourFormat([null, '12:60'])).toEqual(false)
       expect(timeIsValid24HourFormat([null, '12'])).toEqual(false)
       expect(timeIsValid24HourFormat([null, ''])).toEqual(false)
+    })
+  })
+
+  describe('Should check contactPreference for Email', () => {
+    test('returns true for no preference', () => {
+      expect(contactPrefEmailCheck([undefined])).toBe(true)
+      expect(contactPrefEmailCheck(['TEXT'])).toBe(true)
+    })
+
+    test('returns true for valid email case', () => {
+      expect(contactPrefEmailCheck(['EMAIL', 'test@example.com'])).toBe(true)
+      expect(contactPrefEmailCheck(['EMAIL', 'user.name+tag+sorting@example.com'])).toBe(true)
+    })
+
+    test('returns false for invalid email case', () => {
+      expect(contactPrefEmailCheck(['EMAIL', 'plainaddress'])).toBe(false)
+      expect(contactPrefEmailCheck(['EMAIL', '@missingusername.com'])).toBe(false)
+      expect(contactPrefEmailCheck(['EMAIL', 'user@.com'])).toBe(false)
+      expect(contactPrefEmailCheck(['EMAIL', 'user@@example.com'])).toBe(false)
+    })
+
+    test('returns false for EMAIL preference with no email', () => {
+      expect(contactPrefEmailCheck(['EMAIL', ''])).toBe(false)
+      expect(contactPrefEmailCheck(['EMAIL', undefined])).toBe(false)
+    })
+  })
+
+  describe('Mobile Utility Functions', () => {
+    describe('hasAllDigits', () => {
+      test('valid digit strings', () => {
+        expect(hasAllDigits('123456')).toBe(true)
+        expect(hasAllDigits('0')).toBe(true)
+        expect(hasAllDigits('9876543210')).toBe(true)
+      })
+
+      test('invalid digit strings', () => {
+        expect(hasAllDigits('123abc')).toBe(false)
+        expect(hasAllDigits('12.34')).toBe(false)
+        expect(hasAllDigits('123-456')).toBe(false)
+        expect(hasAllDigits('')).toBe(false)
+        expect(hasAllDigits(undefined)).toBe(false)
+      })
+    })
+
+    describe('Should check contactPreference for Mobile', () => {
+      test('returns true for no preference', () => {
+        expect(contactPrefMobileCheck([undefined])).toBe(true)
+        expect(contactPrefMobileCheck(['EMAIL'])).toBe(true)
+      })
+
+      test('returns true for valid digits case', () => {
+        expect(contactPrefMobileCheck(['TEXT', '123456'])).toBe(true)
+        expect(contactPrefMobileCheck(['TEXT', '9876543210'])).toBe(true)
+      })
+
+      test('returns false for invalid digits case', () => {
+        expect(contactPrefMobileCheck(['TEXT', '123abc'])).toBe(false)
+        expect(contactPrefMobileCheck(['TEXT', '12.34'])).toBe(false)
+        expect(contactPrefMobileCheck(['TEXT', '123-456'])).toBe(false)
+      })
+
+      test('returns false for TEXT preference with no digits', () => {
+        expect(contactPrefMobileCheck(['TEXT', ''])).toBe(false)
+        expect(contactPrefMobileCheck(['TEXT', undefined])).toBe(false)
+      })
     })
   })
 })
