@@ -22,7 +22,6 @@ export const mockAlertsContent: UserAlertsContent[] = [
     date: '2025-11-10T10:00:00Z',
     description: 'Test Alert 1',
     officer: mockOfficer,
-    riskLevel: 'HIGH ROSH',
   },
   {
     id: 2,
