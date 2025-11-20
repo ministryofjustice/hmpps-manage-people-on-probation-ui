@@ -5,7 +5,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
 
-import { mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { mockUserAlert, mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient', () => {
@@ -27,6 +27,9 @@ const getUserAlertsSpy = jest
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
+const getAlertNoteSpy = jest
+  .spyOn(MasApiClient.prototype, 'getAlertNote')
+  .mockImplementation(() => Promise.resolve(mockUserAlert)) // Use imported mock
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -117,6 +120,24 @@ describe('alertsController', () => {
       expect(jsonSpy).toHaveBeenCalledWith({
         success: true,
         message: '2 alert(s) cleared successfully',
+      })
+    })
+  })
+
+  describe('getAlertsNote', () => {
+    it('should call getUserAlert with custom page number and sort params, and build query string', async () => {
+      const req = httpMocks.createRequest({
+        query: { back: '/alerts' },
+        params: { alertId: '0', noteId: '0' },
+      })
+      res.locals.user = defaultUser
+
+      await controllers.alerts.getAlertsNote(hmppsAuthClient)(req, res, next)
+
+      expect(getAlertNoteSpy).toHaveBeenCalledWith('0', '0')
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts-note', {
+        back: '/alerts',
+        alert: mockUserAlert,
       })
     })
   })

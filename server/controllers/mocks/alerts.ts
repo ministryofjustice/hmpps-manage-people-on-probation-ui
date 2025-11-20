@@ -1,5 +1,6 @@
 import { UserAlerts, ClearAlertsResponse, UserAlertsContent } from '../../models/Alerts'
 import { Officer } from '../../data/model/schedule'
+import { Note } from '../../data/model/note'
 
 const mockName = {
   forename: 'John',
@@ -44,6 +45,25 @@ export const mockUserAlerts: UserAlerts = {
 export const mockClearAlertsSuccess: ClearAlertsResponse = {
   success: true,
   clearedCount: 2,
+}
+
+export const mockNote: Note = {
+  id: 0,
+  createdBy: 'Me',
+  createdByDate: '11-11-2000',
+  note: 'Notes',
+  hasNotesBeenTruncated: false,
+}
+
+export const mockUserAlert: UserAlertsContent = {
+  id: 0,
+  type: { description: 'ROSH Alert', editable: true },
+  crn: 'X000001',
+  date: '2025-11-10T10:00:00Z',
+  description: 'Test Alert 1',
+  alertNote: mockNote,
+  officer: mockOfficer,
+  riskLevel: 'HIGH ROSH',
 }
 
 export const defaultUser = {
