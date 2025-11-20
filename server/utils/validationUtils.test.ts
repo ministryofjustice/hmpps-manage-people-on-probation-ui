@@ -32,6 +32,8 @@ import {
   type AppointmentsValidationArgs,
   documentSearchValidation,
   personDetailsValidation,
+  eSuperVisionValidation,
+  ESupervisionValidationArgs,
 } from '../properties'
 import { Validateable, ValidationSpec } from '../models/Errors'
 
@@ -643,5 +645,76 @@ describe('isValidCharCount', () => {
         expect(contactPrefMobileCheck(['TEXT', undefined])).toBe(false)
       })
     })
+  })
+})
+
+describe('validates checkin contact type preference', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          checkins: { preferredComs: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-checkins-preferredComs`]:
+      'Select how the person wants us to send a link to the service',
+    [`esupervision-${crn}-${id}-checkins-checkInMobile`]: 'Enter a mobile number',
+    [`esupervision-${crn}-${id}-checkins-checkInEmail`]: 'Enter an email address',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'contact-preference',
+    checkInMobile: '',
+    checkInEmail: '',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Select how to send service link, not selected')
+  })
+})
+
+describe('validates checkin date preference', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          checkins: { interval: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-checkins-date`]:
+      'Enter the date you would like the person to complete their first check in',
+    [`esupervision-${crn}-${id}-checkins-interval`]: 'Select how often you would like the person to check in',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'date-frequency',
+    checkInMobile: '',
+    checkInEmail: '',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Checkin frequency not selected')
   })
 })
