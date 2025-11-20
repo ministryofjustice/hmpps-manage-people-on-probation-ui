@@ -591,6 +591,7 @@ describe('isValidCharCount', () => {
     test('returns true for valid email case', () => {
       expect(contactPrefEmailCheck(['EMAIL', 'test@example.com'])).toBe(true)
       expect(contactPrefEmailCheck(['EMAIL', 'user.name+tag+sorting@example.com'])).toBe(true)
+      expect(contactPrefEmailCheck(['EMAIL', 'firstname.surname@example.com'])).toBe(true)
     })
 
     test('returns false for invalid email case', () => {
