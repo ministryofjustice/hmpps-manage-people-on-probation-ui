@@ -13,7 +13,6 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import Page from '../../pages/page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 
@@ -99,6 +98,7 @@ interface Props {
   uuidOveride?: string
   next?: boolean
   dateInPast?: boolean
+  dateOverride?: DateTime
 }
 
 export const completeLocationDateTimePage = ({
@@ -107,6 +107,7 @@ export const completeLocationDateTimePage = ({
   uuidOveride = '',
   next = false,
   dateInPast = false,
+  dateOverride,
 }: Props = {}) => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationDateTimePage = new AppointmentLocationDateTimePage()
@@ -116,19 +117,34 @@ export const completeLocationDateTimePage = ({
   const yesterdayIsInCurrentMonth = yesterday.month === now.month
   const tomorrowIsInCurrentMonth = tomorrow.month === now.month
   locationDateTimePage.getDatePickerToggle().click()
-  if (!dateInPast) {
-    if (!tomorrowIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-next-month').click()
+  if (dateOverride) {
+    const diff = dateOverride.month - now.month
+    if (diff < 0) {
+      for (let i = 0; i > diff; i -= 1) {
+        cy.get('.moj-js-datepicker-prev-month').click()
+      }
     }
-    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    if (diff > 0) {
+      for (let i = 0; i < diff; i += 1) {
+        cy.get('.moj-js-datepicker-next-month').click()
+      }
+    }
+    cy.get(`[data-testid="${dateOverride.toFormat('d/M/yyyy')}"]`).click()
   } else {
-    if (!yesterdayIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-prev-month').click()
+    if (!dateInPast) {
+      if (!tomorrowIsInCurrentMonth) {
+        cy.get('.moj-js-datepicker-next-month').click()
+      }
+      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    } else {
+      if (!yesterdayIsInCurrentMonth) {
+        cy.get('.moj-js-datepicker-prev-month').click()
+      }
+      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
     }
-    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
-  }
-  if (next) {
-    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    if (next) {
+      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    }
   }
 
   locationDateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
