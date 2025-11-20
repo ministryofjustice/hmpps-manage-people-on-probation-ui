@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import IndexPage from '../../pages'
@@ -18,8 +19,13 @@ import {
   checkUpdateType,
   completeAttendedCompliedPage,
   completeAddNotePage,
+  crn,
+  uuid,
 } from './imports'
 import { statusErrors } from '../../../server/properties/statusErrors'
+import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import AddNotePage from '../../pages/appointments/add-note.page'
+import AppointmentNotePage from '../../pages/appointments/note.page'
 
 const loadPage = ({
   hasVisor = false,
@@ -190,6 +196,11 @@ describe('Check your answers then confirm the appointment', () => {
   })
   describe('User updates the appointment date', () => {
     let cyaPage: AppointmentCheckYourAnswersPage
+    let logOutcomePage: AttendedCompliedPage
+    let supportingInfoPage: AppointmentNotePage
+    let addNotePage: AddNotePage
+
+    const recordOutcome = `appointments-${crn}-${uuid}-outcomeRecorded`
 
     const changeDate = (dateInPast = false) => {
       loadPage({ dateInPast })
@@ -202,35 +213,93 @@ describe('Check your answers then confirm the appointment', () => {
         changeDate()
         completeLocationDateTimePage({ dateInPast: true })
       })
+      it('should redirect to the log an outcome page, then add notes', () => {
+        logOutcomePage = new AttendedCompliedPage()
+        logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+        cy.get(`#${recordOutcome}`).should('not.be.checked')
+        cy.get(`#${recordOutcome}`).click()
+        logOutcomePage.getSubmitBtn().click()
+        addNotePage = new AddNotePage()
+        cy.get(`#appointments-${crn}-${uuid}-notes`).should('have.value', '').type('some notes')
+        cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+        addNotePage.getSubmitBtn().click()
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
+      })
     })
     describe('changes past appointment to future appointment', () => {
+      const dateInPast = true
       beforeEach(() => {
-        changeDate(true)
-        completeLocationDateTimePage()
+        changeDate(dateInPast)
+        completeLocationDateTimePage() // tomorrow
+      })
+      it('should redirect to the supporting information page', () => {
+        supportingInfoPage = new AppointmentNotePage()
+        supportingInfoPage.checkOnPage()
+        cy.get(`#appointments-${crn}-${uuid}-notes`).should('have.value', '').type('some notes')
+        cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+        supportingInfoPage.getSubmitBtn().click()
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
       })
     })
     describe('changes future appointment date to another date in the future', () => {
       beforeEach(() => {
         changeDate()
-        completeLocationDateTimePage()
+        const now = DateTime.now()
+        const dateOverride = now.plus({ days: 2 })
+        completeLocationDateTimePage({ dateOverride })
+      })
+      it('should redirect back to the cya page', () => {
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
       })
     })
+
     describe('changes past appointment date to another date in the past', () => {
+      const dateInPast = true
       beforeEach(() => {
-        changeDate(true)
-        completeLocationDateTimePage({ dateInPast: true })
+        changeDate(dateInPast)
+        changeDate()
+        const now = DateTime.now()
+        const dateOverride = now.minus({ days: 2 })
+        completeLocationDateTimePage({ dateOverride })
+      })
+      it('should redirect to the log an outcome page, then add notes', () => {
+        logOutcomePage = new AttendedCompliedPage()
+        logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+        cy.get(`#${recordOutcome}`).should('not.be.checked')
+        cy.get(`#${recordOutcome}`).click()
+        logOutcomePage.getSubmitBtn().click()
+        addNotePage = new AddNotePage()
+        cy.get(`#appointments-${crn}-${uuid}-notes`).should('have.value', '').type('some notes')
+        cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+        addNotePage.getSubmitBtn().click()
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
       })
     })
+
     describe('submits the same future appointment date', () => {
       beforeEach(() => {
         changeDate()
         completeLocationDateTimePage()
       })
+      it('should redirect back to the cya page', () => {
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
+      })
     })
+
     describe('submits the same past appointment date', () => {
+      const dateInPast = true
       beforeEach(() => {
-        changeDate(true)
+        changeDate(dateInPast)
         completeLocationDateTimePage({ dateInPast: true })
+      })
+      it('should redirect back to the cya page', () => {
+        cyaPage = new AppointmentCheckYourAnswersPage()
+        cyaPage.checkOnPage()
       })
     })
   })

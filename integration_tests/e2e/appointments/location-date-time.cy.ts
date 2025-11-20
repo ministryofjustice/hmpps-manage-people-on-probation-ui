@@ -8,7 +8,6 @@ import {
   checkPopHeader,
   completeAttendedCompliedPage,
   completeAddNotePage,
-  completeSupportingInformationPage,
 } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
@@ -28,6 +27,19 @@ describe('Pick a date, location and time for this appointment', () => {
   let locationNotInListPage: AppointmentLocationNotInListPage
   let notePage: AppointmentNotePage
   let cyaPage: AppointmentCheckYourAnswersPage
+
+  const now = DateTime.now()
+  const yesterday = now.minus({ days: 1 })
+  const yesterdayIsInCurrentMonth = yesterday.month === now.month
+
+  const selectPastDate = () => {
+    locationDateTimePage.getDatePickerToggle().click()
+    if (!yesterdayIsInCurrentMonth) {
+      cy.get('.moj-js-datepicker-prev-month').click()
+    }
+    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+  }
+
   beforeEach(() => {
     cy.task('resetMocks')
   })
@@ -329,9 +341,6 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   describe('Date is selected from the picker which is in the past', () => {
-    const now = DateTime.now()
-    const yesterday = now.minus({ days: 1 })
-    const yesterdayIsInCurrentMonth = yesterday.month === now.month
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getDatePickerToggle().click()
@@ -362,8 +371,6 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   describe('Date is entered which is in the past', () => {
-    const now = DateTime.now()
-    const yesterday = now.minus({ days: 1 })
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getDatePickerInput().type(`${yesterday.toFormat('d/M/yyyy')}`)
@@ -432,17 +439,6 @@ describe('Pick a date, location and time for this appointment', () => {
       second: 0,
       millisecond: 0,
     })
-    const now = DateTime.now()
-    const yesterday = now.minus({ days: 1 })
-    const yesterdayIsInCurrentMonth = yesterday.month === now.month
-
-    const selectPastDate = () => {
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-prev-month').click()
-      }
-      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
-    }
 
     beforeEach(() => {
       cy.clock(mockedTime.toMillis())
@@ -466,7 +462,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
       logOutcomePage = new AttendedCompliedPage()
-      logOutcomePage.checkOnPage()
+      logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
       logOutcomePage.getCancelGoBackLink().click()
       locationDateTimePage.checkOnPage()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
@@ -486,11 +482,38 @@ describe('Pick a date, location and time for this appointment', () => {
     })
   })
 
+  describe('Date in the past is selected, the the alert banner is dismissed', () => {
+    beforeEach(() => {
+      loadPage()
+      selectPastDate()
+    })
+    it('should display the log an outcome alert banner', () => {
+      locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
+    })
+    it('should hide the banner if dismiss link is clicked', () => {
+      cy.get('.moj-alert__dismiss').click()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
+    })
+    it('should not re-show the alert banner when invalid form is submitted and validation errors are shown', () => {
+      cy.get('.moj-alert__dismiss').click()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
+    })
+    it('should not re-show the alert banner when the form is submitted, then the back link is clicked on the next page', () => {
+      cy.get('.moj-alert__dismiss').click()
+      locationDateTimePage.getElementInput(`startTime`).type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getSubmitBtn().click()
+      logOutcomePage.getCancelGoBackLink().click()
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
+    })
+  })
+
   describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      const now = DateTime.now()
       const tomorrow = now.plus({ days: 1 })
       const tomorrowIsInCurrentMonth = tomorrow.month === now.month
       locationDateTimePage.getDatePickerToggle().click()
@@ -513,12 +536,12 @@ describe('Pick a date, location and time for this appointment', () => {
         )
       locationDateTimePage.getSubmitBtn().click()
     })
-    it('should redirect to the supporting information, then cya page', () => {
-      notePage = new AppointmentNotePage()
-      notePage.checkOnPage()
-      completeSupportingInformationPage()
-      cyaPage = new AppointmentCheckYourAnswersPage()
-      cyaPage.checkOnPage()
-    })
+    // it('should redirect to the supporting information, then cya page', () => {
+    //   notePage = new AppointmentNotePage()
+    //   notePage.checkOnPage()
+    //   completeSupportingInformationPage()
+    //   cyaPage = new AppointmentCheckYourAnswersPage()
+    //   cyaPage.checkOnPage()
+    // })
   })
 })

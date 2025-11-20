@@ -103,6 +103,7 @@ export interface AppointmentRequestBody {
   notes?: string
   sensitive?: boolean
   visorReport?: boolean
+  outcomeRecorded?: boolean
 }
 
 export interface CheckAppointment {
