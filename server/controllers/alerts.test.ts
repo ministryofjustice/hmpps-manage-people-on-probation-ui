@@ -4,14 +4,23 @@ import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import ArnsApiClient from '../data/arnsApiClient'
-import * as Utils from '../utils'
 import { mockAppResponse } from './mocks'
 
 import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
-jest.mock('../utils')
+
+let toRoshWidgetSpy: jest.Mock
+
+jest.mock('../utils', () => ({
+  get toRoshWidget() {
+    return toRoshWidgetSpy
+  },
+}))
+
+toRoshWidgetSpy = jest.fn()
+
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -67,7 +76,7 @@ const getRisksSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getRisks')
   .mockImplementation(() => Promise.resolve(mockRisksData))
 
-const toRoshWidgetSpy = jest.spyOn(Utils, 'toRoshWidget').mockReturnValue(mockRoshWidget) // Returns the structurally correct DTO mock
+toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -81,9 +90,11 @@ describe('alertsController', () => {
   })
 
   describe('getAlerts', () => {
-    it('should call getUserAlerts with default page 0 and no sort params, and render the page', async () => {
+    it('should call getUserAlerts with default page 0 and no sort params, and render the page (Risk Enabled)', async () => {
       const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
       res.locals.user = defaultUser
+      // Explicitly enable the flag for this test to expect populated risk data
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
@@ -93,18 +104,20 @@ describe('alertsController', () => {
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap,
+        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
       })
     })
 
-    it('should call getUserAlerts with custom page number and sort params, and build query string', async () => {
+    it('should call getUserAlerts with custom page number and sort params, and build query string (Risk Enabled)', async () => {
       const req = httpMocks.createRequest({
         query: { page: '5', sortBy: 'date', sortOrder: 'desc' },
         url: '/alerts',
       })
       res.locals.user = defaultUser
+      // Explicitly enable the flag for this test to expect populated risk data
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
@@ -114,9 +127,28 @@ describe('alertsController', () => {
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap,
+        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortQueryString: '&sortBy=date&sortOrder=desc',
         currentSort: { column: 'date', order: 'desc' },
+      })
+    })
+
+    it('should skip fetching risk data and return an empty risk map when flag is disabled', async () => {
+      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+      res.locals.user = defaultUser
+      res.locals.flags = { enableRiskOnAlertsDashboard: false }
+
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
+      expect(getRisksSpy).not.toHaveBeenCalled()
+      expect(toRoshWidgetSpy).not.toHaveBeenCalled()
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+        alertsData: mockUserAlertsWithCrn,
+        crnToRiskWidgetMap: {}, // Expect empty object
+        sortQueryString: '',
+        currentSort: { column: undefined, order: undefined },
       })
     })
   })
@@ -125,6 +157,7 @@ describe('alertsController', () => {
     it('should return a 400 error if no alerts are selected', async () => {
       const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: [] }, url: '/alerts/clear' })
       res.locals.user = defaultUser
+      res.locals.flags = {}
 
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
@@ -136,6 +169,7 @@ describe('alertsController', () => {
     it('should call clearAlerts with a single selected alert and return success', async () => {
       const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: '123' }, url: '/alerts/clear' })
       res.locals.user = defaultUser
+      res.locals.flags = {}
 
       clearAlertsSpy.mockResolvedValueOnce({ success: true, clearedCount: 1 })
 
@@ -155,6 +189,7 @@ describe('alertsController', () => {
         url: '/alerts',
       })
       res.locals.user = defaultUser
+      res.locals.flags = {}
 
       clearAlertsSpy.mockResolvedValueOnce({ success: true, clearedCount: 2 })
 

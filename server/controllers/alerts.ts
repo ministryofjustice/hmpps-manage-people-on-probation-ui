@@ -18,23 +18,27 @@ const alertsController: Controller<typeof routes, void> = {
       const arnsClient = new ArnsApiClient(token)
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(pageNumber, sortBy, sortOrder as 'asc' | 'desc')
+      const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
 
-      const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
+      let crnToRiskWidgetMap = {}
 
-      const riskPromises = uniqueCrns.map(async crn => {
-        const risks = await arnsClient.getRisks(crn)
-        const risksWidget = toRoshWidget(risks)
-        return { crn, risksWidget }
-      })
+      if (enableRiskOnAlertsDashboard) {
+        const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
+        const riskPromises = uniqueCrns.map(async crn => {
+          const risks = await arnsClient.getRisks(crn)
+          const risksWidget = toRoshWidget(risks)
+          return { crn, risksWidget }
+        })
 
-      const results = await Promise.all(riskPromises)
+        const results = await Promise.all(riskPromises)
 
-      const crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
-        if (current.risksWidget) {
-          acc[current.crn] = current.risksWidget
-        }
-        return acc
-      }, {})
+        crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
+          if (current.risksWidget) {
+            acc[current.crn] = current.risksWidget
+          }
+          return acc
+        }, {})
+      }
 
       let sortQueryString = ''
       if (sortBy) {

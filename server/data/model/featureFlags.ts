@@ -12,4 +12,5 @@ export class FeatureFlags {
   enableProbFEComponent?: boolean = undefined
   enableAlertsPage?: boolean = undefined
   enableESuperVision?: boolean = undefined
+  enableRiskOnAlertsDashboard?: boolean = undefined
 }
