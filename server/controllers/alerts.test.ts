@@ -44,6 +44,7 @@ const mockUserAlertsWithCrn = {
       id: 1,
       crn: 'X123456',
       type: { description: 'Mock Type', editable: true },
+      name: { forename: 'Mock', middleName: '', surname: 'Case' },
       date: '2025-10-26',
       officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
     },
