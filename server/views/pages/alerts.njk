@@ -41,9 +41,11 @@
                                 </button>
                             </th>
 
+                            {% if flags.enableRiskOnAlertsDashboard === true %}
                             <th scope="col" class="govuk-table__header table-header--narrow" data-qa="riskHeader">
                                 Risk
                             </th>
+                            {% endif %}
 
                             <th scope="col" class="govuk-table__header govuk-!-width-one-third govuk-table__header--sortable" aria-sort="none" data-sort-column="activity" data-qa="activityHeader">
                                 <button type="button" class="sort-button" data-sort="activity">
@@ -88,15 +90,12 @@
                                     <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
                                 </td>
 
-                                <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ alert.riskLevel or '' }}" data-qa="alertRisk">
-                                    {% if alert.riskLevel %}
-                                        <div class="predictor-timeline-item predictor-timeline-item--{{ alert.riskLevel | lower | replace(' ', '-') }}">
-                                    <span class="predictor-timeline-item__level">
-                                        <strong>ROSH</strong> {{ alert.riskLevel | upper }}
-                                    </span>
-                                        </div>
-                                    {% endif %}
+                                {% if flags.enableRiskOnAlertsDashboard === true %}
+                                <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ risksWidget.overallRisk or '' }}" data-qa="alertRisk">
+                                    {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
+                                        <div>{{ predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }) }}</div>
                                 </td>
+                                {% endif %}
 
                                 <td class="govuk-table__cell govuk-!-width-one-third" data-sort-value="{{ alert.type.description }}" data-qa="alertActivity">
                                     <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">

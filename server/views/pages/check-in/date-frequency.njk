@@ -1,0 +1,53 @@
+{% extends "../_form.njk" %}
+{% set title = "Set up  online check ins" %}
+{% set backLink =  '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set radioLabel =  "How often would you like "+ case.name.forename + " to check in?" %}
+{% block form %}
+    <input type="hidden" name="checkInMinDate" value="{{checkInMinDate}}">
+    <h3 class="govuk-heading-s govuk-!-margin-bottom-1" >When would you like {{case.name.forename}} to complete their first online <br/> check in?</h3>
+    {{ mojDatePicker({
+        hint: {
+            text: "They will get a notification to use online check ins from this date"
+        },
+        formGroup: {
+            classes: "govuk-!-margin-bottom-3",
+            attributes: {
+                'data-qa': 'checkInDate'
+            }
+        },
+        minDate: checkInMinDate
+    } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'date'])) }}
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: radioLabel ,
+                classes: "govuk-label--m govuk-!-font-weight-bold"
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'checkInFrequency'
+            }
+        },
+        items: [
+            {
+                value: "WEEKLY",
+                text: "Every week"
+            },
+            {
+                value: "TWO_WEEKS",
+                text: "Every 2 weeks"
+            },
+            {
+                value: "FOUR_WEEKS",
+                text: "Every 4 weeks"
+            },
+            {
+                value: "EIGHT_WEEKS",
+                text: "Every 8 weeks"
+            }
+        ]
+    } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'interval'])) }}
+
+{% endblock %}

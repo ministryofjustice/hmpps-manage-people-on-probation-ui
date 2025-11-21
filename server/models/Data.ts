@@ -3,6 +3,7 @@ import { PersonalDetails } from '../data/model/personalDetails'
 import { Sentence } from '../data/model/sentenceDetails'
 import { AppointmentSession, AppointmentType } from './Appointments'
 import { Errors } from './Errors'
+import { ESupervisionSession } from './ESupervision'
 
 export interface Data {
   isOutLookEventFailed?: any
@@ -32,5 +33,10 @@ export interface Data {
   }
   staff?: {
     [userId: string]: User[]
+  }
+  esupervision?: {
+    [crn: string]: {
+      [id: string]: ESupervisionSession
+    }
   }
 }

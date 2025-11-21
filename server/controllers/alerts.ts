@@ -1,6 +1,8 @@
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
+import ArnsApiClient from '../data/arnsApiClient'
+import { toRoshWidget } from '../utils'
 
 const routes = ['getAlerts', 'clearSelectedAlerts'] as const
 
@@ -15,8 +17,30 @@ const alertsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
+      const arnsClient = new ArnsApiClient(token)
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(pageNumber, sortBy, sortOrder as 'asc' | 'desc')
+      const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
+
+      let crnToRiskWidgetMap = {}
+
+      if (enableRiskOnAlertsDashboard) {
+        const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
+        const riskPromises = uniqueCrns.map(async crn => {
+          const risks = await arnsClient.getRisks(crn)
+          const risksWidget = toRoshWidget(risks)
+          return { crn, risksWidget }
+        })
+
+        const results = await Promise.all(riskPromises)
+
+        crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
+          if (current.risksWidget) {
+            acc[current.crn] = current.risksWidget
+          }
+          return acc
+        }, {})
+      }
 
       let sortQueryString = ''
       if (sortBy) {
@@ -29,6 +53,7 @@ const alertsController: Controller<typeof routes, void> = {
       res.render('pages/alerts', {
         url,
         alertsData,
+        crnToRiskWidgetMap,
         sortQueryString,
         currentSort: {
           column: sortBy,
