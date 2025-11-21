@@ -92,7 +92,7 @@
 
                                 {% if flags.enableRiskOnAlertsDashboard === true %}
                                 <td class="govuk-table__cell table-header--narrow" data-sort-value="{{ risksWidget.overallRisk or '' }}" data-qa="alertRisk">
-                                    {% set risksWidget = crnToRiskWidgetMap[crn] %}
+                                    {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
                                         <div>{{ predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }) }}</div>
                                 </td>
                                 {% endif %}
