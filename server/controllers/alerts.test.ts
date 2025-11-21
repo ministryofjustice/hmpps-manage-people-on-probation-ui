@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse } from './mocks'
 
-import { mockUserAlert, mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
@@ -72,9 +72,6 @@ const getUserAlertsSpy = jest
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
-const getAlertNoteSpy = jest
-  .spyOn(MasApiClient.prototype, 'getAlertNote')
-  .mockImplementation(() => Promise.resolve(mockUserAlert)) // Use imported mock
 const getRisksSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getRisks')
   .mockImplementation(() => Promise.resolve(mockRisksData))

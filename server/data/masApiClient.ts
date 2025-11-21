@@ -41,7 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
-import { UserAlerts, ClearAlertsResponse, UserAlertsContent } from '../models/Alerts'
+import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 
 interface GetUserScheduleProps {

@@ -54,17 +54,6 @@ export const mockNote: Note = {
   hasNotesBeenTruncated: false,
 }
 
-export const mockUserAlert: UserAlertsContent = {
-  id: 0,
-  type: { description: 'ROSH Alert', editable: true },
-  crn: 'X000001',
-  date: '2025-11-10T10:00:00Z',
-  description: 'Test Alert 1',
-  alertNote: mockNote,
-  officer: mockOfficer,
-  riskLevel: 'HIGH ROSH',
-}
-
 export const defaultUser = {
   username: 'testuser',
   token: 'mock-user-token',
