@@ -7,6 +7,8 @@ export default class ContactPreferencePage extends Page {
 
   getSubmitBtn = (): PageElement => cy.get('[data-qa="submitBtn"]')
 
+  getChangeLink = (): PageElement => cy.get('[data-qa="mobileNumberAction"]')
+
   getCheckInPreferredComs = () => {
     return cy.get(`[data-qa="checkInPreferredComs"]`)
   }

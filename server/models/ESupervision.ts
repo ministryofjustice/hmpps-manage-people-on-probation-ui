@@ -1,13 +1,14 @@
 import { Errors } from './Errors'
 
 export interface ESupervisionSession {
-  checkin?: CheckinUserDetails
+  checkins?: CheckinUserDetails
 }
 
 export interface CheckinUserDetails {
   uuid: string
   firstCheckin: string
   checkinInterval: string
+  contactUpdated?: boolean
 }
 export interface LocalParams {
   crn: string
@@ -19,4 +20,7 @@ export interface LocalParams {
   change?: string
   checkInMobile?: string
   checkInEmail?: string
+  contactSaved?: string
+  editCheckInMobile?: string
+  editCheckInEmail?: string
 }

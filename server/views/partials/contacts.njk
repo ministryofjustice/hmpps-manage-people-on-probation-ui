@@ -1,0 +1,45 @@
+{% extends "../partials/layout.njk" %}
+{% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
+{% set mainClasses = "app-container govuk-body" %}
+
+{% block content %}
+    {% set html %}
+    <p class="govuk-notification-banner__heading">
+            We’re not ready to handle this case
+        </p>
+    <p>You may find that:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>not all information is shown</li>
+        <li>some information shows incorrectly</li>
+    </ul>
+    {% endset %}
+    {% if data.features.showInappropriateCaseWarning %}
+        {{ govukNotificationBanner({
+            html: html
+        }) }}
+    {% endif %}
+
+        {% include "../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+
+    {% if errorMessages %}
+        {% set errorList = errorMessages | toErrorList %}
+        {% if errorList.length > 0 %}
+            <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+            </div>
+            </div>
+        {% endif %}
+    {% endif %}
+    {% if title %}
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+            {{ title }}
+        </h2>
+    {% endif %}
+        {% block pageContent %}{% endblock %}
+    {% endblock %}
