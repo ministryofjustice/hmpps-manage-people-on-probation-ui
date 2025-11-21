@@ -73,7 +73,7 @@
   {% if showNotesDetails > 0  %}
     {% for appointmentNote in entry.appointmentNotes %}
       {% if appointmentNote.note %}
-        {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage/note/' + appointmentNote.id + '?category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page + '&back=' + baseUrl)) %}
+        {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
       {% endif %}
     {% endfor  %}
   {% endif %}
