@@ -3,6 +3,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
+import { getUserAlertsCount } from '../middleware/getUserAlertsCount'
 
 export default function alertsRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -12,6 +13,7 @@ export default function alertsRoutes(router: Router, { hmppsAuthClient }: Servic
   router.post(
     '/alerts',
     controllers.alerts.clearSelectedAlerts(hmppsAuthClient),
+    getUserAlertsCount(hmppsAuthClient),
     controllers.alerts.getAlerts(hmppsAuthClient),
   )
 }
