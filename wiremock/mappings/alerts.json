@@ -327,49 +327,6 @@
           "Content-Type": "application/json"
         }
       }
-    },
-    {
-      "request": {
-        "urlPattern": "/mas/alerts/.*/notes/.*",
-        "method": "GET"
-      },
-      "response": {
-        "status": 200,
-        "jsonBody": {
-          "id": 2,
-          "type": {
-            "description": "Appointment attendance failure",
-            "editable": true
-          },
-          "crn": "X000002",
-          "date": "2025-07-10",
-          "description": "Failed to attend scheduled appointment",
-          "alertNote": {
-            "id": 0,
-            "createdBy": "Custody Status Service",
-            "createdByDate": "2024-07-19",
-            "note": "Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.",
-            "hasNoteBeenTruncated": false
-          },
-          "name": {
-            "forename": "Caroline",
-            "middleName": "",
-            "surname": "Wolff"
-          },
-          "officer": {
-            "name": {
-              "forename": "Officer",
-              "middleName": "",
-              "surname": "Test"
-            },
-            "code": "JFROS01"
-          },
-          "riskLevel": "HIGH"
-        },
-        "headers": {
-          "Content-Type": "application/json"
-        }
-      }
     }
   ]
 }
