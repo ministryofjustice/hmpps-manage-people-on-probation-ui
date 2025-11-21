@@ -12,12 +12,15 @@
             {% set timelineItemClass = 'predictor-timeline-item--medium' %}
             {% case 'LOW' %}
                 {% set timelineItemClass = 'predictor-timeline-item--low' %}
+                     {% default %}
+                {% set timelineItemClass = 'predictor-timeline-item--unknown' %}
+                {% set default_level = 'UNKNOWN' %}
                 {% endswitch %}
 
                 <div data-qa="" class="predictor-timeline-item {{ timelineItemClass }}">
                     <span class="predictor-timeline-item__level">
                         <strong>{{ params.type }}</strong>
-                        {{ level }}</span>
+                        {{ default_level if default_level else level }}</span>
                     {% if params.score %}
                         <span class="predictor-timeline-item__score">{{ params.score }}</span>
                     {% endif %}
