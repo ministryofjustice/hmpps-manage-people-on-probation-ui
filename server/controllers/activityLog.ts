@@ -86,6 +86,9 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
+      if (personAppointment.appointment.isAppointment) {
+        return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
+      }
       const isActivityLog = true
       const queryParams = getQueryString(req.query as Record<string, string>)
       await auditService.sendAuditMessage({
@@ -96,7 +99,7 @@ const activityLogController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      res.render('pages/appointments/appointment', {
+      return res.render('pages/appointments/appointment', {
         queryParams,
         back,
         personAppointment,
