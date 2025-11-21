@@ -1,4 +1,5 @@
 import { Name } from '../data/model/personalDetails'
+import { Note } from '../data/model/note'
 import { Officer } from '../data/model/schedule'
 
 export interface UserAlertsType {
@@ -13,7 +14,8 @@ export interface UserAlertsContent {
   name: Name
   date: string
   description?: string
-  notes?: string
+  alertNotes?: Note[]
+  alertNote?: Note
   officer: Officer
   riskLevel?: 'VERY HIGH ROSH' | 'HIGH ROSH' | 'MEDIUM ROSH' | 'LOW ROSH'
 }

@@ -1,7 +1,10 @@
 import {
+  charsOrLess,
   contactPrefEmailCheck,
   contactPrefMobileCheck,
+  isEmail,
   isNotEmpty,
+  isNumeric,
   isValidDate,
   isValidDateFormat,
 } from '../../utils/validationUtils'
@@ -13,10 +16,12 @@ export interface ESupervisionValidationArgs {
   page: string
   checkInMobile?: string
   checkInEmail?: string
+  editCheckInEmail?: string
+  editCheckInMobile?: string
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const { crn, id, page, checkInEmail, checkInMobile } = args
+  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][interval]`]: {
       optional: page !== 'date-frequency',
@@ -78,6 +83,38 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           msg: 'Enter a mobile number',
           log: 'Mobile number not entered in check in process',
           crossField: `[esupervision][${crn}][${id}][checkins][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][editCheckInMobile]`]: {
+      optional: (page === 'edit-contact-preference' && !editCheckInMobile) || page !== 'edit-contact-preference',
+      checks: [
+        {
+          validator: isNumeric,
+          msg: 'Enter a mobile number in the correct format.',
+          log: 'Mobile number not in correct format in check in process',
+        },
+        {
+          validator: charsOrLess,
+          length: 35,
+          msg: `Mobile number must be 35 characters or less.`,
+          log: 'Mobile number must be less than 35 chars, in check in process',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][editCheckInEmail]`]: {
+      optional: (page === 'edit-contact-preference' && !editCheckInEmail) || page !== 'edit-contact-preference',
+      checks: [
+        {
+          validator: isEmail,
+          msg: 'Enter an email address in the correct format.',
+          log: 'Email address not in correct format in check in process',
+        },
+        {
+          validator: charsOrLess,
+          length: 35,
+          msg: `Email address must be 35 characters or less.`,
+          log: 'Email address must be 35 characters or less in check in process',
         },
       ],
     },

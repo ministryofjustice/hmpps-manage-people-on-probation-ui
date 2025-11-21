@@ -1,6 +1,6 @@
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
-import { UserAlerts } from '../models/Alerts'
+import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget } from '../utils'
 
@@ -11,6 +11,8 @@ const alertsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { user } = res.locals
       const { page = '0', sortBy, sortOrder } = req.query as Record<string, string>
+      let { url } = req
+      url = encodeURIComponent(url)
       const pageNumber = parseInt(page, 10)
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
@@ -49,6 +51,7 @@ const alertsController: Controller<typeof routes, void> = {
       }
 
       res.render('pages/alerts', {
+        url,
         alertsData,
         crnToRiskWidgetMap,
         sortQueryString,

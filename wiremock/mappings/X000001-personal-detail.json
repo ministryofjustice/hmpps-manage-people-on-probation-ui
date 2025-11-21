@@ -270,6 +270,19 @@
     },
     {
       "request": {
+        "urlPattern": "/mas/personal-details/X778160/contact",
+        "method": "POST"
+      },
+      "response": {
+        "status": 500,
+        "jsonBody": { "message": "Unable to update personal contact details" },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/mas/personal-details/X000001/contact",
         "method": "POST"
       },

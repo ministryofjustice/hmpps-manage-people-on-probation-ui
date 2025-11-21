@@ -3,7 +3,7 @@ import Page from '../page'
 
 export default class DateFrequencyPage extends Page {
   constructor() {
-    super('Set up online checkin ins')
+    super('Set up online check ins')
   }
 
   getDatePickerToggle = () => {

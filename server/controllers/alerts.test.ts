@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse } from './mocks'
 
-import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { mockUserAlert, mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
@@ -71,8 +71,10 @@ const getUserAlertsSpy = jest
   .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn))
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
-  .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess))
-
+  .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
+const getAlertNoteSpy = jest
+  .spyOn(MasApiClient.prototype, 'getAlertNote')
+  .mockImplementation(() => Promise.resolve(mockUserAlert)) // Use imported mock
 const getRisksSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getRisks')
   .mockImplementation(() => Promise.resolve(mockRisksData))
@@ -108,6 +110,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
+        url: '%2Falerts',
       })
     })
 
@@ -131,6 +134,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortQueryString: '&sortBy=date&sortOrder=desc',
         currentSort: { column: 'date', order: 'desc' },
+        url: '%2Falerts',
       })
     })
 
@@ -150,6 +154,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: {}, // Expect empty object
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
+        url: '%2Falerts',
       })
     })
   })

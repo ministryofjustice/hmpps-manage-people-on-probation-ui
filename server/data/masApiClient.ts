@@ -41,7 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
-import { UserAlerts } from '../models/Alerts'
+import { UserAlerts, ClearAlertsResponse, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 
 interface GetUserScheduleProps {
@@ -133,8 +133,8 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/personal-details/${crn}/contact`,
-      handle404: true,
-      handle500: true,
+      handle404: false,
+      handle500: false,
     })
   }
 
