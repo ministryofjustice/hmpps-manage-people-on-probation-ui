@@ -1,5 +1,5 @@
 {% extends "../_form.njk" %}
-{% set title = "Set up  online checkin ins" %}
+{% set title = "Set up  online check ins" %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/instructions' %}
 {% set radioLabel =  "How often would you like "+ case.name.forename + " to check in?" %}
 {% block form %}
@@ -7,7 +7,7 @@
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1" >When would you like {{case.name.forename}} to complete their first online <br/> check in?</h3>
     {{ mojDatePicker({
         hint: {
-            text: "They will get a notification to use online check ins form this date"
+            text: "They will get a notification to use online check ins from this date"
         },
         formGroup: {
             classes: "govuk-!-margin-bottom-3",

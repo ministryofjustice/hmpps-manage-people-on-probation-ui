@@ -719,3 +719,37 @@ describe('validates checkin date preference', () => {
     expect(loggerSpy).toHaveBeenCalledWith('Checkin frequency not selected')
   })
 })
+
+describe('validates edit contact', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          checkins: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-checkins-editCheckInMobile`]: 'Enter a mobile number in the correct format.',
+    [`esupervision-${crn}-${id}-checkins-editCheckInEmail`]: 'Enter an email address in the correct format.',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'edit-contact-preference',
+    editCheckInMobile: '071838893dsafsadf',
+    editCheckInEmail: 'address1gmail.com',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
+  })
+})

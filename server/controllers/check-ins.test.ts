@@ -1,11 +1,12 @@
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
 import { mockAppResponse } from './mocks'
-import { isValidCrn, isValidUUID } from '../utils'
+import { isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails } from '../data/model/personalDetails'
+import { defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -22,6 +23,7 @@ jest.mock('../utils', () => {
     ...actualUtils,
     isValidCrn: jest.fn(),
     isValidUUID: jest.fn(),
+    setDataValue: jest.fn(),
   }
 })
 
@@ -46,6 +48,7 @@ const getPersonalDetailsSpy = jest
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
+const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 const crn = 'X000001'
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
@@ -72,7 +75,7 @@ describe('checkInsController', () => {
       mockIsValidCrn.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.getIntroPage(null as any)(req, res)
+      await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn })
       expect(mockRenderError).not.toHaveBeenCalled()
@@ -82,7 +85,7 @@ describe('checkInsController', () => {
       mockIsValidCrn.mockReturnValue(false)
 
       const req = baseReq()
-      await controllers.checkIns.getIntroPage(null as any)(req, res)
+      await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -94,7 +97,7 @@ describe('checkInsController', () => {
       mockIsValidCrn.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.postIntroPage(null as any)(req, res)
+      await controllers.checkIns.postIntroPage(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
     })
@@ -103,7 +106,7 @@ describe('checkInsController', () => {
       mockIsValidCrn.mockReturnValue(false)
 
       const req = baseReq()
-      await controllers.checkIns.postIntroPage(null as any)(req, res)
+      await controllers.checkIns.postIntroPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -119,7 +122,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.getDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/date-frequency.njk', {
         crn,
@@ -136,7 +139,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.getDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/date-frequency.njk', {
         crn,
@@ -150,7 +153,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.getDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -161,7 +164,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(false)
 
       const req = baseReq()
-      await controllers.checkIns.getDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.getDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -174,7 +177,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.postDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.postDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/contact-preference`)
     })
@@ -184,7 +187,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.postDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.postDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -195,7 +198,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(false)
 
       const req = baseReq()
-      await controllers.checkIns.postDateFrequencyPage(null as any)(req, res)
+      await controllers.checkIns.postDateFrequencyPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -221,7 +224,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.getContactPreferencePage(null as any)(req, res)
+      await controllers.checkIns.getContactPreferencePage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -232,7 +235,129 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(false)
 
       const req = baseReq()
-      await controllers.checkIns.getContactPreferencePage(null as any)(req, res)
+      await controllers.checkIns.getContactPreferencePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getEditContactPrePage', () => {
+    it('renders edit contact preference when CRN and id are valid', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getEditContactPrePage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/edit-contact-preference.njk', { crn, id: uuid })
+      expect(mockRenderError).not.toHaveBeenCalled()
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getEditContactPrePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getEditContactPrePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('postEditContactPrePage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postEditContactPrePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('updates personal details, sets session flag and redirects on success', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                editCheckInEmail: 'test@example.com',
+                editCheckInMobile: '07700900000',
+              },
+            },
+          },
+        },
+      }
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        session: { data },
+      })
+      res.locals.user = defaultUser
+      const updateSpy = jest
+        .spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
+        .mockImplementation(() => Promise.resolve({ crn } as PersonalDetails))
+
+      await controllers.checkIns.postEditContactPrePage(hmppsAuthClient)(req, res)
+
+      expect(updateSpy).toHaveBeenCalledWith(crn, {
+        emailAddress: 'test@example.com',
+        mobileNumber: '07700900000',
+      })
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        data,
+        ['esupervision', crn, uuid, 'checkins', 'contactUpdated'],
+        true,
+      )
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/contact-preference`)
+    })
+  })
+
+  describe('postContactPreferencePage', () => {
+    it('redirects to photo-options when CRN and id are valid', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postContactPreferencePage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/photo-options`)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postContactPreferencePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postContactPreferencePage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
