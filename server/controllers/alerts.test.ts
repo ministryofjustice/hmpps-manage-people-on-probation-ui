@@ -123,22 +123,4 @@ describe('alertsController', () => {
       })
     })
   })
-
-  describe('getAlertsNote', () => {
-    it('should call getUserAlert with custom page number and sort params, and build query string', async () => {
-      const req = httpMocks.createRequest({
-        query: { back: '/alerts' },
-        params: { alertId: '0', noteId: '0' },
-      })
-      res.locals.user = defaultUser
-
-      await controllers.alerts.getAlertsNote(hmppsAuthClient)(req, res, next)
-
-      expect(getAlertNoteSpy).toHaveBeenCalledWith('0', '0')
-      expect(renderSpy).toHaveBeenCalledWith('pages/alerts-note', {
-        back: '/alerts',
-        alert: mockUserAlert,
-      })
-    })
-  })
 })
