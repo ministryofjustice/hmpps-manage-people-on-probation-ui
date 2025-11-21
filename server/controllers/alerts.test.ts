@@ -153,6 +153,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: {}, // Expect empty object
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
+        url: '%2Falerts',
       })
     })
   })

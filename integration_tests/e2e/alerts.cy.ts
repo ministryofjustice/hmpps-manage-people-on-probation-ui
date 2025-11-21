@@ -70,6 +70,6 @@ context('Alerts Dashboard', () => {
     cy.get('[data-qa="moreInfo-8"]')
       .find('[data-qa="alertNotes-8"]')
       .find('a')
-      .should('have.attr', 'href', '/alerts/8/notes/0?back=%2Falerts')
+      .should('have.attr', 'href', '/case/X000002/appointments/appointment/8/manage/note/0?back=%2Falerts')
   })
 })
