@@ -41,7 +41,7 @@ import {
   AppointmentsPostResponse,
   MasUserDetails,
 } from '../models/Appointments'
-import { UserAlerts, ClearAlertsResponse } from '../models/Alerts'
+import { UserAlerts, ClearAlertsResponse, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 
 interface GetUserScheduleProps {
@@ -430,5 +430,9 @@ export default class MasApiClient extends RestClient {
       path: '/alerts/clear',
       data: { alertIds },
     })
+  }
+
+  async getAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {
+    return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: true })
   }
 }

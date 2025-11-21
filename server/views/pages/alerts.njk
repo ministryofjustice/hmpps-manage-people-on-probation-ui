@@ -102,7 +102,7 @@
                                             {{ alert.type.description }}
                                         </a></p>
 
-                                    {% if alert.description or alert.notes %}
+                                    {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
                                         {{ govukDetails({
                                             summaryText: "More information",
                                             classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
@@ -221,26 +221,26 @@
 {% endblock %}
 
 {% macro renderAlertDetails(alert) %}
-    <dl class="govuk-summary-list govuk-summary-list--no-border govuk-!-margin-bottom-2">
-        {% if alert.description %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Description</dt>
-                <dd class="govuk-summary-list__value" data-qa="alertDescription-{{ alert.id }}">
-                    {{ alert.description }}
-                </dd>
-            </div>
-        {% endif %}
+    {% if alert.description %}
+        <span class="govuk-heading-s govuk-!-margin-bottom-0">Description</span>
+        <div class={{"govuk-!-margin-bottom-5" if alert.alertNotes.length > 0 or alert.alertNote else ""}} data-qa="alertDescription-{{ alert.id }}">
+            {{ alert.description }}
+        </div>
+    {% endif %}
 
-        {% if alert.notes %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Notes</dt>
-                <dd class="govuk-summary-list__value" data-qa="alertNotes-{{ alert.id }}">
-                    {{ alert.notes | slice(0, 500) }}{% if alert.notes | length > 500 %}...{% endif %}
-                </dd>
-            </div>
+    {% if alert.alertNotes.length > 0 or alert.alertNote %}
+        {% set notes = '' %}
+        {% for note in alert.alertNotes %}
+            {% if note.note %}
+                {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
+            {% endif %}
+        {% endfor  %}
+        {% if alert.alertNote %}
+            {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
         {% endif %}
-    </dl>
-    <a href="/case/{{ alert.crn }}/activity-log/contact/{{ alert.id }}" class="govuk-link" data-qa="viewMoreLink-{{ alert.id }}">
-        Open the activity to view more
-    </a>
+        <span class="govuk-heading-s govuk-!-margin-bottom-0">Notes</span>
+        <div data-qa="alertNotes-{{ alert.id }}">
+            {{ notes | safe }}
+        </div>
+    {% endif %}
 {% endmacro %}
