@@ -627,9 +627,41 @@ const stubNullCircumstanceNote = (): SuperAgentRequest =>
     },
   })
 
+const stubUpdatePersonalContact500Response = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/personal-details/X000001/contact',
+      method: 'POST',
+    },
+    response: {
+      status: 500,
+      jsonBody: { message: '500 Error message' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubUpdatePersonalContact404Response = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/mas/personal-details/X000001/contact',
+      method: 'POST',
+    },
+    response: {
+      status: 404,
+      jsonBody: { message: '404 Error message' },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubPersonalDetailsNoMobileNumber,
   stubPersonalDetailsNoTelephoneNumbers,
   stubNoCircumstanceNotes,
   stubNullCircumstanceNote,
+  stubUpdatePersonalContact500Response,
+  stubUpdatePersonalContact404Response,
 }

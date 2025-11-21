@@ -1,9 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { isValidCrn, isValidUUID } from '../utils'
+import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
+import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 
 const routes = [
   'getIntroPage',
@@ -13,6 +14,8 @@ const routes = [
   'getContactPreferencePage',
   'postContactPreferencePage',
   'getPhotoOptionsPage',
+  'getEditContactPrePage',
+  'postEditContactPrePage',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -70,14 +73,30 @@ const checkInsController: Controller<typeof routes, void> = {
   getContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      if (req?.session?.errorMessages) {
+        res.locals.errorMessages = req.session.errorMessages
+        delete req?.session?.errorMessages
+      }
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const { data, back } = req.session
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
       const checkInMobile = personalDetails.mobileNumber
       const checkInEmail = personalDetails.email
+      // if page not submitted, required to save in session for change link /edit page to avoid API call.
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'], checkInMobile)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInEmail'], checkInEmail)
+
+      // To show success message on edit contact preference page
+      const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'])
+      if (contactUpdated) {
+        res.locals.success = true
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.checkins?.contactUpdated
+      }
+
       return res.render('pages/check-in/contact-preference.njk', { crn, id, checkInMobile, checkInEmail })
     }
   },
@@ -98,8 +117,43 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
       return res.render('pages/check-in/photo-options.njk', { crn, id })
+    }
+  },
+  getEditContactPrePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id })
+    }
+  },
+
+  postEditContactPrePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const editCheckInEmail = getDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInEmail'])
+      const editCheckInMobile = getDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
+      const body: PersonalDetailsUpdateRequest = {
+        emailAddress: editCheckInEmail,
+        mobileNumber: editCheckInMobile,
+      }
+
+      const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
+      // Save to show success message on contact preferences page
+      if (personalDetails?.crn) {
+        setDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'], true)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/contact-preference`)
     }
   },
 }

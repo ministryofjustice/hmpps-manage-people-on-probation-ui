@@ -5,6 +5,8 @@ import DateFrequencyPage from '../../pages/check-ins/date-frequencey'
 import { getCheckinUuid } from './imports'
 import ContactPreferencePage from '../../pages/check-ins/contact-preference'
 import PhotoOptionsPage from '../../pages/check-ins/photo-options'
+import EditContactPreferencePage from '../../pages/check-ins/edit-contact-preference'
+import ErrorPage from '../../pages/error'
 
 const loadPage = () => {
   cy.task('stubEnableESuperVision')
@@ -113,5 +115,66 @@ context('Appointment check-ins', () => {
 
     const photoOptionsPage = new PhotoOptionsPage()
     photoOptionsPage.checkOnPage()
+  })
+
+  it('should able to edit contact preference details', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage.getChangeLink().click()
+    const editContactPreferencePage = new EditContactPreferencePage()
+    editContactPreferencePage.checkOnPage()
+    editContactPreferencePage.getSubmitBtn().click()
+    contactPreferencePage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
+  })
+
+  it('should show error page when update fails with 500 HTTP response code', () => {
+    cy.task('stubUpdatePersonalContact500Response')
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage.getChangeLink().click()
+    const editContactPreferencePage = new EditContactPreferencePage()
+    editContactPreferencePage.checkOnPage()
+    editContactPreferencePage.getSubmitBtn().click()
+    const errorPage = new ErrorPage()
+    errorPage.checkPageTitle('Sorry, there is a problem with the service')
+  })
+
+  it('should show error page when update fails with 404 HTTP response code', () => {
+    cy.task('stubUpdatePersonalContact404Response')
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage.getChangeLink().click()
+    const editContactPreferencePage = new EditContactPreferencePage()
+    editContactPreferencePage.checkOnPage()
+    editContactPreferencePage.getSubmitBtn().click()
+    const errorPage = new ErrorPage()
+    errorPage.checkPageTitle('Page not found')
   })
 })

@@ -67,6 +67,7 @@ interface Locals {
   predictorScores?: TimelineItem
   message?: string
   title?: string
+  success?: boolean
   status?: number
   stack?: boolean | number | string
   flags?: FeatureFlags
