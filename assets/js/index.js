@@ -10,7 +10,6 @@ import './predictors'
 import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import { MpopMultiFileUpload } from './mpop-multi-file-upload.mjs'
-import setupAlertsPage from './alerts.mjs'
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
 if ($backendSortableTable) {
@@ -345,4 +344,3 @@ attendanceSelectors()
 homeSearch()
 crissHeaders()
 recentCaseDisplay()
-setupAlertsPage()
