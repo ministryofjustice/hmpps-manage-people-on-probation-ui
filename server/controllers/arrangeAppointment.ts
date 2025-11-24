@@ -18,6 +18,9 @@ import {
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
   getUserOptions,
+  findUncompleted,
+  appointmentDateIsInPast,
+  getAttendedCompliedProps,
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
@@ -26,7 +29,6 @@ import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import { Name } from '../data/model/personalDetails'
 import '../@types/express/index.d'
-import { Activity } from '../data/model/schedule'
 
 const routes = [
   'redirectToSentence',
@@ -54,46 +56,6 @@ const routes = [
   'getAddNote',
   'postAddNote',
 ] as const
-
-export interface AttendedCompliedAppointment {
-  type: string
-  officer: {
-    name: Name
-  }
-  startDateTime: string
-}
-
-export const getAttendedCompliedProps = (
-  req: ExpressRequest,
-  res: AppResponse,
-): { forename: string; surname: string; appointment: AttendedCompliedAppointment | Activity } => {
-  const { crn, id, contactId } = req.params
-  const data = req?.session?.data
-  let appointment: AttendedCompliedAppointment | Activity
-  const { forename, surname } = res.locals.case.name
-  if (contactId) {
-    ;({ appointment } = res.locals.personAppointment)
-  } else {
-    const description = res?.locals?.appointment?.type?.description
-    const name = res?.locals?.appointment?.attending?.name
-    let officerForename = ''
-    let officerSurname = ''
-    if (name) {
-      ;[officerForename, officerSurname] = name.split(' ')
-    }
-    const path = ['appointments', crn, id]
-    const appointmentSession = getDataValue<AppointmentSession>(data, path)
-    const startDateTime = appointmentSession?.date ?? ''
-    appointment = {
-      type: description,
-      officer: {
-        name: { forename: convertToTitleCase(officerForename), surname: convertToTitleCase(officerSurname) },
-      },
-      startDateTime,
-    }
-  }
-  return { forename, surname, appointment }
-}
 
 export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
   const { data } = req.session
@@ -221,7 +183,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postTypeAttendance: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
       const change = req?.query?.change as string
       const { number } = req.query as Record<string, string>
       const query = number ? `?number=${number}` : ''
