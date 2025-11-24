@@ -8,7 +8,7 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
-import { getAttendedCompliedProps } from '../../controllers/arrangeAppointment'
+import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
@@ -47,7 +47,7 @@ const appointments: Route<void> = (req, res, next) => {
     localParams = { ...localParams, useDecorator: true }
   }
   const baseUrl = req.url.split('?')[0]
-  let isAddNotePage = false
+  let isAddNotePage: boolean
   let render = `pages/${[
     url
       .split('?')[0]

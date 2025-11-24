@@ -16,7 +16,12 @@ import {
   mockPersonAppointment,
 } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import {
+  cloneAppointmentAndRedirect,
+  renderError,
+  getAttendedCompliedProps,
+  AttendedCompliedAppointment,
+} from '../middleware'
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import config from '../config'
@@ -59,6 +64,7 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
+  getAttendedCompliedProps: jest.fn(),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -74,6 +80,7 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
+const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const req = httpMocks.createRequest({
   params: {
@@ -89,6 +96,23 @@ const req = httpMocks.createRequest({
     data: {},
   },
 })
+
+const mockAppointment: AttendedCompliedAppointment | Activity = {
+  type: '3 Way Meeting (NS)',
+  officer: {
+    name: {
+      forename: 'Forename',
+      surname: 'Surname',
+    },
+  },
+  startDateTime: '2025-11-20',
+}
+
+mockGetAttendedCompliedProps.mockImplementation(() => ({
+  forename: 'Forename',
+  surname: 'Surname',
+  appointment: mockAppointment,
+}))
 
 const res = mockAppResponse({
   user: {
@@ -332,21 +356,25 @@ describe('controllers/appointments', () => {
     })
   })
 
-  xdescribe('get attended and complied', () => {
+  describe('get attended and complied', () => {
     beforeEach(async () => {
       await controllers.appointments.getAttendedComplied(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/record-outcome', {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
         crn,
         alertDismissed: false,
         isInPast: true,
+        headerPersonName: 'Forename Surname',
+        forename: 'Forename',
+        surname: 'Surname',
+        appointment: mockAppointment,
       })
     })
   })
 
-  xdescribe('post attended and complied', () => {
+  describe('post attended and complied', () => {
     const mockReq = httpMocks.createRequest({
       params: {
         crn,

@@ -16,11 +16,10 @@ import {
   setDataValue,
   getDataValue,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
-import { getAttendedCompliedProps } from './arrangeAppointment'
 
 const routes = [
   'getAppointments',
@@ -247,7 +246,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         forename,
         surname,
         appointment,
-        decoratorName: 'outcomeRecorded',
       })
     }
   },
