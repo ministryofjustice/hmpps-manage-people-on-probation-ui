@@ -4,6 +4,7 @@
 {% from "govuk/components/button/macro.njk" import govukButton %}
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 {% from "moj/components/badge/macro.njk" import mojBadge %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 
 {% set alerts = true %}
@@ -12,13 +13,20 @@
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l" data-qa="pageHeading">Alerts</h1>
-
+            {% if alertsCleared %}
+                {{ mojAlert({
+                    variant: "error" if alertsCleared.error else "success",
+                    title: alertsCleared.message,
+                    showTitleAsHeading: true,
+                    dismissible: false 
+                }) }}
+            {% endif %}
             {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
                 <p class="govuk-body" data-qa="alertsCount">
                     Showing <b>{{ ((alertsData.page) * alertsData.size) + 1 }}</b> to <b>{{ ((alertsData.page) * alertsData.size) + alertsData.content.length }}</b> of <b>{{ alertsData.totalResults }}</b> results
                 </p>
 
-                <form method="post" action="/alerts/clear-selected" id="alerts-form">
+                <form method="post" action="/alerts" id="alerts-form">
 
                     <table class="govuk-table" data-module="moj-sortable-table" data-qa="alertsTable">
                         <thead class="govuk-table__head">

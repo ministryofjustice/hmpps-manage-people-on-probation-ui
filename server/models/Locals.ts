@@ -101,6 +101,7 @@ interface Locals {
   defaultUser?: { username: string; homeArea: string; team: string }
   sentencePlan?: SentencePlan
   alertsCount?: string
+  alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
 }
 

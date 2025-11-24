@@ -1,3 +1,4 @@
+import { Name } from '../data/model/personalDetails'
 import { Note } from '../data/model/note'
 import { Officer } from '../data/model/schedule'
 
@@ -10,6 +11,7 @@ export interface UserAlertsContent {
   id: number
   type: UserAlertsType
   crn: string
+  name: Name
   date: string
   description?: string
   alertNotes?: Note[]
@@ -28,9 +30,4 @@ export interface UserAlerts {
 
 export interface ClearAlertsRequest {
   alertIds: number[]
-}
-
-export interface ClearAlertsResponse {
-  success: boolean
-  clearedCount: number
 }
