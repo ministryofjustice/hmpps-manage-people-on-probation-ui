@@ -753,3 +753,34 @@ describe('validates edit contact', () => {
     expect(loggerSpy).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
   })
 })
+
+describe('validates photo options page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          checkins: { photoUploadOption: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-checkins-photoUploadOption`]: 'Select an option to continue',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'photo-options',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Photo option, not selected')
+  })
+})

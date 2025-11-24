@@ -16,6 +16,9 @@ const routes = [
   'getPhotoOptionsPage',
   'getEditContactPrePage',
   'postEditContactPrePage',
+  'postPhotoOptionsPage',
+  'getTakePhotoPage',
+  'getUploadPhotoPage',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -154,6 +157,39 @@ const checkInsController: Controller<typeof routes, void> = {
       }
 
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/contact-preference`)
+    }
+  },
+  postPhotoOptionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const photoUploadOption = getDataValue(data, ['esupervision', crn, id, 'checkins', 'photoUploadOption'])
+      const redirectTo = photoUploadOption === 'TAKE_A_PIC' ? 'take-a-photo' : 'upload-a-photo'
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/${redirectTo}`)
+    }
+  },
+
+  getTakePhotoPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/take-a-photo.njk', { crn, id })
+    }
+  },
+
+  getUploadPhotoPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/upload-a-photo.njk', { crn, id })
     }
   },
 }

@@ -7,6 +7,8 @@ import ContactPreferencePage from '../../pages/check-ins/contact-preference'
 import PhotoOptionsPage from '../../pages/check-ins/photo-options'
 import EditContactPreferencePage from '../../pages/check-ins/edit-contact-preference'
 import ErrorPage from '../../pages/error'
+import TakeAPhotoOptionsPage from '../../pages/check-ins/take-a-photo-options'
+import UploadAPhotoPage from '../../pages/check-ins/upload-a-photo'
 
 const loadPage = () => {
   cy.task('stubEnableESuperVision')
@@ -176,5 +178,38 @@ context('Appointment check-ins', () => {
     editContactPreferencePage.getSubmitBtn().click()
     const errorPage = new ErrorPage()
     errorPage.checkPageTitle('Page not found')
+  })
+
+  it('Should able to choose photo options', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage
+      .getCheckInPreferredComs()
+      .find('.govuk-radios__item')
+      .eq(0)
+      .find('.govuk-radios__input')
+      .click()
+    contactPreferencePage.getSubmitBtn().click()
+    const takeAPhotoOptionsPage = new TakeAPhotoOptionsPage()
+    takeAPhotoOptionsPage.checkOnPage()
+    takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    takeAPhotoOptionsPage.getSubmitBtn().click()
+    takeAPhotoOptionsPage.getBackLink().click()
+    takeAPhotoOptionsPage.checkOnPage()
+    takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
+    takeAPhotoOptionsPage.getSubmitBtn().click()
+    const uploadablePhoto = new UploadAPhotoPage()
+    uploadablePhoto.checkOnPage()
+    uploadablePhoto.getBackLink().click()
+    takeAPhotoOptionsPage.checkOnPage()
   })
 })

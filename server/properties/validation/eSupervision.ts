@@ -118,5 +118,15 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][checkins][photoUploadOption]`]: {
+      optional: page !== 'photo-options',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an option to continue',
+          log: 'Photo option, not selected',
+        },
+      ],
+    },
   }
 }

@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block content %}
-  {% include "../partials/pop-header.njk" %}
+  {% if not checkinPhotoPage %}
+    {% include "../partials/pop-header.njk" %}
+  {% endif %}
   <hr class="govuk-section-break--l">
   {% if notStandardForm %}
     {% block primary %}{% endblock %}

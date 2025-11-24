@@ -42,10 +42,6 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postContactPreferencePage(),
   )
 
-  router.get('/case/:crn/appointments/:id/check-in/photo-options', [
-    controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient),
-  ])
-
   router.get('/case/:crn/appointments/:id/check-in/edit-contact-preference', [
     controllers.checkIns.getEditContactPrePage(hmppsAuthClient),
   ])
@@ -56,4 +52,23 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     validate.eSuperVision,
     controllers.checkIns.postEditContactPrePage(hmppsAuthClient),
   )
+
+  router.get('/case/:crn/appointments/:id/check-in/photo-options', [
+    controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient),
+  ])
+
+  router.post(
+    '/case/:crn/appointments/:id/check-in/photo-options',
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postPhotoOptionsPage(hmppsAuthClient),
+  )
+
+  router.get('/case/:crn/appointments/:id/check-in/take-a-photo', [
+    controllers.checkIns.getTakePhotoPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/:id/check-in/upload-a-photo', [
+    controllers.checkIns.getUploadPhotoPage(hmppsAuthClient),
+  ])
 }
