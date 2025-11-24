@@ -316,8 +316,7 @@ describe('masApiClient', () => {
         () => masApiClient.getUserAlerts(1, 'date', 'asc'),
       ],
       ['getUserAlerts (minimal)', '/alerts?size=10', () => masApiClient.getUserAlerts()],
-      ['clearAlerts', '/alerts/clear', () => masApiClient.clearAlerts([1, 2, 3]), 'post'],
-      ['getAlertNote', '/alerts/0/notes/0', () => masApiClient.getAlertNote('0', '0')],
+      ['clearAlerts', '/alerts', () => masApiClient.clearAlerts([1, 2, 3]), 'put'],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {
@@ -325,6 +324,9 @@ describe('masApiClient', () => {
       }
       if (method === 'post') {
         fakeMasApiClient.post(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+      }
+      if (method === 'put') {
+        fakeMasApiClient.put(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
       }
 
       const output = await func()

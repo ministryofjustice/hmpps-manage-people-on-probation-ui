@@ -6,7 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse } from './mocks'
 
-import { mockUserAlert, mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
@@ -44,6 +44,7 @@ const mockUserAlertsWithCrn = {
       id: 1,
       crn: 'X123456',
       type: { description: 'Mock Type', editable: true },
+      name: { forename: 'Mock', middleName: '', surname: 'Case' },
       date: '2025-10-26',
       officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
     },
@@ -71,9 +72,6 @@ const getUserAlertsSpy = jest
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
-const getAlertNoteSpy = jest
-  .spyOn(MasApiClient.prototype, 'getAlertNote')
-  .mockImplementation(() => Promise.resolve(mockUserAlert)) // Use imported mock
 const getRisksSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getRisks')
   .mockImplementation(() => Promise.resolve(mockRisksData))
@@ -166,8 +164,7 @@ describe('alertsController', () => {
 
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(statusSpy).toHaveBeenCalledWith(400)
-      expect(jsonSpy).toHaveBeenCalledWith({ error: 'No alerts selected' })
+      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it` })
       expect(clearAlertsSpy).not.toHaveBeenCalled()
     })
 
@@ -181,10 +178,7 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
-      expect(jsonSpy).toHaveBeenCalledWith({
-        success: true,
-        message: '1 alert(s) cleared successfully',
-      })
+      expect(res.locals.alertsCleared).toEqual({ error: false, message: `1 alert(s) cleared successfully` })
     })
 
     it('should call clearAlerts with multiple selected alerts and return success', async () => {
@@ -201,10 +195,7 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
-      expect(jsonSpy).toHaveBeenCalledWith({
-        success: true,
-        message: '2 alert(s) cleared successfully',
-      })
+      expect(res.locals.alertsCleared).toEqual({ error: false, message: `2 alert(s) cleared successfully` })
     })
   })
 })
