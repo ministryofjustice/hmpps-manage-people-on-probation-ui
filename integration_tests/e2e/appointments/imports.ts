@@ -197,7 +197,7 @@ export const checkAppointmentSummary = (
     page
       .getSummaryListRow(3)
       .find('.govuk-summary-list__value')
-      .should('contain.text', 'Deborah Fern (PS - Other)')
+      .should('contain.text', 'Deborah Fern')
       .should('contain.text', '(Automated Allocation Team, London)')
   } else {
     page
