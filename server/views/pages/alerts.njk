@@ -106,7 +106,7 @@
                                 {% endif %}
 
                                 <td class="govuk-table__cell govuk-!-width-one-third" data-sort-value="{{ alert.type.description }}" data-qa="alertActivity">
-                                    <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
+                                    <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
                                             {{ alert.type.description }}
                                         </a></p>
 

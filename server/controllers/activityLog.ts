@@ -87,6 +87,9 @@ const activityLogController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointment(crn, id)
       if (personAppointment.appointment.isAppointment) {
+        if (back) {
+          return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage?back=${back}`)
+        }
         return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
       }
       const isActivityLog = true
