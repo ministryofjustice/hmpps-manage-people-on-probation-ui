@@ -134,7 +134,7 @@
     "@ministryofjustice/probation-search-frontend": "^2.4.0",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.120.0",
     "@sentry/cli": "^2.46.0",
-    "@sentry/node": "^10.12.0",
+    "@sentry/node": "^10.27.0",
     "@types/cypress__code-coverage": "^3.10.2",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.5",
