@@ -8,6 +8,7 @@ import {
   checkPopHeader,
   completeAttendedCompliedPage,
   completeAddNotePage,
+  completeSupportingInformationPage,
 } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
@@ -505,6 +506,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
       logOutcomePage.getCancelGoBackLink().click()
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
@@ -521,6 +523,8 @@ describe('Pick a date, location and time for this appointment', () => {
         cy.get('.moj-js-datepicker-next-month').click()
       }
       cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+      locationDateTimePage.getElementInput(`startTime`).type('09:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
@@ -536,12 +540,13 @@ describe('Pick a date, location and time for this appointment', () => {
         )
       locationDateTimePage.getSubmitBtn().click()
     })
-    // it('should redirect to the supporting information, then cya page', () => {
-    //   notePage = new AppointmentNotePage()
-    //   notePage.checkOnPage()
-    //   completeSupportingInformationPage()
-    //   cyaPage = new AppointmentCheckYourAnswersPage()
-    //   cyaPage.checkOnPage()
-    // })
+
+    it('should redirect to the supporting information, then cya page', () => {
+      notePage = new AppointmentNotePage()
+      notePage.checkOnPage()
+      completeSupportingInformationPage()
+      cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.checkOnPage()
+    })
   })
 })
