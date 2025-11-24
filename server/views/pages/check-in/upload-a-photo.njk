@@ -1,0 +1,15 @@
+{% extends "../_form.njk" %}
+{% set title = "Upload a photo of " + case.name.forename %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-options' %}
+{% set hideButton =  true %}
+{% set buttonText =  'Take photo' %}
+{% block form %}
+
+    <div class="govuk-inset-text">
+        <p>For data protection, you must delete any photos you have of people on <br/>probation form from your
+            device, and any systems you used to send photos to<br/> yourself, for example email or Teams.</p>
+    </div>
+
+
+
+{% endblock %}
