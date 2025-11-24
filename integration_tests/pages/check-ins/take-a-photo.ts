@@ -1,6 +1,6 @@
 import Page, { PageElement } from '../page'
 
-export default class PhotoOptionsPage extends Page {
+export default class TakeAPhotoPage extends Page {
   constructor() {
     super('Take a photo of Caroline')
   }
