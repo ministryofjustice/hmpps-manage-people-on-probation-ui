@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { Request, Response } from 'express'
 import { dateIsInPast, getDataValue } from '../utils'
+import '../@types/express/index.d'
 
 export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean => {
   const { crn, id } = req.params

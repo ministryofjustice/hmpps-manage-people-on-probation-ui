@@ -1,4 +1,4 @@
-import { type AttendedCompliedAppointment } from '../controllers/arrangeAppointment'
+import { type AttendedCompliedAppointment } from '../middleware'
 import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
