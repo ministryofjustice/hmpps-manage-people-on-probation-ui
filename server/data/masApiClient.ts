@@ -414,8 +414,6 @@ export default class MasApiClient extends RestClient {
     if (sortBy && sortOrder) {
       pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
     }
-    console.log(pageQuery)
-    console.log(`/alerts${pageQuery}`)
     return this.get({ path: `/alerts${pageQuery}`, handle404: true })
   }
 
