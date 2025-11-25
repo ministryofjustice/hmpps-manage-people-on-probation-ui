@@ -6,6 +6,7 @@ import { getPersonalDetails, getPersonAppointment } from '../middleware'
 import validate from '../middleware/validation/index'
 import { cacheUploadedFiles } from '../middleware/cacheUploadedFiles'
 import config from '../config'
+import { appointmentsValidation } from '../properties'
 
 export default function multipartRoutes(router: Router, { hmppsAuthClient }: Services) {
   const upload = multer({

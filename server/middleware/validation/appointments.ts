@@ -161,6 +161,21 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateFile = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`) && req?.file) {
+      const isValidMimeType = Object.entries(config.validMimeTypes).some(([_key, value]) => req.file.mimetype === value)
+
+      if (!isValidMimeType) {
+        errorMessages = { ...errorMessages, 'file-upload-1': 'Only pdf and word files are allowed' }
+      }
+
+      if (isValidMimeType && req.file.size > config.maxFileSize) {
+        errorMessages = { ...errorMessages, 'file-upload-1': 'Max file size is too large' }
+      }
+    }
+    return errorMessages
+  }
+
   const validateAddNote = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
@@ -175,6 +190,7 @@ const appointments: Route<void> = (req, res, next) => {
           maxCharCount,
         }),
       )
+      errorMessages = validateFile()
     }
   }
 

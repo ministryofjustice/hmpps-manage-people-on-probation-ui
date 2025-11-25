@@ -54,19 +54,53 @@
 }) }}
 
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
-
-    <div class="govuk-!-margin-bottom-6">
-        <div class="govuk-form-group">
-            <label class="govuk-label govuk-label--m" for="file-upload-1">
-                Upload a file (optional)
-            </label>
-            <div
-                    class="govuk-drop-zone"
-                    data-module="govuk-file-upload">
-                <input class="govuk-file-upload" id="file-upload-1" name="file" type="file">
+    {% if flags.enableSingleFileUpload === true %}
+        <div class="govuk-!-margin-bottom-6">
+            <div class="govuk-form-group">
+                <label class="govuk-label govuk-label--m" for="file-upload-1">
+                    Upload a file (optional)
+                </label>
+                <div
+                        class="govuk-drop-zone"
+                        data-module="govuk-file-upload">
+                    <input class="govuk-file-upload" id="file-upload-1" name="file" type="file">
+                </div>
             </div>
         </div>
-    </div>
+    {% else %}
+        {% set uploadHtml %}
+        <div class="govuk-grid-row govuk-body">
+            <div class="govuk-grid-column-full">
+
+                {{ govukFileUpload({
+                    id: "file-upload-1",
+                    name: "file",
+                    classes: 'moj-multi-file-upload__input',
+                    label: {
+                        text: "Upload files",
+                        classes: 'govuk-label--m'
+                    },
+                    attributes: { multiple: '' }
+                }) }}
+
+                {{ govukButton({
+                    text: 'Upload file',
+                    classes: 'govuk-button--secondary moj-multi-file-upload__button'
+                }) }}
+            </div>
+        </div>
+    {% endset %}
+        {{ mojMultiFileUpload({
+            id: "file-upload-1",
+            name: "fileName",
+            label: { text: "Upload or drag and drop documents" },
+            uploadedFiles: {
+                heading: { text: 'Files added' },
+                items: uploadedFiles
+            },
+            uploadHtml: uploadHtml
+        }) }}
+    {% endif %}
 
     {{ govukRadios({
         name: 'sensitive',
