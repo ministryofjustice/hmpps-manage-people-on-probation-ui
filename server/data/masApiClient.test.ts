@@ -312,8 +312,8 @@ describe('masApiClient', () => {
       ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       [
         'getUserAlerts (full params)',
-        '/alerts?size=10&page=1&sortBy=date&sortOrder=asc',
-        () => masApiClient.getUserAlerts(1, 'date', 'asc'),
+        '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',
+        () => masApiClient.getUserAlerts(1, 'DATE_AND_TIME', 'asc'),
       ],
       ['getUserAlerts (minimal)', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       ['clearAlerts', '/alerts', () => masApiClient.clearAlerts([1, 2, 3]), 'put'],

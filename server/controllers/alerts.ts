@@ -10,16 +10,23 @@ const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
     return async (req, res) => {
       const { user } = res.locals
-      const { page = '0', sortBy, sortOrder } = req.query as Record<string, string>
+      const { page = '0' } = req.query as Record<string, string>
       let { url } = req
       url = encodeURIComponent(url)
       const pageNumber = parseInt(page, 10)
+
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'DATE_AND_TIME.desc'
+      const [sortName, sortDirection] = sortedBy.split('.')
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
 
-      const alertsData: UserAlerts = await masClient.getUserAlerts(pageNumber, sortBy, sortOrder as 'asc' | 'desc')
+      const alertsData: UserAlerts = await masClient.getUserAlerts(
+        pageNumber,
+        sortName,
+        sortDirection as 'asc' | 'desc',
+      )
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
 
       let crnToRiskWidgetMap = {}
@@ -42,23 +49,11 @@ const alertsController: Controller<typeof routes, void> = {
         }, {})
       }
 
-      let sortQueryString = ''
-      if (sortBy) {
-        sortQueryString += `&sortBy=${sortBy}`
-      }
-      if (sortOrder) {
-        sortQueryString += `&sortOrder=${sortOrder}`
-      }
-
       res.render('pages/alerts', {
         url,
         alertsData,
         crnToRiskWidgetMap,
-        sortQueryString,
-        currentSort: {
-          column: sortBy,
-          order: sortOrder,
-        },
+        sortedBy,
       })
     }
   },
