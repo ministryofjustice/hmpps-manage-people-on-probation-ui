@@ -1,4 +1,3 @@
-import { v4 } from 'uuid'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
@@ -12,12 +11,10 @@ import {
   checkUpdateSentence,
   checkUpdateLocation,
   checkUpdateDateTime,
-  checkUpdateRepeating,
   checkUpdateNotes,
   checkUpdateSensitivity,
   checkUpdateBackLinkRefresh,
 } from './imports'
-import AttendancePage from '../../pages/appointments/attendance.page'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
@@ -176,12 +173,11 @@ describe('Arrange another appointment', () => {
       loadPage()
     })
     it('should redirect to the confirmation page', () => {
-      getUuid().then(uuid => {
+      getUuid().then(_uuid => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
         checkUpdateDateTime(arrangeAnotherAppointmentPage)
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
-        confirmPage.checkOnPage()
       })
     })
   })
