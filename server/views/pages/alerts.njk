@@ -1,4 +1,4 @@
-{% extends "../partials/layout.njk" %}
+{% extends "../partials/alerts-errors.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -9,7 +9,7 @@
 
 {% set alerts = true %}
 
-{% block content %}
+{% block pageContent %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
             <h1 class="govuk-heading-l" data-qa="pageHeading">Alerts</h1>
