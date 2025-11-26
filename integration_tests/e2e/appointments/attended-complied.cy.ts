@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
@@ -10,6 +11,7 @@ import {
   crn,
   uuid,
 } from './imports'
+import { dateWithYear } from '../../../server/utils'
 
 const appointmentId = '6'
 
@@ -33,9 +35,12 @@ describe('Log attended and complied appointment', () => {
 
   const checkContent = (manageJourney = false) => {
     const name = 'Alton Berge'
+    const now = DateTime.now()
+    const yesterday = now.minus({ days: 1 })
+    const date = dateWithYear(yesterday.toFormat('yyyy-M-d'))
     const appointmentText = manageJourney
       ? '3 Way Meeting (NS) with Terry Jones on 21 February 2024'
-      : 'Planned Office Visit (NS) with Peter Parker on 18 November 2025'
+      : `Planned Office Visit (NS) with Peter Parker on ${date}`
     const id = getId(manageJourney)
     cy.get(`#${id}-hint`).should('contain.text', `Appointment: ${appointmentText}.`)
     cy.get(`label[for="${id}"]`).should('contain.text', `Yes, ${name.split(' ')[0]} attended and complied`)
