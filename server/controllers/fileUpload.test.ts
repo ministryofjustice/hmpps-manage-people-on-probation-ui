@@ -39,7 +39,7 @@ describe('fileUpload controller', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-  describe.skip('postUploadFile', () => {
+  describe('postUploadFile', () => {
     describe('Uploaded file is invalid type', () => {
       const mockRes = mockAppResponse({
         id,
