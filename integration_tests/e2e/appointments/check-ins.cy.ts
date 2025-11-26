@@ -9,6 +9,7 @@ import EditContactPreferencePage from '../../pages/check-ins/edit-contact-prefer
 import ErrorPage from '../../pages/error'
 import TakeAPhotoOptionsPage from '../../pages/check-ins/take-a-photo-options'
 import UploadAPhotoPage from '../../pages/check-ins/upload-a-photo'
+import PhotoRulesPage from '../../pages/check-ins/photo-rules'
 
 const loadPage = () => {
   cy.task('stubEnableESuperVision')
@@ -211,5 +212,42 @@ context('Appointment check-ins', () => {
     uploadablePhoto.checkOnPage()
     uploadablePhoto.getBackLink().click()
     takeAPhotoOptionsPage.checkOnPage()
+  })
+
+  it('Should able to upload a pic and show rules page', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage
+      .getCheckInPreferredComs()
+      .find('.govuk-radios__item')
+      .eq(0)
+      .find('.govuk-radios__input')
+      .click()
+    contactPreferencePage.getSubmitBtn().click()
+    const takeAPhotoOptionsPage = new TakeAPhotoOptionsPage()
+    takeAPhotoOptionsPage.checkOnPage()
+    takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    takeAPhotoOptionsPage.getSubmitBtn().click()
+    takeAPhotoOptionsPage.getBackLink().click()
+    takeAPhotoOptionsPage.checkOnPage()
+    takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
+    takeAPhotoOptionsPage.getSubmitBtn().click()
+    const uploadAPhoto = new UploadAPhotoPage()
+    uploadAPhoto.checkOnPage()
+    uploadAPhoto.uploadPhoto('person.jpg')
+    uploadAPhoto.continueButton().click()
+    const photoRules = new PhotoRulesPage()
+    photoRules.checkOnPage()
+    photoRules.getBackLink().click()
+    uploadAPhoto.checkOnPage()
   })
 })

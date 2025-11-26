@@ -1,0 +1,23 @@
+{% extends "../_form.njk" %}
+{% set title = "Does this photo meet the rules?" %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/upload-a-photo' %}
+{% set hideButton =  true %}
+{% set checkinPhotoPage =  true %}
+{% block form %}
+
+    <p>Make sure:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>the photo is well lit</li>
+        <li>they are in front of a plain background</li>
+        <li>their face is in the frame</li>
+        <li>there is no one else in the photo</li>
+        <li>they are not wearing a hat or sunglasses</li>
+    </ul>
+    <div class="es-uploaded-image" data-person="{{ name }}">
+        <span>Image</span>
+    </div>
+    <div class="govuk-button-group">
+            <a href="{{ backLink }}" class="govuk-button govuk-button--secondary">No, upload another photo</a>
+    </div>
+{% endblock %}
+

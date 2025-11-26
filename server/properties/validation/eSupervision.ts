@@ -128,5 +128,15 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    photoUpload: {
+      optional: page !== 'upload-a-photo',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select a photo of the person',
+          log: 'Photo not selected.',
+        },
+      ],
+    },
   }
 }

@@ -19,6 +19,8 @@ const routes = [
   'postPhotoOptionsPage',
   'getTakePhotoPage',
   'getUploadPhotoPage',
+  'postPhotoRulesPage',
+  'getPhotoRulesPage',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -190,6 +192,26 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       return res.render('pages/check-in/upload-a-photo.njk', { crn, id })
+    }
+  },
+
+  postPhotoRulesPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/photo-rules`)
+    }
+  },
+  getPhotoRulesPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/photo-rules.njk', { crn, id })
     }
   },
 }
