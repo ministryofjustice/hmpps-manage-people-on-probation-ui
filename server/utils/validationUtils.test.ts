@@ -784,3 +784,34 @@ describe('validates photo options page', () => {
     expect(loggerSpy).toHaveBeenCalledWith('Photo option, not selected')
   })
 })
+
+describe('validates upload a photo page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          checkins: { photoUpload: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    photoUpload: 'Select a photo of the person',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'upload-a-photo',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Photo not selected.')
+  })
+})

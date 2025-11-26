@@ -71,4 +71,15 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   router.get('/case/:crn/appointments/:id/check-in/upload-a-photo', [
     controllers.checkIns.getUploadPhotoPage(hmppsAuthClient),
   ])
+
+  router.post(
+    '/case/:crn/appointments/:id/check-in/upload-a-photo',
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postPhotoRulesPage(hmppsAuthClient),
+  )
+
+  router.get('/case/:crn/appointments/:id/check-in/photo-rules', [
+    controllers.checkIns.getPhotoRulesPage(hmppsAuthClient),
+  ])
 }
