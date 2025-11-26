@@ -58,14 +58,15 @@ describe('fileUpload controller', () => {
       path: '',
     }
 
-    const createMockReq = () => ({
-      file: mockFile,
-      files: [mockFile],
-      body: {
-        id: testId,
-        crn: testCrn,
-      },
-    })
+    const createMockReq = () =>
+      ({
+        file: mockFile,
+        files: [mockFile],
+        body: {
+          id: testId,
+          crn: testCrn,
+        },
+      }) as unknown as Request
 
     describe('Uploaded file is invalid type', () => {
       const testReq = createMockReq()
