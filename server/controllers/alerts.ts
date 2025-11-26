@@ -30,11 +30,26 @@ const alertsController: Controller<typeof routes, void> = {
 
       let crnToRiskWidgetMap = {}
 
+      const uniqueErrorTexts: Set<string> = new Set<string>()
+
       if (enableRiskOnAlertsDashboard) {
         const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
         const riskPromises = uniqueCrns.map(async crn => {
           const risks = await arnsClient.getRisks(crn)
-          const risksWidget = toRoshWidget(risks)
+
+          let risksWidget = null
+
+          if (isErrorSummary(risks)) {
+            risks.errors.forEach(errorItem => {
+              if (errorItem && errorItem.text) {
+                uniqueErrorTexts.add(errorItem.text)
+              }
+            })
+            risksWidget = risks
+          } else {
+            risksWidget = toRoshWidget(risks)
+          }
+
           return { crn, risksWidget }
         })
 
@@ -47,12 +62,15 @@ const alertsController: Controller<typeof routes, void> = {
           return acc
         }, {})
       }
-
+      const risksErrors = Array.from(uniqueErrorTexts).map(text => ({
+        text,
+      }))
       res.render('pages/alerts', {
         url,
         alertsData,
         crnToRiskWidgetMap,
         sortedBy,
+        risksErrors
       })
     }
   },
@@ -85,6 +103,10 @@ const alertsController: Controller<typeof routes, void> = {
       return next()
     }
   },
+}
+
+function isErrorSummary(obj: any): obj is { errors: any[] } {
+  return typeof obj === 'object' && obj !== null && 'errors' in obj && Array.isArray(obj.errors)
 }
 
 export default alertsController

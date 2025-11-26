@@ -48,8 +48,16 @@ const mockUserAlertsWithCrn = {
       date: '2025-10-26',
       officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
     },
+    {
+      id: 2,
+      crn: 'Y789012',
+      type: { description: 'Another Type', editable: true },
+      name: { forename: 'Another', middleName: '', surname: 'Case' },
+      date: '2025-10-25',
+      officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
+    },
   ],
-  totalResults: 1,
+  totalResults: 2,
   totalPages: 1,
   page: 0,
   size: 10,
@@ -61,6 +69,25 @@ const mockRisksData = {
   },
   assessedOn: '2025-11-19',
 } as any
+
+const mockErrorSummary = {
+  errors: [
+    {
+      text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    },
+    { text: 'A different unique error' },
+    {
+      text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    }, // Duplicate
+  ],
+} as any
+
+const expectedErrorSummary = [
+  {
+    text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+  },
+  { text: 'A different unique error' },
+]
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -87,6 +114,7 @@ const next = jest.fn()
 describe('alertsController', () => {
   afterEach(() => {
     jest.clearAllMocks()
+    getRisksSpy.mockImplementation(() => Promise.resolve(mockRisksData))
   })
 
   describe('getAlerts', () => {
@@ -96,16 +124,29 @@ describe('alertsController', () => {
       // Explicitly enable the flag for this test to expect populated risk data
       res.locals.flags = { enableRiskOnAlertsDashboard: true }
 
+      getRisksSpy.mockImplementation(crn => {
+        if (crn === 'X123456' || crn === 'Y789012') return Promise.resolve(mockRisksData)
+        return Promise.resolve(null)
+      })
+      toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
+
+      const expectedCrnToRiskWidgetMap = {
+        X123456: mockRoshWidget,
+        Y789012: mockRoshWidget,
+      }
+
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
       expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
       expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
       expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
+        crnToRiskWidgetMap: expectedCrnToRiskWidgetMap, // Should be populated
         sortedBy: 'date_and_time.desc',
+        risksErrors: [],
         url: encodeURIComponent('/alerts'),
       })
     })
@@ -119,6 +160,17 @@ describe('alertsController', () => {
       // Explicitly enable the flag for this test to expect populated risk data
       res.locals.flags = { enableRiskOnAlertsDashboard: true }
 
+      getRisksSpy.mockImplementation(crn => {
+        if (crn === 'X123456' || crn === 'Y789012') return Promise.resolve(mockRisksData)
+        return Promise.resolve(null)
+      })
+      toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
+
+      const expectedCrnToRiskWidgetMap = {
+        X123456: mockRoshWidget,
+        Y789012: mockRoshWidget,
+      }
+
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
       expect(getUserAlertsSpy).toHaveBeenCalledWith(5, 'SURNAME', 'desc')
@@ -127,8 +179,9 @@ describe('alertsController', () => {
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
+        crnToRiskWidgetMap: expectedCrnToRiskWidgetMap, // Should be populated
         sortedBy: 'SURNAME.desc',
+        risksErrors: [],
         url: encodeURIComponent('/alerts'),
       })
     })
@@ -148,7 +201,42 @@ describe('alertsController', () => {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: {}, // Expect empty object
         sortedBy: 'date_and_time.desc',
+        risksErrors: [],
         url: encodeURIComponent('/alerts'),
+      })
+    })
+
+    it('should aggregate unique error messages when risk service returns ErrorSummary for some CRNs', async () => {
+      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+      res.locals.user = defaultUser
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      getRisksSpy.mockImplementation(crn => {
+        if (crn === 'X123456') return Promise.resolve(mockErrorSummary)
+        if (crn === 'Y789012') return Promise.resolve(mockRisksData)
+        return Promise.resolve(null)
+      })
+
+      const expectedCrnToRiskWidgetMapWithError = {
+        X123456: mockErrorSummary,
+        Y789012: mockRoshWidget,
+      }
+
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+      expect(toRoshWidgetSpy).not.toHaveBeenCalledWith(mockErrorSummary)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+        alertsData: mockUserAlertsWithCrn,
+        crnToRiskWidgetMap: expectedCrnToRiskWidgetMapWithError,
+        sortQueryString: '',
+        currentSort: { column: undefined, order: undefined },
+        risksErrors: expectedErrorSummary,
+        url: '%2Falerts',
       })
     })
   })
