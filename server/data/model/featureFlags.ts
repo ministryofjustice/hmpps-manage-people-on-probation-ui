@@ -13,5 +13,4 @@ export class FeatureFlags {
   enableAlertsPage?: boolean = undefined
   enableESuperVision?: boolean = undefined
   enableRiskOnAlertsDashboard?: boolean = undefined
-  enableSingleFileUpload?: boolean = undefined
 }
