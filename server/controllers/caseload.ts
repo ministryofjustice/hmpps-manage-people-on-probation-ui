@@ -51,7 +51,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         req.session.caseFilter,
       )
       const { filter } = args
-      const { url } = req
+      const url = req.session.sortBy ? '/case?req.session.sortBy' : '/case'
       let newCaseload = caseload
       const currentNavSection = 'yourCases'
       await auditService.sendAuditMessage({
