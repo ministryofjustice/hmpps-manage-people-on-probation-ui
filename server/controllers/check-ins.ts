@@ -5,6 +5,8 @@ import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import { HmppsAuthClient } from '../data'
+import supervisionAppointmentClient from '../../wiremock/stubs/supervisionAppointmentClient'
 
 const routes = [
   'getIntroPage',
@@ -21,6 +23,7 @@ const routes = [
   'getUploadPhotoPage',
   'postPhotoRulesPage',
   'getPhotoRulesPage',
+  'getUpdateCheckIn',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -212,6 +215,26 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       return res.render('pages/check-in/photo-rules.njk', { crn, id })
+    }
+  },
+
+  getUpdateCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      // const { checkIn } = await esupervision.getCheckin(id) //not available yet
+      // checkIn.dueDate = (new Date(checkIn.dueDate), { days: 3 }).toString()
+      // if (checkIn.status === 'SUBMITTED') {
+      //   checkIn.reviewDueDate = (new Date(checkIn.submittedAt), { days: 3 }).toString()
+      // } else if (checkIn.status === 'EXPIRED') {
+      //   checkIn.reviewDueDate = (new Date(checkIn.dueDate), { days: 3 }).toString()
+      // }
+
+      // return res.render('pages/check-in/update.njk', { crn, id, checkIn })
+      return res.render('')
     }
   },
 }
