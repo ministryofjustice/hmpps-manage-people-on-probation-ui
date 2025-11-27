@@ -164,7 +164,7 @@ const appointments: Route<void> = (req, res, next) => {
   const validateFile = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`) && req?.file) {
       if (req.file.size > config.maxFileSize) {
-        errorMessages = { ...errorMessages, 'file-upload-1': 'Max file size is too large' }
+        errorMessages = { ...errorMessages, 'file-upload-1': 'File size must be 5mb or under' }
       }
     }
     return errorMessages
