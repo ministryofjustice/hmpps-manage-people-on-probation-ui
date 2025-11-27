@@ -10,7 +10,7 @@ import {
   cloneAppointmentAndRedirect,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
-  getDefaultUser,
+  getUserOptions,
 } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
@@ -47,6 +47,7 @@ jest.mock('../middleware', () => ({
   getOfficeLocationsByTeamAndProvider: jest.fn(() => mockMiddlewareFn),
   getDefaultUser: jest.fn(() => mockMiddlewareFn),
   checkAnswers: jest.fn(() => mockMiddlewareFn),
+  getUserOptions: jest.fn(() => mockMiddlewareFn),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -82,7 +83,7 @@ const mockedCheckAnswers = checkAnswers as jest.MockedFunction<typeof checkAnswe
 const mockGetOfficeLocationsByTeamAndProvider = getOfficeLocationsByTeamAndProvider as jest.MockedFunction<
   typeof getOfficeLocationsByTeamAndProvider
 >
-const mockGetDefaultUser = getDefaultUser as jest.MockedFunction<typeof getDefaultUser>
+const mockedGetUserOptions = getUserOptions as jest.MockedFunction<typeof getUserOptions>
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
@@ -393,7 +394,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
       expect(mockGetOfficeLocationsByTeamAndProvider).toHaveBeenCalled()
-      expect(mockGetDefaultUser).toHaveBeenCalled()
+      expect(mockedGetUserOptions).toHaveBeenCalled()
       expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
       expect(mockedSetDataValue).toHaveBeenNthCalledWith(
         1,

@@ -61,7 +61,7 @@
     <p class="govuk-caption-m">You can attend or book for someone else</p>
     <div class="govuk-grid-row govuk-!-font-size-19 govuk-!-margin-top-2">
       <div class="govuk-grid-column-two-thirds">
-        <p class="govuk-body" data-qa="attendeeDetails">{{ attendingHtml }}</p>
+        <p class="govuk-body" data-qa="attendeeDetails">{{ attendingHtml | safe }}</p>
       </div>
       <div class="govuk-grid-column-one-third">
         <a href="{{ attendanceUrl }}" class="govuk-link govuk-!-text-align-right" data-qa="changeAttendeeLink">Change</a>

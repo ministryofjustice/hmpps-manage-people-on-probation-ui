@@ -8,7 +8,7 @@ import {
   postAppointments,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
-  getDefaultUser,
+  getUserOptions,
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
@@ -210,9 +210,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
-        // as were overriding auto store session data here, we need to refresh the user locations and default user again, then recheck answers
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
-        await getDefaultUser(hmppsAuthClient)(req, res)
+        await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)
       }
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {

@@ -4,8 +4,8 @@ import { Route } from '../@types'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import { Team, User } from '../data/model/caseload'
 
-export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next?) => {
+export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
+  return async (req, res, next) => {
     const { crn, id } = req.params
     const { username } = res.locals.user
     const { data } = req.session
@@ -13,6 +13,18 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const regexIgnoreValuesInParentheses = /[\(\)]/
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)
+
+    const getTeamsAndStaff = async (
+      providerCode: string,
+      teamCode: string,
+    ): Promise<{ teams: Team[]; users: User[] }> => {
+      const [{ teams }, { users }] = await Promise.all([
+        masClient.getTeamsByProvider(providerCode),
+        masClient.getStaffByTeam(teamCode),
+      ])
+      return { teams, users }
+    }
+
     let attendingUsername = getDataValue(data, ['appointments', crn, id, 'user', 'username']) ?? null
     let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
     let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
@@ -23,7 +35,8 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     let sessionProviders = providers
     let sessionTeams: Team[] = []
     let sessionStaff: User[] = []
-    if (!attendingUsername || !providerCode || !teamCode) {
+
+    if (!providerCode || !teamCode || !attendingUsername) {
       sessionTeams = teams
       sessionStaff = users
       if (probationPractitioner.unallocated === false) {
@@ -38,13 +51,14 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
-    } else {
-      const [{ teams: providerTeams }, { users: providerStaff }] = await Promise.all([
-        masClient.getTeamsByProvider(providerCode),
-        masClient.getStaffByTeam(teamCode),
-      ])
+      const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
       sessionTeams = providerTeams
       sessionStaff = providerStaff
+    } else {
+      const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
+      sessionProviders = getDataValue(data, ['providers', username]) ?? sessionProviders
+      sessionTeams = getDataValue(data, ['teams', username]) ?? providerTeams
+      sessionStaff = getDataValue(data, ['staff', username]) ?? providerStaff
     }
     if (attendingUsername.toLowerCase() === probationPractitioner.username.toLowerCase()) {
       if (!sessionProviders.some(provider => provider.code === probationPractitioner.provider.code)) {
@@ -72,9 +86,6 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     setDataValue(data, ['providers', username], sessionProviders)
     setDataValue(data, ['teams', username], sessionTeams)
     setDataValue(data, ['staff', username], sessionStaff)
-    if (next) {
-      return next()
-    }
-    return null
+    return next()
   }
 }

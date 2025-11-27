@@ -10,6 +10,7 @@ import {
   userProviders,
 } from '../controllers/mocks'
 import { getUserOptions } from './getUserOptions'
+import { setDataValue } from '../utils'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -26,6 +27,8 @@ jest.mock('../utils', () => {
     setDataValue: jest.fn(),
   }
 })
+
+const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 
 const crn = 'X000001'
 const uuid = 'a4615940-2808-4ab5-a8e0-feddecb8ae1a'
@@ -80,24 +83,49 @@ const checkDefaultUserSelection = () => {
     expect(getStaffByTeamSpy).toHaveBeenCalledWith(defaultUserTeamCode)
   })
   it('should create the correct provider options', () => {
-    expect(res.locals.userProviders).toStrictEqual([
-      ...userProviders.providers.slice(0, 2),
-      { ...userProviders.providers[2], selected: 'selected' },
-    ])
+    const expectedProviderOptions = [
+      { code: 'N50', name: 'Greater Manchester' },
+      { code: 'N07', name: 'London' },
+      { code: 'N54', name: 'North East Region', selected: 'selected' },
+    ]
+    expect(res.locals.userProviders).toStrictEqual(expectedProviderOptions)
   })
   it('should create the correct team options', () => {
-    expect(res.locals.userTeams).toStrictEqual([
-      ...appointmentTeams.teams.slice(0, 1),
-      { ...appointmentTeams.teams[1], selected: 'selected' },
-      ...appointmentTeams.teams.slice(2),
-    ])
+    const expectedTeamOptions = [
+      { code: 'N07AAT', description: 'Automated Allocation Team' },
+      {
+        code: 'N07CHT',
+        description: 'Automation SPG',
+        selected: 'selected',
+      },
+      {
+        code: 'N07IVH',
+        description: 'Automation Test No Location Warning',
+      },
+      { code: 'N07SP1', description: 'Bexley\\Bromley SP TEST1' },
+    ]
+    expect(res.locals.userTeams).toStrictEqual(expectedTeamOptions)
   })
   it('should create the correct user options', () => {
-    expect(res.locals.userStaff).toStrictEqual([
-      appointmentStaff.users[2],
-      appointmentStaff.users[1],
-      { ...appointmentStaff.users[0], selected: 'selected' },
-    ])
+    const expectedUserOptions = [
+      {
+        username: 'DeborahFern',
+        nameAndRole: 'Deborah Fern (PS - Other)',
+        staffCode: 'N07B795',
+      },
+      {
+        username: 'IainChambers',
+        nameAndRole: 'Iain Chambers (PS - Other)',
+        staffCode: 'N57A054',
+      },
+      {
+        username: 'peter-parker',
+        nameAndRole: 'Peter Parker (PS - Other)',
+        staffCode: 'N07B722',
+        selected: 'selected',
+      },
+    ]
+    expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
   })
   it('should set res.locals.providerCode as the default user provider', () => {
     expect(res.locals.providerCode).toEqual(defaultUserProviderCode)
@@ -151,24 +179,46 @@ describe('/middleware/getUserOptions()', () => {
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
     })
     it('should create the correct provider options', () => {
-      expect(res.locals.userProviders).toEqual([
-        { ...userProviders.providers[0], selected: 'selected' },
-        ...userProviders.providers.slice(1),
-      ])
+      const expectedProviderOptions = [
+        { code: 'N50', name: 'Greater Manchester', selected: 'selected' },
+        { code: 'N07', name: 'London' },
+        { code: 'N54', name: 'North East Region' },
+      ]
+      expect(res.locals.userProviders).toStrictEqual(expectedProviderOptions)
     })
     it('should create the correct team options', () => {
-      expect(res.locals.userTeams).toStrictEqual([
-        ...appointmentTeams.teams.slice(0, 2),
-        { ...appointmentTeams.teams[2], selected: 'selected' },
-        appointmentTeams.teams[3],
-      ])
+      const expectedTeamOptions = [
+        { code: 'N07AAT', description: 'Automated Allocation Team' },
+        { code: 'N07CHT', description: 'Automation SPG' },
+        {
+          code: 'N07IVH',
+          description: 'Automation Test No Location Warning',
+          selected: 'selected',
+        },
+        { code: 'N07SP1', description: 'Bexley\\Bromley SP TEST1' },
+      ]
+      expect(res.locals.userTeams).toStrictEqual(expectedTeamOptions)
     })
     it('should create the correct user options', () => {
-      expect(res.locals.userStaff).toStrictEqual([
-        appointmentStaff.users[2],
-        { ...appointmentStaff.users[1], selected: 'selected' },
-        appointmentStaff.users[0],
-      ])
+      const expectedUserOptions = [
+        {
+          username: 'DeborahFern',
+          nameAndRole: 'Deborah Fern (PS - Other)',
+          staffCode: 'N07B795',
+        },
+        {
+          username: 'IainChambers',
+          nameAndRole: 'Iain Chambers (PS - Other)',
+          staffCode: 'N57A054',
+          selected: 'selected',
+        },
+        {
+          username: 'peter-parker',
+          nameAndRole: 'Peter Parker (PS - Other)',
+          staffCode: 'N07B722',
+        },
+      ]
+      expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
     })
     it('should set res.locals.providerCode as the session user provider', () => {
       expect(res.locals.providerCode).toEqual(req.session.data.appointments[crn][uuid].user.providerCode)
@@ -246,23 +296,49 @@ describe('/middleware/getUserOptions()', () => {
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
     })
     it('should create the correct provider options', () => {
-      expect(res.locals.userProviders).toStrictEqual([
-        { ...userProviders.providers[0], selected: 'selected' },
-        ...userProviders.providers.slice(1),
-      ])
+      const expectedProviderOptions = [
+        { code: 'N50', name: 'Greater Manchester', selected: 'selected' },
+        { code: 'N07', name: 'London' },
+        { code: 'N54', name: 'North East Region' },
+      ]
+      expect(res.locals.userProviders).toStrictEqual(expectedProviderOptions)
     })
     it('should create the correct team options', () => {
-      expect(res.locals.userTeams).toStrictEqual([
-        { ...appointmentTeams.teams[0], selected: 'selected' },
-        ...appointmentTeams.teams.slice(1),
-      ])
+      const expectedTeamOptions = [
+        {
+          code: 'N07AAT',
+          description: 'Automated Allocation Team',
+          selected: 'selected',
+        },
+        { code: 'N07CHT', description: 'Automation SPG' },
+        {
+          code: 'N07IVH',
+          description: 'Automation Test No Location Warning',
+        },
+        { code: 'N07SP1', description: 'Bexley\\Bromley SP TEST1' },
+      ]
+      expect(res.locals.userTeams).toStrictEqual(expectedTeamOptions)
     })
     it('should create the correct user options', () => {
-      expect(res.locals.userStaff).toStrictEqual([
-        appointmentStaff.users[2],
-        appointmentStaff.users[1],
-        { ...appointmentStaff.users[0], selected: 'selected' },
-      ])
+      const expectedUserOptions = [
+        {
+          username: 'DeborahFern',
+          nameAndRole: 'Deborah Fern (PS - Other)',
+          staffCode: 'N07B795',
+        },
+        {
+          username: 'IainChambers',
+          nameAndRole: 'Iain Chambers (PS - Other)',
+          staffCode: 'N57A054',
+        },
+        {
+          username: 'peter-parker',
+          nameAndRole: 'Peter Parker (PS - Other)',
+          staffCode: 'N07B722',
+          selected: 'selected',
+        },
+      ]
+      expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
     })
     it('should set res.locals.providerCode as the provider code in the request url query', () => {
       expect(res.locals.providerCode).toEqual(providerCode)
@@ -303,24 +379,46 @@ describe('/middleware/getUserOptions()', () => {
       expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
     })
     it('should create the correct provider options', () => {
-      expect(res.locals.userProviders).toStrictEqual([
-        { ...userProviders.providers[0], selected: 'selected' },
-        ...userProviders.providers.slice(1),
-      ])
+      const expectedProviderOptions = [
+        { code: 'N50', name: 'Greater Manchester', selected: 'selected' },
+        { code: 'N07', name: 'London' },
+        { code: 'N54', name: 'North East Region' },
+      ]
+      expect(res.locals.userProviders).toStrictEqual(expectedProviderOptions)
     })
     it('should create the correct team options', () => {
-      expect(res.locals.userTeams).toStrictEqual([
-        ...appointmentTeams.teams.slice(0, 2),
-        { ...appointmentTeams.teams[2], selected: 'selected' },
-        appointmentTeams.teams[3],
-      ])
+      const expectedTeamOptions = [
+        { code: 'N07AAT', description: 'Automated Allocation Team' },
+        { code: 'N07CHT', description: 'Automation SPG' },
+        {
+          code: 'N07IVH',
+          description: 'Automation Test No Location Warning',
+          selected: 'selected',
+        },
+        { code: 'N07SP1', description: 'Bexley\\Bromley SP TEST1' },
+      ]
+      expect(res.locals.userTeams).toStrictEqual(expectedTeamOptions)
     })
     it('should create the correct user options', () => {
-      expect(res.locals.userStaff).toStrictEqual([
-        appointmentStaff.users[2],
-        appointmentStaff.users[1],
-        { ...appointmentStaff.users[0], selected: 'selected' },
-      ])
+      const expectedUserOptions = [
+        {
+          username: 'DeborahFern',
+          nameAndRole: 'Deborah Fern (PS - Other)',
+          staffCode: 'N07B795',
+        },
+        {
+          username: 'IainChambers',
+          nameAndRole: 'Iain Chambers (PS - Other)',
+          staffCode: 'N57A054',
+        },
+        {
+          username: 'peter-parker',
+          nameAndRole: 'Peter Parker (PS - Other)',
+          staffCode: 'N07B722',
+          selected: 'selected',
+        },
+      ]
+      expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
     })
     it('should set res.locals.providerCode as the provider code in the request url query', () => {
       expect(res.locals.providerCode).toEqual(providerCode)
@@ -330,6 +428,53 @@ describe('/middleware/getUserOptions()', () => {
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+  })
+  describe('Next function not provided', () => {
+    const req = buildRequest()
+    let returnValue: null | void
+    beforeEach(async () => {
+      returnValue = await getUserOptions(hmppsAuthClient)(req, res)
+    })
+    it('should update the user providers, teams and staff in the session', () => {
+      const { data } = req.session
+      const expectedProviders = [
+        { code: 'N50', name: 'Greater Manchester', selected: 'selected' },
+        { code: 'N07', name: 'London' },
+        { code: 'N54', name: 'North East Region' },
+      ]
+      const expectedTeams = [
+        { code: 'N07AAT', description: 'Automated Allocation Team' },
+        { code: 'N07CHT', description: 'Automation SPG' },
+        {
+          code: 'N07IVH',
+          description: 'Automation Test No Location Warning',
+          selected: 'selected',
+        },
+        { code: 'N07SP1', description: 'Bexley\\Bromley SP TEST1' },
+      ]
+      const expectedStaff = [
+        {
+          username: 'DeborahFern',
+          nameAndRole: 'Deborah Fern (PS - Other)',
+          staffCode: 'N07B795',
+        },
+        {
+          username: 'IainChambers',
+          nameAndRole: 'Iain Chambers (PS - Other)',
+          staffCode: 'N57A054',
+          selected: 'selected',
+        },
+        {
+          username: 'peter-parker',
+          nameAndRole: 'Peter Parker (PS - Other)',
+          staffCode: 'N07B722',
+        },
+      ]
+      expect(mockSetDataValue).toHaveBeenNthCalledWith(1, data, ['providers', loggedInUsername], expectedProviders)
+      expect(mockSetDataValue).toHaveBeenNthCalledWith(2, data, ['teams', loggedInUsername], expectedTeams)
+      expect(mockSetDataValue).toHaveBeenNthCalledWith(3, data, ['staff', loggedInUsername], expectedStaff)
+      expect(returnValue).toEqual(null)
     })
   })
 })

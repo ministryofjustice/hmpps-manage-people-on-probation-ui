@@ -2,10 +2,10 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
-import { convertToTitleCase, getDataValue } from '../utils'
+import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
-  return async (req, res, next) => {
+  return async (req, res, next?) => {
     const { username } = res.locals.user
     const { crn, id } = req.params
     const { providerCode: providerCodeQuery, teamCode: teamCodeQuery, back } = req.query as Record<string, string>
@@ -39,21 +39,27 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       team => team.description.toLowerCase() === defaultUserDetails.team.toLowerCase(),
     )?.code
 
-    let selectedTeam = teamCodeQuery ?? teamCodeSession
+    let selectedTeam = teamCodeQuery ?? teamCodeQuery
     if (selectedTeam === probationPractitioner.team.code) {
       selectedTeam = defaultTeam
     }
-    if (!selectedTeam) {
+    if (!providerCodeQuery) {
       if (selectedProvider === defaultProvider) {
         selectedTeam = defaultTeam
       } else {
-        selectedTeam = teams[0].code
+        selectedTeam = teamCodeSession ?? teams[0].code
       }
+    }
+    if (providerCodeQuery && !teamCodeQuery) {
+      selectedTeam = teams[0].code
     }
 
     const { users } = await masClient.getStaffByTeam(selectedTeam)
 
-    let selectedUser = usernameSession ?? defaultUserDetails.username ?? users[0].username
+    let selectedUser = usernameSession ?? users[0].username
+    if (teamCodeQuery) {
+      selectedUser = users[0].username
+    }
 
     if (selectedUser.toLowerCase() === probationPractitioner.username.toLowerCase()) {
       selectedUser = defaultUserDetails.username
@@ -105,6 +111,12 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     res.locals.userStaff = userOptions
     res.locals.providerCode = selectedProvider
     res.locals.teamCode = selectedTeam
+    if (!next) {
+      setDataValue(data, ['providers', username], providerOptions)
+      setDataValue(data, ['teams', username], teamOptions)
+      setDataValue(data, ['staff', username], userOptions)
+      return null
+    }
     return next()
   }
 }
