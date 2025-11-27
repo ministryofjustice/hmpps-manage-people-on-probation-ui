@@ -27,6 +27,7 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/appointments/appointment/:contactId/add-note',
     controllers.appointments.getAddNote(hmppsAuthClient),
   )
+
   router.post(
     '/case/:crn/appointments/appointment/:contactId/add-note',
     upload.single('file'),
