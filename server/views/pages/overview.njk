@@ -567,7 +567,7 @@
                     {{ overview.activity.acceptableAbsenceCount }} acceptable absences <br/>
                     {{ overview.activity.rescheduledCount }} rescheduled<br/>
                     <p>
-                      <a href={{crn}}/activity-log>View all activity details</a>
+                      <a href={{crn}}/activity-log>View all contacts details</a>
                     </p>
                   {% else %}
                 None
@@ -584,7 +584,7 @@
             value: { html: '<span data-qa="complianceValue">' + compliance + '</span>'}
           },
           {
-            key: { html: '<span data-qa="activityLogLabel">Activity log</span>'},
+            key: { html: '<span data-qa="activityLogLabel">Contacts</span>'},
             value: { html: '<span data-qa="activityLogValue">' + activity + '</span>'}
           }
         ]

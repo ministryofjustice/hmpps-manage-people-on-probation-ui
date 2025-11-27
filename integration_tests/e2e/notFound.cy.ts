@@ -31,7 +31,7 @@ context('Invalid crn in url', () => {
     const page = new NotFoundPage()
     page.checkPageTitle('Page not found')
   })
-  it('Activity log page should render the 404 error page if CRN does not exist', () => {
+  it('Contacts page should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/activity-log', { failOnStatusCode: false })
     const page = new NotFoundPage()
     page.checkPageTitle('Page not found')

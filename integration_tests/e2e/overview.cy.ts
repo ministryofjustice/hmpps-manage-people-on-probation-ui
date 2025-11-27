@@ -16,7 +16,7 @@ context('Overview', () => {
     page.getTab('personalDetails').should('contain.text', 'Personal details')
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
-    page.getTab('activityLog').should('contain.text', 'Activity log')
+    page.getTab('activityLog').should('contain.text', 'Contacts')
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
 
@@ -161,7 +161,7 @@ context('Overview', () => {
     page.getTab('personalDetails').should('contain.text', 'Personal details')
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
-    page.getTab('activityLog').should('contain.text', 'Activity log')
+    page.getTab('activityLog').should('contain.text', 'Contacts')
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
 

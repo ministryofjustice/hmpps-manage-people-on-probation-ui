@@ -88,7 +88,7 @@ context('Appointment', () => {
     page
       .getElement('[data-qa="appointmentHistory"]')
       .find('a')
-      .should('contain.text', 'View all past appointments in the activity log')
+      .should('contain.text', 'View all past appointments in the contacts')
       .should('have.attr', 'href', '/case/X000001/activity-log')
   })
 })
