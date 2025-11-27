@@ -10,7 +10,7 @@
 
   {% if entry.isAppointment %}
     {% include "./_appointment-timeline-entry.njk" %}
-  {% elseif entry.isEsupervision %}
+  {% elseif entry.isEsupervision && flags.enableESuperVision %}
     {% include "./_online-checkin-entry.njk" %}
   {% elseif entry.isCommunication %}
     {% include "./_communication-timeline-entry.njk" %}
