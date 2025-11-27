@@ -2,7 +2,7 @@ import Page, { PageElement } from './page'
 
 export default class ActivityLogPage extends Page {
   constructor() {
-    super('Activity log')
+    super('Contacts')
   }
 
   getSelectedFiltersBox = (): PageElement => cy.get('.moj-filter__selected')
