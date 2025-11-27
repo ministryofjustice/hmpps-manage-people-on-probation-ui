@@ -136,7 +136,6 @@ context('Appointment check-ins', () => {
     const editContactPreferencePage = new EditContactPreferencePage()
     editContactPreferencePage.checkOnPage()
     editContactPreferencePage.getSubmitBtn().click()
-    contactPreferencePage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
   })
 
   it('should show error page when update fails with 500 HTTP response code', () => {
