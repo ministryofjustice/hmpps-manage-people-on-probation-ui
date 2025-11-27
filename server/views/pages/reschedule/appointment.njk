@@ -1,0 +1,127 @@
+{% extends "../_form.njk" %}
+{% set title = 'Reschedule an appointment' %}
+{% set headerPersonNameForename = personAppointment.personSummary.name.forename  %}
+{% set apptDetails = personAppointment.appointment  %}
+{% set officerName = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname  %}
+{% set officerStaffCode = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname  %}
+{% set appointmentWithTitle = 'Appointment: ' +  apptDetails.type + ' with ' + officerName+ ' on ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime if apptDetails.endDateTime else '')  %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/" + crn + "/appointments/appointment/" + contactId + '/manage'  %}
+{% set formAnchorText = 'Cancel and go back' %}
+{#{% set multipartForm = true %}#}
+{% set submitButtonId = 'continueButton' %}
+{% block form %}
+    <input type="hidden" name="nextAppointment" value="RESCHEDULE">
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: 'Who needs to reschedule this appointment',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'whoNeedsToReschedule'
+            }
+        },
+        hint: {
+            text: appointmentWithTitle
+        },
+        items: [
+            {
+                value: 'POP',
+                text: headerPersonNameForename.split(' ')[0],
+                hint: {
+                    text: "They should give 48 hours notice and provide evidence."
+                }
+            },
+            {
+                value: 'SERVICE',
+                text: "Probation Service",
+                hint: {
+                    text: "Includes changes to probation practitioner availability."
+                }
+            }
+        ]
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','whoNeedsToReschedule' ])      ) }}
+  {#  {{ govukCharacterCount({
+        rows: '10',
+        maxlength: maxCharCount,
+        label: {
+            text: "Why is this appointment being rescheduled?",
+            classes: "govuk-fieldset__legend govuk-fieldset__legend--m",
+            isPageHeading: true
+        },
+        classes: "",
+        formGroup: {
+            attributes: { "data-qa": "reason"}
+        },
+        value: body.reason
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','reason' ])      ) }}
+
+    <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
+    {% set uploadHtml %}
+    <div class="govuk-grid-row govuk-body">
+        <div class="govuk-grid-column-full">
+            {{ govukFileUpload({
+                id: "file-upload-1",
+                name: "file",
+                classes: 'moj-multi-file-upload__input',
+                label: {
+                    text: "Upload any supporting documents",
+                    classes: 'govuk-label--m'
+                },
+                hint: {
+                    text: "For example, a sick note."
+                },
+                attributes: { multiple: '' }
+            }) }}
+
+            {{ govukButton({
+                text: 'Upload file',
+                classes: 'govuk-button--secondary moj-multi-file-upload__button'
+            }) }}
+        </div>
+    </div>
+    {% endset %}
+    {{ mojMultiFileUpload({
+        id: "file-upload-1",
+        name: "fileName",
+        label: { text: "Upload or drag and drop documents" },
+        uploadedFiles: {
+            heading: { text: 'Files added' },
+            items: uploadedFiles
+        },
+        uploadHtml: uploadHtml
+    }) }}
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: 'Does this contact include sensitive information?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'sensitiveInformation'
+            }
+        },
+        hint: {
+            text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+        },
+        items: [
+            {
+                value: 'Yes',
+                text: "Yes, it includes sensitive information"
+            },
+            {
+                value: 'No',
+                text: "No, it is not sensitive"
+            }
+        ]
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }} #}
+{% endblock %}
+

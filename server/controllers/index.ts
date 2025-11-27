@@ -15,6 +15,7 @@ import searchController from './search'
 import fileUploadController from './fileUpload'
 import alertsController from './alerts'
 import checkInsController from './check-ins'
+import rescheduleAppointmentController from './rescheduleAppointments'
 
 export default {
   caseload: caseloadController,
@@ -28,6 +29,7 @@ export default {
   risk: riskController,
   sentence: sentenceController,
   arrangeAppointments: arrangeAppointmentController,
+  rescheduleAppointments: rescheduleAppointmentController,
   document: documentController,
   accessibility: accessibilityController,
   search: searchController,

@@ -187,6 +187,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    /*  [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
+       optional: page !== 'reschedule-appointment',
+       checks: [
+         {
+           validator: isNotEmpty,
+           msg: 'Select if appointment includes sensitive information',
+           log: 'Sensitivity not selected',
+         },
+       ],
+     }, */
     'appointment-id': {
       optional: page !== 'record-an-outcome',
       checks: [
@@ -236,6 +246,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: `Select if they attended and complied`,
           log: 'Attended and complied not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][whoNeedsToReschedule]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select who is rescheduling this appointment',
+          log: 'Select who is rescheduling this appointment not selected',
         },
       ],
     },

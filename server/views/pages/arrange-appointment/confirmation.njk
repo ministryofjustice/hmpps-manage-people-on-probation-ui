@@ -1,5 +1,3 @@
-{% set phoneeNumber = case.mobileNumber %}
-
 {% extends "../_form.njk" %}
 {% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
@@ -19,6 +17,9 @@
 {% set title = 'Appointment arranged' %}
 {% if isInPast %}
   {% set title = 'Past appointment arranged' %}
+{% endif %}
+{% if appointmentType == "RESCHEDULE" %}
+  {% set title = 'Appointment rescheduled' %}
 {% endif %}
 {% set appointmentDatesHtml %}
 {% for appointmentDate in appointmentDates %}

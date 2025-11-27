@@ -545,7 +545,7 @@ export const checkAppointmentDetails = (
       manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
     })
   }
-  it('should display the date and time', () => {
+  it('should display the date and time with Reschedule link when date is in past', () => {
     const index = deliusManaged && hasOutcome ? 2 : 1
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
     manageAppointmentPage
@@ -555,17 +555,13 @@ export const checkAppointmentDetails = (
       manageAppointmentPage
         .getAppointmentDetailsListItem(index, 'actions')
         .find('a')
-        .should('contain.text', 'Change on NDelius')
-        .should('have.attr', 'target', '_blank')
-        .should(
-          'have.attr',
-          'href',
-          'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X778160&contactID=6',
-        )
+        .should('contain.text', 'Reschedule')
+        .should('have.attr', 'href', `/case/${crn}/appointment/6/reschedule`)
     } else {
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     }
   })
+
   it('should display the full location address', () => {
     const index = deliusManaged && hasOutcome ? 3 : 2
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Location')

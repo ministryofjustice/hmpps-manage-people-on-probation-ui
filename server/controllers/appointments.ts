@@ -15,6 +15,7 @@ import {
   handleQuotes,
   setDataValue,
   getDataValue,
+  isInThePast,
 } from '../utils'
 import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
@@ -180,6 +181,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+
+      const canReschedule: boolean = canAppointmentReschedule(personAppointment)
+
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
@@ -188,6 +192,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         url: baseUrl,
         nextAppointment,
         nextAppointmentIsAtHome,
+        canReschedule,
+        contactId,
       })
     }
   },
@@ -403,6 +409,13 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
+}
+
+const canAppointmentReschedule = (pa: any): boolean => {
+  const appointmentStartDateTime = pa?.appointment?.startDateTime as string
+  const appointmentIsInThePast = isInThePast(appointmentStartDateTime)
+  const appointmentIsInTheFuture = new Date(appointmentStartDateTime) > new Date()
+  return !pa?.appointment?.didTheyComply && (appointmentIsInThePast || appointmentIsInTheFuture)
 }
 
 export default appointmentsController

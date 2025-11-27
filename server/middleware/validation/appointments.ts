@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes } from '../../utils'
+import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
@@ -14,6 +14,7 @@ const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data, alertDismissed = false } = session
+  let isReschedulePage = false
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
@@ -239,6 +240,22 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateReschedule = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/reschedule/${contactId}/${id}`)) {
+      isReschedulePage = true
+      render = `pages/appointments/reschedule`
+      errorMessages = validateWithSpec(
+        unflattenBracketKeys(req.body),
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'reschedule-appointment',
+          maxCharCount,
+        }),
+      )
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
@@ -251,8 +268,18 @@ const appointments: Route<void> = (req, res, next) => {
   validateManageAttendedComplied()
   validateAddNote()
   validateManageAddNote()
+  validateReschedule()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+
+    // ** this is required for multifile upload but breaks the validation - needs investigation **
+
+    // if (isAddNotePage || isReschedulePage) {
+    //   req.session.errorMessages = errorMessages
+    //   req.session.body = body
+    //   return res.redirect(req.url)
+    // }
+
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

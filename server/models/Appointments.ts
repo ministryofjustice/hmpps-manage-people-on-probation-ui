@@ -13,6 +13,7 @@ export interface AppointmentSession {
     teamCode?: string
     username?: string
     locationCode?: string
+    staffCode?: string
   }
   type?: string
   visorReport?: YesNo
@@ -35,6 +36,8 @@ export interface AppointmentSession {
   sensitivity?: YesNo
   backendId?: number
   outcomeRecorded?: YesNo
+  contactId?: string
+  rescheduleAppointment?: RescheduleAppointment
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -106,6 +109,26 @@ export interface AppointmentRequestBody {
   outcomeRecorded?: boolean
 }
 
+export interface RescheduleAppointmentRequestBody {
+  date: string
+  startTime: string
+  endTime: string
+  staffCode?: string
+  teamCode?: string
+  locationCode?: string
+  rescheduleNotes?: string
+  notes?: string
+  rescheduleSensitive?: boolean
+  sensitive?: boolean
+  sendToVisor?: boolean
+  requestedBy: string
+  uuid: string
+}
+export interface RescheduleAppointmentResponse {
+  id: number
+  externalReference: string
+}
+
 export interface CheckAppointment {
   start: Date
   end: Date
@@ -118,6 +141,13 @@ export interface AppointmentPatch {
   notes?: string
   files?: string[]
   sensitive?: boolean
+}
+
+export interface RescheduleAppointment {
+  whoNeedsToReschedule?: string
+  reason?: string
+  files?: string[]
+  sensitivity?: YesNo
 }
 
 export interface AppointmentChecks {

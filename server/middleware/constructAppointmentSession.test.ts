@@ -30,6 +30,13 @@ const mockTypes: AppointmentType[] = [
 const crn = 'X000001'
 const username = 'user-1'
 
+const rescheduleAppointment = {
+  whoNeedsToReschedule: 'POP',
+  reason: 'why appointment needs to be rescheduled',
+  files: ['file1', 'file2'],
+  sensitivity: 'YES',
+}
+
 const mockSentences: Sentence[] = [
   {
     id: 49,
@@ -136,7 +143,7 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
 })
 
 const expectedSession = (values: Record<string, string | number | Record<string, string>>) => {
-  const { providerCode, teamCode, username: officerUserName } = mockAppointment.officer
+  const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
   const { eventId, isVisor, startDateTime: date, endDateTime: end, isSensitive } = mockAppointment
   return {
@@ -145,6 +152,7 @@ const expectedSession = (values: Record<string, string | number | Record<string,
       teamCode,
       username: officerUserName,
       locationCode,
+      staffCode: code,
     },
     type: 'COAP',
     visorReport: isVisor ? 'Yes' : 'No',
@@ -233,10 +241,16 @@ describe('/middleware/constructAppointmentSession', () => {
       appointmentTypes: mockTypes,
     })
     constructNextAppointmentSession(req, res, nextSpy)
-    const { providerCode, teamCode, username: officerUserName } = mockAppointment.officer
+    const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode, teamCode, username: officerUserName, locationCode: 'NO_LOCATION_REQUIRED' },
+        user: {
+          providerCode,
+          teamCode,
+          username: officerUserName,
+          locationCode: 'NO_LOCATION_REQUIRED',
+          staffCode: code,
+        },
         type: 'COPT',
       }),
     )
@@ -253,10 +267,10 @@ describe('/middleware/constructAppointmentSession', () => {
       appointmentTypes: mockTypes,
     })
     constructNextAppointmentSession(req, res, nextSpy)
-    const { providerCode, teamCode, username: mockUsername } = mockAppointment.officer
+    const { providerCode, teamCode, username: mockUsername, code } = mockAppointment.officer
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode, teamCode, username: mockUsername, locationCode: '' },
+        user: { providerCode, teamCode, username: mockUsername, locationCode: '', staffCode: code },
         type: '',
         eventId: '',
       }),
@@ -268,7 +282,7 @@ describe('/middleware/constructAppointmentSession', () => {
       eventId: 49,
       type: undefined,
     })
-    const { providerCode, teamCode, username: mockUsername } = mockAppointment.officer
+    const { providerCode, teamCode, username: mockUsername, code } = mockAppointment.officer
     const req = mockReq()
     const res = mockAppResponse({
       personAppointment: mockAppt,
@@ -277,7 +291,7 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode, teamCode, username: mockUsername, locationCode: '' },
+        user: { providerCode, teamCode, username: mockUsername, locationCode: '', staffCode: code },
         type: '',
         eventId: '49',
       }),
@@ -302,7 +316,7 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode: '', teamCode: '', username: '', locationCode: '' },
+        user: { providerCode: '', teamCode: '', username: '', locationCode: '', staffCode: '' },
         eventId: '49',
         type: 'COAP',
       }),
@@ -393,13 +407,13 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    const { providerCode, teamCode, username: mockUsername } = mockAppointment.officer
+    const { providerCode, teamCode, username: mockUsername, code } = mockAppointment.officer
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
         eventId: '',
         type: '',
-        user: { locationCode: '', providerCode, teamCode, username: mockUsername },
+        user: { locationCode: '', providerCode, teamCode, username: mockUsername, staffCode: code },
       }),
     )
   })
@@ -417,8 +431,110 @@ describe('/middleware/constructAppointmentSession', () => {
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
         type: '',
-        user: { username: 'tony-pan', teamCode: 'N07CHT', providerCode: 'N07', locationCode: '' },
+        user: { username: 'tony-pan', teamCode: 'N07CHT', providerCode: 'N07', locationCode: '', staffCode: '12345' },
       }),
     )
+  })
+
+  it('should include rescheduleAppointment when selection is RESCHEDULE and session has reschedule data', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'RESCHEDULE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                rescheduleAppointment,
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toBeDefined()
+    expect(res.locals.nextAppointmentSession.rescheduleAppointment).toEqual(rescheduleAppointment)
+  })
+
+  it('should not include rescheduleAppointment when selection is RESCHEDULE but no reschedule data in session', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'RESCHEDULE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                // no rescheduleAppointment here
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toBeDefined()
+    expect(res.locals.nextAppointmentSession).not.toHaveProperty('rescheduleAppointment')
+  })
+
+  it('should not include rescheduleAppointment when selection is KEEP_TYPE even if reschedule data exists', () => {
+    const mockAppt = mockPersonAppointmentResponse({ eventId: 49 })
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+        id: mockAppointment.id,
+      },
+      body: {
+        nextAppointment: 'KEEP_TYPE',
+      },
+      session: {
+        data: {
+          sentences: {
+            [crn]: mockSentences,
+          },
+          appointments: {
+            [crn]: {
+              [mockAppointment.id]: {
+                rescheduleAppointment,
+              },
+            },
+          },
+        },
+      },
+    })
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    constructNextAppointmentSession(req, res, nextSpy)
+    expect(res.locals.nextAppointmentSession).toBeDefined()
+    expect(res.locals.nextAppointmentSession).not.toHaveProperty('rescheduleAppointment')
   })
 })

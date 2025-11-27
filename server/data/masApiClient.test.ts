@@ -317,6 +317,19 @@ describe('masApiClient', () => {
       ],
       ['getUserAlerts (minimal)', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       ['clearAlerts', '/alerts', () => masApiClient.clearAlerts([1, 2, 3]), 'put'],
+      [
+        'putRescheduleAppointment',
+        '/appointments/1/recreate',
+        () =>
+          masApiClient.putRescheduleAppointment('1', {
+            date: '2024-01-01',
+            startTime: '10:00',
+            endTime: '11:00',
+            requestedBy: 'USER',
+            uuid: 'uuid',
+          }),
+        'put',
+      ],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {
