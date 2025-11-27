@@ -33,12 +33,25 @@ export default function setUpWebSecurity(): Router {
             '*.applicationinsights.azure.com/v2/track',
             (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
           ],
-          connectSrc: [
-            "'self' https://*.sentry.io",
-            'js.monitor.azure.com',
-            '*.applicationinsights.azure.com/v2/track',
-            'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
-          ],
+          // Build connect-src dynamically so we can relax it for local development only
+          // NOTE: Keep localhost allowances out of non-local environments
+          connectSrc: (() => {
+            const sources = [
+              "'self' https://*.sentry.io",
+              'js.monitor.azure.com',
+              '*.applicationinsights.azure.com/v2/track',
+              'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+              // This is required for the S3 bucket to upload checkin images
+              'https://*.s3.eu-west-2.amazonaws.com',
+              // 'https://cloud-platform-*.s3.eu-west-2.amazonaws.com',
+            ]
+            // Allow localhost for local development only
+            if (config.env === 'local') {
+              sources.push('http://localhost:9091')
+              sources.push('http://localhost:3000')
+            }
+            return sources
+          })(),
           workerSrc: ["'self' blob:"],
           styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
           fontSrc: ["'self'", 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'],

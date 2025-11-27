@@ -5,6 +5,9 @@ import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import { CheckinUserDetails } from '../models/ESupervision'
+import { postCheckInDetails } from '../middleware/postCheckInDetails'
+import logger from '../../logger'
 
 const routes = [
   'getIntroPage',
@@ -19,9 +22,25 @@ const routes = [
   'postPhotoOptionsPage',
   'getTakePhotoPage',
   'getUploadPhotoPage',
-  'postPhotoRulesPage',
+  'postUploadaPhotoPage',
   'getPhotoRulesPage',
+  'postPhotoRulesPage',
+  'getCheckinSummaryPage',
+  'postCheckinSummaryPage',
+  'getConfirmationPage',
 ] as const
+
+interface OptionPair {
+  id: string
+  label: string
+}
+
+const checkinIntervals: OptionPair[] = [
+  { id: 'WEEKLY', label: 'Every week' },
+  { id: 'TWO_WEEKS', label: 'Every 2 weeks' },
+  { id: 'FOUR_WEEKS', label: 'Every 4 weeks' },
+  { id: 'EIGHT_WEEKS', label: 'Every 8 weeks' },
+]
 
 const checkInsController: Controller<typeof routes, void> = {
   getIntroPage: hmppsAuthClient => {
@@ -195,7 +214,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  postPhotoRulesPage: hmppsAuthClient => {
+  postUploadaPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -212,6 +231,67 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       return res.render('pages/check-in/photo-rules.njk', { crn, id })
+    }
+  },
+  postPhotoRulesPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/checkin-summary`)
+    }
+  },
+  getCheckinSummaryPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const userDetails: CheckinUserDetails = {
+        ...savedUserDetails,
+        uuid: id,
+        interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
+        preferredComs: savedUserDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
+        photoUploadOption:
+          savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
+      }
+      return res.render('pages/check-in/checkin-summary.njk', { crn, id, userDetails })
+    }
+  },
+
+  postCheckinSummaryPage: hmppsAuthClient => {
+    return async (req, res) => {
+      try {
+        const { setup, uploadLocation } = await postCheckInDetails(hmppsAuthClient)(req, res)
+        const responseBody = { status: 'SUCCESS', message: 'Registration complete', setup, uploadLocation }
+        // Console/log output of the same payload we return to the client
+        logger.info('Check-in registration response', responseBody)
+        res.json(responseBody)
+      } catch (e) {
+        // postCheckInDetails already sent an error response; just stop.
+      }
+    }
+  },
+
+  getConfirmationPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const userDetails: CheckinUserDetails = {
+        ...savedUserDetails,
+        uuid: id,
+        interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
+        preferredComs: savedUserDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
+        photoUploadOption:
+          savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
+      }
+      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
     }
   },
 }

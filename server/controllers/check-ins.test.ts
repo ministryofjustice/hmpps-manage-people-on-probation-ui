@@ -475,7 +475,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.postPhotoRulesPage(hmppsAuthClient)(req, res)
+      await controllers.checkIns.postUploadaPhotoPage(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/photo-rules`)
       expect(mockRenderError).not.toHaveBeenCalled()
@@ -486,7 +486,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
-      await controllers.checkIns.postPhotoRulesPage(hmppsAuthClient)(req, res)
+      await controllers.checkIns.postUploadaPhotoPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
@@ -497,7 +497,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(false)
 
       const req = baseReq()
-      await controllers.checkIns.postPhotoRulesPage(hmppsAuthClient)(req, res)
+      await controllers.checkIns.postUploadaPhotoPage(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
