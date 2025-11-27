@@ -19,7 +19,9 @@
             {% endif %}
             <span class="govuk-visually-hidden"> on {{ thisDate }}
             </a>
-            {% if shouldPromptToRecordAnOutcome %}
+            {% if entry.isEsupervision %}
+                  <br/><a href="/case/{{ crn }}/checkin/{{ entry.id }}?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
+            {% elif shouldPromptToRecordAnOutcome %}
                   <br/>{% include './_log-outcome-link.njk' %}
             {% endif %}
       </p>

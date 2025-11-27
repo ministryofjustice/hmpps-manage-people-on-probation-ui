@@ -406,6 +406,27 @@
                 "forename": "Paul",
                 "surname": "Smith"
               }
+            },
+            {
+              "id": 30,
+              "type": "Online check in submitted",
+              "startDateTime": "2023-02-12T10:15:00.382936Z",
+              "endDateTime": "2023-02-12T10:30:00.382936Z",
+              "isSensitive": false,
+              "hasOutcome": false,
+              "appointmentNotes": [],
+              "officer": {
+                "name": {
+                  "forename": "William",
+                  "surname": "Philips"
+                }
+              },
+              "lastUpdated": "2023-04-20",
+              "lastUpdatedBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "isEsupervision": true
             }
           ]
         },
