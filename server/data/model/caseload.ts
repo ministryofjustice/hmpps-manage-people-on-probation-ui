@@ -37,16 +37,20 @@ export interface CaseloadResponse {
 export interface Team {
   description: string
   code: string
+  selected?: string
 }
 
 export interface Provider {
   code: string
   name: string
+  selected?: string
 }
 
 export interface User {
+  staffCode?: string
   username: string
   nameAndRole: string
+  selected?: string
 }
 
 export interface Location {
@@ -99,12 +103,15 @@ export interface UserTeam {
   teams: Team[]
 }
 
+export interface DefaultUserDetails {
+  staffCode?: string
+  username: string
+  homeArea: string
+  team: string
+}
+
 export interface UserProviders {
-  defaultUserDetails: {
-    username: string
-    homeArea: string
-    team: string
-  }
+  defaultUserDetails: DefaultUserDetails
   providers: Provider[]
   teams: Team[]
   users: User[]

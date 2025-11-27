@@ -1,11 +1,18 @@
 import Page from '../../pages/page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
+import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import 'cypress-plugin-tab'
 import mockResponse from '../../../wiremock/mappings/appointment-types.json'
 import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
-import { checkPopHeader, completeSentencePage } from './imports'
+import {
+  checkPopHeader,
+  completeLocationDateTimePage,
+  completeSentencePage,
+  completeSupportingInformationPage,
+  completeTypePage,
+} from './imports'
 import { toSentenceCase } from '../../../server/utils'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
@@ -25,7 +32,7 @@ describe('Arrange an appointment', () => {
   let typePage: AppointmentTypePage
   let attendancePage: AttendancePage
   let locationPage: AppointmentLocationDateTimePage
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
   describe('What appointment are you arranging?', () => {
@@ -45,10 +52,19 @@ describe('Arrange an appointment', () => {
             .should('contain.text', toSentenceCase(mockAppointmentTypes[i - 1].description))
           typePage.getRadio('type', i).should('not.be.checked')
         }
-
+        cy.get('[data-qa="attendee"] h2').should('contain.text', 'Who will attend the appointment?')
+        cy.get('[data-qa="attendee"] p:nth-of-type(1)').should(
+          'contain.text',
+          'You can attend or book for someone else',
+        )
+        cy.get('[data-qa="attendeeDetails"]').should(
+          'contain.text',
+          'Deborah Fern (PS - Other) (Automated Allocation Team, London)',
+        )
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
       })
+
       describe('Continue is clicked without first selecting a type', () => {
         beforeEach(() => {
           loadPage()
@@ -172,25 +188,77 @@ describe('Arrange an appointment', () => {
       })
     })
   })
-  describe('Changing the attendee', () => {
+
+  describe('Changing the probation practitioner attendee back to default user', () => {
+    const expectedUser = 'Peter Parker (PS-PSO) (Automated Allocation Team, London)'
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
-      typePage.getElement('.govuk-link').click()
     })
-    it('should render the attendee page', () => {
+    it('should render the attendee page with the default user selected', () => {
+      cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.checkOnPage()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
+      cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
+      attendancePage.getSubmitBtn().click()
+      typePage = new AppointmentTypePage()
+      typePage.checkOnPage()
+      cy.get('[data-qa="attendeeDetails').should('contain.text', expectedUser)
+      typePage.getRadio('type', 2).click()
+      typePage.getSubmitBtn().click()
+      locationPage.getBackLink().click()
+      cy.get('[data-qa="attendeeDetails').should('contain.text', expectedUser)
     })
     it('backlink should return to type-attendee page', () => {
+      loadPage()
+      cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.getBackLink().click()
       typePage.checkOnPage()
     })
-    it('submitting should return to type-attendee page', () => {
-      attendancePage = new AttendancePage()
+  })
+
+  describe('Probation practitioner not allocated', () => {
+    beforeEach(() => {
+      cy.task('stubNoAllocatedCOM')
+      loadPage()
+    })
+    it('should list the default user as the attendee', () => {
+      cy.get('[data-qa="attendeeDetails"]').should(
+        'contain.text',
+        'Peter Parker (PS-PSO) (Automated Allocation Team, London)',
+      )
+    })
+    it('should update the default user', () => {
+      const changedUser = 'Iain Chambers (PS - Other) (Homelessness Prevention Team,, North East Region)'
+      cy.get('[data-qa="attendee"] a').click()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N07')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07AAT')
+      cy.get('[data-qa="username"]').should('have.value', 'peter-parker')
+      cy.get('[data-qa="providerCode"]').select('N54')
+      cy.get('[data-qa="teamCode"]').select('N07HPT')
+      cy.get('[data-qa="username"]').select('IainChambers')
       attendancePage.getSubmitBtn().click()
-      typePage.checkOnPage()
+      cy.get('[data-qa="attendeeDetails"]').should('contain.text', changedUser)
+      completeTypePage()
+      completeLocationDateTimePage()
+      completeSupportingInformationPage()
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', changedUser)
+      cyaPage.getSummaryListRow(3).find('.govuk-link').click()
+      cy.get('[data-qa="providerCode"]').should('have.value', 'N54')
+      cy.get('[data-qa="teamCode"]').should('have.value', 'N07HPT')
+      cy.get('[data-qa="username"]').should('have.value', 'IainChambers')
+      cy.get('[data-qa="providerCode"]').select('N07')
+      cy.get('[data-qa="teamCode"]').select('N07AAT')
+      cy.get('[data-qa="username"]').select('peter-parker')
+      attendancePage.getSubmitBtn().click()
+      cyaPage
+        .getSummaryListRow(3)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'Peter Parker (PS-PSO) (Automated Allocation Team, London)')
     })
   })
 })

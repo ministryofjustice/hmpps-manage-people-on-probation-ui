@@ -15,9 +15,9 @@
 
 {% set attendingHtml %}
 {% if appointment.meta.userIsAttending %}
-    {{ appointment.attending.name }}
+  {{ appointment.attending.name }}
 {% else %}
-    {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
+  {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
 {% endif %}
 {% endset %}
 
@@ -56,16 +56,18 @@
   } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
 
   {# Attendence #}
-  <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Who will attend the appointment?</h2>
-  <span class="govuk-caption-m">You can attend or book for someone else</span>
-  <div class="govuk-grid-row govuk-!-font-size-19 govuk-!-margin-top-2">
-    <div class="govuk-grid-column-two-thirds">
-      <p class="govuk-body">{{ attendingHtml }}</p>
+  <section data-qa="attendee">
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Who will attend the appointment?</h2>
+    <p class="govuk-caption-m">You can attend or book for someone else</p>
+    <div class="govuk-grid-row govuk-!-font-size-19 govuk-!-margin-top-2">
+      <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body" data-qa="attendeeDetails">{{ attendingHtml | safe }}</p>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <a href="{{ attendanceUrl }}" class="govuk-link govuk-!-text-align-right" data-qa="changeAttendeeLink">Change</a>
+      </div>
     </div>
-    <div class="govuk-grid-column-one-third">
-      <a href="{{ attendanceUrl }}" class="govuk-link govuk-!-text-align-right">Change</a> 
-    </div>
-  </div>
+  </section>
 
   {# ViSOR section (only if appointment.meta.isVisor is true) #}
   {% if appointment.meta.isVisor %}
@@ -100,4 +102,3 @@
     <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
   {% endif %}
 {% endblock %}
-
