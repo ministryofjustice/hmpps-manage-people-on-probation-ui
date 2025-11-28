@@ -35,28 +35,21 @@ describe('Manage appointment - add a note', () => {
 
   const checkUploadFile = (filetype: string): void => {
     it(`should upload a selected ${filetype} file`, () => {
-      // Intercept the form submission, not a separate file upload endpoint
       cy.intercept('POST', '/case/*/appointments/appointment/*/add-note').as('formSubmit')
       loadPage()
 
       const [fakeFile, fileName] = createFakeFile(1, filetype)
 
-      // Upload using the file input
       addNotePage.getFileUploadInput().attachFile(fakeFile)
 
-      // Add a note (optional but good practice)
       cy.get('#notes').type('Test note')
 
-      // Select sensitivity option
       addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
 
-      // Submit form
       addNotePage.getSubmitBtn().click()
 
-      // Wait for form submission
       cy.wait('@formSubmit')
 
-      // Verify navigation to manage page (successful upload)
       cy.url().should('include', '/manage')
     })
   }
@@ -179,19 +172,14 @@ describe('Manage appointment - add a note', () => {
     loadPage()
     const [fakeFile, fileName] = createFakeFile(6, 'pdf')
 
-    // Upload oversized file
     addNotePage.getFileUploadInput().attachFile(fakeFile)
 
-    // Select sensitivity option
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
 
-    // Click continue to trigger validation
     addNotePage.getSubmitBtn().click()
 
-    // Check for validation error in error summary
     addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
 
-    // Verify error summary link
     cy.get('.govuk-error-summary__list a').should('contain.text', 'File size must be 5mb or under')
     cy.get('.govuk-error-summary__list a').should('have.attr', 'href', '#file-upload-1')
   })
@@ -213,22 +201,16 @@ describe('Manage appointment - add a note', () => {
 
     const [fakeFile, fileName] = createFakeFile(1, 'pdf')
 
-    // Upload valid file
     addNotePage.getFileUploadInput().attachFile(fakeFile)
 
-    // Add note
     cy.get('#notes').type('Test note')
 
-    // Select sensitivity option
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
 
-    // Submit
     addNotePage.getSubmitBtn().click()
 
-    // Wait for form submission
     cy.wait('@formSubmit')
 
-    // Verify navigation
     cy.url().should('include', '/manage')
   })
 })
