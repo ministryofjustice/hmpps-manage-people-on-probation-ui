@@ -5,11 +5,11 @@ export interface ESupervisionSession {
 }
 
 export interface CheckinUserDetails {
-  uuid: string
-  date: string
-  dateDt: Date
-  interval: string
-  preferredComs: string
+  uuid?: string
+  date?: string
+  dateDt?: Date
+  interval?: string
+  preferredComs?: string
   checkInMobile?: string
   checkInEmail?: string
   photoUploadOption?: string
