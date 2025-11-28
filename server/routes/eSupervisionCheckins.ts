@@ -86,4 +86,26 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   router.get('/case/:crn/appointments/:id/check-in/update', [controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)])
 
   router.get('/case/:crn/appointments/:id/check-in/view', [controllers.checkIns.getViewCheckIn(hmppsAuthClient)])
+  router.get('/case/:crn/appointments/:id/check-in/review/expired', [
+    controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/:id/check-in/review/expired', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postReviewExpiredCheckIn(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/:id/check-in/review/identity', [
+    controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/:id/check-in/review/identity', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postReviewIdentityCheckIn(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/:id/check-in/review/notes', [
+    controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/:id/check-in/review/notes', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postReviewNotesCheckIn(hmppsAuthClient),
+  ])
 }

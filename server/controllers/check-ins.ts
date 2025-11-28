@@ -26,6 +26,12 @@ const routes = [
   'getPhotoRulesPage',
   'getUpdateCheckIn',
   'getViewCheckIn',
+  'getReviewExpiredCheckIn',
+  'postReviewExpiredCheckIn',
+  'getReviewIdentityCheckIn',
+  'postReviewIdentityCheckIn',
+  'getReviewNotesCheckIn',
+  'postReviewNotesCheckIn',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -244,32 +250,14 @@ const checkInsController: Controller<typeof routes, void> = {
           uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
           firstName: 'string',
           lastName: 'string',
-          crn: 'string',
-          dateOfBirth: '2025-11-27',
           status: 'INITIAL',
           practitioner: 'string',
           createdAt: '2025-11-27T15:40:42.399Z',
-          email: 'string',
-          phoneNumber: 'string',
-          photoUrl: 'string',
-          firstCheckin: '2025-11-27',
           checkinInterval: 'WEEKLY',
         },
-        submittedAt: '2025-11-27T15:40:42.399Z',
-        surveyResponse: {
-          additionalProp1: 'string',
-          additionalProp2: 'string',
-          additionalProp3: 'string',
-        },
+        surveyResponse: {},
         createdBy: 'string',
         createdAt: '2025-11-27T15:40:42.399Z',
-        reviewedBy: 'string',
-        reviewedAt: '2025-11-27T15:40:42.399Z',
-        checkinStartedAt: '2025-11-27T15:40:42.399Z',
-        videoUrl: 'string',
-        snapshotUrl: 'string',
-        autoIdCheck: 'MATCH',
-        manualIdCheck: 'MATCH',
         flaggedResponses: ['string'],
       }
       if (checkIn.status === 'REVIEWED') {
@@ -301,18 +289,12 @@ const checkInsController: Controller<typeof routes, void> = {
           uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
           firstName: 'Bob',
           lastName: 'Smith',
-          crn: 'string',
-          dateOfBirth: '2025-11-27',
           status: 'INITIAL',
           practitioner: 'string',
           createdAt: '2025-11-27T15:40:42.399Z',
-          email: 'string',
-          phoneNumber: 'string',
           photoUrl: 'string',
-          firstCheckin: '2025-11-27',
           checkinInterval: 'WEEKLY',
         },
-        submittedAt: '2025-11-27T15:40:42.399Z',
         surveyResponse: {
           mentalHealth: 'well',
           assistance: ['thing1', 'thing2'],
@@ -320,9 +302,6 @@ const checkInsController: Controller<typeof routes, void> = {
         },
         createdBy: 'string',
         createdAt: '2025-11-27T15:40:42.399Z',
-        reviewedBy: 'string',
-        reviewedAt: '2025-11-27T15:40:42.399Z',
-        checkinStartedAt: '2025-11-27T15:40:42.399Z',
         videoUrl: 'string',
         snapshotUrl: 'string',
         autoIdCheck: 'MATCH',
@@ -330,6 +309,81 @@ const checkInsController: Controller<typeof routes, void> = {
         flaggedResponses: ['string'],
       }
       return res.render('pages/check-in/view.njk', { crn, id, back, checkIn })
+    }
+  },
+
+  getReviewExpiredCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+
+      const checkIn: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'EXPIRED',
+        dueDate: '2025-11-27',
+        offender: {
+          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          firstName: 'Bob',
+          lastName: 'Smith',
+          status: 'INITIAL',
+          practitioner: 'string',
+          createdAt: '2025-11-27T15:40:42.399Z',
+          checkinInterval: 'WEEKLY',
+        },
+        surveyResponse: {},
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        flaggedResponses: ['string'],
+      }
+      return res.render('pages/check-in/review/expired.njk', { crn, id, back, checkIn })
+    }
+  },
+
+  postReviewExpiredCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/view`)
+    }
+  },
+
+  getReviewIdentityCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      return renderError(404)(req, res)
+    }
+  },
+
+  postReviewIdentityCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/notes`)
+    }
+  },
+
+  getReviewNotesCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      return renderError(404)(req, res)
+    }
+  },
+
+  postReviewNotesCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/view`)
     }
   },
 }
