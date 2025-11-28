@@ -18,6 +18,23 @@ const stubSanIndicatorTrue = (): SuperAgentRequest =>
     },
   })
 
+const stubArnsUnavailable = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/arns/risks/crn/.*',
+      method: 'GET',
+    },
+    response: {
+      status: 500,
+      jsonBody: {
+        message: 'Error',
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 const stubSentencePlan404 = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -32,4 +49,4 @@ const stubSentencePlan404 = (): SuperAgentRequest =>
     },
   })
 
-export default { stubSanIndicatorTrue, stubSentencePlan404 }
+export default { stubSanIndicatorTrue, stubSentencePlan404, stubArnsUnavailable }
