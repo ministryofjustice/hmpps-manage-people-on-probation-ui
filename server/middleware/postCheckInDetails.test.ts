@@ -7,7 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/ESupervisionClient')
+jest.mock('../data/eSupervisionClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
