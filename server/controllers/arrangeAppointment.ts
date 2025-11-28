@@ -373,7 +373,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postAttendedComplied: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/add-note`)
+      const { change } = req.query as Record<string, string>
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/add-note${change ? `?change=${change}` : ''}`)
     }
   },
   getLocationNotInList: () => {
@@ -424,10 +425,11 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postAddNote: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { change } = req.query as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/check-your-answers`)
+      return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
   getRepeating: () => {
