@@ -36,7 +36,6 @@ const mockRoshWidget = {
   risks: [{ riskTo: 'General Public', community: ['HIGH'], custody: ['MEDIUM'] }],
 } as any
 
-const mockCrnToRiskWidgetMap = { X123456: mockRoshWidget }
 
 const mockUserAlertsWithCrn = {
   content: [
@@ -82,6 +81,10 @@ const mockErrorSummary = {
   ],
 } as any
 
+const mockNonCriticalErrorSummary = {
+  errors: [],
+} as any
+
 const expectedArnsUnavailableErrors = mockErrorSummary.errors.map((errorItem: any) => ({
   text: errorItem.text,
 }))
@@ -112,6 +115,9 @@ describe('alertsController', () => {
   afterEach(() => {
     jest.clearAllMocks()
     getRisksSpy.mockImplementation(() => Promise.resolve(mockRisksData))
+    toRoshWidgetSpy.mockClear()
+    toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
+    getUserAlertsSpy.mockResolvedValue(mockUserAlertsWithCrn)
   })
 
   describe('getAlerts', () => {
@@ -233,8 +239,49 @@ describe('alertsController', () => {
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
         risksErrors: expectedArnsUnavailableErrors,
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
       })
+    })
+
+    it('should treat an empty error summary as non-critical and still call toRoshWidget (Non-Critical Error Path)', async () => {
+      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+      res.locals.user = defaultUser
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      const nonCriticalWidget = { widget: 'from-non-critical-error' }
+
+      getRisksSpy.mockImplementation(crn => {
+        if (crn === 'X123456') return Promise.resolve(mockNonCriticalErrorSummary)
+        if (crn === 'Y789012') return Promise.resolve(mockRisksData)
+        return Promise.resolve(null)
+      })
+
+      toRoshWidgetSpy.mockImplementation(risks => {
+        if (risks === mockNonCriticalErrorSummary) return nonCriticalWidget
+        if (risks === mockRisksData) return mockRoshWidget
+        return null
+      })
+
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
+
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockNonCriticalErrorSummary)
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+      expect(toRoshWidgetSpy).toHaveBeenCalledTimes(2)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/alerts',
+        expect.objectContaining({
+          crnToRiskWidgetMap: {
+            X123456: nonCriticalWidget,
+            Y789012: mockRoshWidget,
+          },
+          risksErrors: [], // No critical error banner
+          url: encodeURIComponent('/alerts'),
+        }),
+      )
     })
   })
 
