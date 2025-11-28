@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
-import ESupervisionClient from '../data/ESupervisionClient'
+import ESupervisionClient from '../data/eSupervisionClient'
 import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/eSuperVision'
 import logger from '../../logger'
 import { ProbationPractitioner } from '../data/model/caseload'
@@ -38,9 +38,10 @@ export const postCheckInDetails = (
       checkinInterval: savedUserDetails.interval,
       startedAt: new Date().toISOString(),
     }
+    logger.info('Checkin Registration started')
+    logger.info('message: ', data)
     try {
       const setup: OffenderSetup = await eSupervisionClient.postOffenderSetup(data)
-      logger.info('Checkin Registration started')
       const uploadLocation: LocationInfo = await eSupervisionClient.getProfilePhotoUploadLocation(setup, 'image/jpeg')
       logger.info('locationInfo', { uploadLocation })
       return { setup, uploadLocation }

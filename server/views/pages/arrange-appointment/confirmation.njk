@@ -20,6 +20,7 @@
 {% set appointmentDatesHtml %}
 {% for appointmentDate in appointmentDates %}
    {% if loop.index > 1 %}<br>{% endif %}
+   <span data-qa="appointment-date">{{ appointmentDate }}
    <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
     {{ appointmentDate | dateWithYear }}
     from

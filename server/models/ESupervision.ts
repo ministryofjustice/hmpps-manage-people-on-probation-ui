@@ -13,6 +13,8 @@ export interface CheckinUserDetails {
   checkInMobile?: string
   checkInEmail?: string
   photoUploadOption?: string
+  displayCommsOption?: string
+  displayDay?: string
   contactUpdated?: boolean
 }
 export interface LocalParams {

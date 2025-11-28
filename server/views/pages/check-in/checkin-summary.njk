@@ -6,10 +6,10 @@
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
 
-{% set checkInDateLabel = "When would you like " + case.name.forename + " to complete<br/> their first online check in?"  %}
+{% set checkInDateLabel = "When would you like " + case.name.forename + " to complete their first online check in?"  %}
 {% set checkInDateVal = userDetails.date | dmyToLongDate  %}
-{% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check<br/> in?"  %}
-{% set sendLinkLabel = "How does " + case.name.forename + " want us to send a link to<br/> the service?"  %}
+{% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check in?"  %}
+{% set sendLinkLabel = "How does " + case.name.forename + " want us to send a link to the service?"  %}
 {% set photoOptopionLabel = "How do you want to take a photo of " + case.name.forename + "?"  %}
 {% set photoPersonLabel = "Photo of " + case.name.forename %}
 {% set name = "Image of " + case.name.forename + " added for identification" %}
@@ -149,7 +149,7 @@
     }) }}
 
     <div class="govuk-!-width-one-half">
-        <button id="registerButton" class="govuk-button">Confirm</button>
+        <button id="registerButton" class="govuk-button" data-qa="submit-btn">Confirm</button>
 
         <form id="completeRegistrationForm" method="post" action="{{ confirmEndUrl }}">
             <input type="hidden" name="_csrf" value="{{ csrfToken }}" />

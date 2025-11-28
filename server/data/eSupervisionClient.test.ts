@@ -2,7 +2,7 @@ import nock from 'nock'
 
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
-import ESupervisionClient from './ESupervisionClient'
+import ESupervisionClient from './eSupervisionClient'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')

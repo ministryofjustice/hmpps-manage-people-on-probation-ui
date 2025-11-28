@@ -19,8 +19,8 @@
 
 
 {% set panelHtml %}
-<div class="govuk-!-font-size-27">
-    <strong>Starting {{ checkInDateVal }}</strong><br/>
+<div class="govuk-!-font-size-36">
+    Starting {{ userDetails.displayDay }} {{ checkInDateVal }}<br/>
      then {{ userDetails.interval | lower }}
 </div>
 {% endset %}
@@ -37,7 +37,7 @@
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
       <p class="govuk-body">
         We have sent a confirmation to
-        {{case.name.forename}} on {{ userDetails.checkInMobile }} / {{ userDetails.checkInEmail }}.
+        {{case.name.forename}} on {{ userDetails.displayCommsOption }}.
         </p>
         <p>
             {{case.name.forename}} will receive a message to their preferred contact method each time<br/>

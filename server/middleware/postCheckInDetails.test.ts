@@ -1,6 +1,6 @@
 import { postCheckInDetails } from './postCheckInDetails'
 import MasApiClient from '../data/masApiClient'
-import ESupervisionClient from '../data/ESupervisionClient'
+import ESupervisionClient from '../data/eSupervisionClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 
@@ -26,7 +26,6 @@ describe('postCheckInDetails', () => {
     const checkins =
       overrides?.checkins ??
       ({
-        // dd/M/yyyy format
         date: '12/3/2025',
         interval: 'WEEK',
         checkInEmail: 'test@test.com',
@@ -87,12 +86,10 @@ describe('postCheckInDetails', () => {
     const handler = postCheckInDetails(hmppsAuthClient)
     const result = await handler(req, res)
 
-    // Verify token retrieval and clients used
     expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(username)
     expect(MasApiClient).toHaveBeenCalledWith(token)
     expect(ESupervisionClient).toHaveBeenCalledWith(token)
 
-    // Verify the payload built correctly
     expect(postOffenderSetup).toHaveBeenCalledTimes(1)
     const calledWith = postOffenderSetup.mock.calls[0][0]
     expect(calledWith).toMatchObject({
@@ -106,11 +103,9 @@ describe('postCheckInDetails', () => {
       phoneNumber: '07123456789',
       checkinInterval: 'WEEK',
     })
-    // Date converted from dd/M/yyyy => yyyy/M/dd (no left-pad for month)
     expect(calledWith.firstCheckinDate).toBe('2025/3/12')
     expect(typeof calledWith.startedAt).toBe('string')
 
-    // Verify upload location call and handler return
     expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg')
     expect(result).toEqual({ setup, uploadLocation })
   })

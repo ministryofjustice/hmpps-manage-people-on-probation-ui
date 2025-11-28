@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
@@ -271,7 +271,7 @@ const checkInsController: Controller<typeof routes, void> = {
         logger.info('Check-in registration response', responseBody)
         res.json(responseBody)
       } catch (e) {
-        // postCheckInDetails already sent an error response; just stop.
+        // postCheckInDetails already sent an error response
       }
     }
   },
@@ -287,9 +287,9 @@ const checkInsController: Controller<typeof routes, void> = {
         ...savedUserDetails,
         uuid: id,
         interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
-        preferredComs: savedUserDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
-        photoUploadOption:
-          savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
+        displayCommsOption:
+          savedUserDetails.preferredComs === 'EMAIL' ? savedUserDetails.checkInEmail : savedUserDetails.checkInMobile,
+        displayDay: dayOfWeek(DateTime.fromFormat(savedUserDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
       }
       return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
     }
