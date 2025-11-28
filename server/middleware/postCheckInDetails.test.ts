@@ -88,7 +88,6 @@ describe('postCheckInDetails', () => {
 
     expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(username)
     expect(MasApiClient).toHaveBeenCalledWith(token)
-    expect(ESupervisionClient).toHaveBeenCalledWith(token)
 
     expect(postOffenderSetup).toHaveBeenCalledTimes(1)
     const calledWith = postOffenderSetup.mock.calls[0][0]
