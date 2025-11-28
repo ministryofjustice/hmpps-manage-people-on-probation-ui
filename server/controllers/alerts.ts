@@ -29,23 +29,26 @@ const alertsController: Controller<typeof routes, void> = {
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
 
       let crnToRiskWidgetMap = {}
-
-      const uniqueErrorTexts: Set<string> = new Set<string>()
+      let arnsUnavailableError: any = null
 
       if (enableRiskOnAlertsDashboard) {
         const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
-        const riskPromises = uniqueCrns.map(async crn => {
-          const risks = await arnsClient.getRisks(crn)
 
+        const riskPromises = uniqueCrns.map(async crn => {
+          if (arnsUnavailableError) {
+            return { crn, risksWidget: arnsUnavailableError }
+          }
+
+          const risks = await arnsClient.getRisks(crn)
           let risksWidget = null
 
           if (isErrorSummary(risks)) {
-            risks.errors.forEach(errorItem => {
-              if (errorItem && errorItem.text) {
-                uniqueErrorTexts.add(errorItem.text)
-              }
-            })
-            risksWidget = risks
+            if (risks.errors.length > 0 && risks.errors[0]?.text) {
+              arnsUnavailableError = risks
+              risksWidget = risks
+            } else {
+              risksWidget = toRoshWidget(risks)
+            }
           } else {
             risksWidget = toRoshWidget(risks)
           }
@@ -55,16 +58,29 @@ const alertsController: Controller<typeof routes, void> = {
 
         const results = await Promise.all(riskPromises)
 
-        crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
-          if (current.risksWidget) {
-            acc[current.crn] = current.risksWidget
-          }
-          return acc
-        }, {})
+        if (arnsUnavailableError) {
+          crnToRiskWidgetMap = uniqueCrns.reduce<Record<string, any>>((acc, crn) => {
+            acc[crn] = arnsUnavailableError
+            return acc
+          }, {})
+        } else {
+          crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
+            if (current.risksWidget) {
+              acc[current.crn] = current.risksWidget
+            }
+            return acc
+          }, {})
+        }
       }
-      const risksErrors = Array.from(uniqueErrorTexts).map(text => ({
-        text,
-      }))
+      let risksErrors: { text: string }[] = []
+
+      if (arnsUnavailableError) {
+        risksErrors = arnsUnavailableError.errors.map((errorItem: any) => ({
+          text: errorItem.text,
+        }))
+      }
+
+
       res.render('pages/alerts', {
         url,
         alertsData,

@@ -78,16 +78,13 @@ const mockErrorSummary = {
     { text: 'A different unique error' },
     {
       text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
-    }, // Duplicate
+    },
   ],
 } as any
 
-const expectedErrorSummary = [
-  {
-    text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
-  },
-  { text: 'A different unique error' },
-]
+const expectedArnsUnavailableErrors = mockErrorSummary.errors.map((errorItem: any) => ({
+  text: errorItem.text,
+}))
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -206,7 +203,7 @@ describe('alertsController', () => {
       })
     })
 
-    it('should aggregate unique error messages when risk service returns ErrorSummary for some CRNs', async () => {
+    it('should short-circuit, override all risk widgets with the error, and return the error messages when a critical error is found', async () => {
       const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
       res.locals.user = defaultUser
       res.locals.flags = { enableRiskOnAlertsDashboard: true }
@@ -219,7 +216,7 @@ describe('alertsController', () => {
 
       const expectedCrnToRiskWidgetMapWithError = {
         X123456: mockErrorSummary,
-        Y789012: mockRoshWidget,
+        Y789012: mockErrorSummary,
       }
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
@@ -235,7 +232,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: expectedCrnToRiskWidgetMapWithError,
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
-        risksErrors: expectedErrorSummary,
+        risksErrors: expectedArnsUnavailableErrors,
         url: '%2Falerts',
       })
     })
