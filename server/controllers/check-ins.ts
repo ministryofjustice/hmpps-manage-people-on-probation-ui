@@ -8,6 +8,7 @@ import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/per
 import { HmppsAuthClient } from '../data'
 import supervisionAppointmentClient from '../../wiremock/stubs/supervisionAppointmentClient'
 import { ESupervisionCheckIn } from '../data/model/esupervision'
+import ESupervisionClient from '../data/eSupervisionClient'
 
 const routes = [
   'getIntroPage',
@@ -227,38 +228,17 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getUpdateCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      console.log('HERE')
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const { back } = req.query
 
-      // const { checkIn } = await esupervision.getCheckin(id) //not available yet
-      // checkIn.dueDate = (new Date(checkIn.dueDate), { days: 3 }).toString()
-      // if (checkIn.status === 'SUBMITTED') {
-      //   checkIn.reviewDueDate = (new Date(checkIn.submittedAt), { days: 3 }).toString()
-      // } else if (checkIn.status === 'EXPIRED') {
-      //   checkIn.reviewDueDate = (new Date(checkIn.dueDate), { days: 3 }).toString()
-      // }
-      const checkIn: ESupervisionCheckIn = {
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'REVIEWED',
-        dueDate: '2025-11-27',
-        offender: {
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          firstName: 'string',
-          lastName: 'string',
-          status: 'INITIAL',
-          practitioner: 'string',
-          createdAt: '2025-11-27T15:40:42.399Z',
-          checkinInterval: 'WEEKLY',
-        },
-        surveyResponse: {},
-        createdBy: 'string',
-        createdAt: '2025-11-27T15:40:42.399Z',
-        flaggedResponses: ['string'],
-      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+      const checkIn = checkInResponse.checkin
+
       if (checkIn.status === 'REVIEWED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${back}`)
       }
@@ -280,32 +260,13 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
 
-      const checkIn: ESupervisionCheckIn = {
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'REVIEWED',
-        dueDate: '2025-11-27',
-        offender: {
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          firstName: 'Bob',
-          lastName: 'Smith',
-          status: 'INITIAL',
-          practitioner: 'string',
-          createdAt: '2025-11-27T15:40:42.399Z',
-          photoUrl: 'string',
-          checkinInterval: 'WEEKLY',
-        },
-        surveyResponse: {
-          mentalHealth: 'well',
-          assistance: ['thing1', 'thing2'],
-          callback: 'no',
-        },
-        createdBy: 'string',
-        createdAt: '2025-11-27T15:40:42.399Z',
-        videoUrl: 'string',
-        snapshotUrl: 'string',
-        autoIdCheck: 'MATCH',
-        manualIdCheck: 'MATCH',
-        flaggedResponses: ['string'],
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+      const checkIn = checkInResponse.checkin
+
+      if (checkIn.status !== 'REVIEWED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
       }
       return res.render('pages/check-in/view.njk', { crn, id, back, checkIn })
     }

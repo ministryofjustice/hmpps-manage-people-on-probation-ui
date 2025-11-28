@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/esup/checkins/.*",
+        "urlPathPattern": "/esupervision/offender_checkins/.*",
         "method": "GET"
       },
       "response": {
@@ -10,39 +10,25 @@
         "jsonBody": {
           "checkin": {
             "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "status": "CREATED",
+            "status": "REVIEWED",
             "dueDate": "2025-11-27",
             "offender": {
               "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "firstName": "string",
-              "lastName": "string",
-              "crn": "string",
-              "dateOfBirth": "2025-11-27",
+              "firstName": "Bob",
+              "lastName": "Smith",
               "status": "INITIAL",
               "practitioner": "string",
               "createdAt": "2025-11-27T15:40:42.399Z",
-              "email": "string",
-              "phoneNumber": "string",
               "photoUrl": "string",
-              "firstCheckin": "2025-11-27",
-              "checkinInterval": "WEEKLY",
-              "deactivationEntry": {
-                "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-                "comment": "string",
-                "createdAt": "2025-11-27T15:40:42.399Z"
-              }
+              "checkinInterval": "WEEKLY"
             },
-            "submittedAt": "2025-11-27T15:40:42.399Z",
             "surveyResponse": {
-              "additionalProp1": "string",
-              "additionalProp2": "string",
-              "additionalProp3": "string"
+              "mentalHealth": "well",
+              "assistance": ["thing1", "thing2"],
+              "callback": "no"
             },
             "createdBy": "string",
             "createdAt": "2025-11-27T15:40:42.399Z",
-            "reviewedBy": "string",
-            "reviewedAt": "2025-11-27T15:40:42.399Z",
-            "checkinStartedAt": "2025-11-27T15:40:42.399Z",
             "videoUrl": "string",
             "snapshotUrl": "string",
             "autoIdCheck": "MATCH",
@@ -63,6 +49,9 @@
               }
             ]
           }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
         }
       }
     }
