@@ -1,0 +1,33 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/mas/case/.*/probation-practitioner",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "code": "N56A050",
+          "name": {
+            "forename": "Ben",
+            "surname": "Towers"
+          },
+          "provider": {
+            "code": "N56",
+            "name": "East of England"
+          },
+          "team": {
+            "code": "N56DTX",
+            "description": "Default Designated Transfer Team"
+          },
+          "unallocated": false,
+          "username": "BenTowers"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

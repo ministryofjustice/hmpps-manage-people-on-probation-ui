@@ -1,0 +1,111 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/offender_setup/.+?/upload_location",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "locationInfo": {
+            "url": "http://localhost:9091/esupervision/fake-s3-upload",
+            "method": "PUT"
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/fake-s3-upload",
+        "method": "PUT"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8",
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Expose-Headers": "*"
+        }
+      }
+    },
+
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/fake-s3-upload",
+        "method": "OPTIONS"
+      },
+      "response": {
+        "status": 204,
+        "headers": {
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Methods": "PUT, OPTIONS",
+          "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Requested-With",
+          "Access-Control-Max-Age": "600"
+        }
+      }
+    },
+
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/offender_setup",
+        "method": "POST"
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "locationInfo": {
+            "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afz9",
+            "practitioner": "AUTH_USER",
+            "createdAt": "2025-01-13T15:28:37.920581Z"
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/offender_setup500",
+        "method": "POST"
+      },
+      "response": {
+        "status": 500,
+        "jsonBody": {
+          "status": 500,
+          "errorCode": null,
+          "userMessage": "500 internal server error",
+          "developerMessage": "500 internal server error",
+          "moreInfo": null
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/offender_setup422",
+        "method": "POST"
+      },
+      "response": {
+        "status": 422,
+        "jsonBody": {
+          "status": 422,
+          "errorCode": null,
+          "userMessage": "422 BAD_REQUEST contact information",
+          "developerMessage": "422 BAD_REQUEST contact information",
+          "message": "contact information",
+          "moreInfo": null
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    }
+  ]
+}
