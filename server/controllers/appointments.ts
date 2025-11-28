@@ -300,6 +300,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { notes, sensitive } = req.body
+      const file = req.file as Express.Multer.File
       const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -313,7 +314,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         body.outcomeRecorded = true
         delete req.session.data.appointments[crn][id].outcomeRecorded
       }
-      await masClient.patchAppointment(body)
+
+      await Promise.all([masClient.patchAppointment(body), masClient.patchDocuments(crn, id, file)])
+
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
