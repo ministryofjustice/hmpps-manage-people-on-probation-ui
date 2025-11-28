@@ -21,7 +21,7 @@ export interface ESupervisionCheckIn {
   dueDate: string
   offender: ESupervisionOffender
   submittedAt?: string
-  // surveyResponse
+  surveyResponse: any
   createdBy: string
   createdAt: string
   reviewedBy?: string

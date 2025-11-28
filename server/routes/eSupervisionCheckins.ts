@@ -84,4 +84,6 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   ])
 
   router.get('/case/:crn/appointments/:id/check-in/update', [controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)])
+
+  router.get('/case/:crn/appointments/:id/check-in/view', [controllers.checkIns.getViewCheckIn(hmppsAuthClient)])
 }

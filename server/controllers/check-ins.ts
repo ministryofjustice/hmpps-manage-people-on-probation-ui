@@ -7,6 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import { HmppsAuthClient } from '../data'
 import supervisionAppointmentClient from '../../wiremock/stubs/supervisionAppointmentClient'
+import { ESupervisionCheckIn } from '../data/model/esupervision'
 
 const routes = [
   'getIntroPage',
@@ -24,6 +25,7 @@ const routes = [
   'postPhotoRulesPage',
   'getPhotoRulesPage',
   'getUpdateCheckIn',
+  'getViewCheckIn',
 ] as const
 
 const checkInsController: Controller<typeof routes, void> = {
@@ -220,10 +222,12 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getUpdateCheckIn: hmppsAuthClient => {
     return async (req, res) => {
+      console.log('HERE')
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const { back } = req.query
 
       // const { checkIn } = await esupervision.getCheckin(id) //not available yet
       // checkIn.dueDate = (new Date(checkIn.dueDate), { days: 3 }).toString()
@@ -232,9 +236,100 @@ const checkInsController: Controller<typeof routes, void> = {
       // } else if (checkIn.status === 'EXPIRED') {
       //   checkIn.reviewDueDate = (new Date(checkIn.dueDate), { days: 3 }).toString()
       // }
+      const checkIn: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'REVIEWED',
+        dueDate: '2025-11-27',
+        offender: {
+          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          firstName: 'string',
+          lastName: 'string',
+          crn: 'string',
+          dateOfBirth: '2025-11-27',
+          status: 'INITIAL',
+          practitioner: 'string',
+          createdAt: '2025-11-27T15:40:42.399Z',
+          email: 'string',
+          phoneNumber: 'string',
+          photoUrl: 'string',
+          firstCheckin: '2025-11-27',
+          checkinInterval: 'WEEKLY',
+        },
+        submittedAt: '2025-11-27T15:40:42.399Z',
+        surveyResponse: {
+          additionalProp1: 'string',
+          additionalProp2: 'string',
+          additionalProp3: 'string',
+        },
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        reviewedBy: 'string',
+        reviewedAt: '2025-11-27T15:40:42.399Z',
+        checkinStartedAt: '2025-11-27T15:40:42.399Z',
+        videoUrl: 'string',
+        snapshotUrl: 'string',
+        autoIdCheck: 'MATCH',
+        manualIdCheck: 'MATCH',
+        flaggedResponses: ['string'],
+      }
+      if (checkIn.status === 'REVIEWED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${back}`)
+      }
+      if (checkIn.status === 'SUBMITTED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/identity?back=${back}`)
+      }
+      if (checkIn.status === 'EXPIRED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/expired?back=${back}`)
+      }
+      return renderError(404)(req, res)
+    }
+  },
 
-      // return res.render('pages/check-in/update.njk', { crn, id, checkIn })
-      return res.render('')
+  getViewCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+
+      const checkIn: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'REVIEWED',
+        dueDate: '2025-11-27',
+        offender: {
+          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          firstName: 'Bob',
+          lastName: 'Smith',
+          crn: 'string',
+          dateOfBirth: '2025-11-27',
+          status: 'INITIAL',
+          practitioner: 'string',
+          createdAt: '2025-11-27T15:40:42.399Z',
+          email: 'string',
+          phoneNumber: 'string',
+          photoUrl: 'string',
+          firstCheckin: '2025-11-27',
+          checkinInterval: 'WEEKLY',
+        },
+        submittedAt: '2025-11-27T15:40:42.399Z',
+        surveyResponse: {
+          mentalHealth: 'well',
+          assistance: ['thing1', 'thing2'],
+          callback: 'no',
+        },
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        reviewedBy: 'string',
+        reviewedAt: '2025-11-27T15:40:42.399Z',
+        checkinStartedAt: '2025-11-27T15:40:42.399Z',
+        videoUrl: 'string',
+        snapshotUrl: 'string',
+        autoIdCheck: 'MATCH',
+        manualIdCheck: 'MATCH',
+        flaggedResponses: ['string'],
+      }
+      return res.render('pages/check-in/view.njk', { crn, id, back, checkIn })
     }
   },
 }
