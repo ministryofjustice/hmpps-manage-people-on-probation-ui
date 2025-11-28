@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '../utils'
+import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -39,6 +39,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       sensitivity,
       until: untilDate,
       visorReport,
+      outcomeRecorded,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const body: AppointmentRequestBody = {
       user: {
@@ -66,6 +67,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
     if (licenceConditionId) {
       body.licenceConditionId = parseInt(licenceConditionId as string, 10)
+    }
+    if (outcomeRecorded) {
+      body.outcomeRecorded = outcomeRecorded === 'Yes'
     }
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)

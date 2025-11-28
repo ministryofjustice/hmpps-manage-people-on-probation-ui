@@ -136,6 +136,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
+  njkEnv.addFilter('merge', (obj, other) => ({ ...obj, ...other }))
   njkEnv.addFilter('shortTime', shortTime)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
