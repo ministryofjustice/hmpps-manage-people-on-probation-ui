@@ -1,10 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import { CheckinUserDetails } from '../models/ESupervision'
+import { postCheckInDetails } from '../middleware/postCheckInDetails'
+import logger from '../../logger'
 
 const routes = [
   'getIntroPage',
@@ -19,9 +22,25 @@ const routes = [
   'postPhotoOptionsPage',
   'getTakePhotoPage',
   'getUploadPhotoPage',
-  'postPhotoRulesPage',
+  'postUploadaPhotoPage',
   'getPhotoRulesPage',
+  'postPhotoRulesPage',
+  'getCheckinSummaryPage',
+  'postCheckinSummaryPage',
+  'getConfirmationPage',
 ] as const
+
+interface OptionPair {
+  id: string
+  label: string
+}
+
+const checkinIntervals: OptionPair[] = [
+  { id: 'WEEKLY', label: 'Every week' },
+  { id: 'TWO_WEEKS', label: 'Every 2 weeks' },
+  { id: 'FOUR_WEEKS', label: 'Every 4 weeks' },
+  { id: 'EIGHT_WEEKS', label: 'Every 8 weeks' },
+]
 
 const checkInsController: Controller<typeof routes, void> = {
   getIntroPage: hmppsAuthClient => {
@@ -195,7 +214,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  postPhotoRulesPage: hmppsAuthClient => {
+  postUploadaPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -212,6 +231,67 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       return res.render('pages/check-in/photo-rules.njk', { crn, id })
+    }
+  },
+  postPhotoRulesPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/checkin-summary`)
+    }
+  },
+  getCheckinSummaryPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const userDetails: CheckinUserDetails = {
+        ...savedUserDetails,
+        uuid: id,
+        interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
+        preferredComs: savedUserDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
+        photoUploadOption:
+          savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
+      }
+      return res.render('pages/check-in/checkin-summary.njk', { crn, id, userDetails })
+    }
+  },
+
+  postCheckinSummaryPage: hmppsAuthClient => {
+    return async (req, res) => {
+      try {
+        const { setup, uploadLocation } = await postCheckInDetails(hmppsAuthClient)(req, res)
+        const responseBody = { status: 'SUCCESS', message: 'Registration complete', setup, uploadLocation }
+        res.json(responseBody)
+        logger.info('Check-in registration successful')
+      } catch (e) {
+        const statusCode = e?.data?.status || 500
+        res.status(statusCode).json({ status: 'ERROR', message: e?.data?.userMessage || e?.message || 'Unknown error' })
+      }
+    }
+  },
+
+  getConfirmationPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const userDetails: CheckinUserDetails = {
+        ...savedUserDetails,
+        uuid: id,
+        interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
+        displayCommsOption:
+          savedUserDetails.preferredComs === 'EMAIL' ? savedUserDetails.checkInEmail : savedUserDetails.checkInMobile,
+        displayDay: dayOfWeek(DateTime.fromFormat(savedUserDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
+      }
+      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
     }
   },
 }

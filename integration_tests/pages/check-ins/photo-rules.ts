@@ -5,9 +5,7 @@ export default class PhotoRulesPage extends Page {
     super('Does this photo meet the rules?')
   }
 
-  getPhotoOptions = () => {
-    return cy.get(`[data-qa="uploadOptions"]`)
-  }
+  getAnotherPicBtn = (): PageElement => cy.get('[data-qa="anotherPhotoBtn"]')
 
   getBackLink = (): PageElement => cy.get('.govuk-back-link')
 }
