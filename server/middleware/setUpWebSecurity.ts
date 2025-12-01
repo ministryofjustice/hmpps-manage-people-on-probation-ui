@@ -42,8 +42,8 @@ export default function setUpWebSecurity(): Router {
               '*.applicationinsights.azure.com/v2/track',
               'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
               // This is required for the S3 bucket to upload checkin images
-              // 'https://*.s3.eu-west-2.amazonaws.com',
-              'https://cloud-platform-d45760bf4de1d1fa391e43417b29b7e1.s3.eu-west-2.amazonaws.com',
+              // (either have a custom domain or each environment or use the default wild card domain)
+              'https://*.s3.eu-west-2.amazonaws.com',
             ]
             // Allow localhost for local development only
             if (config.env === 'local') {
