@@ -698,12 +698,7 @@ describe('checkInsController', () => {
         setup: { id: 'setup-1' },
         uploadLocation: 's3://bucket/key',
       })
-      expect(logger.info).toHaveBeenCalledWith('Check-in registration response', {
-        status: 'SUCCESS',
-        message: 'Registration complete',
-        setup: { id: 'setup-1' },
-        uploadLocation: 's3://bucket/key',
-      })
+      expect(logger.info).toHaveBeenCalledWith('Check-in registration successful')
     })
   })
 

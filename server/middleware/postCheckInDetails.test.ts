@@ -133,20 +133,23 @@ describe('postCheckInDetails', () => {
     expect(calledWith.practitionerId).toBe(username)
   })
 
-  it('handles error from ESupervisionClient and responds with status and message', async () => {
+  it('throws error when ESupervisionClient.postOffenderSetup fails (no res.status/json)', async () => {
     const { req, res } = buildReqRes()
 
     jest.spyOn(MasApiClient.prototype, 'getProbationPractitioner').mockResolvedValue({ username: 'pp-user' } as any)
 
-    const error = Object.assign(new Error('boom'), { data: { status: 400, userMessage: 'Bad request' } })
+    const error = Object.assign(new Error('registration failure'), {
+      data: { status: 400, userMessage: 'Bad request' },
+    })
 
     jest.spyOn(ESupervisionClient.prototype, 'postOffenderSetup').mockRejectedValue(error as any)
-    jest.spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation').mockResolvedValue({} as any)
+    const getProfilePhotoUploadLocation = jest.spyOn(ESupervisionClient.prototype, 'getProfilePhotoUploadLocation')
 
     const handler = postCheckInDetails(hmppsAuthClient)
 
     await expect(handler(req, res)).rejects.toBe(error)
-    expect(res.status).toHaveBeenCalledWith(400)
-    expect(res.json).toHaveBeenCalledWith({ status: 'ERROR', message: 'Bad request' })
+    expect(res.status).not.toHaveBeenCalled()
+    expect(res.json).not.toHaveBeenCalled()
+    expect(getProfilePhotoUploadLocation).not.toHaveBeenCalled()
   })
 })

@@ -47,8 +47,7 @@ export const postCheckInDetails = (
       return { setup, uploadLocation }
     } catch (error) {
       const statusCode = error?.data?.status || 500
-      logger.error(`locationInfo statusCode${statusCode}`)
-      res.status(statusCode).json({ status: 'ERROR', message: error?.data?.userMessage || error.message })
+      logger.error(`locationInfo statusCode : ${statusCode}`)
       // Re-throw to allow upstream handlers to decide if they want to stop further processing
       throw error
     }
