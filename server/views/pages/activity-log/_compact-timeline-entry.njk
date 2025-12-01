@@ -2,7 +2,13 @@
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
-{% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?' + queryParams + '&back=' + baseUrl if entry.isAppointment else '/case/' + crn + '/activity/' + entry.id + '?' + queryParams %}
+
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+{% if entry.isAppointment %}
+      {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+{% elif entry.isEsupervision %}
+      {% set link = '/case/' + crn + '/check-in/' + entry.EsupervisionId + '/manage?back=' + url %}
+{% endif %}
 
 {% set titleHtml %}
 <p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
@@ -20,7 +26,7 @@
             <span class="govuk-visually-hidden"> on {{ thisDate }}
             </a>
             {% if entry.isEsupervision and flags.enableESuperVision  %}
-                  <br/><a href="/case/{{ crn }}/checkin/{{ entry.EsupervisionId }}?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
+                  <br/><a href="{{ link }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
             {% elif shouldPromptToRecordAnOutcome %}
                   <br/>{% include './_log-outcome-link.njk' %}
             {% endif %}

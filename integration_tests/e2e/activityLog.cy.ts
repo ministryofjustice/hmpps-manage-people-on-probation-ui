@@ -626,4 +626,12 @@ context('Contacts', () => {
     page.getBackLink().click()
     checkDefaultViewPersists()
   })
+  it('link to checkin page should be correct', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getDateFromInput().type('11/2/2023')
+    page.getDateToInput().type('11/2/2023')
+    page.getApplyFiltersButton().click()
+    cy.get('[data-qa="timeline11Card"] a').should('have.attr', 'href', '/case/X000001/')
+  })
 })
