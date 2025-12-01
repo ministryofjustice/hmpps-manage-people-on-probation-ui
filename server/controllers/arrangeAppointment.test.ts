@@ -167,6 +167,7 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
     },
     flags: {
       enableRepeatAppointments: true,
+      enablePastAppointments: true,
     },
     user: {
       username,
@@ -506,6 +507,29 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         _maxDate: '31/12/2199',
+        change: undefined,
+        showValidation: false,
+        personRisks: undefined,
+        alertDismissed: false,
+        isInPast: false,
+      })
+    })
+    it('should render the location date and time page if past appointment feature flag is disabled', async () => {
+      const mockReq = createMockRequest({ query: {} })
+      const mockRes = createMockResponse({
+        appointment: { type: { isLocationRequired: false } },
+        flags: {
+          enableRepeatAppointments: true,
+          enablePastAppointments: false,
+        },
+      })
+      await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
+      const mockRenderSpy = jest.spyOn(mockRes, 'render')
+      expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
+        crn,
+        id: uuid,
+        _maxDate: '31/12/2199',
+        _minDate: '1/7/2025',
         change: undefined,
         showValidation: false,
         personRisks: undefined,

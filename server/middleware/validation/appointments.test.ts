@@ -40,6 +40,9 @@ const res = mockAppResponse({
     dateTo: '',
     keywords: '',
   },
+  flags: {
+    enablePastAppointments: true,
+  },
 })
 const next = jest.fn()
 

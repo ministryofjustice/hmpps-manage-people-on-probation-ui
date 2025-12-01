@@ -7,6 +7,8 @@ import {
   isNotEarlierThan,
   isValidCharCount,
   timeIsValid24HourFormat,
+  isTodayOrLater,
+  timeIsNowOrInFuture,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -19,10 +21,11 @@ export interface AppointmentsValidationArgs {
   contactId?: string
   notes?: string
   maxCharCount?: number
+  enablePastAppointments?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, contactId, page, visor, repeatingValue, notes, maxCharCount } = args
+  const { crn, id, contactId, page, visor, repeatingValue, notes, maxCharCount, enablePastAppointments } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -78,6 +81,15 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'The date must not be later than 31/12/2199',
           crossField: `_maxDate`,
         },
+        ...(!enablePastAppointments
+          ? [
+              {
+                validator: isTodayOrLater,
+                msg: 'Date must be today or in the future',
+                log: 'Date must be today or in the future',
+              },
+            ]
+          : []),
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
@@ -94,6 +106,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Enter a time in the 24-hour format, for example 16:30',
           crossField: `[appointments][${crn}][${id}][date]`,
         },
+        ...(!enablePastAppointments
+          ? [
+              {
+                validator: timeIsNowOrInFuture,
+                msg: 'The start time must be now or in the future',
+                log: 'The start time must be now or in the future',
+                crossField: `[appointments][${crn}][${id}][date]`,
+              },
+            ]
+          : []),
       ],
     },
     [`[appointments][${crn}][${id}][end]`]: {
