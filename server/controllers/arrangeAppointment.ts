@@ -26,6 +26,7 @@ import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
 import '../@types/express/index.d'
+import { getMinMaxDates } from '../utils/getMinMaxDates'
 
 const routes = [
   'redirectToSentence',
@@ -248,6 +249,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { change, validation } = req.query
       const showValidation = validation === 'true'
       const isInPast = appointmentDateIsInPast(req)
+      const { enablePastAppointments } = res.locals.flags
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
@@ -270,8 +272,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!locations?.length && appointment.type?.isLocationRequired) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
-      // eslint-disable-next-line no-underscore-dangle
-      const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
+      const { _minDate, _maxDate } = getMinMaxDates()
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personRisks = await masClient.getPersonRiskFlags(crn)
@@ -285,6 +286,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         personRisks,
         isInPast,
         alertDismissed,
+        ...(!enablePastAppointments ? { _minDate } : {}),
       })
     }
   },

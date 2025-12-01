@@ -94,6 +94,7 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'location-date-time',
+          enablePastAppointments: res.locals.flags.enablePastAppointments,
         }),
         { now },
       )

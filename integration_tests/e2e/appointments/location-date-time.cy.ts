@@ -549,4 +549,52 @@ describe('Pick a date, location and time for this appointment', () => {
       cyaPage.checkOnPage()
     })
   })
+  describe('Past appointments feature flag disabled', () => {
+    beforeEach(() => {
+      cy.task('stubDisablePastAppointments')
+      loadPage()
+    })
+    it('disable all past dates in the date picker', () => {
+      locationDateTimePage.getDatePickerToggle().click()
+      if (!yesterdayIsInCurrentMonth) {
+        cy.get('.moj-js-datepicker-prev-month').click()
+      }
+      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).should('have.attr', 'aria-disabled', 'true')
+    })
+    it('should display validation error when past date entered', () => {
+      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
+      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.checkErrorSummaryBox([
+        'Date must be today or in the future',
+        'Enter a start time',
+        'Enter an end time',
+      ])
+    })
+    it('should show validation error if today and start time in the past entered', () => {
+      const mockedTime = DateTime.local().set({
+        hour: 9,
+        minute: 1,
+        second: 0,
+        millisecond: 0,
+      })
+      const mockedNow = mockedTime.toUTC().toISO()
+      cy.request({
+        method: 'POST',
+        url: 'http://localhost:3007/__test/set-mocked-time',
+        body: { time: mockedNow },
+      })
+      cy.clock(DateTime.fromISO(mockedNow).toMillis())
+      locationDateTimePage.getDatePickerInput().clear().type(now.toFormat('d/M/yyyy'))
+      locationDateTimePage.getElementInput(`startTime`).type('08:10')
+      locationDateTimePage.getElementInput(`endTime`).focus().type('08:30')
+      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.checkErrorSummaryBox(['The start time must be now or in the future'])
+    })
+    it('should not display the alert banner when a past appointment is entered', () => {
+      locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
+      locationDateTimePage.getLogOutcomesAlertBanner().should('not.exist')
+    })
+  })
 })

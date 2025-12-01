@@ -75,9 +75,6 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
 
   router.post(
     '/case/:crn/arrange-appointment/:id/add-note',
-    // upload.array('file'),
-    // parseMultipartBody,
-    // cacheUploadedFiles,
     autoStoreSessionData(hmppsAuthClient),
     validate.appointments,
     controllers.arrangeAppointments.postAddNote(),
