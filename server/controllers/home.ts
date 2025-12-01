@@ -15,7 +15,8 @@ const homeController: Controller<typeof routes, void> = {
       const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
         req.host.includes(host),
       )
-      const { url } = req
+      let { url } = req
+      url = encodeURIComponent(url)
       return res.render('pages/homepage/homepage', {
         totalAppointments,
         totalOutcomes,

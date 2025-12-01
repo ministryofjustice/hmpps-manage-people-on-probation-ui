@@ -24,7 +24,11 @@ context('Appointment', () => {
       .upcomingAppointmentAction(1)
       .find('a')
       .should('contain.text', 'Manage')
-      .should('have.attr', 'href', `/case/X000001/appointments/appointment/1/manage?back=/case/X000001/appointments`)
+      .should(
+        'have.attr',
+        'href',
+        `/case/X000001/appointments/appointment/1/manage?back=%2Fcase%2FX000001%2Fappointments`,
+      )
   })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
@@ -71,7 +75,7 @@ context('Appointment', () => {
       '[class="govuk-table__row"]',
       1,
       1,
-      `/case/X000001/appointments/appointment/1/manage?back=/case/X000001/appointments`,
+      `/case/X000001/appointments/appointment/1/manage?back=%2Fcase%2FX000001%2Fappointments`,
     )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url(2))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url(4))
@@ -79,7 +83,7 @@ context('Appointment', () => {
       '[class="govuk-table__row"]',
       5,
       1,
-      `/case/X000001/appointments/appointment/5/manage?back=/case/X000001/appointments`,
+      `/case/X000001/appointments/appointment/5/manage?back=%2Fcase%2FX000001%2Fappointments`,
     )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
