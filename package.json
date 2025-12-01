@@ -147,7 +147,7 @@
     "connect-redis": "9.0.0",
     "csurf": "^1.11.0",
     "dotenv": "^17.2.2",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "express-prom-bundle": "^8.0.0",
     "express-session": "^1.18.1",
     "glob": "^11.0.3",
