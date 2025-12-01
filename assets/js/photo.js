@@ -243,7 +243,6 @@ if (registerButton) {
           'x-csrf-token': document.querySelector('input[name=_csrf]').value,
         },
       })
-      console.log(`Checkin Offender info, status: ${registerResponse.status}`)
 
       if (!registerResponse.ok) {
         const errorText = await registerResponse.text()
@@ -262,15 +261,11 @@ if (registerButton) {
           code: result.code || 'REGISTRATION_FAILED',
         })
       }
-      console.log('Checkin Offender info .Completed')
-      console.log('Image upload process started')
       const image = localStorage.getItem(IMAGE_SESSION_KEY)
       if (!image) {
         console.warn('Image not found in session storage')
         return
       }
-      console.log('image found')
-
       const { url } = result.uploadLocation.locationInfo
       const uploadImageResult = await fetch(url, {
         method: 'PUT',
@@ -287,7 +282,6 @@ if (registerButton) {
           body: uploadError,
         })
       }
-      console.log('Image upload process completed')
       // Success: clear session, set hidden field, and submit form
       localStorage.removeItem(IMAGE_SESSION_KEY)
       document.getElementById('setupId').value = result.setup.uuid
