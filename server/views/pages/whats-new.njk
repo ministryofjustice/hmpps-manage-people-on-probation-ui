@@ -1,0 +1,88 @@
+{% extends "./partials/template.njk" %}
+
+{% block content %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-l">What's new</h1>
+
+            <p class="govuk-body">View highlights of what's new and what's improved for Manage people on probation.</p>
+
+            <p class="govuk-body">
+                If you have any feedback or questions on the service or any of these updates, email
+                <a href="mailto:mpop-digital-team@justice.gov.uk" class="govuk-link">mpop-digital-team@justice.gov.uk</a>.
+            </p>
+
+            {% set updates = [
+                {
+                    date: "31 October 2025",
+                    title: "View all outcomes to log on one page and other service improvements",
+                    content: '
+        <p class="govuk-body"><strong>View all outcomes to log on one page</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>The "You need to record an outcome for xx appointments" link now goes to a page that lists every appointment without an outcome, so you can view them quicker.</li>
+        </ul>
+
+        <p class="govuk-body"><strong>Manage appointments in this service</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>You can use Manage people on probation (MPOP) to manage appointments arranged in this service, with a bug fix stopping those links from going to NDelius.</li>
+        </ul>
+        <p class="govuk-body">Thanks to our users at Harrow and Barnet PDU for this feedback. If you have any ideas or comments, we\'d love to hear via <a href="mailto:mpop-digital-team@justice.gov.uk" class="govuk-link">mpop-digital-team@justice.gov.uk</a>.</p>
+
+        <p class="govuk-body"><strong>NDelius Risk flags</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>The risk flags now display the same data as on NDelius, correcting a bug where risk showed as high instead of medium or low "risk to staff".</li>
+        </ul>
+
+        <p class="govuk-body"><strong>Adding and viewing notes</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>To save you a click, you can now add notes right after selecting that a person on probation attended and complied. This change means you do not return to the appointment details page to adding notes.</li>
+          <li>You can now read a long note in a dedicated page, thanks to a bug fix.</li>
+        </ul>
+
+        <p class="govuk-body"><strong>Clearer signposting between NDelius and MPOP</strong></p>
+        <ul class="govuk-list govuk-list--bullet">
+          <li>We\'ve made it easier for you to see which service an appointment was created on. NDelius-created appointments now display "Manage on NDelius" links on the "Appointments" page, and on the "Activity log" page for appointments without outcomes.</li>
+        </ul>
+      '
+                },
+                {
+                    date: "23 September 2025",
+                    title: "Welcome to Manage people on probation",
+                    content: '
+        <p class="govuk-body">Welcome to our first update since we launched to our first private beta users on 23 September 2025.</p>
+        <p class="govuk-body">This update includes:</p>
+        <ul class="govuk-list govuk-list--bullet">
+            <li>Initial dashboard view of appointments and outcomes.</li>
+            <li>Search functionality for people on probation.</li>
+            <li>Links to related services like NDelius and Create and vary a licence.</li>
+        </ul>
+      '
+                }
+            ] %}
+
+            {#
+            MOJ/GDS Accordion component
+            The first item is expanded by default (newest update)
+            #}
+            {{ govukAccordion({
+                id: "whats-new-updates",
+                items: updates | map(update => ({
+                    heading: {
+                        html: update.title
+                    },
+                    summary: {
+                        text: update.date
+                    },
+                    content: {
+                        html: update.content
+                    },
+                    expanded: loop.index === 1
+                }))
+            }) }}
+
+        </div>
+
+
+    </div>
+{% endblock %}
