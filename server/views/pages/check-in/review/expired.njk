@@ -14,17 +14,17 @@
         <p class="govuk-body">This information will be added to the contact.</p>
 
         <h2 class="govuk-heading-m">Why did {{checkIn.offender.firstName}} not complete their check in?</h2>
-        {{ govukCharacterCount({
-            hint: {
-                text: "For example, the person did not have access to a device."
-            },
-            rows: '10',
-            maxlength: maxCharCount,
-            formGroup: {
-                attributes: { "data-qa": "notes"}
-            }
-        }) }}
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukCharacterCount({
+                hint: {
+                    text: "For example, the person did not have access to a device."
+                },
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
             <div class="govuk-button-group">
                 {{ govukButton({
                 html: "Complete review",

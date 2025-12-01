@@ -49,43 +49,43 @@
         </dl>
 
         <h2 class="govuk-heading-m">What information do you want to add?</h2>
-        {{ govukCharacterCount({
-            hint: {
-                text: "This information will be added to the contact"
-            },
-            rows: '10',
-            maxlength: maxCharCount,
-            formGroup: {
-                attributes: { "data-qa": "notes"}
-            }
-        }) }}
-
-        {{ govukRadios({
-            fieldset: {
-                legend: {
-                    text: 'Did the check in help you with risk management? (optional)',
-                    classes: "govuk-label--m govuk-!-font-weight-bold",
-                    hint: 'This information is only used to help us learn about how you use this system.'
-                }
-            },
-            formGroup: {
-                attributes: {
-                    'data-qa': 'riskManagement'
-                }
-            },
-            items: [
-                {
-                    value: true,
-                    text: "Yes"
-                },
-                {
-                    value: false,
-                    text: "No"
-                }
-            ]
-        } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'helpedManage'])) }}
-
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukCharacterCount({
+                hint: {
+                    text: "This information will be added to the contact"
+                },
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
+
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: 'Did the check in help you with risk management? (optional)',
+                        classes: "govuk-label--m govuk-!-font-weight-bold",
+                        hint: 'This information is only used to help us learn about how you use this system.'
+                    }
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'riskManagement'
+                    }
+                },
+                items: [
+                    {
+                        value: true,
+                        text: "Yes"
+                    },
+                    {
+                        value: false,
+                        text: "No"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'helpedManage'])) }}
+
             <div class="govuk-button-group">
                 {{ govukButton({
                 html: "Confirm review",

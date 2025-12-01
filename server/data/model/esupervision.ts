@@ -84,3 +84,9 @@ export interface LocationInfo {
   contentType: string
   duration: string
 }
+
+export interface ESupervisionReview {
+  practitioner?: string
+  manualIdCheck: string // MATCH, NO_MATCH
+  missedCheckinComment: string
+}

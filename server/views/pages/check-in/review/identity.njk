@@ -61,31 +61,31 @@
             </div>
         </dl>
 
-        {{ govukRadios({
-            fieldset: {
-                legend: {
-                    text: 'Is the person in the video ' + checkIn.offender.firstName,
-                    classes: "govuk-label--m govuk-!-font-weight-bold"
-                }
-            },
-            formGroup: {
-                attributes: {
-                    'data-qa': 'confirmIdentity'
-                }
-            },
-            items: [
-                {
-                    value: true,
-                    text: "Yes"
-                },
-                {
-                    value: false,
-                    text: "No"
-                }
-            ]
-        } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'confirmIdentity'])) }}
-
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: 'Is the person in the video ' + checkIn.offender.firstName,
+                        classes: "govuk-label--m govuk-!-font-weight-bold"
+                    }
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'confirmIdentity'
+                    }
+                },
+                items: [
+                    {
+                        value: true,
+                        text: "Yes"
+                    },
+                    {
+                        value: false,
+                        text: "No"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'manualIdCheck'])) }}
+
             <div class="govuk-button-group">
                 {{ govukButton({
                 html: "Confirm and review responses",

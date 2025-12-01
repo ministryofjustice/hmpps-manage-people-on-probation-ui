@@ -7,7 +7,7 @@ import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import { HmppsAuthClient } from '../data'
 import supervisionAppointmentClient from '../../wiremock/stubs/supervisionAppointmentClient'
-import { ESupervisionCheckIn } from '../data/model/esupervision'
+import { ESupervisionCheckIn, ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 
 const routes = [
@@ -280,23 +280,13 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
 
-      const checkIn: ESupervisionCheckIn = {
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'EXPIRED',
-        dueDate: '2025-11-27',
-        offender: {
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          firstName: 'Bob',
-          lastName: 'Smith',
-          status: 'INITIAL',
-          practitioner: 'string',
-          createdAt: '2025-11-27T15:40:42.399Z',
-          checkinInterval: 'WEEKLY',
-        },
-        surveyResponse: {},
-        createdBy: 'string',
-        createdAt: '2025-11-27T15:40:42.399Z',
-        flaggedResponses: ['string'],
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+      const checkIn = checkInResponse.checkin
+
+      if (checkIn.status !== 'EXPIRED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
       }
       return res.render('pages/check-in/review/expired.njk', { crn, id, back, checkIn })
     }
@@ -310,28 +300,13 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
 
-      const checkIn: ESupervisionCheckIn = {
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'SUBMITTED',
-        dueDate: '2025-11-27',
-        offender: {
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          firstName: 'Bob',
-          lastName: 'Smith',
-          status: 'INITIAL',
-          practitioner: 'string',
-          createdAt: '2025-11-27T15:40:42.399Z',
-          photoUrl: 'string',
-          checkinInterval: 'WEEKLY',
-        },
-        surveyResponse: {},
-        createdBy: 'string',
-        createdAt: '2025-11-27T15:40:42.399Z',
-        submittedAt: '2025-11-27T15:40:42.399Z',
-        videoUrl: 'string',
-        snapshotUrl: 'string',
-        autoIdCheck: 'MATCH',
-        flaggedResponses: ['string'],
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+      const checkIn = checkInResponse.checkin
+
+      if (checkIn.status !== 'SUBMITTED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
       }
       return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn })
     }
@@ -343,8 +318,9 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/notes`)
+      let { url } = req
+      url = encodeURIComponent(url)
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/notes?back=${url}`)
     }
   },
 
@@ -355,33 +331,19 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { back } = req.query
+      const { data } = req.session
+      const checkInSession = getDataValue(data, ['esupervision', crn, id, 'checkins'])
+      if (checkInSession?.manualIdCheck === undefined) {
+        return res.redirect(back ? (back as string) : `/case/${crn}/appointments/${id}/check-in/review/identity`)
+      }
 
-      const checkIn: ESupervisionCheckIn = {
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        status: 'SUBMITTED',
-        dueDate: '2025-11-27',
-        offender: {
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          firstName: 'Bob',
-          lastName: 'Smith',
-          status: 'INITIAL',
-          practitioner: 'string',
-          createdAt: '2025-11-27T15:40:42.399Z',
-          photoUrl: 'string',
-          checkinInterval: 'WEEKLY',
-        },
-        surveyResponse: {
-          mentalHealth: 'well',
-          assistance: ['thing1', 'thing2'],
-          callback: 'no',
-        },
-        createdBy: 'string',
-        createdAt: '2025-11-27T15:40:42.399Z',
-        submittedAt: '2025-11-27T15:40:42.399Z',
-        videoUrl: 'string',
-        snapshotUrl: 'string',
-        autoIdCheck: 'MATCH',
-        flaggedResponses: ['string'],
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+      const checkIn = checkInResponse.checkin
+
+      if (checkIn.status !== 'SUBMITTED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
       }
       return res.render('pages/check-in/review/notes.njk', { crn, id, back, checkIn })
     }
@@ -393,8 +355,23 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      let { url } = req
+      url = encodeURIComponent(url)
 
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/view`)
+      const { data } = req.session
+      const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
+
+      const review: ESupervisionReview = {
+        practitioner: res.locals.user.username,
+        manualIdCheck: checkIn.manualIdCheck,
+        missedCheckinComment: checkIn.note,
+      }
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      await eSupervisionClient.postOffenderCheckInReview(id, review)
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${url}`)
     }
   },
 }
