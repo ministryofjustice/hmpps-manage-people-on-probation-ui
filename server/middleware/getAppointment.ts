@@ -82,15 +82,36 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
       const users: User[] = getDataValue(data, ['staff', loggedInUsername])
+      let selectedRegion = ''
+      let selectedTeam = ''
+      let selectedUser = ''
+      if (providerCode && providers) {
+        selectedRegion = providers.find(r => r.code === providerCode)?.name
+        if (!selectedRegion) {
+          const { providers: attendingUserProviders } = await masClient.getUserProviders(staffId)
+          selectedRegion = attendingUserProviders.find(provider => provider.code === providerCode)?.name
+        }
+      }
+      if (teamCode && teams) {
+        selectedTeam = teams.find(team => team.code === teamCode)?.description
+        if (!selectedTeam) {
+          const { teams: attendingUserTeams } = await masClient.getUserProviders(staffId)
+          selectedTeam = attendingUserTeams.find(team => team.code === teamCode)?.description
+        }
+      }
+      if (!selectedRegion) selectedRegion = res.locals.defaultUser.homeArea
+      if (!selectedTeam) selectedTeam = res.locals.defaultUser.team
+      if (staffId && users) {
+        selectedUser = users.find(user => user.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
+        if (!selectedUser) {
+          selectedRegion = res.locals.defaultUser.homeArea
+          selectedTeam = res.locals.defaultUser.team
+          selectedUser = users.find(
+            user => user.username.toLowerCase() === res.locals.defaultUser.username,
+          )?.nameAndRole
+        }
+      }
 
-      const selectedRegion =
-        providerCode && providers ? providers.find(r => r.code === providerCode)?.name : res.locals.defaultUser.homeArea
-      const selectedTeam =
-        teamCode && teams ? teams.find(team => team.code === teamCode)?.description : res.locals.defaultUser.team
-      const selectedUser =
-        staffId && users
-          ? users.find(user => user.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
-          : res.locals.defaultUser.username
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {
@@ -129,6 +150,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
     }
     res.locals.appointment = appointment
+    // console.dir(appointment, { depth: null })
     return next()
   }
 }
