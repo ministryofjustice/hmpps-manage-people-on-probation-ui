@@ -110,6 +110,19 @@ export interface UserProviders {
   users: User[]
 }
 
+export interface ProbationPractitioner {
+  code: string
+  provider: Provider
+  team: Team
+  name: {
+    forename: string
+    middleName: string
+    surname: string
+  }
+  unallocated: boolean
+  username?: string
+}
+
 export interface UserLocations {
   name: {
     forename: string

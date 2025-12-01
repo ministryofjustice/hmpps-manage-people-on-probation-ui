@@ -21,7 +21,15 @@ import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
 import { PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
-import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
+import {
+  ProbationPractitioner,
+  TeamCaseload,
+  UserAppontment,
+  UserCaseload,
+  UserLocations,
+  UserProviders,
+  UserTeam,
+} from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
@@ -430,5 +438,9 @@ export default class MasApiClient extends RestClient {
       path: '/alerts',
       data: { alertIds },
     })
+  }
+
+  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner | null> {
+    return this.get({ path: `/case/${crn}/probation-practitioner`, handle404: true })
   }
 }
