@@ -264,15 +264,11 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postCheckinSummaryPage: hmppsAuthClient => {
     return async (req, res) => {
-      try {
-        const { setup, uploadLocation } = await postCheckInDetails(hmppsAuthClient)(req, res)
-        const responseBody = { status: 'SUCCESS', message: 'Registration complete', setup, uploadLocation }
-        // Console/log output of the same payload we return to the client
-        logger.info('Check-in registration response', responseBody)
-        res.json(responseBody)
-      } catch (e) {
-        // postCheckInDetails already sent an error response
-      }
+      const { setup, uploadLocation } = await postCheckInDetails(hmppsAuthClient)(req, res)
+      const responseBody = { status: 'SUCCESS', message: 'Registration complete', setup, uploadLocation }
+      // Console/log output of the same payload we return to the client
+      logger.info('Check-in registration response', responseBody)
+      res.json(responseBody)
     }
   },
 

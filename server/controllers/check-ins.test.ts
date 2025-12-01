@@ -705,17 +705,6 @@ describe('checkInsController', () => {
         uploadLocation: 's3://bucket/key',
       })
     })
-
-    it('does not call res.json when middleware throws (error already handled)', async () => {
-      mockPostCheckInDetails.mockImplementationOnce(() => async () => {
-        throw new Error('boom')
-      })
-
-      const req = baseReq()
-      await controllers.checkIns.postCheckinSummaryPage(hmppsAuthClient)(req, res)
-
-      expect(res.json).not.toHaveBeenCalled()
-    })
   })
 
   describe('getConfirmationPage', () => {
