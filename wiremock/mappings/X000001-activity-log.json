@@ -426,7 +426,52 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "isEsupervision": true
+              "isEsupervision": true,
+              "EsupervisionId": "6fa85f64-5717-4562-b3fc-2c963f66afa6"
+            },
+            {
+              "id": 31,
+              "type": "Online check in reviewed",
+              "startDateTime": "2023-02-11T10:15:00.382936Z",
+              "endDateTime": "2023-02-11T10:30:00.382936Z",
+              "isSensitive": false,
+              "hasOutcome": false,
+              "appointmentNotes": [],
+              "officer": {
+                "name": {
+                  "forename": "William",
+                  "surname": "Philips"
+                }
+              },
+              "lastUpdated": "2023-04-20",
+              "lastUpdatedBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "isEsupervision": true,
+              "EsupervisionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+            },
+            {
+              "id": 32,
+              "type": "Online check in expired",
+              "startDateTime": "2023-02-10T10:15:00.382936Z",
+              "endDateTime": "2023-02-10T10:30:00.382936Z",
+              "isSensitive": false,
+              "hasOutcome": false,
+              "appointmentNotes": [],
+              "officer": {
+                "name": {
+                  "forename": "William",
+                  "surname": "Philips"
+                }
+              },
+              "lastUpdated": "2023-04-20",
+              "lastUpdatedBy": {
+                "forename": "Paul",
+                "surname": "Smith"
+              },
+              "isEsupervision": true,
+              "EsupervisionId": "5fa85f64-5717-4562-b3fc-2c963f66afa6"
             }
           ]
         },

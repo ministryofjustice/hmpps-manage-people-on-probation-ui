@@ -16,7 +16,7 @@
 
 {% set actionsHtml %}
 {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
-<a href="/case/{{ crn }}/checkin/{{ entry.id }}?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
+<a href="/case/{{ crn }}/checkin/{{ entry.EsupervisionId }}?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
 {% endset %}
 
 {{ appSummaryCard({

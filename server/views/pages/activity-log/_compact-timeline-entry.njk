@@ -20,7 +20,7 @@
             <span class="govuk-visually-hidden"> on {{ thisDate }}
             </a>
             {% if entry.isEsupervision and flags.enableESuperVision  %}
-                  <br/><a href="/case/{{ crn }}/checkin/{{ entry.id }}?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
+                  <br/><a href="/case/{{ crn }}/checkin/{{ entry.EsupervisionId }}?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
             {% elif shouldPromptToRecordAnOutcome %}
                   <br/>{% include './_log-outcome-link.njk' %}
             {% endif %}
