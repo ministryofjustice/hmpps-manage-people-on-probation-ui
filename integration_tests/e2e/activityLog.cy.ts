@@ -636,6 +636,10 @@ context('Contacts', () => {
     page.getDateFromInput().type('11/2/2023')
     page.getDateToInput().type('11/2/2023')
     page.getApplyFiltersButton().click()
-    cy.get('[data-qa="timeline11Card"] a').should('have.attr', 'href', '/case/X000001/')
+    cy.get('[data-qa="timeline11Card"] a').should(
+      'have.attr',
+      'href',
+      '/case/X000001/check-in/6fa85f64-5717-4562-b3fc-2c963f66afa6/update?back=%2Fcase%2FX000001%2Factivity-log',
+    )
   })
 })

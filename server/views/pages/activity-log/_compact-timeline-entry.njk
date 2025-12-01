@@ -7,7 +7,7 @@
 {% if entry.isAppointment %}
       {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
 {% elif entry.isEsupervision %}
-      {% set link = '/case/' + crn + '/check-in/' + entry.EsupervisionId + '/manage?back=' + url %}
+      {% set link = '/case/' + crn + '/check-in/' + entry.EsupervisionId + '/update?back=' + url %}
 {% endif %}
 
 {% set titleHtml %}

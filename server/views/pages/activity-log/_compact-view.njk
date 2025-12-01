@@ -1,5 +1,10 @@
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
-{% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?' + queryParams + '&back=' + baseUrl if entry.isAppointment else '/case/' + crn + '/activity/' + entry.id + '?' + queryParams %}
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+{% if entry.isAppointment %}
+      {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+{% elif entry.isEsupervision %}
+      {% set link = '/case/' + crn + '/check-in/' + entry.EsupervisionId + '/update?back=' + url %}
+{% endif %}
 
 <table class="govuk-table govuk-!-margin-top-4">
   <thead class="govuk-table__head">
