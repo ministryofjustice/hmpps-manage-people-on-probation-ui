@@ -183,8 +183,7 @@
                     {% set currentPage = alertsData.page or 0 %}
                     {% set totalPages = alertsData.totalPages %}
 
-                    {% set sortFragment = sortQueryString | slice(1) if sortQueryString and sortQueryString.length > 0 else '' %}
-                    {% set url = "/alerts?" + sortFragment + ('&' if sortFragment else '') %}
+                    {% set url = "/alerts?" + (('sortBy=' + sortedBy + '&') if sortedBy else '') %}
 
                     {% set paginationItems = [] %}
                     {% set totalLinks = 3 %}
