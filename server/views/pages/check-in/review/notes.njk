@@ -32,6 +32,11 @@
                     How {{ checkIn.offender.firstName }} has been feeling
                 </dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth }}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if 'mentalHealth' in checkIn.flaggedResponses %}
+                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                    {% endif %}
+                </dd>
             </dd>
             </div>
                 <div class="govuk-summary-list__row">
@@ -41,10 +46,20 @@
                         {{ a }}{% if not loop.last %},{% endif %}
                     {% endfor %}
                 </dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if 'assistance' in checkIn.flaggedResponses %}
+                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                    {% endif %}
+                </dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback }}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if 'callback' in checkIn.flaggedResponses %}
+                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                    {% endif %}
+                </dd>
             </div>
         </dl>
 

@@ -28,6 +28,11 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.autoIdCheck == "NO_MATCH" %}
+                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                    {% endif %}
+                </dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Image of {{checkIn.offender.firstName}}</dt>
