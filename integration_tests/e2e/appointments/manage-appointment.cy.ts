@@ -760,7 +760,7 @@ describe('Manage an appointment', () => {
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
-      describe('Complied appointment is in the future', () => {
+      describe('Appointment in future with outcome recorded', () => {
         it('Should not display Reschedule link', () => {
           manageAppointmentPage.getTaskName(1).should('contain.text', name)
           manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
@@ -772,14 +772,14 @@ describe('Manage an appointment', () => {
       })
     })
 
-    describe('Non Complied appointment with future date', () => {
+    describe('Appointment in future with no outcome recorded', () => {
       const name = 'Log attended and complied appointment'
       beforeEach(() => {
         cy.task('stubAppointmentNonCompliedWithFutureDate')
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
-      describe('Non complied appointment is in the future', () => {
+      describe('Appointment in future with no outcome recorded', () => {
         it('should display the reschedule link ', () => {
           manageAppointmentPage.getTaskName(1).should('contain.text', name)
           manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
@@ -798,14 +798,14 @@ describe('Manage an appointment', () => {
       })
     })
 
-    describe('Complied appointment with past date', () => {
+    describe('Appointment in past with outcome recorded', () => {
       const name = 'Log attended and complied appointment'
       beforeEach(() => {
         cy.task('stubAppointmentCompliedWithPastDate')
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
-      describe('Complied appointment is in the past', () => {
+      describe('Appointment in past with outcome recorded', () => {
         it('Should not display Reschedule link', () => {
           manageAppointmentPage.getTaskName(1).should('contain.text', name)
           manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
@@ -817,7 +817,7 @@ describe('Manage an appointment', () => {
       })
     })
 
-    describe('Non Complied appointment with past date', () => {
+    describe('Appointment in past with no outcome recorded', () => {
       const name = 'Log attended and complied appointment'
       beforeEach(() => {
         cy.task('stubAppointmentNonCompliedWithPastDate')
@@ -840,6 +840,17 @@ describe('Manage an appointment', () => {
           const rescheduleAppointmentPage = new RescheduleAppointmentPage()
           rescheduleAppointmentPage.checkOnPage()
         })
+      })
+    })
+    describe('Appointment has no outcome recorded, feature flag is disabled', () => {
+      beforeEach(() => {
+        cy.task('stubDisableRescheduleAppointment')
+        cy.task('stubAppointmentNonCompliedWithPastDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      it('should not display the reschedule link', () => {
+        manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
       })
     })
   })
