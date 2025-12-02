@@ -146,7 +146,7 @@ describe('/controllers/activityLogController', () => {
     it('should request all predictors from the api', () => {
       expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
     })
-    it('should render the activity log page', () => {
+    it('should render the contacts page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
         personActivity: mockActivities,
         baseUrl: '',

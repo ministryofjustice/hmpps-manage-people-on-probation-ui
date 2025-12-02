@@ -419,7 +419,7 @@ describe('validates appointment location and date time page request with spec', 
   })
 })
 
-describe('validates activity log filter request with spec', () => {
+describe('validates contacts filter request with spec', () => {
   const testRequest = {
     dateFrom: '10/4/2025',
     dateTo: '6/4/2025',

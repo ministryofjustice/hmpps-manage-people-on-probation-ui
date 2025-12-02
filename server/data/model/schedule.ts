@@ -77,6 +77,8 @@ export interface Activity {
   eventId?: number
   component?: SentenceComponent
   nsiId?: number
+  isESupervision?: string
+  EsupervisionId?: string
 }
 
 export interface PersonAppointment {
