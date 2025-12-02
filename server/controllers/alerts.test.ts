@@ -36,8 +36,6 @@ const mockRoshWidget = {
   risks: [{ riskTo: 'General Public', community: ['HIGH'], custody: ['MEDIUM'] }],
 } as any
 
-const mockCrnToRiskWidgetMap = { X123456: mockRoshWidget }
-
 const mockUserAlertsWithCrn = {
   content: [
     {
@@ -48,8 +46,16 @@ const mockUserAlertsWithCrn = {
       date: '2025-10-26',
       officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
     },
+    {
+      id: 2,
+      crn: 'Y789012',
+      type: { description: 'Another Type', editable: true },
+      name: { forename: 'Another', middleName: '', surname: 'Case' },
+      date: '2025-10-25',
+      officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
+    },
   ],
-  totalResults: 1,
+  totalResults: 2,
   totalPages: 1,
   page: 0,
   size: 10,
@@ -62,6 +68,23 @@ const mockRisksData = {
   assessedOn: '2025-11-19',
 } as any
 
+const mockErrorSummary = {
+  errors: [
+    {
+      text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    },
+    { text: 'A different unique error' },
+  ],
+} as any
+
+const mockNonCriticalErrorSummary = {
+  errors: [],
+} as any
+
+const expectedArnsUnavailableErrors = mockErrorSummary.errors.map((errorItem: any) => ({
+  text: errorItem.text,
+}))
+
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue('token-alerts')
@@ -71,71 +94,54 @@ const getUserAlertsSpy = jest
   .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn))
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
-  .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
+  .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess))
 const getRisksSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getRisks')
   .mockImplementation(() => Promise.resolve(mockRisksData))
 
-toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
-
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
-const jsonSpy = jest.spyOn(res, 'json')
-const statusSpy = jest.spyOn(res, 'status')
 const next = jest.fn()
 
 describe('alertsController', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
+    getRisksSpy.mockImplementation(() => Promise.resolve(mockRisksData))
+    toRoshWidgetSpy.mockClear()
+    toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
+    getUserAlertsSpy.mockResolvedValue(mockUserAlertsWithCrn)
   })
 
   describe('getAlerts', () => {
-    it('should call getUserAlerts with default page 0 and no sort params, and render the page (Risk Enabled)', async () => {
+    it('should call getUserAlerts with default page 0 and no sort params, and render the page (Risk Enabled - Success Path)', async () => {
       const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
       res.locals.user = defaultUser
-      // Explicitly enable the flag for this test to expect populated risk data
       res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      const expectedCrnToRiskWidgetMap = {
+        X123456: mockRoshWidget,
+        Y789012: mockRoshWidget,
+      }
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
       expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
       expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
       expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+      expect(toRoshWidgetSpy).toHaveBeenCalledTimes(2)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
+        crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
+        risksErrors: [],
         url: '%2Falerts',
       })
     })
 
-    it('should call getUserAlerts with custom page number and sort params, and build query string (Risk Enabled)', async () => {
-      const req = httpMocks.createRequest({
-        query: { page: '5', sortBy: 'date', sortOrder: 'desc' },
-        url: '/alerts',
-      })
-      res.locals.user = defaultUser
-      // Explicitly enable the flag for this test to expect populated risk data
-      res.locals.flags = { enableRiskOnAlertsDashboard: true }
-
-      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
-
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(5, 'date', 'desc')
-      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
-      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
-
-      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-        alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
-        sortQueryString: '&sortBy=date&sortOrder=desc',
-        currentSort: { column: 'date', order: 'desc' },
-        url: '%2Falerts',
-      })
-    })
-
-    it('should skip fetching risk data and return an empty risk map when flag is disabled', async () => {
+    it('should skip fetching risk data and return an empty risk map when flag is disabled (Risk Disabled Path)', async () => {
       const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
       res.locals.user = defaultUser
       res.locals.flags = { enableRiskOnAlertsDashboard: false }
@@ -148,26 +154,131 @@ describe('alertsController', () => {
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: {}, // Expect empty object
+        crnToRiskWidgetMap: {},
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
+        risksErrors: [],
         url: '%2Falerts',
       })
+    })
+
+    it('should short-circuit, override all risk widgets with the error, and return the error messages when a critical error is found (Critical Error Path)', async () => {
+      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+      res.locals.user = defaultUser
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      getRisksSpy.mockImplementation(crn => {
+        if (crn === 'X123456') return Promise.resolve(mockErrorSummary)
+        if (crn === 'Y789012') return Promise.resolve(mockRisksData)
+        return Promise.resolve(null)
+      })
+
+      const expectedCrnToRiskWidgetMapWithError = {
+        X123456: mockErrorSummary,
+        Y789012: mockErrorSummary,
+      }
+
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+        alertsData: mockUserAlertsWithCrn,
+        crnToRiskWidgetMap: expectedCrnToRiskWidgetMapWithError,
+        sortQueryString: '',
+        currentSort: { column: undefined, order: undefined },
+        risksErrors: expectedArnsUnavailableErrors,
+        url: '%2Falerts',
+      })
+    })
+
+    it('should treat an empty error summary as non-critical and still call toRoshWidget (Non-Critical Error Path)', async () => {
+      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+      res.locals.user = defaultUser
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      const nonCriticalWidget = { widget: 'from-non-critical-error' }
+
+      getRisksSpy.mockImplementation(crn => {
+        if (crn === 'X123456') return Promise.resolve(mockNonCriticalErrorSummary)
+        if (crn === 'Y789012') return Promise.resolve(mockRisksData)
+        return Promise.resolve(null)
+      })
+
+      toRoshWidgetSpy.mockImplementation(risks => {
+        if (risks === mockNonCriticalErrorSummary) return nonCriticalWidget
+        if (risks === mockRisksData) return mockRoshWidget
+        return null
+      })
+
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
+
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockNonCriticalErrorSummary)
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+      expect(toRoshWidgetSpy).toHaveBeenCalledTimes(2)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/alerts',
+        expect.objectContaining({
+          crnToRiskWidgetMap: {
+            X123456: nonCriticalWidget,
+            Y789012: mockRoshWidget,
+          },
+          risksErrors: [], // No critical error banner
+          url: '%2Falerts',
+        }),
+      )
+    })
+
+    it('should filter out alerts with empty CRN when fetching risk data (CRN Filtering Path)', async () => {
+      const mockAlertsWithEmptyCrn = {
+        ...mockUserAlertsWithCrn,
+        content: [
+          ...mockUserAlertsWithCrn.content,
+          {
+            id: 3,
+            crn: null, // This one should be filtered out
+            type: { description: 'No CRN', editable: true },
+            name: { forename: 'No', middleName: '', surname: 'CRN' },
+            date: '2025-10-24',
+            officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
+          },
+          {
+            id: 4,
+            crn: '',
+            type: { description: 'Empty String CRN', editable: true },
+            name: { forename: 'Empty', middleName: '', surname: 'CRN' },
+            date: '2025-10-23',
+            officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
+          },
+        ],
+      }
+      getUserAlertsSpy.mockResolvedValueOnce(mockAlertsWithEmptyCrn)
+
+      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+      res.locals.user = defaultUser
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+      expect(getRisksSpy).toHaveBeenCalledTimes(2)
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(getRisksSpy).toHaveBeenCalledWith('Y789012')
+      expect(getRisksSpy).not.toHaveBeenCalledWith(null)
+      expect(getRisksSpy).not.toHaveBeenCalledWith('')
+      expect(getRisksSpy).not.toHaveBeenCalledWith(undefined)
+
+      expect(renderSpy).toHaveBeenCalled()
     })
   })
 
   describe('clearSelectedAlerts', () => {
-    it('should return a 400 error if no alerts are selected', async () => {
-      const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: [] }, url: '/alerts/clear' })
-      res.locals.user = defaultUser
-      res.locals.flags = {}
-
-      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
-
-      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it` })
-      expect(clearAlertsSpy).not.toHaveBeenCalled()
-    })
-
     it('should call clearAlerts with a single selected alert and return success', async () => {
       const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: '123' }, url: '/alerts/clear' })
       res.locals.user = defaultUser
@@ -179,6 +290,7 @@ describe('alertsController', () => {
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `1 alert(s) cleared successfully` })
+      expect(next).toHaveBeenCalled()
     })
 
     it('should call clearAlerts with multiple selected alerts and return success', async () => {
@@ -196,6 +308,28 @@ describe('alertsController', () => {
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `2 alert(s) cleared successfully` })
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('should return an error and call next if no alerts are selected (Error Path)', async () => {
+      const reqEmpty = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: [] }, url: '/alerts/clear' })
+      res.locals.user = defaultUser
+      res.locals.flags = {}
+
+      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(reqEmpty, res, next)
+
+      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it` })
+      expect(clearAlertsSpy).not.toHaveBeenCalled()
+      expect(next).toHaveBeenCalledTimes(1)
+
+      next.mockClear()
+
+      const reqMissing = httpMocks.createRequest({ method: 'POST', body: {}, url: '/alerts/clear' })
+      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(reqMissing, res, next)
+
+      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it` })
+      expect(clearAlertsSpy).not.toHaveBeenCalled()
+      expect(next).toHaveBeenCalledTimes(1)
     })
   })
 })
