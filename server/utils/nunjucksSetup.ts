@@ -73,7 +73,7 @@ import {
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../models/Locals'
-import { splitString } from './split'
+import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
