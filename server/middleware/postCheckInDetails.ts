@@ -3,7 +3,7 @@ import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/eSuperVision'
+import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/esupervision'
 import logger from '../../logger'
 import { ProbationPractitioner } from '../data/model/caseload'
 
