@@ -127,5 +127,4 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     '/case/:crn/appointments/:id/check-in/confirm-end',
     controllers.checkIns.getConfirmationPage(hmppsAuthClient),
   )
-
 }

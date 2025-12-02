@@ -13,7 +13,6 @@ import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
 
-
 const routes = [
   'getIntroPage',
   'getDateFrequencyPage',
