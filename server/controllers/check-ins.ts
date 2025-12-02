@@ -12,6 +12,7 @@ import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
+import config from '../config'
 
 const routes = [
   'getIntroPage',
@@ -284,10 +285,12 @@ const checkInsController: Controller<typeof routes, void> = {
       const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
       const checkIn = checkInResponse.checkin
 
+      const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
+
       if (checkIn.status !== 'REVIEWED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
       }
-      return res.render('pages/check-in/view.njk', { crn, id, back, checkIn })
+      return res.render('pages/check-in/view.njk', { crn, id, back, checkIn, videoLink })
     }
   },
 
