@@ -86,7 +86,7 @@ export interface LocationInfo {
 }
 
 export interface ESupervisionReview {
-  practitioner?: string
-  manualIdCheck: string // MATCH, NO_MATCH
-  missedCheckinComment: string
+  practitioner: string
+  manualIdCheck?: string // MATCH, NO_MATCH
+  missedCheckinComment?: string
 }
