@@ -11,8 +11,7 @@ const alertsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { user } = res.locals
       const { page = '0', sortBy, sortOrder } = req.query as Record<string, string>
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
       const pageNumber = parseInt(page, 10)
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)

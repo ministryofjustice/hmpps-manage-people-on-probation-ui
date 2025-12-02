@@ -95,7 +95,9 @@ context('Contacts', () => {
       cardBody,
       1,
       0,
-      '/case/X000001/appointments/appointment/11/manage/note/1?back=%2Fcase%2FX000001%2Factivity-log',
+      `/case/X000001/appointments/appointment/11/manage/note/1?back=${encodeURIComponent(
+        '/case/X000001/activity-log',
+      )}`,
     )
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
@@ -418,7 +420,7 @@ context('Contacts', () => {
       .should(
         'have.attr',
         'href',
-        '/case/X000001/appointments/appointment/16/manage?back=%2Fcase%2FX000001%2Factivity-log',
+        `/case/X000001/appointments/appointment/16/manage?back=${encodeURIComponent('/case/X000001/activity-log')}`,
       )
 
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
@@ -639,7 +641,9 @@ context('Contacts', () => {
     cy.get('[data-qa="timeline11Card"] a').should(
       'have.attr',
       'href',
-      '/case/X000001/check-in/6fa85f64-5717-4562-b3fc-2c963f66afa6/update?back=%2Fcase%2FX000001%2Factivity-log',
+      `/case/X000001/check-in/6fa85f64-5717-4562-b3fc-2c963f66afa6/update?back=${encodeURIComponent(
+        '/case/X000001/activity-log',
+      )}`,
     )
   })
 })

@@ -27,7 +27,7 @@ context('Appointment', () => {
       .should(
         'have.attr',
         'href',
-        `/case/X000001/appointments/appointment/1/manage?back=%2Fcase%2FX000001%2Fappointments`,
+        `/case/X000001/appointments/appointment/1/manage?back=${encodeURIComponent('/case/X000001/appointments')}`,
       )
   })
   it('Appointments page with upcoming and past appointments is rendered', () => {
@@ -75,7 +75,7 @@ context('Appointment', () => {
       '[class="govuk-table__row"]',
       1,
       1,
-      `/case/X000001/appointments/appointment/1/manage?back=%2Fcase%2FX000001%2Fappointments`,
+      `/case/X000001/appointments/appointment/1/manage?back=${encodeURIComponent('/case/X000001/appointments')}`,
     )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 2, 1, url(2))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 4, 1, url(4))
@@ -83,7 +83,7 @@ context('Appointment', () => {
       '[class="govuk-table__row"]',
       5,
       1,
-      `/case/X000001/appointments/appointment/5/manage?back=%2Fcase%2FX000001%2Fappointments`,
+      `/case/X000001/appointments/appointment/5/manage?back=${encodeURIComponent('/case/X000001/appointments')}`,
     )
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))

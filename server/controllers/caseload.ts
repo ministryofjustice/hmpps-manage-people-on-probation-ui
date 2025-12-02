@@ -52,8 +52,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
       )
       const { filter } = args
 
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
 
       let newCaseload = caseload
       const currentNavSection = 'yourCases'
