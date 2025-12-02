@@ -13,6 +13,7 @@ import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
 import config from '../config'
+import { ProbationPractitioner } from '../data/model/caseload'
 
 const routes = [
   'getIntroPage',
@@ -381,13 +382,17 @@ const checkInsController: Controller<typeof routes, void> = {
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
 
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
+      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+
       const review: ESupervisionReview = {
-        practitioner: res.locals.user.username,
+        practitioner: practitionerId,
         manualIdCheck: checkIn.manualIdCheck,
         missedCheckinComment: checkIn.note,
       }
 
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
 
