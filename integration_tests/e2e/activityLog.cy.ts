@@ -35,7 +35,7 @@ const checkDefaultViewPersists = () => {
   cy.get('.toggle-menu__list-item:nth-of-type(1) span').should('contain.text', 'Default view')
 }
 
-context('Activity log', () => {
+context('Contacts', () => {
   const today = new Date()
   const day = today.getDate()
   const month = today.getMonth() + 1
@@ -47,7 +47,7 @@ context('Activity log', () => {
     const page = new ErrorPage()
     page.checkPageTitle('Page not found')
   })
-  it('should render the activity log results', () => {
+  it('should render the contacts results', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getTimelineCardValue(1, 'enforcement', 'Label').should('contain.text', 'Enforcement')
@@ -68,7 +68,7 @@ context('Activity log', () => {
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.toggle-menu .toggle-menu__list-item:nth-of-type(1)').should('contain.text', 'Default view')
     cy.get('.toggle-menu .toggle-menu__list-item:nth-of-type(2) a').should('contain.text', 'Compact view')
-    cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Filter activity log'))
+    cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Filter contacts'))
     page.getApplyFiltersButton().should('contain.text', 'Apply filters')
     page.getSelectedFiltersBox().should('not.exist')
     cy.get('[data-qa="keywords"]').within(() => cy.get('label').should('contain.text', 'Keywords'))
@@ -95,7 +95,9 @@ context('Activity log', () => {
       cardBody,
       1,
       0,
-      '/case/X000001/appointments/appointment/11/manage/note/1?category=undefined&view=default&requirement=undefined&undefined&page=0&back=/case/X000001/activity-log',
+      `/case/X000001/appointments/appointment/11/manage/note/1?back=${encodeURIComponent(
+        '/case/X000001/activity-log',
+      )}`,
     )
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
@@ -382,7 +384,7 @@ context('Activity log', () => {
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
     cy.get('.govuk-pagination').should('exist')
   })
-  it('Activity log page is rendered in default view', () => {
+  it('Contacts page is rendered in default view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     page.getCardHeader('timeline1').should('contain.text', 'Planned video contact (NS)')
@@ -415,7 +417,11 @@ context('Activity log', () => {
     page
       .getCardHeader('timeline7')
       .find('.app-summary-card__actions a')
-      .should('have.attr', 'href', '/case/X000001/appointments/appointment/16/manage?back=/case/X000001/activity-log')
+      .should(
+        'have.attr',
+        'href',
+        `/case/X000001/appointments/appointment/16/manage?back=${encodeURIComponent('/case/X000001/activity-log')}`,
+      )
 
     page.getCardHeader('timeline8').should('contain.text', 'Initial appointment at 10:15am')
     page.getCardHeader('timeline9').should('contain.text', 'Initial appointment at 10:15am')
@@ -542,7 +548,7 @@ context('Activity log', () => {
     page.getPaginationLink(4).should('contain.text', '5')
     page.getPaginationLink(5).should('contain.text', '6')
   })
-  it('Activity log page is rendered in compact view', () => {
+  it('Contacts page is rendered in compact view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.toggle-menu__list-item:nth-of-type(2) a').click()
@@ -625,5 +631,19 @@ context('Activity log', () => {
     cy.get('[data-qa="timeline1Card"] a').click()
     page.getBackLink().click()
     checkDefaultViewPersists()
+  })
+  it('link to checkin page should be correct', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getDateFromInput().type('11/2/2023')
+    page.getDateToInput().type('11/2/2023')
+    page.getApplyFiltersButton().click()
+    cy.get('[data-qa="timeline11Card"] a').should(
+      'have.attr',
+      'href',
+      `/case/X000001/check-in/6fa85f64-5717-4562-b3fc-2c963f66afa6/update?back=${encodeURIComponent(
+        '/case/X000001/activity-log',
+      )}`,
+    )
   })
 })
