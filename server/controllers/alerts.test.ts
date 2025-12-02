@@ -107,7 +107,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
       })
     })
 
@@ -131,7 +131,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortQueryString: '&sortBy=date&sortOrder=desc',
         currentSort: { column: 'date', order: 'desc' },
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
       })
     })
 
@@ -151,7 +151,7 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: {}, // Expect empty object
         sortQueryString: '',
         currentSort: { column: undefined, order: undefined },
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
       })
     })
   })

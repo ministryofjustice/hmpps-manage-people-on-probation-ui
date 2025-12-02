@@ -2,7 +2,6 @@
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
 {% set appointment = entry %}
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
-
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if entry.isAppointment %}
       {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
@@ -12,8 +11,7 @@
 
 {% set titleHtml %}
 <span class="govuk-heading-s govuk-!-margin-bottom-0">
-  <a href="{{link}}">{{ entry.type | toSentenceCase }} at {{ entry.startDateTime | govukTime }}
-    <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+  <a href="{{link}}">{{ entry.type | toSentenceCase }}</a>
 </span>
 {% endset %}
 
@@ -23,9 +21,7 @@
 
 {% set actionsHtml %}
 {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
-{% if shouldPromptToRecordAnOutcome %}
-  {% include './_log-outcome-link.njk' %}
-{% endif %}
+<a href="{{ link }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
 {% endset %}
 
 {{ appSummaryCard({
