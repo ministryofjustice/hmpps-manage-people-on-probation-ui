@@ -340,8 +340,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/notes?back=${url}`)
     }
   },
@@ -377,8 +376,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
 
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
