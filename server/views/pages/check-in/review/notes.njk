@@ -34,7 +34,7 @@
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth }}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if 'mentalHealth' in checkIn.flaggedResponses %}
-                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
             </dd>
@@ -48,7 +48,7 @@
                 </dd>
                 <dd class="govuk-summary-list__actions">
                     {% if 'assistance' in checkIn.flaggedResponses %}
-                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
             </div>
@@ -57,7 +57,7 @@
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback }}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if 'callback' in checkIn.flaggedResponses %}
-                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
             </div>

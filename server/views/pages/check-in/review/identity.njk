@@ -30,7 +30,7 @@
                 <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if checkIn.autoIdCheck == "NO_MATCH" %}
-                        <span class="govuk-tag govuk-tag--red">Needs attention</span>
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
             </div>
