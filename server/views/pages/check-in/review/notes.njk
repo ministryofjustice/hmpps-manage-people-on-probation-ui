@@ -16,11 +16,11 @@
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Checked in on</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.submittedAt}}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYear(true) }}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Review due</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.dueDate}}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.dueDate | dateWithYear }}</dd>
             </div>
         </dl>
 
@@ -31,7 +31,7 @@
                 <dt class="govuk-summary-list__key">
                     How {{ checkIn.offender.firstName }} has been feeling
                 </dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth }}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if 'mentalHealth' in checkIn.flaggedResponses %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
@@ -54,7 +54,7 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback }}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if 'callback' in checkIn.flaggedResponses %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}

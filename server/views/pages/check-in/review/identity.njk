@@ -14,11 +14,11 @@
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Checked in on</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.submittedAt}}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYear(true) }}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Review due</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.dueDate}}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.dueDate | dateWithYear }}</dd>
             </div>
         </dl>
 

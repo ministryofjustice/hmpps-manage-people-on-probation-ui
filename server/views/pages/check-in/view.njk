@@ -103,20 +103,20 @@
                 <dt class="govuk-summary-list__key">
                     How {{ checkIn.offender.firstName }} is feeling
                 </dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth }}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
             </dd>
             </div>
                 <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Anything they need help with</dt>
                 <dd class="govuk-summary-list__value">
-                {% for a in checkIn.surveyResponse.assistance %}
-                    {{ a }}{% if not loop.last %},{% endif %}
+                {% for a in checkIn.surveyResponse.assistance | split %}
+                    {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}
                 {% endfor %}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Contact with practitioner requested</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback }}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
             </div>
         </dl>
     </div>
