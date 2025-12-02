@@ -4,6 +4,7 @@ import controllers from '../controllers'
 import validate from '../middleware/validation'
 import { autoStoreSessionData } from '../middleware'
 import checkInReview from '../middleware/validation/checkInReview'
+import { getCheckIn } from '../middleware/getCheckIn'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
@@ -84,31 +85,43 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getPhotoRulesPage(hmppsAuthClient),
   ])
 
-  router.get('/case/:crn/appointments/:id/check-in/update', [controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)])
-  router.get('/case/:crn/appointments/:id/check-in/view', [controllers.checkIns.getViewCheckIn(hmppsAuthClient)])
+  router.get('/case/:crn/appointments/:id/check-in/update', [
+    getCheckIn(hmppsAuthClient),
+    controllers.checkIns.getUpdateCheckIn(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/:id/check-in/view', [
+    getCheckIn(hmppsAuthClient),
+    controllers.checkIns.getViewCheckIn(hmppsAuthClient),
+  ])
   router.get('/case/:crn/appointments/:id/check-in/review/expired', [
+    getCheckIn(hmppsAuthClient),
     controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/:id/check-in/review/expired', [
     autoStoreSessionData(hmppsAuthClient),
-    validate.checkInReview(hmppsAuthClient),
+    getCheckIn(hmppsAuthClient),
+    validate.checkInReview,
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
 
   router.get('/case/:crn/appointments/:id/check-in/review/identity', [
+    getCheckIn(hmppsAuthClient),
     controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/:id/check-in/review/identity', [
     autoStoreSessionData(hmppsAuthClient),
-    validate.checkInReview(hmppsAuthClient),
+    getCheckIn(hmppsAuthClient),
+    validate.checkInReview,
     controllers.checkIns.postReviewIdentityCheckIn(hmppsAuthClient),
   ])
   router.get('/case/:crn/appointments/:id/check-in/review/notes', [
+    getCheckIn(hmppsAuthClient),
     controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/:id/check-in/review/notes', [
     autoStoreSessionData(hmppsAuthClient),
-    validate.checkInReview(hmppsAuthClient),
+    getCheckIn(hmppsAuthClient),
+    validate.checkInReview,
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
 

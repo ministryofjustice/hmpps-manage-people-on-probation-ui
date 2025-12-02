@@ -255,10 +255,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
 
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const eSupervisionClient = new ESupervisionClient(token)
-      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
-      const checkIn = checkInResponse.checkin
+      const { checkIn } = res.locals
 
       if (checkIn.status === 'REVIEWED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${back}`)
@@ -281,10 +278,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
 
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const eSupervisionClient = new ESupervisionClient(token)
-      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
-      const checkIn = checkInResponse.checkin
+      const { checkIn } = res.locals
 
       const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
 
@@ -302,11 +296,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { back } = req.query
-
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const eSupervisionClient = new ESupervisionClient(token)
-      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
-      const checkIn = checkInResponse.checkin
+      const { checkIn } = res.locals
 
       if (checkIn.status !== 'EXPIRED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
@@ -322,11 +312,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { back } = req.query
-
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const eSupervisionClient = new ESupervisionClient(token)
-      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
-      const checkIn = checkInResponse.checkin
+      const { checkIn } = res.locals
 
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
@@ -349,6 +335,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getReviewNotesCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { checkIn } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -358,11 +345,6 @@ const checkInsController: Controller<typeof routes, void> = {
       if (checkInSession?.manualIdCheck === undefined) {
         return res.redirect(back ? (back as string) : `/case/${crn}/appointments/${id}/check-in/review/identity`)
       }
-
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const eSupervisionClient = new ESupervisionClient(token)
-      const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
-      const checkIn = checkInResponse.checkin
 
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
