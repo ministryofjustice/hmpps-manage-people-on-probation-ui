@@ -6,7 +6,14 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString, setDataValue } from '../utils'
+import {
+  toRoshWidget,
+  toPredictors,
+  isValidCrn,
+  isNumericString,
+  setDataValue,
+  canRescheduleAppointment,
+} from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -58,6 +65,7 @@ jest.mock('../utils', () => {
     isNumericString: jest.fn(),
     isMatchingAddress: jest.fn(() => true),
     setDataValue: jest.fn(),
+    canRescheduleAppointment: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -82,6 +90,8 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
 >
 const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -270,6 +280,7 @@ describe('controllers/appointments', () => {
 
   describe('get manage appointment', () => {
     beforeEach(async () => {
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
@@ -290,91 +301,6 @@ describe('controllers/appointments', () => {
         url: '',
         canReschedule: true,
         contactId: '1234',
-      })
-    })
-
-    describe('canReschedule logic', () => {
-      it('should be false when didTheyComply is true', async () => {
-        const compliantAppointment = {
-          ...mockPersonAppointment,
-          appointment: {
-            ...mockPersonAppointment.appointment,
-            didTheyComply: true,
-            isInPast: true,
-          },
-        }
-        getPersonAppointmentSpy.mockResolvedValueOnce(compliantAppointment as any)
-        const localRes = mockAppResponse({
-          user: { username: 'user-1' },
-          case: { mainAddress: {} },
-        })
-        const localRender = jest.spyOn(localRes, 'render')
-        await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, localRes)
-        expect(localRender).toHaveBeenCalledWith(
-          'pages/appointments/manage-appointment',
-          expect.objectContaining({ canReschedule: false }),
-        )
-      })
-
-      it('should be true when not complied and appointment is in the past', async () => {
-        const pastAppointment = {
-          ...mockPersonAppointment,
-          appointment: {
-            ...mockPersonAppointment.appointment,
-            didTheyComply: false,
-            isInPast: true,
-            startDateTime: '2020-01-01T10:00:00.000Z',
-          },
-        }
-        getPersonAppointmentSpy.mockResolvedValueOnce(pastAppointment as any)
-        const localRes = mockAppResponse({
-          user: { username: 'user-1' },
-          case: { mainAddress: {} },
-        })
-        const localRender = jest.spyOn(localRes, 'render')
-        await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, localRes)
-        expect(localRender).toHaveBeenCalledWith(
-          'pages/appointments/manage-appointment',
-          expect.objectContaining({ canReschedule: true }),
-        )
-      })
-
-      it('should be true when not complied and appointment is in the future', async () => {
-        const futureAppointment = {
-          ...mockPersonAppointment,
-          appointment: {
-            ...mockPersonAppointment.appointment,
-            didTheyComply: false,
-            isInPast: false,
-            startDateTime: '2999-01-01T10:00:00.000Z',
-          },
-        }
-        getPersonAppointmentSpy.mockResolvedValueOnce(futureAppointment as any)
-        const localRes = mockAppResponse({
-          user: { username: 'user-1' },
-          case: { mainAddress: {} },
-        })
-        const localRender = jest.spyOn(localRes, 'render')
-        await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, localRes)
-        expect(localRender).toHaveBeenCalledWith(
-          'pages/appointments/manage-appointment',
-          expect.objectContaining({ canReschedule: true }),
-        )
-      })
-
-      it('should be false when appointment details are missing', async () => {
-        const missingAppointment: any = {}
-        getPersonAppointmentSpy.mockResolvedValueOnce(missingAppointment)
-        const localRes = mockAppResponse({
-          user: { username: 'user-1' },
-          case: { mainAddress: {} },
-        })
-        const localRender = jest.spyOn(localRes, 'render')
-        await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, localRes)
-        expect(localRender).toHaveBeenCalledWith(
-          'pages/appointments/manage-appointment',
-          expect.objectContaining({ canReschedule: false }),
-        )
       })
     })
   })
