@@ -36,18 +36,18 @@
                     src="{{ "/assets/images/placeholder.png" if checkIn.offender.photoUrl == null else checkIn.offender.photoUrl }}"
                     class="es-profile-image es-profile-image--small"
                     alt="Profile image of {{ checkIn.offender.firstName }} {{ checkIn.offender.lastName }}"
-                    />
+                    crossorigin />
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Image from check in video</dt>
                 <dd class="govuk-summary-list__value">
                     {% if checkIn.snapshotUrl %}
-                    <img
+                        <img
                         src="{{ checkIn.snapshotUrl }}"
                         class="es-profile-image es-profile-image--small"
                         alt="Snapshot from video of {{ checkIn.offender.firstName }} {{ checkIn.offender.lastName }}"
-                    />
+                        crossorigin />
                     {% else %}
                     <span>No image available</span>
                     {% endif %}
