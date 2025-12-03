@@ -20,7 +20,7 @@ describe('View appointment note page', () => {
     page.getRowData('appointmentDetails', 'note', 'Value').should('contain.text', 'Email sent to Stuart')
     page.getRowData('appointmentDetails', 'sensitive', 'Label').should('contain.text', 'No')
   })
-  it('Back link goes to activity log by default', () => {
+  it('Back link goes to contacts by default', () => {
     cy.visit('/case/X000001/appointments/appointment/11/manage/note/1')
     const page = new AppointmentPage()
     page.getBackLink().click()

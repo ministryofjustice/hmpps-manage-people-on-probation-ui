@@ -11,8 +11,7 @@ const alertsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { user } = res.locals
       const { page = '0' } = req.query as Record<string, string>
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
       const pageNumber = parseInt(page, 10)
 
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'DATE_AND_TIME.desc'

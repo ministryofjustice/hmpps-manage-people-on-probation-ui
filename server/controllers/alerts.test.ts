@@ -106,7 +106,8 @@ describe('alertsController', () => {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortedBy: 'DATE_AND_TIME.desc',
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
+
       })
     })
 
@@ -129,7 +130,7 @@ describe('alertsController', () => {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortedBy: 'SURNAME.desc',
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
       })
     })
 
@@ -148,7 +149,7 @@ describe('alertsController', () => {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: {}, // Expect empty object
         sortedBy: 'DATE_AND_TIME.desc',
-        url: '%2Falerts',
+        url: encodeURIComponent('/alerts'),
       })
     })
   })

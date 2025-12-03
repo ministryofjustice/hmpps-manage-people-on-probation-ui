@@ -113,6 +113,18 @@ export default {
     url: get('FLIPT_URL', 'http://localhost:8100', requiredInProduction),
     token: get('FLIPT_TOKEN', 'FLIPT_TOKEN', requiredInProduction),
   },
+  probationFrontendComponents: {
+    connectSrc: get(
+      'PROBATION_FRONTEND_COMPONENTS_CONNECT_SRC',
+      'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+    fontSrc: get(
+      'PROBATION_FRONTEND_COMPONENTS_FONT_SRC',
+      'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+  },
   apis: {
     appInsights: {
       connectionString: get('APPLICATIONINSIGHTS_CONNECTION_STRING', null, requiredInProduction),
@@ -203,6 +215,14 @@ export default {
         deadline: Number(get('PROBATION_FRONTEND_COMPONENTS_API_TIMEOUT_RESPONSE', 10000)),
       },
       agent: new AgentConfig(Number(get('PROBATION_FRONTEND_COMPONENTS_API_TIMEOUT_RESPONSE', 10000))),
+    },
+    eSupervisionApi: {
+      url: get('E_SUPERVISION_API_URL', 'http://localhost:8100', requiredInProduction),
+      timeout: {
+        response: Number(get('E_SUPERVISION_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('E_SUPERVISION_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('ESUP_API_TIMEOUT_RESPONSE', 10000))),
     },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),

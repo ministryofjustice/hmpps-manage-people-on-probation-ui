@@ -1,9 +1,9 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
-{% set pageTitle = makePageTitle({ pageHeading: "Activity log" }) %}
+{% set pageTitle = makePageTitle({ pageHeading: "Contacts" }) %}
 {% set currentNavSection = 'timeline' %}
-{% set currentSectionName = 'Activity log' %}
+{% set currentSectionName = 'Contacts' %}
 {% set headerPersonName = personActivity.personSummary.name.forename + ' ' + personActivity.personSummary.name.surname %}
 {% set headerCRN = personActivity.personSummary.crn %}
 {% set headerDob = personActivity.personSummary.dateOfBirth  %}
@@ -46,7 +46,7 @@
 <div class="govuk-grid-row govuk-!-margin-top-4">
   {% include "./activity-log/_filters.njk" %}
   <div class="govuk-grid-column-two-thirds">
-    {% if not (title == 'Activity log') %}
+    {% if not (title == 'Contacts') %}
       <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
         {{ title }}
       </h2>

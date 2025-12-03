@@ -344,7 +344,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -417,7 +419,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -486,7 +490,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -565,7 +571,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {

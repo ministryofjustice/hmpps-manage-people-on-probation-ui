@@ -308,6 +308,11 @@ describe('masApiClient', () => {
       ['getUserAccess', '/user/USER/access/X000001', () => masApiClient.getUserAccess('USER', 'X000001')],
       ['checkUserAccess', '/user/USER/access', () => masApiClient.checkUserAccess('USER', []), 'post'],
       ['getDeliusRoles', '/user/USER', () => masApiClient.getDeliusRoles('USER')],
+      [
+        'getProbationPractitioner',
+        '/case/X000001/probation-practitioner',
+        () => masApiClient.getProbationPractitioner('X000001'),
+      ],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
       ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       [
