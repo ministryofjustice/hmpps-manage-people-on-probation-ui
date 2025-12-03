@@ -426,8 +426,7 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "isEsupervision": true,
-              "EsupervisionId": "6fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "eSupervisionId": "6fa85f64-5717-4562-b3fc-2c963f66afa6"
             },
             {
               "id": 31,
@@ -448,8 +447,7 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "isEsupervision": true,
-              "EsupervisionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "eSupervisionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             },
             {
               "id": 32,
@@ -470,8 +468,7 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "isEsupervision": true,
-              "EsupervisionId": "5fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "eSupervisionId": "5fa85f64-5717-4562-b3fc-2c963f66afa6"
             }
           ]
         },

@@ -6,8 +6,8 @@
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if entry.isAppointment %}
       {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
-{% elif entry.isEsupervision %}
-      {% set link = '/case/' + crn + '/check-in/' + entry.EsupervisionId + '/update?back=' + url %}
+{% elif entry.eSupervisionId %}
+      {% set link = '/case/' + crn + '/check-in/' + entry.eSupervisionId + '/update?back=' + url %}
 {% endif %}
 
 {% set titleHtml %}
@@ -25,7 +25,7 @@
             {% endif %}
             <span class="govuk-visually-hidden"> on {{ thisDate }}
             </a>
-            {% if entry.isEsupervision and flags.enableESuperVision  %}
+            {% if entry.eSupervisionId and flags.enableESuperVision  %}
                   <br/><a href="{{ link }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
             {% elif shouldPromptToRecordAnOutcome %}
                   <br/>{% include './_log-outcome-link.njk' %}
