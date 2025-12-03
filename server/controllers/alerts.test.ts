@@ -107,7 +107,6 @@ describe('alertsController', () => {
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
         sortedBy: 'DATE_AND_TIME.desc',
         url: encodeURIComponent('/alerts'),
-
       })
     })
 
