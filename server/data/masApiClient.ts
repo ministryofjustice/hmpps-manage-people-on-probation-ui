@@ -253,12 +253,14 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/documents/${crn}${pageQuery}`, handle404: true })
   }
 
-  async patchDocuments(crn: string, id: string, file: Express.Multer.File) {
+  async patchDocuments(crn: string, id: string, file: Express.Multer.File): Promise<{ statusCode: number }> {
     return this.patch({
       path: `/documents/${crn}/update/contact/${id}`,
       handle404: true,
       handle500: true,
       file,
+      errorMessageFor500:
+        'Nomis is experiencing technical difficulties. It has not been possible to upload document. Please try again later',
     })
   }
 

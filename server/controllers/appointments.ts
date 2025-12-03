@@ -291,21 +291,43 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
+
       const { notes, sensitive } = req.body
-      const { data } = req.session
+      const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
+
+      let hasError = false
 
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
         notes: handleQuotes(notes),
         sensitive: sensitive === 'Yes',
       }
+
       if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
         body.outcomeRecorded = true
         delete req.session.data.appointments[crn][id].outcomeRecorded
       }
+
       await masClient.patchAppointment(body)
+
+      try {
+        const patchResponse = await masClient.patchDocuments(crn, id, file)
+
+        if (patchResponse.statusCode < 200 || patchResponse.statusCode >= 300) {
+          hasError = true
+        }
+      } catch {
+        hasError = true
+      }
+
+      if (hasError) {
+        return res.render(`pages/appointments/add-note`, {
+          uploadError: 'Upload failed, please try again later',
+        })
+      }
+
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
