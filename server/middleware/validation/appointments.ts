@@ -7,9 +7,10 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
+import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params, body, session } = req
+  const { params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data } = session
   const { back = '', change = '' } = req.query as Record<string, string>
@@ -29,37 +30,35 @@ const appointments: Route<void> = (req, res, next) => {
   }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
-  let render = `pages/${[
-    url
-      .split('?')[0]
-      .split('/')
-      .filter(item => item)
-      .filter((_item, i) => ![0, 1, 3].includes(i))
-      .join('/'),
-  ]}`
+  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
+
+  let errorMessages = res?.locals?.errorMessages || {}
 
   const validateType = (): void => {
     if (baseUrl.includes('/type')) {
       if (personLevel) {
         res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
       }
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(req.body, appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor })),
+      }
     }
   }
 
   const validateSentence = (): void => {
     if (baseUrl.includes('/sentence')) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'sentence',
-        }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            page: 'sentence',
+          }),
+        ),
+      }
     }
   }
 
@@ -68,15 +67,18 @@ const appointments: Route<void> = (req, res, next) => {
       localParams._minDate = req.body._minDate
       localParams._maxDate = req.body._maxDate
       const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'location-date-time',
-        }),
-        { now },
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            page: 'location-date-time',
+          }),
+          { now },
+        ),
+      }
     }
   }
 
@@ -93,15 +95,18 @@ const appointments: Route<void> = (req, res, next) => {
         finalAppointmentDate = appointmentRepeatingDates[appointmentRepeatingDates.length - 1]
         isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
       }
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'repeating',
-          repeatingValue,
-        }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            page: 'repeating',
+            repeatingValue,
+          }),
+        ),
+      }
       if (isMoreThanAYear) {
         errorMessages = {
           ...errorMessages,
@@ -114,91 +119,95 @@ const appointments: Route<void> = (req, res, next) => {
   const validateRecordAnOutcome = () => {
     if (baseUrl.includes(`case/${crn}/record-an-outcome`)) {
       render = `pages/appointments/record-an-outcome`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          contactId,
-          page: 'record-an-outcome',
-        }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            contactId,
+            page: 'record-an-outcome',
+          }),
+        ),
+      }
     }
   }
 
   const validateAttendedComplied = () => {
     if (req.url.includes(`appointment/${contactId}/attended-complied`)) {
       render = `pages/appointments/attended-complied`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          contactId,
-          page: 'attended-complied',
-        }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            contactId,
+            page: 'attended-complied',
+          }),
+        ),
+      }
     }
   }
 
   const validateSupportingInformation = () => {
     if (baseUrl.includes('/supporting-information')) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          contactId,
-          page: 'supporting-information',
-          notes: req.body.appointments[crn][id].notes,
-          maxCharCount: maxCharCount as number,
-        }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            contactId,
+            page: 'supporting-information',
+            notes: req.body.appointments[crn][id].notes,
+            maxCharCount: maxCharCount as number,
+          }),
+        ),
+      }
     }
   }
 
   const validateNextAppointment = () => {
     if (baseUrl.includes('/next-appointment')) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'next-appointment',
-        }),
-      )
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            page: 'next-appointment',
+          }),
+        ),
+      }
       render = 'pages/appointments/next-appointment'
     }
-  }
-
-  const validateFile = () => {
-    if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`) && req?.file) {
-      if (req.file.size > config.maxFileSize) {
-        errorMessages = { ...errorMessages, 'file-upload-1': 'File size must be 5mb or under' }
-      }
-    }
-    return errorMessages
   }
 
   const validateAddNote = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
       render = `pages/appointments/add-note`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'add-note',
-          notes: req.body.notes,
-          maxCharCount: maxCharCount as number,
-        }),
-      )
-      errorMessages = validateFile()
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          req.body,
+          appointmentsValidation({
+            crn,
+            id,
+            page: 'add-note',
+            notes: req.body.notes,
+            maxCharCount: maxCharCount as number,
+          }),
+        ),
+      }
     }
   }
 
-  let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
   validateLocationDateTime()

@@ -19,7 +19,6 @@ import {
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { getQueryString } from './activityLog'
 
 const routes = [
   'getAppointments',
@@ -270,16 +269,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         delete req.session.body
       }
       const url = encodeURIComponent(req.url)
-      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+      const { maxCharCount } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
         url,
-        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
-        maxFileSize,
-        fileUploadLimit,
-        uploadedFiles,
         maxCharCount,
       })
     }
@@ -314,17 +309,21 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       try {
         const patchResponse = await masClient.patchDocuments(crn, id, file)
-
         if (patchResponse.statusCode < 200 || patchResponse.statusCode >= 300) {
           hasError = true
         }
-      } catch {
-        hasError = true
+      } catch (e) {
+        // When multer errors, we don't want to display upload failed banner
+
+        if (e.status !== 415) {
+          hasError = true
+        }
       }
 
       if (hasError) {
         return res.render(`pages/appointments/add-note`, {
-          uploadError: 'Upload failed, please try again later',
+          uploadError:
+            'File not uploaded. Please try again. If this file upload error persists, contact mpop-digital-team@justice.gov.uk.',
         })
       }
 

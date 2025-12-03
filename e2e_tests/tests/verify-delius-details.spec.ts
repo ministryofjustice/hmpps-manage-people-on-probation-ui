@@ -4,7 +4,7 @@ import { Person } from '@ministryofjustice/hmpps-probation-integration-e2e-tests
 import {
   buildAddress,
   Address,
-} from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/address/create-address'
+} from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/address/create-address.mjs'
 import { login as loginToManageMySupervision } from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/manage-a-supervision/login.mjs'
 import loginDeliusAndCreateOffender from '../steps/delius/create-offender/createOffender'
 

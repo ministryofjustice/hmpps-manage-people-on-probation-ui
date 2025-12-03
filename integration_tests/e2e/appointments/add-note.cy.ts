@@ -37,19 +37,12 @@ describe('Manage appointment - add a note', () => {
     it(`should upload a selected ${filetype} file`, () => {
       cy.intercept('POST', '/case/*/appointments/appointment/*/add-note').as('formSubmit')
       loadPage()
-
       const [fakeFile, fileName] = createFakeFile(1, filetype)
-
       addNotePage.getFileUploadInput().attachFile(fakeFile)
-
       cy.get('#notes').type('Test note')
-
       addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
-
       addNotePage.getSubmitBtn().click()
-
       cy.wait('@formSubmit')
-
       cy.url().should('include', '/manage')
     })
   }
@@ -175,19 +168,14 @@ describe('Manage appointment - add a note', () => {
   it('should display validation error for file over 5mb when continue is clicked', () => {
     loadPage()
     const [fakeFile, fileName] = createFakeFile(6, 'pdf')
-
     addNotePage.getFileUploadInput().attachFile(fakeFile)
-
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
-
     addNotePage.getSubmitBtn().click()
-
     addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
-
     cy.get('.govuk-error-summary__list a').should('contain.text', 'File size must be 5mb or under')
-    cy.get('.govuk-error-summary__list a').should('have.attr', 'href', '#file-upload-1')
+    cy.get('.govuk-error-summary__list a').should('have.attr', 'href', '#fileUpload')
   })
-  //
+
   for (const filetype of ['pdf', 'doc', 'docx']) {
     checkUploadFile(filetype)
   }
@@ -202,45 +190,40 @@ describe('Manage appointment - add a note', () => {
   it('should submit successfully with a valid file and sensitivity option selected', () => {
     cy.intercept('POST', '/case/*/appointments/appointment/*/add-note').as('formSubmit')
     loadPage()
-
     const [fakeFile, fileName] = createFakeFile(1, 'pdf')
-
     addNotePage.getFileUploadInput().attachFile(fakeFile)
-
     cy.get('#notes').type('Test note')
-
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
-
     addNotePage.getSubmitBtn().click()
-
     cy.wait('@formSubmit')
-
     cy.url().should('include', '/manage')
   })
 
-  it('should show upload notification banner when file upload fails', () => {
+  it('should show upload error summary when file upload fails', () => {
     cy.task('stubPatchDocument500Response')
-
     loadPage()
-    const [fakeFile, fileName] = createFakeFile(1, 'pdf')
-    addNotePage.getFileUploadInput().attachFile(fakeFile)
 
+    const [fakeFile] = createFakeFile(1, 'pdf')
+    addNotePage.getFileUploadInput().attachFile(fakeFile)
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+
     addNotePage.getSubmitBtn().click()
 
-    cy.get('[data-qa="uploadError"]').should('be.visible')
+    cy.get('.govuk-error-summary').should('be.visible')
+    cy.contains('File not uploaded').should('be.visible')
   })
 
-  it('should show upload notification banner when file upload fails due to error', () => {
+  it('should show upload error summary when file upload fails due to thrown error', () => {
     cy.task('stubPatchDocumentThrownErrorResponse')
-
     loadPage()
-    const [fakeFile, fileName] = createFakeFile(1, 'pdf')
-    addNotePage.getFileUploadInput().attachFile(fakeFile)
 
+    const [fakeFile] = createFakeFile(1, 'pdf')
+    addNotePage.getFileUploadInput().attachFile(fakeFile)
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+
     addNotePage.getSubmitBtn().click()
 
-    cy.get('[data-qa="uploadError"]').should('be.visible')
+    cy.get('.govuk-error-summary').should('be.visible')
+    cy.contains('File not uploaded').should('be.visible')
   })
 })

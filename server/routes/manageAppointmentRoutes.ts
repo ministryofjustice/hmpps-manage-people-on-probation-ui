@@ -6,14 +6,14 @@ import { getPersonalDetails, getPersonAppointment } from '../middleware'
 import validate from '../middleware/validation/index'
 import { cacheUploadedFiles } from '../middleware/cacheUploadedFiles'
 import config from '../config'
+import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function manageAppointmentRoutes(router: Router, { hmppsAuthClient }: Services) {
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
-      fileSize: config.maxFileSize * config.fileUploadLimit,
-      fieldSize: 1 * 1024 * 1024, // 1 MB max per field
-      files: config.fileUploadLimit,
+      fileSize: config.maxFileSize,
+      files: 1,
     },
   })
 
@@ -29,7 +29,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.post(
     '/case/:crn/appointments/appointment/:contactId/add-note',
-    upload.single('file'),
+    multerErrorHandler('fileUpload'),
     validate.appointments,
     controllers.appointments.postAddNote(hmppsAuthClient),
   )
