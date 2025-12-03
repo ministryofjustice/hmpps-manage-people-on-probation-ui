@@ -331,12 +331,12 @@ context('Appointment check-ins', () => {
     checkYourAnswersPage.checkOnPage()
 
     // Date change
-    checkYourAnswersPage.getDateActionBtn().click()
+    checkYourAnswersPage.getElementData('dateAction').click()
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getSubmitBtn().click()
     checkYourAnswersPage.checkOnPage()
     checkYourAnswersPage.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Every week')
-    checkYourAnswersPage.getIntervalActionBtn().click()
+    checkYourAnswersPage.getElementData('intervalAction').click()
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(2).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
@@ -345,7 +345,7 @@ context('Appointment check-ins', () => {
 
     // Contact preference change
     checkYourAnswersPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', 'Text message')
-    checkYourAnswersPage.getPreferredComsActionBtn().click()
+    checkYourAnswersPage.getElementData('preferredComsAction').click()
     contactPreferencePage.checkOnPage()
     contactPreferencePage
       .getCheckInPreferredComs()
@@ -358,7 +358,7 @@ context('Appointment check-ins', () => {
     checkYourAnswersPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', 'Email')
 
     // Mobile
-    checkYourAnswersPage.getCheckInMobileActionBtn().click()
+    checkYourAnswersPage.getElementData('checkInMobileAction').click()
     contactPreferencePage.checkOnPage()
     contactPreferencePage.getChangeLink().click()
     const editContactPreferencePage = new EditContactPreferencePage()
@@ -373,7 +373,7 @@ context('Appointment check-ins', () => {
       .getSummaryListRow(6)
       .find('.govuk-summary-list__value')
       .should('contain.text', 'Take a photo using this device')
-    checkYourAnswersPage.getPhotoUploadOptionActionBtn().click()
+    checkYourAnswersPage.getElementData('photoUploadOptionAction').click()
     takeAPhotoOptionsPage.checkOnPage()
     takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
     takeAPhotoOptionsPage.getSubmitBtn().click()

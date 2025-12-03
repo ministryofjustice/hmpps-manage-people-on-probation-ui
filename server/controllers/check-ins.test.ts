@@ -609,14 +609,12 @@ describe('checkInsController', () => {
         query: { cya: 'true' },
       })
 
-      const nextMock: jest.MockedFunction<import('express').NextFunction> = jest.fn() as jest.MockedFunction<
-        import('express').NextFunction
-      >
+      const nextSpy = jest.fn()
 
-      await redirectWizard('/some/next/url')(req as any, res as any, nextMock)
+      await redirectWizard('/some/next/url')(req, res, nextSpy)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/checkin-summary`)
-      expect(nextMock).not.toHaveBeenCalled()
+      expect(nextSpy).not.toHaveBeenCalled()
     })
 
     it('calls next when cya is not true', async () => {
@@ -625,14 +623,11 @@ describe('checkInsController', () => {
         query: { cya: 'false' },
       })
 
-      const nextMock: jest.MockedFunction<import('express').NextFunction> = jest.fn() as jest.MockedFunction<
-        import('express').NextFunction
-      >
-
-      await redirectWizard('/some/next/url')(req as any, res as any, nextMock)
+      const nextSpy = jest.fn()
+      await redirectWizard('/some/next/url')(req, res, nextSpy)
 
       expect(redirectSpy).not.toHaveBeenCalled()
-      expect(nextMock).toHaveBeenCalledTimes(1)
+      expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
 
