@@ -16,6 +16,7 @@ import supervisionAppointmentClient from './supervisionAppointmentClient'
 import probationFEIntegration from './probationFEIntegration'
 import alerts from './alerts'
 import eSupervisionAPI from './eSupervisionAPI'
+import document from './document'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -36,4 +37,5 @@ export default {
   ...probationFEIntegration,
   ...alerts,
   ...eSupervisionAPI,
+  ...document,
 }
