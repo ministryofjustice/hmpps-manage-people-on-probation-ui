@@ -5,7 +5,7 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { ESupervisionReview } from '../data/model/esupervision'
+import { ESupervisionCheckIn, ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -255,14 +255,15 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const { checkIn } = res.locals
 
-      if (checkIn.status === 'REVIEWED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/view${back ? `?back=${back}` : ''}`)
+      const statusMap = {
+        REVIEWED: 'view',
+        SUBMITTED: 'review/identity',
+        EXPIRED: 'review/expired',
       }
-      if (checkIn.status === 'SUBMITTED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/identity${back ? `?back=${back}` : ''}`)
-      }
-      if (checkIn.status === 'EXPIRED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/expired${back ? `?back=${back}` : ''}`)
+      if (Object.keys(statusMap).includes(checkIn.status)) {
+        return res.redirect(
+          `/case/${crn}/appointments/${id}/check-in/${statusMap[checkIn.status]}${back ? `?back=${back}` : ''}`,
+        )
       }
       return renderError(404)(req, res)
     }

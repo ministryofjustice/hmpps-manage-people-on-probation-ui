@@ -1,4 +1,4 @@
-import httpMocks from 'node-mocks-http'
+import httpMocks, { RequestOptions } from 'node-mocks-http'
 import validation from '.'
 import { mockAppResponse } from '../../controllers/mocks'
 
@@ -18,7 +18,7 @@ const reqBase = {
   query: {},
   session: {},
   body: {},
-} as object
+} as RequestOptions
 const req = httpMocks.createRequest(reqBase)
 const res = mockAppResponse({
   filters: {
@@ -54,7 +54,7 @@ describe('/controllers/arrangeAppointmentController', () => {
       body: {
         esupervision,
       },
-    } as unknown
+    } as RequestOptions
     const reqIdentity = httpMocks.createRequest(reqBaseIdentity)
     validation.checkInReview(reqIdentity, res, next)
     expect(next).toHaveBeenCalled()
@@ -69,7 +69,7 @@ describe('/controllers/arrangeAppointmentController', () => {
       body: {
         esupervision: {},
       },
-    } as unknown
+    } as RequestOptions
     const reqIdentity = httpMocks.createRequest(reqBaseIdentity)
     validation.checkInReview(reqIdentity, res, next)
     expect(res.render).toHaveBeenCalled()
@@ -95,7 +95,7 @@ describe('/controllers/arrangeAppointmentController', () => {
       body: {
         esupervision,
       },
-    } as unknown
+    } as RequestOptions
     const reqExpired = httpMocks.createRequest(reqBaseExpired)
     validation.checkInReview(reqExpired, res, next)
     expect(next).toHaveBeenCalled()
@@ -110,7 +110,7 @@ describe('/controllers/arrangeAppointmentController', () => {
       body: {
         esupervision: {},
       },
-    } as unknown
+    } as RequestOptions
     const reqExpired = httpMocks.createRequest(reqBaseExpired)
     validation.checkInReview(reqExpired, res, next)
     expect(res.render).toHaveBeenCalled()

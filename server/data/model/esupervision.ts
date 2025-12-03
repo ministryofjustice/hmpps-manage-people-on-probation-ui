@@ -17,7 +17,7 @@ export interface ESupervisionOffender {
 
 export interface ESupervisionCheckIn {
   uuid: string
-  status: string // CREATED, SUBMITED, REVIEWED, CANCELLED, EXPIRED
+  status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED' // CREATED, SUBMITED, REVIEWED, CANCELLED, EXPIRED
   dueDate: string
   offender: ESupervisionOffender
   submittedAt?: string
