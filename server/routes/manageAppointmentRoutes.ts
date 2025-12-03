@@ -10,11 +10,6 @@ import config from '../config'
 export default function manageAppointmentRoutes(router: Router, { hmppsAuthClient }: Services) {
   const upload = multer({
     storage: multer.memoryStorage(),
-    limits: {
-      fileSize: config.maxFileSize * config.fileUploadLimit,
-      fieldSize: 1 * 1024 * 1024, // 1 MB max per field
-      files: config.fileUploadLimit,
-    },
   })
 
   router.all(

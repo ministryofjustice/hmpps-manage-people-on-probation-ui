@@ -436,17 +436,12 @@ describe('controllers/appointments', () => {
       expect(mockReq.session.body).toBeUndefined()
     })
     it('should render the add note page', () => {
-      const { fileUploadLimit, maxFileSize, validMimeTypes } = config
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
         body: null,
         crn,
         errorMessages: null,
-        uploadedFiles: [],
-        fileUploadLimit,
-        maxFileSize,
         url: '',
         maxCharCount: 4000,
-        validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })
   })
