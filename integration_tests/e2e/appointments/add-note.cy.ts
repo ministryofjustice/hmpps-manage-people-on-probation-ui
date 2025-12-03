@@ -219,7 +219,7 @@ describe('Manage appointment - add a note', () => {
   })
 
   it('should show upload notification banner when file upload fails', () => {
-    cy.task(`stubPatchDocument500Response`)
+    cy.task('stubPatchDocument500Response')
 
     loadPage()
     const [fakeFile, fileName] = createFakeFile(1, 'pdf')
@@ -232,7 +232,7 @@ describe('Manage appointment - add a note', () => {
   })
 
   it('should show upload notification banner when file upload fails due to error', () => {
-    cy.task(`stubPatchDocumentThrownErrorResponse`)
+    cy.task('stubPatchDocumentThrownErrorResponse')
 
     loadPage()
     const [fakeFile, fileName] = createFakeFile(1, 'pdf')

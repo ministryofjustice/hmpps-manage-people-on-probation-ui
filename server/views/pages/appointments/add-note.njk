@@ -15,9 +15,6 @@
 {% endif %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 
-
-
-
 {% block beforeHeading %}
     {% if uploadError %}
     {% set html %}
@@ -32,8 +29,7 @@
 {% endblock %}
 
 {% block form %}
-    <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in
-        the CRISS format.</p>
+    <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
     {{ govukDetails({
         classes: 'govuk-!-margin-bottom-6',
         summaryText: 'Take notes using CRISS',
