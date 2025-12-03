@@ -113,6 +113,18 @@ export default {
     url: get('FLIPT_URL', 'http://localhost:8100', requiredInProduction),
     token: get('FLIPT_TOKEN', 'FLIPT_TOKEN', requiredInProduction),
   },
+  probationFrontendComponents: {
+    connectSrc: get(
+      'PROBATION_FRONTEND_COMPONENTS_CONNECT_SRC',
+      'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+    fontSrc: get(
+      'PROBATION_FRONTEND_COMPONENTS_FONT_SRC',
+      'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+  },
   apis: {
     appInsights: {
       connectionString: get('APPLICATIONINSIGHTS_CONNECTION_STRING', null, requiredInProduction),
