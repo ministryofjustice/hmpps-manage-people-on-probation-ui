@@ -81,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 const show = el => {
+  // Safely handle missing elements
+  if (!el) return
   const element = el
   element.classList.remove('es-hidden')
   element.classList.add('es-show')
@@ -88,6 +90,8 @@ const show = el => {
 }
 
 const hide = el => {
+  // Safely handle missing elements
+  if (!el) return
   const element = el
   element.classList.remove('es-show')
   element.classList.add('es-hidden')

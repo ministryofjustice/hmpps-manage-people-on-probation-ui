@@ -1,5 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
+import { redirectWizard } from './check-ins'
 import { mockAppResponse } from './mocks'
 import { isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
@@ -70,6 +71,7 @@ const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue
 const mockPostCheckInDetails = postCheckInDetails as jest.MockedFunction<typeof postCheckInDetails>
 
 const crn = 'X000001'
+const cya = false
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 
 const baseReq = () =>
@@ -147,6 +149,7 @@ describe('checkInsController', () => {
         crn,
         id: uuid,
         checkInMinDate: '2/7/2025',
+        cya,
       })
     })
 
@@ -164,6 +167,7 @@ describe('checkInsController', () => {
         crn,
         id: uuid,
         checkInMinDate: '10/7/2025',
+        cya,
       })
     })
 
@@ -487,7 +491,7 @@ describe('checkInsController', () => {
       const req = baseReq()
       await controllers.checkIns.getTakePhotoPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/take-a-photo.njk', { crn, id: uuid })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/take-a-photo.njk', { crn, id: uuid, cya })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 
@@ -522,7 +526,7 @@ describe('checkInsController', () => {
       const req = baseReq()
       await controllers.checkIns.getUploadPhotoPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/upload-a-photo.njk', { crn, id: uuid })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/upload-a-photo.njk', { crn, id: uuid, cya })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 
@@ -546,6 +550,89 @@ describe('checkInsController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('postTakeAPhotoPage', () => {
+    it('redirects to photo rules with selected upload option when CRN and id are valid', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        body: { userPhotoUpload: 'TAKE_A_PIC' },
+      })
+
+      await controllers.checkIns.postTakeAPhotoPage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `/case/${crn}/appointments/${uuid}/check-in/photo-rules?photoUpload=TAKE_A_PIC`,
+      )
+      expect(mockRenderError).not.toHaveBeenCalled()
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        body: { userPhotoUpload: 'UPLOAD' },
+      })
+
+      await controllers.checkIns.postTakeAPhotoPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        body: { userPhotoUpload: 'UPLOAD' },
+      })
+
+      await controllers.checkIns.postTakeAPhotoPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('redirectWizard', () => {
+    it('redirects to checkin summary when cya=true', async () => {
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        query: { cya: 'true' },
+      })
+
+      const nextMock: jest.MockedFunction<import('express').NextFunction> = jest.fn() as jest.MockedFunction<
+        import('express').NextFunction
+      >
+
+      await redirectWizard('/some/next/url')(req as any, res as any, nextMock)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/checkin-summary`)
+      expect(nextMock).not.toHaveBeenCalled()
+    })
+
+    it('calls next when cya is not true', async () => {
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        query: { cya: 'false' },
+      })
+
+      const nextMock: jest.MockedFunction<import('express').NextFunction> = jest.fn() as jest.MockedFunction<
+        import('express').NextFunction
+      >
+
+      await redirectWizard('/some/next/url')(req as any, res as any, nextMock)
+
+      expect(redirectSpy).not.toHaveBeenCalled()
+      expect(nextMock).toHaveBeenCalledTimes(1)
     })
   })
 

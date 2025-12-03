@@ -15,6 +15,19 @@
 {% set name = "Image of " + case.name.forename + " added for identification" %}
 {% set photo = "<div class='es-uploaded-image es-uploaded-image--small' data-person='{{ name }}'></div>" %}
 {% set confirmEndUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/confirm-end' %}
+{% set changeDateUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/date-frequency?cya=true' %}
+{% set contactPreUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/contact-preference?cya=true' %}
+{% set photoPrefUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-options?cya=true' %}
+{% set uploadPhotoUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/upload-a-photo?cya=true' %}
+{% set takeAPhotoUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/take-a-photo?cya=true' %}
+{% set photoUrl = '' %}
+{% if userDetails.photoUploadOption == 'Upload a photo' %}
+    <p>test</p>
+    {% set photoUrl = uploadPhotoUrl %}
+{% else %}
+    {% set photoUrl = takeAPhotoUrl %}
+    <p>test11</p>
+{% endif %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -74,9 +87,12 @@
                 value: { html:  checkInDateVal },
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: changeDateUrl,
                     text: "Change",
-                    visuallyHiddenText: "date"
+                    visuallyHiddenText: "date",
+                    attributes: {
+                        'data-qa': 'dateAction'
+                    }
                 }
                 ]
             } },
@@ -85,9 +101,12 @@
                 value: { html: userDetails.interval },
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: changeDateUrl,
                     text: "Change",
-                    visuallyHiddenText: "interval"
+                    visuallyHiddenText: "interval",
+                    attributes: {
+                        'data-qa': 'intervalAction'
+                    }
                 }
                 ]
             } },
@@ -96,9 +115,12 @@
                 value: { html: userDetails.preferredComs},
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: contactPreUrl,
                     text: "Change",
-                    visuallyHiddenText: "preferredComs"
+                    visuallyHiddenText: "preferredComs",
+                    attributes: {
+                        'data-qa': 'preferredComsAction'
+                    }
                 }
                 ]
             } },
@@ -107,9 +129,12 @@
                 value: { html: userDetails.checkInMobile},
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: contactPreUrl,
                     text: "Change",
-                    visuallyHiddenText: "checkInMobile"
+                    visuallyHiddenText: "checkInMobile",
+                    attributes: {
+                        'data-qa': 'checkInMobileAction'
+                    }
                 }
                 ]
             } },
@@ -118,9 +143,12 @@
                 value: { html: userDetails.checkInEmail},
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: contactPreUrl,
                     text: "Change",
-                    visuallyHiddenText: "checkInEmail"
+                    visuallyHiddenText: "checkInEmail",
+                    attributes: {
+                        'data-qa': 'checkInEmailAction'
+                    }
                 }
                 ]
             } },
@@ -129,9 +157,12 @@
                 value: { html: userDetails.photoUploadOption},
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: photoPrefUrl,
                     text: "Change",
-                    visuallyHiddenText: "photoUploadOption"
+                    visuallyHiddenText: "photoUploadOption",
+                    attributes: {
+                        'data-qa': 'photoUploadOptionAction'
+                    }
                 }
                 ]
             } },
@@ -140,9 +171,12 @@
                 value: { html: '<div class="es-uploaded-image" data-person="' + name + '">&nbsp;</div>' },
                 actions: {
                 items: [ {
-                    href: "#",
+                    href: photoUrl,
                     text: "Change",
-                    visuallyHiddenText: "photo"
+                    visuallyHiddenText: "photo",
+                    attributes: {
+                        'data-qa': 'photoAction'
+                    }
                 } ]
             } }
         ]
