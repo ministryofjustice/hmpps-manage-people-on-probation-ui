@@ -74,47 +74,6 @@ describe('/controllers/arrangeAppointmentController', () => {
     validation.checkInReview(reqIdentity, res, next)
     expect(res.render).toHaveBeenCalled()
   })
-  it('validation passes for notes page', async () => {
-    const esupervision = {
-      [crn]: {
-        [id]: {
-          checkins: {
-            helpedManage: true,
-          },
-        },
-      },
-    }
-    const reqBaseNotes = {
-      ...reqBase,
-      url: notesUrl,
-      session: {
-        data: {
-          esupervision,
-        },
-      },
-      body: {
-        esupervision,
-      },
-    } as unknown
-    const reqNotes = httpMocks.createRequest(reqBaseNotes)
-    validation.checkInReview(reqNotes, res, next)
-    expect(next).toHaveBeenCalled()
-  })
-  it('validation fails if no option selected', async () => {
-    const reqBaseNotes = {
-      ...reqBase,
-      url: notesUrl,
-      session: {
-        data: {},
-      },
-      body: {
-        esupervision: {},
-      },
-    } as unknown
-    const reqNotes = httpMocks.createRequest(reqBaseNotes)
-    validation.checkInReview(reqNotes, res, next)
-    expect(res.render).toHaveBeenCalled()
-  })
   it('validation passes for expired page', async () => {
     const esupervision = {
       [crn]: {

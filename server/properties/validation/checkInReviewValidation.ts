@@ -23,16 +23,6 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][checkins][helpedManage]`]: {
-      optional: page !== 'notes',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select whether the system improved risk management',
-          log: 'System review not completed',
-        },
-      ],
-    },
     [`[esupervision][${crn}][${id}][checkins][note]`]: {
       optional: page !== 'expired',
       checks: [
