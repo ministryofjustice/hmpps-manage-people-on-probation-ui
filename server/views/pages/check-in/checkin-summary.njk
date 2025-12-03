@@ -22,11 +22,9 @@
 {% set takeAPhotoUrl =  '/case/' + crn + '/appointments/' + id + '/check-in/take-a-photo?cya=true' %}
 {% set photoUrl = '' %}
 {% if userDetails.photoUploadOption == 'Upload a photo' %}
-    <p>test</p>
     {% set photoUrl = uploadPhotoUrl %}
 {% else %}
     {% set photoUrl = takeAPhotoUrl %}
-    <p>test11</p>
 {% endif %}
 
 {% block beforeContent %}
