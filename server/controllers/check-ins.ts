@@ -256,13 +256,13 @@ const checkInsController: Controller<typeof routes, void> = {
       const { checkIn } = res.locals
 
       if (checkIn.status === 'REVIEWED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/view${back ? `?back=${back}` : ''}`)
       }
       if (checkIn.status === 'SUBMITTED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/identity?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/identity${back ? `?back=${back}` : ''}`)
       }
       if (checkIn.status === 'EXPIRED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/expired?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/expired${back ? `?back=${back}` : ''}`)
       }
       return renderError(404)(req, res)
     }
@@ -281,7 +281,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
 
       if (checkIn.status !== 'REVIEWED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       return res.render('pages/check-in/view.njk', { crn, id, back, checkIn, videoLink })
     }
@@ -297,7 +297,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const { checkIn } = res.locals
 
       if (checkIn.status !== 'EXPIRED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       return res.render('pages/check-in/review/expired.njk', { crn, id, back, checkIn })
     }
@@ -312,10 +312,12 @@ const checkInsController: Controller<typeof routes, void> = {
       const { back } = req.query
       const { checkIn } = res.locals
 
+      const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
+
       if (checkIn.status !== 'SUBMITTED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
-      return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn })
+      return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn, videoLink })
     }
   },
 
@@ -345,7 +347,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
 
       if (checkIn.status !== 'SUBMITTED') {
-        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update?back=${back}`)
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       return res.render('pages/check-in/review/notes.njk', { crn, id, back, checkIn })
     }

@@ -12,7 +12,7 @@
     <div class="govuk-grid-column-full">
 
         <dl class="govuk-summary-list">
-            <div class="govuk-summary-list__row">
+            <div class="govuk-summary-list__row" data-qa="datetimeSummary">
                 <dt class="govuk-summary-list__key">Checked in on</dt>
                 <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYear(true) }}</dd>
             </div>
@@ -24,7 +24,7 @@
 
         <h2 class="govuk-heading-m">Review and confirm identity</h2>
         <hr class="govuk-section-break govuk-section-break--visible">
-        <dl class="govuk-summary-list govuk-!-margin-top-0">
+        <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="identitySummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
@@ -61,7 +61,7 @@
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Check in video</dt>
                 <dd class="govuk-summary-list__value">
-                    <a href="/practitioners/checkin/{{ checkIn.uuid }}/video" class="govuk-link">View video</a>
+                    <a href="{{ videoLink }}" class="govuk-link">View video</a>
                 </dd>
             </div>
         </dl>

@@ -18,7 +18,7 @@
 
         <h2 class="govuk-heading-m">Practioner review</h2>
         <hr class="govuk-section-break govuk-section-break--visible">
-        <dl class="govuk-summary-list govuk-!-margin-top-0">
+        <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Is this person in the video {{checkIn.offender.firstName}}?</dt>
                 <dd class="govuk-summary-list__value">{{"Yes" if checkIn.manualIdCheck == "MATCH" else "No"}}</dd>
@@ -64,7 +64,7 @@
 
         <h2 class="govuk-heading-m govuk-!-margin-top-5">{{checkIn.offender.firstName}}s check in</h2>
         <hr class="govuk-section-break govuk-section-break--visible">
-        <dl class="govuk-summary-list govuk-!-margin-top-0">
+        <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>

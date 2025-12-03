@@ -1036,6 +1036,7 @@ describe('checkInsController', () => {
         id: req.params.id,
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
+        videoLink: `${config.esupervision.link}/practitioners/checkin/${req.params.id}/video`,
       })
     })
 
