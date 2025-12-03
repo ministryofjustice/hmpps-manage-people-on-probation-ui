@@ -14,7 +14,7 @@ const alertsController: Controller<typeof routes, void> = {
       const url = encodeURIComponent(req.url)
       const pageNumber = parseInt(page, 10)
 
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'DATE_AND_TIME.desc'
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const [sortName, sortDirection] = sortedBy.split('.')
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
@@ -23,7 +23,7 @@ const alertsController: Controller<typeof routes, void> = {
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(
         pageNumber,
-        sortName,
+        sortName.toUpperCase(),
         sortDirection as 'asc' | 'desc',
       )
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true

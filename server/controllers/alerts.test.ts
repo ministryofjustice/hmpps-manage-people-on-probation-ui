@@ -105,7 +105,7 @@ describe('alertsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
-        sortedBy: 'DATE_AND_TIME.desc',
+        sortedBy: 'date_and_time.desc',
         url: encodeURIComponent('/alerts'),
       })
     })
@@ -147,7 +147,7 @@ describe('alertsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: {}, // Expect empty object
-        sortedBy: 'DATE_AND_TIME.desc',
+        sortedBy: 'date_and_time.desc',
         url: encodeURIComponent('/alerts'),
       })
     })
