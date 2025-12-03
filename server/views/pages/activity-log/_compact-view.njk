@@ -31,7 +31,7 @@
               <a href="{{ link }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
                 <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
             </div>
-          {% elseif flags.enableESuperVision === true or entry.eSupervisionId === undefined %}
+          {% elseif flags.enableESuperVision === true or not entry.eSupervisionId %}
             {% include "./_compact-timeline-entry.njk" %}
           {% endif %}
         </li>
