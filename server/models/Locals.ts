@@ -103,6 +103,7 @@ interface Locals {
   alertsCount?: string
   alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
+  uploadError: string
 }
 
 export interface AppResponse extends Response {

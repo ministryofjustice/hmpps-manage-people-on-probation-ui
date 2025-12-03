@@ -28,6 +28,10 @@
             }) }}
         {% endif %}
     {% endif %}
+
+    {% block beforeHeading %}
+    {% endblock %}
+
     {% block heading %}
         {% if title %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
