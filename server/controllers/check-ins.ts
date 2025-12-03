@@ -5,9 +5,7 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { HmppsAuthClient } from '../data'
-import supervisionAppointmentClient from '../../wiremock/stubs/supervisionAppointmentClient'
-import { ESupervisionCheckIn, ESupervisionReview } from '../data/model/esupervision'
+import { ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -371,8 +369,8 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const review: ESupervisionReview = {
         practitioner: practitionerId,
-        manualIdCheck: checkIn.manualIdCheck,
-        missedCheckinComment: checkIn.note,
+        manualIdCheck: checkIn?.manualIdCheck,
+        missedCheckinComment: checkIn?.note,
       }
 
       const eSupervisionClient = new ESupervisionClient(token)
