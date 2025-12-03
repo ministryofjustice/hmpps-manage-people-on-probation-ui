@@ -23,7 +23,7 @@ $mappa-colour: #4c2c92;
 @import './components/summary-card';
 @import './components/card';
 @import 'assets/scss/local';
-@import 'assets/scss/_photo';
+@import './components/photo';
 @import './components/sortable-table';
 @import '../../node_modules/govuk-frontend/dist/govuk/base';
 @import '../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table';

@@ -41,7 +41,7 @@ export default function setUpWebSecurity(): Router {
               "'self' https://*.sentry.io",
               'js.monitor.azure.com',
               '*.applicationinsights.azure.com/v2/track',
-              'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+              config.probationFrontendComponents.connectSrc,
               // This is required for the S3 bucket to upload checkin images
               // (either have a custom domain or each environment or use the default wild card domain)
               'https://*.s3.eu-west-2.amazonaws.com',
@@ -55,7 +55,7 @@ export default function setUpWebSecurity(): Router {
           })(),
           workerSrc: ["'self' blob:"],
           styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
-          fontSrc: ["'self'", 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'],
+          fontSrc: ["'self'", config.probationFrontendComponents.fontSrc],
           formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
         },
       },

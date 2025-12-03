@@ -42,6 +42,10 @@ const buildConfig = {
         to: path.join(cwd, 'dist/assets/images'),
       },
       {
+        from: path.join(cwd, 'assets/js/fallback_prob_fe_app.js'),
+        to: path.join(cwd, 'dist/assets/js/fallback_prob_fe_app.js'),
+      },
+      {
         from: path.join(cwd, 'package.json'),
         to: path.join(cwd, 'dist/package.json'),
       },
