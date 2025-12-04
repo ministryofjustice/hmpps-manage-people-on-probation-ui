@@ -18,6 +18,7 @@ import arrangeAppointmentRoutes from './arrangeAppointment'
 import documentsRoutes from './documents'
 import alertsRoutes from './alerts'
 import eSuperVisionCheckInsRoutes from './eSupervisionCheckins'
+import whatsNew from './whatsNew'
 
 export default function routes(router: Router, services: Services): Router {
   home(router, services)
@@ -36,5 +37,6 @@ export default function routes(router: Router, services: Services): Router {
   documentsRoutes(router, services)
   alertsRoutes(router, services)
   eSuperVisionCheckInsRoutes(router, services)
+  whatsNew(router, services)
   return router
 }
