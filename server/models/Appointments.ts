@@ -141,6 +141,8 @@ export interface AppointmentPatch {
   notes?: string
   files?: string[]
   sensitive?: boolean
+  date?: string
+  startTime?: string
 }
 
 export interface RescheduleAppointment {
@@ -191,6 +193,7 @@ export interface LocalParams {
   forename?: string
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
+  isReschedule?: boolean
 }
 
 export interface MasUserDetails {

@@ -3,6 +3,7 @@ import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '..
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
+  AppointmentPatch,
   AppointmentSession,
   RescheduleAppointmentRequestBody,
   RescheduleAppointmentResponse,
@@ -12,10 +13,12 @@ import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEven
 
 import FlagService from '../services/flagService'
 import { FeatureFlags } from '../data/model/featureFlags'
+import { appointmentDateIsInPast } from './appointmentDateIsInPast'
+import { PersonAppointment } from '../data/model/schedule'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
-): Route<Promise<RescheduleAppointmentResponse>> => {
+): Route<Promise<RescheduleAppointmentResponse | PersonAppointment>> => {
   return async (req, res) => {
     const { crn, id: uuid, contactId } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -27,22 +30,35 @@ export const postRescheduleAppointments = (
     const selectedTeam = getDataValue(data, ['appointments', crn, uuid, 'user', 'teamCode'])
     const selectedLocation = getDataValue(data, ['appointments', crn, uuid, 'user', 'locationCode'])
     const staffCode = getDataValue(data, ['appointments', crn, uuid, 'user', 'staffCode'])
-    const body: RescheduleAppointmentRequestBody = {
-      date,
-      startTime: start,
-      endTime: end,
-      uuid,
-      staffCode,
-      teamCode: selectedTeam,
-      locationCode: selectedLocation,
-      requestedBy: rescheduleAppointment.whoNeedsToReschedule,
-      // rescheduleNotes: handleQuotes(rescheduleAppointment.reason),
-      //  rescheduleSensitive: rescheduleAppointment.sensitivity === 'Yes',
-      notes: handleQuotes(notes),
-      sensitive: sensitivity === 'Yes',
-      sendToVisor: visorReport === 'Yes',
+    const isInPast = appointmentDateIsInPast(req)
+    let response: RescheduleAppointmentResponse | PersonAppointment
+    if (!isInPast) {
+      const body: RescheduleAppointmentRequestBody = {
+        date,
+        startTime: start,
+        endTime: end,
+        uuid,
+        staffCode,
+        teamCode: selectedTeam,
+        locationCode: selectedLocation,
+        requestedBy: rescheduleAppointment.whoNeedsToReschedule,
+        // rescheduleNotes: handleQuotes(rescheduleAppointment.reason),
+        //  rescheduleSensitive: rescheduleAppointment.sensitivity === 'Yes',
+        notes: handleQuotes(notes),
+        sensitive: sensitivity === 'Yes',
+        sendToVisor: visorReport === 'Yes',
+      }
+      response = await masClient.putRescheduleAppointment(contactId, body)
+    } else {
+      const body: AppointmentPatch = {
+        id: parseInt(contactId, 10),
+        notes: handleQuotes(notes),
+        sensitive: sensitivity === 'Yes',
+        date,
+        startTime: start,
+      }
+      response = await masClient.patchAppointment(body)
     }
-    const response = await masClient.putRescheduleAppointment(contactId, body)
 
     /*
         const userDetails = await masClient.getUserDetails(username)

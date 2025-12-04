@@ -46,6 +46,7 @@ jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(),
   findUncompleted: jest.fn(),
   appointmentDateIsInPast: jest.fn(),
+  isRescheduleAppointment: jest.fn().mockImplementation(() => true),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -482,6 +483,7 @@ describe('controllers/arrangeAppointment', () => {
         personRisks: undefined,
         alertDismissed: false,
         isInPast: false,
+        isReschedule: true,
       })
     })
     it('should render the location date and time page if past appointment feature flag is disabled', async () => {
@@ -505,6 +507,7 @@ describe('controllers/arrangeAppointment', () => {
         personRisks: undefined,
         alertDismissed: false,
         isInPast: false,
+        isReschedule: true,
       })
     })
     it('If session has errors, it should delete the errors', async () => {
@@ -602,6 +605,7 @@ describe('controllers/arrangeAppointment', () => {
         change: mockReq.query.change,
         showValidation: false,
         isInPast: false,
+        isReschedule: true,
         alertDismissed: false,
         personRisks: undefined,
         _maxDate: '31/12/2199',
@@ -641,6 +645,7 @@ describe('controllers/arrangeAppointment', () => {
         showValidation: false,
         alertDismissed: false,
         isInPast: false,
+        isReschedule: true,
         personRisks: undefined,
       })
     })

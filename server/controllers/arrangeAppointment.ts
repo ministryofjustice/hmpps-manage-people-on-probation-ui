@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid'
-import { DateTime } from 'luxon'
 import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
@@ -18,6 +17,7 @@ import {
   findUncompleted,
   appointmentDateIsInPast,
   getAttendedCompliedProps,
+  isRescheduleAppointment,
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
@@ -27,6 +27,7 @@ import MasApiClient from '../data/masApiClient'
 import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
+import { PersonAppointment } from '../data/model/schedule'
 
 const routes = [
   'redirectToSentence',
@@ -89,8 +90,11 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   }
   if (req.url.includes('reschedule')) {
     baseUrl = `/case/${crn}/appointments/reschedule/${contactId}/${id}`
-    const response: RescheduleAppointmentResponse = await postRescheduleAppointments(client)(req, res)
-    backendId = response?.id
+    const response: RescheduleAppointmentResponse | PersonAppointment = await postRescheduleAppointments(client)(
+      req,
+      res,
+    )
+    backendId = 'id' in response ? response.id : contactId
   } else {
     const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
     backendId = response.appointments[response.appointments.length - 1].id
@@ -246,7 +250,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
-      const { change, validation } = req.query
+      const { change, validation } = req.query as Record<string, string>
       const showValidation = validation === 'true'
       const isInPast = appointmentDateIsInPast(req)
       const { enablePastAppointments } = res.locals.flags
@@ -258,6 +262,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           [`appointments-${crn}-${id}-user-locationCode`]: 'Select an appointment location',
         }
       }
+      const isReschedule = isRescheduleAppointment(req)
       if (change) {
         const date = getDataValue(data, ['appointments', crn, id, 'date'])
         setDataValue(data, ['appointments', crn, id, 'temp', 'date'], date)
@@ -286,6 +291,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         personRisks,
         isInPast,
         alertDismissed,
+        isReschedule,
         ...(!enablePastAppointments ? { _minDate } : {}),
       })
     }
@@ -357,8 +363,10 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { change } = req.query as Record<string, string>
       const { alertDismissed = false } = req.session
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const isReschedule = isRescheduleAppointment(req)
       res.render('pages/appointments/attended-complied', {
         crn,
         id,
@@ -369,6 +377,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         forename: convertToTitleCase(forename),
         surname: convertToTitleCase(surname),
         useDecorator: true,
+        isReschedule,
       })
     }
   },
