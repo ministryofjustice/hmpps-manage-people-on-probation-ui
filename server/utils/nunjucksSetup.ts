@@ -147,6 +147,9 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
+  njkEnv.addFilter('isArray', (str: string | string[]) => {
+    return Array.isArray(str)
+  })
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
