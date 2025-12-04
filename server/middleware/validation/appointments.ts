@@ -9,12 +9,12 @@ import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
 import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
+import { isRescheduleAppointment } from '../isRescheduleAppointment'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data, alertDismissed = false } = session
-  let isReschedulePage = false
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
@@ -35,7 +35,7 @@ const appointments: Route<void> = (req, res, next) => {
   if (
     [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
   ) {
-    localParams = { ...localParams, isInPast: appointmentDateIsInPast(req) }
+    localParams = { ...localParams, isInPast: appointmentDateIsInPast(req), isReschedule: isRescheduleAppointment(req) }
   }
   if (req.url.includes('/attended-complied')) {
     localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
@@ -243,7 +243,6 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateReschedule = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/reschedule/${contactId}/${id}`)) {
-      isReschedulePage = true
       render = `pages/appointments/reschedule`
       errorMessages = validateWithSpec(
         unflattenBracketKeys(req.body),
@@ -272,14 +271,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateReschedule()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-
-    // ** this is required for multifile upload but breaks the validation - needs investigation **
-
-    // if (isAddNotePage || isReschedulePage) {
-    //   req.session.errorMessages = errorMessages
-    //   req.session.body = body
-    //   return res.redirect(req.url)
-    // }
 
     return res.render(render, { errorMessages, ...localParams })
   }
