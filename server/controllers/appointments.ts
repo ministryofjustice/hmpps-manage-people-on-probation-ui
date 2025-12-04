@@ -19,7 +19,6 @@ import {
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { getQueryString } from './activityLog'
 
 const routes = [
   'getAppointments',
