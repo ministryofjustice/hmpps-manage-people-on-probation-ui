@@ -3,6 +3,7 @@ import type { Services } from '../services'
 import controllers from '../controllers'
 import validate from '../middleware/validation'
 import { autoStoreSessionData } from '../middleware'
+import { redirectWizard } from '../controllers/check-ins'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
@@ -17,6 +18,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     '/case/:crn/appointments/:id/check-in/date-frequency',
     autoStoreSessionData(hmppsAuthClient),
     validate.eSuperVision,
+    redirectWizard('/case/:crn/appointments/:id/check-in/date-frequency'),
     controllers.checkIns.postDateFrequencyPage(),
   )
 
@@ -28,6 +30,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     '/case/:crn/appointments/:id/check-in/contact-preference',
     autoStoreSessionData(hmppsAuthClient),
     validate.eSuperVision,
+    redirectWizard('/case/:crn/appointments/:id/check-in/contact-preference'),
     controllers.checkIns.postContactPreferencePage(),
   )
 
@@ -101,5 +104,11 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   router.post(
     '/case/:crn/appointments/:id/check-in/confirm-end',
     controllers.checkIns.getConfirmationPage(hmppsAuthClient),
+  )
+
+  router.post(
+    '/case/:crn/appointments/:id/check-in/take-a-photo',
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postTakeAPhotoPage(hmppsAuthClient),
   )
 }
