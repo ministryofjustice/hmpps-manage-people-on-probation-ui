@@ -7,7 +7,6 @@ import checkInReview from '../middleware/validation/checkInReview'
 import { getCheckIn } from '../middleware/getCheckIn'
 import { redirectWizard } from '../controllers/check-ins'
 
-
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
 
