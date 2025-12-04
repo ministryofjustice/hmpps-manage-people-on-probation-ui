@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg id="Layer_1" xmlns="http://www.w3.org/2000/svg" version="1.1" viewBox="0 0 99.2 127.6">
+  <defs>
+    <style>
+      .white-outline {
+      fill: none;
+      stroke: #fff;
+      stroke-miterlimit: 10;
+      }
+
+      .mask {
+      fill: #b1b4b6;
+      fill-opacity: 0.5;
+      }
+    </style>
+  </defs>
+  <path class="mask"
+        d="M0-.2V127.8h99V-.2H0ZM49.6,110c-19.6,0-35.4-20.7-35.4-46.2S30,17.6,49.6,17.6s35.4,20.7,35.4,46.2-15.9,46.2-35.4,46.2Z"/>
+  <ellipse class="white-outline" cx="49.6" cy="63.8" rx="35.4" ry="46.2"/>
+</svg>
