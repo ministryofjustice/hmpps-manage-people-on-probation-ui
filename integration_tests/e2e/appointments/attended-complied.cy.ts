@@ -25,6 +25,8 @@ const loadPage = () => {
   completeLocationDateTimePage({ dateInPast: true })
 }
 
+const isAttendedCompliedPage = true
+
 describe('Log attended and complied appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let recordAnOutcomePage: AttendedCompliedPage
@@ -37,7 +39,7 @@ describe('Log attended and complied appointment', () => {
     const name = 'Alton Berge'
     const now = DateTime.now()
     const yesterday = now.minus({ days: 1 })
-    const date = dateWithYear(yesterday.toFormat('yyyy-M-d'))
+    const date = dateWithYear(yesterday.toFormat('yyyy-M-dd'))
     const appointmentText = manageJourney
       ? '3 Way Meeting (NS) with Terry Jones on 21 February 2024'
       : `Planned Office Visit (NS) with Peter Parker on ${date}`
@@ -54,7 +56,7 @@ describe('Log attended and complied appointment', () => {
       recordAnOutcomePage = new AttendedCompliedPage()
       recordAnOutcomePage.getSubmitBtn().click()
       checkContent(manageJourney)
-      checkLogOutcomesAlert()
+      checkLogOutcomesAlert(isAttendedCompliedPage)
       recordAnOutcomePage.checkPageTitle(`Confirm if ${name} attended and complied`)
       recordAnOutcomePage.checkErrorSummaryBox(['Select if they attended and complied'])
       recordAnOutcomePage.getElement(`#${id}-error`).should($error => {
@@ -77,7 +79,7 @@ describe('Log attended and complied appointment', () => {
     it('should render page with correct elements', () => {
       checkContent(manageJourney)
     })
-    checkLogOutcomesAlert()
+    checkLogOutcomesAlert(isAttendedCompliedPage)
     it('should navigate to add appointment notes if the user submits after selecting the checkbox', () => {
       recordAnOutcomePage = new AttendedCompliedPage()
       cy.get('#outcomeRecorded').click()
@@ -101,7 +103,7 @@ describe('Log attended and complied appointment', () => {
     it('should render page with correct elements', () => {
       checkContent()
     })
-    checkLogOutcomesAlert()
+    checkLogOutcomesAlert(isAttendedCompliedPage)
     checkValidation()
     it('should link to the add notes page', () => {
       const id = getId()
