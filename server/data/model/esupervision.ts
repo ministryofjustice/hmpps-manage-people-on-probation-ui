@@ -4,19 +4,19 @@ export interface ESupervisionOffender {
   lastName: string
   crn?: string
   dateOfBirth?: string
-  status: string // INITIAL, VERIFIED, ACTIVE
+  status: 'INITIAL' | 'VERIFIED' | 'ACTIVE'
   practitioner: string
   createdAt: string
   email?: string
   phoneNumber?: string
   photoUrl?: string
   firstCheckin?: string
-  checkinInterval: string // WEEKLY, TWO_WEEKS, FOUR_WEEKS, EIGHT_WEEKS
+  checkinInterval: 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'
 }
 
 export interface ESupervisionCheckIn {
   uuid: string
-  status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED' // CREATED, SUBMITED, REVIEWED, CANCELLED, EXPIRED
+  status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED'
   dueDate: string
   offender: ESupervisionOffender
   submittedAt?: string
@@ -28,8 +28,8 @@ export interface ESupervisionCheckIn {
   checkinStartedAt?: string
   videoUrl?: string
   snapshotUrl?: string
-  autoIdCheck?: string // MATCH, NO_MATCH
-  manualIdCheck?: string // MATCH, NO_MATCH
+  autoIdCheck?: 'MATCH' | 'NO_MATCH'
+  manualIdCheck?: 'MATCH' | 'NO_MATCH'
   flaggedResponses: string[]
 }
 
@@ -39,7 +39,12 @@ export interface ESupervisionLog {
   createdAt: string
   uuid: string
   practitioner: string
-  logEntryType: string // OFFENDER_SETUP_COMPLETE, OFFENDER_DEACTIVATED, OFFENDER_CHECKIN_NOT_SUBMITTED, OFFENDER_CHECKIN_RESCHEDULED, OFFENDER_CHECKIN_OUTSIDE_ACCESS
+  logEntryType:
+    | 'OFFENDER_SETUP_COMPLETE'
+    | 'OFFENDER_DEACTIVATED'
+    | 'OFFENDER_CHECKIN_NOT_SUBMITTED'
+    | 'OFFENDER_CHECKIN_RESCHEDULED'
+    | 'OFFENDER_CHECKIN_OUTSIDE_ACCESS'
   checkin: string
 }
 
@@ -86,6 +91,6 @@ export interface LocationInfo {
 
 export interface ESupervisionReview {
   practitioner: string
-  manualIdCheck?: string // MATCH, NO_MATCH
+  manualIdCheck?: 'MATCH' | 'NO_MATCH'
   missedCheckinComment?: string
 }
