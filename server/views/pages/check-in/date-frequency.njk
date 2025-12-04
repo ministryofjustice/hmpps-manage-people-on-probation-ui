@@ -1,6 +1,7 @@
 {% extends "../_form.njk" %}
 {% set title = "Set up  online check ins" %}
-{% set backLink =  '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set backLink1 =  '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set backLink =  '/case/' + crn + '/appointments/check-in/' + 'instructions' if not cya else 'checkin-summary' %}
 {% set radioLabel =  "How often would you like "+ case.name.forename + " to check in?" %}
 {% block form %}
     <input type="hidden" name="checkInMinDate" value="{{checkInMinDate}}">

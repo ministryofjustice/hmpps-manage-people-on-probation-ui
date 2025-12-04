@@ -39,11 +39,9 @@ export const postCheckInDetails = (
       startedAt: new Date().toISOString(),
     }
     logger.info('Checkin Registration started')
-    logger.info('message: ', data)
     try {
       const setup: OffenderSetup = await eSupervisionClient.postOffenderSetup(data)
       const uploadLocation: LocationInfo = await eSupervisionClient.getProfilePhotoUploadLocation(setup, 'image/jpeg')
-      logger.info('locationInfo', { uploadLocation })
       return { setup, uploadLocation }
     } catch (error) {
       const statusCode = error?.data?.status || 500
