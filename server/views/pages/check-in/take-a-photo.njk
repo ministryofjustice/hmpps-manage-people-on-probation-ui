@@ -1,9 +1,30 @@
 {% extends "../_form.njk" %}
 {% set title = "Take a photo of " + case.name.forename %}
-{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-options' %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'photo-options' if not cya else 'checkin-summary' %}
 {% set hideButton =  true %}
+{% set formId =  true %}
+{% set formIdName =  'photoForm' %}
 {% set checkinPhotoPage =  true %}
 {% block form %}
-
-
+    <div class="es-photo-capture es-hidden" id="es-photo-capture">
+        <div class="es-photo-capture__wrap">
+            <video id="es-photo-capture__video" class="es-photo-capture__video"></video>
+            <span class="es-photo-capture__frame"></span>
+        </div>
+        <div class="govuk-button-group">
+            {{
+            govukButton({
+                text: "Take photo",
+                type: "button",
+                id: "take-photo",
+                disabled: true,
+                attributes: {
+                    'data-qa': 'submit-btn'
+                }
+            })
+            }}
+        </div>
+    </div>
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
+    <input type="hidden" name="userPhotoUpload" id="userPhotoUpload" value="false" />
 {% endblock %}

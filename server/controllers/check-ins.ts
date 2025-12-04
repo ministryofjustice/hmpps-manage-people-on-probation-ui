@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
-import { Controller } from '../@types'
+import { NextFunction, Request, Response } from 'express'
+import { Controller, Route } from '../@types'
 import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
@@ -39,6 +40,7 @@ const routes = [
   'getCheckinSummaryPage',
   'postCheckinSummaryPage',
   'getConfirmationPage',
+  'postTakeAPhotoPage',
 ] as const
 
 interface OptionPair {
@@ -81,6 +83,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const cya = req.query.cya === 'true'
       const today = new Date()
       // setting temporary fix for minDate
       // (https://github.com/ministryofjustice/moj-frontend/issues/923)
@@ -91,7 +94,7 @@ const checkInsController: Controller<typeof routes, void> = {
       } else {
         checkInMinDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
       }
-      return res.render(`pages/check-in/date-frequency.njk`, { crn, id, checkInMinDate })
+      return res.render(`pages/check-in/date-frequency.njk`, { crn, id, checkInMinDate, cya })
     }
   },
 
@@ -117,6 +120,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const { data, back } = req.session
+      const { cya } = req.query
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
       const checkInMobile = personalDetails.mobileNumber
@@ -131,8 +135,7 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.checkins?.contactUpdated
       }
-
-      return res.render('pages/check-in/contact-preference.njk', { crn, id, checkInMobile, checkInEmail })
+      return res.render('pages/check-in/contact-preference.njk', { crn, id, checkInMobile, checkInEmail, cya })
     }
   },
 
@@ -152,7 +155,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/photo-options.njk', { crn, id })
+      const cya = req.query.cya === 'true'
+      return res.render('pages/check-in/photo-options.njk', { crn, id, cya })
     }
   },
   getEditContactPrePage: hmppsAuthClient => {
@@ -181,14 +185,16 @@ const checkInsController: Controller<typeof routes, void> = {
         emailAddress: editCheckInEmail,
         mobileNumber: editCheckInMobile,
       }
-
+      let cyaQuery = ''
+      if (req.query?.cya === 'true') {
+        cyaQuery = '?cya=true'
+      }
       const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
       // Save to show success message on contact preferences page
       if (personalDetails?.crn) {
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'], true)
       }
-
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/contact-preference`)
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/contact-preference${cyaQuery}`)
     }
   },
   postPhotoOptionsPage: hmppsAuthClient => {
@@ -211,7 +217,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/take-a-photo.njk', { crn, id })
+      const cya = req.query.cya === 'true'
+      return res.render('pages/check-in/take-a-photo.njk', { crn, id, cya })
     }
   },
 
@@ -221,7 +228,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/upload-a-photo.njk', { crn, id })
+      const cya = req.query.cya === 'true'
+      return res.render('pages/check-in/upload-a-photo.njk', { crn, id, cya })
     }
   },
 
@@ -241,7 +249,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/photo-rules.njk', { crn, id })
+      const { photoUpload } = req.query
+      return res.render('pages/check-in/photo-rules.njk', { crn, id, photoUpload })
     }
   },
 
@@ -442,6 +451,30 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
     }
   },
+
+  postTakeAPhotoPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { userPhotoUpload } = req.body
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const photoRedirect = `/case/${crn}/appointments/${id}/check-in/photo-rules?photoUpload=${userPhotoUpload}`
+      return res.redirect(photoRedirect)
+    }
+  },
+}
+
+export const redirectWizard = (url: string): Route<Promise<void>> => {
+  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const { crn, id } = req.params
+    let redirectUrl = url
+    if (req.query.cya === 'true') {
+      redirectUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      return res.redirect(redirectUrl)
+    }
+    return next()
+  }
 }
 
 export default checkInsController
