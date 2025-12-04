@@ -1,0 +1,104 @@
+@use 'govuk-frontend/dist/govuk/index' as gds;
+
+.videoRecorder__videoWrap {
+  position: relative;
+  width: 100%;
+  max-width: 30rem;
+  background-color: #eee;
+  margin-bottom: 1rem;
+
+  &::before {
+    display: block;
+    padding-top: 133.33%;
+    content: '';
+  }
+}
+
+.videoRecorder__video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  z-index: 1;
+  transform: scaleX(-1);
+}
+
+.videoRecorder__video-preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.videoRecorder__tag {
+  position: absolute;
+  top: 2px;
+  left: 0;
+  right: 0;
+  z-index: 2;
+  display: none;
+  align-items: center;
+  padding: 5px;
+  max-width: none;
+  justify-content: center;
+  font-size: 19px;
+
+  &.status--recording {
+    font-weight: gds.$govuk-font-weight-bold;
+    background: gds.govuk-colour('red');
+    color: gds.govuk-colour('white');
+  }
+}
+
+.videoRecorder__frame {
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  background-image: url(/assets/images/frame.svg);
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.videoRecorder__video-preview + .videoRecorder__tag {
+  display: block;
+}
+
+.sticky-action-bar {
+  position: relative;
+  margin-bottom: 1rem;
+
+  &.stuck {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100;
+    padding: 1rem;
+    margin-bottom: 0;
+    background: rgba(255, 255, 255, 0.8);
+  }
+
+  &__inner {
+    max-width: 960px;
+    margin: 0 auto;
+  }
+
+  .govuk-button {
+    margin-bottom: 0;
+  }
+}
+
+#stickyActionSpacer, #stickyActionSentinel {
+  height: 0;
+}
