@@ -12,7 +12,6 @@ export interface ESupervisionOffender {
   photoUrl?: string
   firstCheckin?: string
   checkinInterval: string // WEEKLY, TWO_WEEKS, FOUR_WEEKS, EIGHT_WEEKS
-  // deactivationEntry
 }
 
 export interface ESupervisionCheckIn {
