@@ -31,7 +31,7 @@ export default class AddNotePage extends Page {
   }
 
   getFileUploadInput = () => {
-    return cy.get('#fileUpload-input')
+    return cy.get('#fileUpload')
   }
 
   getFileUploadLabel = () => {
