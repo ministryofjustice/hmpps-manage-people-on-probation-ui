@@ -108,7 +108,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const { data, back } = req.session
+      const { data } = req.session
       const { cya } = req.query
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
@@ -262,7 +262,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const userDetails: CheckinUserDetails = {
         ...savedUserDetails,
         uuid: id,
-        interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
+        interval: checkinIntervals.find(option => option.id === savedUserDetails?.interval)?.label,
         preferredComs: savedUserDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
         photoUploadOption:
           savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',

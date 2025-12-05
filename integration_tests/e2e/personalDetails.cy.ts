@@ -27,7 +27,7 @@ context('Personal Details', () => {
     page.getCardHeader('staffContacts').should('contain.text', 'Staff contacts')
     page.getCardHeader('equalityMonitoring').should('contain.text', 'Equality monitoring')
     page.getRowData('contactDetails', 'telephoneNumber', 'Value').should('contain.text', '0123456999')
-    page.getRowData('contactDetails', 'mobileNumber', 'Value').should('contain.text', '071838893')
+    page.getRowData('contactDetails', 'mobileNumber', 'Value').should('contain.text', '07783889300')
     page.getRowData('contactDetails', 'emailAddress', 'Value').should('contain.text', 'address1@gmail.com')
     page.getRowData('contactDetails', 'mainAddress', 'Value').should('contain.text', 'No fixed address')
     page.getRowData('contactDetails', 'otherAddresses', 'Value').should('contain.text', '1 other address')

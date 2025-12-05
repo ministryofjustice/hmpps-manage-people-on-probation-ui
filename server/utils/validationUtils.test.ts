@@ -24,6 +24,7 @@ import {
   contactPrefEmailCheck,
   hasAllDigits,
   contactPrefMobileCheck,
+  isValidMobileNumber,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -140,6 +141,24 @@ describe('is today or later', () => {
     ['populated invalid', [DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString()], true],
   ])('%s isTodayOrLater(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(isTodayOrLater(a)).toEqual(expected)
+  })
+})
+
+describe('is a valid mobile number', () => {
+  it.each([
+    ['empty string', '', false],
+    ['null', null, false],
+    ['undefined', undefined, false],
+    ['invalid', '01632', false],
+    ['invalid', '01632 960 000', false],
+    ['invalid', '01632960000', false],
+    ['invalid', '0163296asfsf', false],
+    ['invalid', '0163296a*)(*', false],
+    ['valid', '07771 900 900', true],
+    ['valid', '07771900900', true],
+    ['valid', '07783889300', true],
+  ])('%s isValidMobileNumber(%s, %s)', (_: string, a: string, expected: boolean) => {
+    expect(isValidMobileNumber(a)).toEqual(expected)
   })
 })
 
@@ -631,8 +650,12 @@ describe('isValidCharCount', () => {
       })
 
       test('returns true for valid digits case', () => {
-        expect(contactPrefMobileCheck(['TEXT', '123456'])).toBe(true)
-        expect(contactPrefMobileCheck(['TEXT', '9876543210'])).toBe(true)
+        expect(contactPrefMobileCheck(['TEXT', '07771 900 900'])).toBe(true)
+        expect(contactPrefMobileCheck(['TEXT', '07771900900'])).toBe(true)
+      })
+
+      test('returns false for landline number', () => {
+        expect(contactPrefMobileCheck(['TEXT', '0123456999'])).toBe(false)
       })
 
       test('returns false for invalid digits case', () => {
