@@ -176,7 +176,7 @@ describe('Arrange an appointment', () => {
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
-      typePage.getElement('.govuk-link').click()
+      cy.get(`[data-qa="who-will-attend-change-link"]`).click()
     })
     it('should render the attendee page', () => {
       attendancePage = new AttendancePage()
