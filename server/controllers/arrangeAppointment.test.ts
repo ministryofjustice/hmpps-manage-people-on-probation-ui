@@ -4,7 +4,14 @@ import controllers from '.'
 import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
-import { postAppointments, renderError, cloneAppointmentAndRedirect, getAppointment } from '../middleware'
+import {
+  postAppointments,
+  renderError,
+  cloneAppointmentAndRedirect,
+  getOfficeLocationsByTeamAndProvider,
+  checkAnswers,
+  getUserOptions,
+} from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
@@ -37,6 +44,10 @@ jest.mock('../middleware', () => ({
   renderError: jest.fn(() => mockMiddlewareFn),
   postAppointments: jest.fn(),
   cloneAppointmentAndRedirect: jest.fn(),
+  getOfficeLocationsByTeamAndProvider: jest.fn(() => mockMiddlewareFn),
+  getDefaultUser: jest.fn(() => mockMiddlewareFn),
+  checkAnswers: jest.fn(() => mockMiddlewareFn),
+  getUserOptions: jest.fn(() => mockMiddlewareFn),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -68,6 +79,11 @@ const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNum
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockedPostAppointments = postAppointments as jest.MockedFunction<typeof postAppointments>
 const mockedCloneAppointment = cloneAppointmentAndRedirect as jest.MockedFunction<typeof cloneAppointmentAndRedirect>
+const mockedCheckAnswers = checkAnswers as jest.MockedFunction<typeof checkAnswers>
+const mockGetOfficeLocationsByTeamAndProvider = getOfficeLocationsByTeamAndProvider as jest.MockedFunction<
+  typeof getOfficeLocationsByTeamAndProvider
+>
+const mockedGetUserOptions = getUserOptions as jest.MockedFunction<typeof getUserOptions>
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => uuid),
@@ -377,11 +393,28 @@ describe('controllers/arrangeAppointment', () => {
         appointmentBody: { temp: { providerCode, teamCode, username } },
       })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user'], {
-        teamCode,
+      expect(mockGetOfficeLocationsByTeamAndProvider).toHaveBeenCalled()
+      expect(mockedGetUserOptions).toHaveBeenCalled()
+      expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
+      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+        1,
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'providerCode'],
         providerCode,
+      )
+      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+        2,
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'teamCode'],
+        teamCode,
+      )
+      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+        3,
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'username'],
         username,
-      })
+      )
+
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
     })
     it('should redirect to the next uncompleted field if the change query parameter exists in the url', async () => {

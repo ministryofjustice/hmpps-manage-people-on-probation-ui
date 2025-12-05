@@ -5,7 +5,7 @@ import { Route } from '../@types'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/eSuperVision'
 import logger from '../../logger'
-import { ProbationPractitioner } from '../data/model/caseload'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const postCheckInDetails = (
   hmppsAuthClient: HmppsAuthClient,

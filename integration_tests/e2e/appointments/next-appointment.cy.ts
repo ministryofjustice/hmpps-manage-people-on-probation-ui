@@ -93,7 +93,7 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
+        .should('contain.text', 'Terry Jones (PS-PSO) (Automated Allocation Team, London)')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__actions')
@@ -138,7 +138,7 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
+        .should('contain.text', 'Terry Jones (PS-PSO) (Automated Allocation Team, London)')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__actions')
@@ -181,7 +181,7 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'peter parker (PS-PSO) (Automated Allocation Team, London)')
+        .should('contain.text', 'Peter Parker (PS-PSO) (Automated Allocation Team, London)')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__actions')
@@ -226,7 +226,7 @@ describe('Create next appointment', () => {
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__value')
-        .should('contain.text', 'terry jones (PS-PSO) (Automated Allocation Team, London)')
+        .should('contain.text', 'Terry Jones (PS-PSO) (Automated Allocation Team, London)')
       arrangeAnotherAppointmentPage
         .getSummaryListRow(3)
         .find('.govuk-summary-list__actions')
