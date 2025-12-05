@@ -13,6 +13,7 @@ import PhotoRulesPage from '../../pages/check-ins/photo-rules'
 import CheckYourAnswersPage from '../../pages/check-ins/check-your-answers'
 import CheckinConfirmationPage from '../../pages/check-ins/confirmation.page'
 import TakeAPhotoPage from '../../pages/check-ins/take-a-photo'
+import { statusErrors } from '../../../server/properties'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -520,5 +521,47 @@ context('check-ins error scenario ', () => {
     checkYourAnswersPage.checkOnPage()
     checkYourAnswersPage.getSubmitBtn().click()
     checkYourAnswersPage.getErrorText().should('contain.text', 'An error occurred during registration')
+  })
+
+  it('Should able to show error page, when checkin registration fails', () => {
+    loadPage()
+    cy.task('stubOffenderSetupComplete500Response')
+    cy.get('[data-qa="online-checkin-btn"]').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.getSubmitBtn().click()
+    const dateFrequencyPage = new DateFrequencyPage()
+    dateFrequencyPage.getDatePickerToggle().click()
+    dateFrequencyPage.getNextDayButton().click()
+    dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    dateFrequencyPage.getSubmitBtn().click()
+    const contactPreferencePage = new ContactPreferencePage()
+    contactPreferencePage.checkOnPage()
+    contactPreferencePage
+      .getCheckInPreferredComs()
+      .find('.govuk-radios__item')
+      .eq(0)
+      .find('.govuk-radios__input')
+      .click()
+    contactPreferencePage.getSubmitBtn().click()
+    const takeAPhotoOptionsPage = new TakeAPhotoOptionsPage()
+    takeAPhotoOptionsPage.checkOnPage()
+    takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    takeAPhotoOptionsPage.getSubmitBtn().click()
+    takeAPhotoOptionsPage.getBackLink().click()
+    takeAPhotoOptionsPage.checkOnPage()
+    takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
+    takeAPhotoOptionsPage.getSubmitBtn().click()
+    const uploadAPhoto = new UploadAPhotoPage()
+    uploadAPhoto.checkOnPage()
+    uploadAPhoto.uploadPhoto('person.jpg')
+    uploadAPhoto.continueButton().click()
+    const photoRules = new PhotoRulesPage()
+    photoRules.checkOnPage()
+    photoRules.getSubmitBtn().click()
+    const checkYourAnswersPage = new CheckYourAnswersPage()
+    checkYourAnswersPage.checkOnPage()
+    checkYourAnswersPage.getSubmitBtn().click()
+    cy.get('h1').should('contain.text', statusErrors[500].title)
+    cy.get('[data-qa="errorMessage"]').should('contain.html', statusErrors[500].message)
   })
 })
