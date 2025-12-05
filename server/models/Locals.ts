@@ -104,6 +104,7 @@ interface Locals {
   alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
   uploadError: string
+  renderPath: string
 }
 
 export interface AppResponse extends Response {

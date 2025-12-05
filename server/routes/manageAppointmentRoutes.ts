@@ -13,7 +13,6 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
     storage: multer.memoryStorage(),
     limits: {
       fileSize: config.maxFileSize,
-      fieldSize: 1 * 1024 * 1024, // 1 MB max per field
       files: 1,
     },
   })

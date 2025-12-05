@@ -7,6 +7,7 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
+import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
@@ -19,14 +20,7 @@ const appointments: Route<void> = (req, res, next) => {
   const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
-  let render = `pages/${[
-    url
-      .split('?')[0]
-      .split('/')
-      .filter(item => item)
-      .filter((_item, i) => ![0, 1, 3].includes(i))
-      .join('/'),
-  ]}`
+  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
 
   const validateType = (): void => {
     if (baseUrl.includes('/type')) {
@@ -161,15 +155,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateFile = () => {
-    if (baseUrl.includes(`/add-note`) && req?.file) {
-      if (req.file.size > config.maxFileSize) {
-        errorMessages = { ...errorMessages, 'file-upload-1': 'File size must be 5mb or under' }
-      }
-    }
-    return errorMessages
-  }
-
   const validateAddNote = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
@@ -184,11 +169,10 @@ const appointments: Route<void> = (req, res, next) => {
           maxCharCount,
         }),
       )
-      errorMessages = validateFile()
     }
   }
 
-  let errorMessages: Record<string, string> = {}
+  let errorMessages = res?.locals?.errorMessages || {}
   validateType()
   validateSentence()
   validateLocationDateTime()
