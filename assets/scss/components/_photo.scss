@@ -1,0 +1,99 @@
+.es-photo-capture {
+  &__wrap {
+    position: relative;
+    height: 460px;
+    width: 345px;
+    background-color: #000;
+    margin-bottom: 1rem;
+  }
+
+  &__video {
+    height: 100%;
+    width: 100%;
+    z-index: 1;
+    display: block;
+    object-fit: cover;
+    transform: scaleX(-1);
+  }
+
+  &__frame {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    background-image: url(/assets/images/frame.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+
+  canvas {
+    display: none;
+  }
+}
+
+.es-uploaded-image {
+  margin-bottom: 2rem;
+  text-align: center;
+
+  span {
+    display: block;
+    background: govuk-colour('light-grey');
+    padding: 1rem;
+    color: $govuk-text-colour;
+    @include govuk-font($size: 19);
+  }
+
+  img {
+    max-width: 100%;
+    max-height: 460px;
+    height: auto;
+    display: block;
+    box-shadow: rgba(0, 0, 0, 0.4) 0 1px 2px 0,
+    rgba(0, 0, 0, 0.1) 0 1px 4px 0;
+  }
+}
+
+.es-profile-image {
+  max-width: 100%;
+  margin-bottom: 2rem;
+}
+
+.es-profile-image--small {
+  max-width: 100%;
+  max-height: 250px;
+  height: auto;
+  display: block;
+}
+
+#photoPreview {
+  position: relative;
+  visibility: hidden;
+  width: 100%;
+  max-width: 300px;
+  overflow: clip;
+
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+}
+
+.es-flex-row {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  &__item {
+    flex: 1;
+    margin-right: 1rem;
+
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+}

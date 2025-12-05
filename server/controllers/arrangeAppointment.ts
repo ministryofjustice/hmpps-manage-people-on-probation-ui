@@ -142,8 +142,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -430,7 +429,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getCheckYourAnswers: () => {
     return async (req, res) => {
       const repeatingEnabled = res.locals.flags.enableRepeatAppointments === true
-      const { url } = req
+      const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       let location = null
@@ -461,7 +460,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postConfirmation: () => {
     return async (req, res) => {
       const { data } = req.session
-      const { url } = req
+      const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -472,7 +471,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
 
   getArrangeAnotherAppointment: () => {
     return async (req, res) => {
-      const { url } = req
+      const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!getDataValue<AppointmentSession>(data, ['appointments', crn, id])) {

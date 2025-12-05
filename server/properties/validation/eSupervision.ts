@@ -4,9 +4,9 @@ import {
   contactPrefMobileCheck,
   isEmail,
   isNotEmpty,
-  isNumeric,
   isValidDate,
   isValidDateFormat,
+  isValidMobileNumber,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -90,7 +90,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       optional: (page === 'edit-contact-preference' && !editCheckInMobile) || page !== 'edit-contact-preference',
       checks: [
         {
-          validator: isNumeric,
+          validator: isValidMobileNumber,
           msg: 'Enter a mobile number in the correct format.',
           log: 'Mobile number not in correct format in check in process',
         },
@@ -125,6 +125,16 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select an option to continue',
           log: 'Photo option, not selected',
+        },
+      ],
+    },
+    photoUpload: {
+      optional: page !== 'upload-a-photo',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select a photo of the person',
+          log: 'Photo not selected.',
         },
       ],
     },

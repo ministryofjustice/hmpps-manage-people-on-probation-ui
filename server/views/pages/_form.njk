@@ -11,8 +11,8 @@
 {% block content %}
   {% if not checkinPhotoPage %}
     {% include "../partials/pop-header.njk" %}
+      <hr class="govuk-section-break--l">
   {% endif %}
-  <hr class="govuk-section-break--l">
   {% if notStandardForm %}
     {% block primary %}{% endblock %}
   {% else %}
@@ -35,7 +35,7 @@
             </h2>
           {% endif %}
         {% endblock %}
-        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %}>
+        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %} {% if formId %} id="{{ formIdName }}"{% endif %}>
           {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
           {% block form %}{% endblock %}
           {% if not hideButton %}

@@ -24,6 +24,7 @@ import {
   contactPrefEmailCheck,
   hasAllDigits,
   contactPrefMobileCheck,
+  isValidMobileNumber,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -140,6 +141,24 @@ describe('is today or later', () => {
     ['populated invalid', [DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString()], true],
   ])('%s isTodayOrLater(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(isTodayOrLater(a)).toEqual(expected)
+  })
+})
+
+describe('is a valid mobile number', () => {
+  it.each([
+    ['empty string', '', false],
+    ['null', null, false],
+    ['undefined', undefined, false],
+    ['invalid', '01632', false],
+    ['invalid', '01632 960 000', false],
+    ['invalid', '01632960000', false],
+    ['invalid', '0163296asfsf', false],
+    ['invalid', '0163296a*)(*', false],
+    ['valid', '07771 900 900', true],
+    ['valid', '07771900900', true],
+    ['valid', '07783889300', true],
+  ])('%s isValidMobileNumber(%s, %s)', (_: string, a: string, expected: boolean) => {
+    expect(isValidMobileNumber(a)).toEqual(expected)
   })
 })
 
@@ -419,7 +438,7 @@ describe('validates appointment location and date time page request with spec', 
   })
 })
 
-describe('validates activity log filter request with spec', () => {
+describe('validates contacts filter request with spec', () => {
   const testRequest = {
     dateFrom: '10/4/2025',
     dateTo: '6/4/2025',
@@ -631,8 +650,12 @@ describe('isValidCharCount', () => {
       })
 
       test('returns true for valid digits case', () => {
-        expect(contactPrefMobileCheck(['TEXT', '123456'])).toBe(true)
-        expect(contactPrefMobileCheck(['TEXT', '9876543210'])).toBe(true)
+        expect(contactPrefMobileCheck(['TEXT', '07771 900 900'])).toBe(true)
+        expect(contactPrefMobileCheck(['TEXT', '07771900900'])).toBe(true)
+      })
+
+      test('returns false for landline number', () => {
+        expect(contactPrefMobileCheck(['TEXT', '0123456999'])).toBe(false)
       })
 
       test('returns false for invalid digits case', () => {
@@ -782,5 +805,36 @@ describe('validates photo options page', () => {
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
     expect(loggerSpy).toHaveBeenCalledWith('Photo option, not selected')
+  })
+})
+
+describe('validates upload a photo page', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          checkins: { photoUpload: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    photoUpload: 'Select a photo of the person',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'upload-a-photo',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Photo not selected.')
   })
 })

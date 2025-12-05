@@ -1,15 +1,35 @@
 {% extends "../_form.njk" %}
 {% set title = "Upload a photo of " + case.name.forename %}
-{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-options' %}
-{% set hideButton =  true %}
-{% set buttonText =  'Take photo' %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'photo-options' if not cya else 'checkin-summary' %}
+{% set buttonText =  'Continue' %}
 {% block form %}
 
-    <div class="govuk-inset-text">
-        <p>For data protection, you must delete any photos you have of people on <br/>probation form from your
-            device, and any systems you used to send photos to<br/> yourself, for example email or Teams.</p>
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+                {{ govukFileUpload({
+                    id: "photoUpload",
+                    name: "photoUpload",
+                    type: "file",
+                    classes: 'govuk-file-upload',
+                    label: {
+                        text: "Upload file",
+                        classes: "govuk-!-margin-bottom-2"
+                    },
+                    errorMessage: {
+                        text: "Select a photo of the person"
+                    } if errorMessages.photoUpload ,
+                    javascript: true,
+                    attributes: { accept: "image/*" }
+                }) }}
     </div>
+</div>
 
+                <div id="photoPreview"></div>
 
-
+                {{ govukInsetText({
+                    html: "For data protection, you must delete any photos you have of people on <br/>probation from your device, and any
+                        systems you used to send photos to <br/> yourself, for example Email or Teams."
+                }) }}
+                <input type="hidden" name="userPhotoUpload" id="userPhotoUpload" value="true" />
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
 {% endblock %}

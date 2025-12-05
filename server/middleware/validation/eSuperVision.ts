@@ -93,11 +93,25 @@ const eSuperVision: Route<void> = (req, res, next) => {
       )
     }
   }
+  const validateUploadPhotoPage = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/upload-a-photo`)) {
+      render = `pages/check-in/upload-a-photo`
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'upload-a-photo',
+        }),
+      )
+    }
+  }
   let errorMessages: Record<string, string> = {}
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()
   validatePhotoOptionsPage()
+  validateUploadPhotoPage()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

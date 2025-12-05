@@ -1048,7 +1048,7 @@ describe('controllers/arrangeAppointment', () => {
       })
       await controllers.arrangeAppointments.getArrangeAnotherAppointment()(mockReq, res)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/arrange-another-appointment`, {
-        url,
+        url: encodeURIComponent(url),
         crn,
         id: uuid,
       })
