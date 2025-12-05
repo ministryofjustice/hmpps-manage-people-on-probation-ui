@@ -10,7 +10,11 @@ const upload = multer({
     files: 1,
   },
   fileFilter: (_req, file, cb) => {
-    if (!config.validMimeTypes.includes(file.mimetype)) {
+    if (
+      !Object.entries(config.validMimeTypes)
+        .map(([_k, v]) => v)
+        .includes(file.mimetype)
+    ) {
       return cb(new MulterError('LIMIT_UNEXPECTED_FILE', file.fieldname))
     }
     return cb(null, true)

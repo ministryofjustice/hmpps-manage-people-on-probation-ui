@@ -169,7 +169,7 @@ describe('Manage appointment - add a note', () => {
     addNotePage.getSubmitBtn().click()
     addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
     cy.get('.govuk-error-summary__list a').should('contain.text', 'File size must be 5mb or under')
-    cy.get('.govuk-error-summary__list a').should('have.attr', 'href', '#file-upload-1')
+    cy.get('.govuk-error-summary__list a').should('have.attr', 'href', '#fileUpload')
   })
 
   for (const filetype of ['pdf', 'doc', 'docx']) {
