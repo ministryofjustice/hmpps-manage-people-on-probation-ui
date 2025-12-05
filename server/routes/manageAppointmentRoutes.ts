@@ -41,7 +41,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
   )
   router.post(
     '/appointments/file/delete',
-    upload.single('fileUpload'),
+    upload.single('file'),
     controllers.fileUpload.postDeleteFile(hmppsAuthClient),
   )
   return router

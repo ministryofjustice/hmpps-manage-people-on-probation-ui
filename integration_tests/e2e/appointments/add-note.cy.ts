@@ -163,20 +163,13 @@ describe('Manage appointment - add a note', () => {
 
   it('should display validation error for file over 5mb when continue is clicked', () => {
     loadPage()
-
-    const [fakeFile] = createFakeFile(6, 'pdf')
-
-    cy.get('input[type="file"][name="fileUpload"]').attachFile(fakeFile)
-
+    const [fakeFile, fileName] = createFakeFile(6, 'pdf')
+    addNotePage.getFileUploadInput().attachFile(fakeFile)
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
-
     addNotePage.getSubmitBtn().click()
-
     addNotePage.checkErrorSummaryBox(['File size must be 5mb or under'])
-
-    cy.get('.govuk-error-summary__list a')
-      .should('contain.text', 'File size must be 5mb or under')
-      .and('have.attr', 'href', '#fileUpload')
+    cy.get('.govuk-error-summary__list a').should('contain.text', 'File size must be 5mb or under')
+    cy.get('.govuk-error-summary__list a').should('have.attr', 'href', '#file-upload')
   })
 
   for (const filetype of ['pdf', 'doc', 'docx']) {
