@@ -17,12 +17,12 @@
 
 {% block beforeHeading %}
     {% if uploadError %}
-    {% set html %}
+        {% set html %}
         <p data-qa="uploadError" class="govuk-notification-banner__heading">
             {{ uploadError }}
         </p>
-    {% endset %}
-    {{ govukNotificationBanner({
+        {% endset %}
+        {{ govukNotificationBanner({
         html: html
     }) }}
     {% endif %}
@@ -75,23 +75,23 @@
             <label class="govuk-label govuk-label--m" for="fileUpload">
                 Upload a file (optional)
             </label>
-
+            {% if errorMessages.fileUpload %}
+                <p id="fileUpload-error" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span>
+                    {{ errorMessages.fileUpload }}
+                </p>
+            {% endif %}
             <div class="govuk-drop-zone" data-module="govuk-file-upload">
                 {{ govukFileUpload({
                     id: "fileUpload",
-                    name: "file",
+                    name: "fileUpload",
                     classes: "govuk-file-upload",
                     attributes: {
                         accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     }
                 }) }}
             </div>
-
-            {% if errorMessages.fileUpload %}
-                <p class="govuk-error-message">Only pdf and word files are allowed</p>
-            {% endif %}
         </div>
-
 
     </div>
 

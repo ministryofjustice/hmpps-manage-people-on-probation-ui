@@ -29,8 +29,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.post(
     '/case/:crn/appointments/appointment/:contactId/add-note',
-    upload.single('file'),
-    multerErrorHandler,
+    multerErrorHandler('fileUpload'),
     validate.appointments,
     controllers.appointments.postAddNote(hmppsAuthClient),
   )
