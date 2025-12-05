@@ -309,22 +309,17 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       try {
         const patchResponse = await masClient.patchDocuments(crn, id, file)
-        console.log("**************** ", patchResponse)
         if (patchResponse.statusCode < 200 || patchResponse.statusCode >= 300) {
           hasError = true
         }
-      } catch(e) {
+      } catch (e) {
         // When multer errors, we don't want to display upload failed banner
 
-        console.log("**************** multer exception", e)
-        console.log("**************** multer status code", e.status)
-        if(e.status !== 415){
+        if (e.status !== 415) {
           hasError = true
         }
       }
-      console.log("****************++ ")
-      console.log(hasError)
-      console.log("****************++ ")
+
       if (hasError) {
         return res.render(`pages/appointments/add-note`, {
           uploadError: 'Upload failed, please try again later',
