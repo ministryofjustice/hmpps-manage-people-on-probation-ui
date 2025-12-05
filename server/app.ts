@@ -26,7 +26,7 @@ import './sentry'
 import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
-import multipartRoutes from './routes/multipartRoutes'
+import manageAppointmentRoutes from './routes/manageAppointmentRoutes'
 import testRoutes from './routes/testRoutes'
 import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
 import { getUserAlertsCount } from './middleware/getUserAlertsCount'
@@ -63,7 +63,7 @@ export default function createApp(services: Services): express.Application {
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
   // Routes that use multer for multipart upload must be registered before csrf executes
   const router = Router()
-  app.use(multipartRoutes(router, services))
+  app.use(manageAppointmentRoutes(router, services))
   app.use(setUpCsrf())
   app.use(routes(router, services))
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)

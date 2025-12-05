@@ -13,112 +13,118 @@
         {% endif %}
     {% endfor %}
 {% endif %}
+{% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
+
+{% block beforeHeading %}
+    {% if uploadError %}
+        {% set html %}
+        <p data-qa="uploadError" class="govuk-notification-banner__heading">
+            {{ uploadError }}
+        </p>
+        {% endset %}
+        {{ govukNotificationBanner({
+        html: html
+    }) }}
+    {% endif %}
+{% endblock %}
+
 {% block form %}
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
     {{ govukDetails({
-                          classes: 'govuk-!-margin-bottom-6',
-                          summaryText: 'Take notes using CRISS',
-                          html: '<p class="govuk-body govuk-!-margin-bottom-1">CRISS stands for:</p><ul class="govuk-list govuk-list--bullet"><li>Check in with the person on probation</li><li>Review their progress from the last session</li><li>Intervention - target their criminogenic needs and risk</li><li>Summarise what you discussed in this session</li><li>Set tasks to review in the next session</li></ul>'
-                      }) }}
+        classes: 'govuk-!-margin-bottom-6',
+        summaryText: 'Take notes using CRISS',
+        html: '<p class="govuk-body govuk-!-margin-bottom-1">CRISS stands for:</p><ul class="govuk-list govuk-list--bullet"><li>Check in with the person on probation</li><li>Review their progress from the last session</li><li>Intervention - target their criminogenic needs and risk</li><li>Summarise what you discussed in this session</li><li>Set tasks to review in the next session</li></ul>'
+    }) }}
     {% if hasNotes %}
         <section data-qa="previousNotes">
             <h3 class="govuk-heading-m">Previous notes</h3>
             {{ govukInsetText({
-  html: notes
-}) }}
+                html: notes
+            }) }}
         </section>
     {% endif %}
     {{ govukButton({
-    text: "Show CRISS headers",
-    classes: "govuk-button--secondary",
-    id: "crissButton",
-    attributes: {
-        'data-qa': 'crissButton'
-    },
-    type: 'button'
+        text: "Show CRISS headers",
+        classes: "govuk-button--secondary",
+        id: "crissButton",
+        attributes: {
+            'data-qa': 'crissButton'
+        },
+        type: 'button'
     }) }}
 
     {{ govukCharacterCount({
-  id: "notes",
-  name: "notes",
-  rows: '10',
-  maxlength: maxCharCount,
-  classes: "",
-  formGroup: {
-    attributes: { "data-qa": "notes"}
-   },
-  value: body.notes,
-   errorMessage: {
-        text: 'Note must be ' + maxCharCount + ' characters or less'
-    }  if errorMessages.notes
-}) }}
+        id: "notes",
+        name: "notes",
+        rows: '10',
+        maxlength: maxCharCount,
+        classes: "",
+        formGroup: {
+            attributes: { "data-qa": "notes"}
+        },
+        value: body.notes,
+        errorMessage: {
+            text: 'Note must be ' + maxCharCount + ' characters or less'
+        }  if errorMessages.notes
+    }) }}
 
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
 
-    {% set uploadHtml %}
-    <div class="govuk-grid-row govuk-body">
-        <div class="govuk-grid-column-full">
-
-            {{ govukFileUpload({
-                            id: "file-upload-1",
-                            name: "file",
-                            classes: 'moj-multi-file-upload__input',
-                            label: {
-                                text: "Upload files",
-                                classes: 'govuk-label--m'
-                            },
-                            attributes: { multiple: '' }
-                        }) }}
-
-            {{ govukButton({
-                            text: 'Upload file',
-                            classes: 'govuk-button--secondary moj-multi-file-upload__button'
-                        }) }}
+    <div class="govuk-!-margin-bottom-6">
+        <div class="govuk-form-group">
+            <label class="govuk-label govuk-label--m" for="fileUpload">
+                Upload a file (optional)
+            </label>
+            {% if errorMessages.fileUpload %}
+                <p id="fileUpload-error" class="govuk-error-message">
+                    <span class="govuk-visually-hidden">Error:</span>
+                    {{ errorMessages.fileUpload }}
+                </p>
+            {% endif %}
+            <div class="govuk-drop-zone" data-module="govuk-file-upload">
+                {{ govukFileUpload({
+                    id: "fileUpload",
+                    name: "fileUpload",
+                    classes: "govuk-file-upload",
+                    attributes: {
+                        accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    }
+                }) }}
+            </div>
         </div>
-    </div>
-    {% endset %}
 
-    {{ mojMultiFileUpload({
-                        id: "file-upload-1",
-                        name: "fileName",
-                        label: { text: "Upload or drag and drop documents" },
-                        uploadedFiles: {
-                            heading: { text: 'Files added' },
-                            items: uploadedFiles
-                        },
-                        uploadHtml: uploadHtml
-                    }) }}
+    </div>
 
     {{ govukRadios({
         name: 'sensitive',
         id: 'sensitive',
-    fieldset: {
-        legend: {
-            text: 'Does this appointment include sensitive information?',
-            classes: "govuk-fieldset__legend--m",
-            isPageHeading: false
-        }
-    },
-    formGroup: {
-        attributes: {
-            'data-qa': 'sensitiveInformation'
-        }
-    },
-    hint: {
-        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
-    },
-    items: [
-        {
-            value: 'Yes',
-            text: "Yes, it includes sensitive information"
+        fieldset: {
+            legend: {
+                text: 'Does this appointment include sensitive information?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+            }
         },
-        {
-            value: 'No',
-            text: "No, it is not sensitive"
-        }
-    ],
-    errorMessage: {
-        text: "Please select an option"
-    }  if errorMessages.sensitive 
-}) }}
+        formGroup: {
+            attributes: {
+                'data-qa': 'sensitiveInformation'
+            }
+        },
+        hint: {
+            text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+        },
+        items: [
+            {
+                value: 'Yes',
+                text: "Yes, it includes sensitive information"
+            },
+            {
+                value: 'No',
+                text: "No, it is not sensitive"
+            }
+        ],
+        errorMessage: {
+            text: "Please select an option"
+        }  if errorMessages.sensitive
+    }) }}
 {% endblock %}
