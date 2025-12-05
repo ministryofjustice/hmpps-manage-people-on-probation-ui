@@ -4,7 +4,6 @@ const technicalUpdates = JSON.parse(fs.readFileSync('./technicalUpdates.json').t
 
 export default class TechnicalUpdatesService {
   getTechnicalUpdates() {
-    console.dir(technicalUpdates, { depth: null })
     return technicalUpdates
   }
 
