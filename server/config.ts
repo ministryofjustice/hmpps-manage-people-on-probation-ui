@@ -239,7 +239,7 @@ export default {
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
   fileUploadLimit: 5,
-  maxCharCount: 4000,
+  maxCharCount: get('CHAR_COUNT', 12000, requiredInProduction),
   preservedWords: ['(NS)', '(Non', 'NS)'],
   preservedSeparators: ['-'],
 }

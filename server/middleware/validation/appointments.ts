@@ -16,7 +16,17 @@ const appointments: Route<void> = (req, res, next) => {
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
+  const localParams: LocalParams = {
+    crn,
+    id,
+    body,
+    contactId,
+    actionType,
+    personLevel,
+    maxCharCount: maxCharCount as number,
+    back,
+    change,
+  }
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage = false
   let render = `pages/${[
@@ -141,7 +151,7 @@ const appointments: Route<void> = (req, res, next) => {
           contactId,
           page: 'supporting-information',
           notes: req.body.appointments[crn][id].notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }
@@ -172,7 +182,7 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           page: 'add-note',
           notes: req.body.notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }

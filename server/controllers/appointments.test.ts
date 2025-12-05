@@ -439,7 +439,7 @@ describe('controllers/appointments', () => {
         fileUploadLimit,
         maxFileSize,
         url: '',
-        maxCharCount: 4000,
+        maxCharCount: 12000,
         validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })

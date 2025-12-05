@@ -33,29 +33,33 @@ describe('Add supporting information (optional)', () => {
     checkPopHeader('Alton Berge', true)
   })
 
-  it('should display validation errors if note is more than 4000 character', () => {
+  it('should display validation errors if note is more than 12000 character', () => {
     loadPage()
-    const note = 'x'.repeat(4001)
-    cy.get(`#appointments-${crn}-${uuid}-notes`).type(note, { delay: 0 })
+    const note = 'x'.repeat(12001)
+    cy.get(`#appointments-${crn}-${uuid}-notes`).invoke('val', note).trigger('input')
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
     appointmentNotePage.getSubmitBtn().click()
-    appointmentNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    appointmentNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
     appointmentNotePage
       .getElement(`#appointments-${crn}-${uuid}-notes-error`)
-      .should('contain.text', 'Note must be 4000 characters or less')
+      .should('contain.text', 'Note must be 12000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
   })
 
   it('should count a return as 1 character', () => {
     loadPage()
-    const paragraph = 'x'.repeat(2000)
-    cy.get(`#appointments-${crn}-${uuid}-notes`).type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
+    cy.get(`#appointments-${crn}-${uuid}-notes`).then($el => {
+      const paragraph = 'x'.repeat(6000)
+      const value = `${paragraph}\n\n${paragraph}`
+      $el.val(value)
+      $el[0].dispatchEvent(new Event('input', { bubbles: true }))
+    })
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
     appointmentNotePage.getSubmitBtn().click()
-    appointmentNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
+    appointmentNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
     appointmentNotePage
       .getElement(`#appointments-${crn}-${uuid}-notes-error`)
-      .should('contain.text', 'Note must be 4000 characters or less')
+      .should('contain.text', 'Note must be 12000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
   })
   it('should show validation errors if sensitivity option is not selected', () => {
