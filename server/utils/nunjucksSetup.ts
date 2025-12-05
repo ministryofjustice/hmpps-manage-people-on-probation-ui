@@ -67,6 +67,7 @@ import {
   convertToTitleCase,
   getPersonLevelTypes,
   handleQuotes,
+  merge,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -139,6 +140,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('shortTime', shortTime)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
+  njkEnv.addFilter('merge', merge)
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
