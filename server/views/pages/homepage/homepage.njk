@@ -1,5 +1,5 @@
 {% extends "../../partials/layout.njk" %}
-{% from "../../_components/govuk/accordion-mpop/macro.njk" import govukAccordion %}
+{% from "../../_components/govuk/accordion-mpop/macro.njk" import probationAccordion %}
 {% from "probation/case-search/macro.njk" import caseSearch %}
 
 {% set mainClasses = "app-container govuk-body" %}
@@ -28,7 +28,7 @@
 {% endset %}
 
 {% block content %}
-  {{ govukAccordion({
+  {{ probationAccordion({
     id: "accordion-default",
     attributes: {
      'data-qa': 'homepage-appointments'
@@ -50,7 +50,7 @@
     ]
   }) }}
 
-  {{ govukAccordion({
+  {{ probationAccordion({
     id: "accordion-default",
     attributes: {
      'data-qa': 'homepage-outcomes'

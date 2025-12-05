@@ -69,6 +69,7 @@ import {
   getPersonLevelTypes,
   handleQuotes,
   dateToLongDate,
+  merge,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -147,6 +148,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
+  njkEnv.addFilter('merge', merge)
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
