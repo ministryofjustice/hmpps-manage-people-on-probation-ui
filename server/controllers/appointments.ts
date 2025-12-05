@@ -16,7 +16,7 @@ import {
   setDataValue,
   getDataValue,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getQueryString } from './activityLog'
@@ -219,6 +219,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      const { alertDismissed = false } = req.session
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
@@ -227,8 +228,16 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const headerPersonName = `${forename} ${surname}`
       res.render('pages/appointments/attended-complied', {
         crn,
+        alertDismissed,
+        isInPast: true,
+        headerPersonName,
+        forename,
+        surname,
+        appointment,
       })
     }
   },
@@ -292,7 +301,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { notes, sensitive } = req.body
-      const { data } = req.session
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 

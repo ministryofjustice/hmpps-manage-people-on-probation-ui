@@ -1,3 +1,4 @@
+import { type AttendedCompliedAppointment } from '../middleware'
 import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
@@ -12,11 +13,6 @@ export interface AppointmentSession {
     teamCode?: string
     username?: string
     locationCode?: string
-  }
-  temp?: {
-    providerCode?: string
-    teamCode?: string
-    username?: string
   }
   type?: string
   visorReport?: YesNo
@@ -38,7 +34,14 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
-  outcomeRecorded?: boolean
+  outcomeRecorded?: YesNo
+  temp?: {
+    providerCode?: string
+    teamCode?: string
+    username?: string
+    isInPast?: boolean
+    date?: string
+  }
 }
 
 export interface AppointmentType {
@@ -100,6 +103,7 @@ export interface AppointmentRequestBody {
   notes?: string
   sensitive?: boolean
   visorReport?: boolean
+  outcomeRecorded?: boolean
 }
 
 export interface CheckAppointment {
@@ -152,6 +156,11 @@ export interface LocalParams {
   actionType?: string
   back?: string
   change?: string
+  isInPast?: boolean
+  alertDismissed?: boolean
+  forename?: string
+  appointment?: AttendedCompliedAppointment | Activity
+  useDecorator?: boolean
 }
 
 export interface MasUserDetails {
