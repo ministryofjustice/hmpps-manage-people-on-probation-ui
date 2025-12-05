@@ -7,6 +7,7 @@ import {
   isNumeric,
   isUkPostcode,
   isValidDate,
+  isValidMobileNumber,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -41,7 +42,7 @@ export const personDetailsValidation = ({
     optional: editingMainAddress === false || !mobileNumber,
     checks: [
       {
-        validator: isNumeric,
+        validator: isValidMobileNumber,
         msg: 'Enter a mobile number in the correct format.',
       },
       {
