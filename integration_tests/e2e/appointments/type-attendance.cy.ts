@@ -194,6 +194,7 @@ describe('Arrange an appointment', () => {
     beforeEach(() => {
       loadPage()
       typePage = new AppointmentTypePage()
+      cy.get(`[data-qa="changeAttendeeLink"]`).click()
     })
     it('should render the attendee page with the default user selected', () => {
       typePage.getRadio('type', 2).click()
