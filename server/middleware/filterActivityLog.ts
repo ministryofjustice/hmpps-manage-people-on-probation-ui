@@ -9,8 +9,8 @@ import { Option } from '../models/Option'
 
 export const filterActivityLog: Route<void> = (req, res, next): void => {
   if (req?.query?.clear) {
-    req.session.activityLogFilters = undefined
-    req.session.errorMessages = undefined
+    delete req.session.activityLogFilters
+    delete req.session.errorMessages
   }
   const { clearFilterKey, clearFilterValue } = req.query
   const view = req?.query?.view ?? req?.body?.view

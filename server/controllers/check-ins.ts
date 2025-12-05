@@ -6,9 +6,13 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import { ESupervisionCheckIn, ESupervisionReview } from '../data/model/esupervision'
+import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
+import config from '../config'
+import { ProbationPractitioner } from '../data/model/caseload'
 
 const routes = [
   'getIntroPage',
@@ -25,6 +29,13 @@ const routes = [
   'getUploadPhotoPage',
   'postUploadaPhotoPage',
   'getPhotoRulesPage',
+  'getUpdateCheckIn',
+  'getViewCheckIn',
+  'getReviewExpiredCheckIn',
+  'getReviewIdentityCheckIn',
+  'postReviewIdentityCheckIn',
+  'getReviewNotesCheckIn',
+  'postReviewCheckIn',
   'postPhotoRulesPage',
   'getCheckinSummaryPage',
   'postCheckinSummaryPage',
@@ -242,13 +253,150 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/photo-rules.njk', { crn, id, photoUpload })
     }
   },
+
+  getUpdateCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+
+      const { checkIn } = res.locals
+
+      const statusMap = {
+        REVIEWED: 'view',
+        SUBMITTED: 'review/identity',
+        EXPIRED: 'review/expired',
+      }
+      if (Object.keys(statusMap).includes(checkIn.status)) {
+        return res.redirect(
+          `/case/${crn}/appointments/${id}/check-in/${statusMap[checkIn.status]}${back ? `?back=${back}` : ''}`,
+        )
+      }
+      return renderError(404)(req, res)
+    }
+  },
+
+  getViewCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+
+      const { checkIn } = res.locals
+
+      const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
+
+      if (checkIn.status !== 'REVIEWED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+      }
+      return res.render('pages/check-in/view.njk', { crn, id, back, checkIn, videoLink })
+    }
+  },
+
+  getReviewExpiredCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+      const { checkIn } = res.locals
+
+      if (checkIn.status !== 'EXPIRED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+      }
+      return res.render('pages/check-in/review/expired.njk', { crn, id, back, checkIn })
+    }
+  },
+
+  getReviewIdentityCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+      const { checkIn } = res.locals
+
+      const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
+
+      if (checkIn.status !== 'SUBMITTED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+      }
+      return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn, videoLink })
+    }
+  },
+
+  postReviewIdentityCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const url = encodeURIComponent(req.url)
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/notes?back=${url}`)
+    }
+  },
+
+  getReviewNotesCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { checkIn } = res.locals
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+      const { data } = req.session
+      const checkInSession = getDataValue(data, ['esupervision', crn, id, 'checkins'])
+      if (checkInSession?.manualIdCheck === undefined) {
+        return res.redirect(back ? (back as string) : `/case/${crn}/appointments/${id}/check-in/review/identity`)
+      }
+
+      if (checkIn.status !== 'SUBMITTED') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+      }
+      return res.render('pages/check-in/review/notes.njk', { crn, id, back, checkIn })
+    }
+  },
+
+  postReviewCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const url = encodeURIComponent(req.url)
+
+      const { data } = req.session
+      const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
+      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+
+      const review: ESupervisionReview = {
+        practitioner: practitionerId,
+        manualIdCheck: checkIn?.manualIdCheck,
+        missedCheckinComment: checkIn?.note,
+      }
+
+      const eSupervisionClient = new ESupervisionClient(token)
+      await eSupervisionClient.postOffenderCheckInReview(id, review)
+
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${url}`)
+    }
+  },
   postPhotoRulesPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/checkin-summary`)
     }
   },

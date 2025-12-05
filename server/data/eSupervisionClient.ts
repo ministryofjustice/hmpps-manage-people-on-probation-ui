@@ -1,7 +1,14 @@
 import config from '../config'
 import RestClient from './restClient'
 
-import { LocationInfo, OffenderInfo, OffenderSetup } from './model/eSuperVision'
+import {
+  ESupervisionCheckIn,
+  ESupervisionCheckInResponse,
+  ESupervisionReview,
+  LocationInfo,
+  OffenderInfo,
+  OffenderSetup,
+} from './model/esupervision'
 
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {
@@ -26,6 +33,19 @@ export default class ESupervisionClient extends RestClient {
       handle404: false,
       handle500: false,
       errorMessageFor500: 'Failed to fetch upload upload location',
+    })
+  }
+
+  async getOffenderCheckIn(uuid: string): Promise<ESupervisionCheckInResponse> {
+    return this.get({
+      path: `/offender_checkins/${uuid}`,
+    })
+  }
+
+  async postOffenderCheckInReview(uuid: string, review: ESupervisionReview): Promise<ESupervisionCheckIn> {
+    return this.post({
+      path: `/offender_checkins/${uuid}/review`,
+      data: review,
     })
   }
 }
