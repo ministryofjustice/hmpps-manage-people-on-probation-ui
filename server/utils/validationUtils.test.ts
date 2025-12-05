@@ -553,16 +553,16 @@ describe('isValidCharCount', () => {
   it('should return true if no value', () => {
     expect(isValidCharCount([null])).toEqual(true)
   })
-  it('should return true if value is less than 4000 chars', () => {
-    const value = 'x'.repeat(4000)
+  it('should return true if value is less than 12000 chars', () => {
+    const value = 'x'.repeat(12000)
     expect(isValidCharCount([value])).toEqual(true)
   })
-  it('should return false if value is more than 4000 chars', () => {
-    const value = 'x'.repeat(4001)
+  it('should return false if value is more than 12000 chars', () => {
+    const value = 'x'.repeat(12001)
     expect(isValidCharCount([value])).toEqual(false)
   })
-  it('should return false if value including line breaks is more than 4000 chars', () => {
-    const paragraph = 'x'.repeat(1000)
+  it('should return false if value including line breaks is more than 12000 chars', () => {
+    const paragraph = 'x'.repeat(3000)
     const value = `${paragraph}\r\n${paragraph}\r\n${paragraph}\r\n${paragraph}`
     expect(isValidCharCount([value])).toEqual(false)
   })
