@@ -127,7 +127,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
     redirectWizard(['eventId', 'type', ['user', 'locationCode'], 'repeating']),
-    controllers.arrangeAppointments.getConfirmation(),
+    // getAppointment(hmppsAuthClient),
+    controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
   )
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
   router.get(
