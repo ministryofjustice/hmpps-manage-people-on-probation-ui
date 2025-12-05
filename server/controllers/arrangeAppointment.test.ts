@@ -56,6 +56,7 @@ jest.mock('../data/masApiClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
       getPersonRiskFlags: jest.fn(),
+      getUserDetails: jest.fn().mockImplementation(() => Promise.resolve({ firstName: 'first' })),
     }
   })
 })
@@ -965,9 +966,12 @@ describe('controllers/arrangeAppointment', () => {
   })
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
-      const mockReq = createMockRequest()
-      await controllers.arrangeAppointments.getConfirmation()(mockReq, res)
-      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, { crn })
+      const mockReq = createMockRequest({ appointmentSession: { user: { username: '' } } })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
+        crn,
+        attendingName: "first's ",
+      })
     })
   })
   describe('postConfirmation', () => {
