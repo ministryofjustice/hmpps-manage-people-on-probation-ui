@@ -441,8 +441,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const attending = getDataValue(data, ['appointments', crn, id, 'user'])
-      console.log(attending)
-      console.log(res.locals.user.username)
       let attendingName = 'Your '
       if (attending.username.toUpperCase() !== res.locals.user.username) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
