@@ -441,12 +441,18 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const attending = getDataValue(data, ['appointments', crn, id, 'user'])
+      console.log(attending)
+      console.log(res.locals.user.username)
       let attendingName = 'Your '
       if (attending.username.toUpperCase() !== res.locals.user.username) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
-        const user = await masClient.getUserDetails(attending.username.toUpperCase())
-        attendingName = `${user.firstName}'s `
+        try {
+          const user = await masClient.getUserDetails(attending.username.toUpperCase())
+          attendingName = `${user.firstName}'s `
+        } catch {
+          attendingName = `The officer's `
+        }
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
