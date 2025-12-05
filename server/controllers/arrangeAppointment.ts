@@ -1,10 +1,15 @@
 import { v4 as uuidv4 } from 'uuid'
-import { DateTime } from 'luxon'
 import { Request } from 'express'
 import { Controller } from '../@types'
 import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { ArrangedSession } from '../models/ArrangedSession'
-import { renderError, postAppointments } from '../middleware'
+import {
+  renderError,
+  postAppointments,
+  getOfficeLocationsByTeamAndProvider,
+  checkAnswers,
+  getUserOptions,
+} from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
@@ -188,7 +193,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       return res.render(`pages/arrange-appointment/attendance`, { crn, id, errors, change })
     }
   },
-  postWhoWillAttend: () => {
+  postWhoWillAttend: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -201,7 +206,12 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
       if (providerCode) {
-        setDataValue(data, ['appointments', crn, id, 'user'], { teamCode, providerCode, username })
+        setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
+        setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
+        setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
+        await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
+        await getUserOptions(hmppsAuthClient)(req, res)
+        checkAnswers(req, res)
       }
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp

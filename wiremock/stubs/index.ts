@@ -15,6 +15,8 @@ import risk from './risk'
 import supervisionAppointmentClient from './supervisionAppointmentClient'
 import probationFEIntegration from './probationFEIntegration'
 import alerts from './alerts'
+import caseDetail from './caseDetail'
+import user from './user'
 import eSupervisionAPI from './eSupervisionAPI'
 
 export default {
@@ -35,5 +37,7 @@ export default {
   ...supervisionAppointmentClient,
   ...probationFEIntegration,
   ...alerts,
+  ...caseDetail,
+  ...user,
   ...eSupervisionAPI,
 }
