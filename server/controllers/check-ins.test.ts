@@ -11,7 +11,8 @@ import { defaultUser } from './mocks/alerts'
 import logger from '../../logger'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import config from '../config'
-import { ProbationPractitioner } from '../data/model/caseload'
+import { ProbationPractitioner } from '../models/CaseDetail'
+import ESupervisionClient from '../data/eSupervisionClient'
 
 jest.mock('../../logger', () => ({
   info: jest.fn(),
@@ -68,6 +69,7 @@ jest.mock('../data/eSupervisionClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
       postOffenderCheckInReview: jest.fn().mockImplementation(() => Promise.resolve({})),
+      postOffenderSetupComplete: jest.fn().mockImplementation(async () => undefined),
     }
   })
 })

@@ -11,8 +11,8 @@ import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
-import { ProbationPractitioner } from '../data/model/caseload'
 import { postCheckinInComplete } from '../middleware/postCheckinComplete'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 const routes = [
   'getIntroPage',

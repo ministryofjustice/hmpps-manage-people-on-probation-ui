@@ -85,8 +85,8 @@ export interface ESupervisionReview {
   practitioner: string
   manualIdCheck?: 'MATCH' | 'NO_MATCH'
   missedCheckinComment?: string
+}
 
-  
 export interface OffenderSetupCompleteResponse {
   uuid: string
   crn: string
