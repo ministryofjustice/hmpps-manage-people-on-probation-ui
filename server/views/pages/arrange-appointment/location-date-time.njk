@@ -154,6 +154,13 @@
           attributes: { "data-qa": "nonWorkingDayNameWarning"},
           html: warningMessages.nonWorkingDayName
       }) if warningMessages.nonWorkingDayName }}
+        {{ mojAlert({
+          variant: "warning",
+          title: warningMessages.overlapsWithMeetingWith,
+          dismissible: true,
+          attributes: { "data-qa": "overlapsWithMeetingWith"},
+          html: warningMessages.overlapsWithMeetingWith
+      }) if warningMessages.overlapsWithMeetingWith }}
     {% endif %}
     {% if showCircumstances %}
         {{ govukDetails({
