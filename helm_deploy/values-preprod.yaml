@@ -33,6 +33,7 @@ generic-service:
     TIER_LINK: 'https://tier-preprod.hmpps.service.justice.gov.uk/case'
     SENTENCE_PLAN_LINK: 'https://sentence-plan-preprod.hmpps.service.justice.gov.uk'
     E_SUPERVISION_API_URL: 'https://esupervision-api-preprod.hmpps.service.justice.gov.uk'
+    CHAR_COUNT: 4000
     ENVIRONMENT_NAME: PRE-PRODUCTION
     ENVIRONMENT: preprod
 

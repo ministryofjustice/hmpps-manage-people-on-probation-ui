@@ -4,7 +4,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
-import { getDataValue } from '../utils'
+import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 
@@ -17,6 +17,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
+    // eslint-disable-next-line no-useless-escape
+    const regexIgnoreValuesInParentheses = /[\(\)]/
 
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
@@ -34,6 +36,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       string,
       string
     >
+
     if (appointmentSession) {
       const {
         user: { username: staffId = null, locationCode = null, providerCode = null, teamCode = null } = {},
@@ -78,16 +81,15 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
-      const users: User[] = getDataValue(data, ['staff', loggedInUsername])
+      const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
+      const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
+      const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
+      const selectedUser = convertToTitleCase(
+        staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
+        [],
+        regexIgnoreValuesInParentheses,
+      )
 
-      const selectedRegion =
-        providerCode && providers ? providers.find(r => r.code === providerCode)?.name : res.locals.defaultUser.homeArea
-      const selectedTeam =
-        teamCode && teams ? teams.find(team => team.code === teamCode)?.description : res.locals.defaultUser.team
-      const selectedUser =
-        staffId && users
-          ? users.find(user => user.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
-          : res.locals.defaultUser.username
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {

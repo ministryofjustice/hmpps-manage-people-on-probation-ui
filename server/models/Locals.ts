@@ -3,7 +3,7 @@ import { Response } from 'express'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
-import { Location, Provider, Team, User } from '../data/model/caseload'
+import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse } from './Appointments'
@@ -99,7 +99,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
-  defaultUser?: { username: string; homeArea: string; team: string }
+  attendingUser?: DefaultUserDetails
   sentencePlan?: SentencePlan
   alertsCount?: string
   alertsCleared?: { error: boolean; message: string }

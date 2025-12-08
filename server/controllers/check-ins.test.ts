@@ -33,7 +33,7 @@ jest.mock('../data/masApiClient')
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve({ username: 'name' } as ProbationPractitioner))
-
+jest.mock('../data/eSupervisionClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
 

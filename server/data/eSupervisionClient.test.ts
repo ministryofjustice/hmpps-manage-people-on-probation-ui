@@ -43,12 +43,7 @@ describe('ESupervisionClient', () => {
       const body = {
         setupUuid: 'setup-uuid-1',
         practitionerId: 'user-1',
-        firstName: 'John',
-        lastName: 'Doe',
         crn: 'X000001',
-        dateOfBirth: '1990-01-01',
-        email: 'test@test.com',
-        phoneNumber: '07123456789',
         firstCheckinDate: '2024-01-01',
         checkinInterval: 'WEEKLY',
         startedAt: '2024-01-01T10:00:00Z',
@@ -61,7 +56,7 @@ describe('ESupervisionClient', () => {
       }
 
       fakeESupervisionApi
-        .post('/offender_setup', body)
+        .post('/v2/offender_setup', body)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
@@ -80,13 +75,13 @@ describe('ESupervisionClient', () => {
       }
       const contentType = 'image/jpeg'
       const response = {
-        url: 'http://localhost:9091/esupervision/fake-s3-upload',
+        url: 'http://localhost:9091/esupervision/v2/fake-s3-upload',
         contentType,
         duration: 'PT5M',
       }
 
       fakeESupervisionApi
-        .post(`/offender_setup/${offenderSetup.uuid}/upload_location`)
+        .post(`/v2/offender_setup/${offenderSetup.uuid}/upload_location`)
         .query({ 'content-type': contentType })
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .matchHeader('content-type', 'application/json')

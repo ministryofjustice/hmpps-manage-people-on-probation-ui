@@ -12,6 +12,7 @@ import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
 import { ProbationPractitioner } from '../data/model/caseload'
+import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 
 const routes = [
   'getIntroPage',
@@ -119,7 +120,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const { data, back } = req.session
+      const { data } = req.session
       const { cya } = req.query
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
@@ -412,7 +413,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const userDetails: CheckinUserDetails = {
         ...savedUserDetails,
         uuid: id,
-        interval: checkinIntervals.find(option => option.id === savedUserDetails.interval).label,
+        interval: checkinIntervals.find(option => option.id === savedUserDetails?.interval)?.label,
         preferredComs: savedUserDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
         photoUploadOption:
           savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
@@ -442,6 +443,9 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+
+      await postCheckinInComplete(hmppsAuthClient)(req, res)
+
       const userDetails: CheckinUserDetails = {
         ...savedUserDetails,
         uuid: id,

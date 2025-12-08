@@ -124,7 +124,7 @@ describe('Manage appointment - add a note', () => {
   it('should display validation errors if continue button is clicked without first selecting a sensitive option', () => {
     loadPage()
     const note = 'x'.repeat(4000)
-    cy.get('#notes').type(note, { delay: 0 })
+    cy.get('#notes').invoke('val', note).trigger('input')
     addNotePage.getSubmitBtn().click()
     addNotePage.checkErrorSummaryBox(['Select whether or not the appointment note contains sensitive information'])
     addNotePage.getElement(`#sensitive-error`).should('contain.text', 'Please select an option')
@@ -132,25 +132,29 @@ describe('Manage appointment - add a note', () => {
     addNotePage.getElement(`#sensitive`).should('be.focused')
   })
 
-  it('should display validation errors if note is more than 4000 character', () => {
+  it('should display validation errors if note is more than 12000 character', () => {
     loadPage()
-    const note = 'x'.repeat(4001)
-    cy.get('#notes').type(note, { delay: 0 })
+    const note = 'x'.repeat(12001)
+    cy.get('#notes').invoke('val', note).trigger('input')
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     addNotePage.getSubmitBtn().click()
-    addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
-    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+    addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 12000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
   })
 
   it('should count a return as 1 character', () => {
     loadPage()
-    const paragraph = 'x'.repeat(2000)
-    cy.get('#notes').type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
+    cy.get('#notes').then($el => {
+      const paragraph = 'x'.repeat(6000)
+      const value = `${paragraph}\n\n${paragraph}`
+      $el.val(value)
+      $el[0].dispatchEvent(new Event('input', { bubbles: true }))
+    })
     addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     addNotePage.getSubmitBtn().click()
-    addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
-    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+    addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+    addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 12000 characters or less')
     cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
   })
 
