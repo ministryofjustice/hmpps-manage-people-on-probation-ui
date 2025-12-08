@@ -6,12 +6,11 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { ESupervisionCheckIn, ESupervisionReview } from '../data/model/esupervision'
+import { ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
-import config from '../config'
 import { ProbationPractitioner } from '../data/model/caseload'
 
 const routes = [
@@ -40,6 +39,7 @@ const routes = [
   'getCheckinSummaryPage',
   'postCheckinSummaryPage',
   'getConfirmationPage',
+  'getCheckinVideoPage',
   'postTakeAPhotoPage',
 ] as const
 
@@ -288,7 +288,8 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const { checkIn } = res.locals
 
-      const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
+      const url = encodeURIComponent(req.url)
+      const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
 
       if (checkIn.status !== 'REVIEWED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
@@ -322,7 +323,8 @@ const checkInsController: Controller<typeof routes, void> = {
       const { back } = req.query
       const { checkIn } = res.locals
 
-      const videoLink = `${config.esupervision.link}/practitioners/checkin/${id}/video`
+      const url = encodeURIComponent(req.url)
+      const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
 
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
@@ -452,6 +454,17 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  getCheckinVideoPage: HmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { checkIn } = res.locals
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+      return res.render('pages/check-in/video.njk', { crn, id, checkIn, back })
+    }
+  },
   postTakeAPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params

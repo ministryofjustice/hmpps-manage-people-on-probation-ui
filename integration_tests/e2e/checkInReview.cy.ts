@@ -5,6 +5,7 @@ import ActivityLogPage from '../pages/activityLog'
 import CheckInReviewExpiredPage from '../pages/check-ins/review/expired.page'
 import CheckInReviewIdentityPage from '../pages/check-ins/review/identity.page'
 import CheckInReviewNotesPage from '../pages/check-ins/review/notes.page'
+import CheckInVideoPage from '../pages/check-ins/video.page'
 
 const crn = 'X000001'
 const expiredId = '5fa85f64-5717-4562-b3fc-2c963f66afa6'
@@ -36,7 +37,7 @@ context('check in reviews', () => {
       .should(
         'have.attr',
         'href',
-        `https://esupervision-dev.hmpps.service.justice.gov.uk/practitioners/checkin/${reviewedId}/video`,
+        `/case/${crn}/appointments/${reviewedId}/check-in/video?back=${encodeURIComponent(`/case/${crn}/appointments/${reviewedId}/check-in/view`)}`,
       )
     page.getBackLink().click()
     Page.verifyOnPage(ActivityLogPage)
@@ -64,7 +65,7 @@ context('check in reviews', () => {
       .should(
         'have.attr',
         'href',
-        `https://esupervision-dev.hmpps.service.justice.gov.uk/practitioners/checkin/${submittedId}/video`,
+        `/case/${crn}/appointments/${submittedId}/check-in/video?back=${encodeURIComponent(`/case/${crn}/appointments/${submittedId}/check-in/review/identity`)}`,
       )
 
     page.getRadio('confirmIdentity', 1).click()
@@ -75,5 +76,16 @@ context('check in reviews', () => {
     page.checkOnPage()
     page.getSubmitBtn().click()
     page2.checkOnPage()
+  })
+
+  it('Review video for check in', () => {
+    cy.visit(`/case/${crn}/appointments/${reviewedId}/check-in/video`)
+    const page = Page.verifyOnPage(CheckInVideoPage)
+
+    page.getSubmitBtn().click()
+    const page2 = Page.verifyOnPage(ViewCheckInPage)
+
+    page2.getSummaryListRow(4, 'checkInSummary').find('.govuk-summary-list__value .govuk-link').click()
+    page.checkOnPage()
   })
 })
