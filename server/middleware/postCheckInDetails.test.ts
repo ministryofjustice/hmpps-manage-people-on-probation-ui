@@ -97,6 +97,7 @@ describe('postCheckInDetails', () => {
       crn,
       checkinInterval: 'WEEK',
     })
+    expect(calledWith.firstCheckin).toBe('2025/3/12')
     expect(typeof calledWith.startedAt).toBe('string')
 
     expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg')
