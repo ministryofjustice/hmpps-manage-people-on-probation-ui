@@ -2,14 +2,14 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_setup/.+?/upload_location",
+        "urlPathPattern": "/esupervision/v2/offender_setup/.+?/upload_location",
         "method": "POST"
       },
       "response": {
         "status": 200,
         "jsonBody": {
           "locationInfo": {
-            "url": "http://localhost:9091/esupervision/fake-s3-upload",
+            "url": "http://localhost:9091/esupervision/v2/fake-s3-upload",
             "method": "PUT"
           }
         },
@@ -20,7 +20,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/fake-s3-upload",
+        "urlPathPattern": "/esupervision/v2/fake-s3-upload",
         "method": "PUT"
       },
       "response": {
@@ -35,7 +35,7 @@
 
     {
       "request": {
-        "urlPathPattern": "/esupervision/fake-s3-upload",
+        "urlPathPattern": "/esupervision/v2/fake-s3-upload",
         "method": "OPTIONS"
       },
       "response": {
@@ -51,7 +51,7 @@
 
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_setup",
+        "urlPathPattern": "/esupervision/v2/offender_setup",
         "method": "POST"
       },
       "response": {
@@ -70,17 +70,17 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_setup500",
+        "urlPathPattern": "/esupervision/v2/offender_setup",
         "method": "POST"
       },
       "response": {
-        "status": 500,
+        "status": 201,
         "jsonBody": {
-          "status": 500,
-          "errorCode": null,
-          "userMessage": "500 internal server error",
-          "developerMessage": "500 internal server error",
-          "moreInfo": null
+          "locationInfo": {
+            "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afz9",
+            "practitioner": "AUTH_USER",
+            "createdAt": "2025-01-13T15:28:37.920581Z"
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -89,7 +89,30 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_setup422",
+        "urlPathPattern": "/esupervision/v2/offender_setup/.+?/complete",
+        "method": "POST"
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afz9",
+          "crn": "X000001",
+          "practitionerId": "AUTH_USER",
+          "status": "VERIFIED",
+          "createdAt": "2025-01-13T15:28:37.920581Z",
+          "createdBy": "AutomatedTestUser",
+          "offender": "3fa85f64-5717-4562-b3fc-2c963f66afp9",
+          "updatedAt": "2025-12-05T15:12:45.641890978Z",
+          "firstCheckin": "2025-12-06"
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offender_setup422",
         "method": "POST"
       },
       "response": {
@@ -100,6 +123,25 @@
           "userMessage": "422 BAD_REQUEST contact information",
           "developerMessage": "422 BAD_REQUEST contact information",
           "message": "contact information",
+          "moreInfo": null
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offender_setup/.+?/complete500",
+        "method": "POST"
+      },
+      "response": {
+        "status": 500,
+        "jsonBody": {
+          "status": 500,
+          "errorCode": null,
+          "userMessage": "Unexpected error: No setup found for uuid=93e135af-4526-68ed-fd63-112437f63465",
+          "developerMessage": "No setup found for uuid=93e135af-4526-68ed-fd63-112437f63465",
           "moreInfo": null
         },
         "headers": {

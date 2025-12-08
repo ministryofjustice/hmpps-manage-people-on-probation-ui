@@ -9,6 +9,7 @@ import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/per
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
+import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 
 const routes = [
   'getIntroPage',
@@ -292,6 +293,9 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+
+      await postCheckinInComplete(hmppsAuthClient)(req, res)
+
       const userDetails: CheckinUserDetails = {
         ...savedUserDetails,
         uuid: id,

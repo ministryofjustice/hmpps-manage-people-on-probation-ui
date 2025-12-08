@@ -94,15 +94,10 @@ describe('postCheckInDetails', () => {
     expect(calledWith).toMatchObject({
       setupUuid,
       practitionerId: 'pp-user',
-      firstName: baseCase.name.forename,
-      lastName: baseCase.name.surname,
-      dateOfBirth: baseCase.dateOfBirth,
       crn,
-      email: 'test@test.com',
-      phoneNumber: '07123456789',
       checkinInterval: 'WEEK',
     })
-    expect(calledWith.firstCheckinDate).toBe('2025/3/12')
+    expect(calledWith.firstCheckin).toBe('2025/3/12')
     expect(typeof calledWith.startedAt).toBe('string')
 
     expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg')
