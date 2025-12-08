@@ -263,8 +263,13 @@ export const checkAppointmentSummary = (
     page
       .getSummaryListRow(3)
       .find('.govuk-summary-list__value')
-      .should('contain.text', 'Peter Parker (PS-PSO)')
-      .should('contain.text', '(Automated Allocation Team, London)')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Peter Parker' : 'Ben Towers')
+      .should(
+        'contain.text',
+        page instanceof ArrangeAnotherAppointmentPage
+          ? '(Automated Allocation Team, London)'
+          : '(Default Designated Transfer Team, East of England)',
+      )
   }
   page.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
   page
