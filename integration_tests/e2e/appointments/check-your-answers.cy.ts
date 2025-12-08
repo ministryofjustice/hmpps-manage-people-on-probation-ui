@@ -149,7 +149,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
     it('should display the attended and complied row', () => {
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkAppointmentSummary(cyaPage, false, true)
+      checkAppointmentSummary(cyaPage, false, false, true)
       it('should update the notes when value is changed', () => {
         checkUpdateNotes(cyaPage)
       })
