@@ -1,11 +1,9 @@
 import { postCheckinInComplete } from './postCheckinComplete'
 import ESupervisionClient from '../data/eSupervisionClient'
-import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import logger from '../../logger'
 
-// Strongly typed mocked instances
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 jest.mock('../data/eSupervisionClient')
@@ -39,7 +37,7 @@ describe('postCheckinInComplete middleware', () => {
     jest.spyOn(HmppsAuthClient.prototype, 'getSystemClientToken').mockImplementation(async () => token)
   })
 
-  it('calls ESupervisionClient.postOffenderSetupComplete with id using system token and logs success', async () => {
+  it('Should calls postOffenderSetupComplete with id using system token and logs success', async () => {
     const { req, res } = buildReqRes()
 
     const postComplete = jest
@@ -58,7 +56,7 @@ describe('postCheckinInComplete middleware', () => {
     expect(logSpy).toHaveBeenCalledWith('Checkin Registration completed successfully.')
   })
 
-  it('propagates error when ESupervisionClient.postOffenderSetupComplete fails (no response handling)', async () => {
+  it('Should propagates error when postOffenderSetupComplete fails (no response handling)', async () => {
     const { req, res } = buildReqRes()
 
     const error = Object.assign(new Error('completion failed'), {
