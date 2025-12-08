@@ -912,7 +912,7 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         back: 'repeating',
         change,
-        maxCharCount: 4000,
+        maxCharCount: 12000,
         showValidation: false,
       })
     })
@@ -929,7 +929,7 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         back: 'date-time',
         change,
-        maxCharCount: 4000,
+        maxCharCount: 12000,
         showValidation: false,
       })
     })
