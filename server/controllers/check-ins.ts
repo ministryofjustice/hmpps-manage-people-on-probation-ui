@@ -42,6 +42,7 @@ const routes = [
   'getConfirmationPage',
   'getCheckinVideoPage',
   'postTakeAPhotoPage',
+  'postViewCheckIn',
 ] as const
 
 interface OptionPair {
@@ -299,6 +300,25 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  postViewCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+
+      const { data } = req.session
+      const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupervisionClient = new ESupervisionClient(token)
+      await eSupervisionClient.postOffenderCheckInNote(id, checkIn.note)
+
+      return res.redirect(`/case/${crn}/activity-log`)
+    }
+  },
+
   getReviewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -383,15 +403,17 @@ const checkInsController: Controller<typeof routes, void> = {
       const practitionerId = pp?.username ? pp.username : res.locals.user.username
 
       const review: ESupervisionReview = {
-        practitioner: practitionerId,
+        reviewedBy: practitionerId,
         manualIdCheck: checkIn?.manualIdCheck,
-        missedCheckinComment: checkIn?.note,
+        missedCheckinComment: checkIn?.missedCheckinComment,
+        furtherActions: checkIn?.furtherActions,
+        riskManagementFeedback: checkIn?.riskManagementFeedback,
       }
 
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
 
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/view?back=${url}`)
+      return res.redirect(`/case/${crn}/activity-log`)
     }
   },
   postPhotoRulesPage: hmppsAuthClient => {

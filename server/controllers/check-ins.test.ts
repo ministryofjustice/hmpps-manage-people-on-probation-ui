@@ -1281,9 +1281,7 @@ describe('checkInsController', () => {
       await controllers.checkIns.postReviewCheckIn(hmppsAuthClient)(req, res)
 
       expect(getProbationPractitionerSpy).toHaveBeenCalled()
-      expect(redirectSpy).toHaveBeenCalledWith(
-        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/view?back=${req.url}`,
-      )
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
     })
 
     it('returns 404 when CRN is invalid', async () => {

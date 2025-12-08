@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_checkins/.*",
+        "urlPathPattern": "/esupervision/v2/offender_checkins/.*",
         "method": "GET"
       },
       "response": {
@@ -12,16 +12,35 @@
             "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
             "status": "REVIEWED",
             "dueDate": "2025-11-27",
-            "offender": {
-              "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "firstName": "Bob",
-              "lastName": "Smith",
-              "status": "INITIAL",
-              "practitioner": "string",
-              "createdAt": "2025-11-27T15:40:42.399Z",
-              "photoUrl": "string",
-              "checkinInterval": "WEEKLY"
+            "personalDetails": {
+              "crn": "X123456",
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "mobile": "07700900123",
+              "email": "john.smith@example.com",
+              "practitioner": {
+                "name": {
+                  "forename": "John",
+                  "surname": "Smith"
+                },
+                "email": "practitioner@example.com",
+                "localAdminUnit": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                },
+                "probationDeliveryUnit": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                },
+                "provider": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                }
+              }
             },
+            "furtherActions": "Nothing for now",
             "surveyResponse": {
               "mentalHealth": "well",
               "assistance": ["thing1", "thing2"],
@@ -57,7 +76,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_checkins/5fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "urlPathPattern": "/esupervision/v2/offender_checkins/5fa85f64-5717-4562-b3fc-2c963f66afa6",
         "method": "GET"
       },
       "response": {
@@ -67,14 +86,33 @@
             "uuid": "5fa85f64-5717-4562-b3fc-2c963f66afa6",
             "status": "EXPIRED",
             "dueDate": "2025-11-27",
-            "offender": {
-              "uuid": "5fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "firstName": "Bob",
-              "lastName": "Smith",
-              "status": "INITIAL",
-              "practitioner": "string",
-              "createdAt": "2025-11-27T15:40:42.399Z",
-              "checkinInterval": "WEEKLY"
+            "personalDetails": {
+              "crn": "X123456",
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "mobile": "07700900123",
+              "email": "john.smith@example.com",
+              "practitioner": {
+                "name": {
+                  "forename": "John",
+                  "surname": "Smith"
+                },
+                "email": "practitioner@example.com",
+                "localAdminUnit": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                },
+                "probationDeliveryUnit": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                },
+                "provider": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                }
+              }
             },
             "surveyResponse": {},
             "createdBy": "string",
@@ -103,7 +141,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_checkins/6fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "urlPathPattern": "/esupervision/v2/offender_checkins/6fa85f64-5717-4562-b3fc-2c963f66afa6",
         "method": "GET"
       },
       "response": {
@@ -113,15 +151,33 @@
             "uuid": "6fa85f64-5717-4562-b3fc-2c963f66afa6",
             "status": "SUBMITTED",
             "dueDate": "2025-11-27",
-            "offender": {
-              "uuid": "6fa85f64-5717-4562-b3fc-2c963f66afa6",
-              "firstName": "Bob",
-              "lastName": "Smith",
-              "status": "INITIAL",
-              "practitioner": "string",
-              "createdAt": "2025-11-27T15:40:42.399Z",
-              "photoUrl": "string",
-              "checkinInterval": "WEEKLY"
+            "personalDetails": {
+              "crn": "X123456",
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "mobile": "07700900123",
+              "email": "john.smith@example.com",
+              "practitioner": {
+                "name": {
+                  "forename": "John",
+                  "surname": "Smith"
+                },
+                "email": "practitioner@example.com",
+                "localAdminUnit": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                },
+                "probationDeliveryUnit": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                },
+                "provider": {
+                  "code": "N01ABC",
+                  "description": "London North LAU"
+                }
+              }
             },
             "surveyResponse": {
               "mentalHealth": "well",
@@ -158,7 +214,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/offender_checkins/.*/review",
+        "urlPathPattern": "/esupervision/v2/offender_checkins/.*/review",
         "method": "POST"
       },
       "response": {
@@ -167,16 +223,35 @@
           "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
           "status": "REVIEWED",
           "dueDate": "2025-11-27",
-          "offender": {
-            "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
-            "firstName": "Bob",
-            "lastName": "Smith",
-            "status": "INITIAL",
-            "practitioner": "string",
-            "createdAt": "2025-11-27T15:40:42.399Z",
-            "photoUrl": "string",
-            "checkinInterval": "WEEKLY"
+          "personalDetails": {
+            "crn": "X123456",
+            "name": {
+              "forename": "John",
+              "surname": "Smith"
+            },
+            "mobile": "07700900123",
+            "email": "john.smith@example.com",
+            "practitioner": {
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "email": "practitioner@example.com",
+              "localAdminUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "probationDeliveryUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "provider": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              }
+            }
           },
+          "furtherActions": "Nothing for now",
           "surveyResponse": {
             "mentalHealth": "well",
             "assistance": ["thing1", "thing2"],

@@ -1,24 +1,8 @@
-export interface ESupervisionOffender {
-  uuid: string
-  firstName: string
-  lastName: string
-  crn?: string
-  dateOfBirth?: string
-  status: 'INITIAL' | 'VERIFIED' | 'ACTIVE'
-  practitioner: string
-  createdAt: string
-  email?: string
-  phoneNumber?: string
-  photoUrl?: string
-  firstCheckin?: string
-  checkinInterval: 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'
-}
-
 export interface ESupervisionCheckIn {
   uuid: string
   status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED'
   dueDate: string
-  offender: ESupervisionOffender
+  personalDetails: PersonalDetails
   submittedAt?: string
   surveyResponse: any
   createdBy: string
@@ -31,6 +15,7 @@ export interface ESupervisionCheckIn {
   autoIdCheck?: 'MATCH' | 'NO_MATCH'
   manualIdCheck?: 'MATCH' | 'NO_MATCH'
   flaggedResponses: string[]
+  furtherActions?: string
 }
 
 export interface ESupervisionLog {
@@ -58,6 +43,14 @@ export interface ESupervisionCheckInResponse {
   checkinLogs: ESupervisionCheckInLogs
 }
 
+export interface ESupervisionReview {
+  reviewedBy: string
+  manualIdCheck?: 'MATCH' | 'NO_MATCH'
+  furtherActions?: string
+  missedCheckinComment?: string
+  riskManagementFeedback?: boolean
+}
+
 export type ExternalUserId = string
 export interface OffenderSetup {
   uuid: string
@@ -79,12 +72,6 @@ export interface LocationInfo {
   url: string
   contentType: string
   duration: string
-}
-
-export interface ESupervisionReview {
-  practitioner: string
-  manualIdCheck?: 'MATCH' | 'NO_MATCH'
-  missedCheckinComment?: string
 }
 
 export interface OffenderSetupCompleteResponse {

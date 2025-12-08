@@ -35,12 +35,12 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image of {{checkIn.offender.firstName}}</dt>
+                <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
                 <dd class="govuk-summary-list__value">
                     <img
-                    src="{{ "/assets/images/placeholder.png" if checkIn.offender.photoUrl == null else checkIn.offender.photoUrl }}"
+                    src="{{ "/assets/images/placeholder.png" if checkIn.photoUrl == null else checkIn.photoUrl }}"
                     class="es-profile-image es-profile-image--small"
-                    alt="Profile image of {{ checkIn.offender.firstName }} {{ checkIn.offender.lastName }}"
+                    alt="Profile image of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                     crossorigin />
                 </dd>
             </div>
@@ -51,7 +51,7 @@
                         <img
                         src="{{ checkIn.snapshotUrl }}"
                         class="es-profile-image es-profile-image--small"
-                        alt="Snapshot from video of {{ checkIn.offender.firstName }} {{ checkIn.offender.lastName }}"
+                        alt="Snapshot from video of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                         crossorigin />
                     {% else %}
                     <span>No image available</span>
@@ -70,7 +70,7 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
-                        text: 'Is the person in the video ' + checkIn.offender.firstName,
+                        text: 'Is the person in the video ' + checkIn.personalDetails.name.forename,
                         classes: "govuk-label--m govuk-!-font-weight-bold"
                     }
                 },

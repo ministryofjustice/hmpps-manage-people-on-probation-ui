@@ -20,7 +20,7 @@
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Is this person in the video {{checkIn.offender.firstName}}?</dt>
+                <dt class="govuk-summary-list__key">Is this person in the video {{ checkIn.personalDetails.name.forename }}?</dt>
                 <dd class="govuk-summary-list__value">{{"Yes" if checkIn.manualIdCheck == "MATCH" else "No"}}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if checkIn.manualIdCheck == "MATCH" %}
@@ -33,22 +33,23 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
-                <dd class="govuk-summary-list__value"></dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe }}</dd>
             </div>
         </dl>
 
         <h2 class="govuk-heading-m">Add further information</h2>
-        {{ govukCharacterCount({
-            hint: {
-                text: "This information will be added to contact notes"
-            },
-            rows: '10',
-            maxlength: maxCharCount,
-            formGroup: {
-                attributes: { "data-qa": "notes"}
-            }
-        }) }}
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukCharacterCount({
+                hint: {
+                    text: "This information will be added to contact notes"
+                },
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
+
             <div class="govuk-button-group">
                 {{ govukButton({
                 html: "Add update",
@@ -62,7 +63,7 @@
 
         <hr class="govuk-section-break govuk-section-break--visible">
 
-        <h2 class="govuk-heading-m govuk-!-margin-top-5">{{checkIn.offender.firstName}}s check in</h2>
+        <h2 class="govuk-heading-m govuk-!-margin-top-5">{{ checkIn.personalDetails.name.forename }}s check in</h2>
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
             <div class="govuk-summary-list__row">
@@ -70,12 +71,12 @@
                 <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image of {{checkIn.offender.firstName}}</dt>
+                <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
                 <dd class="govuk-summary-list__value">
                     <img
-                    src="{{ "/assets/images/placeholder.png" if checkIn.offender.photoUrl == null else checkIn.offender.photoUrl }}"
+                    src="{{ "/assets/images/placeholder.png" if checkIn.photoUrl == null else checkIn.photoUrl }}"
                     class="es-profile-image es-profile-image--small"
-                    alt="Profile image of {{ checkIn.offender.firstName }} {{ checkIn.offender.lastName }}"
+                    alt="Profile image of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                     crossorigin />
                 </dd>
             </div>
@@ -86,7 +87,7 @@
                         <img
                         src="{{ checkIn.snapshotUrl }}"
                         class="es-profile-image es-profile-image--small"
-                        alt="Snapshot from video of {{ checkIn.offender.firstName }} {{ checkIn.offender.lastName }}"
+                        alt="Snapshot from video of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                         crossorigin />
                     {% else %}
                     <span>No image available</span>
@@ -101,7 +102,7 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                    How {{ checkIn.offender.firstName }} is feeling
+                    How {{ checkIn.personalDetails.name.forename }} is feeling
                 </dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
             </dd>

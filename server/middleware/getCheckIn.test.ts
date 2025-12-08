@@ -21,15 +21,33 @@ const checkInResponseMock = {
     uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
     status: 'REVIEWED',
     dueDate: '2025-11-27',
-    offender: {
-      uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      firstName: 'Bob',
-      lastName: 'Smith',
-      status: 'INITIAL',
-      practitioner: 'string',
-      createdAt: '2025-11-27T15:40:42.399Z',
-      photoUrl: 'string',
-      checkinInterval: 'WEEKLY',
+    personalDetails: {
+      crn: 'X123456',
+      name: {
+        forename: 'Bob',
+        surname: 'Smith',
+      },
+      mobile: '07700900123',
+      email: 'john.smith@example.com',
+      practitioner: {
+        name: {
+          forename: 'John',
+          surname: 'Smith',
+        },
+        email: 'practitioner@example.com',
+        localAdminUnit: {
+          code: 'N01ABC',
+          description: 'London North LAU',
+        },
+        probationDeliveryUnit: {
+          code: 'N01ABC',
+          description: 'London North LAU',
+        },
+        provider: {
+          code: 'N01ABC',
+          description: 'London North LAU',
+        },
+      },
     },
     surveyResponse: {
       mentalHealth: 'well',
