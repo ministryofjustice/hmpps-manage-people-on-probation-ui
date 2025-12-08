@@ -13,6 +13,16 @@ export interface CheckInReviewValidationArgs {
 export const checkInReviewValidation = (args: CheckInReviewValidationArgs): ValidationSpec => {
   const { crn, id, page } = args
   return {
+    [`[esupervision][${crn}][${id}][checkins][note]`]: {
+      optional: page !== 'view',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Please enter a note to add to the contact',
+          log: 'Note verification not completed',
+        },
+      ],
+    },
     [`[esupervision][${crn}][${id}][checkins][manualIdCheck]`]: {
       optional: page !== 'identity',
       checks: [
@@ -23,7 +33,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][checkins][note]`]: {
+    [`[esupervision][${crn}][${id}][checkins][missedCheckinComment]`]: {
       optional: page !== 'expired',
       checks: [
         {
