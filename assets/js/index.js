@@ -9,6 +9,7 @@ import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import { MpopMultiFileUpload } from './mpop-multi-file-upload.mjs'
 import setupAlertsPage from './alerts'
+import setupTechnicalUpdates from './technical-updates'
 import './photo'
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
@@ -350,3 +351,4 @@ homeSearch()
 crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
+setupTechnicalUpdates()
