@@ -8,7 +8,7 @@ import {
   LocationInfo,
   OffenderInfo,
   OffenderSetup,
-  OffenderSetupCompleteResponse
+  OffenderSetupCompleteResponse,
 } from './model/esupervision'
 
 export default class ESupervisionClient extends RestClient {
