@@ -313,7 +313,6 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupervisionClient = new ESupervisionClient(token)
-      console.log(checkIn)
       await eSupervisionClient.postOffenderCheckInNote(id, checkIn.note)
 
       return res.redirect(`/case/${crn}/activity-log`)

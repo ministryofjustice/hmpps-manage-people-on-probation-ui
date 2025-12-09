@@ -20,7 +20,7 @@ context('check in reviews', () => {
     page
       .getSummaryListRow(1, 'reviewSummary')
       .find('.govuk-summary-list__key')
-      .should('contain.text', 'Is this person in the video Bob?')
+      .should('contain.text', 'Is this person in the video John?')
     page.getSummaryListRow(1, 'reviewSummary').find('.govuk-summary-list__value').should('contain.text', 'Yes')
     page
       .getSummaryListRow(1, 'reviewSummary')
