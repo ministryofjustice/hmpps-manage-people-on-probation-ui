@@ -36,16 +36,16 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const { teams } = await masClient.getTeamsByProvider(selectedProvider)
 
     const defaultTeam = defaultTeams.find(
-      team => team.description.toLowerCase() === defaultUserDetails.team.toLowerCase(),
+      team => team.description.toLowerCase() === defaultUserDetails?.team?.toLowerCase(),
     )?.code
 
     let selectedTeam = teamCodeQuery ?? teamCodeQuery
     if (selectedTeam === probationPractitioner.team.code) {
-      selectedTeam = defaultTeam
+      selectedTeam = defaultTeam ?? teams[0].code
     }
     if (!providerCodeQuery) {
       if (selectedProvider === defaultProvider) {
-        selectedTeam = defaultTeam
+        selectedTeam = defaultTeam ?? teams[0].code
       } else {
         selectedTeam = teamCodeSession ?? teams[0].code
       }
