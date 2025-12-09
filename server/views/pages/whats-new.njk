@@ -11,7 +11,11 @@
             {% if item | isArray (item) %}
                 <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
                     {% for subItem in item %}
-                        <li>{{ subItem }}</li>
+                        {% if subItem.includes('mpop-digital-team@justice.gov.uk') %}
+                            <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-0">{{ subItem }}</p>
+                        {% else %}
+                            <li>{{ subItem }}</li>
+                        {% endif %}
                     {% endfor %}
                 </ul>
             {%else%}
@@ -59,7 +63,7 @@
         <div class="govuk-grid-column-two-thirds">
             <h3 class="govuk-heading-s">Welcome to our service updates</h3>
             <p class="govuk-body">View highlights of what's new and what's improved for Manage people on probation.</p>
-            <p class="govuk-body govuk-!-margin-bottom-5">
+            <p class="govuk-body govuk-!-margin-bottom-9">
                 If you have any feedback or questions on the service or any of these updates, email
                 <a href="mailto:mpop-digital-team@justice.gov.uk" class="govuk-link">mpop-digital-team@justice.gov.uk</a>.
             </p>
