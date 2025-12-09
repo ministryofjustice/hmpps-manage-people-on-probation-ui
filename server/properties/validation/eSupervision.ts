@@ -9,6 +9,7 @@ import {
   isValidMobileNumber,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
+import { getDataValue } from '../../utils'
 
 export interface ESupervisionValidationArgs {
   crn: string
@@ -18,10 +19,11 @@ export interface ESupervisionValidationArgs {
   checkInEmail?: string
   editCheckInEmail?: string
   editCheckInMobile?: string
+  change?: string
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile } = args
+  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][interval]`]: {
       optional: page !== 'date-frequency',
@@ -54,7 +56,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][checkins][preferredComs]`]: {
-      optional: page !== 'contact-preference',
+      optional: page !== 'contact-preference' || change !== 'main',
       checks: [
         {
           validator: isNotEmpty,
@@ -83,6 +85,27 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           msg: 'Enter a mobile number',
           log: 'Mobile number not entered in check in process',
           crossField: `[esupervision][${crn}][${id}][checkins][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][editCheckInMobile]`]: {
+      optional: page !== 'edit-contact-preference' || !editCheckInEmail || page !== 'edit-contact-preference',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how mobile...',
+          log: 'Select how to send service link, not selected',
+          // crossField: `[esupervision][${crn}][${id}][checkins][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][editCheckInEmail]`]: {
+      optional: page !== 'edit-contact-preference' || change !== 'EMAIL' || page !== 'edit-contact-preference',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how email...',
+          log: 'Select how to send service link, not selected',
         },
       ],
     },

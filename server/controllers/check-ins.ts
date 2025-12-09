@@ -132,10 +132,16 @@ const checkInsController: Controller<typeof routes, void> = {
   postContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { change } = req.body
+      let redirectUrl = `/case/${crn}/appointments/${id}/check-in/edit-contact-preference?change=${change}`
+      if (change === 'main') {
+        redirectUrl = `/case/${crn}/appointments/${id}/check-in/photo-options`
+      }
+
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/photo-options`)
+      return res.redirect(redirectUrl)
     }
   },
 
@@ -152,11 +158,12 @@ const checkInsController: Controller<typeof routes, void> = {
   getEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
 
-      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id })
+      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id, change })
     }
   },
 

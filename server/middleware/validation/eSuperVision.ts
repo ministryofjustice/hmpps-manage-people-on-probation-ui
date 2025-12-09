@@ -3,7 +3,7 @@ import { validateWithSpec } from '../../utils/validationUtils'
 
 import { eSuperVisionValidation } from '../../properties/validation/eSupervision'
 import { LocalParams } from '../../models/ESupervision'
-import { getDataValue } from '../../utils'
+import { getDataValue, setDataValue } from '../../utils'
 
 const eSuperVision: Route<void> = (req, res, next) => {
   const { url, params, body } = req
@@ -58,12 +58,15 @@ const eSuperVision: Route<void> = (req, res, next) => {
           checkInEmail,
           checkInMobile,
           page: 'contact-preference',
+          change: req.body.change,
         }),
       )
     }
   }
   const validateEditContactPreference = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/edit-contact-preference`)) {
+      const preferredComs = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'preferredComs'])
+
       render = `pages/check-in/edit-contact-preference`
       errorMessages = validateWithSpec(
         req.body,
@@ -75,6 +78,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
           editCheckInEmail,
           editCheckInMobile,
           page: 'edit-contact-preference',
+          change: preferredComs,
         }),
       )
     }
