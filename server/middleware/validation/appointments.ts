@@ -216,7 +216,7 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           page: `arrange-appointment/${id}/add-note`,
           notes: req.body.appointments[crn][id].notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }
