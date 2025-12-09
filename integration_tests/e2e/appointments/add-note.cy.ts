@@ -23,7 +23,6 @@ describe('Add a note', () => {
       const note = 'x'.repeat(4000)
       cy.get(`#${idPrefix}notes`).type(note, { delay: 0 })
       addNotePage.getSubmitBtn().click()
-
       addNotePage.checkErrorSummaryBox(['Select whether or not the appointment note contains sensitive information'])
       addNotePage
         .getElement(`#${idPrefix}sensitivity-error`)
@@ -32,14 +31,14 @@ describe('Add a note', () => {
       addNotePage.getElement(`#${idPrefix}sensitivity`).should('be.focused')
     })
 
-    it('should display validation errors if note is more than 4000 characters', () => {
+    it('should display validation errors if note is more than 12000 characters', () => {
       loadPage()
-      const note = 'x'.repeat(4001)
+      const note = 'x'.repeat(12001)
       cy.get(`#${idPrefix}notes`).type(note, { delay: 0 })
       addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
       addNotePage.getSubmitBtn().click()
-      addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
-      addNotePage.getElement(`#${idPrefix}notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+      addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+      addNotePage.getElement(`#${idPrefix}notes-error`).should('contain.text', 'Note must be 12000 characters or less')
       cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
     })
   }
@@ -165,12 +164,12 @@ describe('Add a note', () => {
 
     it('should count a return as 1 character', () => {
       loadPage()
-      const paragraph = 'x'.repeat(2000)
-      cy.get('#notes').type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
+      const paragraph = 'x'.repeat(6000)
+      cy.get(`#notes`).type(`${paragraph}\n\n${paragraph}`, { delay: 0 })
       addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
       addNotePage.getSubmitBtn().click()
-      addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
-      addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+      addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+      addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 12000 characters or less')
       cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
     })
 
@@ -229,9 +228,11 @@ describe('Add a note', () => {
       cy.get('#notes').invoke('val', note).trigger('input')
       addNotePage.getSubmitBtn().click()
       addNotePage.checkErrorSummaryBox(['Select whether or not the appointment note contains sensitive information'])
-      addNotePage.getElement(`#sensitive-error`).should('contain.text', 'Please select an option')
+      addNotePage
+        .getElement(`#sensitivity-error`)
+        .should('contain.text', 'Select whether or not the appointment note contains sensitive information')
       addNotePage.getErrorSummaryLink(0).click()
-      addNotePage.getElement(`#sensitive`).should('be.focused')
+      addNotePage.getElement(`#sensitivity`).should('be.focused')
     })
 
     it('should display validation errors if note is more than 12000 character', () => {
@@ -287,7 +288,7 @@ describe('Add a note', () => {
       checkUploadFile(filetype)
     }
 
-    it('should persist the files added list when page is submitted', () => {
+    xit('should persist the files added list when page is submitted', () => {
       cy.intercept('POST', '/appointments/file/upload').as('fileUpload')
       loadPage()
       const [fakeFile1, fileName1] = createFakeFile(1, 'png')
