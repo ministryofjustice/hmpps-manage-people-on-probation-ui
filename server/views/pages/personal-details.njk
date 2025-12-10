@@ -209,8 +209,13 @@
 
   {% set personalDetailsHtml %}
   {% set dateOfBirthAndAge %}
-  {{ personalDetails.dateOfBirth | dateWithYear }} ({{ personalDetails.dateOfBirth | yearsSince }} years old)
+  {{ personalDetails.dateOfBirth | dateWithYear + (" (" + personalDetails.dateOfBirth | yearsSince + " years old)" if not personalDetails.dateOfDeath ) }}
+  {% endset %}
+  {% if personalDetails.dateOfDeath %}
+    {% set dateOfDeathAndAge %}
+    {{ personalDetails.dateOfDeath | dateWithYear }} ({{ personalDetails.dateOfBirth | yearsBetween(personalDetails.dateOfDeath) }} years old)
         {% endset %}
+  {% endif %}
 
   {% set disabilities %}
   {% if personalDetails.disabilities.disabilities.length > 0 %}
@@ -327,6 +332,10 @@
                 key: { html: '<span data-qa="dateOfBirthLabel">Date of birth</span>' },
                 value: { html: '<span data-qa="dateOfBirthValue">' + dateOfBirthAndAge + '</span>'}
               },
+              {
+                key: { html: '<span data-qa="dateOfDeathLabel">Date of death</span>' },
+                value: { html: '<span data-qa="dateOfDeathValue">' + dateOfDeathAndAge + '</span>'}
+              } if dateOfDeathAndAge,
               {
                 key: { html: '<span data-qa="preferredNameLabel">Preferred name/Known as</span>' },
                 value: { html: '<span data-qa="preferredNameValue">' + personalDetails.preferredName + '</span>'}
