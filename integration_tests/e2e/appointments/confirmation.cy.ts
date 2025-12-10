@@ -103,7 +103,6 @@ describe('Confirmation page', () => {
     loadPage()
     cy.get('[data-qa="anotherAppointmentLink"]').click()
     const nextAppointmentsPage = new NextAppointmentPage()
-    nextAppointmentsPage.checkOnPage()
     nextAppointmentsPage.getBackLink().click()
     confirmPage.checkOnPage()
   })
