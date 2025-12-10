@@ -99,6 +99,15 @@ describe('Confirmation page', () => {
     appointmentsPage.checkOnPage()
   })
 
+  it('should link to the next appointment page when practitioner clicks Arrange another appointment', () => {
+    loadPage()
+    cy.get('[data-qa="anotherAppointmentLink"]').click()
+    const nextAppointmentsPage = new NextAppointmentPage()
+    nextAppointmentsPage.checkOnPage()
+    nextAppointmentsPage.getBackLink().click()
+    confirmPage.checkOnPage()
+  })
+
   describe('Should render the page with error message, when SVA client API call fails', () => {
     beforeEach(() => {
       cy.task('resetMocks')
