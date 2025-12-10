@@ -6,6 +6,7 @@ import express, { Request, NextFunction } from 'express'
 import {
   initialiseName,
   yearsSince,
+  yearsBetween,
   dateWithYear,
   dateToTimestamp,
   dateWithDayAndWithoutYear,
@@ -115,6 +116,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
   njkEnv.addFilter('yearsSince', yearsSince)
+  njkEnv.addFilter('yearsBetween', yearsBetween)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)
   njkEnv.addFilter('dateWithYearShortMonth', dateWithYearShortMonth)
   njkEnv.addFilter('fullName', fullName)

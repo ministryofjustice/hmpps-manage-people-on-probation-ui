@@ -71,6 +71,7 @@ export interface PersonalDetails {
   provisions: Provision[]
   personalCircumstances: PersonalCircumstance[]
   dateOfBirth: string
+  dateOfDeath?: string
 }
 export interface Disability {
   description: string
