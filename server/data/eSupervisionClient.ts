@@ -4,6 +4,7 @@ import RestClient from './restClient'
 import {
   ESupervisionCheckIn,
   ESupervisionCheckInResponse,
+  ESupervisionNote,
   ESupervisionReview,
   LocationInfo,
   OffenderInfo,
@@ -59,10 +60,10 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
-  async postOffenderCheckInNote(uuid: string, note: string): Promise<void> {
+  async postOffenderCheckInNote(uuid: string, notes: ESupervisionNote): Promise<void> {
     return this.post({
       path: `/v2/offender_checkins/${uuid}/update`,
-      data: { notes: note },
+      data: notes,
     })
   }
 }

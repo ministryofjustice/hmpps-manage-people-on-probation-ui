@@ -51,6 +51,11 @@ export interface ESupervisionReview {
   riskManagementFeedback?: boolean
 }
 
+export interface ESupervisionNote {
+  updatedBy: string
+  notes: string
+}
+
 export type ExternalUserId = string
 export interface OffenderSetup {
   uuid: string

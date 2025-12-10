@@ -6,7 +6,7 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { ESupervisionReview } from '../data/model/esupervision'
+import { ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -312,8 +312,17 @@ const checkInsController: Controller<typeof routes, void> = {
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+
+      const masClient = new MasApiClient(token)
+      const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
+      const practitionerId = pp?.username ? pp.username : res.locals.user.username
+
       const eSupervisionClient = new ESupervisionClient(token)
-      await eSupervisionClient.postOffenderCheckInNote(id, checkIn.note)
+      const notes: ESupervisionNote = {
+        updatedBy: practitionerId,
+        notes: checkIn.note,
+      }
+      await eSupervisionClient.postOffenderCheckInNote(id, notes)
 
       return res.redirect(`/case/${crn}/activity-log`)
     }
