@@ -3,7 +3,12 @@ import nock from 'nock'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
 import ESupervisionClient from './eSupervisionClient'
-import { ESupervisionCheckIn, ESupervisionCheckInResponse, ESupervisionReview } from './model/esupervision'
+import {
+  ESupervisionCheckIn,
+  ESupervisionCheckInResponse,
+  ESupervisionNote,
+  ESupervisionReview,
+} from './model/esupervision'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -169,7 +174,7 @@ describe('ESupervisionClient', () => {
   })
 
   describe('postOffenderCheckInReview', () => {
-    it('should GET checkin details from uuid', async () => {
+    it('should POST review to uuid', async () => {
       const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
 
       const review: ESupervisionReview = {
@@ -230,6 +235,27 @@ describe('ESupervisionClient', () => {
         .reply(200, response)
 
       const output = await client.postOffenderCheckInReview(checkInUuid, review)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postOffenderCheckInNote', () => {
+    it('should POST note to uuid', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const notes: ESupervisionNote = {
+        updatedBy: 'id',
+        notes: 'note',
+      }
+
+      const response = {}
+
+      fakeESupervisionApi
+        .post(`/v2/offender_checkins/${checkInUuid}/update`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postOffenderCheckInNote(checkInUuid, notes)
       expect(output).toEqual(response)
     })
   })

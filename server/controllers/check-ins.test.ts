@@ -13,6 +13,7 @@ import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import config from '../config'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
+import { ESupervisionCheckIn } from '../data/model/esupervision'
 
 jest.mock('../../logger', () => ({
   info: jest.fn(),
@@ -31,9 +32,6 @@ jest.mock('../middleware/postCheckInDetails', () => ({
 }))
 
 jest.mock('../data/masApiClient')
-const getProbationPractitionerSpy = jest
-  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
-  .mockImplementation(() => Promise.resolve({ username: 'name' } as ProbationPractitioner))
 jest.mock('../data/eSupervisionClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
@@ -65,17 +63,17 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 
-jest.mock('../data/eSupervisionClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      postOffenderCheckInReview: jest.fn().mockImplementation(() => Promise.resolve({})),
-      postOffenderSetupComplete: jest.fn().mockImplementation(async () => undefined),
-    }
-  })
-})
+const postReviewSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInReview')
+  .mockImplementation(() => Promise.resolve({} as ESupervisionCheckIn))
+const postReviewNoteSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInNote')
+  .mockImplementation(() => Promise.resolve())
 
+const getProbationPractitionerSpy = jest
+  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+  .mockImplementation(() => Promise.resolve({ username: 'name' } as ProbationPractitioner))
 const mockPersonalDetails = {} as PersonalDetails
-
 const getPersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonalDetails')
   .mockImplementation(() => Promise.resolve(mockPersonalDetails))
@@ -1272,14 +1270,62 @@ describe('checkInsController', () => {
     })
   })
 
+  describe('postViewCheckIn', () => {
+    it('redirect to activity log page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                note: 'note',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(postReviewNoteSpy).toHaveBeenCalled()
+      expect(getProbationPractitionerSpy).toHaveBeenCalled()
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
   describe('postReviewCheckIn', () => {
-    it('redirect to notes page', async () => {
+    it('redirect to activity log page', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       await controllers.checkIns.postReviewCheckIn(hmppsAuthClient)(req, res)
 
+      expect(postReviewSpy).toHaveBeenCalled()
       expect(getProbationPractitionerSpy).toHaveBeenCalled()
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
     })
