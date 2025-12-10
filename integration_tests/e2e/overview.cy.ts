@@ -36,6 +36,8 @@ context('Overview', () => {
     page.getRowData('personalDetails', 'preferredName', 'Value').should('contain.text', 'Caz')
     page.getRowData('personalDetails', 'preferredGender', 'Value').should('contain.text', 'Female')
     page.getRowData('personalDetails', 'dateOfBirthAndAge', 'Value').should('contain.text', '9 January 2002')
+    cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('not.exist')
+    cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('not.exist')
     page.getRowData('personalDetails', 'contactNumber', 'Value').should('contain.text', '07989654824')
     page
       .getRowData('personalDetails', 'currentCircumstances', 'Value')
@@ -135,6 +137,18 @@ context('Overview', () => {
         const recentCase = JSON.parse(JSON.stringify(result))
         expect(expected, recentCase)
       })
+  })
+  it('Overview page is rendered with date of death', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001')
+    cy.get('[data-qa="dateOfBirthAndAgeValue"]')
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.eq(`9 January 2002`)
+      })
+    cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('contain.text', 'Date of death')
+    cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('contain.text', '11 September 2024 (22 years old)')
   })
   it('Overview page is rendered for new san indicator assessment', () => {
     cy.task('stubSanIndicatorTrue')
