@@ -197,8 +197,13 @@ export const checkAppointmentSummary = (
     page
       .getSummaryListRow(3)
       .find('.govuk-summary-list__value')
-      .should('contain.text', 'Deborah Fern')
-      .should('contain.text', '(Automated Allocation Team, London)')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Deborah Fern' : 'Ben Towers')
+      .should(
+        'contain.text',
+        page instanceof ArrangeAnotherAppointmentPage
+          ? '(Automated Allocation Team, London)'
+          : '(Default Designated Transfer Team, East of England)',
+      )
   } else {
     page
       .getSummaryListRow(3)

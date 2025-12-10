@@ -10,6 +10,7 @@ import {
   redirectWizard,
   getDefaultUser,
   getUserOptions,
+  routeChangeAttendee,
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -56,6 +57,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.post(
     '/case/:crn/arrange-appointment/:id/type-attendance',
+    routeChangeAttendee,
     validate.appointments,
     controllers.arrangeAppointments.postTypeAttendance(),
   )
