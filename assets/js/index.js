@@ -338,7 +338,7 @@ const changeAttendeeLink = document.querySelector('[data-qa=changeAttendeeLink]'
 if (changeAttendeeLink) {
   changeAttendeeLink.addEventListener('click', e => {
     e.preventDefault()
-    e.target.closest('form').submit()
+    e.currentTarget.closest('form').submit()
   })
 }
 
