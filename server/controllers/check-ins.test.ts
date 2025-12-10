@@ -78,6 +78,7 @@ const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const baseReq = () =>
   httpMocks.createRequest({
     params: { crn, id: uuid },
+    query: { back: '' },
     session: {},
   })
 
@@ -99,7 +100,7 @@ describe('checkInsController', () => {
       const req = baseReq()
       await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn, back: req.query.back })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 

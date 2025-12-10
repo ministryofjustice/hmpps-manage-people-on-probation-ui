@@ -23,7 +23,7 @@ export interface OffenderSetupCompleteResponse {
   uuid: string
   crn: string
   practitionerId: string
-  status: 'INITIAL' | 'VERIFIED' | 'INACTIVE'
+  status: OffenderStatus
   firstCheckin: string
   checkinInterval: string
   createdAt: string
@@ -54,11 +54,25 @@ export interface Practitioner {
 
 export interface PersonalDetails {
   crn: string
-  name: {
-    forename: string
-    surname: string
-  }
+  name: Name
   mobile: string
   email: string | null
   practitioner: Practitioner
 }
+
+interface Name {
+  forename: string
+  surname: string
+}
+
+export interface OffenderCheckinsByCRNResponse {
+  uuid: string
+  crn: string
+  status: OffenderStatus
+  firstCheckin: string
+  checkinInterval: CheckInterval
+  contactPreferences: string
+}
+
+export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
+export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'

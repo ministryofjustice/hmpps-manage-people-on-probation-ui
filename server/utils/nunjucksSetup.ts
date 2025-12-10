@@ -73,6 +73,7 @@ import {
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../models/Locals'
+import getUserFriendlyString from './eSupervisionFriendlyString'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   const production = process.env.NODE_ENV === 'production'
@@ -141,6 +142,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
+  njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))

@@ -16,6 +16,7 @@ import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
+import { OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -103,6 +104,7 @@ interface Locals {
   alertsCount?: string
   alertsCleared?: { error: boolean; message: string }
   contactResponse?: ContactResponse
+  offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
 }
 
 export interface AppResponse extends Response {

@@ -18,6 +18,10 @@
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set manageCheckinLink = '#' %}
+{% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up oline check ins'%}
+{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else checkinLink %}
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
@@ -188,6 +192,57 @@
         ]
       }
     }) }}
+
+    {% set checkin %}
+    {% set nextCheckin = offenderCheckinsByCRNResponse %}
+    {% set nextCheckinText %}
+        {% if nextCheckin %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
+                        value: { html: '<span data-qa="firstCheckInValue">' + nextCheckin.firstCheckin | dateWithDayAndWithoutYear + '</span'}
+                    },
+                    {
+                        key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
+                        value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span'}
+                    },
+                    {
+                        key: { html: '<span data-qa="contactPreferenceValueLabel">Contact preferences</span>'},
+                        value: { html: '<span data-qa="contactPreferenceValue">' + nextCheckin.contactPreferences | userFriendlyString  + '</span'}
+                    }
+
+                ]
+            }) }}
+        {% else %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="nextAppointmentLabel">Next check in due</span>'},
+                        value: { html: '<span data-qa="nextAppointmentValue"> Online check ins not set up </span'}
+                    }
+                ]
+            }) }}
+        {% endif %}
+    {% endset %}
+    {% endset %}
+  {% if flags.enableESuperVision === true %}
+    {{ appSummaryCard({
+        titleText: 'Online check ins',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinCard'},
+        html: nextCheckinText,
+        actions: {
+            items: [
+                {
+                    text: checkinLinkText,
+                    href: checkinHrefLink
+                }
+            ]
+        }
+    }) }}
+  {% endif %}
 
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}

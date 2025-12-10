@@ -148,6 +148,45 @@
           "Content-Type": "application/json;charset=UTF-8"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offenders/crn/X000001",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa7",
+          "crn": "X000001",
+          "status": "VERIFIED",
+          "firstCheckin": "2025-11-03",
+          "checkinInterval": "WEEKLY",
+          "contactPreferences": "EMAIL"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offenders/crn/X778160",
+        "method": "GET"
+      },
+      "response": {
+        "status": 404,
+        "jsonBody": {
+          "status": 404,
+          "errorCode": "NOT_FOUND",
+          "userMessage": "404 NOT_FOUND, CRN X778160 not found",
+          "developerMessage": "404 NOT_FOUND , CRN X778160 not found",
+          "moreInfo": null
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }
