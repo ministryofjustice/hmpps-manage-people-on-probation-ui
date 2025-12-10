@@ -61,7 +61,7 @@ $mappa-colour: #4c2c92;
   row-gap: 20px;
 }
 
-.probation-accordion-custom.govuk-accordion {
+.govuk-accordion__probation-accordion-custom {
   .govuk-accordion__controls {
     display: none;
     height: 25px;
@@ -588,8 +588,4 @@ body.feature-disabled {
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-
-.technical-updates-content {
-  float: left;
 }

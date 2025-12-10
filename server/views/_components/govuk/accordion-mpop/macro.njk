@@ -1,7 +1,7 @@
 {% macro probationAccordion(params) %}
     {%- set params = params | default({}) %}
     {%- set params = params | merge({
-        classes: (params.classes | default('')) + ' probation-accordion-custom'
+        classes: (params.classes | default('')) + ' govuk-accordion__probation-accordion-custom'
     }) -%}
     {%- include "./template.njk" -%}
 {% endmacro %}
