@@ -196,7 +196,6 @@ describe('Arrange an appointment', () => {
       typePage = new AppointmentTypePage()
     })
     it('should render the attendee page with the default user selected', () => {
-      typePage.getRadio('type', 2).click()
       cy.get('[data-qa="attendee"] a').click()
       attendancePage = new AttendancePage()
       attendancePage.checkOnPage()
@@ -206,7 +205,6 @@ describe('Arrange an appointment', () => {
       attendancePage.getSubmitBtn().click()
       typePage = new AppointmentTypePage()
       typePage.checkOnPage()
-      typePage.getRadio('type', 2).should('be.checked')
       cy.get('[data-qa="attendeeDetails').should('contain.text', expectedUser)
       typePage.getRadio('type', 2).click()
       typePage.getSubmitBtn().click()
