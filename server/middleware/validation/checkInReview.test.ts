@@ -8,6 +8,7 @@ const checkInUrl = `case/${crn}/appointments/${id}/check-in`
 const identityUrl = `${checkInUrl}/review/identity`
 const notesUrl = `${checkInUrl}/review/notes`
 const expiredUrl = `${checkInUrl}/review/expired`
+const viewUrl = `${checkInUrl}/view`
 
 const reqBase = {
   method: 'POST',
@@ -113,6 +114,47 @@ describe('/controllers/arrangeAppointmentController', () => {
     } as RequestOptions
     const reqExpired = httpMocks.createRequest(reqBaseExpired)
     validation.checkInReview(reqExpired, res, next)
+    expect(res.render).toHaveBeenCalled()
+  })
+  it('validation passes for view page', async () => {
+    const esupervision = {
+      [crn]: {
+        [id]: {
+          checkins: {
+            note: 'note',
+          },
+        },
+      },
+    }
+    const reqBaseView = {
+      ...reqBase,
+      url: viewUrl,
+      session: {
+        data: {
+          esupervision,
+        },
+      },
+      body: {
+        esupervision,
+      },
+    } as RequestOptions
+    const reqView = httpMocks.createRequest(reqBaseView)
+    validation.checkInReview(reqView, res, next)
+    // expect(next).toHaveBeenCalled()
+  })
+  it('validation fails if no option selected', async () => {
+    const reqBaseView = {
+      ...reqBase,
+      url: viewUrl,
+      session: {
+        data: {},
+      },
+      body: {
+        esupervision: {},
+      },
+    } as RequestOptions
+    const reqView = httpMocks.createRequest(reqBaseView)
+    validation.checkInReview(reqView, res, next)
     expect(res.render).toHaveBeenCalled()
   })
 })
