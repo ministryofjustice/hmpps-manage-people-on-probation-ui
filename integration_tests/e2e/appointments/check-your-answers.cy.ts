@@ -13,7 +13,6 @@ import {
   checkUpdateDateTime,
   checkUpdateLocation,
   checkUpdateNotes,
-  checkUpdateRepeating,
   checkUpdateSensitivity,
   checkUpdateSentence,
   checkUpdateType,
@@ -40,7 +39,7 @@ const loadPage = ({
 }
 
 describe('Check your answers then confirm the appointment', () => {
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
 

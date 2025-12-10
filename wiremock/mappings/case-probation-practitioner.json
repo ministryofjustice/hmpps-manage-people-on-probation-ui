@@ -2,27 +2,27 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas/case/.*/probation-practitioner",
+        "urlPattern": "/mas/case/.*/probation-practitioner",
         "method": "GET"
       },
       "response": {
         "status": 200,
         "jsonBody": {
-          "code": "N56A050",
+          "code": "N07B795",
           "name": {
-            "forename": "Ben",
-            "surname": "Towers"
+            "forename": "Deborah",
+            "surname": "Fern"
           },
           "provider": {
-            "code": "N56",
-            "name": "East of England"
+            "code": "N07",
+            "name": "London"
           },
           "team": {
-            "code": "N56DTX",
-            "description": "Default Designated Transfer Team"
+            "code": "N07AAT",
+            "description": "Automated Allocation Team"
           },
           "unallocated": false,
-          "username": "BenTowers"
+          "username": "DeborahFern"
         },
         "headers": {
           "Content-Type": "application/json"
