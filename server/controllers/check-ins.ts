@@ -208,7 +208,6 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const photoUploadOption = getDataValue(data, ['esupervision', crn, id, 'checkins', 'photoUploadOption'])
       const redirectTo = photoUploadOption === 'TAKE_A_PIC' ? 'take-a-photo' : 'upload-a-photo'
-
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/${redirectTo}`)
     }
   },
@@ -263,9 +262,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { back } = req.query
-
       const { checkIn } = res.locals
-
       const statusMap = {
         REVIEWED: 'view',
         SUBMITTED: 'review/identity',
@@ -336,7 +333,6 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
-
       if (checkIn.status !== 'EXPIRED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
@@ -352,10 +348,8 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
-
       const url = encodeURIComponent(req.url)
       const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
-
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
@@ -402,15 +396,12 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const url = encodeURIComponent(req.url)
-
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
-
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
       const practitionerId = pp?.username ? pp.username : res.locals.user.username
-
       const review: ESupervisionReview = {
         reviewedBy: practitionerId,
         manualIdCheck: checkIn?.manualIdCheck,
@@ -418,10 +409,8 @@ const checkInsController: Controller<typeof routes, void> = {
         furtherActions: checkIn?.furtherActions,
         riskManagementFeedback: checkIn?.riskManagementFeedback,
       }
-
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
-
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
@@ -474,9 +463,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
       await postCheckinInComplete(hmppsAuthClient)(req, res)
-
       const userDetails: CheckinUserDetails = {
         ...savedUserDetails,
         uuid: id,
