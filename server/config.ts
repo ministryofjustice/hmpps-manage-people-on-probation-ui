@@ -102,7 +102,7 @@ export default {
     link: get('CAVAL_LINK', 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk', requiredInProduction),
   },
   esupervision: {
-    link: get('ESUPERVISION_LINK', 'https://esupervision-dev.hmpps.service.justice.gov.uk/', {
+    link: get('ESUPERVISION_LINK', 'https://esupervision-dev.hmpps.service.justice.gov.uk', {
       requireInProduction: false,
     }),
   },
@@ -239,7 +239,7 @@ export default {
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
   fileUploadLimit: 5,
-  maxCharCount: 4000,
+  maxCharCount: get('CHAR_COUNT', 12000, requiredInProduction),
   preservedWords: ['(NS)', '(Non', 'NS)'],
   preservedSeparators: ['-'],
 }

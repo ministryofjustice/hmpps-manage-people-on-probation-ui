@@ -121,4 +121,7 @@ describe('/middleware/getOfficeLocationsByTeamAndProvider()', () => {
   it('should call next()', () => {
     expect(nextSpy).toHaveBeenCalled()
   })
+  it('should return null if no next in parameters', async () => {
+    expect(await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)).toEqual(null)
+  })
 })

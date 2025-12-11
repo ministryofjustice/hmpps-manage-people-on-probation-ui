@@ -185,7 +185,7 @@ export const completeNextAppointmentPage = (index = 1) => {
 
 export const checkAppointmentSummary = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
-  repeatingEnabled = false,
+  probationPractitioner = false,
 ) => {
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
   page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned office visit (NS)')
@@ -193,11 +193,19 @@ export const checkAppointmentSummary = (
   page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
   page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
-  page
-    .getSummaryListRow(3)
-    .find('.govuk-summary-list__value')
-    .should('contain.text', 'peter parker (PS-PSO)')
-    .should('contain.text', '(Automated Allocation Team, London)')
+  if (probationPractitioner) {
+    page
+      .getSummaryListRow(3)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', 'Deborah Fern')
+      .should('contain.text', '(Automated Allocation Team, London)')
+  } else {
+    page
+      .getSummaryListRow(3)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', 'Peter Parker (PS-PSO)')
+      .should('contain.text', '(Automated Allocation Team, London)')
+  }
   page.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
   page
     .getSummaryListRow(4)
@@ -221,14 +229,8 @@ export const checkAppointmentSummary = (
     page.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   }
 
-  const index = repeatingEnabled ? 1 : 0
-  if (repeatingEnabled) {
-    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
-    page
-      .getSummaryListRow(6)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
-  }
+  const index = 0
+
   page
     .getSummaryListRow(6 + index)
     .find('.govuk-summary-list__key')

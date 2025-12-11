@@ -21,15 +21,7 @@ import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
 import { PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
-import {
-  ProbationPractitioner,
-  TeamCaseload,
-  UserAppontment,
-  UserCaseload,
-  UserLocations,
-  UserProviders,
-  UserTeam,
-} from './model/caseload'
+import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
@@ -51,6 +43,8 @@ import {
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
+import { ProbationPractitioner } from '../models/CaseDetail'
+import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 
 interface GetUserScheduleProps {
   username: string
@@ -354,6 +348,14 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/providers${queryParameters}`, handle404: true })
   }
 
+  async getTeamsByProvider(providerCode: string): Promise<AppointmentTeams> {
+    return this.get({ path: `/appointment/teams/provider/${providerCode}` })
+  }
+
+  async getStaffByTeam(teamCode: string): Promise<AppointmentStaff> {
+    return this.get({ path: `/appointment/staff/team/${teamCode}` })
+  }
+
   async getUserLocations(username: string): Promise<UserLocations> {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
@@ -440,7 +442,7 @@ export default class MasApiClient extends RestClient {
     })
   }
 
-  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner | null> {
-    return this.get({ path: `/case/${crn}/probation-practitioner`, handle404: true })
+  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
+    return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 }

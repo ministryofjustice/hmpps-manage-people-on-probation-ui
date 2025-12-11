@@ -3,9 +3,9 @@ import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/eSuperVision'
+import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/esupervision'
 import logger from '../../logger'
-import { ProbationPractitioner } from '../data/model/caseload'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const postCheckInDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -14,7 +14,6 @@ export const postCheckInDetails = (
     const { crn, id } = req.params
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
-    const caseDetails = res.locals.case
     const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
 
     // firstCheckinDate is provided in format dd/M/yyyy. Convert to yyyy/M/dd as required by API.
@@ -28,13 +27,8 @@ export const postCheckInDetails = (
     const data: OffenderInfo = {
       setupUuid: id,
       practitionerId,
-      firstName: caseDetails.name.forename,
-      lastName: caseDetails.name.surname,
-      dateOfBirth: caseDetails.dateOfBirth,
       crn,
-      email: savedUserDetails.checkInEmail,
-      phoneNumber: savedUserDetails.checkInMobile,
-      firstCheckinDate,
+      firstCheckin: firstCheckinDate,
       checkinInterval: savedUserDetails.interval,
       startedAt: new Date().toISOString(),
     }

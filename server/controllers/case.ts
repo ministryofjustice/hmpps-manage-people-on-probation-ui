@@ -46,6 +46,7 @@ const caseController: Controller<typeof routes, void> = {
         tierCalculation,
         risksWidget,
         predictorScores,
+        personalDetails: req.session.data.personalDetails[crn],
         sanIndicator: sanIndicatorResponse?.sanIndicator,
       })
     }

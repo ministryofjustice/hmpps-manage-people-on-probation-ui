@@ -13,7 +13,6 @@ import {
   checkUpdateDateTime,
   checkUpdateLocation,
   checkUpdateNotes,
-  checkUpdateRepeating,
   checkUpdateSensitivity,
   checkUpdateSentence,
   checkUpdateType,
@@ -40,7 +39,7 @@ const loadPage = ({
 }
 
 describe('Check your answers then confirm the appointment', () => {
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
 
@@ -48,7 +47,8 @@ describe('Check your answers then confirm the appointment', () => {
     loadPage()
     const cyaPage = new AppointmentCheckYourAnswersPage()
     checkPopHeader('Alton Berge', true)
-    checkAppointmentSummary(cyaPage)
+    const showsProbationPractitioner = true
+    checkAppointmentSummary(cyaPage, showsProbationPractitioner)
   })
 
   it('should render the page with VISOR report', () => {
