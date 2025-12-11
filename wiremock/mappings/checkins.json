@@ -272,7 +272,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/v2/offender_checkins/.*/update",
+        "urlPathPattern": "/esupervision/v2/offender_checkins/.*/annotate",
         "method": "POST"
       },
       "response": {
