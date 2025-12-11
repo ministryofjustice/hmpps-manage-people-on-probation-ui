@@ -43,19 +43,15 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
           : `${checks.isWithinOneHourOfMeetingWith.appointmentIsWith.forename} ${checks.isWithinOneHourOfMeetingWith.appointmentIsWith.surname} already has an appointment with ${res.locals.case.name.forename} within an hour of this date and time. Continue with these details or make changes.`
     }
 
-    // Check errors
-    const errorMessages: Record<string, string> = {}
     if (checks.overlapsWithMeetingWith) {
-      errorMessages[`appointments-${crn}-${id}-start`] =
-        `Choose a time that does not clash with ${res.locals.case.name.forename}’s existing appointment at ${checks.overlapsWithMeetingWith.startAndEnd}`
+      warningMessages.overlapsWithMeetingWith = `${res.locals.case.name.forename} has an existing appointment at ${checks.overlapsWithMeetingWith.startAndEnd} that overlaps with this time. Continue with these details or make changes`
     }
 
-    if (warningMessagesSeen && Object.keys(errorMessages).length === 0 && sameValuesHaveBeenSubmitted === true) {
+    if (warningMessagesSeen && sameValuesHaveBeenSubmitted === true) {
       return next()
     }
 
     res.locals.warningMessages = warningMessages
-    res.locals.errorMessages = errorMessages
     return res.render(render, { warningMessages, ...localParams })
   }
 }

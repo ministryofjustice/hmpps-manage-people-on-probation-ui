@@ -1,0 +1,16 @@
+{% if flags.enablePastAppointments %}
+  {% set html = 'You can only use this service to log attended and complied outcomes.<br><a href="#" target="_blank" rel="external noopener noreferrer">Use NDelius to arrange an appointment in the past with another outcome</a>.' %}
+  {% if isAttendedComplied %}
+    {% set html = 'You can only log attended and complied outcomes. If you need to log a different outcome, <a href="#" target="_blank" rel="external noopener noreferrer">arrange this appointment on NDelius</a>.' %}
+  {% endif %}
+  <div data-module="serviceAlert" class="{% if (isInPast == false) or (isInPast == true and alertDismissed == true) %}display-none{% endif %}">
+    {{ mojAlert({
+  variant: "information",
+  title: "You can only use this service to log attended and complied outcomes.",
+  showTitleAsHeading: false,
+  dismissible: true,
+  html: html
+}) }}
+  </div>
+  <span data-qa="serviceAlertStatus" class="govuk-visually-hidden" aria-live="polite"></span>
+{% endif %}
