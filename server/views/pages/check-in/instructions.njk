@@ -3,7 +3,8 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn  +"/appointments" %}
 {% set formAnchorText = "Cancel" %}
-{% set backLink =  '/case/' + crn + '/appointments' %}
+{% set back = back if back else '' %}
+{% set backLink =  '/case/' + crn + '/'  + back %}
 {% block form %}
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">

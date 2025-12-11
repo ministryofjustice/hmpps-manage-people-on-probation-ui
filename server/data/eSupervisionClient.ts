@@ -7,6 +7,7 @@ import {
   ESupervisionNote,
   ESupervisionReview,
   LocationInfo,
+  OffenderCheckinsByCRNResponse,
   OffenderInfo,
   OffenderSetup,
   OffenderSetupCompleteResponse,
@@ -21,8 +22,6 @@ export default class ESupervisionClient extends RestClient {
     return this.post({
       data: body,
       path: `/v2/offender_setup`,
-      handle404: false,
-      handle500: false,
       errorMessageFor500: 'Failed to post offender checkin details',
     })
   }
@@ -32,8 +31,6 @@ export default class ESupervisionClient extends RestClient {
       path: `/v2/offender_setup/${offenderSetup.uuid}/upload_location`,
       query: { 'content-type': photoContentType },
       headers: { 'Content-Type': 'application/json' },
-      handle404: false,
-      handle500: false,
       errorMessageFor500: 'Failed to fetch check-in upload location',
     })
   }
@@ -41,8 +38,6 @@ export default class ESupervisionClient extends RestClient {
   async postOffenderSetupComplete(setupId: string): Promise<OffenderSetupCompleteResponse> {
     return this.post({
       path: `/v2/offender_setup/${setupId}/complete`,
-      handle404: false,
-      handle500: false,
       errorMessageFor500: 'Failed to complete offender checkin registration',
     })
   }
@@ -65,5 +60,9 @@ export default class ESupervisionClient extends RestClient {
       path: `/v2/offender_checkins/${uuid}/annotate`,
       data: notes,
     })
+  }
+
+  async getOffenderCheckinsByCRN(crn: string): Promise<OffenderCheckinsByCRNResponse | null> {
+    return this.get({ path: `/v2/offenders/crn/${crn}`, handle404: true })
   }
 }
