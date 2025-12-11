@@ -1000,7 +1000,7 @@ describe('controllers/arrangeAppointment', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest()
       await controllers.arrangeAppointments.getConfirmation()(mockReq, res)
-      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, { crn })
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, { crn, url: '' })
     })
   })
   describe('postConfirmation', () => {
