@@ -154,71 +154,8 @@
                         </button>
                     </div>
                 </form>
-
-                {% if alertsData.totalPages > 1 %}
-                    {% set currentPage = alertsData.page or 0 %}
-                    {% set totalPages = alertsData.totalPages %}
-
-                    {% set sortFragment = sortQueryString | slice(1) if sortQueryString and sortQueryString.length > 0 else '' %}
-                    {% set url = "/alerts?" + sortFragment + ('&' if sortFragment else '') %}
-
-                    {% set paginationItems = [] %}
-                    {% set totalLinks = 3 %}
-                    {% if totalLinks > totalPages %}
-                        {% set totalLinks = totalPages %}
-                    {% endif %}
-
-                    {% set start = 0 %}
-                    {% set end = start + totalLinks %}
-                    {% if currentPage > 0 %}
-                        {% set start = currentPage -1 %}
-                        {% set end = start + totalLinks %}
-                    {% endif %}
-                    {% if currentPage + 1 == totalPages %}
-                        {% set start = currentPage - (totalLinks -1) %}
-                        {% set end = totalPages %}
-                    {% endif %}
-
-                    {% if (totalPages > 3) and (currentPage != 0) and (start != 0) %}
-                        {% set paginationItems = (paginationItems.push(
-                            {
-                                number: 1,
-                                href: url + 'page=0'
-                            },
-                            {
-                                ellipsis: true
-                            }), paginationItems) %}
-                    {% endif %}
-
-                    {% for i in range(start , end) -%}
-                        {% set paginationItems = (paginationItems.push({
-                            number: i + 1,
-                            href: url + 'page=' + i,
-                            current: true if i == currentPage else false
-                        }), paginationItems) %}
-                    {% endfor %}
-
-                    {% if (totalPages > 3) and ((currentPage + 1) != totalPages) and (end !== totalPages) %}
-                        {% set paginationItems = (paginationItems.push(
-                            {
-                                ellipsis: true
-                            },
-                            {
-                                number: totalPages,
-                                href: url + 'page=' + (totalPages - 1)
-                            }
-                        ), paginationItems) %}
-                    {% endif %}
-
-                    {{ govukPagination({
-                        previous: {
-                            href: url + 'page=' + (currentPage - 1)
-                        } if currentPage > 0 and totalPages > 1,
-                        next: {
-                            href: url + 'page=' + (currentPage + 1)
-                        } if currentPage + 1 < totalPages and totalPages > 1,
-                        items: paginationItems
-                    }) }}
+                {% if pagination.items | length > 1 %}
+                    {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
                 {% endif %}
 
             {% else %}

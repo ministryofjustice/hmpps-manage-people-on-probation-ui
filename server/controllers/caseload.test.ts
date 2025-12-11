@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { v4 as uuidv4 } from 'uuid'
+import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import logger from '../../logger'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -296,7 +297,7 @@ describe('caseloadController', () => {
       }
       const req = httpMocks.createRequest({
         query: {
-          page: '',
+          page: '1',
         },
         url: '/caseload/appointments/upcoming',
       })
@@ -304,7 +305,7 @@ describe('caseloadController', () => {
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
-        page: req.query.page,
+        page: (parseInt(req.query.page as string, 10) - 1).toString(),
         size: '',
         sortBy: '',
         ascending: '',
@@ -312,11 +313,16 @@ describe('caseloadController', () => {
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
-        page: req.query.page,
         type: 'upcoming',
         sortBy,
-        paginationUrl: '/caseload/appointments/upcoming?',
-        sortUrl: '/caseload/appointments/upcoming',
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
+        sortUrl: '/caseload/appointments/upcoming?page=1',
         url: req.url,
       })
     })
@@ -338,7 +344,7 @@ describe('caseloadController', () => {
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
-        page: req.query.page,
+        page: (parseInt(req.query.page as string, 10) - 1).toString(),
         size: '',
         sortBy: 'name',
         ascending: 'true',
@@ -346,10 +352,15 @@ describe('caseloadController', () => {
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
-        page: req.query.page,
         type: 'upcoming',
         sortBy,
-        paginationUrl: '/caseload/appointments/upcoming?sortBy=name.asc&',
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
         sortUrl: '/caseload/appointments/upcoming?page=2',
         url: req.url,
       })
@@ -372,7 +383,7 @@ describe('caseloadController', () => {
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
-        page: req.query.page,
+        page: (parseInt(req.query.page as string, 10) - 1).toString(),
         size: '',
         sortBy: 'appointment',
         ascending: 'false',
@@ -380,10 +391,15 @@ describe('caseloadController', () => {
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
-        page: req.query.page,
         type: 'upcoming',
         sortBy,
-        paginationUrl: '/caseload/appointments/upcoming?sortBy=appointment.desc&',
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
         sortUrl: '/caseload/appointments/upcoming?page=2',
         url: req.url,
       })
@@ -404,7 +420,7 @@ describe('caseloadController', () => {
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
-        page: req.query.page,
+        page: (parseInt(req.query.page as string, 10) - 1).toString(),
         size: '',
         sortBy: '',
         ascending: '',
@@ -412,10 +428,15 @@ describe('caseloadController', () => {
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
-        page: req.query.page,
         type: 'no-outcome',
         sortBy,
-        paginationUrl: '/caseload/appointments/no-outcome?',
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
         sortUrl: '/caseload/appointments/no-outcome?page=0',
         url: req.url,
       })
@@ -436,7 +457,7 @@ describe('caseloadController', () => {
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
         username: res.locals.user.username,
-        page: '',
+        page: '0',
         size: '',
         sortBy: 'sentence',
         ascending: 'false',
@@ -444,10 +465,15 @@ describe('caseloadController', () => {
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/caseload/appointments', {
         userSchedule: expectedUserSchedule,
-        page: '',
         type: 'no-outcome',
         sortBy,
-        paginationUrl: '/caseload/appointments/no-outcome?sortBy=sentence.desc&',
+        pagination: getPaginationLinks(
+          req.query.page ? Number.parseInt(req.query.page as string, 10) : 1,
+          mockResponse.totalPages,
+          mockResponse.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockResponse.size,
+        ),
         sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
       })

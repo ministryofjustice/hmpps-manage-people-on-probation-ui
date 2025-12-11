@@ -1,3 +1,5 @@
+import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
+import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
@@ -10,15 +12,15 @@ const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
     return async (req, res) => {
       const { user } = res.locals
-      const { page = '0', sortBy, sortOrder } = req.query as Record<string, string>
+      const { sortBy, sortOrder } = req.query as Record<string, string>
       const url = encodeURIComponent(req.url)
-      const pageNumber = parseInt(page, 10)
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
 
-      const alertsData: UserAlerts = await masClient.getUserAlerts(pageNumber, sortBy, sortOrder as 'asc' | 'desc')
+      const alertsData: UserAlerts = await masClient.getUserAlerts(pageNum - 1, sortBy, sortOrder as 'asc' | 'desc')
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
 
       let crnToRiskWidgetMap = {}
@@ -49,9 +51,18 @@ const alertsController: Controller<typeof routes, void> = {
         sortQueryString += `&sortOrder=${sortOrder}`
       }
 
+      const pagination: Pagination = getPaginationLinks(
+        req.query.page ? pageNum : 1,
+        alertsData?.totalPages || 0,
+        alertsData?.totalResults || 0,
+        page => addParameters(req, { page: page.toString() }),
+        alertsData?.size || 10,
+      )
+
       res.render('pages/alerts', {
         url,
         alertsData,
+        pagination,
         crnToRiskWidgetMap,
         sortQueryString,
         currentSort: {
