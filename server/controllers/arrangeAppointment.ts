@@ -443,7 +443,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
-  getConfirmation: () => {
+  getConfirmation: hmppsAuthClient => {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
@@ -451,11 +451,29 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const attending = getDataValue(data, ['appointments', crn, id, 'user'])
+      let attendingName = 'Your '
+      if (attending.username.toUpperCase() !== res.locals.user.username) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        try {
+          const user = await masClient.getUserDetails(attending.username.toUpperCase())
+          attendingName = `${user.firstName}'s `
+        } catch {
+          attendingName = `The officer's `
+        }
+      }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
       delete req.session.data.isOutLookEventFailed
-      return res.render(`pages/arrange-appointment/confirmation`, { crn, backendId, isOutLookEventFailed, url })
+      return res.render(`pages/arrange-appointment/confirmation`, {
+        crn,
+        backendId,
+        isOutLookEventFailed,
+        attendingName,
+        url,
+      })
     }
   },
   postConfirmation: () => {
@@ -475,6 +493,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
+
       if (!getDataValue<AppointmentSession>(data, ['appointments', crn, id])) {
         return res.redirect(`/case/${crn}/appointments`)
       }
