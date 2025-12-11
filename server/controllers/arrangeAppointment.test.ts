@@ -1004,7 +1004,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         attendingName: "first's ",
-        url: ""
+        url: '',
       })
     })
   })

@@ -472,7 +472,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         backendId,
         isOutLookEventFailed,
         attendingName,
-        url
+        url,
       })
     }
   },
