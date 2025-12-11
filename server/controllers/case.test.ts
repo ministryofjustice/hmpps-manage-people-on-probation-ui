@@ -11,6 +11,7 @@ import { Overview } from '../data/model/overview'
 import { Needs, PersonRiskFlags } from '../data/model/risk'
 import { toPredictors, toRoshWidget } from '../utils'
 import { checkAuditMessage } from './testutils'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -33,9 +34,11 @@ const crn = 'X000001'
 const mockOverview = {} as Overview
 const mockNeeds = {} as Needs
 const mockRiskFlags = {} as PersonRiskFlags
+const mockPersonalDetails = {} as PersonalDetails
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
   .mockImplementation(() => Promise.resolve(mockOverview))
+jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockImplementation(() => Promise.resolve(mockPersonalDetails))
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
@@ -70,6 +73,13 @@ describe('caseController', () => {
         sentenceNumber: '123',
       },
       url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
     })
     beforeEach(async () => {
       await controllers.case.getCase(hmppsAuthClient)(req, res)
@@ -95,6 +105,7 @@ describe('caseController', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
+        personalDetails: mockPersonalDetails,
       })
     })
   })
@@ -104,6 +115,13 @@ describe('caseController', () => {
         crn,
       },
       url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
     })
     beforeEach(async () => {
       await controllers.case.getCase(hmppsAuthClient)(req, res)
@@ -128,6 +146,7 @@ describe('caseController', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
+        personalDetails: mockPersonalDetails,
       })
     })
   })

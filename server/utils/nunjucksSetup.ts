@@ -6,6 +6,7 @@ import express, { Request, NextFunction } from 'express'
 import {
   initialiseName,
   yearsSince,
+  yearsBetween,
   dateWithYear,
   dateToTimestamp,
   dateWithDayAndWithoutYear,
@@ -73,6 +74,7 @@ import {
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../models/Locals'
+import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
@@ -116,6 +118,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
   njkEnv.addFilter('yearsSince', yearsSince)
+  njkEnv.addFilter('yearsBetween', yearsBetween)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)
   njkEnv.addFilter('dateWithYearShortMonth', dateWithYearShortMonth)
   njkEnv.addFilter('fullName', fullName)
@@ -139,10 +142,11 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('shortTime', shortTime)
+  njkEnv.addFilter('split', splitString)
+  njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
-  njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))

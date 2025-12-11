@@ -177,7 +177,10 @@ export default abstract class Page {
     })
   }
 
-  getSummaryListRow = (index: number) => {
+  getSummaryListRow = (index: number, summary?: string) => {
+    if (summary) {
+      return cy.get(`[data-qa="${summary}"] .govuk-summary-list__row:nth-child(${index})`)
+    }
     return cy.get(`.govuk-summary-list__row:nth-child(${index})`)
   }
 

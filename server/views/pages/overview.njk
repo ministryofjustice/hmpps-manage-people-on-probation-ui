@@ -126,13 +126,13 @@
 
 {% block pageContent %}
 
-    {% if 'very high' in (riskToStaff.levelDescription | lower) %}
-        {% set level = 'VERY_HIGH' %}
-    {% else %}
-        {% set level = riskToStaff.levelDescription or riskToStaff.level %}
-    {% endif %}
+  {% if 'very high' in (riskToStaff.levelDescription | lower) %}
+    {% set level = 'VERY_HIGH' %}
+  {% else %}
+    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
+  {% endif %}
 
-    {% if level and (level | upper == 'VERY_HIGH' or level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
+  {% if level and(level | upper == 'VERY_HIGH' or level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
     {% set html %}
     <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
     {% endset %}
@@ -246,8 +246,8 @@
 
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}
-  {{ overview.personalDetails.dateOfBirth | dateWithYear }} ({{ overview.personalDetails.dateOfBirth | yearsSince }} years old)
-            {% set contactNumber %}
+  {{ overview.personalDetails.dateOfBirth | dateWithYear + (" (" + overview.personalDetails.dateOfBirth | yearsSince + " years old)" if not personalDetails.dateOfDeath ) }}
+  {% set contactNumber %}
   {% if overview.personalDetails.telephoneNumber %}
     {{ overview.personalDetails.telephoneNumber }}<br/>
   {% endif %}
@@ -259,6 +259,11 @@
                 {% endif %}
   {% endset %}
   {% endset %}
+  {% if personalDetails.dateOfDeath %}
+    {% set dateOfDeathAndAge %}
+    {{ personalDetails.dateOfDeath | dateWithYear }} ({{ overview.personalDetails.dateOfBirth | yearsBetween(personalDetails.dateOfDeath) }} years old)
+        {% endset %}
+  {% endif %}
   {% set circumstances %}
   {% if overview.personalDetails.personalCircumstances.length > 0 %}
     <ul class="govuk-list">
@@ -318,6 +323,10 @@
             key: { html: '<span data-qa="dateOfBirthAndAgeLabel">Date of birth</span>'},
             value: { html: '<span data-qa="dateOfBirthAndAgeValue">' + dateOfBirthAndAge + '</span>'}
           },
+          {
+            key: { html: '<span data-qa="dateOfDeathAndAgeLabel">Date of death</span>'},
+            value: { html: '<span data-qa="dateOfDeathAndAgeValue">' + dateOfDeathAndAge + '</span>'}
+          } if dateOfDeathAndAge,
           {
             key: { html: '<span data-qa="contactNumberLabel">Contact number</span>'},
             value: { html: '<span class="app-!-font-family-tabular" data-qa="contactNumberValue">' + contactNumber + '</span>'}
