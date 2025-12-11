@@ -252,6 +252,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personRisks = await masClient.getPersonRiskFlags(crn)
+      res.locals.change = change as any
+
       return res.render(`pages/arrange-appointment/location-date-time`, {
         crn,
         id,
