@@ -251,7 +251,7 @@ describe('ESupervisionClient', () => {
       const response = {}
 
       fakeESupervisionApi
-        .post(`/v2/offender_checkins/${checkInUuid}/update`)
+        .post(`/v2/offender_checkins/${checkInUuid}/annotate`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
