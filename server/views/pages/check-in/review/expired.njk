@@ -1,0 +1,41 @@
+{% extends "../../_form.njk" %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% set title = "Online check in missed" %}
+{% set backLink = back if back else 
+  '/case/' + crn + '/activity-log' %}
+ {% set hideButton = true %}
+
+{% block form %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+        <p class="govuk-body">This information will be added to the contact.</p>
+
+        <h2 class="govuk-heading-m">Why did {{ checkIn.personalDetails.name.forename }} not complete their check in?</h2>
+        <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukCharacterCount({
+                hint: {
+                    text: "For example, the person did not have access to a device."
+                },
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'missedCheckinComment'])) }}
+            <div class="govuk-button-group">
+                {{ govukButton({
+                html: "Complete review",
+                attributes: {
+                    'data-qa': 'submit-btn'
+                }
+                }) }}
+            </div>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        </form>
+    </div>
+</div>
+
+{% endblock %}
