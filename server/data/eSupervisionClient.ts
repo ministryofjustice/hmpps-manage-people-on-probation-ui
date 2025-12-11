@@ -1,7 +1,16 @@
 import config from '../config'
 import RestClient from './restClient'
 
-import { LocationInfo, OffenderInfo, OffenderSetup, OffenderSetupCompleteResponse } from './model/esupervision'
+import {
+  ESupervisionCheckIn,
+  ESupervisionCheckInResponse,
+  ESupervisionNote,
+  ESupervisionReview,
+  LocationInfo,
+  OffenderInfo,
+  OffenderSetup,
+  OffenderSetupCompleteResponse,
+} from './model/esupervision'
 
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {
@@ -35,6 +44,26 @@ export default class ESupervisionClient extends RestClient {
       handle404: false,
       handle500: false,
       errorMessageFor500: 'Failed to complete offender checkin registration',
+    })
+  }
+
+  async getOffenderCheckIn(uuid: string): Promise<ESupervisionCheckInResponse> {
+    return this.get({
+      path: `/v2/offender_checkins/${uuid}`,
+    })
+  }
+
+  async postOffenderCheckInReview(uuid: string, review: ESupervisionReview): Promise<ESupervisionCheckIn> {
+    return this.post({
+      path: `/v2/offender_checkins/${uuid}/review`,
+      data: review,
+    })
+  }
+
+  async postOffenderCheckInNote(uuid: string, notes: ESupervisionNote): Promise<void> {
+    return this.post({
+      path: `/v2/offender_checkins/${uuid}/update`,
+      data: notes,
     })
   }
 }

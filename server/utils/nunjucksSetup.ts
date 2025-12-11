@@ -74,6 +74,8 @@ import {
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../models/Locals'
+import { splitString } from './splitString'
+import getUserFriendlyString from './eSupervisionFriendlyString'
 
 export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
   const production = process.env.NODE_ENV === 'production'
@@ -140,6 +142,8 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
   njkEnv.addFilter('shortTime', shortTime)
+  njkEnv.addFilter('split', splitString)
+  njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
