@@ -50,7 +50,7 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
   app.use(baseController())
-  nunjucksSetup(app, services.applicationInfo)
+  nunjucksSetup(app, services.applicationInfo, services)
   const apiRouter = Router()
   app.use(testRoutes(apiRouter))
   app.use(setUpAuthentication())

@@ -2,6 +2,7 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express, { Request, NextFunction } from 'express'
+import type { Services } from '../services'
 
 import {
   initialiseName,
@@ -69,6 +70,7 @@ import {
   getPersonLevelTypes,
   handleQuotes,
   dateToLongDate,
+  merge,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -77,7 +79,11 @@ import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
 
-export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
+export default function nunjucksSetup(
+  app: express.Express,
+  applicationInfo: ApplicationInfo,
+  services: Services,
+): void {
   const production = process.env.NODE_ENV === 'production'
   app.set('view engine', 'njk')
 
@@ -147,6 +153,10 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
   njkEnv.addFilter('dmyToLongDate', dateToLongDate)
+  njkEnv.addFilter('merge', merge)
+  njkEnv.addFilter('isArray', (str: string | string[]) => {
+    return Array.isArray(str)
+  })
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
@@ -185,4 +195,5 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('riskLevelLabel', riskLevelLabel)
   njkEnv.addGlobal('toIsoDateFromPicker', toIsoDateFromPicker)
   njkEnv.addGlobal('fromIsoDateToPicker', fromIsoDateToPicker)
+  njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
 }

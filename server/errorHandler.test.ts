@@ -7,6 +7,22 @@ import { statusErrors, type StatusErrorCode } from './properties'
 import createErrorHandler from './errorHandler'
 import logger from '../logger'
 import { AppResponse } from './models/Locals'
+import type { Services } from './services' // Required for typing the mock
+
+const mockTechnicalUpdatesService = {
+  getLatestTechnicalUpdateHeading: jest.fn(() => 'Mock Heading'),
+  getTechnicalUpdates: jest.fn(),
+}
+
+const mockSearchService = {
+  post: jest.fn((req, res, next) => next()),
+  get: jest.fn((req, res, next) => next()),
+}
+
+const mockServices: Services = {
+  technicalUpdatesService: mockTechnicalUpdatesService as any,
+  searchService: mockSearchService as any,
+} as unknown as Services
 
 let app: Express
 
@@ -31,7 +47,7 @@ const nextSpy = jest.fn()
 const loggerErrorSpy = jest.spyOn(logger, 'error')
 
 beforeEach(() => {
-  app = appWithAllRoutes({})
+  app = appWithAllRoutes({ services: mockServices })
 })
 
 afterEach(() => {
@@ -82,7 +98,7 @@ describe('GET 404', () => {
   })
 
   it('should render content without stack in production mode', () => {
-    return request(appWithAllRoutes({ production: true }))
+    return request(appWithAllRoutes({ production: true, services: mockServices }))
       .get('/unknown')
       .expect(404)
       .expect('Content-Type', /html/)
