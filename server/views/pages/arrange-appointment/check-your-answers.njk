@@ -2,6 +2,7 @@
 {% set notStandardForm = true %}
 {% set title = 'Check your answers then confirm the appointment' %}
 {% set buttonText = 'Confirm this appointment' %}
+{% set showCalendarInsetText = not isInPast %}
 {% block beforeContent %}{% endblock %}
 {% block primary %}
   <div class="govuk-grid-row">
@@ -10,4 +11,5 @@
     </div>
   </div>
   {% include "./appointment-summary.njk" %}
+
 {% endblock %}
