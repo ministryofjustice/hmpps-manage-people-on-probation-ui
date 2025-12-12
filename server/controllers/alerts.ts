@@ -81,7 +81,11 @@ const alertsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
 
       await masClient.clearAlerts(alertIds)
-      res.locals.alertsCleared = { error: false, message: `${alertIds.length} alert(s) cleared successfully` }
+      const alertCount = alertIds.length
+      res.locals.alertsCleared = {
+        error: false,
+        message: `You've cleared ${alertCount} ${alertCount <= 1 ? 'alert' : 'alerts'}.`,
+      }
 
       return next()
     }
