@@ -164,7 +164,7 @@ describe('ESupervisionClient', () => {
       }
 
       fakeESupervisionApi
-        .get(`/v2/offender_checkins/${checkInUuid}`)
+        .get(`/v2/offender_checkins/${checkInUuid}?include-personal-details=true`)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
