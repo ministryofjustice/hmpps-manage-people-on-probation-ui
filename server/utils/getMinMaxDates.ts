@@ -8,12 +8,10 @@ export const getMinMaxDates = (): { _minDate: string; _maxDate: string } => {
 
   let _minDate: string
   if (today.getDate() > 9) {
-    today.setDate(today.getDate() - 1)
     _minDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
   } else {
     _minDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
   }
   const _maxDate = DateTime.fromISO('2199-12-31').toFormat('d/M/yyyy')
-
   return { _minDate, _maxDate }
 }
