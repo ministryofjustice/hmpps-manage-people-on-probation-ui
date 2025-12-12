@@ -195,4 +195,6 @@ export default abstract class Page {
   }
 
   getElementByDataQA = (name: string): PageElement => cy.get(`[data-qa="${name}"]`)
+
+  hideMessageLink = (): PageElement => cy.get('#hide-message')
 }

@@ -36,7 +36,7 @@ describe('Attended and complied', () => {
   })
 
   it('should return to management appointment when cancel link is clicked', () => {
-    cy.get('.govuk-link').should('contain.text', 'Cancel and go back').click()
+    cy.get(`[data-qa="cancel-and-go-back-link"]`).click()
     manageAppointmentPage = new ManageAppointmentPage()
   })
 
