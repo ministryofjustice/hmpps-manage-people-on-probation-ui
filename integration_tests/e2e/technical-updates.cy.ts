@@ -20,8 +20,8 @@ context('Technical Updates', () => {
     technicalUpdatesPage.headingText().should('have.text', 'What’s new')
   })
 
-  it('technical updates banner is visible on page', () => {
+  it('technical updates banner is not visible on page', () => {
     const technicalUpdatesPage = Page.verifyOnPage(TechnicalUpdatesPage)
-    technicalUpdatesPage.technicalUpdatesBanner().should('not.have.class', 'moj-hidden')
+    technicalUpdatesPage.technicalUpdatesBanner().should('have.class', 'moj-hidden')
   })
 })
