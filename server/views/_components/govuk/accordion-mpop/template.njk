@@ -20,7 +20,7 @@
     <div id="{{ params.id }}-content-{{ index }}" class="govuk-accordion__section-content">
       {% if item.content.html %}
         {{ item.content.html | safe | trim | indent(6) }}
-      {% elseif item.content.text %}
+      {% elif item.content.text %}
         <p class="govuk-body">
           {{ item.content.text | trim | indent(8) }}
         </p>

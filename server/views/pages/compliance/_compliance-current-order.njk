@@ -159,9 +159,9 @@ No start date on current order
   {% set failureToComplyHtml %}
   {% if failureToComplyCount == 0 %}
         None
-      {% elseif attendedButDidNotComplyCount == 0 %}
+      {% elif attendedButDidNotComplyCount == 0 %}
     {% if unacceptableAbsenceCount == 1 %}1 unacceptable absence{% else %}{{ unacceptableAbsenceCount }} unacceptable absences{% endif %}
-  {% elseif unacceptableAbsenceCount == 0 %}
+  {% elif unacceptableAbsenceCount == 0 %}
     {% if attendedButDidNotComplyCount == 1 %}1 failure{% else %}{{ attendedButDidNotComplyCount }} failures{% endif %} to comply because of behaviour
       {% else %}
     <p>{{ failureToComplyCount }} failures to comply:</p>
@@ -184,7 +184,7 @@ No start date on current order
   {% set waitingForEvidenceHtml %}
   {% if waitingForEvidenceCount > 0 %}
     {{ waitingForEvidenceCount }} absence waiting for evidence
-      {% elseif waitingForEvidenceCount > 0 %}
+      {% elif waitingForEvidenceCount > 0 %}
     {{ waitingForEvidenceCount }} absences waiting for evidence
       {% else %}
         None
@@ -194,9 +194,9 @@ No start date on current order
   {% set rescheduledHtml %}
   {% if rescheduledCount == 0 %}
         None
-      {% elseif rescheduledByStaffCount == 0 %}
+      {% elif rescheduledByStaffCount == 0 %}
     {{ rescheduledByPersonOnProbationCount }} requested by {{ personCompliance.personSummary.name | fullName }}
-  {% elseif rescheduledByPersonOnProbationCount == 0 %}
+  {% elif rescheduledByPersonOnProbationCount == 0 %}
     {{ rescheduledByStaffCount }} requested by staff
       {% else %}
     <p>{{ rescheduledCount }} rescheduled:</p>
@@ -211,7 +211,7 @@ No start date on current order
 
   {% if lettersCount === 1 %}
         First warning letter sent
-      {% elseif lettersCount > 1 %}
+      {% elif lettersCount > 1 %}
     {{ lettersCount }} letters sent
       {% else %}
         None
