@@ -1,22 +1,20 @@
-{% extends "../../../partials/case.njk" %}
-{% set pageTitle = makePageTitle({pageHeading: "Online check ins"}) %}
-{% set currentNavSection = 'overview' %}
-{% set currentSectionName = 'Online check ins' %}
+{% extends "../../../partials/contacts.njk" %}
+{% set title = "Online check ins" %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/settings' %}
+{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/contact' %}
 {% set photoLabel = "Photo of " + case.name.forename %}
 {% set photoUrl = offenderCheckinsByCRNResponse.snapshotUrl %}
+{% set backLink = '/case/' + crn %}
 
 {% block beforeContent %}
-  {{ govukBreadcrumbs({
-      items: [
-        {
-          text: "Cases",
-          href: "/case"
-        },
-        {
-          text: headerPersonName
-        }
-      ]
+    {{ govukBreadcrumbs({
+        items: [
+            {
+                text: "< Back",
+                href: backLink
+            }
+        ]
     }) }}
 {% endblock %}
 
@@ -109,15 +107,4 @@
             ]
         }) }}
     {% endset %}
-
-{#    {{ appSummaryCard({
-        titleText: 'Photo',
-        headingLevel: 3,
-        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
-        attributes: {'data-qa': 'checkinPhotoCard'},
-        html: photoText
-    }) }} #}
-
-
-
 {% endblock %}
