@@ -9,7 +9,6 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
     const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
-    console.log(checkInResponse)
     res.locals.checkIn = checkInResponse
     return next()
   }
