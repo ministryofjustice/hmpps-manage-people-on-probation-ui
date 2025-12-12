@@ -1375,7 +1375,7 @@ describe('checkInsController', () => {
       await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
 
       // token retrieval and MAS client call
-      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')
       expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-checkin.njk', {
         crn,
