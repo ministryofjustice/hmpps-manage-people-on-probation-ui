@@ -21,7 +21,7 @@
 {% set setActionButtons = "false" %}
 {% set checkinButtonText = 'Manage online check ins' if offenderCheckinsByCRNResponse else 'Set up online check ins' %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions?back=appointments' %}
-{% set manageCheckinLink = '#' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
 {% set checkinLink = manageCheckinLink if offenderCheckinsByCRNResponse else checkinLink %}
 {% set headerActions %}
 <div class="moj-button-group moj-button-group--inline">
