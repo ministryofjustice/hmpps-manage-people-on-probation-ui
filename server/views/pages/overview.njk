@@ -372,7 +372,7 @@
 
   {% if currentRisksToThemselves.length == 1 %}
     <p>Immediate concerns about {{ currentRisksToThemselves[0] }}</p>
-  {% elseif currentRisksToThemselves.length > 0 %}
+  {% elif currentRisksToThemselves.length > 0 %}
     <p>Immediate concerns about:</p>
     <ul class="govuk-list govuk-list--bullet">
       {% for risk in currentRisksToThemselves %}
@@ -383,7 +383,7 @@
 
   {% if previousRisksToThemselves.length == 1 %}
     <p>Previous concerns about {{ previousRisksToThemselves[0] }}</p>
-  {% elseif previousRisksToThemselves.length > 0 %}
+  {% elif previousRisksToThemselves.length > 0 %}
     <p>Previous concerns about:</p>
     <ul class="govuk-list govuk-list--bullet">
       {% for risk in previousRisksToThemselves %}

@@ -36,7 +36,7 @@ set actions = {
   {% for addressNote in address.addressNotes %}
     {% set notes = notes.concat(appNote(addressNote, '/case/' + crn + '/personal-details/addresses/' + address.id + '/note/' + addressNote.id)) %}
   {% endfor %}
-{% elseif address.addressNote %}
+{% elif address.addressNote %}
   {% set note = address.addressNote.note %}
 {% endif %}
 

@@ -54,9 +54,9 @@
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
         {% if predictorScores.error and caseSummary.roshHistory.error %}
             <p class='govuk-body' data-qa='timeline-missing'>RoSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
-        {% elseif predictorScores.error %}
+        {% elif predictorScores.error %}
             <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
-        {% elseif roshHistory.error %}
+        {% elif roshHistory.error %}
             <p class='govuk-body' data-qa='rosh-history-missing'>Historical RoSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
         {% endif %}
         {% if timeline.length %}
