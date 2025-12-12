@@ -49,6 +49,10 @@ describe('Check your answers then confirm the appointment', () => {
     checkPopHeader('Alton Berge', true)
     const showsProbationPractitioner = true
     checkAppointmentSummary(cyaPage, showsProbationPractitioner)
+    cy.get('[data-qa="calendarInviteInset"]').should(
+      'contain.text',
+      `You'll receive a calendar invite for the appointment`,
+    )
   })
 
   it('should render the page with VISOR report', () => {

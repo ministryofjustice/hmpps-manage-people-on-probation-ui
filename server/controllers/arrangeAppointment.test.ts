@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { dateIsInPast, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import {
@@ -36,6 +36,7 @@ jest.mock('../utils', () => {
     isValidUUID: jest.fn(),
     isNumericString: jest.fn(),
     setDataValue: jest.fn(),
+    dateIsInPast: jest.fn().mockImplementation(() => ({ isInPast: false, isToday: false })),
   }
 })
 
@@ -1051,6 +1052,7 @@ describe('controllers/arrangeAppointment', () => {
         url: encodeURIComponent(url),
         crn,
         id: uuid,
+        isInPast: null,
       })
     })
   })
