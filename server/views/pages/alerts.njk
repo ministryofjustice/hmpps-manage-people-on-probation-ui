@@ -75,7 +75,6 @@
                 },
                 {
                     text: alert.date | dateWithYearShortMonth,
-                    format: "numeric",
                     attributes: { "data-qa":"alertDate" }
                 },
                 {
@@ -84,7 +83,6 @@
                 },
                 {
                     html: predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }),
-                    format: "numeric",
                     attributes: {"data-qa": "alertRisk" }
                 } if flags.enableRiskOnAlertsDashboard === true,
                 {
