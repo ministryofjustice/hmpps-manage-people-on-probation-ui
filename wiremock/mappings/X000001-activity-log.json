@@ -426,7 +426,7 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "eSupervisionId": "6fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "esupervisionId": "6fa85f64-5717-4562-b3fc-2c963f66afa6"
             },
             {
               "id": 31,
@@ -447,7 +447,7 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "eSupervisionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "esupervisionId": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
             },
             {
               "id": 32,
@@ -468,7 +468,8 @@
                 "forename": "Paul",
                 "surname": "Smith"
               },
-              "eSupervisionId": "5fa85f64-5717-4562-b3fc-2c963f66afa6"
+              "deliusManaged": true,
+              "esupervisionId": "5fa85f64-5717-4562-b3fc-2c963f66afa6"
             }
           ]
         },

@@ -33,7 +33,7 @@
                 </dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
                 <dd class="govuk-summary-list__actions">
-                    {% if 'mentalHealth' in checkIn.flaggedResponses %}
+                    {% if checkIn.flaggedResponses and 'mentalHealth' in checkIn.flaggedResponses %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
@@ -47,7 +47,7 @@
                     {% endfor %}
                 </dd>
                 <dd class="govuk-summary-list__actions">
-                    {% if 'assistance' in checkIn.flaggedResponses %}
+                    {% if checkIn.flaggedResponses and 'assistance' in checkIn.flaggedResponses %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
@@ -56,7 +56,7 @@
                 <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
                 <dd class="govuk-summary-list__actions">
-                    {% if 'callback' in checkIn.flaggedResponses %}
+                    {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>

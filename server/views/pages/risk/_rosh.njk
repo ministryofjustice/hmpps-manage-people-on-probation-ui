@@ -1,11 +1,11 @@
 {% macro getOverallRiskLevelClass(level) %}
     {% if level == 'VERY_HIGH' %}
         rosh-widget--very-high
-        {% elif level == 'HIGH' %}
+        {% elseif level == 'HIGH' %}
         rosh-widget--high
-        {% elif level == 'MEDIUM' %}
+        {% elseif level == 'MEDIUM' %}
         rosh-widget--medium
-        {% elif level == 'LOW' %}
+        {% elseif level == 'LOW' %}
         rosh-widget--low
     {% endif %}
 {% endmacro %}
@@ -13,11 +13,11 @@
 {% macro getRiskLevelText(level) %}
     {% if level == 'VERY_HIGH' %}
         Very high
-        {% elif level == 'HIGH' %}
+        {% elseif level == 'HIGH' %}
         High
-        {% elif level == 'MEDIUM' %}
+        {% elseif level == 'MEDIUM' %}
         Medium
-        {% elif level == 'LOW' %}
+        {% elseif level == 'LOW' %}
         Low
         {% else  %}
         N/A
@@ -29,14 +29,14 @@
     {% if level == overall %}
         {% if level == 'VERY_HIGH' %}
             rosh--very-high
-            {% elif level == 'HIGH' %}
+            {% elseif level == 'HIGH' %}
             rosh--high
-            {% elif level == 'MEDIUM' %}
+            {% elseif level == 'MEDIUM' %}
             rosh--medium
-            {% elif level == 'LOW' %}
+            {% elseif level == 'LOW' %}
             rosh--low
         {% endif %}
-    {% elif level === undefined %}
+    {% elseif level === undefined %}
         govuk-hint
     {% endif %}
 {% endmacro %}
@@ -49,7 +49,7 @@
             <span class="govuk-body-s govuk-hint">A RoSH summary has not been completed for this individual. Check OASys for this person's current assessment status.</span></p>
     </div>
 
-{% elif risksWidget.overallRisk == 'UNAVAILABLE' %}
+{% elseif risksWidget.overallRisk == 'UNAVAILABLE' %}
     <div class="rosh-widget rosh-widget--unavailable">
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m">
             <strong>UNKNOWN</strong> ROSH</h{{ scoresHeadingLevel | default('3') }}>
