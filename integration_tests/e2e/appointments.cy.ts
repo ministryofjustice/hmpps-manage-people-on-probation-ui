@@ -5,6 +5,9 @@ const url = (contactId: number, component = 'UpdateContact') =>
   `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=X000001&contactID=${contactId}`
 
 context('Appointment', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
@@ -13,7 +16,7 @@ context('Appointment', () => {
     page.headerName().should('contain.text', 'Eula Schmeler')
     page.assertRiskTags()
 
-    page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'Upcoming appointments')
+    page.getElement('[data-qa="upcomingAppointments"]').find('h3').should('contain.text', 'Upcoming appointments')
     page.upcomingAppointmentDate(1).should('contain.text', '22 December 2044')
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
@@ -63,7 +66,7 @@ context('Appointment', () => {
     page.upcomingAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
     page.upcomingAppointmentType(2).should('contain.text', 'Planned video contact (NS)')
 
-    page.getElement('[data-qa="pastAppointments"]').find('h2').should('contain.text', 'Past appointments')
+    page.getElement('[data-qa="pastAppointments"]').find('h3').should('contain.text', 'Past appointments')
     page.pastAppointmentDate(1).should('contain.text', '22 March 2024')
     page.pastAppointmentTime(1).should('contain.text', '8:15am to 8:30am')
     page.pastAppointmentType(1).should('contain.text', 'Phone call')
@@ -94,5 +97,11 @@ context('Appointment', () => {
       .find('a')
       .should('contain.text', 'View all past appointments in the contacts')
       .should('have.attr', 'href', '/case/X000001/activity-log')
+  })
+  it('should render the page if the pop is deceased', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/appointments')
+    cy.get('[data-qa=arrange-appointment-btn]').should('not.exist')
+    cy.get('[data-qa=online-checkin-btn]').should('not.exist')
   })
 })
