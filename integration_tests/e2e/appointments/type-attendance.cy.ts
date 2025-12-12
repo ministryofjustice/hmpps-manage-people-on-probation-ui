@@ -59,7 +59,7 @@ describe('Arrange an appointment', () => {
         )
         cy.get('[data-qa="attendeeDetails"]').should(
           'contain.text',
-          'Ben Towers (Default Designated Transfer Team, East of England)',
+          'Deborah Fern (PS - Other) (Automated Allocation Team, London)',
         )
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')

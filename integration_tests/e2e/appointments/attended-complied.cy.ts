@@ -42,7 +42,7 @@ describe('Log attended and complied appointment', () => {
     const date = dateWithYear(yesterday.toFormat('yyyy-M-dd'))
     const appointmentText = manageJourney
       ? '3 Way Meeting (NS) with Terry Jones on 21 February 2024'
-      : `Planned Office Visit (NS) with Ben Towers on ${date}`
+      : `Planned Office Visit (NS) with Deborah Fern on ${date}`
     const id = getId(manageJourney)
     cy.get(`#${id}-hint`).should('contain.text', `Appointment: ${appointmentText}.`)
     cy.get(`label[for="${id}"]`).should('contain.text', `Yes, ${name.split(' ')[0]} attended and complied`)
