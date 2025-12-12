@@ -421,11 +421,8 @@ export default class MasApiClient extends RestClient {
     if (page !== undefined) {
       pageQuery = `${pageQuery}&page=${page}`
     }
-    if (sortBy) {
-      pageQuery = `${pageQuery}&sortBy=${sortBy}`
-    }
-    if (sortOrder) {
-      pageQuery = `${pageQuery}&sortOrder=${sortOrder}`
+    if (sortBy && sortOrder) {
+      pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
     }
     return this.get({ path: `/alerts${pageQuery}`, handle404: true })
   }
