@@ -124,7 +124,6 @@ interface Name {
   forename: string
   surname: string
 }
-
 export interface OffenderCheckinsByCRNResponse {
   uuid: string
   crn: string
@@ -132,6 +131,7 @@ export interface OffenderCheckinsByCRNResponse {
   firstCheckin: string
   checkinInterval: CheckInterval
   contactPreferences: string
+  snapshotUrl?: string
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

@@ -1351,4 +1351,37 @@ describe('checkInsController', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
   })
+
+  describe('getManageCheckinPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('fetch personal details and renders mange-checkin page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      // Arrange personal details returned by MAS
+      ;(mockPersonalDetails as PersonalDetails).mobileNumber = '07700900000'
+      ;(mockPersonalDetails as PersonalDetails).email = 'test@example.com'
+
+      const req = baseReq()
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      // token retrieval and MAS client call
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('user-1')
+      expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-checkin.njk', {
+        crn,
+        mobile: '07700900000',
+        email: 'test@example.com',
+      })
+    })
+  })
 })

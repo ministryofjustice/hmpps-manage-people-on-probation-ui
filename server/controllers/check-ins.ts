@@ -43,6 +43,7 @@ const routes = [
   'getCheckinVideoPage',
   'postTakeAPhotoPage',
   'postViewCheckIn',
+  'getManageCheckinPage',
 ] as const
 
 interface OptionPair {
@@ -497,6 +498,20 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const photoRedirect = `/case/${crn}/appointments/${id}/check-in/photo-rules?photoUpload=${userPhotoUpload}`
       return res.redirect(photoRedirect)
+    }
+  },
+  getManageCheckinPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      if (!isValidCrn(crn)) {
+        return renderError(404)(req, res)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+      const mobile = personalDetails.mobileNumber
+      const { email } = personalDetails
+      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, mobile, email })
     }
   },
 }
