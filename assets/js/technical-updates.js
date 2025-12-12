@@ -33,6 +33,14 @@ const setupTechnicalUpdates = () => {
 
     // 3. Clear the timer, as it's now permanently dismissed
     localStorage.removeItem(FIRST_VIEW_TIME_KEY)
+
+    // 4. Accessibility: Announce the change to screen readers using the status element
+    // The element is statically defined in prob_fe_header.njk
+    const statusElement = document.getElementById('whatsNewBannerStatus')
+
+    if (statusElement) {
+      statusElement.textContent = 'Technical updates banner dismissed.'
+    }
   }
 
   /**
