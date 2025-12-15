@@ -1,3 +1,15 @@
-{% macro appNote(note, href) %}
-    {% include './template.njk' %}
+{% macro appNote(note, href, maxChars = none) %}
+    {% set max_chars = maxChars | default(0) %}
+    {% set original_note = note.note | default('') %}
+    {% set note_length = original_note | length %}
+
+    {% if max_chars > 0 and note_length > max_chars %}
+        {% set displayNoteContent = original_note | truncate(max_chars, true, '') %}
+        {% set needsLink = true %}
+    {% else %}
+        {% set displayNoteContent = original_note %}
+        {% set needsLink = false %}
+    {% endif %}
+
+    {%- include "./template.njk" -%}
 {% endmacro %}

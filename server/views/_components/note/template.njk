@@ -1,7 +1,7 @@
 <div class="app-note">
     <p class="govuk-body govuk-!-margin-bottom-1">
-        <span class="line-break">{{ note.note | handleQuotes('unescape') }}</span>
-        {% if note.hasNoteBeenTruncated === true %}... <a href="{{ href }}">View full note</a>
+        <span class="line-break">{{ displayNoteContent }}</span>
+        {% if note.hasNoteBeenTruncated === true or needsLink === true %}... <a href="{{ href }}">View full note</a>
         {% endif %}
     </p>
     <p class="govuk-body-s secondary-text app-note__author">

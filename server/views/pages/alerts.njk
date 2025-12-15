@@ -261,11 +261,11 @@
         {% set notes = '' %}
         {% for note in alert.alertNotes %}
             {% if note.note %}
-                {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
+                {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url, 500)) %}
             {% endif %}
         {% endfor  %}
         {% if alert.alertNote %}
-            {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
+            {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url, 500)) %}
         {% endif %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">Notes</span>
         <div data-qa="alertNotes-{{ alert.id }}">
