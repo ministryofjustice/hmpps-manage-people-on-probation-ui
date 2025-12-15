@@ -2,6 +2,7 @@ import CaseSearchService from '@ministryofjustice/probation-search-frontend/serv
 import { dataAccess } from '../data'
 import UserService from './userService'
 import FlagService from './flagService'
+import TechnicalUpdatesService from './technicalUpdatesService'
 import config from '../config'
 import ProbationComponentsApiService from './ProbationComponentsService'
 
@@ -17,6 +18,7 @@ export const services = () => {
   })
 
   const flagService = new FlagService()
+  const technicalUpdatesService = new TechnicalUpdatesService()
 
   const probationComponentsApiService = new ProbationComponentsApiService(probationFrontendComponentsApiClient)
 
@@ -27,6 +29,7 @@ export const services = () => {
     searchService,
     flagService,
     probationComponentsApiService,
+    technicalUpdatesService,
   }
 }
 

@@ -80,7 +80,7 @@
     </ul>
     {% endset %}
     {{ govukSummaryList({
-        classes: 'govuk-!-margin-bottom-9',
+        classes: 'govuk-!-margin-bottom-{% if showCalendarInsetText %}6{% else %}9{% endif %}',
         rows: [
             { key: { text: "Appointment for" },
             value: { html: 'Not entered' if (not appointment.appointmentFor.sentence and not appointment.appointmentFor.forename) else sentenceHtml | safe  },
@@ -166,6 +166,15 @@
      ] 
      } if showAction }
 ] }) }}
+    {% if showCalendarInsetText %}
+        {{ govukInsetText({
+  text: "You'll receive a calendar invite for the appointment",
+  classes: 'govuk!-margin-top-0',
+   attributes: {
+        'data-qa': 'calendarInviteInset'
+      }
+}) }}
+    {% endif %}
     {{ govukButton({
       html: buttonText,
       attributes: {

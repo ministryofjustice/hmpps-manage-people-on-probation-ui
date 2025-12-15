@@ -18,6 +18,10 @@
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set manageCheckinLink = '#' %}
+{% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up oline check ins'%}
+{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else checkinLink %}
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
@@ -189,6 +193,57 @@
       }
     }) }}
 
+    {% set checkin %}
+    {% set nextCheckin = offenderCheckinsByCRNResponse %}
+    {% set nextCheckinText %}
+        {% if nextCheckin %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
+                        value: { html: '<span data-qa="firstCheckInValue">' + nextCheckin.firstCheckin | dateWithDayAndWithoutYear + '</span'}
+                    },
+                    {
+                        key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
+                        value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span'}
+                    },
+                    {
+                        key: { html: '<span data-qa="contactPreferenceValueLabel">Contact preferences</span>'},
+                        value: { html: '<span data-qa="contactPreferenceValue">' + nextCheckin.contactPreferences | userFriendlyString  + '</span'}
+                    }
+
+                ]
+            }) }}
+        {% else %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
+                        value: { html: '<span data-qa="checkinDueValue"> Online check ins not set up </span'}
+                    }
+                ]
+            }) }}
+        {% endif %}
+    {% endset %}
+    {% endset %}
+  {% if flags.enableESuperVision === true %}
+    {{ appSummaryCard({
+        titleText: 'Online check ins',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinCard'},
+        html: nextCheckinText,
+        actions: {
+            items: [
+                {
+                    text: checkinLinkText,
+                    href: checkinHrefLink
+                }
+            ]
+        }
+    }) }}
+  {% endif %}
+
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}
   {{ overview.personalDetails.dateOfBirth | dateWithYear + (" (" + overview.personalDetails.dateOfBirth | yearsSince + " years old)" if not personalDetails.dateOfDeath ) }}
@@ -317,7 +372,7 @@
 
   {% if currentRisksToThemselves.length == 1 %}
     <p>Immediate concerns about {{ currentRisksToThemselves[0] }}</p>
-  {% elseif currentRisksToThemselves.length > 0 %}
+  {% elif currentRisksToThemselves.length > 0 %}
     <p>Immediate concerns about:</p>
     <ul class="govuk-list govuk-list--bullet">
       {% for risk in currentRisksToThemselves %}
@@ -328,7 +383,7 @@
 
   {% if previousRisksToThemselves.length == 1 %}
     <p>Previous concerns about {{ previousRisksToThemselves[0] }}</p>
-  {% elseif previousRisksToThemselves.length > 0 %}
+  {% elif previousRisksToThemselves.length > 0 %}
     <p>Previous concerns about:</p>
     <ul class="govuk-list govuk-list--bullet">
       {% for risk in previousRisksToThemselves %}

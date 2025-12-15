@@ -10,7 +10,6 @@ import { PersonalDetails } from '../data/model/personalDetails'
 import { defaultUser } from './mocks/alerts'
 import logger from '../../logger'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
-import config from '../config'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { ESupervisionCheckIn } from '../data/model/esupervision'
@@ -118,7 +117,7 @@ describe('checkInsController', () => {
       const req = baseReq()
       await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn, back: req.query.back })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 

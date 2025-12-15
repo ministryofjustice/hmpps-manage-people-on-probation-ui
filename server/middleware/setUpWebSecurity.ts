@@ -23,13 +23,15 @@ export default function setUpWebSecurity(): Router {
           mediaSrc: [
             "'self'",
             // This is required for the S3 bucket to upload checkin images
-            // (either have a custom domain or each environment or use the default wild card domain)
+            // (either have a custom domain for each environment or use the default wild card domain)
             'https://*.s3.eu-west-2.amazonaws.com/',
           ],
           imgSrc: [
             "'self'",
             // This is required for the S3 bucket to upload checkin images
-            // (either have a custom domain or each environment or use the default wild card domain)
+            // (either have a custom domain for each environment or use the default wild card domain)
+            // data: Allow inline base64 images across all environments (needed for data URL previews)
+            'data:',
             'https://*.s3.eu-west-2.amazonaws.com/',
           ],
           defaultSrc: ["'self'", 'js.monitor.azure.com', '*.applicationinsights.azure.com/v2/track'],
@@ -54,7 +56,7 @@ export default function setUpWebSecurity(): Router {
               '*.applicationinsights.azure.com/v2/track',
               config.probationFrontendComponents.connectSrc,
               // This is required for the S3 bucket to upload checkin images
-              // (either have a custom domain or each environment or use the default wild card domain)
+              // (either have a custom domain for each environment or use the default wild card domain)
               'https://*.s3.eu-west-2.amazonaws.com',
             ]
             // Allow localhost for local development only

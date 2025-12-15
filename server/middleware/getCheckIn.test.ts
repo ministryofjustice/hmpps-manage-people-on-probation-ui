@@ -4,7 +4,7 @@ import { HmppsAuthClient } from '../data'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { ESupervisionCheckInResponse } from '../data/model/esupervision'
+import { ESupervisionCheckIn, ESupervisionCheckInResponse } from '../data/model/esupervision'
 import { getCheckIn } from './getCheckIn'
 
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -17,66 +17,50 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const checkInResponseMock = {
-  checkin: {
-    uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-    status: 'REVIEWED',
-    dueDate: '2025-11-27',
-    personalDetails: {
-      crn: 'X123456',
+  uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+  status: 'REVIEWED',
+  dueDate: '2025-11-27',
+  personalDetails: {
+    crn: 'X123456',
+    name: {
+      forename: 'Bob',
+      surname: 'Smith',
+    },
+    mobile: '07700900123',
+    email: 'john.smith@example.com',
+    practitioner: {
       name: {
-        forename: 'Bob',
+        forename: 'John',
         surname: 'Smith',
       },
-      mobile: '07700900123',
-      email: 'john.smith@example.com',
-      practitioner: {
-        name: {
-          forename: 'John',
-          surname: 'Smith',
-        },
-        email: 'practitioner@example.com',
-        localAdminUnit: {
-          code: 'N01ABC',
-          description: 'London North LAU',
-        },
-        probationDeliveryUnit: {
-          code: 'N01ABC',
-          description: 'London North LAU',
-        },
-        provider: {
-          code: 'N01ABC',
-          description: 'London North LAU',
-        },
+      email: 'practitioner@example.com',
+      localAdminUnit: {
+        code: 'N01ABC',
+        description: 'London North LAU',
+      },
+      probationDeliveryUnit: {
+        code: 'N01ABC',
+        description: 'London North LAU',
+      },
+      provider: {
+        code: 'N01ABC',
+        description: 'London North LAU',
       },
     },
-    surveyResponse: {
-      mentalHealth: 'well',
-      assistance: ['thing1', 'thing2'],
-      callback: 'no',
-    },
-    createdBy: 'string',
-    createdAt: '2025-11-27T15:40:42.399Z',
-    videoUrl: 'string',
-    snapshotUrl: 'string',
-    autoIdCheck: 'MATCH',
-    manualIdCheck: 'MATCH',
-    flaggedResponses: ['string'],
   },
-  checkinLogs: {
-    hint: 'ALL',
-    logs: [
-      {
-        comment: 'string',
-        offender: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        createdAt: '2025-11-27T15:40:42.399Z',
-        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        practitioner: 'string',
-        logEntryType: 'OFFENDER_SETUP_COMPLETE',
-        checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-      },
-    ],
+  surveyResponse: {
+    mentalHealth: 'well',
+    assistance: ['thing1', 'thing2'],
+    callback: 'no',
   },
-} as unknown as ESupervisionCheckInResponse
+  createdBy: 'string',
+  createdAt: '2025-11-27T15:40:42.399Z',
+  videoUrl: 'string',
+  snapshotUrl: 'string',
+  autoIdCheck: 'MATCH',
+  manualIdCheck: 'MATCH',
+  flaggedResponses: ['string'],
+} as unknown as ESupervisionCheckIn
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
@@ -109,7 +93,7 @@ describe('middleware/getCheckIn', () => {
       expect(spy).toHaveBeenCalled()
     })
     it('should add checkIn to res.locals', () => {
-      expect(res.locals.checkIn).toEqual(checkInResponseMock.checkin)
+      expect(res.locals.checkIn).toEqual(checkInResponseMock)
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalled()
