@@ -17,14 +17,6 @@ const $mpopSortableTable = document.querySelector('table[data-module="moj-mpop-s
 if ($mpopSortableTable) {
   new MpopSortableTable($mpopSortableTable)
 }
-const $multifileUpload = document.querySelector('[data-module="moj-multi-file-upload"]')
-if ($multifileUpload) {
-  const enableDelete = window.enableDeleteAppointmentFile
-  if (!enableDelete) {
-    document.body.classList.add('feature-disabled')
-  }
-}
-
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-interval]')
   if (repeatingFrequency) {
