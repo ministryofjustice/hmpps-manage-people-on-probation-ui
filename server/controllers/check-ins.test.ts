@@ -68,6 +68,9 @@ const postReviewSpy = jest
 const postReviewNoteSpy = jest
   .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInNote')
   .mockImplementation(() => Promise.resolve())
+const startReviewSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInStarted')
+  .mockImplementation(() => Promise.resolve({} as ESupervisionCheckIn))
 
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
@@ -923,6 +926,7 @@ describe('checkInsController', () => {
       const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
       await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
 
+      expect(startReviewSpy).toHaveBeenCalled()
       expect(reviewRedirectSpy).toHaveBeenCalledWith(
         `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/identity?back=${req.query.back}`,
       )
@@ -937,6 +941,7 @@ describe('checkInsController', () => {
       const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
       await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
 
+      expect(startReviewSpy).toHaveBeenCalled()
       expect(reviewRedirectSpy).toHaveBeenCalledWith(
         `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/expired?back=${req.query.back}`,
       )

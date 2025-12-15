@@ -270,6 +270,14 @@ const checkInsController: Controller<typeof routes, void> = {
         SUBMITTED: 'review/identity',
         EXPIRED: 'review/expired',
       }
+      if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
+        const practitionerId = pp?.username ? pp.username : res.locals.user.username
+        const eSupervisionClient = new ESupervisionClient(token)
+        await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
+      }
       if (Object.keys(statusMap).includes(checkIn.status)) {
         return res.redirect(
           `/case/${crn}/appointments/${id}/check-in/${statusMap[checkIn.status]}${back ? `?back=${back}` : ''}`,
@@ -408,7 +416,7 @@ const checkInsController: Controller<typeof routes, void> = {
         reviewedBy: practitionerId,
         manualIdCheck: checkIn?.manualIdCheck,
         missedCheckinComment: checkIn?.missedCheckinComment,
-        furtherActions: checkIn?.furtherActions,
+        notes: checkIn?.furtherActions,
         riskManagementFeedback: checkIn?.riskManagementFeedback,
       }
       const eSupervisionClient = new ESupervisionClient(token)

@@ -46,7 +46,7 @@ export interface ESupervisionCheckInResponse {
 export interface ESupervisionReview {
   reviewedBy: string
   manualIdCheck?: 'MATCH' | 'NO_MATCH'
-  furtherActions?: string
+  notes?: string
   missedCheckinComment?: string
   riskManagementFeedback?: boolean
 }
