@@ -42,9 +42,9 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
-  async getOffenderCheckIn(uuid: string): Promise<ESupervisionCheckIn> {
+  async getOffenderCheckIn(uuid: string, personalDetails: boolean = true): Promise<ESupervisionCheckIn> {
     return this.get({
-      path: `/v2/offender_checkins/${uuid}`,
+      path: `/v2/offender_checkins/${uuid}?include-personal-details=${personalDetails}`,
     })
   }
 
