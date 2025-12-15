@@ -26,7 +26,7 @@ context('Alerts Dashboard', () => {
   it('Person link should navigate to case overview', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('[data-qa="alertRow-1"]').find('[data-qa="alertPerson"]').find('a').click()
+    cy.get('.govuk-table__row').eq(1).find('[data-qa="alertPerson"]').find('a').click()
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
   })
@@ -34,7 +34,8 @@ context('Alerts Dashboard', () => {
   it('Update link opens in NDelius', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('[data-qa="alertRow-1"]')
+    cy.get('.govuk-table__row')
+      .eq(1)
       .find('[data-qa="alertActions"]')
       .find('a')
       .should('contain.text', 'Update')
