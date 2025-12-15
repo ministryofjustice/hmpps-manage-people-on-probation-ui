@@ -16,11 +16,7 @@ import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import {
-  ESupervisionCheckIn,
-  ESupervisionCheckInResponse,
-  OffenderCheckinsByCRNResponse,
-} from '../data/model/esupervision'
+import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
