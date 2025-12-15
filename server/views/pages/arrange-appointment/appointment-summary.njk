@@ -145,11 +145,21 @@
             key: { html: '<span data-qa="repeatingAppointmentLabel">Repeating appointment</span>' },
       value: { html: '<span data-qa="repeatingAppointmentValue">' + ('Yes' if appointment.repeating === 'Yes' else 'No') + '</span>' },
       actions: { items: [ { href: changePath + "/repeating?change=" + url, text: "Change", visuallyHiddenText: "repeating appointment" } ] } } if flags.enableRepeatAppointments == true,
+       { key: { text: "Attended and complied" },
+    value: { html: appointment.outcomeRecorded },
+    actions: {
+    items: [ { 
+    href: changePath + "/attended-complied?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "outcome recorded"
+     } 
+     ] 
+     } if showAction } if appointment.outcomeRecorded,  
        { key: { text: "Supporting information" },
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 
-    href: changePath + "/supporting-information?change=" + url, 
+    href: changePath + ("/add-note" if appointment.outcomeRecorded else "/supporting-information") + "?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "notes"
      } 
@@ -159,7 +169,7 @@
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ { 
-    href: changePath + "/supporting-information?change=" + url, 
+    href: changePath + ("/add-note" if appointment.outcomeRecorded else "/supporting-information") + "?change=" + url, 
     text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
     visuallyHiddenText: "sensitivity"
      } 

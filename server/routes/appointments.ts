@@ -34,6 +34,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   )
 
   router.all('/case/:crn/appointments/appointment/:contactId/attended-complied', getPersonAppointment(hmppsAuthClient))
+
   get(
     '/case/:crn/appointments/appointment/:contactId/attended-complied',
     controllers.appointments.getAttendedComplied(hmppsAuthClient),

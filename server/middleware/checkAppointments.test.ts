@@ -264,3 +264,25 @@ describe('/middleware/checkAppointments does not show any warnings if checks do 
     expect(nextSpy).toHaveBeenCalledTimes(0)
   })
 })
+describe('if appointment overlaps', () => {
+  const mockAppointmentChecks: AppointmentChecks = {
+    nonWorkingDayName: null,
+    isWithinOneHourOfMeetingWith: null,
+    overlapsWithMeetingWith: {
+      isCurrentUser: false,
+      appointmentIsWith: { forename: 'Test', surname: 'User' },
+      startAndEnd: '11am to 12pm',
+    },
+  }
+  beforeEach(async () => {
+    spy = jest
+      .spyOn(MasApiClient.prototype, 'checkAppointments')
+      .mockImplementationOnce(() => Promise.resolve(mockAppointmentChecks))
+    await checkAppointments(hmppsAuthClient)(req, res, nextSpy)
+  })
+  it('should shows warning', () => {
+    expect(res.locals.warningMessages.overlapsWithMeetingWith).toEqual(
+      'Test has an existing appointment at 11am to 12pm that overlaps with this time. Continue with these details or make changes',
+    )
+  })
+})

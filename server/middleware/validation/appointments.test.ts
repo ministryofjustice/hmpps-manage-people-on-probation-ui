@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import validation from '.'
 import { mockAppResponse } from '../../controllers/mocks'
+import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 
 const crn = 'X000001'
 const contactId = '1'
@@ -10,6 +11,16 @@ const typeUrl = `${arrangeAppointmentUrl}/type`
 const locationDateTimeUrl = `${arrangeAppointmentUrl}/location-date-time`
 const repeatingUrl = `${arrangeAppointmentUrl}/repeating`
 const supportingUrl = `${arrangeAppointmentUrl}/supporting-information`
+
+jest.mock('../appointmentDateIsInPast', () => {
+  return {
+    appointmentDateIsInPast: jest.fn(),
+  }
+})
+
+const mockedAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
+
+mockedAppointmentDateIsInPast.mockReturnValue(false)
 
 const reqBase = {
   method: 'POST',
@@ -28,6 +39,9 @@ const res = mockAppResponse({
     dateFrom: '',
     dateTo: '',
     keywords: '',
+  },
+  flags: {
+    enablePastAppointments: true,
   },
 })
 const next = jest.fn()

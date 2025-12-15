@@ -1,15 +1,14 @@
-import { DateTime } from 'luxon'
 import {
   isNotEmpty,
   isValidDate,
   isValidDateFormat,
   isStringNumber,
   timeIsNotLaterThan,
-  isTodayOrLater,
   isNotEarlierThan,
   isValidCharCount,
-  timeIsNowOrInFuture,
   timeIsValid24HourFormat,
+  isTodayOrLater,
+  timeIsNowOrInFuture,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
@@ -22,10 +21,11 @@ export interface AppointmentsValidationArgs {
   contactId?: string
   notes?: string
   maxCharCount?: number
+  enablePastAppointments?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, page, visor, repeatingValue, notes, maxCharCount } = args
+  const { crn, id, contactId, page, visor, repeatingValue, notes, maxCharCount, enablePastAppointments } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -76,16 +76,20 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Appointment date is not valid',
         },
         {
-          validator: isTodayOrLater,
-          msg: 'Date must be today or in the future',
-          log: 'Date must be today or in the future',
-        },
-        {
           validator: isNotEarlierThan,
           msg: 'The date must not be later than 31/12/2199',
           log: 'The date must not be later than 31/12/2199',
           crossField: `_maxDate`,
         },
+        ...(!enablePastAppointments
+          ? [
+              {
+                validator: isTodayOrLater,
+                msg: 'Date must be today or in the future',
+                log: 'Date must be today or in the future',
+              },
+            ]
+          : []),
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
@@ -102,12 +106,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Enter a time in the 24-hour format, for example 16:30',
           crossField: `[appointments][${crn}][${id}][date]`,
         },
-        {
-          validator: timeIsNowOrInFuture,
-          msg: 'The start time must be now or in the future',
-          log: 'The start time must be now or in the future',
-          crossField: `[appointments][${crn}][${id}][date]`,
-        },
+        ...(!enablePastAppointments
+          ? [
+              {
+                validator: timeIsNowOrInFuture,
+                msg: 'The start time must be now or in the future',
+                log: 'The start time must be now or in the future',
+                crossField: `[appointments][${crn}][${id}][date]`,
+              },
+            ]
+          : []),
       ],
     },
     [`[appointments][${crn}][${id}][end]`]: {
@@ -180,7 +188,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][notes]`]: {
-      optional: page !== 'supporting-information' || (page === 'supporting-information' && notes.trim() === ''),
+      optional:
+        !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) ||
+        (!['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) && notes.trim() === ''),
       checks: [
         {
           validator: isValidCharCount,
@@ -190,11 +200,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     [`[appointments][${crn}][${id}][sensitivity]`]: {
-      optional: page !== 'supporting-information',
+      optional: !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page),
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select if appointment includes sensitive information',
+          msg: 'Select whether or not the appointment note contains sensitive information',
           log: 'Sensitivity not selected',
         },
       ],
@@ -220,7 +230,9 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     notes: {
-      optional: page !== 'add-note' || (page === 'add-note' && notes.trim() === ''),
+      optional:
+        page !== `appointment/${contactId}/add-note` ||
+        (page === `appointment/${contactId}/add-note` && notes.trim() === ''),
       checks: [
         {
           validator: isValidCharCount,
@@ -229,8 +241,8 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    sensitive: {
-      optional: page !== 'add-note',
+    sensitivity: {
+      optional: page !== `appointment/${contactId}/add-note`,
       checks: [
         {
           validator: isNotEmpty,
@@ -239,8 +251,18 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][outcomeRecorded]`]: {
+      optional: page !== `arrange-appointment/${id}/attended-complied`,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: `Select if they attended and complied`,
+          log: 'Attended and complied not selected',
+        },
+      ],
+    },
     outcomeRecorded: {
-      optional: page !== 'attended-complied',
+      optional: page !== `appointment/${contactId}/attended-complied`,
       checks: [
         {
           validator: isNotEmpty,
