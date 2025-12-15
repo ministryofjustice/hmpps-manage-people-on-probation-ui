@@ -84,7 +84,7 @@ const alertsController: Controller<typeof routes, void> = {
       const alertCount = alertIds.length
       res.locals.alertsCleared = {
         error: false,
-        message: `You've cleared ${alertCount} ${alertCount <= 1 ? 'alert' : 'alerts'}.`,
+        message: `You've cleared ${alertCount} ${alertCount > 1 ? 'alerts' : 'alert'}.`,
       }
 
       return next()
