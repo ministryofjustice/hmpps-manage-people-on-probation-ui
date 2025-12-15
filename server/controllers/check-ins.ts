@@ -43,6 +43,7 @@ const routes = [
   'getCheckinVideoPage',
   'postTakeAPhotoPage',
   'postViewCheckIn',
+  'getManageCheckinPage',
 ] as const
 
 interface OptionPair {
@@ -269,6 +270,14 @@ const checkInsController: Controller<typeof routes, void> = {
         SUBMITTED: 'review/identity',
         EXPIRED: 'review/expired',
       }
+      if (checkIn.status === 'SUBMITTED' || checkIn.status === 'EXPIRED') {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
+        const practitionerId = pp?.username ? pp.username : res.locals.user.username
+        const eSupervisionClient = new ESupervisionClient(token)
+        await eSupervisionClient.postOffenderCheckInStarted(id, practitionerId)
+      }
       if (Object.keys(statusMap).includes(checkIn.status)) {
         return res.redirect(
           `/case/${crn}/appointments/${id}/check-in/${statusMap[checkIn.status]}${back ? `?back=${back}` : ''}`,
@@ -407,7 +416,7 @@ const checkInsController: Controller<typeof routes, void> = {
         reviewedBy: practitionerId,
         manualIdCheck: checkIn?.manualIdCheck,
         missedCheckinComment: checkIn?.missedCheckinComment,
-        furtherActions: checkIn?.furtherActions,
+        notes: checkIn?.furtherActions,
         riskManagementFeedback: checkIn?.riskManagementFeedback,
       }
       const eSupervisionClient = new ESupervisionClient(token)
@@ -497,6 +506,20 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const photoRedirect = `/case/${crn}/appointments/${id}/check-in/photo-rules?photoUpload=${userPhotoUpload}`
       return res.redirect(photoRedirect)
+    }
+  },
+  getManageCheckinPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      if (!isValidCrn(crn)) {
+        return renderError(404)(req, res)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+      const mobile = personalDetails.mobileNumber
+      const { email } = personalDetails
+      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, mobile, email })
     }
   },
 }

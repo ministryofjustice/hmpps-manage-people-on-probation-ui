@@ -55,6 +55,13 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
+  async postOffenderCheckInStarted(uuid: string, practitioner: string): Promise<ESupervisionCheckIn> {
+    return this.post({
+      path: `/v2/offender_checkins/${uuid}/review-started`,
+      data: { practitionerId: practitioner },
+    })
+  }
+
   async postOffenderCheckInNote(uuid: string, notes: ESupervisionNote): Promise<void> {
     return this.post({
       path: `/v2/offender_checkins/${uuid}/annotate`,

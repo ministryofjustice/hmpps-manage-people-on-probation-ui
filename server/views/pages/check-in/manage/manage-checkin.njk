@@ -1,0 +1,110 @@
+{% extends "../../../partials/contacts.njk" %}
+{% set title = "Online check ins" %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/settings' %}
+{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/contact' %}
+{% set photoLabel = "Photo of " + case.name.forename %}
+{% set photoUrl = offenderCheckinsByCRNResponse.snapshotUrl %}
+{% set backLink = '/case/' + crn %}
+
+{% block beforeContent %}
+    {{ govukBreadcrumbs({
+        items: [
+            {
+                text: "< Back",
+                href: backLink
+            }
+        ]
+    }) }}
+{% endblock %}
+
+{% block pageContent %}
+    {% set checkin %}
+    {% set nextCheckin = offenderCheckinsByCRNResponse %}
+    {% set nextCheckinText %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
+                        value: { html: '<span data-qa="firstCheckInValue">' + nextCheckin.firstCheckin | dateWithDayAndWithoutYear + '</span>'}
+                    },
+                    {
+                        key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
+                        value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span>'}
+                    }
+                ]
+            }) }}
+    {% endset %}
+    {% endset %}
+    {{ appSummaryCard({
+        titleText: 'Check in settings',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinSettingsCard'},
+        html: nextCheckinText,
+        actions: {
+            items: [
+                {
+                    text: 'Change',
+                    href: '#'
+                }
+            ]
+        }
+    }) }}
+
+    {% set contactDetailsText %}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { html: '<span data-qa="emailAddressLabel">Email address</span>'},
+                    value: { html: '<span data-qa="emailAddressValue">' + email + '</span>' if email else '<span data-qa="emailAddressValue">No email address</span>'}
+                },
+                {
+                    key: { html: '<span data-qa="mobileNumberLabel">Mobile number</span>'},
+                    value: { html: '<span data-qa="mobileNumberValue">' + mobile + '</span>' if mobile else '<span data-qa="mobileNumberValue">No mobile number</span>'}
+                }
+            ]
+        }) }}
+
+
+
+    {% endset %}
+
+    {{ appSummaryCard({
+        titleText: 'Contact details',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinContactCard'},
+        html: contactDetailsText,
+        actions: {
+            items: [
+                {
+                    text: 'Change',
+                    href: '#'
+                }
+            ]
+        }
+    }) }}
+  {% set photoDisplayHtml %}
+    {% if photoUrl %}
+        &nbsp;<img
+                src="{{ photoUrl }}"
+                class="es-profile-image es-profile-image--small"
+                alt="image"
+                crossorigin />
+    {% else %}
+        <span>No image available</span>
+    {% endif %}
+  {% endset %}
+
+    {% set photoText %}
+        {{ govukSummaryList({
+            rows: [
+                {
+                    key: { html: '<span data-qa="methodLabel">' + photoLabel + '</span>'},
+                    value: { html: photoDisplayHtml }
+                }
+            ]
+        }) }}
+    {% endset %}
+{% endblock %}

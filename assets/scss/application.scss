@@ -574,7 +574,7 @@ body.feature-disabled {
 }
 
 .technical-updates-banner {
-  background-color: #F9E1EC;
+  background-color: #f9e1ec;
   padding: 10px 0 10px 0;
 }
 
@@ -584,8 +584,11 @@ body.feature-disabled {
 }
 
 .technical-updates-container {
-  color: #0B0C0C;
+  color: #0b0c0c;
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+.display-none {
+  display: none;
 }
