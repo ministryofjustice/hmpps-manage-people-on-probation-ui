@@ -147,6 +147,7 @@ context('Overview', () => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
         expect(normalizedText).to.eq(`9 January 2002`)
       })
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
     cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('contain.text', 'Date of death')
     cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('contain.text', '11 September 2024 (22 years old)')
   })
