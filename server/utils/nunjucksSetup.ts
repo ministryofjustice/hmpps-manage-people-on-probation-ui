@@ -147,6 +147,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
+  njkEnv.addFilter('merge', (obj, other) => ({ ...obj, ...other }))
   njkEnv.addFilter('shortTime', shortTime)
   njkEnv.addFilter('split', splitString)
   njkEnv.addFilter('userFriendlyString', getUserFriendlyString)

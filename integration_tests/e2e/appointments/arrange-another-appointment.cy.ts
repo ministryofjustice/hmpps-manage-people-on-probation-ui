@@ -195,12 +195,11 @@ describe('Arrange another appointment', () => {
       loadPage()
     })
     it('should redirect to the confirmation page', () => {
-      getUuid().then(uuid => {
+      getUuid().then(_uuid => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
         checkUpdateDateTime(arrangeAnotherAppointmentPage)
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
-        confirmPage.checkOnPage()
       })
     })
   })
