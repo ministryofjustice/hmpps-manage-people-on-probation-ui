@@ -308,16 +308,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       await masClient.patchAppointment(body)
 
       try {
-        const patchResponse = await masClient.patchDocuments(crn, id, file)
-        if (patchResponse.statusCode < 200 || patchResponse.statusCode >= 300) {
-          hasError = true
-        }
+        await masClient.patchDocuments(crn, id, file)
       } catch (e) {
-        // When multer errors, we don't want to display upload failed banner
-
-        if (e.status !== 415) {
-          hasError = true
-        }
+        hasError = true
       }
 
       if (hasError) {

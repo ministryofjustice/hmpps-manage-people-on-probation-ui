@@ -260,7 +260,7 @@ export default class MasApiClient extends RestClient {
       handle500: true,
       file,
       errorMessageFor500:
-        'Nomis is experiencing technical difficulties. It has not been possible to upload document. Please try again later',
+        'NDelius is experiencing technical difficulties. It has not been possible to upload document. Please try again later',
     })
   }
 
