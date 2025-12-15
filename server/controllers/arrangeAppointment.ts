@@ -591,9 +591,9 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         const masClient = new MasApiClient(token)
         try {
           const user = await masClient.getUserDetails(attending.username.toUpperCase())
-          attendingName = `${user.firstName}'s `
+          attendingName = `${user.firstName}´s `
         } catch {
-          attendingName = `The officer's `
+          attendingName = `The officer´s `
         }
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk

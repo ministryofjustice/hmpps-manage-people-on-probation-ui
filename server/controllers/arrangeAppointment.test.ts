@@ -65,6 +65,7 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('uuid', () => ({
   v4: jest.fn(),
 }))
@@ -1174,16 +1175,16 @@ describe('controllers/arrangeAppointment', () => {
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { backendId: 1234, user: {username: ''} },
+        appointmentSession: { backendId: 1234, user: { username: '' } },
         dataSession: { isOutLookEventFailed: false },
       })
-      await controllers.arrangeAppointments.getConfirmation()(mockReq, res)
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
         crn,
         isInPast: false,
         backendId: 1234,
         isOutLookEventFailed: false,
-        attendingName: "first's",
+        attendingName: 'first´s ',
         url: '',
       })
     })

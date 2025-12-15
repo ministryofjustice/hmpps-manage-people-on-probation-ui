@@ -15,6 +15,7 @@ import {
 } from './imports'
 import OverviewPage from '../../pages/overview'
 import YourCasesPage from '../../pages/myCases'
+import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 
 const loadPage = (crnOverride = '', dateInPast = false) => {
   completeSentencePage(1, '', crnOverride)
@@ -106,7 +107,6 @@ describe('Confirmation page', () => {
   })
 
   describe('Appointment arranged in the future', () => {
-
     beforeEach(() => {
       loadPage()
       confirmPage = new AppointmentConfirmationPage()
