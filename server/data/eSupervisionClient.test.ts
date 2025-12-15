@@ -239,6 +239,66 @@ describe('ESupervisionClient', () => {
     })
   })
 
+  describe('postOffenderCheckInStarted', () => {
+    it('should POST practitioner who is starting the review', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const response: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'REVIEWED',
+        dueDate: '2025-11-27',
+        personalDetails: {
+          crn: 'X123456',
+          name: {
+            forename: 'Bob',
+            surname: 'Smith',
+          },
+          mobile: '07700900123',
+          email: 'john.smith@example.com',
+          practitioner: {
+            name: {
+              forename: 'John',
+              surname: 'Smith',
+            },
+            email: 'practitioner@example.com',
+            localAdminUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            probationDeliveryUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            provider: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+          },
+        },
+        surveyResponse: {
+          mentalHealth: 'well',
+          assistance: ['thing1', 'thing2'],
+          callback: 'no',
+        },
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        videoUrl: 'string',
+        snapshotUrl: 'string',
+        autoIdCheck: 'MATCH',
+        manualIdCheck: 'MATCH',
+        flaggedResponses: ['string'],
+      }
+
+      fakeESupervisionApi
+        .post(`/v2/offender_checkins/${checkInUuid}/review-started`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postOffenderCheckInStarted(checkInUuid, 'practitioner')
+      expect(output).toEqual(response)
+    })
+  })
+
   describe('postOffenderCheckInNote', () => {
     it('should POST note to uuid', async () => {
       const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
