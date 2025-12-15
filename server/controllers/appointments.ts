@@ -19,7 +19,6 @@ import {
 import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { getQueryString } from './activityLog'
 
 const routes = [
   'getAppointments',
@@ -270,16 +269,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         delete req.session.body
       }
       const url = encodeURIComponent(req.url)
-      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+      const { maxCharCount } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
         url,
-        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
-        maxFileSize,
-        fileUploadLimit,
-        uploadedFiles,
         maxCharCount,
       })
     }
@@ -291,21 +286,40 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
+
       const { notes, sensitive } = req.body
-      const { data } = req.session
+      const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
+
+      let hasError = false
 
       const body: AppointmentPatch = {
         id: parseInt(id, 10),
         notes: handleQuotes(notes),
         sensitive: sensitive === 'Yes',
       }
+
       if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
         body.outcomeRecorded = true
         delete req.session.data.appointments[crn][id].outcomeRecorded
       }
+
       await masClient.patchAppointment(body)
+
+      try {
+        await masClient.patchDocuments(crn, id, file)
+      } catch (e) {
+        hasError = true
+      }
+
+      if (hasError) {
+        return res.render(`pages/appointments/add-note`, {
+          uploadError:
+            'File not uploaded. Please try again. If this file upload error persists, contact mpop-digital-team@justice.gov.uk.',
+        })
+      }
+
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
