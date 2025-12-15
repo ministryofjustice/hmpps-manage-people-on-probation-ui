@@ -4,6 +4,7 @@ import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
+  dateIsInPast,
   getDataValue,
   getPersonLevelTypes,
   isNumericString,

@@ -87,7 +87,7 @@ describe('Log attended and complied appointment', () => {
       addNotePage = new AddNotePage()
     })
     it('should return to management appointment when cancel link is clicked', () => {
-      cy.get('.govuk-link').should('contain.text', 'Cancel and go back').click()
+      cy.get('[data-qa=cancelGoBackLink]').should('contain.text', 'Cancel and go back').click()
       manageAppointmentPage = new ManageAppointmentPage()
     })
     checkValidation(manageJourney)
