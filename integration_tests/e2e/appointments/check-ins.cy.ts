@@ -14,6 +14,8 @@ import CheckYourAnswersPage from '../../pages/check-ins/check-your-answers'
 import CheckinConfirmationPage from '../../pages/check-ins/confirmation.page'
 import TakeAPhotoPage from '../../pages/check-ins/take-a-photo'
 import { statusErrors } from '../../../server/properties'
+import OverviewPage from '../../pages/overview'
+import ManageCheckins from '../../pages/check-ins/manage-checkins'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -49,8 +51,8 @@ context('Appointment check-ins', () => {
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getSubmitBtn().click()
     dateFrequencyPage.checkErrorSummaryBox([
-      'Select how often you would like the person to check in',
       'Enter the date you would like the person to complete their first check in',
+      'Select how often you would like the person to check in',
     ])
 
     getCheckinUuid().then(uuid => {
@@ -563,5 +565,74 @@ context('check-ins error scenario ', () => {
     checkYourAnswersPage.getSubmitBtn().click()
     cy.get('h1').should('contain.text', statusErrors[500].title)
     cy.get('[data-qa="errorMessage"]').should('contain.html', statusErrors[500].message)
+  })
+})
+
+context('check-ins overview and manage pages', () => {
+  it('should show online check ins section with check in details', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160`)
+    const overviewPage = new OverviewPage()
+    overviewPage.checkOnPage()
+    overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
+    overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
+    overviewPage.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
+    overviewPage.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    overviewPage.getElementData('frequencyLabel').should('contain.text', 'Frequency')
+    overviewPage.getElementData('frequencyValue').should('contain.text', 'Every week')
+    overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
+    overviewPage
+      .getElementData('checkinCard')
+      .find('.govuk-link')
+      .should('contain.text', 'View all online check in details')
+  })
+
+  it('should show online check ins due section ', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X000001`)
+    const overviewPage = new OverviewPage()
+    overviewPage.checkOnPage()
+    overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
+    overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
+    overviewPage.getElementData('checkinDueLabel').should('contain.text', 'Next check in due')
+    overviewPage.getElementData('checkinDueValue').should('contain.text', 'Online check ins not set up')
+    overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Set up online check ins')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').click()
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.checkOnPage()
+    instructionsPage.getBackLink().click()
+    overviewPage.checkOnPage()
+  })
+
+  it('should show checkin details', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160`)
+    const overviewPage = new OverviewPage()
+    overviewPage.checkOnPage()
+    overviewPage
+      .getElementData('checkinCard')
+      .find('.govuk-link')
+      .should('contain.text', 'View all online check in details')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').click()
+
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
+    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
+    manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
+    manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
+
+    manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
+    manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
+    manageCheckins.getElementData('emailAddressLabel').should('contain.text', 'Email address')
+    manageCheckins.getElementData('emailAddressValue').should('contain.text', 'address1@gmail.com')
+    manageCheckins.getElementData('mobileNumberLabel').should('contain.text', 'Mobile number')
+    manageCheckins.getElementData('mobileNumberValue').should('contain.text', '071838893')
   })
 })

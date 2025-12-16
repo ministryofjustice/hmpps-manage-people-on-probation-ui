@@ -12,15 +12,22 @@ const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
     return async (req, res) => {
       const { user } = res.locals
-      const { sortBy, sortOrder } = req.query as Record<string, string>
+      const { page = '0' } = req.query as Record<string, string>
       const url = encodeURIComponent(req.url)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
+
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
+      const [sortName, sortDirection] = sortedBy.split('.')
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
 
-      const alertsData: UserAlerts = await masClient.getUserAlerts(pageNum - 1, sortBy, sortOrder as 'asc' | 'desc')
+      const alertsData: UserAlerts = await masClient.getUserAlerts(
+        pageNumber,
+        sortName.toUpperCase(),
+        sortDirection as 'asc' | 'desc',
+      )
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
 
       let crnToRiskWidgetMap = {}
@@ -42,15 +49,7 @@ const alertsController: Controller<typeof routes, void> = {
           return acc
         }, {})
       }
-
-      let sortQueryString = ''
-      if (sortBy) {
-        sortQueryString += `&sortBy=${sortBy}`
-      }
-      if (sortOrder) {
-        sortQueryString += `&sortOrder=${sortOrder}`
-      }
-
+      
       const pagination: Pagination = getPaginationLinks(
         req.query.page ? pageNum : 1,
         alertsData?.totalPages || 0,
@@ -64,11 +63,7 @@ const alertsController: Controller<typeof routes, void> = {
         alertsData,
         pagination,
         crnToRiskWidgetMap,
-        sortQueryString,
-        currentSort: {
-          column: sortBy,
-          order: sortOrder,
-        },
+        sortedBy,
       })
     }
   },
@@ -92,7 +87,11 @@ const alertsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
 
       await masClient.clearAlerts(alertIds)
-      res.locals.alertsCleared = { error: false, message: `${alertIds.length} alert(s) cleared successfully` }
+      const alertCount = alertIds.length
+      res.locals.alertsCleared = {
+        error: false,
+        message: `You've cleared ${alertCount} ${alertCount > 1 ? 'alerts' : 'alert'}.`,
+      }
 
       return next()
     }

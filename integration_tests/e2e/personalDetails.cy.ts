@@ -5,7 +5,7 @@ import AdjustmentsPage from '../pages/adjustments'
 import { checkPopHeader } from './appointments/imports'
 
 context('Personal Details', () => {
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
   it('Personal Details page is rendered', () => {
@@ -33,14 +33,14 @@ context('Personal Details', () => {
     page.getRowData('contactDetails', 'otherAddresses', 'Value').should('contain.text', '1 other address')
     page.getRowData('contactDetails', 'contacts', 'Value').should('contain.text', 'Steve Wilson – GP (secondary)')
     page.getRowData('contactDetails', 'mainAddressNotes', 'Value').should('contain.text', 'Main Address')
-
     page.getElementData('telephoneNumberAction').should('exist')
     page.getElementData('mobileNumberAction').should('exist')
     page.getElementData('emailAddressAction').should('exist')
     page.getElementData('mainAddressAction').should('exist')
-
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
     page.getRowData('personalDetails', 'dateOfBirth', 'Value').should('contain.text', '18 August 1979')
+    cy.get('[data-qa=dateOfDeathLabel]').should('not.exist')
+    cy.get('[data-qa=dateOfDeathValue]').should('not.exist')
     page.getRowData('personalDetails', 'aliases', 'Value').should('contain.text', 'Jonny Smith')
     page.getRowData('personalDetails', 'previousSurname', 'Label').should('contain.text', 'Previous name')
     page.getRowData('personalDetails', 'previousSurname', 'Value').should('contain.text', 'Jones')
@@ -96,6 +96,19 @@ context('Personal Details', () => {
         'href',
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=EqualityMonitoring&CRN=X000001',
       )
+  })
+
+  it('Personal details page is rendered with date of death', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/personal-details')
+    cy.get('[data-qa="dateOfBirthValue')
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.eq(`18 August 1979`)
+      })
+    cy.get('[data-qa="dateOfDeathLabel"]').should('contain.text', 'Date of death')
+    cy.get('[data-qa="dateOfDeathValue"]').should('contain.text', '11 September 2024 (45 years old)')
   })
 
   it('Personal details page is rendered for new san indicator assessment', () => {

@@ -641,7 +641,7 @@ context('Contacts', () => {
     cy.get('[data-qa="timeline11Card"] a').should(
       'have.attr',
       'href',
-      `/case/X000001/check-in/6fa85f64-5717-4562-b3fc-2c963f66afa6/update?back=${encodeURIComponent(
+      `/case/X000001/appointments/6fa85f64-5717-4562-b3fc-2c963f66afa6/check-in/update?back=${encodeURIComponent(
         '/case/X000001/activity-log',
       )}`,
     )

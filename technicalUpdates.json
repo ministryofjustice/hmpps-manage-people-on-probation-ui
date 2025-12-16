@@ -1,0 +1,35 @@
+[
+  {
+    "heading": "View all outcomes to log on one page and other service improvements",
+    "summary": "11 December 2025",
+    "whatsNew": [
+      "View all outcomes to log on one page",
+      [
+        "The ‘You need to record an outcome for xx appointments’ link now goes to a page that lists every appointment without an outcome, so you can view them quicker."
+      ],
+      "Manage appointments in this service",
+      [
+        "You can use Manage people on probation (MPOP) to manage appointments arranged in this service, with a bug fix stopping those links from going to NDelius.",
+        "Thanks to our users at Harrow and Barnet PDU for this feedback. If you have any ideas or comments, we’d love to hear via mpop-digital-team@justice.gov.uk."
+      ],
+      "NDelius Risk flags",
+      [
+        "The risk flags now display the same data as on NDelius, correcting a bug where risk showed as ‘high’ instead of ‘medium’ for ‘risk to staff’."
+      ],
+      "Adding and viewing notes",
+      [
+        "To save you a click, you can now add notes right after selecting that a person on probation attended and compiled. This change means you do not return to the appointment details before adding notes.",
+        "You can now read a long note in a dedicated page, thanks to a bug fix."
+      ],
+      "Clearer signposting between NDelius and MPOP",
+      [
+        "We’ve made it easier for you to see which service an appointment was created on. NDelius-created appointments now display ‘Manage on NDelius’ links on the ‘Appointments’ page, and on the ‘Activity log’ page for appointments without outcomes."
+      ]
+    ]
+  },
+  {
+    "heading": "Welcome to Manage people on probation",
+    "summary": "23 September 2025",
+    "whatsNew": []
+  }
+]

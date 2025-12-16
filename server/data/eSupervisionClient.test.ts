@@ -3,6 +3,12 @@ import nock from 'nock'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
 import ESupervisionClient from './eSupervisionClient'
+import {
+  ESupervisionCheckIn,
+  ESupervisionCheckInResponse,
+  ESupervisionNote,
+  ESupervisionReview,
+} from './model/esupervision'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -87,6 +93,229 @@ describe('ESupervisionClient', () => {
         .reply(200, response)
 
       const output = await client.getProfilePhotoUploadLocation(offenderSetup as any, contentType)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getOffenderCheckIn', () => {
+    it('should GET checkin details from uuid', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const response: ESupervisionCheckInResponse = {
+        checkin: {
+          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+          status: 'REVIEWED',
+          dueDate: '2025-11-27',
+          personalDetails: {
+            crn: 'X123456',
+            name: {
+              forename: 'Bob',
+              surname: 'Smith',
+            },
+            mobile: '07700900123',
+            email: 'john.smith@example.com',
+            practitioner: {
+              name: {
+                forename: 'John',
+                surname: 'Smith',
+              },
+              email: 'practitioner@example.com',
+              localAdminUnit: {
+                code: 'N01ABC',
+                description: 'London North LAU',
+              },
+              probationDeliveryUnit: {
+                code: 'N01ABC',
+                description: 'London North LAU',
+              },
+              provider: {
+                code: 'N01ABC',
+                description: 'London North LAU',
+              },
+            },
+          },
+          surveyResponse: {
+            mentalHealth: 'well',
+            assistance: ['thing1', 'thing2'],
+            callback: 'no',
+          },
+          createdBy: 'string',
+          createdAt: '2025-11-27T15:40:42.399Z',
+          videoUrl: 'string',
+          snapshotUrl: 'string',
+          autoIdCheck: 'MATCH',
+          manualIdCheck: 'MATCH',
+          flaggedResponses: ['string'],
+        },
+        checkinLogs: {
+          hint: 'ALL',
+          logs: [
+            {
+              comment: 'string',
+              offender: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+              createdAt: '2025-11-27T15:40:42.399Z',
+              uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+              practitioner: 'string',
+              logEntryType: 'OFFENDER_SETUP_COMPLETE',
+              checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            },
+          ],
+        },
+      }
+
+      fakeESupervisionApi
+        .get(`/v2/offender_checkins/${checkInUuid}?include-personal-details=true`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.getOffenderCheckIn(checkInUuid)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postOffenderCheckInReview', () => {
+    it('should POST review to uuid', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const review: ESupervisionReview = {
+        reviewedBy: 'id',
+        manualIdCheck: 'NO_MATCH',
+        missedCheckinComment: 'no reason',
+      }
+
+      const response: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'REVIEWED',
+        dueDate: '2025-11-27',
+        personalDetails: {
+          crn: 'X123456',
+          name: {
+            forename: 'Bob',
+            surname: 'Smith',
+          },
+          mobile: '07700900123',
+          email: 'john.smith@example.com',
+          practitioner: {
+            name: {
+              forename: 'John',
+              surname: 'Smith',
+            },
+            email: 'practitioner@example.com',
+            localAdminUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            probationDeliveryUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            provider: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+          },
+        },
+        surveyResponse: {
+          mentalHealth: 'well',
+          assistance: ['thing1', 'thing2'],
+          callback: 'no',
+        },
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        videoUrl: 'string',
+        snapshotUrl: 'string',
+        autoIdCheck: 'MATCH',
+        manualIdCheck: 'MATCH',
+        flaggedResponses: ['string'],
+      }
+
+      fakeESupervisionApi
+        .post(`/v2/offender_checkins/${checkInUuid}/review`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postOffenderCheckInReview(checkInUuid, review)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postOffenderCheckInStarted', () => {
+    it('should POST practitioner who is starting the review', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const response: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'REVIEWED',
+        dueDate: '2025-11-27',
+        personalDetails: {
+          crn: 'X123456',
+          name: {
+            forename: 'Bob',
+            surname: 'Smith',
+          },
+          mobile: '07700900123',
+          email: 'john.smith@example.com',
+          practitioner: {
+            name: {
+              forename: 'John',
+              surname: 'Smith',
+            },
+            email: 'practitioner@example.com',
+            localAdminUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            probationDeliveryUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            provider: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+          },
+        },
+        surveyResponse: {
+          mentalHealth: 'well',
+          assistance: ['thing1', 'thing2'],
+          callback: 'no',
+        },
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        videoUrl: 'string',
+        snapshotUrl: 'string',
+        autoIdCheck: 'MATCH',
+        manualIdCheck: 'MATCH',
+        flaggedResponses: ['string'],
+      }
+
+      fakeESupervisionApi
+        .post(`/v2/offender_checkins/${checkInUuid}/review-started`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postOffenderCheckInStarted(checkInUuid, 'practitioner')
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postOffenderCheckInNote', () => {
+    it('should POST note to uuid', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const notes: ESupervisionNote = {
+        updatedBy: 'id',
+        notes: 'note',
+      }
+
+      const response = {}
+
+      fakeESupervisionApi
+        .post(`/v2/offender_checkins/${checkInUuid}/annotate`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postOffenderCheckInNote(checkInUuid, notes)
       expect(output).toEqual(response)
     })
   })

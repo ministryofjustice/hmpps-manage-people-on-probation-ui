@@ -10,14 +10,14 @@
 
   {% if entry.isAppointment %}
     {% include "./_appointment-timeline-entry.njk" %}
-  {% elseif entry.isEsupervision %}
+  {% elif entry.esupervisionId %}
     {% if flags.enableESuperVision %}
       {% include "./_online-checkin-entry.njk" %}
     {% endif %}
-  {% elseif entry.isCommunication %}
+  {% elif entry.isCommunication %}
     {% include "./_communication-timeline-entry.njk" %}
-  {% elseif entry.isSystemContact %}
- {% include "./_system-contact-timeline-entry.njk" %}
+  {% elif entry.isSystemContact %}
+    {% include "./_system-contact-timeline-entry.njk" %}
   {% else %}
     {% include "./_other-timeline-entry.njk" %}
   {% endif %}

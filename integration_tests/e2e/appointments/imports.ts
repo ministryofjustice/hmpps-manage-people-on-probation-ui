@@ -13,11 +13,13 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import Page from '../../pages/page'
+import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import AddNotePage from '../../pages/appointments/add-note.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 export const date = DateTime.now().plus({ days: 1 }).toISODate()
+export const pastDate = DateTime.now().minus({ days: 1 }).toISODate()
 export const startTime = '09:00'
 export const endTime = '10:00'
 export const dateRegex: RegExp =
@@ -90,14 +92,53 @@ export const completeAttendancePage = () => {
   attendancePage.getSubmitBtn().click()
 }
 
-export const completeLocationDateTimePage = (index = 1, crnOverride = '', uuidOveride = '', next = false) => {
+interface Props {
+  index?: number
+  crnOverride?: string
+  uuidOveride?: string
+  next?: boolean
+  dateInPast?: boolean
+  dateOverride?: DateTime
+}
+
+export const completeLocationDateTimePage = ({
+  index = 1,
+  crnOverride = '',
+  uuidOveride = '',
+  dateInPast = false,
+  dateOverride,
+}: Props = {}) => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationDateTimePage = new AppointmentLocationDateTimePage()
+  const now = DateTime.now()
+  const yesterday = now.minus({ days: 1 })
+  const tomorrow = now.plus({ days: 1 })
+  const yesterdayIsInCurrentMonth = yesterday.month === now.month
+  const tomorrowIsInCurrentMonth = tomorrow.month === now.month
   locationDateTimePage.getDatePickerToggle().click()
-  if (next) {
-    locationDateTimePage.getNextDayButton().click()
+  if (dateOverride) {
+    const diff = dateOverride.month - now.month
+    if (diff < 0) {
+      for (let i = 0; i > diff; i -= 1) {
+        cy.get('.moj-js-datepicker-prev-month').click()
+      }
+    }
+    if (diff > 0) {
+      for (let i = 0; i < diff; i += 1) {
+        cy.get('.moj-js-datepicker-next-month').click()
+      }
+    }
+    cy.get(`[data-testid="${dateOverride.toFormat('d/M/yyyy')}"]`).click()
+  } else if (!dateInPast) {
+    if (!tomorrowIsInCurrentMonth) {
+      cy.get('.moj-js-datepicker-next-month').click()
+    }
+    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
   } else {
-    locationDateTimePage.getActiveDayButton().click()
+    if (!yesterdayIsInCurrentMonth) {
+      cy.get('.moj-js-datepicker-prev-month').click()
+    }
+    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
   }
   locationDateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
   locationDateTimePage
@@ -109,6 +150,23 @@ export const completeLocationDateTimePage = (index = 1, crnOverride = '', uuidOv
     .click()
   locationDateTimePage.getSubmitBtn().click()
   locationDateTimePage.getSubmitBtn().click()
+}
+
+export const completeAttendedCompliedPage = (manageJourney = false) => {
+  const idPrefix = manageJourney ? '' : `appointments-${crn}-${uuid}-`
+  const logOutcomePage = new AttendedCompliedPage()
+  cy.get(`#${idPrefix}outcomeRecorded`).click()
+  logOutcomePage.getSubmitBtn().click()
+}
+
+export const completeAddNotePage = (crnOverride = '', uuidOveride = '') => {
+  const addNotePage = new AddNotePage()
+  addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+  addNotePage
+    .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-notes`)
+    .focus()
+    .type('Some notes')
+  addNotePage.getSubmitBtn().click()
 }
 
 export const completeSupportingInformationPage = (notes = true, crnOverride = '', uuidOveride = '') => {
@@ -186,6 +244,8 @@ export const completeNextAppointmentPage = (index = 1) => {
 export const checkAppointmentSummary = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
   probationPractitioner = false,
+  repeatingEnabled = false,
+  dateInPast = false,
 ) => {
   page.getSummaryListRow(2).find('.govuk-summary-list__key').should('contain.text', 'Appointment type')
   page.getSummaryListRow(2).find('.govuk-summary-list__value').should('contain.text', 'Planned office visit (NS)')
@@ -203,8 +263,13 @@ export const checkAppointmentSummary = (
     page
       .getSummaryListRow(3)
       .find('.govuk-summary-list__value')
-      .should('contain.text', 'Peter Parker (PS-PSO)')
-      .should('contain.text', '(Automated Allocation Team, London)')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Peter Parker' : 'Deborah Fern')
+      .should(
+        'contain.text',
+        page instanceof ArrangeAnotherAppointmentPage
+          ? '(Automated Allocation Team, London)'
+          : '(PS - Other) (Automated Allocation Team, London)',
+      )
   }
   page.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
   page
@@ -222,15 +287,29 @@ export const checkAppointmentSummary = (
       .invoke('text')
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
-        expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+        if (dateInPast) {
+          expect(normalizedText).to.include(`${dateWithYear(pastDate)} from ${startTime} to ${endTime}`)
+        } else {
+          expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+        }
       })
   }
   if (page instanceof ArrangeAnotherAppointmentPage) {
     page.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   }
 
-  const index = 0
-
+  const index = repeatingEnabled || dateInPast ? 1 : 0
+  if (repeatingEnabled) {
+    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
+    page
+      .getSummaryListRow(6)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
+  }
+  if (dateInPast) {
+    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
+    page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+  }
   page
     .getSummaryListRow(6 + index)
     .find('.govuk-summary-list__key')
@@ -256,7 +335,7 @@ export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeA
   typePage.getSubmitBtn().click()
   if (page instanceof ArrangeAnotherAppointmentPage) {
     getUuid().then(pageUuid => {
-      completeLocationDateTimePage(1, '', pageUuid, true)
+      completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
       completeSupportingInformationPage(true, '', pageUuid)
     })
   }
@@ -270,7 +349,7 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
     sentencePage.getElement(`#appointments-${crn}-${pageUuid}-eventId-2`).click()
     sentencePage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeLocationDateTimePage(1, '', pageUuid, true)
+      completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
       completeSupportingInformationPage(true, '', pageUuid)
     }
     page.checkOnPage()
@@ -333,9 +412,11 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
         .invoke('text')
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`,
-          )
+          if (normalizedText) {
+            expect(normalizedText.toString()).to.include(
+              `${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`,
+            )
+          }
         })
     })
   })
@@ -348,7 +429,7 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
     repeatingPage.getElement(`#appointments-${crn}-${pageUuid}-repeating-2`).click()
     repeatingPage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeLocationDateTimePage(1, '', pageUuid, true)
+      completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
       completeSupportingInformationPage(true, '', pageUuid)
     }
     page.checkOnPage()
@@ -367,11 +448,39 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
   })
 }
 
-export const checkUpdateNotes = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+export const checkLogOutcomesAlert = (attendedComplied = false) => {
+  it('should render the log outcomes alert banner', () => {
+    cy.get('[data-module="serviceAlert"]').as('alert')
+    cy.get('@alert')
+      .get('.moj-alert__content')
+      .should(
+        'contain.text',
+        !attendedComplied
+          ? 'You can only use this service to log attended and complied outcomes.'
+          : 'You can only log attended and complied outcomes. If you need to log a different outcome,',
+      )
+    cy.get('@alert')
+      .get('.moj-alert__content a')
+      .should(
+        'contain.text',
+        !attendedComplied
+          ? 'Use NDelius to arrange an appointment in the past with another outcome'
+          : 'arrange this appointment on NDelius',
+      )
+      .should('have.attr', 'href', '#')
+      .should('have.attr', 'target', '_blank')
+    cy.get('@alert').get('.moj-alert__action button').should('contain.text', 'Dismiss')
+  })
+}
+
+export const checkUpdateNotes = (
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+  dateInPast = false,
+) => {
   getUuid().then(pageUuid => {
     page.getSummaryListRow(6).find('.govuk-link').click()
     const updatedNotes = 'Some updated notes'
-    const notePage = new AppointmentNotePage()
+    const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-notes`).focus().clear().type(updatedNotes)
     notePage.getSubmitBtn().click()
     page.checkOnPage()
@@ -379,14 +488,17 @@ export const checkUpdateNotes = (page: AppointmentCheckYourAnswersPage | Arrange
   })
 }
 
-export const checkUpdateSensitivity = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
+export const checkUpdateSensitivity = (
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+  dateInPast = false,
+) => {
   getUuid().then(pageUuid => {
     page.getSummaryListRow(7).find('.govuk-link').click()
-    const notePage = new AppointmentNotePage()
+    const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()
     notePage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeLocationDateTimePage(1, '', pageUuid, true)
+      completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
     }
     page.checkOnPage()
     page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No')

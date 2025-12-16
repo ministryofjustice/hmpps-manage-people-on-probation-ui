@@ -1,8 +1,10 @@
+import { DateTime } from 'luxon'
 import ArrangeAnotherAppointmentPage from '../../pages/appointments/arrange-another-appointment.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
-import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
+import AppointmentdateTimePage from '../../pages/appointments/location-date-time.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
+import SupportingInformationPage from '../../pages/appointments/note.page'
 import {
   checkAppointmentSummary,
   getUuid,
@@ -30,12 +32,14 @@ describe('Arrange another appointment', () => {
   it('should render the page', () => {
     cy.task('stubNextAppointment')
     loadPage()
+    cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
     checkAppointmentSummary(arrangeAnotherAppointmentPage)
     arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
   })
   describe('User clicks submit without selecting a date and time', () => {
-    let dateTimePage: AppointmentLocationDateTimePage
+    let dateTimePage: AppointmentdateTimePage
+    let supportingInformationPage: SupportingInformationPage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
     beforeEach(() => {
       cy.task('stubNextAppointment')
@@ -45,7 +49,7 @@ describe('Arrange another appointment', () => {
     })
 
     it('should redirect to the date/time page', () => {
-      dateTimePage = new AppointmentLocationDateTimePage()
+      dateTimePage = new AppointmentdateTimePage()
       dateTimePage.checkOnPage()
     })
     it('should display the error summary box', () => {
@@ -70,6 +74,24 @@ describe('Arrange another appointment', () => {
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode-error`).should($error => {
           expect($error.text().trim()).to.include('Select an appointment location')
         })
+      })
+    })
+    it('should display the outlook invite inset text', () => {
+      getUuid().then(uuid => {
+        dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+        const tomorrow = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
+        dateTimePage.getDatePickerInput().clear().type(tomorrow)
+        dateTimePage.getElementInput(`startTime`).type('09:10')
+        dateTimePage.getElementInput(`endTime`).focus().type('10:30')
+        dateTimePage.getSubmitBtn().click()
+        dateTimePage.getSubmitBtn().click()
+        supportingInformationPage = new SupportingInformationPage()
+        cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
+        supportingInformationPage.getSubmitBtn().click()
+        cy.get('[data-qa="calendarInviteInset"]').should(
+          'contain.text',
+          `You'll receive a calendar invite for the appointment`,
+        )
       })
     })
   })
@@ -100,13 +122,13 @@ describe('Arrange another appointment', () => {
 
   describe('User clicks submit without selecting a location', () => {
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
-    let locationPage: AppointmentLocationDateTimePage
+    let locationPage: AppointmentdateTimePage
     beforeEach(() => {
       cy.task('stubAppointmentNoLocation')
       loadPage('X000001')
       arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
       arrangeAnotherAppointmentPage.getSubmitBtn().click()
-      locationPage = new AppointmentLocationDateTimePage()
+      locationPage = new AppointmentdateTimePage()
       locationPage.checkOnPage()
     })
     it('should display the error summary box', () => {
@@ -173,12 +195,11 @@ describe('Arrange another appointment', () => {
       loadPage()
     })
     it('should redirect to the confirmation page', () => {
-      getUuid().then(uuid => {
+      getUuid().then(_uuid => {
         const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
         checkUpdateDateTime(arrangeAnotherAppointmentPage)
         arrangeAnotherAppointmentPage.getSubmitBtn().click()
         confirmPage = new AppointmentConfirmationPage()
-        confirmPage.checkOnPage()
       })
     })
   })

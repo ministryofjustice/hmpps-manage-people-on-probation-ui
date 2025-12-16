@@ -10,6 +10,9 @@ import { PersonalDetails } from '../data/model/personalDetails'
 import { defaultUser } from './mocks/alerts'
 import logger from '../../logger'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
+import { ProbationPractitioner } from '../models/CaseDetail'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { ESupervisionCheckIn } from '../data/model/esupervision'
 
 jest.mock('../../logger', () => ({
   info: jest.fn(),
@@ -59,8 +62,20 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 
-const mockPersonalDetails = {} as PersonalDetails
+const postReviewSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInReview')
+  .mockImplementation(() => Promise.resolve({} as ESupervisionCheckIn))
+const postReviewNoteSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInNote')
+  .mockImplementation(() => Promise.resolve())
+const startReviewSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postOffenderCheckInStarted')
+  .mockImplementation(() => Promise.resolve({} as ESupervisionCheckIn))
 
+const getProbationPractitionerSpy = jest
+  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+  .mockImplementation(() => Promise.resolve({ username: 'name' } as ProbationPractitioner))
+const mockPersonalDetails = {} as PersonalDetails
 const getPersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonalDetails')
   .mockImplementation(() => Promise.resolve(mockPersonalDetails))
@@ -75,11 +90,17 @@ const crn = 'X000001'
 const cya = false
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 
-const baseReq = () =>
+const baseReq = (data?: any) =>
   httpMocks.createRequest({
     params: { crn, id: uuid },
-    session: {},
+    session: { data },
+    query: {
+      back: 'string',
+    },
+    url: 'url',
   })
+
+const reviewRes = (status: string) => mockAppResponse({ checkIn: { status } })
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -99,7 +120,7 @@ describe('checkInsController', () => {
       const req = baseReq()
       await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn, back: req.query.back })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 
@@ -878,6 +899,494 @@ describe('checkInsController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getUpdateCheckIn', () => {
+    it('redirect to view page if checkIn already reviewed', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('REVIEWED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/view?back=${req.query.back}`,
+      )
+    })
+
+    it('redirect to confirm identity page if checkIn was submitted', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(startReviewSpy).toHaveBeenCalled()
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/identity?back=${req.query.back}`,
+      )
+    })
+
+    it('redirect to missed appointment notes page if checkIn expired', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(startReviewSpy).toHaveBeenCalled()
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/expired?back=${req.query.back}`,
+      )
+    })
+
+    it('returns 404 when checkIn status is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('INVALID')
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, resReview)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getViewCheckIn', () => {
+    it('redirect if checkIn not reviewed', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      )
+    })
+
+    it('render checkIn view page if correct', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('REVIEWED')
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
+      })
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getReviewExpiredCheckIn', () => {
+    it('redirect if checkIn not expired', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      )
+    })
+
+    it('render checkIn expired page if correct', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED')
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/expired.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+      })
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getReviewIdentityCheckIn', () => {
+    it('redirect if checkIn not submitted', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      )
+    })
+
+    it('render checkIn identity page if correct', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED')
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/identity.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
+      })
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getReviewNotesCheckIn', () => {
+    it('redirect if checkIn not submitted', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                manualIdCheck: 'MATCH',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      const resReview = reviewRes('EXPIRED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      )
+    })
+
+    it('redirect if no manualIdCheck', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(req.query.back)
+    })
+
+    it('render checkIn notes page if correct', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                manualIdCheck: 'MATCH',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      const resReview = reviewRes('SUBMITTED')
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/notes.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+      })
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('postReviewIdentityCheckIn', () => {
+    it('redirect to notes page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postReviewIdentityCheckIn(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/review/notes?back=${req.url}`,
+      )
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postReviewIdentityCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postReviewIdentityCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('postViewCheckIn', () => {
+    it('redirect to activity log page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                note: 'note',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(postReviewNoteSpy).toHaveBeenCalled()
+      expect(getProbationPractitionerSpy).toHaveBeenCalled()
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postViewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('postReviewCheckIn', () => {
+    it('redirect to activity log page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postReviewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(postReviewSpy).toHaveBeenCalled()
+      expect(getProbationPractitionerSpy).toHaveBeenCalled()
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postReviewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.postReviewCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getManageCheckinPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('fetch personal details and renders mange-checkin page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      // Arrange personal details returned by MAS
+      ;(mockPersonalDetails as PersonalDetails).mobileNumber = '07700900000'
+      ;(mockPersonalDetails as PersonalDetails).email = 'test@example.com'
+
+      const req = baseReq()
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      // token retrieval and MAS client call
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')
+      expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-checkin.njk', {
+        crn,
+        mobile: '07700900000',
+        email: 'test@example.com',
+      })
     })
   })
 })

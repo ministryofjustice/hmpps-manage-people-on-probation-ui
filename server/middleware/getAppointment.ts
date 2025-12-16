@@ -28,7 +28,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       meta: {
         isVisor: currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
         forename,
-        change: (req?.query?.change as string) || null,
+        change: (req?.query?.change as string) ?? null,
         userIsAttending,
       },
     }
@@ -53,7 +53,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         repeating,
         notes,
         sensitivity,
+        outcomeRecorded,
       } = appointmentSession
+
       const type: AppointmentType | null = typeId
         ? req.session.data.appointmentTypes.find(team => team.code === typeId)
         : null
@@ -93,7 +95,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {
-        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) || ''
+        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) ?? ''
       }
 
       appointment = {
@@ -106,9 +108,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {
           sentence: parseInt(eventId, 10) !== 0 ? sentence : null,
-          requirement: sentenceRequirement?.description || null,
-          licenceCondition: sentenceLicenceCondition?.mainDescription || null,
-          nsi: sentenceNsi?.description || null,
+          requirement: sentenceRequirement?.description ?? null,
+          licenceCondition: sentenceLicenceCondition?.mainDescription ?? null,
+          nsi: sentenceNsi?.description ?? null,
           forename: eventId === 'PERSON_LEVEL_CONTACT' ? forename : null,
         },
         attending: {
@@ -122,8 +124,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         end,
         repeating,
         repeatingDates,
-        notes: notes || null,
-        sensitivity: sensitivity || null,
+        notes: notes ?? null,
+        sensitivity: sensitivity ?? null,
+        outcomeRecorded: outcomeRecorded ?? null,
       }
     }
     res.locals.appointment = appointment

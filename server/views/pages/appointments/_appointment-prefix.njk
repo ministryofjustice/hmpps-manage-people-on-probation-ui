@@ -1,12 +1,12 @@
 {% if appointment.isInitial %}
   Initial appointment
-{% elseif appointment.isNationalStandard %}
+{% elif appointment.isNationalStandard %}
   National standard appointment
-{% elseif appointment.isAppointment %}
+{% elif appointment.isAppointment %}
   Appointment
-{% elseif appointment.isCommunication %}
+{% elif appointment.isCommunication %}
   Communication
-{% elseif appointment.isSystemContact %}
+{% elif appointment.isSystemContact %}
   System Generated
 {% else %}
   Other contact
