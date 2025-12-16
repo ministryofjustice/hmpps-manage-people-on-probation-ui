@@ -175,7 +175,7 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
-      expect(res.locals.alertsCleared).toEqual({ error: false, message: `1 alert(s) cleared successfully` })
+      expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 1 alert.` })
     })
 
     it('should call clearAlerts with multiple selected alerts and return success', async () => {
@@ -192,7 +192,7 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
-      expect(res.locals.alertsCleared).toEqual({ error: false, message: `2 alert(s) cleared successfully` })
+      expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 2 alerts.` })
     })
   })
 })
