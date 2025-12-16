@@ -4,6 +4,9 @@
 
 {% set technicalUpdateItems = [] %}
 
+{% set email_address = 'mpop-digital-team@justice.gov.uk' %}
+{% set email_link = '<a href="mailto:' ~ email_address ~ '" class="govuk-link">' ~ email_address ~ '</a>' %}
+
 {% for technicalUpdate in technicalUpdates %}
     {% set content %}
 
@@ -11,8 +14,9 @@
             {% if item | isArray (item) %}
                 <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
                     {% for subItem in item %}
-                        {% if subItem.includes('mpop-digital-team@justice.gov.uk') %}
-                            <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-0">{{ subItem }}</p>
+                        {% if subItem.includes(email_address) %}
+                            {% set linked_subItem = subItem | replace(email_address, email_link) %}
+                            <p class="govuk-body govuk-!-margin-top-4 govuk-!-margin-bottom-0">{{ linked_subItem | safe }}</p>
                         {% else %}
                             <li>{{ subItem }}</li>
                         {% endif %}
@@ -35,7 +39,7 @@
         heading: {
             html: sectionHeadingHtml
         },
-            expanded: loop.first,
+        expanded: loop.first,
         content: {
             html: content
         }
