@@ -86,7 +86,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
-      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {

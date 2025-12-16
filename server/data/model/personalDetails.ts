@@ -58,11 +58,16 @@ export interface PersonalDetails {
   name: Name
   contacts: PersonalContact[]
   mainAddress?: PersonAddress
-  otherAddresses: PersonAddress[]
+  otherAddressCount: number
+  previousAddressCount: number
   preferredGender: string
   dateOfBirth: string
+  dateOfDeath?: string
   preferredName?: string
   previousSurname?: string
+  preferredLanguage?: string
+  genderIdentity?: string
+  selfDescribedGender?: string
   aliases: Name[]
   telephoneNumber?: string
   mobileNumber?: string
@@ -71,10 +76,14 @@ export interface PersonalDetails {
   disabilities: Disabilities
   provisions: Provisions
   pnc?: string
+  noms?: string
   sex: string
   religionOrBelief?: string
   sexualOrientation?: string
+  requiresInterpreter?: boolean
   documents: Document[]
+  lastUpdated?: string
+  lastUpdatedBy?: Name
   addressTypes: AddressType[]
   staffContacts: Contact[]
 }
