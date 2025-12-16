@@ -428,7 +428,7 @@ const checkInsController: Controller<typeof routes, void> = {
         riskManagementFeedback: risk,
       }
       const eSupervisionClient = new ESupervisionClient(token)
-      console.log(await eSupervisionClient.postOffenderCheckInReview(id, review))
+      await eSupervisionClient.postOffenderCheckInReview(id, review)
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
