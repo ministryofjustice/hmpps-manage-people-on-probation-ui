@@ -412,7 +412,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
       const practitionerId = pp?.username ? pp.username : res.locals.user.username
-      let risk: boolean
+      let risk: boolean = null
       if (checkIn?.riskManagementFeedback) {
         risk = checkIn.riskManagementFeedback === 'yes'
       }
