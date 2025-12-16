@@ -23,7 +23,6 @@ describe('Add a note', () => {
       const note = 'x'.repeat(4000)
       cy.get(`#${idPrefix}notes`).type(note, { delay: 0 })
       addNotePage.getSubmitBtn().click()
-
       addNotePage.checkErrorSummaryBox(['Select whether or not the appointment note contains sensitive information'])
       addNotePage
         .getElement(`#${idPrefix}sensitivity-error`)
@@ -32,14 +31,14 @@ describe('Add a note', () => {
       addNotePage.getElement(`#${idPrefix}sensitivity`).should('be.focused')
     })
 
-    it('should display validation errors if note is more than 4000 characters', () => {
+    it('should display validation errors if note is more than 12000 characters', () => {
       loadPage()
-      const note = 'x'.repeat(4001)
+      const note = 'x'.repeat(12001)
       cy.get(`#${idPrefix}notes`).type(note, { delay: 0 })
       addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
       addNotePage.getSubmitBtn().click()
-      addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
-      addNotePage.getElement(`#${idPrefix}notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+      addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+      addNotePage.getElement(`#${idPrefix}notes-error`).should('contain.text', 'Note must be 12000 characters or less')
       cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
     })
   }
@@ -165,12 +164,100 @@ describe('Add a note', () => {
 
     it('should count a return as 1 character', () => {
       loadPage()
-      const paragraph = 'x'.repeat(2000)
-      cy.get('#notes').type(`${paragraph}{enter}{enter}${paragraph}`, { delay: 0 })
+      const paragraph = 'x'.repeat(6000)
+      cy.get(`#notes`).type(`${paragraph}\n\n${paragraph}`, { delay: 0 })
       addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
       addNotePage.getSubmitBtn().click()
-      addNotePage.checkErrorSummaryBox(['Note must be 4000 characters or less'])
-      addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 4000 characters or less')
+      addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+      addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 12000 characters or less')
+      cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
+    })
+
+    it('should validate a png file as being an invalid file type when selected', () => {
+      loadPage()
+      addNotePage.getChooseFilesButton().click()
+      const [fakeFile, fileName] = createFakeFile(1, 'png')
+      cy.get('.moj-multi-file-upload__input').attachFile(fakeFile)
+      addNotePage
+        .getFileUploadListItem('error', 'text', 0)
+        .should('contain.text', `${fileName}: File type must be pdf or word`)
+      addNotePage.getFileUploadListItem('error', 'status', 0).should('contain.text', 'Upload failed')
+      addNotePage.getFileUploadListItemDeleteButton(0).should('contain.text', 'Delete')
+    })
+
+    it('should validate a file over 5mb in size as invalid', () => {
+      loadPage()
+      const [fakeFile, fileName] = createFakeFile(6, 'pdf')
+      addNotePage.getChooseFilesButton().click()
+      cy.get('.moj-multi-file-upload__input').attachFile(fakeFile)
+      addNotePage
+        .getFileUploadListItem('error', 'text', 0)
+        .should('contain.text', `${fileName}: File size must be 5mb or under`)
+      addNotePage.getFileUploadListItem('error', 'status', 0).should('contain.text', 'Upload failed')
+    })
+
+    for (const filetype of ['pdf', 'doc', 'docx']) {
+      checkUploadFile(filetype)
+    }
+
+    it('should render the page with no previous notes', () => {
+      cy.task('stubPastAppointmentNoOutcomeNoNotes')
+      loadPage()
+      addNotePage.getPreviousNotes().should('not.exist')
+    })
+
+    it('should add the CRISS headers to the textarea', () => {
+      loadPage()
+      addNotePage.getCrissButton().click()
+      addNotePage
+        .getNotesTextarea()
+        .should('have.value', 'Check in\n\nReview\n\nIntervention\n\nSummarise\n\nSet tasks')
+    })
+
+    it('should not add CRISS headers if notes textarea contains a value', () => {
+      loadPage()
+      const notesValue = 'Some notes'
+      addNotePage.getNotesTextarea().type(notesValue)
+      addNotePage.getCrissButton().click()
+      addNotePage.getNotesTextarea().should('have.value', notesValue)
+    })
+
+    it('should display validation errors if continue button is clicked without first selecting a sensitive option', () => {
+      loadPage()
+      const note = 'x'.repeat(4000)
+      cy.get('#notes').invoke('val', note).trigger('input')
+      addNotePage.getSubmitBtn().click()
+      addNotePage.checkErrorSummaryBox(['Select whether or not the appointment note contains sensitive information'])
+      addNotePage
+        .getElement(`#sensitivity-error`)
+        .should('contain.text', 'Select whether or not the appointment note contains sensitive information')
+      addNotePage.getErrorSummaryLink(0).click()
+      addNotePage.getElement(`#sensitivity`).should('be.focused')
+    })
+
+    it('should display validation errors if note is more than 12000 character', () => {
+      loadPage()
+      const note = 'x'.repeat(12001)
+      cy.get('#notes').invoke('val', note).trigger('input')
+      addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+      addNotePage.getSubmitBtn().click()
+      addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+      addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 12000 characters or less')
+      cy.get('.govuk-character-count__status').should('contain.text', 'You have 1 character too many')
+    })
+
+    it('should count a return as 1 character', () => {
+      loadPage()
+      cy.get('#notes').then($el => {
+        const paragraph = 'x'.repeat(6000)
+        const value = `${paragraph}\n\n${paragraph}`
+        $el.val(value)
+        $el[0].dispatchEvent(new Event('input', { bubbles: true }))
+      })
+      addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+      addNotePage.getSubmitBtn().click()
+      addNotePage.checkErrorSummaryBox(['Note must be 12000 characters or less'])
+      addNotePage.getElement(`#notes-error`).should('contain.text', 'Note must be 12000 characters or less')
       cy.get('.govuk-character-count__status').should('contain.text', 'You have 2 characters too many')
     })
 
@@ -226,38 +313,14 @@ describe('Add a note', () => {
       manageAppointmentPage = new ManageAppointmentPage()
     })
 
-    xit('should hide the file delete button when feature toggle is disabled', () => {
-      const checkAddedFiles = (reload = false) => {
-        const assertion = reload ? 'not.be.visible' : 'not.exist'
-        addNotePage.getFileUploadListItem('success', 'text', 0).should('contain.text', fileName)
-        addNotePage.getFileUploadListItem('success', 'status', 0).should('contain.text', 'Uploaded')
-        addNotePage.getFileUploadListItemDeleteButton(0).should('not.be.visible')
-        addNotePage
-          .getFileUploadListItem('error', 'text', 1)
-          .should('contain.text', `${fileName2}: File type must be pdf or word`)
-        addNotePage.getFileUploadListItem('error', 'status', 1).should('contain.text', 'Upload failed')
-        addNotePage.getFileUploadListItemDeleteButton(1).should(assertion)
-        addNotePage
-          .getFileUploadListItem('error', 'text', 2)
-          .should('contain.text', `${fileName3}: File size must be 5mb or under`)
-        addNotePage.getFileUploadListItem('error', 'status', 2).should('contain.text', 'Upload failed')
-        addNotePage.getFileUploadListItemDeleteButton(1).should(assertion)
-      }
-      cy.task('stubNoDeleteAppointmentFiles')
-      cy.intercept('POST', '/appointments/file/upload').as('fileUpload')
+    it('should submit the page successfully if sensitivity option is selected then continue is clicked', () => {
       loadPage()
-      const [fakeFile, fileName] = createFakeFile(1, 'pdf')
-      const [fakeFile2, fileName2] = createFakeFile(1, 'png')
-      const [fakeFile3, fileName3] = createFakeFile(6, 'pdf')
-      addNotePage.getChooseFilesButton().click()
-      cy.get('.moj-multi-file-upload__input').attachFile([fakeFile, fakeFile2, fakeFile3])
-      cy.wait('@fileUpload')
-      checkAddedFiles()
+      addNotePage.getSensitiveInformation().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
       addNotePage.getSubmitBtn().click()
-      const reload = true
-      checkAddedFiles(reload)
+      manageAppointmentPage = new ManageAppointmentPage()
     })
   })
+
   describe('Arrange an appointment in the past', () => {
     const loadPage = () => {
       completeSentencePage()

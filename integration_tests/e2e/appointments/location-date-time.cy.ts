@@ -296,17 +296,13 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElementInput(`endTime`).focus().type('11:15')
       locationDateTimePage.getSubmitBtn().click()
     })
-    it('should display the error summary box', () => {
-      locationDateTimePage.checkErrorSummaryBox([
-        'Choose a time that does not clash with Alton’s existing appointment at 11am to 12pm',
-      ])
-    })
-    it('should display the error messages', () => {
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include(
-          'Choose a time that does not clash with Alton’s existing appointment at 11am to 12pm',
+    it('should display the overlapping appointment warning', () => {
+      cy.get('[data-qa=overlapsWithMeetingWith]')
+        .should('be.visible')
+        .should(
+          'contain.text',
+          'Alton has an existing appointment at 11am to 12pm that overlaps with this time. Continue with these details or make changes',
         )
-      })
     })
   })
 
@@ -314,9 +310,9 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      locationDateTimePage.getDatePickerInput().type('1/1/2200')
-      locationDateTimePage.getElementInput(`startTime`).type('10:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('11:00')
+      locationDateTimePage.getDatePickerInput().clear().type('1/1/2200')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('11:00')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {

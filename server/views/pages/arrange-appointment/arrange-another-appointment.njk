@@ -3,6 +3,9 @@
 {% set notStandardForm = true %}
 {% set anotherAppointment = true %}
 {% set buttonText = "Arrange appointment" %}
+{% if isInPast != true and isInPast != null %}
+    {% set showCalendarInsetText = true %}
+{% endif %}
 {% block beforeContent %}{% endblock %}
 {% block primary %}
     <div class="govuk-grid-row">

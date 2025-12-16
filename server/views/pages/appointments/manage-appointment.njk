@@ -9,10 +9,7 @@
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
-{% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
-  '' %}
-{% set backLink = back + extraBreadcrumb if back else 
-  '/case/' + crn + '/appointments' %}
+{% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = nextAppointment.appointment.type | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (

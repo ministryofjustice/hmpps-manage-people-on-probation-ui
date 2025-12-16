@@ -65,7 +65,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient),
     getWhoAttends(hmppsAuthClient),
-    //  getUserProviders(hmppsAuthClient),
+    getUserProviders(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.getConfirmation(),

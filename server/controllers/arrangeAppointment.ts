@@ -1,8 +1,10 @@
 import { v4 as uuidv4 } from 'uuid'
+import { DateTime } from 'luxon'
 import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
   convertToTitleCase,
+  dateIsInPast,
   getDataValue,
   getPersonLevelTypes,
   isNumericString,
@@ -14,6 +16,9 @@ import { ArrangedSession } from '../models/ArrangedSession'
 import {
   renderError,
   postAppointments,
+  getOfficeLocationsByTeamAndProvider,
+  checkAnswers,
+  getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
   getAttendedCompliedProps,
@@ -169,8 +174,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       const { change, validation } = req.query
       const { data } = req.session
-      let { url } = req
-      url = encodeURIComponent(url)
+      const url = encodeURIComponent(req.url)
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
@@ -220,7 +224,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       return res.render(`pages/arrange-appointment/attendance`, { crn, id, errors, change })
     }
   },
-  postWhoWillAttend: () => {
+  postWhoWillAttend: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -233,7 +237,12 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
       if (providerCode) {
-        setDataValue(data, ['appointments', crn, id, 'user'], { teamCode, providerCode, username })
+        setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
+        setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
+        setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
+        await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
+        await getUserOptions(hmppsAuthClient)(req, res)
+        checkAnswers(req, res)
       }
       if (req.session?.data?.appointments?.[crn]?.[id]?.temp) {
         delete req.session.data.appointments[crn][id].temp
@@ -562,15 +571,27 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getCheckYourAnswers: () => {
     return async (req, res) => {
       const repeatingEnabled = res.locals.flags.enableRepeatAppointments === true
-      const { url } = req
+      const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       let location = null
-      const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
+      const {
+        start,
+        date,
+        user: { locationCode: selectedLocation },
+      } = getDataValue(data, ['appointments', crn, id])
+      const { isInPast } = dateIsInPast(date, start)
       if (![`LOCATION_NOT_IN_LIST`, 'NO_LOCATION_REQUIRED'].includes(selectedLocation)) {
         location = res.locals.userLocations.find((loc: any) => loc.description === selectedLocation)
       }
-      return res.render(`pages/arrange-appointment/check-your-answers`, { crn, id, location, url, repeatingEnabled })
+      return res.render(`pages/arrange-appointment/check-your-answers`, {
+        crn,
+        id,
+        location,
+        url,
+        repeatingEnabled,
+        isInPast,
+      })
     }
   },
   postCheckYourAnswers: hmppsAuthClient => {
@@ -580,6 +601,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
+      const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -616,13 +638,19 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
 
   getArrangeAnotherAppointment: () => {
     return async (req, res) => {
-      const { url } = req
+      const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
-      if (!getDataValue<AppointmentSession>(data, ['appointments', crn, id])) {
+      const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])
+      if (!appointment) {
         return res.redirect(`/case/${crn}/appointments`)
       }
-      return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id })
+      const { date, start } = appointment
+      let isInPast = null
+      if (date) {
+        ;({ isInPast } = dateIsInPast(date, start))
+      }
+      return res.render(`pages/arrange-appointment/arrange-another-appointment`, { url, crn, id, isInPast })
     }
   },
   postArrangeAnotherAppointment: hmppsAuthClient => {

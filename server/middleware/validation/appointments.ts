@@ -26,7 +26,7 @@ const appointments: Route<void> = (req, res, next) => {
     contactId,
     actionType,
     personLevel,
-    maxCharCount,
+    maxCharCount: maxCharCount as number,
     back,
     change,
     alertDismissed,
@@ -186,7 +186,7 @@ const appointments: Route<void> = (req, res, next) => {
           contactId,
           page: 'supporting-information',
           notes: req.body.appointments[crn][id].notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }
@@ -217,7 +217,7 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           page: `arrange-appointment/${id}/add-note`,
           notes: req.body.appointments[crn][id].notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }
@@ -234,7 +234,7 @@ const appointments: Route<void> = (req, res, next) => {
           id,
           page: `appointment/${contactId}/add-note`,
           notes: req.body.notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
           contactId,
         }),
       )
@@ -250,7 +250,7 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'reschedule-appointment',
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }

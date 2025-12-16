@@ -179,7 +179,10 @@ export default abstract class Page {
     })
   }
 
-  getSummaryListRow = (index: number) => {
+  getSummaryListRow = (index: number, summary?: string) => {
+    if (summary) {
+      return cy.get(`[data-qa="${summary}"] .govuk-summary-list__row:nth-child(${index})`)
+    }
     return cy.get(`.govuk-summary-list__row:nth-child(${index})`)
   }
 
@@ -194,6 +197,8 @@ export default abstract class Page {
   }
 
   getElementByDataQA = (name: string): PageElement => cy.get(`[data-qa="${name}"]`)
+
+  hideMessageLink = (): PageElement => cy.get('#hide-message')
 
   getLogOutcomesAlertBanner = (): PageElement => cy.get('[data-module="serviceAlert"]')
 }

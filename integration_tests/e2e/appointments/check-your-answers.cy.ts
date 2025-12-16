@@ -55,16 +55,20 @@ const loadPage = ({
 
 describe('Check your answers then confirm the appointment', () => {
   let confirmPage: AppointmentConfirmationPage
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
-
   describe('Appointment date is in the future', () => {
     it('should render the page', () => {
       loadPage()
       const cyaPage = new AppointmentCheckYourAnswersPage()
       checkPopHeader('Alton Berge', true)
-      checkAppointmentSummary(cyaPage)
+      const showsProbationPractitioner = true
+      checkAppointmentSummary(cyaPage, showsProbationPractitioner)
+      cy.get('[data-qa="calendarInviteInset"]').should(
+        'contain.text',
+        `You'll receive a calendar invite for the appointment`,
+      )
     })
 
     it('should render the page with VISOR report', () => {
@@ -145,7 +149,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
     it('should display the attended and complied row', () => {
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkAppointmentSummary(cyaPage, false, true)
+      checkAppointmentSummary(cyaPage, false, false, true)
       it('should update the notes when value is changed', () => {
         checkUpdateNotes(cyaPage)
       })

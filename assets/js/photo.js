@@ -81,6 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
 })
 
 const show = el => {
+  // Safely handle missing elements
+  if (!el) return
   const element = el
   element.classList.remove('es-hidden')
   element.classList.add('es-show')
@@ -88,6 +90,8 @@ const show = el => {
 }
 
 const hide = el => {
+  // Safely handle missing elements
+  if (!el) return
   const element = el
   element.classList.remove('es-show')
   element.classList.add('es-hidden')
@@ -229,7 +233,15 @@ if (registerButton) {
     const button = event.target
     button.setAttribute('disabled', 'disabled')
     try {
-      const registerResponse = await fetch('/practitioners/register/begin', {
+      const crnInput = document.getElementById('hiddenCrn')
+      const idInput = document.getElementById('hiddenId')
+      if (!crnInput || !idInput || !crnInput.value || !idInput.value) {
+        throw Object.assign(new Error('Missing CRN or appointment ID'), { type: 'CONFIG_ERROR' })
+      }
+      const crn = crnInput.value
+      const id = idInput.value
+      const checkinUrl = `/case/${crn}/appointments/${id}/check-in/confirm-start`
+      const registerResponse = await fetch(checkinUrl, {
         method: 'POST',
         headers: {
           'x-csrf-token': document.querySelector('input[name=_csrf]').value,
@@ -253,14 +265,12 @@ if (registerButton) {
           code: result.code || 'REGISTRATION_FAILED',
         })
       }
-
       const image = localStorage.getItem(IMAGE_SESSION_KEY)
       if (!image) {
         console.warn('Image not found in session storage')
         return
       }
-
-      const { url } = result.uploadLocation
+      const { url } = result.uploadLocation.locationInfo
       const uploadImageResult = await fetch(url, {
         method: 'PUT',
         body: dataUrlToBlob(image),
@@ -268,7 +278,6 @@ if (registerButton) {
           'Content-Type': IMAGE_CONTENT_TYPE,
         },
       })
-
       if (!uploadImageResult.ok) {
         const uploadError = await uploadImageResult.text().catch(() => '')
         throw Object.assign(new Error(`Image upload failed: ${uploadImageResult.status}`), {
@@ -277,7 +286,6 @@ if (registerButton) {
           body: uploadError,
         })
       }
-
       // Success: clear session, set hidden field, and submit form
       localStorage.removeItem(IMAGE_SESSION_KEY)
       document.getElementById('setupId').value = result.setup.uuid
@@ -294,12 +302,10 @@ if (registerButton) {
 const showRegistrationError = error => {
   let errorMessage = 'An error occurred during registration'
   let messageDetail = ''
-
   const parsed = error.body ? JSON.parse(error.body) : {}
   if (parsed && typeof parsed.message === 'string') {
     messageDetail = parsed.message
   }
-
   // Show friendlier messages for known error cases
   if (error.status === 422 && messageDetail.toLowerCase().includes('contact information')) {
     errorMessage = "The email address or phone number you've entered is already associated with another person"

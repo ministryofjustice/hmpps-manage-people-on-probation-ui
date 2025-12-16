@@ -1,5 +1,10 @@
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
-{% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?' + queryParams + '&back=' + baseUrl if entry.isAppointment else '/case/' + crn + '/activity/' + entry.id + '?' + queryParams %}
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+{% if entry.isAppointment %}
+      {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+{% elif entry.esupervisionId %}
+      {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
+{% endif %}
 
 <table class="govuk-table govuk-!-margin-top-4">
   <thead class="govuk-table__head">
@@ -21,12 +26,12 @@
         <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
         {% endif %}
         <li>
-          {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false %}
+          {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false and not entry.esupervisionId %}
             <div class="govuk-hint govuk-!-margin-bottom-1">
               <a href="{{ link }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
                 <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
             </div>
-          {% else %}
+          {% elif flags.enableESuperVision === true or not entry.esupervisionId %}
             {% include "./_compact-timeline-entry.njk" %}
           {% endif %}
         </li>

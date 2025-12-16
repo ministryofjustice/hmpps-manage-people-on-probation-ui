@@ -9,6 +9,7 @@ import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import { MpopMultiFileUpload } from './mpop-multi-file-upload.mjs'
 import setupAlertsPage from './alerts'
+import setupTechnicalUpdates from './technical-updates'
 import './photo'
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
@@ -334,6 +335,14 @@ const recentCaseDisplay = () => {
   }
 }
 
+const changeAttendeeLink = document.querySelector('[data-qa=changeAttendeeLink]')
+if (changeAttendeeLink) {
+  changeAttendeeLink.addEventListener('click', e => {
+    e.preventDefault()
+    e.currentTarget.closest('form').submit()
+  })
+}
+
 class ServiceAlert {
   constructor() {
     this.alert = document.querySelector('[data-module="serviceAlert"]')
@@ -451,4 +460,5 @@ homeSearch()
 crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
+setupTechnicalUpdates()
 new ServiceAlert()

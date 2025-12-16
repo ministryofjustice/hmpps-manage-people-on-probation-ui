@@ -4,7 +4,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
-import { getDataValue } from '../utils'
+import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 
@@ -17,6 +17,8 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
     const { data } = req.session
+    // eslint-disable-next-line no-useless-escape
+    const regexIgnoreValuesInParentheses = /[\(\)]/
 
     let userIsAttending = null
     if (req?.session?.data?.appointments?.[crn]?.[id]?.user?.username && loggedInUsername) {
@@ -81,36 +83,14 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
-      const users: User[] = getDataValue(data, ['staff', loggedInUsername])
-      let selectedRegion = ''
-      let selectedTeam = ''
-      let selectedUser = ''
-      if (providerCode && providers) {
-        selectedRegion = providers.find(r => r.code === providerCode)?.name
-        if (!selectedRegion) {
-          const { providers: attendingUserProviders } = await masClient.getUserProviders(staffId)
-          selectedRegion = attendingUserProviders.find(provider => provider.code === providerCode)?.name
-        }
-      }
-      if (teamCode && teams) {
-        selectedTeam = teams.find(team => team.code === teamCode)?.description
-        if (!selectedTeam) {
-          const { teams: attendingUserTeams } = await masClient.getUserProviders(staffId)
-          selectedTeam = attendingUserTeams.find(team => team.code === teamCode)?.description
-        }
-      }
-      if (!selectedRegion) selectedRegion = res.locals.defaultUser.homeArea
-      if (!selectedTeam) selectedTeam = res.locals.defaultUser.team
-      if (staffId && users) {
-        selectedUser = users.find(user => user.username.toLowerCase() === staffId.toLowerCase())?.nameAndRole
-        if (!selectedUser) {
-          selectedRegion = res.locals.defaultUser.homeArea
-          selectedTeam = res.locals.defaultUser.team
-          selectedUser = users.find(
-            user => user.username.toLowerCase() === res.locals.defaultUser.username,
-          )?.nameAndRole
-        }
-      }
+      const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
+      const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
+      const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
+      const selectedUser = convertToTitleCase(
+        staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
+        [],
+        regexIgnoreValuesInParentheses,
+      )
 
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode

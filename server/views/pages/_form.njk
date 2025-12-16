@@ -11,7 +11,7 @@
 {% block content %}
   {% if not checkinPhotoPage %}
     {% include "../partials/pop-header.njk" %}
-      <hr class="govuk-section-break--l">
+    <hr class="govuk-section-break--l">
   {% endif %}
   {% if notStandardForm %}
     {% block primary %}{% endblock %}
@@ -26,16 +26,16 @@
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
+          {% endif %}
         {% endif %}
-    {% endif %}
-    {% block heading %}
-        {% if title %}
+        {% block heading %}
+          {% if title %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
               {{ title }}
             </h2>
           {% endif %}
         {% endblock %}
-        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %}>
+        <form method="post" autocomplete="off" action="{{ action if action else paths.current }}"{% if multipartForm %} enctype="multipart/form-data"{% endif %} {% if formId %} id="{{ formIdName }}"{% endif %}>
           {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
           {% block form %}{% endblock %}
           {% if not hideButton %}
@@ -44,12 +44,14 @@
                 html: buttonText if buttonText else 'Continue',
                 isStartButton: buttonText === 'Start now',
                 id: submitButtonId if submitButtonId else 'submit-btn',
+                name: 'submit-btn',
                 attributes: {
                   'data-qa': 'submit-btn'
                 }
               }) }}
-              {% if  showAnchorLink === true %}
-                   <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink"> {{ formAnchorText }}</a>
+              {% if showAnchorLink === true %}
+                <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink">
+                  {{ formAnchorText }}</a>
               {% endif %}
             </div>
           {% endif %}

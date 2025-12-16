@@ -3,12 +3,14 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import {
   autoStoreSessionData,
   getPersonalDetails,
-  getWhoAttends,
   getOfficeLocationsByTeamAndProvider,
   getSentences,
   getAppointmentTypes,
   getAppointment,
   redirectWizard,
+  getDefaultUser,
+  getUserOptions,
+  routeChangeAttendee,
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -26,7 +28,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/*path',
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient),
-    getWhoAttends(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
   )
   router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
@@ -36,7 +37,6 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post('/case/:crn/arrange-appointment/:id/*path', [
     autoStoreSessionData(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getWhoAttends(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
   ])
@@ -49,23 +49,30 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.get(
     '/case/:crn/arrange-appointment/:id/type-attendance',
     redirectWizard(['eventId']),
+    getAppointmentTypes(hmppsAuthClient),
+    getPersonalDetails(hmppsAuthClient),
+    getDefaultUser(hmppsAuthClient),
+    getAppointment(hmppsAuthClient),
     controllers.arrangeAppointments.getTypeAttendance(),
   )
 
   router.post(
     '/case/:crn/arrange-appointment/:id/type-attendance',
+    routeChangeAttendee,
     validate.appointments,
     controllers.arrangeAppointments.postTypeAttendance(),
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
     redirectWizard(['eventId']),
+    getUserOptions(hmppsAuthClient),
+
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/attendance',
     validate.appointments,
-    controllers.arrangeAppointments.postWhoWillAttend(),
+    controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient),
   )
 
   router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)

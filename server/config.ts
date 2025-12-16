@@ -102,7 +102,7 @@ export default {
     link: get('CAVAL_LINK', 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk', requiredInProduction),
   },
   esupervision: {
-    link: get('ESUPERVISION_LINK', 'https://esupervision-dev.hmpps.service.justice.gov.uk/', {
+    link: get('ESUPERVISION_LINK', 'https://esupervision-dev.hmpps.service.justice.gov.uk', {
       requireInProduction: false,
     }),
   },
@@ -112,6 +112,18 @@ export default {
   flipt: {
     url: get('FLIPT_URL', 'http://localhost:8100', requiredInProduction),
     token: get('FLIPT_TOKEN', 'FLIPT_TOKEN', requiredInProduction),
+  },
+  probationFrontendComponents: {
+    connectSrc: get(
+      'PROBATION_FRONTEND_COMPONENTS_CONNECT_SRC',
+      'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+    fontSrc: get(
+      'PROBATION_FRONTEND_COMPONENTS_FONT_SRC',
+      'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
   },
   apis: {
     appInsights: {
@@ -204,6 +216,14 @@ export default {
       },
       agent: new AgentConfig(Number(get('PROBATION_FRONTEND_COMPONENTS_API_TIMEOUT_RESPONSE', 10000))),
     },
+    eSupervisionApi: {
+      url: get('E_SUPERVISION_API_URL', 'http://localhost:8100', requiredInProduction),
+      timeout: {
+        response: Number(get('E_SUPERVISION_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('E_SUPERVISION_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('ESUP_API_TIMEOUT_RESPONSE', 10000))),
+    },
   },
   domain: get('INGRESS_URL', 'http://localhost:3000', requiredInProduction),
   environmentName: get('ENVIRONMENT_NAME', ''),
@@ -219,7 +239,7 @@ export default {
   },
   maxFileSize: 5 * 1024 * 1024, // 5mb
   fileUploadLimit: 5,
-  maxCharCount: 4000,
+  maxCharCount: get('CHAR_COUNT', 12000, requiredInProduction),
   preservedWords: ['(NS)', '(Non', 'NS)'],
   preservedSeparators: ['-'],
 }

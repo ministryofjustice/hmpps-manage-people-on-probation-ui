@@ -297,7 +297,6 @@ describe('controllers/appointments', () => {
         back: undefined,
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
-        queryParams: ['view=default'],
         url: '',
         canReschedule: true,
         contactId: '1234',
@@ -483,7 +482,7 @@ describe('controllers/appointments', () => {
         fileUploadLimit,
         maxFileSize,
         url: '',
-        maxCharCount: 4000,
+        maxCharCount: 12000,
         validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })
@@ -694,7 +693,6 @@ describe('controllers/appointments', () => {
         crn,
         contactId,
         back: undefined,
-        queryParams: ['view=default'],
       })
     })
   })

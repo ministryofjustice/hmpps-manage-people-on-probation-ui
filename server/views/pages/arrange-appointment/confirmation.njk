@@ -33,7 +33,7 @@
 {% endfor %}
 {% set cases = "/case/" %}
 {% set overViewLink = "/case/" + crn %}
-{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
+{% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment?back=" + url %}
 {% endset %}
 
 {% set panelHtml %}

@@ -1,6 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = "Does this photo meet the rules?" %}
-{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/upload-a-photo' %}
+{% set backPage =  "take-a-photo" if photoUpload else  "upload-a-photo" %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + backPage %}
+{% set summaryLink =  '/case/' + crn + '/appointments/' + id + '/check-in/checkin-summary' %}
 {% set hideButton =  true %}
 {% set checkinPhotoPage =  true %}
 {% block form %}
@@ -17,7 +19,8 @@
         <span>Image</span>
     </div>
     <div class="govuk-button-group">
-            <a href="{{ backLink }}" class="govuk-button govuk-button--secondary">No, upload another photo</a>
+            <a href="{{ summaryLink }}" class="govuk-button" data-qa="submit-btn">Yes, continue</a>
+            <a href="{{ backLink }}" class="govuk-button govuk-button--secondary" data-qa="anotherPhotoBtn">No, upload another photo</a>
     </div>
 {% endblock %}
 

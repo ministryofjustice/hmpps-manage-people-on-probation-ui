@@ -18,6 +18,11 @@
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
+{% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up online check ins'%}
+{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
+  checkinLink %}
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
@@ -121,14 +126,22 @@
 {% endblock %}
 
 {% block pageContent %}
+  {% if personalDetails.dateOfDeath %}
+    {{ govukWarningText({
+  text: "There is a date of death recorded for " + overview.personalDetails.name.forename + ".",
+  iconFallbackText: "Warning",
+  attributes: {
+    'data-qa': 'dateOfDeathWarning'
+  }
+}) }}
+  {% endif %}
+  {% if 'very high' in (riskToStaff.levelDescription | lower) %}
+    {% set level = 'VERY_HIGH' %}
+  {% else %}
+    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
+  {% endif %}
 
-    {% if 'very high' in (riskToStaff.levelDescription | lower) %}
-        {% set level = 'VERY_HIGH' %}
-    {% else %}
-        {% set level = riskToStaff.levelDescription or riskToStaff.level %}
-    {% endif %}
-
-    {% if level and (level | upper == 'VERY_HIGH' or level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
+  {% if level and(level | upper == 'VERY_HIGH' or level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
     {% set html %}
     <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
     {% endset %}
@@ -189,10 +202,56 @@
       }
     }) }}
 
+  {% set checkin %}
+  {% set nextCheckin = offenderCheckinsByCRNResponse %}
+  {% set nextCheckinText %}
+  {% if nextCheckin %}
+    {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
+                        value: { html: '<span data-qa="firstCheckInValue">' + nextCheckin.firstCheckin | dateWithDayAndWithoutYear + '</span>'}
+                    },
+                    {
+                        key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
+                        value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span>'}
+                    }
+                ]
+            }) }}
+  {% else %}
+    {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
+                        value: { html: '<span data-qa="checkinDueValue"> Online check ins not set up </span>'}
+                    }
+                ]
+            }) }}
+  {% endif %}
+  {% endset %}
+  {% endset %}
+  {% if flags.enableESuperVision === true %}
+    {{ appSummaryCard({
+        titleText: 'Online check ins',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinCard'},
+        html: nextCheckinText,
+        actions: {
+            items: [
+                {
+                    text: checkinLinkText,
+                    href: checkinHrefLink
+                }
+            ]
+        }
+    }) }}
+  {% endif %}
+
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}
-  {{ overview.personalDetails.dateOfBirth | dateWithYear }} ({{ overview.personalDetails.dateOfBirth | yearsSince }} years old)
-            {% set contactNumber %}
+  {{ overview.personalDetails.dateOfBirth | dateWithYear + (" (" + overview.personalDetails.dateOfBirth | yearsSince + " years old)" if not personalDetails.dateOfDeath ) }}
+  {% set contactNumber %}
   {% if overview.personalDetails.telephoneNumber %}
     {{ overview.personalDetails.telephoneNumber }}<br/>
   {% endif %}
@@ -204,6 +263,11 @@
                 {% endif %}
   {% endset %}
   {% endset %}
+  {% if personalDetails.dateOfDeath %}
+    {% set dateOfDeathAndAge %}
+    {{ personalDetails.dateOfDeath | dateWithYear }} ({{ overview.personalDetails.dateOfBirth | yearsBetween(personalDetails.dateOfDeath) }} years old)
+        {% endset %}
+  {% endif %}
   {% set circumstances %}
   {% if overview.personalDetails.personalCircumstances.length > 0 %}
     <ul class="govuk-list">
@@ -264,6 +328,10 @@
             value: { html: '<span data-qa="dateOfBirthAndAgeValue">' + dateOfBirthAndAge + '</span>'}
           },
           {
+            key: { html: '<span data-qa="dateOfDeathAndAgeLabel">Date of death</span>'},
+            value: { html: '<span data-qa="dateOfDeathAndAgeValue">' + dateOfDeathAndAge + '</span>'}
+          } if dateOfDeathAndAge,
+          {
             key: { html: '<span data-qa="contactNumberLabel">Contact number</span>'},
             value: { html: '<span class="app-!-font-family-tabular" data-qa="contactNumberValue">' + contactNumber + '</span>'}
           },
@@ -308,7 +376,7 @@
 
   {% if currentRisksToThemselves.length == 1 %}
     <p>Immediate concerns about {{ currentRisksToThemselves[0] }}</p>
-  {% elseif currentRisksToThemselves.length > 0 %}
+  {% elif currentRisksToThemselves.length > 0 %}
     <p>Immediate concerns about:</p>
     <ul class="govuk-list govuk-list--bullet">
       {% for risk in currentRisksToThemselves %}
@@ -319,7 +387,7 @@
 
   {% if previousRisksToThemselves.length == 1 %}
     <p>Previous concerns about {{ previousRisksToThemselves[0] }}</p>
-  {% elseif previousRisksToThemselves.length > 0 %}
+  {% elif previousRisksToThemselves.length > 0 %}
     <p>Previous concerns about:</p>
     <ul class="govuk-list govuk-list--bullet">
       {% for risk in previousRisksToThemselves %}
@@ -567,7 +635,7 @@
                     {{ overview.activity.acceptableAbsenceCount }} acceptable absences <br/>
                     {{ overview.activity.rescheduledCount }} rescheduled<br/>
                     <p>
-                      <a href={{crn}}/activity-log>View all activity details</a>
+                      <a href={{crn}}/activity-log>View all contacts details</a>
                     </p>
                   {% else %}
                 None
@@ -584,7 +652,7 @@
             value: { html: '<span data-qa="complianceValue">' + compliance + '</span>'}
           },
           {
-            key: { html: '<span data-qa="activityLogLabel">Activity log</span>'},
+            key: { html: '<span data-qa="activityLogLabel">Contacts</span>'},
             value: { html: '<span data-qa="activityLogValue">' + activity + '</span>'}
           }
         ]

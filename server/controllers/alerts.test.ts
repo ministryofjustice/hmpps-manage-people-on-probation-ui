@@ -90,7 +90,7 @@ describe('alertsController', () => {
   })
 
   describe('getAlerts', () => {
-    it('should call getUserAlerts with default page 0 and no sort params, and render the page (Risk Enabled)', async () => {
+    it('should call getUserAlerts with default page 0 and default sort params, and render the page (Risk Enabled)', async () => {
       const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
       res.locals.user = defaultUser
       // Explicitly enable the flag for this test to expect populated risk data
@@ -98,22 +98,21 @@ describe('alertsController', () => {
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
       expect(getRisksSpy).toHaveBeenCalledWith('X123456')
       expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
-        sortQueryString: '',
-        currentSort: { column: undefined, order: undefined },
-        url: '%2Falerts',
+        sortedBy: 'date_and_time.desc',
+        url: encodeURIComponent('/alerts'),
       })
     })
 
     it('should call getUserAlerts with custom page number and sort params, and build query string (Risk Enabled)', async () => {
       const req = httpMocks.createRequest({
-        query: { page: '5', sortBy: 'date', sortOrder: 'desc' },
+        query: { page: '5', sortBy: 'SURNAME.desc' },
         url: '/alerts',
       })
       res.locals.user = defaultUser
@@ -122,16 +121,15 @@ describe('alertsController', () => {
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(5, 'date', 'desc')
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(5, 'SURNAME', 'desc')
       expect(getRisksSpy).toHaveBeenCalledWith('X123456')
       expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
-        sortQueryString: '&sortBy=date&sortOrder=desc',
-        currentSort: { column: 'date', order: 'desc' },
-        url: '%2Falerts',
+        sortedBy: 'SURNAME.desc',
+        url: encodeURIComponent('/alerts'),
       })
     })
 
@@ -142,16 +140,15 @@ describe('alertsController', () => {
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, undefined, undefined)
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
       expect(getRisksSpy).not.toHaveBeenCalled()
       expect(toRoshWidgetSpy).not.toHaveBeenCalled()
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: {}, // Expect empty object
-        sortQueryString: '',
-        currentSort: { column: undefined, order: undefined },
-        url: '%2Falerts',
+        sortedBy: 'date_and_time.desc',
+        url: encodeURIComponent('/alerts'),
       })
     })
   })
@@ -178,7 +175,7 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
-      expect(res.locals.alertsCleared).toEqual({ error: false, message: `1 alert(s) cleared successfully` })
+      expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 1 alert.` })
     })
 
     it('should call clearAlerts with multiple selected alerts and return success', async () => {
@@ -195,7 +192,7 @@ describe('alertsController', () => {
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
-      expect(res.locals.alertsCleared).toEqual({ error: false, message: `2 alert(s) cleared successfully` })
+      expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 2 alerts.` })
     })
   })
 })

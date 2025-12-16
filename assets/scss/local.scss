@@ -82,3 +82,15 @@
   border-left-color: govuk-colour('blue');
   background-color: #eaf4f9;
 }
+
+.guidance-panel--narrow {
+  max-width: 55ch;
+}
+
+.govuk-summary-list__value .es-uploaded-image {
+  margin-bottom: 0;
+  display: inline-block;
+  text-align: left;
+  vertical-align: top;
+}
+

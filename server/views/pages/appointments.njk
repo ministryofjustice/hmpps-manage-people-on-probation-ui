@@ -19,6 +19,10 @@
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
+{% set checkinButtonText = 'Manage online check ins' if offenderCheckinsByCRNResponse else 'Set up online check ins' %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions?back=appointments' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
+{% set checkinLink = manageCheckinLink if offenderCheckinsByCRNResponse else checkinLink %}
 {% set headerActions %}
 <div class="moj-button-group moj-button-group--inline">
   {% if not flags.enableESuperVision %}
@@ -175,7 +179,7 @@
                       </form>
                   </div>
                   <div class="moj-button-group__item">
-                      <a href="/case/{{ crn }}/appointments/check-in/instructions" class="govuk-button govuk-button--secondary govuk-!-margin-left-3" data-qa="online-checkin-btn">Set up online check ins</a>
+                      <a href="{{ checkinLink }}" class="govuk-button govuk-button--secondary govuk-!-margin-left-3" data-qa="online-checkin-btn">{{ checkinButtonText }}</a>
                   </div>
            </div>
           {% endif %}
@@ -253,7 +257,7 @@
       <section data-qa="appointmentHistory">
         <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
         <p>
-          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
+          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the contacts page</a>.</p>
       </section>
     </div>
   </div>

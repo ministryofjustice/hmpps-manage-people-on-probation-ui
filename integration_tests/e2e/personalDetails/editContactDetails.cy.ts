@@ -23,7 +23,7 @@ context('Edit contact details', () => {
     page.getElement('mobileNumber').should('be.visible')
     page.getElement('mobileNumber').find('label').should('contain.text', 'Mobile number')
     page.getElement('mobileNumber').find('.govuk-hint').should('contain.text', 'For example, 07771 900 900')
-    page.getElement('mobileNumber').find('input').should('have.value', '071838893')
+    page.getElement('mobileNumber').find('input').should('have.value', '07783889300')
     page.getElement('emailAddress').should('be.visible')
     page.getElement('emailAddress').find('label').should('contain.text', 'Email address')
     page.getElement('emailAddress').find('.govuk-hint').should('contain.text', 'For example, name@example.com')
@@ -51,16 +51,6 @@ context('Edit contact details', () => {
     page.getErrorSummaryLink(0).click()
     page.getElementInput('phoneNumber').should('be.focused')
   })
-
-  it('Submitting a phone number over 35 chars should show error messages', () => {
-    cy.visit('/case/X000001/personal-details/edit-contact-details')
-    const page = new EditContactDetails()
-    const expectedError = 'Phone number must be 35 characters or less.'
-    submitInvalidCharLength(page, 'phoneNumber')
-    page.getErrorSummaryLink(0).should('contain.text', expectedError)
-    page.getElement('phoneNumberError').should('be.visible').should('contain.text', expectedError)
-  })
-
   it('Submitting a non-numeric mobile number should show error messages', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = new EditContactDetails()
@@ -69,16 +59,6 @@ context('Edit contact details', () => {
     page.getErrorSummaryLink(0).should('contain.text', expectedError)
     page.getElement('mobileNumberError').should('be.visible').should('contain.text', expectedError)
   })
-
-  it('Submitting a mobile number over 35 chars should show error messages', () => {
-    cy.visit('/case/X000001/personal-details/edit-contact-details')
-    const page = new EditContactDetails()
-    const expectedError = 'Mobile number must be 35 characters or less.'
-    submitInvalidCharLength(page, 'mobileNumber')
-    page.getErrorSummaryLink(0).should('contain.text', expectedError)
-    page.getElement('mobileNumberError').should('be.visible').should('contain.text', expectedError)
-  })
-
   it('Submitting an invalid email address should show error messages', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = new EditContactDetails()

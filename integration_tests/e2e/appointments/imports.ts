@@ -243,6 +243,7 @@ export const completeNextAppointmentPage = (index = 1) => {
 
 export const checkAppointmentSummary = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+  probationPractitioner = false,
   repeatingEnabled = false,
   dateInPast = false,
 ) => {
@@ -252,11 +253,24 @@ export const checkAppointmentSummary = (
   page.getSummaryListRow(1).find('.govuk-summary-list__key').should('contain.text', 'Appointment for')
   page.getSummaryListRow(1).find('.govuk-summary-list__value').should('contain.text', '12 month Community order')
   page.getSummaryListRow(3).find('.govuk-summary-list__key').should('contain.text', 'Attending')
-  page
-    .getSummaryListRow(3)
-    .find('.govuk-summary-list__value')
-    .should('contain.text', 'peter parker (PS-PSO)')
-    .should('contain.text', '(Automated Allocation Team, London)')
+  if (probationPractitioner) {
+    page
+      .getSummaryListRow(3)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', 'Deborah Fern')
+      .should('contain.text', '(Automated Allocation Team, London)')
+  } else {
+    page
+      .getSummaryListRow(3)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'Peter Parker' : 'Deborah Fern')
+      .should(
+        'contain.text',
+        page instanceof ArrangeAnotherAppointmentPage
+          ? '(Automated Allocation Team, London)'
+          : '(PS - Other) (Automated Allocation Team, London)',
+      )
+  }
   page.getSummaryListRow(4).find('.govuk-summary-list__key').should('contain.text', 'Location')
   page
     .getSummaryListRow(4)
@@ -434,18 +448,25 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
   })
 }
 
-export const checkLogOutcomesAlert = () => {
+export const checkLogOutcomesAlert = (attendedComplied = false) => {
   it('should render the log outcomes alert banner', () => {
     cy.get('[data-module="serviceAlert"]').as('alert')
     cy.get('@alert')
       .get('.moj-alert__content')
-      .should('contain.text', 'You can only use this service to log attended and complied outcomes.')
-    cy.get('@alert')
-      .get('.moj-alert__content')
-      .should('contain.text', 'You can only use this service to log attended and complied outcomes.')
+      .should(
+        'contain.text',
+        !attendedComplied
+          ? 'You can only use this service to log attended and complied outcomes.'
+          : 'You can only log attended and complied outcomes. If you need to log a different outcome,',
+      )
     cy.get('@alert')
       .get('.moj-alert__content a')
-      .should('contain.text', 'Use NDelius to arrange an appointment in the past with another outcome')
+      .should(
+        'contain.text',
+        !attendedComplied
+          ? 'Use NDelius to arrange an appointment in the past with another outcome'
+          : 'arrange this appointment on NDelius',
+      )
       .should('have.attr', 'href', '#')
       .should('have.attr', 'target', '_blank')
     cy.get('@alert').get('.moj-alert__action button').should('contain.text', 'Dismiss')

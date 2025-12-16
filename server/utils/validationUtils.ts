@@ -23,7 +23,7 @@ export const contactPrefMobileCheck = (args: any[]) => {
   if (!args[0] || args[0] === 'EMAIL') {
     return true
   }
-  return args[0] === 'TEXT' && hasAllDigits(args[1])
+  return args[0] === 'TEXT' && isValidMobileNumber(args[1])
 }
 
 export const isNumeric = (args: any[]) => /^[\d ]+$/.test(args[0])
@@ -151,6 +151,8 @@ export const isValidCharCount = (args: any[]) => {
   const textLength = value.split('\r\n').join('').length
   return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
 }
+
+export const isValidMobileNumber = (string: string) => /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(string)
 
 export function validateWithSpec<R extends Validateable>(
   request: R,

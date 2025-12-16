@@ -1,10 +1,11 @@
 {% extends "../../partials/contacts.njk" %}
 {% set title = "Contact Preferences" %}
-{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/date-frequency' %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'date-frequency' if not cya else 'checkin-summary'%}
 {% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
 {% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use online check ins." %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
+{% set cyaLink =  "?cya=true" if cya else  "" %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -36,7 +37,7 @@
                     value: { html: ('<span data-qa="mobileNumberValue" class="app-!-font-family-tabular">' + checkInMobile+ '</span>') if checkInMobile else '<span data-qa="mobileNumberValue">No mobile number</span>' },
                     actions: {
                     items: [{
-                        href:"/case/" + crn + "/appointments/" + id +"/check-in/edit-contact-preference",
+                        href:"/case/" + crn + "/appointments/" + id +"/check-in/edit-contact-preference" + cyaLink,
                         text: "Change",
                         visuallyHiddenText: "mobile number",
                         attributes: {
@@ -50,7 +51,7 @@
                     value: { html: '<span data-qa="emailAddressValue">' + checkInEmail+ '</span>' if checkInEmail else '<span data-qa="emailAddressValue">No email address</span>' },
                     actions: {
                     items: [{
-                        href:"/case/" + crn + "/appointments/" + id +"/check-in/edit-contact-preference",
+                        href:"/case/" + crn + "/appointments/" + id +"/check-in/edit-contact-preference" + cyaLink,
                         text: "Change",
                         visuallyHiddenText: "email address",
                         attributes: {

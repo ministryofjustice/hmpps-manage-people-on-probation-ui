@@ -10,19 +10,19 @@
 
 {% if hasCurrentSuicideRisk and hasCurrentSelfHarmRisk %}
   {% set text = 'Immediate concerns about suicide and self-harm' %}
-{% elseif hasCurrentSuicideRisk and not hasPreviousSelfHarmRisk %}
+{% elif hasCurrentSuicideRisk and not hasPreviousSelfHarmRisk %}
   {% set text = 'Immediate concerns about suicide' %}
-{% elseif hasCurrentSelfHarmRisk and not hasPreviousSuicideRisk %}
+{% elif hasCurrentSelfHarmRisk and not hasPreviousSuicideRisk %}
   {% set text = 'Immediate concerns about self-harm' %}
-{% elseif hasCurrentSuicideRisk and hasPreviousSelfHarmRisk %}
+{% elif hasCurrentSuicideRisk and hasPreviousSelfHarmRisk %}
   {% set text = 'Immediate concerns about suicide and previous concerns about self-harm' %}
-{% elseif hasCurrentSelfHarmRisk and hasPreviousSuicideRisk %}
+{% elif hasCurrentSelfHarmRisk and hasPreviousSuicideRisk %}
   {% set text = 'Immediate concerns about self-harm and previous concerns about suicide' %}
-{% elseif hasPreviousSuicideRisk and hasPreviousSelfHarmRisk %}
+{% elif hasPreviousSuicideRisk and hasPreviousSelfHarmRisk %}
   {% set text = 'Previous concerns about self-harm and suicide' %}
-{% elseif hasPreviousSuicideRisk %}
+{% elif hasPreviousSuicideRisk %}
   {% set text = 'Previous concerns about suicide' %}
-{% elseif hasPreviousSelfHarmRisk %}
+{% elif hasPreviousSelfHarmRisk %}
   {% set text = 'Previous concerns about self-harm' %}
 {% else %}
   {% set text = 'No concerns' %}
@@ -57,19 +57,19 @@
 
 {% if hasCurrentCustodyRisk and hasCurrentHostelRisk %}
   {% set text = 'Immediate concerns about coping in custody and in a hostel' %}
-{% elseif hasCurrentCustodyRisk and not hasPreviousHostelRisk %}
+{% elif hasCurrentCustodyRisk and not hasPreviousHostelRisk %}
   {% set text = 'Immediate concerns about coping in custody' %}
-{% elseif hasCurrentHostelRisk and not hasPreviousCustodyRisk %}
+{% elif hasCurrentHostelRisk and not hasPreviousCustodyRisk %}
   {% set text = 'Immediate concerns about coping in a hostel' %}
-{% elseif hasCurrentCustodyRisk and hasPreviousHostelRisk %}
+{% elif hasCurrentCustodyRisk and hasPreviousHostelRisk %}
   {% set text = 'Immediate concerns about coping in custody and previous concerns about coping in a hostel' %}
-{% elseif hasCurrentHostelRisk and hasPreviousCustodyRisk %}
+{% elif hasCurrentHostelRisk and hasPreviousCustodyRisk %}
   {% set text = 'Immediate concerns about coping in a hostel and previous concerns about coping in custody' %}
-{% elseif hasPreviousCustodyRisk and hasPreviousHostelRisk %}
+{% elif hasPreviousCustodyRisk and hasPreviousHostelRisk %}
   {% set text = 'Previous concerns about coping in custody or in a hostel' %}
-{% elseif hasPreviousCustodyRisk %}
+{% elif hasPreviousCustodyRisk %}
   {% set text = 'Previous concerns about coping in custody' %}
-{% elseif hasPreviousHostelRisk %}
+{% elif hasPreviousHostelRisk %}
   {% set text = 'Previous concerns about coping in a hostel' %}
 {% else %}
   {% set text = 'No concerns' %}
@@ -101,7 +101,7 @@
 
 {% if hasCurrentRisk %}
   {% set text = 'Immediate concerns about a vulnerability' %}
-{% elseif hasPreviousRisk %}
+{% elif hasPreviousRisk %}
   {% set text = 'Previous concerns about a vulnerability' %}
 {% else %}
   {% set text = 'No concerns' %}

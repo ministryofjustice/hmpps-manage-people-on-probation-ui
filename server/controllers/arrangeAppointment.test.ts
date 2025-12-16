@@ -9,6 +9,9 @@ import {
   postAppointments,
   renderError,
   cloneAppointmentAndRedirect,
+  getOfficeLocationsByTeamAndProvider,
+  checkAnswers,
+  getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
 } from '../middleware'
@@ -36,6 +39,7 @@ jest.mock('../utils', () => {
     isValidUUID: jest.fn(),
     isNumericString: jest.fn(),
     setDataValue: jest.fn(),
+    dateIsInPast: jest.fn().mockImplementation(() => ({ isInPast: false, isToday: false })),
   }
 })
 
@@ -47,6 +51,10 @@ jest.mock('../middleware', () => ({
   findUncompleted: jest.fn(),
   appointmentDateIsInPast: jest.fn(),
   isRescheduleAppointment: jest.fn().mockImplementation(() => true),
+  getOfficeLocationsByTeamAndProvider: jest.fn(() => mockMiddlewareFn),
+  getDefaultUser: jest.fn(() => mockMiddlewareFn),
+  checkAnswers: jest.fn(() => mockMiddlewareFn),
+  getUserOptions: jest.fn(() => mockMiddlewareFn),
 }))
 jest.mock('uuid', () => ({
   v4: jest.fn(),
@@ -78,6 +86,11 @@ const mockedIsNumberString = isNumericString as jest.MockedFunction<typeof isNum
 const mockedSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockedPostAppointments = postAppointments as jest.MockedFunction<typeof postAppointments>
 const mockedCloneAppointment = cloneAppointmentAndRedirect as jest.MockedFunction<typeof cloneAppointmentAndRedirect>
+const mockedCheckAnswers = checkAnswers as jest.MockedFunction<typeof checkAnswers>
+const mockGetOfficeLocationsByTeamAndProvider = getOfficeLocationsByTeamAndProvider as jest.MockedFunction<
+  typeof getOfficeLocationsByTeamAndProvider
+>
+const mockedGetUserOptions = getUserOptions as jest.MockedFunction<typeof getUserOptions>
 const mockedFindUncompleted = findUncompleted as jest.MockedFunction<typeof findUncompleted>
 const mockedAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
@@ -397,11 +410,28 @@ describe('controllers/arrangeAppointment', () => {
         appointmentBody: { temp: { providerCode, teamCode, username } },
       })
       await controllers.arrangeAppointments.postWhoWillAttend()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid, 'user'], {
-        teamCode,
+      expect(mockGetOfficeLocationsByTeamAndProvider).toHaveBeenCalled()
+      expect(mockedGetUserOptions).toHaveBeenCalled()
+      expect(mockedCheckAnswers).toHaveBeenCalledWith(mockReq, res)
+      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+        1,
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'providerCode'],
         providerCode,
+      )
+      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+        2,
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'teamCode'],
+        teamCode,
+      )
+      expect(mockedSetDataValue).toHaveBeenNthCalledWith(
+        3,
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'user', 'username'],
         username,
-      })
+      )
+
       expect(mockReq.session.data.appointments[crn][uuid].temp).toBeUndefined()
     })
     it('should redirect to the next uncompleted field if the change query parameter exists in the url', async () => {
@@ -1061,7 +1091,7 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         back: 'repeating',
         change,
-        maxCharCount: 4000,
+        maxCharCount: 12000,
         showValidation: false,
         isInPast: false,
       })
@@ -1079,7 +1109,7 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         back: 'date-time',
         change,
-        maxCharCount: 4000,
+        maxCharCount: 12000,
         showValidation: false,
         isInPast: false,
       })
@@ -1157,6 +1187,7 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         backendId: 1234,
         isOutLookEventFailed: false,
+        appointmentType: undefined,
       })
     })
   })
@@ -1205,9 +1236,10 @@ describe('controllers/arrangeAppointment', () => {
       })
       await controllers.arrangeAppointments.getArrangeAnotherAppointment()(mockReq, res)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/arrange-another-appointment`, {
-        url,
+        url: encodeURIComponent(url),
         crn,
         id: uuid,
+        isInPast: null,
       })
     })
   })

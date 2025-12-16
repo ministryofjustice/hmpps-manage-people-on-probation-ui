@@ -25,7 +25,9 @@ context('All Upcoming Appointment', () => {
       .should(
         'have.attr',
         'href',
-        '/case/X000001/appointments/appointment/1/manage?back=/case/X000001/upcoming-appointments',
+        `/case/X000001/appointments/appointment/1/manage?back=${encodeURIComponent(
+          '/case/X000001/upcoming-appointments',
+        )}`,
       )
   })
 })
