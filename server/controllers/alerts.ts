@@ -12,7 +12,6 @@ const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
     return async (req, res) => {
       const { user } = res.locals
-      const { page = '0' } = req.query as Record<string, string>
       const url = encodeURIComponent(req.url)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
@@ -24,7 +23,7 @@ const alertsController: Controller<typeof routes, void> = {
       const arnsClient = new ArnsApiClient(token)
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(
-        pageNumber,
+        pageNum - 1,
         sortName.toUpperCase(),
         sortDirection as 'asc' | 'desc',
       )
@@ -49,7 +48,7 @@ const alertsController: Controller<typeof routes, void> = {
           return acc
         }, {})
       }
-      
+
       const pagination: Pagination = getPaginationLinks(
         req.query.page ? pageNum : 1,
         alertsData?.totalPages || 0,
