@@ -21,7 +21,8 @@
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
 {% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up online check ins'%}
-{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else checkinLink %}
+{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
+  checkinLink %}
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
@@ -125,7 +126,15 @@
 {% endblock %}
 
 {% block pageContent %}
-
+  {% if personalDetails.dateOfDeath %}
+    {{ govukWarningText({
+  text: "There is a date of death recorded for " + overview.personalDetails.name.forename + ".",
+  iconFallbackText: "Warning",
+  attributes: {
+    'data-qa': 'dateOfDeathWarning'
+  }
+}) }}
+  {% endif %}
   {% if 'very high' in (riskToStaff.levelDescription | lower) %}
     {% set level = 'VERY_HIGH' %}
   {% else %}
@@ -193,11 +202,11 @@
       }
     }) }}
 
-    {% set checkin %}
-    {% set nextCheckin = offenderCheckinsByCRNResponse %}
-    {% set nextCheckinText %}
-        {% if nextCheckin %}
-            {{ govukSummaryList({
+  {% set checkin %}
+  {% set nextCheckin = offenderCheckinsByCRNResponse %}
+  {% set nextCheckinText %}
+  {% if nextCheckin %}
+    {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
@@ -209,8 +218,8 @@
                     }
                 ]
             }) }}
-        {% else %}
-            {{ govukSummaryList({
+  {% else %}
+    {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
@@ -218,9 +227,9 @@
                     }
                 ]
             }) }}
-        {% endif %}
-    {% endset %}
-    {% endset %}
+  {% endif %}
+  {% endset %}
+  {% endset %}
   {% if flags.enableESuperVision === true %}
     {{ appSummaryCard({
         titleText: 'Online check ins',
