@@ -412,15 +412,23 @@ const checkInsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
       const practitionerId = pp?.username ? pp.username : res.locals.user.username
+      let risk
+      if (checkIn?.riskManagementFeedback) {
+        if (checkIn.riskManagementFeedback === 'yes') {
+          risk = true
+        } else {
+          risk = false
+        }
+      }
       const review: ESupervisionReview = {
         reviewedBy: practitionerId,
         manualIdCheck: checkIn?.manualIdCheck,
         missedCheckinComment: checkIn?.missedCheckinComment,
         notes: checkIn?.furtherActions,
-        riskManagementFeedback: checkIn?.riskManagementFeedback,
+        riskManagementFeedback: risk,
       }
       const eSupervisionClient = new ESupervisionClient(token)
-      await eSupervisionClient.postOffenderCheckInReview(id, review)
+      console.log(await eSupervisionClient.postOffenderCheckInReview(id, review))
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
