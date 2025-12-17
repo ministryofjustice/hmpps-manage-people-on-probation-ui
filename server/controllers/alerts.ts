@@ -86,7 +86,7 @@ const alertsController: Controller<typeof routes, void> = {
       const { url } = req
 
       if (!selectedAlerts || selectedAlerts.length === 0) {
-        res.locals.alertsCleared = { error: true, message: `Select an alert to clear it` }
+        res.locals.alertsCleared = { error: true, message: `Select an alert to clear it.` }
         return next()
       }
 
