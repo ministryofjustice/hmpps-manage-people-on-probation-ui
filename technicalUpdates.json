@@ -1,12 +1,8 @@
 [
   {
-    "heading": "View alerts and get calendar invitations for appointments",
+    "heading": "Get calendar invitations for appointments",
     "summary": "18 December 2025",
     "whatsNew": [
-      "View and clear alerts",
-      [
-        "Alerts for your caseload now appear automatically in Manage people on probation, giving you live updates while you use the service and saving you from opening NDelius to read them. \n\nNow you’ll see a red notification at the top of the screen, clearly showing how many alerts you have and when new alerts arrive. \n\nIn your list of alerts, you can click to reveal more information on each alert without having to open the contact in a new screen. If you need to update the contact the alert is about, the ‘Update’ link takes you straight to that contact on NDelius to make changes. \n\nYou can clear alerts and they’ll disappear in both this service and NDelius, saving you a click."
-      ],
       "Get calendar invitations for appointments with people on probation",
       [
         "To make managing your appointment schedule easier, you now get an automatic meeting invitation in your inbox when you arrange an appointment with a person on probation.\u2028\u2028The invitation appears as private in your calendar, so only you will see the appointment details which include: \nthe title \nthe time and date\na direct link to the appointment within the service \u2028\nIf you arrange an appointment for someone else, they will get the private meeting invitation instead."
