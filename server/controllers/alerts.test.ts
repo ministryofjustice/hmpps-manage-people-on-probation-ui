@@ -69,6 +69,9 @@ tokenStore.getToken.mockResolvedValue('token-alerts')
 const getUserAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserAlerts')
   .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn))
+const getAlertNoteSpy = jest
+  .spyOn(MasApiClient.prototype, 'getUserAlertNote')
+  .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn.content[0]))
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
@@ -199,6 +202,36 @@ describe('alertsController', () => {
 
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 2 alerts.` })
+    })
+  })
+
+  describe('getAlertNote', () => {
+    it('should call alert note API', async () => {
+      const contactId = '0'
+      const noteId = '0'
+      const req = httpMocks.createRequest({
+        params: { contactId, noteId },
+        query: {},
+        url: `/alerts/${contactId}/notes/${noteId}`,
+      })
+      res.locals.user = defaultUser
+      // Explicitly enable the flag for this test to expect populated risk data
+      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+      await controllers.alerts.getAlertNote(hmppsAuthClient)(req, res, next)
+
+      expect(getAlertNoteSpy).toHaveBeenCalledWith('0', '0')
+      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+        alertsData: { content: [mockUserAlertsWithCrn.content[0]] },
+        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
+        sortedBy: 'date_and_time.desc',
+        note: true,
+        unencodedUrl: '/alerts/0/notes/0',
+        url: encodeURIComponent('/alerts/0/notes/0'),
+      })
     })
   })
 })

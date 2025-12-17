@@ -327,6 +327,51 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/alerts/.*/notes/.*",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": 1,
+          "type": {
+            "description": "Email/Text from offender",
+            "editable": true
+          },
+          "crn": "X000001",
+          "date": "2025-07-10",
+          "description": "Email from offending community team",
+          "alertNotes": [
+            {
+              "id": 0,
+              "createdBy": "Custody Status Service",
+              "createdByDate": "2024-07-19",
+              "note": "Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.",
+              "hasNoteBeenTruncated": false
+            }
+          ],
+          "name": {
+            "forename": "Caroline",
+            "middleName": "",
+            "surname": "Wolff"
+          },
+          "officer": {
+            "name": {
+              "forename": "Officer",
+              "middleName": "",
+              "surname": "Test"
+            },
+            "code": "STMOR01"
+          },
+          "riskLevel": "MEDIUM"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }
