@@ -91,21 +91,9 @@ const alertsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const arnsClient = new ArnsApiClient(token)
-      const alertNote = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
-      const caseDetails = await masClient.getPersonalDetails(crn)
-      const alert: UserAlertsContent = {
-        ...alertNote.appointment,
-        officer: alertNote.appointment.officer,
-        id: parseInt(alertNote.appointment.id, 10),
-        type: { description: alertNote.appointment.type, editable: true },
-        crn,
-        name: caseDetails.name,
-        date: alertNote.appointment.startDateTime,
-        alertNotes: alertNote.appointment.appointmentNotes,
-        alertNote: alertNote.appointment.appointmentNote,
-      }
-      const alertsData = { content: [alert] }
+
+      const alertNote: UserAlertsContent = await masClient.getUserAlertNote(contactId, noteId)
+      const alertsData = { content: [alertNote] }
 
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
       let crnToRiskWidgetMap = {}
