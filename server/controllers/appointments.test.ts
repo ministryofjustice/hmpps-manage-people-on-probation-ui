@@ -198,6 +198,7 @@ describe('controllers/appointments', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
+        hasDeceased: false,
         url: '',
       })
     })
@@ -286,6 +287,7 @@ describe('controllers/appointments', () => {
         back: undefined,
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
+        hasDeceased: false,
         url: '',
       })
     })
