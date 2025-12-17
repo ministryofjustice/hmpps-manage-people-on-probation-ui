@@ -5,6 +5,7 @@ import { Route } from '../@types'
 import { CheckAppointment, LocalParams } from '../models/Appointments'
 import { isEmptyObject } from '../utils/isEmptyObject'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
+import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 
 export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -19,9 +20,15 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     setDataValue(data, ['appointments', crn, id, 'previousValues'], { date, startTime, endTime })
     const start = dateTime(date, startTime)
     const end = dateTime(date, endTime)
-
+    const { enablePastAppointments } = res.locals.flags
     const { _minDate, _maxDate } = getMinMaxDates()
-    const localParams: LocalParams = { crn, id, _minDate, _maxDate }
+    const localParams: LocalParams = {
+      crn,
+      id,
+      ...(!enablePastAppointments ? { _minDate } : {}),
+      _maxDate,
+      isInPast: appointmentDateIsInPast(req),
+    }
     const render = `pages/arrange-appointment/location-date-time`
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
