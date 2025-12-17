@@ -69,7 +69,7 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`The appointment has been added to:`)
         })
-      cy.get('[data-qa="outlook-msg"] li').eq(0).should('contain', 'your calendar')
+      cy.get('[data-qa="outlook-msg"] li').eq(0).should('contain.text', `John`)
       cy.get('[data-qa="outlook-msg"] li')
         .eq(1)
         .should('contain', 'the NDelius contact log and officer diary, along with any supporting information')
@@ -135,8 +135,8 @@ describe('Confirmation page', () => {
           })
 
         cy.get('[data-qa="outlook-err-msg-1"]').should(
-          'contain',
-          'There is a technical problem with Outlook and we could not send you a calendar invitation.',
+          'contain.text',
+          'There is a technical problem with Outlook and we could not send a calendar invitation.',
         )
         cy.get('[data-qa="outlook-err-msg-2"]').should(
           'contain',
@@ -182,8 +182,8 @@ describe('Confirmation page', () => {
           })
 
         cy.get('[data-qa="outlook-err-msg-1"]').should(
-          'contain',
-          'There is a technical problem with Outlook and we could not send you a calendar invitation.',
+          'contain.text',
+          'There is a technical problem with Outlook and we could not send a calendar invitation.',
         )
         cy.get('[data-qa="outlook-err-msg-2"]').should(
           'contain',
