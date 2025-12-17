@@ -5,7 +5,6 @@
 {% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
 {% set pageTitle = makePageTitle({pageHeading: "Upcoming appointments"}) %}
 {% set currentNavSection = 'appointments' %}
-{% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
 {% set headerCRN = upcomingAppointments.personSummary.crn %}
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}

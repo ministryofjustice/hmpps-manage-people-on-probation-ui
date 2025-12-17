@@ -6,7 +6,6 @@
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set appointmentsWithoutAnOutcomeCount = overview.appointmentsWithoutOutcome %}
-{% set headerPersonName = overview.personalDetails.name.forename + ' ' + overview.personalDetails.name.surname %}
 {% set headerCRN = crn %}
 {% set headerDob = overview.personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
@@ -119,22 +118,13 @@
           href: "/case"
         },
         {
-          text: headerPersonName
+          text: headerPersonName.forename + ' ' + headerPersonName.surname
         }
       ]
     }) }}
 {% endblock %}
 
 {% block pageContent %}
-  {% if personalDetails.dateOfDeath %}
-    {{ govukWarningText({
-  text: "There is a date of death recorded for " + overview.personalDetails.name.forename + ".",
-  iconFallbackText: "Warning",
-  attributes: {
-    'data-qa': 'dateOfDeathWarning'
-  }
-}) }}
-  {% endif %}
   {% if 'very high' in (riskToStaff.levelDescription | lower) %}
     {% set level = 'VERY_HIGH' %}
   {% else %}

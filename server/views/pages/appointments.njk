@@ -6,8 +6,7 @@
 {% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
 {% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
 {% set currentNavSection = 'appointments' %}
-{% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
-{% set personForename = upcomingAppointments.personSummary.name.forename %}
+{% set personForename = headerPersonName.forename %}
 {% set headerCRN = upcomingAppointments.personSummary.crn %}
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
@@ -116,7 +115,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -146,6 +145,7 @@
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
 
         <h2 class="govuk-heading-l" data-qa="appointments-header-label">Appointments</h2>
+        {% include "../partials/_date-of-death-warning.njk" %}
         {% if not hasDeceased %}
           <div class="moj-button-group moj-button-group--inline govuk-!-margin-bottom-3">
             <div class="moj-button-group__item">
@@ -235,7 +235,7 @@
         {% endif %}
       </section>
       <section data-qa="appointmentHistory">
-        <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
+        <h3 class="govuk-heading-m" id="section3">Appointment history</h3>
         <p>
           <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the contacts page</a>.</p>
       </section>

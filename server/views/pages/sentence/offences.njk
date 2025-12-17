@@ -1,16 +1,17 @@
 {% extends "../../partials/layout.njk" %}
 {% set title = 'Offences' %}
-{% set headerPersonName = offences.name.forename + ' ' + offences.name.surname %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Offences", "Sentence"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Offences", "Sentence"]
+}) %}
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
     {
       text: "Cases",
       href: "/search"
     },
     {
-      text: headerPersonName,
+      text: headerPersonName.forename + ' ' + headerPersonName.surname,
       href: "/case/" + crn,
       attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
     },
@@ -26,17 +27,17 @@
 {% endblock %}
 
 {% block content %}
-    <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
+  <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
 
-    {% set offence = offences.mainOffence %}
-    {% set mainOffence = true %}
-    {% include './_offence.njk' %}
+  {% set offence = offences.mainOffence %}
+  {% set mainOffence = true %}
+  {% include './_offence.njk' %}
 
-    {% set mainOffence = false %}
-    {% if offences.additionalOffences and offences.additionalOffences.length > 0 %}
-      <h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
-      {% for offence in offences.additionalOffences %}
-        {% include './_offence.njk' %}
-      {% endfor %}
-    {% endif %}
+  {% set mainOffence = false %}
+  {% if offences.additionalOffences and offences.additionalOffences.length > 0 %}
+    <h2 class="govuk-heading-l govuk-!-margin-top-8">Additional offences</h2>
+    {% for offence in offences.additionalOffences %}
+      {% include './_offence.njk' %}
+    {% endfor %}
+  {% endif %}
 {% endblock %}
