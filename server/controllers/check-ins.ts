@@ -576,7 +576,13 @@ const checkInsController: Controller<typeof routes, void> = {
         'manageCheckin',
         'editCheckInMobile',
       ])
-      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'])
+      const checkInEmail = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'manageCheckin',
+        'editCheckInEmail',
+      ])
       return res.render('pages/check-in/manage/manage-edit-contact.njk', {
         crn,
         id,
@@ -609,7 +615,11 @@ const checkInsController: Controller<typeof routes, void> = {
         // Save to show success message on contact preferences page
         if (personalDetails?.crn) {
           setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'contactUpdated'], true)
-          setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], editCheckInMobile1)
+          setDataValue(
+            req.session.data,
+            ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'],
+            editCheckInMobile1,
+          )
           setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], editCheckInEmail1)
         }
       }
