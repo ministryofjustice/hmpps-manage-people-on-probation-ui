@@ -61,6 +61,7 @@ export interface PersonalDetails {
   otherAddresses: PersonAddress[]
   preferredGender: string
   dateOfBirth: string
+  dateOfDeath?: string
   preferredName?: string
   previousSurname?: string
   aliases: Name[]
