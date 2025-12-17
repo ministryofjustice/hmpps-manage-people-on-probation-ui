@@ -4,7 +4,6 @@
 {% set pageTitle = makePageTitle({pageHeading: "Documents"}) %}
 {% set currentNavSection = 'documents' %}
 {% set currentSectionName = 'Documents' %}
-{% set headerPersonName = documents.personSummary.name.forename + ' ' + documents.personSummary.name.surname %}
 {% set headerCRN = documents.personSummary.crn %}
 {% set headerDob = documents.personSummary.dateOfBirth %}
 {% set offenderId = documents.personSummary.offenderId %}
@@ -18,7 +17,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },

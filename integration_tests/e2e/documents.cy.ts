@@ -35,6 +35,12 @@ context('Documents', () => {
     page.getElementData('dateModifiedValue3').should('have.text', '6 Mar 2021')
   })
 
+  it('should render the page with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/documents')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
+  })
+
   it('Documents page is rendered with no results', () => {
     cy.task('stubTextSearchOff')
     cy.visit('/case/X777916/documents')

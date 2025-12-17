@@ -9,7 +9,6 @@
     pageHeading: ["Staff contacts", "Personal details"]
   }) %}
 {% endif %}
-{% set headerPersonName = professionalContact.name.forename + ' ' + professionalContact.name.surname %}
 
 {% block beforeContent %}
   {% set breadcrumbItems = [
@@ -18,7 +17,7 @@
       href: "/case"
     },
     {
-      text: headerPersonName,
+      text: headerPersonName.forename + ' ' + headerPersonName.surname,
       href: "/case/" + crn,
       attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
     }

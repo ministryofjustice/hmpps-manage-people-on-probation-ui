@@ -50,9 +50,12 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     res.locals.risksWidget = toRoshWidget(risks)
     res.locals.tierCalculation = tierCalculation
     res.locals.predictorScores = toPredictors(predictors)
-    res.locals.headerPersonName = `${overview.name.forename} ${overview.name.surname}`
+    res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = overview.crn
     res.locals.headerDob = overview.dateOfBirth
+    if (overview?.dateOfDeath) {
+      res.locals.dateOfDeath = overview.dateOfDeath
+    }
     return next()
   }
 }

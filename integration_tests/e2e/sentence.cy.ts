@@ -2,6 +2,9 @@ import Page from '../pages/page'
 import SentencePage from '../pages/sentence'
 
 context('Sentence', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('Sentence page is rendered', () => {
     cy.visit('/case/X000001/sentence')
     const page = Page.verifyOnPage(SentencePage)
@@ -154,6 +157,12 @@ context('Sentence', () => {
     page
       .getRowData('sentence', 'courtDocuments', 'Value')
       .within(() => cy.get('ul > li').eq(2).should('contain.text', 'Unavailable'))
+  })
+
+  it('Sentence page is rendered with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/sentence')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
 
   it('Sentence page is rendered via query parameter', () => {

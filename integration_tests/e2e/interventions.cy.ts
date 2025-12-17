@@ -9,7 +9,7 @@ context('Interventions', () => {
     cy.visit('/case/X000001/interventions')
     const page = Page.verifyOnPage(InterventionsPage)
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     page.pageHeading().should('contain.text', 'Interventions')
 
     page.assertRiskTags()
@@ -30,6 +30,12 @@ context('Interventions', () => {
       .getRowData('interventions', 'referralInterventionTitle1', 'Value')
       .should('contain.text', 'Accommodation Services - North East')
     page.getRowData('interventions', 'referralReferenceNumber1', 'Value').should('contain.text', 'AC2495AC')
+  })
+
+  it('should render the page with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/interventions')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
 
   it('Interventions page is rendered with no results', () => {

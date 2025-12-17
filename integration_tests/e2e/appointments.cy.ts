@@ -13,7 +13,7 @@ context('Appointment', () => {
     const page = Page.verifyOnPage(AppointmentsPage)
 
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     page.assertRiskTags()
 
     page.getElement('[data-qa="upcomingAppointments"]').find('h3').should('contain.text', 'Upcoming appointments')
@@ -33,12 +33,17 @@ context('Appointment', () => {
         `/case/X000001/appointments/appointment/1/manage?back=${encodeURIComponent('/case/X000001/appointments')}`,
       )
   })
+  it('should render the page with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/appointments')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
+  })
   it('Appointments page with upcoming and past appointments is rendered', () => {
     cy.visit('/case/X000001/appointments')
     const page = Page.verifyOnPage(AppointmentsPage)
 
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     page.assertRiskTags()
 
     page.getAlert().should('contain.text', 'medium')
@@ -91,7 +96,7 @@ context('Appointment', () => {
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
 
-    page.getElement('[data-qa="appointmentHistory"]').find('h2').should('contain.text', 'Appointment history')
+    page.getElement('[data-qa="appointmentHistory"]').find('h3').should('contain.text', 'Appointment history')
     page
       .getElement('[data-qa="appointmentHistory"]')
       .find('a')

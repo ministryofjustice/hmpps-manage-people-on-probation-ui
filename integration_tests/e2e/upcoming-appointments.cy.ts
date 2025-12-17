@@ -10,7 +10,7 @@ context('All Upcoming Appointment', () => {
     const page = Page.verifyOnPage(UpcomingAppointmentsPage)
 
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     page.assertRiskTags()
 
     page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'All upcoming appointments')

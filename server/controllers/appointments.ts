@@ -232,7 +232,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
-      const headerPersonName = `${forename} ${surname}`
+      const headerPersonName = { forename, surname }
       res.render('pages/appointments/attended-complied', {
         crn,
         alertDismissed,

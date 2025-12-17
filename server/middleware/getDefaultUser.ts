@@ -60,7 +60,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       sessionTeams = getDataValue(data, ['teams', username]) ?? providerTeams
       sessionStaff = getDataValue(data, ['staff', username]) ?? providerStaff
     }
-    if (attendingUsername.toLowerCase() === probationPractitioner.username.toLowerCase()) {
+    if (attendingUsername.toLowerCase() === probationPractitioner?.username?.toLowerCase()) {
       if (!sessionProviders.some(provider => provider.code === probationPractitioner.provider.code)) {
         sessionProviders = [...sessionProviders, probationPractitioner.provider]
       }
