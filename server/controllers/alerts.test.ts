@@ -161,7 +161,7 @@ describe('alertsController', () => {
 
       await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it` })
+      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it.` })
       expect(clearAlertsSpy).not.toHaveBeenCalled()
     })
 
