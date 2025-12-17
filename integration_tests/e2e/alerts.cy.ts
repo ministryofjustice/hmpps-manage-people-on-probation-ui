@@ -71,10 +71,13 @@ context('Alerts Dashboard', () => {
     cy.get('[data-qa="moreInfo-8"]')
       .find('[data-qa="alertNotes-8"]')
       .find('a')
+      .should('have.attr', 'href', `/alerts/8/note/0?back=${encodeURIComponent('/alerts')}`)
+      .click()
+    cy.get('[data-qa="moreInfo-1"]')
+      .find('[data-qa="alertNotes-1"]')
       .should(
-        'have.attr',
-        'href',
-        `/case/X000002/appointments/appointment/8/manage/note/0?back=${encodeURIComponent('/alerts')}`,
+        'contain.text',
+        'Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.',
       )
   })
 })
