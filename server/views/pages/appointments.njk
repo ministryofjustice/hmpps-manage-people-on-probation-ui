@@ -145,6 +145,7 @@
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
 
         <h2 class="govuk-heading-l" data-qa="appointments-header-label">Appointments</h2>
+        {% include "../partials/_date-of-death-warning.njk" %}
         {% if not hasDeceased %}
           <div class="moj-button-group moj-button-group--inline govuk-!-margin-bottom-3">
             <div class="moj-button-group__item">
