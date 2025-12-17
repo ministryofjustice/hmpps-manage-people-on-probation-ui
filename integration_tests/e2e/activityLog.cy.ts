@@ -42,6 +42,10 @@ context('Contacts', () => {
   const year = today.getFullYear()
   const date = `${day}/${month}/${year}`
 
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
+
   it('should render the 404 error page if CRN does not exist', () => {
     cy.visit('/case/XXXXXXX/activity-log', { failOnStatusCode: false })
     const page = new ErrorPage()
@@ -62,6 +66,11 @@ context('Contacts', () => {
     page.getTimelineCardValue(4, 'outcome', 'Value').should('contain.text', 'User-generated free text content')
     page.getTimelineCardValue(4, 'documents', 'Label').should('contain.text', 'Documents')
     page.getTimelineCardValue(4, 'documents', 'Value').should('contain.text', 'Eula-Schmeler-X000001-UPW.pdf')
+  })
+  it('should render the page with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/activity-log')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')

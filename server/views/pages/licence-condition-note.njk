@@ -1,21 +1,22 @@
 {% extends "../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Sentence", "Licence condition"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Sentence", "Licence condition"]
+}) %}
 {% set currentNavSection = 'sentence' %}
 {% set currentSectionName = 'Sentence' %}
-{% set headerPersonName = licenceNoteDetails.personSummary.name.forename + ' ' + licenceNoteDetails.personSummary.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = licenceNoteDetails.personSummary.dateOfBirth  %}
-{% set headerGender = licenceNoteDetails.personSummary.gender  %}
+{% set headerDob = licenceNoteDetails.personSummary.dateOfBirth %}
+{% set headerGender = licenceNoteDetails.personSummary.gender %}
 
 {% block beforeContent %}
-    {{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
       items: [
         {
           text: "Cases",
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -28,8 +29,8 @@
 {% endblock %}
 
 {% block pageContent %}
-    {% set licenceConditionNote %}
-        {{ govukSummaryList({
+  {% set licenceConditionNote %}
+  {{ govukSummaryList({
         rows: [
           {
             key: { text: 'Subtype' },
@@ -57,15 +58,14 @@
           } if licenceNoteDetails.licenceCondition.licenceConditionNote.note
         ]
       }) }}
-    {% endset %}
+  {% endset %}
 
-    {% if licenceNoteDetails.licenceCondition %}
-        {{ appSummaryCard({
+  {% if licenceNoteDetails.licenceCondition %}
+    {{ appSummaryCard({
           titleText: licenceNoteDetails.licenceCondition.mainDescription,
           attributes: {'data-qa': 'licenceConditionNoteCard'},
           classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
           html: licenceConditionNote
         }) }}
-    {% endif %}
+  {% endif %}
 {% endblock %}
-

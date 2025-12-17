@@ -1,12 +1,11 @@
 {% extends "../../../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: "Personal details" }) %}
+{% set pageTitle = makePageTitle({pageHeading: "Personal details"}) %}
 {% set currentNavSection = 'personal-details' %}
 {% set currentSectionName = 'Personal details' %}
-{% set headerPersonName = personalDetails.name.forename + ' ' + personalDetails.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = personalDetails.dateOfBirth  %}
-{% set headerGender = personalDetails.preferredGender  %}
-{% set noFixedAddress =  personalDetails.mainAddress.noFixedAddress === true %}
+{% set headerDob = personalDetails.dateOfBirth %}
+{% set headerGender = personalDetails.preferredGender %}
+{% set noFixedAddress = personalDetails.mainAddress.noFixedAddress === true %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -16,7 +15,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -37,99 +36,107 @@
 
 {% block pageContent %}
     {% set contactDetails %}
-        {% set mainAddress = personalDetails.mainAddress %}
-            {% set address %}
-                {% if personalDetails.mainAddress %}
-                    {% if mainAddress.noFixedAddress === true %}
+    {% set mainAddress = personalDetails.mainAddress %}
+    {% set address %}
+    {% if personalDetails.mainAddress %}
+        {% if mainAddress.noFixedAddress === true %}
                         No fixed address
                     {% else %}
-                        {% set addressAsList = addressToList(mainAddress) %}
-                            {% if addressAsList.length > 0 %}
-                                {{ addressAsList.join('<br>') | safe }}
-                                <br/>
-                            {% endif %}
-                    {% endif %}
-                    <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-                        <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="addressTypeLabel">Type of address</span>
-                        <span data-qa="addressTypeValue">{{ mainAddress.type + ' (verified)' if mainAddress.verified else mainAddress.type + ' (not verified)' }} </span>
-                    </p>
-                    <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-                        <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressStartDateLabel">Start date</span>
-                        <span data-qa="mainAddressStartDateValue">{{ mainAddress.from | dateWithYear }} </span>
-                    </p>
+            {% set addressAsList = addressToList(mainAddress) %}
+            {% if addressAsList.length > 0 %}
+                {{ addressAsList.join('<br>') | safe }}
+                <br/>
+            {% endif %}
+        {% endif %}
+        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+            <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="addressTypeLabel">Type of address</span>
+            <span data-qa="addressTypeValue">{{ mainAddress.type + ' (verified)' if mainAddress.verified else mainAddress.type + ' (not verified)' }}
+            </span>
+        </p>
+        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+            <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressStartDateLabel">Start date</span>
+            <span data-qa="mainAddressStartDateValue">{{ mainAddress.from | dateWithYear }}
+            </span>
+        </p>
 
-                    {% if mainAddress.addressNote.createdBy %}
-                        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-                            <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteAddedByLabel">Note added by</span>
-                            <span data-qa="mainAddressStartDateValue">{{ mainAddress.addressNote.createdBy }} </span>
-                        </p>
-                        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-                            <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteDateAddedLabel">Date added</span>
-                            <span data-qa="mainAddressStartDateValue">{{ mainAddress.addressNote.createdByDate | dateWithYear }} </span>
-                        </p>
-                    {% endif %}
-                    <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
-                        <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteLabel">Note</span>
-                        <span data-qa="mainAddressNotesValue">
-                            {% if mainAddress.addressNote %}
-                                <p class="govuk-body line-break"> {{ mainAddress.addressNote.note }} </p>
-                            {% else %}
+        {% if mainAddress.addressNote.createdBy %}
+            <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+                <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteAddedByLabel">Note added by</span>
+                <span data-qa="mainAddressStartDateValue">{{ mainAddress.addressNote.createdBy }}
+                </span>
+            </p>
+            <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+                <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteDateAddedLabel">Date added</span>
+                <span data-qa="mainAddressStartDateValue">{{ mainAddress.addressNote.createdByDate | dateWithYear }}
+                </span>
+            </p>
+        {% endif %}
+        <p class="govuk-!-margin-top-2 govuk-!-margin-bottom-0">
+            <span class="govuk-summary-list__key govuk-!-padding-bottom-0" data-qa="mainAddressNoteLabel">Note</span>
+            <span data-qa="mainAddressNotesValue">
+                {% if mainAddress.addressNote %}
+                    <p class="govuk-body line-break">
+                        {{ mainAddress.addressNote.note }}
+                    </p>
+                {% else %}
                                 No notes
                             {% endif %}
-                        </span>
-                    </p>
-            {% else %}
+            </span>
+        </p>
+    {% else %}
                 No main address
             {% endif %}
-        {% endset %}
+    {% endset %}
 
-        {% set personalContacts %}
-            {% if personalDetails.contacts.length > 0 %}
-                <ul class="govuk-list">
-                    {% for contact in personalDetails.contacts %}
-                        <li>
-                            <p>
-                                {{ contact.relationshipType }}:<br />
-                                <a data-ai-id="personalContactLink" href="personal-details/personal-contact/{{ contact.contactId }}">{{ contact.name | fullName }} – {{ contact.relationship }}</a>
-                            </p>
-                        </li>
-                    {% endfor %}
-                </ul>
-            {% else %}
+    {% set personalContacts %}
+    {% if personalDetails.contacts.length > 0 %}
+        <ul class="govuk-list">
+            {% for contact in personalDetails.contacts %}
+                <li>
+                    <p>
+                        {{ contact.relationshipType }}:<br/>
+                        <a data-ai-id="personalContactLink" href="personal-details/personal-contact/{{ contact.contactId }}">{{ contact.name | fullName }} – {{ contact.relationship }}</a>
+                    </p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
                 None
             {% endif %}
-        {% endset %}
+    {% endset %}
 
-        {% set otherAddressesHtml %}
-            {% set otherAddressCount = personalDetails.otherAddressCount %}
-            {% set previousAddressCount = personalDetails.previousAddressCount %}
-            {% set hasOtherAddresses = otherAddressCount > 0 %}
-            {% set hasPreviousAddresses = previousAddressCount > 0 %}
+    {% set otherAddressesHtml %}
+    {% set otherAddressCount = personalDetails.otherAddressCount %}
+    {% set previousAddressCount = personalDetails.previousAddressCount %}
+    {% set hasOtherAddresses = otherAddressCount > 0 %}
+    {% set hasPreviousAddresses = previousAddressCount > 0 %}
 
-            {% if hasOtherAddresses or hasPreviousAddresses %}
-                {% set otherAddressString = '1 other address' if otherAddressCount == 1 else otherAddressCount + ' other addresses' %}
-                {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else previousAddressCount + ' previous addresses' %}
+    {% if hasOtherAddresses or hasPreviousAddresses %}
+        {% set otherAddressString = '1 other address' if otherAddressCount == 1 else 
+            otherAddressCount + ' other addresses' %}
+        {% set previousAddressString = '1 previous address' if previousAddressCount == 1 else 
+            previousAddressCount + ' previous addresses' %}
 
-                {% if hasOtherAddresses and hasPreviousAddresses %}
-                    <ul class="govuk-list">
-                        <li>{{ otherAddressString }}</li>
-                        <li>{{ previousAddressString }}</li>
-                    </ul>
-                {% elif hasOtherAddresses %}
-                    {{ otherAddressString }}
-                {% else %}
-                    {{ previousAddressString }}
-                {% endif %}
+        {% if hasOtherAddresses and hasPreviousAddresses %}
+            <ul class="govuk-list">
+                <li>{{ otherAddressString }}</li>
+                <li>{{ previousAddressString }}</li>
+            </ul>
+        {% elif hasOtherAddresses %}
+            {{ otherAddressString }}
+        {% else %}
+            {{ previousAddressString }}
+        {% endif %}
 
-                <p>
-                    <a href="personal-details/addresses">View all addresses</a>
-                </p>
-            {% else %}
+        <p>
+            <a href="personal-details/addresses">View all addresses</a>
+        </p>
+    {% else %}
                 No other addresses
             {% endif %}
-        {% endset %}
+    {% endset %}
 
-        {{ govukSummaryList({
+    {{ govukSummaryList({
             rows: [
               {
                   key: { html: '<span data-qa="telephoneNumberLabel">Phone number</span>' },
