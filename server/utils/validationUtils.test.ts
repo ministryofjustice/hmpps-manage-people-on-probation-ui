@@ -850,13 +850,13 @@ describe('validates manage checkin settings', () => {
     esupervision: {
       [crn]: {
         [id]: {
-          mangeCheckin: { interval: undefined },
+          manageCheckin: { interval: undefined },
         },
       },
     },
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
-    [`esupervision-${crn}-${id}-mangeCheckin-date`]:
+    [`esupervision-${crn}-${id}-manageCheckin-date`]:
       'Enter the date you would like the person to complete their first check in',
   }
   const args: ESupervisionValidationArgs = {
@@ -884,14 +884,14 @@ describe('validates manage edit contact', () => {
     esupervision: {
       [crn]: {
         [id]: {
-          mangeCheckin: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+          manageCheckin: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
         },
       },
     },
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
-    [`esupervision-${crn}-${id}-mangeCheckin-editCheckInMobile`]: 'Enter a mobile number in the correct format.',
-    [`esupervision-${crn}-${id}-mangeCheckin-editCheckInEmail`]: 'Enter an email address in the correct format.',
+    [`esupervision-${crn}-${id}-manageCheckin-editCheckInMobile`]: 'Enter a mobile number in the correct format.',
+    [`esupervision-${crn}-${id}-manageCheckin-editCheckInEmail`]: 'Enter an email address in the correct format.',
   }
   const args: ESupervisionValidationArgs = {
     crn,

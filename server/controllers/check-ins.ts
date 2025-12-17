@@ -520,8 +520,8 @@ const checkInsController: Controller<typeof routes, void> = {
       const { email } = personalDetails
       const { data } = req.session
       // if page not submitted, required to save in session for change link  to avoid API call.
-      setDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'], mobile)
-      setDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'], email)
+      setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], mobile)
+      setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
     }
   },
@@ -532,14 +532,14 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { data } = req.session
-      const checkInMobile = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'])
-      const checkInEmail = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'])
+      const checkInMobile = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'])
+      const checkInEmail = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'])
 
       // To show success message on edit contact preference page
-      const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'contactUpdated'])
+      const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'contactUpdated'])
       if (contactUpdated) {
         res.locals.success = true
-        delete req.session?.data?.esupervision?.[crn]?.[id]?.mangeCheckin?.contactUpdated
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.contactUpdated
       }
       return res.render('pages/check-in/manage/manage-contact.njk', { crn, id, checkInMobile, checkInEmail })
     }
@@ -551,10 +551,10 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { change } = req.body
-      const checkInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'])
-      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'])
-      setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInMobile'], checkInMobile)
-      setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'], checkInEmail)
+      const checkInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'])
+      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'])
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInMobile'], checkInMobile)
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'], checkInEmail)
       let redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}/edit-contact?change=${change}`
       if (change === 'main') {
         redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`
@@ -573,10 +573,10 @@ const checkInsController: Controller<typeof routes, void> = {
         'esupervision',
         crn,
         id,
-        'mangeCheckin',
+        'manageCheckin',
         'editCheckInMobile',
       ])
-      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'])
+      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'])
       return res.render('pages/check-in/manage/manage-edit-contact.njk', {
         crn,
         id,
@@ -595,8 +595,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'])
-      const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInMobile'])
+      const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'])
+      const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInMobile'])
       if (previousMobile !== editCheckInMobile1 || previousEmail !== editCheckInEmail1) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
@@ -608,9 +608,9 @@ const checkInsController: Controller<typeof routes, void> = {
         const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
         // Save to show success message on contact preferences page
         if (personalDetails?.crn) {
-          setDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'contactUpdated'], true)
-          setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'], editCheckInMobile1)
-          setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'], editCheckInEmail1)
+          setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'contactUpdated'], true)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], editCheckInMobile1)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], editCheckInEmail1)
         }
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/contact`)

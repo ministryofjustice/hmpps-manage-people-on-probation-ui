@@ -80,7 +80,6 @@ const getPersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonalDetails')
   .mockImplementation(() => Promise.resolve(mockPersonalDetails))
 
-// Spy for updating personal details contact
 const updatePersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
   .mockImplementation(() => Promise.resolve({ crn } as PersonalDetails))
@@ -1414,7 +1413,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 checkInMobile: '07700900011',
                 checkInEmail: 'user@example.com',
               },
@@ -1442,7 +1441,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 checkInMobile: '07700900011',
                 checkInEmail: 'user@example.com',
                 contactUpdated: true,
@@ -1458,7 +1457,7 @@ describe('checkInsController', () => {
 
       expect(mockRes.locals.success).toBe(true)
       // contactUpdated flag should be removed
-      expect(req.session?.data?.esupervision?.[crn]?.[uuid]?.mangeCheckin?.contactUpdated).toBeUndefined()
+      expect(req.session?.data?.esupervision?.[crn]?.[uuid]?.manageCheckin?.contactUpdated).toBeUndefined()
     })
   })
 
@@ -1481,7 +1480,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 checkInMobile: '07700900022',
                 checkInEmail: 'edit@example.com',
               },
@@ -1496,12 +1495,12 @@ describe('checkInsController', () => {
 
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
-        ['esupervision', crn, uuid, 'mangeCheckin', 'editCheckInMobile'],
+        ['esupervision', crn, uuid, 'manageCheckin', 'editCheckInMobile'],
         '07700900022',
       )
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
-        ['esupervision', crn, uuid, 'mangeCheckin', 'editCheckInEmail'],
+        ['esupervision', crn, uuid, 'manageCheckin', 'editCheckInEmail'],
         'edit@example.com',
       )
       expect(redirectSpy).toHaveBeenCalledWith(
@@ -1517,7 +1516,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 checkInMobile: '07700900022',
                 checkInEmail: 'edit@example.com',
               },
@@ -1553,7 +1552,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 editCheckInMobile: '07700900033',
                 editCheckInEmail: 'edited@example.com',
               },
@@ -1595,7 +1594,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 editCheckInMobile: '07700900044',
                 editCheckInEmail: 'same@example.com',
               },
@@ -1620,7 +1619,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              mangeCheckin: {
+              manageCheckin: {
                 editCheckInMobile: '07700900055',
                 editCheckInEmail: 'new@example.com',
                 checkInMobile: 'oldmobile',
@@ -1645,17 +1644,17 @@ describe('checkInsController', () => {
       // flags and values updated in session
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
-        ['esupervision', crn, uuid, 'mangeCheckin', 'contactUpdated'],
+        ['esupervision', crn, uuid, 'manageCheckin', 'contactUpdated'],
         true,
       )
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
-        ['esupervision', crn, uuid, 'mangeCheckin', 'checkInMobile'],
+        ['esupervision', crn, uuid, 'manageCheckin', 'checkInMobile'],
         '07700900055',
       )
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
-        ['esupervision', crn, uuid, 'mangeCheckin', 'checkInEmail'],
+        ['esupervision', crn, uuid, 'manageCheckin', 'checkInEmail'],
         'new@example.com',
       )
 

@@ -3,8 +3,8 @@
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
 {% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
 {% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
-{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][mangeCheckin][checkInMobile]' %}
-{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][mangeCheckin][checkInEmail]' %}
+{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInMobile]' %}
+{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInEmail]' %}
 {% set mobileValue = checkInMobile if checkInMobile else 'No mobile number' %}
 {% set emailValue = checkInEmail if checkInEmail else 'No email address' %}
 
@@ -93,7 +93,7 @@
                         text: "Email"
                     }
                 ]
-            } | decorateFormAttributes(['esupervision', crn, id, 'mangeCheckin', 'preferredComs'])) }}
+            } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'preferredComs'])) }}
             <div class="govuk-button-group">
                 <button type="submit" name ="change" value = "main" class="govuk-button" data-module="govuk-button" data-qa="submit-btn" data-govuk-button-init="">
                     Save changes

@@ -128,7 +128,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][mangeCheckin][date]`]: {
+    [`[esupervision][${crn}][${id}][manageCheckin][date]`]: {
       optional: page !== 'checkin-settings',
       checks: [
         {
@@ -148,7 +148,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][mangeCheckin][editCheckInMobile]`]: {
+    [`[esupervision][${crn}][${id}][manageCheckin][editCheckInMobile]`]: {
       optional: (page === 'edit-contact' && !editCheckInMobile) || page !== 'edit-contact',
       checks: [
         {
@@ -164,7 +164,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][mangeCheckin][editCheckInEmail]`]: {
+    [`[esupervision][${crn}][${id}][manageCheckin][editCheckInEmail]`]: {
       optional: (page === 'edit-contact' && !editCheckInEmail) || page !== 'edit-contact',
       checks: [
         {

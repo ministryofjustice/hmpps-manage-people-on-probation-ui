@@ -15,14 +15,14 @@ const eSuperVision: Route<void> = (req, res, next) => {
     'esupervision',
     crn,
     id,
-    'mangeCheckin',
+    'manageCheckin',
     'editCheckInMobile',
   ])
   const manageEditCheckInEmail = getDataValue(req.session.data, [
     'esupervision',
     crn,
     id,
-    'mangeCheckin',
+    'manageCheckin',
     'editCheckInEmail',
   ])
 
