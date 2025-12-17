@@ -155,8 +155,11 @@ describe('is a valid mobile number', () => {
     ['invalid', '0163296asfsf', false],
     ['invalid', '0163296a*)(*', false],
     ['valid', '07771 900 900', true],
-    ['valid', '07771900900', true],
+    ['valid', '07771 900 900 ', true],
+    ['valid', ' 07771900900', true],
     ['valid', '07783889300', true],
+    ['valid', ' 07783889300 ', true],
+    ['valid', '    07771 900 900      ', true],
   ])('%s isValidMobileNumber(%s, %s)', (_: string, a: string, expected: boolean) => {
     expect(isValidMobileNumber(a)).toEqual(expected)
   })
@@ -836,5 +839,73 @@ describe('validates upload a photo page', () => {
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
     expect(loggerSpy).toHaveBeenCalledWith('Photo not selected.')
+  })
+})
+
+describe('validates manage checkin settings', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          mangeCheckin: { interval: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-mangeCheckin-date`]:
+      'Enter the date you would like the person to complete their first check in',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'checkin-settings',
+    checkInMobile: '',
+    checkInEmail: '',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Checkin date not entered')
+  })
+})
+
+describe('validates manage edit contact', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          mangeCheckin: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-mangeCheckin-editCheckInMobile`]: 'Enter a mobile number in the correct format.',
+    [`esupervision-${crn}-${id}-mangeCheckin-editCheckInEmail`]: 'Enter an email address in the correct format.',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'edit-contact',
+    editCheckInMobile: '071838893dsafsadf',
+    editCheckInEmail: 'address1gmail.com',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
   })
 })

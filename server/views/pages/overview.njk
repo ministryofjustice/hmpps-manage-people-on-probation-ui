@@ -19,7 +19,7 @@
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
-{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 {% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up online check ins'%}
 {% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
   checkinLink %}

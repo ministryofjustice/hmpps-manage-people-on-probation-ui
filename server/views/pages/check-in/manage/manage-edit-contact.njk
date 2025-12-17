@@ -1,0 +1,50 @@
+{% extends "../../_form.njk" %}
+{% set title = "Edit contact details for " +  case.name.forename%}
+{% set backLink =  '/case/' + crn + '/appointments/check-in/manage/'+ id + '/contact' %}
+{% set buttonText = "Save changes" %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = backLink %}
+{% set formAnchorText = "Cancel and go back" %}
+{% set showError = false %}
+
+
+{% block form %}
+    <input type="hidden" name="previousMobile" value="{{ checkInMobile }}">
+    <input type="hidden" name="previousEmail" value="{{ checkInEmail }}">
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-three-quarters">
+            {{ govukInput({
+                label: {
+                    text: "Mobile number (optional)",
+                    classes: "govuk-label--s govuk-!-font-weight-bold"
+                },
+                hint: {
+                    text: "For example, 07771 900 900"
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'mobileNumber'
+                    }
+                },
+                classes: "govuk-input"
+            } | decorateFormAttributes(['esupervision', crn, id, 'mangeCheckin', 'editCheckInMobile'])) }}
+
+
+            {{ govukInput({
+                label: {
+                    text: "Email address (optional)",
+                    classes: "govuk-label--s govuk-!-font-weight-bold"
+                },
+                hint: {
+                    text: "For example, name@example.com"
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'editEmail'
+                    }
+                },
+                classes: "govuk-input"
+            } | decorateFormAttributes(['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'])) }}
+    </div>
+</div>
+{% endblock %}

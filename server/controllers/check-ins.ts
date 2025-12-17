@@ -44,6 +44,10 @@ const routes = [
   'postTakeAPhotoPage',
   'postViewCheckIn',
   'getManageCheckinPage',
+  'getManageContactPage',
+  'postManageContactPage',
+  'getManageEditContactPage',
+  'postManageEditContactPage',
 ] as const
 
 interface OptionPair {
@@ -88,16 +92,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const cya = req.query.cya === 'true'
-      const today = new Date()
-      // setting temporary fix for minDate
-      // (https://github.com/ministryofjustice/moj-frontend/issues/923)
-      let checkInMinDate: string
-      today.setDate(today.getDate() + 1)
-      if (today.getDate() > 9) {
-        checkInMinDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
-      } else {
-        checkInMinDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
-      }
+      const checkInMinDate = getMinDate()
       return res.render(`pages/check-in/date-frequency.njk`, { crn, id, checkInMinDate, cya })
     }
   },
@@ -514,8 +509,8 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
-      if (!isValidCrn(crn)) {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -523,7 +518,102 @@ const checkInsController: Controller<typeof routes, void> = {
       const personalDetails = await masClient.getPersonalDetails(crn)
       const mobile = personalDetails.mobileNumber
       const { email } = personalDetails
-      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, mobile, email })
+      const { data } = req.session
+      // if page not submitted, required to save in session for change link  to avoid API call.
+      setDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'], mobile)
+      setDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'], email)
+      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
+    }
+  },
+  getManageContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { data } = req.session
+      const checkInMobile = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'])
+      const checkInEmail = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'])
+
+      // To show success message on edit contact preference page
+      const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'contactUpdated'])
+      if (contactUpdated) {
+        res.locals.success = true
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.mangeCheckin?.contactUpdated
+      }
+      return res.render('pages/check-in/manage/manage-contact.njk', { crn, id, checkInMobile, checkInEmail })
+    }
+  },
+  postManageContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { change } = req.body
+      const checkInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'])
+      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'])
+      setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInMobile'], checkInMobile)
+      setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'], checkInEmail)
+      let redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}/edit-contact?change=${change}`
+      if (change === 'main') {
+        redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`
+      }
+      return res.redirect(redirectUrl)
+    }
+  },
+  getManageEditContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { change } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const checkInMobile = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'mangeCheckin',
+        'editCheckInMobile',
+      ])
+      const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'])
+      return res.render('pages/check-in/manage/manage-edit-contact.njk', {
+        crn,
+        id,
+        change,
+        checkInMobile,
+        checkInEmail,
+      })
+    }
+  },
+  postManageEditContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      const { previousMobile, previousEmail } = req.body
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInEmail'])
+      const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'editCheckInMobile'])
+      if (previousMobile !== editCheckInMobile1 || previousEmail !== editCheckInEmail1) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+
+        const body: PersonalDetailsUpdateRequest = {
+          emailAddress: editCheckInEmail1,
+          mobileNumber: editCheckInMobile1,
+        }
+        const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
+        // Save to show success message on contact preferences page
+        if (personalDetails?.crn) {
+          setDataValue(data, ['esupervision', crn, id, 'mangeCheckin', 'contactUpdated'], true)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInMobile'], editCheckInMobile1)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'mangeCheckin', 'checkInEmail'], editCheckInEmail1)
+        }
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/contact`)
     }
   },
 }
@@ -538,6 +628,21 @@ export const redirectWizard = (url: string): Route<Promise<void>> => {
     }
     return next()
   }
+}
+
+export const getMinDate = (): string => {
+  const today = new Date()
+  // setting temporary fix for minDate
+  // (https://github.com/ministryofjustice/moj-frontend/issues/923)
+  let checkInMinDate: string
+  today.setDate(today.getDate() + 1)
+  if (today.getDate() > 9) {
+    checkInMinDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
+  } else {
+    checkInMinDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
+  }
+
+  return checkInMinDate
 }
 
 export default checkInsController
