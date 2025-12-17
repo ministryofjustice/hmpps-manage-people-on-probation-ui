@@ -20,33 +20,18 @@ const alertsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
-      const arnsClient = new ArnsApiClient(token)
 
       const alertsData: UserAlerts = await masClient.getUserAlerts(
         pageNumber,
         sortName.toUpperCase(),
         sortDirection as 'asc' | 'desc',
       )
+
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
-
       let crnToRiskWidgetMap = {}
-
       if (enableRiskOnAlertsDashboard) {
-        const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
-        const riskPromises = uniqueCrns.map(async crn => {
-          const risks = await arnsClient.getRisks(crn)
-          const risksWidget = toRoshWidget(risks)
-          return { crn, risksWidget }
-        })
-
-        const results = await Promise.all(riskPromises)
-
-        crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
-          if (current.risksWidget) {
-            acc[current.crn] = current.risksWidget
-          }
-          return acc
-        }, {})
+        const arnsClient = new ArnsApiClient(token)
+        crnToRiskWidgetMap = await getCrnRiskMap(alertsData.content, arnsClient)
       }
 
       res.render('pages/alerts', {
@@ -70,28 +55,15 @@ const alertsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const arnsClient = new ArnsApiClient(token)
+
       const alertNote: UserAlertsContent = await masClient.getUserAlertNote(contactId, noteId)
       const alertsData = { content: [alertNote] }
 
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
       let crnToRiskWidgetMap = {}
       if (enableRiskOnAlertsDashboard) {
-        const uniqueCrns = [alertNote.crn]
-        const riskPromises = uniqueCrns.map(async crn => {
-          const risks = await arnsClient.getRisks(crn)
-          const risksWidget = toRoshWidget(risks)
-          return { crn, risksWidget }
-        })
-
-        const results = await Promise.all(riskPromises)
-
-        crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
-          if (current.risksWidget) {
-            acc[current.crn] = current.risksWidget
-          }
-          return acc
-        }, {})
+        const arnsClient = new ArnsApiClient(token)
+        crnToRiskWidgetMap = await getCrnRiskMap(alertsData.content, arnsClient)
       }
 
       res.render('pages/alerts', {
@@ -136,6 +108,26 @@ const alertsController: Controller<typeof routes, void> = {
       return next()
     }
   },
+}
+
+const getCrnRiskMap = async (alertsData: UserAlertsContent[], arnsClient: ArnsApiClient) => {
+  const uniqueCrns = [...new Set(alertsData.map(item => item.crn))].filter(Boolean)
+  const riskPromises = uniqueCrns.map(async crn => {
+    const risks = await arnsClient.getRisks(crn)
+    const risksWidget = toRoshWidget(risks)
+    return { crn, risksWidget }
+  })
+
+  const results = await Promise.all(riskPromises)
+
+  const crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
+    if (current.risksWidget) {
+      acc[current.crn] = current.risksWidget
+    }
+    return acc
+  }, {})
+
+  return crnToRiskWidgetMap
 }
 
 export default alertsController
