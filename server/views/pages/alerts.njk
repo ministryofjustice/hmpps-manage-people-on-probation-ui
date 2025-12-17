@@ -71,13 +71,11 @@
             {% set alertRows = (alertRows.push([
                 {
                     html: alertCheckbox,
-                    attributes: { "data-qa":"alertCheckbox" },
-                    classes: "govuk-!-width-one-twentieth"
+                    attributes: { "data-qa":"alertCheckbox" }
                 },
                 {
                     text: alert.date | dateWithYearShortMonth,
-                    attributes: { "data-qa":"alertDate" },
-                    classes: "govuk-!-width-one-tenth"
+                    attributes: { "data-qa":"alertDate" }
                 },
                 {
                     html: alertPerson,
@@ -86,8 +84,7 @@
                 },
                 {
                     html: predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }),
-                    attributes: {"data-qa": "alertRisk" },
-                    classes: "govuk-!-width-one-tenth"
+                    attributes: {"data-qa": "alertRisk" }
                 } if flags.enableRiskOnAlertsDashboard === true,
                 {
                     html: alertActivity,
@@ -96,8 +93,7 @@
                 },
                 {
                     html: alertUpdate,
-                    attributes: { "data-qa":"alertActions" },
-                    classes: "govuk-!-width-one-fifth"
+                    attributes: { "data-qa":"alertActions" }
                 }
 
             ]), alertRows) %}
