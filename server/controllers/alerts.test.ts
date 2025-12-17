@@ -1,4 +1,6 @@
 import httpMocks from 'node-mocks-http'
+import getPaginationLinks from '@ministryofjustice/probation-search-frontend/utils/pagination'
+import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import controllers from '.'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -84,6 +86,19 @@ const jsonSpy = jest.spyOn(res, 'json')
 const statusSpy = jest.spyOn(res, 'status')
 const next = jest.fn()
 
+const defaultPagination = {
+  from: '1',
+  items: [
+    {
+      current: true,
+      href: 'undefined://undefined/alerts?page=1',
+      number: 1,
+    },
+  ],
+  to: '1',
+  total: '1',
+}
+
 describe('alertsController', () => {
   afterEach(() => {
     jest.clearAllMocks()
@@ -105,6 +120,13 @@ describe('alertsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
+        pagination: getPaginationLinks(
+          1,
+          mockUserAlertsWithCrn.totalPages,
+          mockUserAlertsWithCrn.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockUserAlertsWithCrn.size,
+        ),
         sortedBy: 'date_and_time.desc',
         url: encodeURIComponent('/alerts'),
       })
@@ -121,13 +143,20 @@ describe('alertsController', () => {
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(5, 'SURNAME', 'desc')
+      expect(getUserAlertsSpy).toHaveBeenCalledWith(4, 'SURNAME', 'desc')
       expect(getRisksSpy).toHaveBeenCalledWith('X123456')
       expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
 
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
+        pagination: getPaginationLinks(
+          5,
+          mockUserAlertsWithCrn.totalPages,
+          mockUserAlertsWithCrn.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockUserAlertsWithCrn.size,
+        ),
         sortedBy: 'SURNAME.desc',
         url: encodeURIComponent('/alerts'),
       })
@@ -147,6 +176,13 @@ describe('alertsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
         alertsData: mockUserAlertsWithCrn,
         crnToRiskWidgetMap: {}, // Expect empty object
+        pagination: getPaginationLinks(
+          1,
+          mockUserAlertsWithCrn.totalPages,
+          mockUserAlertsWithCrn.totalResults,
+          page => addParameters(req, { page: page.toString() }),
+          mockUserAlertsWithCrn.size,
+        ),
         sortedBy: 'date_and_time.desc',
         url: encodeURIComponent('/alerts'),
       })

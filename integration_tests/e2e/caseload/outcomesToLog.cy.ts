@@ -96,7 +96,7 @@ context('Outcomes to log', () => {
       .getPaginationItem(1)
       .find('a')
       .should('contain.text', '1')
-      .should('have.attr', 'href', '/caseload/appointments/no-outcome?page=0')
+      .should('have.attr', 'href', 'http://localhost:3007/caseload/appointments/no-outcome?page=1')
       .should('have.attr', 'aria-current', 'page')
   })
   const sortableColumns = ['Name / CRN', 'DOB / Age', 'Sentence', 'Date and time']
