@@ -58,6 +58,7 @@
             {% endset %}
 
             {% set alertUpdate %}
+            {% if alert.type.editable %}
             <a href="{{ deliusDeepLinkUrl('UpdateContact', alert.crn, alert.id) }}"
                 class="govuk-link"
                 target="_blank"
@@ -66,6 +67,16 @@
                 Update
                 <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
             </a>
+            {% else %}
+            <a href="{{ deliusDeepLinkUrl('Contact', alert.crn, alert.id) }}"
+                class="govuk-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-qa="updateInNDelius-{{ alert.id }}">
+                View
+                <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
+            </a>
+            {% endif %}
             {% endset %}
 
             {% set alertRows = (alertRows.push([
@@ -152,7 +163,7 @@
                                 attributes: { "aria-sort": setSortOrder('type_description', sortedBy), 'data-sort-column': 'type_description', 'data-qa': 'activityHeader', 'data-sort-name': 'type_description', 'data-sort-action': 'alerts' }
                             },
                             {
-                                html: 'Update on NDelius<br>(opens in new tab)',
+                                html: 'View/Update on NDelius<br>(opens in new tab)',
                                 classes: "vertical-align--middle govuk-action--bottom",
                                 attributes: { 'data-qa': "actionsHeader" }
                             }
