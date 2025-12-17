@@ -278,11 +278,11 @@
         {% set notes = '' %}
         {% for note in alert.alertNotes %}
             {% if note.note %}
-                {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
+                {% set notes = notes.concat(appNote(note, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
             {% endif %}
         {% endfor  %}
         {% if alert.alertNote %}
-            {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
+            {% set notes = notes.concat(appNote(alert.alertNote, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
         {% endif %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">Notes</span>
         <div data-qa="alertNotes-{{ alert.id }}">

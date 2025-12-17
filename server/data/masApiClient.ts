@@ -416,6 +416,10 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}`, handle404: true })
   }
 
+  async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {
+    return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: true })
+  }
+
   async getUserAlerts(page?: number, sortBy?: string, sortOrder?: 'asc' | 'desc'): Promise<UserAlerts> {
     let pageQuery = '?size=10'
     if (page !== undefined) {
