@@ -649,6 +649,15 @@ describe('Manage an appointment', () => {
         })
       })
     })
+    describe('POP has deceased', () => {
+      beforeEach(() => {
+        cy.task('stubPersonalDetailsDateOfDeathManage')
+        loadPage()
+      })
+      it('should not display a link to arrange next appointment', () => {
+        manageAppointmentPage.getTaskLink(3).should('not.exist')
+      })
+    })
   })
   describe('Appointment details', () => {
     beforeEach(() => {
