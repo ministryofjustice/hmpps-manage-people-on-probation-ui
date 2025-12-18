@@ -1,10 +1,18 @@
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
-import { UserAlerts, UserAlertsContent } from '../models/Alerts'
+import { UserAlerts } from '../models/Alerts'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget } from '../utils'
+import { RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
+import { ErrorSummaryItem } from '../data/model/common'
+import { apiErrors } from '../properties'
 
 const routes = ['getAlerts', 'clearSelectedAlerts'] as const
+
+interface RestClientError {
+  status: number
+  errors: ErrorSummaryItem[]
+}
 
 const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
@@ -27,59 +35,41 @@ const alertsController: Controller<typeof routes, void> = {
         sortDirection as 'asc' | 'desc',
       )
       const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
-
-      let crnToRiskWidgetMap = {}
-      let arnsUnavailableError: any = null
-
-      if (enableRiskOnAlertsDashboard) {
-        const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
-
-        const riskPromises = uniqueCrns.map(async crn => {
-          if (arnsUnavailableError) {
-            return { crn, risksWidget: arnsUnavailableError }
-          }
-
-          const risks = await arnsClient.getRisks(crn)
-          let risksWidget = null
-
-          if (isErrorSummary(risks)) {
-            if (risks.errors.length > 0 && risks.errors[0]?.text) {
-              arnsUnavailableError = risks
-              risksWidget = risks
-            } else {
-              risksWidget = toRoshWidget(risks)
-            }
-          } else {
-            risksWidget = toRoshWidget(risks)
-          }
-
-          return { crn, risksWidget }
-        })
-
-        const results = await Promise.all(riskPromises)
-
-        if (arnsUnavailableError) {
-          crnToRiskWidgetMap = uniqueCrns.reduce<Record<string, any>>((acc, crn) => {
-            acc[crn] = arnsUnavailableError
-            return acc
-          }, {})
-        } else {
-          crnToRiskWidgetMap = results.reduce<Record<string, any>>((acc, current) => {
-            if (current.risksWidget) {
-              acc[current.crn] = current.risksWidget
-            }
-            return acc
-          }, {})
-        }
-      }
+      let results: { crn: string; risksWidget: RoshRiskWidgetDto | string }[] = []
+      let crnToRiskWidgetMap: { [crn: string]: RiskSummary | string } = {}
       let risksErrors: { text: string }[] = []
 
-      if (arnsUnavailableError) {
-        risksErrors = arnsUnavailableError.errors.map((errorItem: any) => ({
-          text: errorItem.text,
-        }))
+      const responseIsError = (response: RiskSummary): response is RestClientError => {
+        return (response as RestClientError).errors !== undefined
       }
 
+      if (enableRiskOnAlertsDashboard) {
+        let allRiskResponses: RiskSummary[]
+        let arnsUnavailableError: string = null
+        const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
+        try {
+          allRiskResponses = await Promise.all(uniqueCrns.map(crn => arnsClient.getRisks(crn)))
+          // promise.all will complete and resolve even if response of any request is a 500 error, so check for error
+          const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
+          if (responseErrorIndex >= 0) arnsUnavailableError = allRiskResponses[responseErrorIndex].errors[0].text
+        } catch (err: any) {
+          // catch any other errors
+          arnsUnavailableError = apiErrors.risks
+        }
+
+        // this results, risksErrors and crnToRiskWidgetMap variables below probably need refactoring but left in so correct values are passed to template
+
+        if (allRiskResponses.length) {
+          results = allRiskResponses.map((riskResponse, i) => ({
+            crn: uniqueCrns[i],
+            risksWidget: arnsUnavailableError ?? toRoshWidget(riskResponse),
+          }))
+          crnToRiskWidgetMap = results.reduce((acc, { crn, risksWidget }) => ({ ...acc, [crn]: risksWidget }), {})
+        }
+        if (arnsUnavailableError) {
+          risksErrors = [{ text: arnsUnavailableError }]
+        }
+      }
 
       res.render('pages/alerts', {
         url,
