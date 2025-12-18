@@ -80,6 +80,10 @@ const getPersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonalDetails')
   .mockImplementation(() => Promise.resolve(mockPersonalDetails))
 
+const updatePersonalDetailsSpy = jest
+  .spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
+  .mockImplementation(() => Promise.resolve({ crn } as PersonalDetails))
+
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
@@ -1385,8 +1389,276 @@ describe('checkInsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-checkin.njk', {
         crn,
         mobile: '07700900000',
+        id: uuid,
         email: 'test@example.com',
       })
+    })
+  })
+  describe('getManageContactPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.getManageContactPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('reads contact info from session and renders', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                checkInMobile: '07700900011',
+                checkInEmail: 'user@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+
+      await controllers.checkIns.getManageContactPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-contact.njk', {
+        crn,
+        id: uuid,
+        checkInMobile: '07700900011',
+        checkInEmail: 'user@example.com',
+      })
+    })
+
+    it('shows success message when contactUpdated flag set and clears it', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data: any = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                checkInMobile: '07700900011',
+                checkInEmail: 'user@example.com',
+                contactUpdated: true,
+              },
+            },
+          },
+        },
+      }
+      const mockRes = mockAppResponse()
+      const req = baseReq(data)
+
+      await controllers.checkIns.getManageContactPage(hmppsAuthClient)(req, mockRes)
+
+      expect(mockRes.locals.success).toBe(true)
+      // contactUpdated flag should be removed
+      expect(req.session?.data?.esupervision?.[crn]?.[uuid]?.manageCheckin?.contactUpdated).toBeUndefined()
+    })
+  })
+
+  describe('postManageContactPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('stores edit values in session and redirects to edit-contact when change is email', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                checkInMobile: '07700900022',
+                checkInEmail: 'edit@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.body = { change: 'email' }
+
+      await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
+
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'editCheckInMobile'],
+        '07700900022',
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'editCheckInEmail'],
+        'edit@example.com',
+      )
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `/case/${crn}/appointments/check-in/manage/${uuid}/edit-contact?change=email`,
+      )
+    })
+
+    it('redirects to main manage page when change is main', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                checkInMobile: '07700900022',
+                checkInEmail: 'edit@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.body = { change: 'main' }
+
+      await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
+    })
+  })
+
+  describe('getManageEditContactPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.getManageEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('renders edit-contact with values and change query', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                editCheckInMobile: '07700900033',
+                editCheckInEmail: 'edited@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.query = { change: 'email' }
+
+      await controllers.checkIns.getManageEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-edit-contact.njk', {
+        crn,
+        id: uuid,
+        change: 'email',
+        checkInMobile: '07700900033',
+        checkInEmail: 'edited@example.com',
+      })
+    })
+  })
+
+  describe('postManageEditContactPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.postManageEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('redirects to contact page without API call when no changes', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                editCheckInMobile: '07700900044',
+                editCheckInEmail: 'same@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.body = { previousMobile: '07700900044', previousEmail: 'same@example.com' }
+
+      await controllers.checkIns.postManageEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(updatePersonalDetailsSpy).not.toHaveBeenCalled()
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/contact`)
+    })
+
+    it('updates MAS when values changed, sets flags and redirects', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data: any = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                editCheckInMobile: '07700900055',
+                editCheckInEmail: 'new@example.com',
+                checkInMobile: 'oldmobile',
+                checkInEmail: 'old@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.body = { previousMobile: '07700900044', previousEmail: 'same@example.com' }
+
+      await controllers.checkIns.postManageEditContactPage(hmppsAuthClient)(req, res)
+
+      // token and update called
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')
+      expect(updatePersonalDetailsSpy).toHaveBeenCalledWith(crn, {
+        emailAddress: 'new@example.com',
+        mobileNumber: '07700900055',
+      })
+
+      // flags and values updated in session
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'contactUpdated'],
+        true,
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'checkInMobile'],
+        '07700900055',
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'checkInEmail'],
+        'new@example.com',
+      )
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/contact`)
     })
   })
 })
