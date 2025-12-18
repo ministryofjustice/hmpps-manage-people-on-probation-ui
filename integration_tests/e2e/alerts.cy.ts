@@ -42,7 +42,7 @@ context('Alerts Dashboard', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=Contact&CRN=X000001&contactID=1',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=1',
       )
       .should('have.attr', 'target', '_blank')
   })

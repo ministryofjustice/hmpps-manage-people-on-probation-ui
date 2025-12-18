@@ -10,6 +10,7 @@ import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
 import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
+import { getMinMaxDates } from '../../utils/getMinMaxDates'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
@@ -35,7 +36,15 @@ const appointments: Route<void> = (req, res, next) => {
   if (
     [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
   ) {
-    localParams = { ...localParams, isInPast: appointmentDateIsInPast(req), isReschedule: isRescheduleAppointment(req) }
+    const { enablePastAppointments } = res.locals.flags
+    const { _minDate, _maxDate } = getMinMaxDates()
+    localParams = {
+      ...localParams,
+      isReschedule: isRescheduleAppointment(req),
+      isInPast: appointmentDateIsInPast(req),
+      ...(!enablePastAppointments ? { _minDate } : {}),
+      _maxDate,
+    }
   }
   if (req.url.includes('/attended-complied')) {
     localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
@@ -271,7 +280,6 @@ const appointments: Route<void> = (req, res, next) => {
   validateReschedule()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

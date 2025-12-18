@@ -1,5 +1,4 @@
 import { v4 as uuidv4 } from 'uuid'
-import { DateTime } from 'luxon'
 import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
 import {
@@ -29,6 +28,7 @@ import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
+import { Name } from '../data/model/personalDetails'
 import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
@@ -597,13 +597,25 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
-  getConfirmation: () => {
+  getConfirmation: hmppsAuthClient => {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
       const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
+      }
+      const attending = getDataValue(data, ['appointments', crn, id, 'user'])
+      let attendingName = 'Your '
+      if (attending.username.toUpperCase() !== res.locals.user.username) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        try {
+          const user = await masClient.getUserDetails(attending.username.toUpperCase())
+          attendingName = `${user.firstName}´s `
+        } catch {
+          attendingName = `The officer´s `
+        }
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
@@ -620,14 +632,16 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         crn,
         backendId,
         isOutLookEventFailed,
-        appointmentType,
+        attendingName,
+        url,
         isInPast,
       })
     }
   },
   postConfirmation: () => {
     return async (req, res) => {
-      const { url } = req
+      const { data } = req.session
+      const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)

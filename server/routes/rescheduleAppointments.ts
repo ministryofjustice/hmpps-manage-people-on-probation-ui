@@ -4,7 +4,7 @@ import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import {
-  autoStoreMultipartFormSessionData,
+  // autoStoreMultipartFormSessionData,
   autoStoreSessionData,
   cacheUploadedFiles,
   constructNextAppointmentSession,
@@ -15,8 +15,8 @@ import {
   getPersonAppointment,
   getSentences,
   getUserProviders,
-  getWhoAttends,
-  redirectWizard,
+  // getWhoAttends,
+  // redirectWizard,
 } from '../middleware'
 import validate from '../middleware/validation'
 
@@ -64,7 +64,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient),
-    getWhoAttends(hmppsAuthClient),
+    // getWhoAttends(hmppsAuthClient),
     getUserProviders(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),

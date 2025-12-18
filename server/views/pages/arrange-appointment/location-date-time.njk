@@ -9,7 +9,7 @@
 {% set relationship = '' %}
 {% set provisions = [] %}
 {% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
-{% set personForename = case.name.forename %}
+{% set personForename = headerPersonName.forename %}
 
 {% block heading %}
     {% set level = riskToStaff.levelDescription or riskToStaff.level %}

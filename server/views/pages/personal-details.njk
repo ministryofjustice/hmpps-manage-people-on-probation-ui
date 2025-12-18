@@ -2,7 +2,6 @@
 {% set pageTitle = makePageTitle({pageHeading: "Personal details"}) %}
 {% set currentNavSection = 'personal-details' %}
 {% set currentSectionName = 'Personal details' %}
-{% set headerPersonName = personalDetails.name.forename + ' ' + personalDetails.name.surname %}
 {% set headerCRN = crn %}
 {% set headerDob = personalDetails.dateOfBirth %}
 {% set headerGender = personalDetails.preferredGender %}
@@ -16,7 +15,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },

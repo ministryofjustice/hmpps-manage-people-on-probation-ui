@@ -27,9 +27,9 @@ context('Appointment check-ins', () => {
     loadPage()
     const page = Page.verifyOnPage(AppointmentsPage)
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     cy.get('[data-qa="appointments-header-label"]').should('contain.text', 'Appointments')
-    page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'Upcoming appointments')
+    page.getElement('[data-qa="upcomingAppointments"]').find('h3').should('contain.text', 'Upcoming appointments')
     page
       .getElement('[data-qa="online-checkin-btn"]')
       .should('be.visible')

@@ -170,7 +170,7 @@ context('Overview', () => {
     cy.visit('/case/X000002')
     const page = Page.verifyOnPage(OverviewPage)
     page.headerCrn().should('contain.text', 'X000002')
-    page.headerName().should('contain.text', 'Caroline Wolff')
+    page.headerName().should('contain.text', 'Eula Schmeler')
     page.pageHeading().should('contain.text', 'Overview')
     page.getTab('overview').should('contain.text', 'Overview')
     page.getTab('personalDetails').should('contain.text', 'Personal details')

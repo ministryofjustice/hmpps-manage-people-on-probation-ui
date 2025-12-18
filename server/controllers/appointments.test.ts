@@ -208,6 +208,7 @@ describe('controllers/appointments', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
+        hasDeceased: false,
         url: '',
       })
     })
@@ -297,6 +298,7 @@ describe('controllers/appointments', () => {
         back: undefined,
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
+        hasDeceased: false,
         url: '',
         canReschedule: true,
         contactId: '1234',
@@ -378,7 +380,7 @@ describe('controllers/appointments', () => {
         crn,
         alertDismissed: false,
         isInPast: true,
-        headerPersonName: 'Forename Surname',
+        headerPersonName: { forename: 'Forename', surname: 'Surname' },
         forename: 'Forename',
         surname: 'Surname',
         appointment: mockAppointment,

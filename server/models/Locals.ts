@@ -61,9 +61,10 @@ interface Locals {
   requirement?: string
   appointment?: AppointmentLocals
   case?: PersonalDetails
-  headerPersonName?: string
+  headerPersonName?: { forename: string; surname: string }
   headerCRN?: string
   headerDob?: string
+  dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   predictorScores?: TimelineItem

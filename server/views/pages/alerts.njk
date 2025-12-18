@@ -41,12 +41,14 @@
             {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
 
             {% set alertActivity %}
-                <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
-                        {{ alert.type.description }}
-                    </a></p>
+            <p>
+                <a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
+                    {{ alert.type.description }}
+                </a>
+            </p>
 
-                {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
-                    {{ govukDetails({
+            {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
+                {{ govukDetails({
                         summaryText: "More information",
                         classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
                         attributes: {
@@ -54,11 +56,11 @@
                         },
                         html: renderAlertDetails(alert)
                     }) }}
-                {% endif %}
+            {% endif %}
             {% endset %}
 
             {% set alertUpdate %}
-            <a href="{{ deliusDeepLinkUrl('Contact', alert.crn, alert.id) }}"
+            <a href="{{ deliusDeepLinkUrl('UpdateContact', alert.crn, alert.id) }}"
                 class="govuk-link"
                 target="_blank"
                 rel="noopener noreferrer"
@@ -87,7 +89,8 @@
                 } if flags.enableRiskOnAlertsDashboard === true,
                 {
                     html: alertActivity,
-                    attributes: { "data-qa":"alertActivity" }
+                    attributes: { "data-qa":"alertActivity" },
+                    classes: "govuk-!-width-three-tenths"
                 },
                 {
                     html: alertUpdate,
@@ -181,7 +184,10 @@
                     {% set currentPage = alertsData.page or 0 %}
                     {% set totalPages = alertsData.totalPages %}
 
-                    {% set url = "/alerts?" + (('sortBy=' + sortedBy + '&') if sortedBy else '') %}
+                    {% set url = "/alerts?" + (
+                    ('sortBy=' + sortedBy + '&')if sortedBy else 
+                        ''
+                    ) %}
 
                     {% set paginationItems = [] %}
                     {% set totalLinks = 3 %}
@@ -192,7 +198,7 @@
                     {% set start = 0 %}
                     {% set end = start + totalLinks %}
                     {% if currentPage > 0 %}
-                        {% set start = currentPage -1 %}
+                        {% set start = currentPage - 1 %}
                         {% set end = start + totalLinks %}
                     {% endif %}
                     {% if currentPage + 1 == totalPages %}
@@ -201,21 +207,18 @@
                     {% endif %}
 
                     {% if (totalPages > 3) and (currentPage != 0) and (start != 0) %}
-                        {% set paginationItems = (paginationItems.push(
-                            {
-                                number: 1,
-                                href: url + 'page=0'
-                            },
-                            {
-                                ellipsis: true
-                            }), paginationItems) %}
+                        {% set paginationItems = (paginationItems.push({
+                            number: 1,
+                            href: url + 'page=0'
+                        }, {ellipsis: true}), paginationItems) %}
                     {% endif %}
 
                     {% for i in range(start , end) -%}
                         {% set paginationItems = (paginationItems.push({
                             number: i + 1,
                             href: url + 'page=' + i,
-                            current: true if i == currentPage else false
+                            current: true if i == currentPage else 
+                                false
                         }), paginationItems) %}
                     {% endfor %}
 
@@ -263,7 +266,7 @@
             {% if note.note %}
                 {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
             {% endif %}
-        {% endfor  %}
+        {% endfor %}
         {% if alert.alertNote %}
             {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
         {% endif %}
