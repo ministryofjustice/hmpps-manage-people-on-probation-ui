@@ -1,8 +1,8 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Online check ins" %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
-{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/settings' %}
-{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/contact' %}
+{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
+{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/contact' %}
 {% set photoLabel = "Photo of " + case.name.forename %}
 {% set photoUrl = offenderCheckinsByCRNResponse.snapshotUrl %}
 {% set backLink = '/case/' + crn %}
@@ -80,7 +80,7 @@
             items: [
                 {
                     text: 'Change',
-                    href: '#'
+                    href: changeContactLink
                 }
             ]
         }

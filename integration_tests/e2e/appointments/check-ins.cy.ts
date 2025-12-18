@@ -16,6 +16,8 @@ import TakeAPhotoPage from '../../pages/check-ins/take-a-photo'
 import { statusErrors } from '../../../server/properties'
 import OverviewPage from '../../pages/overview'
 import ManageCheckins from '../../pages/check-ins/manage-checkins'
+import ManageContactPage from '../../pages/check-ins/manage-contact'
+import ManageEditContactPage from '../../pages/check-ins/manage-edit-contact'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -634,5 +636,37 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.getElementData('emailAddressValue').should('contain.text', 'address1@gmail.com')
     manageCheckins.getElementData('mobileNumberLabel').should('contain.text', 'Mobile number')
     manageCheckins.getElementData('mobileNumberValue').should('contain.text', '071838893')
+  })
+
+  it('should able to visit contact details page', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160`)
+    const overviewPage = new OverviewPage()
+    overviewPage.checkOnPage()
+    overviewPage
+      .getElementData('checkinCard')
+      .find('.govuk-link')
+      .should('contain.text', 'View all online check in details')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').click()
+
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
+    manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
+    manageCheckins.getElementData('checkinContactCard').find('.govuk-link').click()
+    const manageContact = new ManageContactPage()
+    manageContact.checkOnPage()
+
+    manageContact.getElement('button[name="change"][value="mobile"]').click()
+    const manageEditContactPage = new ManageEditContactPage()
+    manageEditContactPage.checkOnPage()
+    manageEditContactPage.getElement('a.govuk-back-link').should('be.visible').click()
+    manageContact.checkOnPage()
+
+    manageContact.getElement('button[name="change"][value="emailAddress"]').click()
+    manageEditContactPage.checkOnPage()
+    manageEditContactPage.getBackLink().click()
+    manageContact.checkOnPage()
   })
 })

@@ -576,6 +576,22 @@ body.feature-disabled {
   }
 }
 
+.mpop-govuk-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  color: #1d70b8;
+  text-decoration: underline;
+}
+
+.mpop-govuk-link-button:hover {
+  color: #003078;
+  text-decoration: underline;
+}
+
 .technical-updates-banner {
   background-color: #f9e1ec;
   padding: 10px 0 10px 0;
