@@ -270,7 +270,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/personal-details/X778160/contact",
+        "urlPattern": "/mas/personal-details/X801756/contact",
         "method": "POST"
       },
       "response": {
@@ -283,7 +283,7 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/personal-details/X000001/contact",
+        "urlPattern": "/mas/personal-details/.*/contact",
         "method": "POST"
       },
       "response": {

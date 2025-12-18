@@ -152,7 +152,10 @@ export const isValidCharCount = (args: any[]) => {
   return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
 }
 
-export const isValidMobileNumber = (string: string) => /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(string)
+export const isValidMobileNumber = (input: string) => {
+  const value = typeof input === 'string' ? input : String(input ?? '')
+  return /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(value.trim())
+}
 
 export function validateWithSpec<R extends Validateable>(
   request: R,

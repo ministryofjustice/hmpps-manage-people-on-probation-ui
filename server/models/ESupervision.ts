@@ -2,6 +2,7 @@ import { Errors } from './Errors'
 
 export interface ESupervisionSession {
   checkins?: CheckinUserDetails
+  manageCheckin?: CheckinUserDetails
 }
 
 export interface CheckinUserDetails {
