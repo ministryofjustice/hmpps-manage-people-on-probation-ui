@@ -57,7 +57,7 @@ describe('Log attended and complied appointment', () => {
       recordAnOutcomePage.getSubmitBtn().click()
       checkContent(manageJourney)
       checkLogOutcomesAlert(isAttendedCompliedPage)
-      recordAnOutcomePage.checkPageTitle(`Confirm if ${name} attended and complied`)
+      recordAnOutcomePage.checkPageTitle(`Confirm ${name} attended and complied`)
       recordAnOutcomePage.checkErrorSummaryBox(['Select if they attended and complied'])
       recordAnOutcomePage.getElement(`#${id}-error`).should($error => {
         expect($error.text().trim()).to.include('Select if they attended and complied')
@@ -98,7 +98,7 @@ describe('Log attended and complied appointment', () => {
     })
     it('should link to the attended and complied page', () => {
       recordAnOutcomePage = new AttendedCompliedPage()
-      recordAnOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+      recordAnOutcomePage.checkPageTitle('Confirm Alton attended and complied')
     })
     it('should render page with correct elements', () => {
       checkContent()
