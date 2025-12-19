@@ -1,7 +1,5 @@
 import { Router } from 'express'
-
 import type { Services } from '../services'
-
 import home from './home'
 import searchRoutes from './search'
 import caseRoutes from './case'

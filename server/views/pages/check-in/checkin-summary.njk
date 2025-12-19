@@ -1,16 +1,15 @@
 {% extends "../../partials/layout.njk" %}
 {% from "../../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% set mainClasses = "app-container govuk-body" %}
-{% set title = "Check your answers before adding " + case.name.forename + " to online check ins"  %}
+{% set title = "Check your answers before adding " + case.name.forename + " to online check ins" %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-rules' %}
-{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
-{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
-
-{% set checkInDateLabel = "When would you like " + case.name.forename + " to complete their first online check in?"  %}
-{% set checkInDateVal = userDetails.date | dmyToLongDate  %}
-{% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check in?"  %}
-{% set sendLinkLabel = "How does " + case.name.forename + " want us to send a link to the service?"  %}
-{% set photoOptopionLabel = "How do you want to take a photo of " + case.name.forename + "?"  %}
+{% set setMobile = '[esupervision][' + crn + '][' + id + '][checkins][checkInMobile]' %}
+{% set setEmail = '[esupervision][' + crn + '][' + id + '][checkins][checkInEmail]' %}
+{% set checkInDateLabel = "When would you like " + case.name.forename + " to complete their first online check in?" %}
+{% set checkInDateVal = userDetails.date | dmyToLongDate %}
+{% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check in?" %}
+{% set sendLinkLabel = "How does " + case.name.forename + " want us to send a link to the service?" %}
+{% set photoOptopionLabel = "How do you want to take a photo of " + case.name.forename + "?" %}
 {% set photoPersonLabel = "Photo of " + case.name.forename %}
 {% set name = "Image of " + case.name.forename + " added for identification" %}
 {% set photo = "<div class='es-uploaded-image es-uploaded-image--small' data-person='{{ name }}'></div>" %}
@@ -41,14 +40,14 @@
 
 {% block content %}
     {% set html %}
-        <p class="govuk-notification-banner__heading">
+    <p class="govuk-notification-banner__heading">
             We’re not ready to handle this case
         </p>
-        <p>You may find that:</p>
-        <ul class="govuk-list govuk-list--bullet">
-            <li>not all information is shown</li>
-            <li>some information shows incorrectly</li>
-        </ul>
+    <p>You may find that:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>not all information is shown</li>
+        <li>some information shows incorrectly</li>
+    </ul>
     {% endset %}
     {% if data.features.showInappropriateCaseWarning %}
         {{ govukNotificationBanner({
@@ -77,8 +76,8 @@
             {{ title }}
         </h2>
     {% endif %}
-    {%  block pageContent %}
-    {{ govukSummaryList({
+    {% block pageContent %}
+        {{ govukSummaryList({
         rows: [
             { key:
                 { html:  checkInDateLabel  },
@@ -180,18 +179,16 @@
         ]
     }) }}
 
-    <div class="govuk-!-width-one-half">
-        <button id="registerButton" class="govuk-button" data-qa="submit-btn">Confirm</button>
+        <div class="govuk-!-width-one-half">
+            <button id="registerButton" class="govuk-button" data-qa="submit-btn">Confirm</button>
 
-        <form id="completeRegistrationForm" method="post" action="{{ confirmEndUrl }}">
-            <input type="hidden" name="_csrf" value="{{ csrfToken }}" />
-            <input type="hidden" id="setupId" name="setupId" value="{{ setupId }}" />
-            <input type="hidden" id="hiddenCrn" name="hiddenCrn" value="{{ crn }}" />
-            <input type="hidden" id="hiddenId" name="hiddenId" value="{{ id }}" />
-        </form>
-    </div>
+            <form id="completeRegistrationForm" method="post" action="{{ confirmEndUrl }}">
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}"/>
+                <input type="hidden" id="setupId" name="setupId" value="{{ setupId }}"/>
+                <input type="hidden" id="hiddenCrn" name="hiddenCrn" value="{{ crn }}"/>
+                <input type="hidden" id="hiddenId" name="hiddenId" value="{{ id }}"/>
+            </form>
+        </div>
 
-
-
-{% endblock %}
+    {% endblock %}
 {% endblock %}

@@ -179,7 +179,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         logOutcomePage = new AttendedCompliedPage()
-        logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+        logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
         cy.get(`#${recordOutcome}`).should('not.be.checked')
         cy.get(`#${recordOutcome}`).click()
         logOutcomePage.getSubmitBtn().click()
@@ -231,7 +231,7 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         logOutcomePage = new AttendedCompliedPage()
-        logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+        logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
         cy.get(`#${recordOutcome}`).should('not.be.checked')
         cy.get(`#${recordOutcome}`).click()
         logOutcomePage.getSubmitBtn().click()

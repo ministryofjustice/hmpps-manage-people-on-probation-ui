@@ -459,7 +459,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
       logOutcomePage = new AttendedCompliedPage()
-      logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+      logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
       logOutcomePage.getCancelGoBackLink().click()
       locationDateTimePage.checkOnPage()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')

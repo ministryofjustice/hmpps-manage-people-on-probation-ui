@@ -372,7 +372,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { change } = req.query as Record<string, string>
       const { alertDismissed = false } = req.session
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
       const isReschedule = isRescheduleAppointment(req)

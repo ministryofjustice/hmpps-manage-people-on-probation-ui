@@ -11,6 +11,20 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const { checkInMinDate, checkInMobile, checkInEmail } = body
   const editCheckInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
   const editCheckInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInEmail'])
+  const manageEditCheckInMobile = getDataValue(req.session.data, [
+    'esupervision',
+    crn,
+    id,
+    'manageCheckin',
+    'editCheckInMobile',
+  ])
+  const manageEditCheckInEmail = getDataValue(req.session.data, [
+    'esupervision',
+    crn,
+    id,
+    'manageCheckin',
+    'editCheckInEmail',
+  ])
 
   const { back = '' } = req.query as Record<string, string>
   const localParams: LocalParams = {
@@ -106,12 +120,47 @@ const eSuperVision: Route<void> = (req, res, next) => {
       )
     }
   }
+  const validateCheckinSettings = () => {
+    if (baseUrl.includes(`case/${crn}/appointments/check-in/manage/${id}/settings`)) {
+      render = `pages/check-in/manage/checkin-settings`
+      localParams.id = id
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'checkin-settings',
+        }),
+      )
+    }
+  }
+
+  const validateManageEditContactPreference = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/edit-contact`)) {
+      render = `pages/check-in/manage/manage-edit-contact`
+      localParams.id = id
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          checkInEmail,
+          checkInMobile,
+          editCheckInEmail: manageEditCheckInEmail,
+          editCheckInMobile: manageEditCheckInMobile,
+          page: 'edit-contact',
+        }),
+      )
+    }
+  }
   let errorMessages: Record<string, string> = {}
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()
   validatePhotoOptionsPage()
   validateUploadPhotoPage()
+  validateCheckinSettings()
+  validateManageEditContactPreference()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

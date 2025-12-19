@@ -1,8 +1,8 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Online check ins" %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
-{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/settings' %}
-{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/contact' %}
+{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
+{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/contact' %}
 {% set photoLabel = "Photo of " + case.name.forename %}
 {% set photoUrl = offenderCheckinsByCRNResponse.snapshotUrl %}
 {% set backLink = '/case/' + crn %}
@@ -22,7 +22,7 @@
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
-            {{ govukSummaryList({
+    {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
@@ -53,7 +53,7 @@
     }) }}
 
     {% set contactDetailsText %}
-        {{ govukSummaryList({
+    {{ govukSummaryList({
             rows: [
                 {
                     key: { html: '<span data-qa="emailAddressLabel">Email address</span>'},
@@ -65,8 +65,6 @@
                 }
             ]
         }) }}
-
-
 
     {% endset %}
 
@@ -80,25 +78,25 @@
             items: [
                 {
                     text: 'Change',
-                    href: '#'
+                    href: changeContactLink
                 }
             ]
         }
     }) }}
-  {% set photoDisplayHtml %}
+    {% set photoDisplayHtml %}
     {% if photoUrl %}
         &nbsp;<img
                 src="{{ photoUrl }}"
                 class="es-profile-image es-profile-image--small"
                 alt="image"
-                crossorigin />
+                crossorigin/>
     {% else %}
         <span>No image available</span>
     {% endif %}
-  {% endset %}
+    {% endset %}
 
     {% set photoText %}
-        {{ govukSummaryList({
+    {{ govukSummaryList({
             rows: [
                 {
                     key: { html: '<span data-qa="methodLabel">' + photoLabel + '</span>'},

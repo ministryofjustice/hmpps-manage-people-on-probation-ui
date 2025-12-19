@@ -1,6 +1,6 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-{%- from "moj/components/alert/macro.njk" import mojAlert -%}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
 {% set pageTitle = makePageTitle({pageHeading: "Overview"}) %}
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
@@ -18,7 +18,7 @@
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
-{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 {% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up online check ins'%}
 {% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
   checkinLink %}
