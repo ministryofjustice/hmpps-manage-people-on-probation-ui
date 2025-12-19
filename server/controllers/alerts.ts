@@ -74,7 +74,6 @@ const alertsController: Controller<typeof routes, void> = {
         const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
         try {
           allRiskResponses = await Promise.all(uniqueCrns.map(crn => arnsClient.getRisks(crn)))
-          console.log(allRiskResponses)
 
           // promise.all will complete and resolve even if response of any request is a 500 error, so check for error
           const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
