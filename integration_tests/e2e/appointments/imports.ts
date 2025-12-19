@@ -467,7 +467,11 @@ export const checkLogOutcomesAlert = (attendedComplied = false) => {
           ? 'Use NDelius to arrange an appointment in the past with another outcome'
           : 'arrange this appointment on NDelius',
       )
-      .should('have.attr', 'href', '#')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X778160',
+      )
       .should('have.attr', 'target', '_blank')
     cy.get('@alert').get('.moj-alert__action button').should('contain.text', 'Dismiss')
   })
