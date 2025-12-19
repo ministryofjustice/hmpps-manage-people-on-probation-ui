@@ -17,6 +17,18 @@ import {
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import SentencePlanApiClient from '../data/sentencePlanApiClient'
+import { PersonalDetailsSession } from '../models/Data'
+import {
+  Circumstances,
+  Disabilities,
+  Name,
+  PersonalContact,
+  Provisions,
+  Document,
+  AddressType,
+  PersonalDetails,
+} from '../data/model/personalDetails'
+import { Contact } from '../data/model/professionalContact'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -26,19 +38,9 @@ jest.mock('../data/arnsApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
-const mock = (crn = 'X000001') =>
-  ({
-    name: {
-      forename: 'Caroline',
-      surname: 'Wolff',
-    },
-    crn,
-    dateOfBirth: '1979-08-18',
-  }) as any
-
 const getPersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-  .mockImplementation(() => Promise.resolve(mock('X000002')))
+  .mockImplementation(() => Promise.resolve(overview()))
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
@@ -55,6 +57,38 @@ const getPlanByCrnSpy = jest
   .mockImplementation(() => Promise.resolve(mockSentencePlans))
 
 const nextSpy = jest.fn()
+
+const overview = (crn = 'X000001'): PersonalDetails => ({
+  name: {
+    forename: 'Caroline',
+    surname: 'Wolff',
+  },
+  crn,
+  contacts: [] as PersonalContact[],
+  otherAddressCount: 0,
+  previousAddressCount: 0,
+  preferredGender: 'male',
+  dateOfBirth: '1979-08-18',
+  aliases: [] as Name[],
+  circumstances: {} as Circumstances,
+  disabilities: {} as Disabilities,
+  provisions: {} as Provisions,
+  sex: 'male',
+  documents: [] as Document[],
+  addressTypes: [] as AddressType[],
+  staffContacts: [] as Contact[],
+})
+
+const mock = (crn = 'X000001', lastUpdatedDate = mockSentencePlans[0].lastUpdatedDate): PersonalDetailsSession => ({
+  overview: overview(crn),
+  sentencePlan: {
+    lastUpdatedDate,
+    showLink: false,
+  },
+  risks: mockRisks,
+  tierCalculation: mockTierCalculation,
+  predictors: mockPredictors,
+})
 
 const req = httpMocks.createRequest({
   params: {
@@ -88,11 +122,14 @@ describe('/middleware/getPersonalDetails', () => {
   })
 
   it('should request data from the api if personal details for crn does not exist in the session', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     const expected = {
       personalDetails: {
         X000001: mock(),
-        X000002: mock('X000002'),
+        X000002: mock('X000002', ''),
       },
     }
     expect(req.session.data).toEqual(expected)
@@ -102,8 +139,38 @@ describe('/middleware/getPersonalDetails', () => {
     expect(predictorsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', { nameOrCrn: req.params.crn })
     expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')
-    expect(getPlanByCrnSpy).toHaveBeenCalled()
-    expect(res.locals.case).toEqual(mock('X000002'))
+    expect(res.locals.case).toEqual(overview('X000002'))
+    expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
+    expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
+    expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
+    expect(res.locals.headerPersonName).toEqual(`Caroline Wolff`)
+    expect(res.locals.headerCRN).toEqual(req.params.crn)
+    expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(nextSpy).toHaveBeenCalled()
+    getPersonalDetailsSpy.mockRestore()
+  })
+
+  it('should not request data from the api if personal details for crn already exist in the session', async () => {
+    const mockReq = httpMocks.createRequest({
+      params: {
+        crn: 'X000002',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+            X000002: mock('X000002'),
+          },
+        },
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(mockReq, res, nextSpy)
+    expect(getPersonalDetailsSpy).not.toHaveBeenCalled()
+    expect(risksSpy).not.toHaveBeenCalled()
+    expect(tierCalculationSpy).not.toHaveBeenCalled()
+    expect(predictorsSpy).not.toHaveBeenCalled()
+    expect(searchUserCaseloadSpy).not.toHaveBeenCalled()
+    expect(res.locals.case).toEqual(overview('X000002'))
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
     expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
@@ -141,7 +208,7 @@ describe('/middleware/getPersonalDetails', () => {
     } as unknown as AppResponse
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient)(req, mockRes, nextSpy)
     expect(getPlanByCrnSpy).not.toHaveBeenCalled()
   })
@@ -159,7 +226,7 @@ describe('/middleware/getPersonalDetails', () => {
 
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient)(req, mockedRes, nextSpy)
     expect(mockedRes.locals.sentencePlan).toStrictEqual({
       showLink: false,
@@ -174,7 +241,7 @@ describe('/middleware/getPersonalDetails', () => {
       .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
@@ -194,7 +261,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient)(req, mockedRes, nextSpy)
     expect(mockedRes.locals.sentencePlan).toStrictEqual({
       showLink: false,
@@ -205,7 +272,7 @@ describe('/middleware/getPersonalDetails', () => {
   it('should set the correct sentence plan local variables if user has sentence plan role, pop has sentence plan and pop in user caseload', async () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
       .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
       .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
@@ -232,7 +299,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
     await getPersonalDetails(hmppsAuthClient)(mockedReq, mockedRes, nextSpy)
     expect(mockedRes.locals.sentencePlan).toStrictEqual({
-      showLink: true,
+      showLink: false,
       lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
     })
   })
@@ -240,7 +307,7 @@ describe('/middleware/getPersonalDetails', () => {
   it('should set the correct sentence plan local variables if pop has no sentence plan', async () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(mock('X000002')))
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
 
     const mockedRes = mockAppResponse({
