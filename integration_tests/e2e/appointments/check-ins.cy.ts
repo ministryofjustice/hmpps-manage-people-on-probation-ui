@@ -612,6 +612,18 @@ context('check-ins overview and manage pages', () => {
   it('should show checkin details', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESuperVision')
+
+    cy.visit(`/case/X778160/appointments`)
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
+    appointmentsPage
+      .getElement('[data-qa="online-manage-btn"]')
+      .should('be.visible')
+      .and('contain.text', 'Manage online check ins')
+    appointmentsPage.getElement('[data-qa="online-manage-btn"]').click()
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -621,7 +633,6 @@ context('check-ins overview and manage pages', () => {
       .should('contain.text', 'View all online check in details')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
 
-    const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
     manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
