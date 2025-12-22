@@ -205,8 +205,12 @@
                     {
                         key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
                         value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span>'}
+                    },
+                    {
+                        key: { html: '<span data-qa="contactPrefLabel">Contact preferences</span>'},
+                        value: { html: '<span data-qa="contactPrefValue">' + nextCheckin.contactPreference | userFriendlyString + '</span>'}
                     }
-                ]
+                   ]
             }) }}
   {% else %}
     {{ govukSummaryList({
