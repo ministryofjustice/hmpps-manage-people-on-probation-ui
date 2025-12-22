@@ -3,6 +3,7 @@ const definitions: Record<string, string> = {
   NO: 'No',
   EMAIL: 'Email',
   TEXT: 'Text message',
+  PHONE: 'Text message',
   WEEKLY: 'Every week',
   TWO_WEEKS: 'Every 2 weeks',
   FOUR_WEEKS: 'Every 4 weeks',
