@@ -130,8 +130,8 @@ export interface OffenderCheckinsByCRNResponse {
   status: OffenderStatus
   firstCheckin: string
   checkinInterval: CheckInterval
-  contactPreferences: string
-  snapshotUrl?: string
+  contactPreference: 'PHONE' | 'EMAIL'
+  photoUrl?: string
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

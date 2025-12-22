@@ -583,6 +583,8 @@ context('check-ins overview and manage pages', () => {
     overviewPage.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
     overviewPage.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     overviewPage.getElementData('frequencyValue').should('contain.text', 'Every week')
+    overviewPage.getElementData('contactPrefLabel').should('contain.text', 'Contact preferences')
+    overviewPage.getElementData('contactPrefValue').should('contain.text', 'Text message')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage
       .getElementData('checkinCard')
