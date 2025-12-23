@@ -70,7 +70,8 @@ export interface OffenderInfo {
   crn: string
   firstCheckin: string
   checkinInterval: string
-  startedAt: string
+  contactPreference: string
+  startedAt?: string
 }
 
 export interface LocationInfo {
