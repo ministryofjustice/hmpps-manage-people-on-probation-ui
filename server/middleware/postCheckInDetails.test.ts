@@ -31,6 +31,7 @@ describe('postCheckInDetails', () => {
         checkInEmail: 'test@test.com',
         checkInMobile: '07123456789',
         photoUploadOption: '07123456789',
+        preferredComs: 'EMAIL',
       } as const)
 
     const req: any = {
@@ -99,6 +100,7 @@ describe('postCheckInDetails', () => {
     })
     expect(calledWith.firstCheckin).toBe('2025/3/12')
     expect(typeof calledWith.startedAt).toBe('string')
+    expect(calledWith.contactPreference).toBe('EMAIL')
 
     expect(getProfilePhotoUploadLocation).toHaveBeenCalledWith(setup, 'image/jpeg')
     expect(result).toEqual({ setup, uploadLocation })
