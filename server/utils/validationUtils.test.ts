@@ -607,7 +607,7 @@ describe('isValidCharCount', () => {
   describe('Should check contactPreference for Email', () => {
     test('returns true for no preference', () => {
       expect(contactPrefEmailCheck([undefined])).toBe(true)
-      expect(contactPrefEmailCheck(['TEXT'])).toBe(true)
+      expect(contactPrefEmailCheck(['PHONE'])).toBe(true)
     })
 
     test('returns true for valid email case', () => {
@@ -653,23 +653,23 @@ describe('isValidCharCount', () => {
       })
 
       test('returns true for valid digits case', () => {
-        expect(contactPrefMobileCheck(['TEXT', '07771 900 900'])).toBe(true)
-        expect(contactPrefMobileCheck(['TEXT', '07771900900'])).toBe(true)
+        expect(contactPrefMobileCheck(['PHONE', '07771 900 900'])).toBe(true)
+        expect(contactPrefMobileCheck(['PHONE', '07771900900'])).toBe(true)
       })
 
       test('returns false for landline number', () => {
-        expect(contactPrefMobileCheck(['TEXT', '0123456999'])).toBe(false)
+        expect(contactPrefMobileCheck(['PHONE', '0123456999'])).toBe(false)
       })
 
       test('returns false for invalid digits case', () => {
-        expect(contactPrefMobileCheck(['TEXT', '123abc'])).toBe(false)
-        expect(contactPrefMobileCheck(['TEXT', '12.34'])).toBe(false)
-        expect(contactPrefMobileCheck(['TEXT', '123-456'])).toBe(false)
+        expect(contactPrefMobileCheck(['PHONE', '123abc'])).toBe(false)
+        expect(contactPrefMobileCheck(['PHONE', '12.34'])).toBe(false)
+        expect(contactPrefMobileCheck(['PHONE', '123-456'])).toBe(false)
       })
 
-      test('returns false for TEXT preference with no digits', () => {
-        expect(contactPrefMobileCheck(['TEXT', ''])).toBe(false)
-        expect(contactPrefMobileCheck(['TEXT', undefined])).toBe(false)
+      test('returns false for PHONE preference with no digits', () => {
+        expect(contactPrefMobileCheck(['PHONE', ''])).toBe(false)
+        expect(contactPrefMobileCheck(['PHONE', undefined])).toBe(false)
       })
     })
   })
