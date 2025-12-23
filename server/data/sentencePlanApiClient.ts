@@ -12,7 +12,7 @@ export default class SentencePlanApiClient extends RestClient {
       path: `/plans/crn/${crn}`,
       handle404: true,
       handle500: true,
-      errorMessageFor500:
+      errorMessage:
         'The sentence plan service is experiencing technical difficulties. It has not been possible to provide sentence plan information',
     })
   }

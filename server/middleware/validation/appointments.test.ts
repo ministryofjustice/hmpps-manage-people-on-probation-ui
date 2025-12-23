@@ -21,200 +21,191 @@ const reqBase = {
   query: {},
   session: {},
   body: {},
-} as object
-const req = httpMocks.createRequest(reqBase)
-const res = mockAppResponse({
-  filters: {
-    dateFrom: '',
-    dateTo: '',
-    keywords: '',
-  },
-})
-const next = jest.fn()
+}
 
 describe('/controllers/arrangeAppointmentController', () => {
-  afterEach(() => {
+  let next: jest.Mock
+  let makeRes: () => any
+
+  beforeEach(() => {
     jest.clearAllMocks()
+
+    next = jest.fn()
+
+    makeRes = () =>
+      mockAppResponse({
+        filters: {
+          dateFrom: '',
+          dateTo: '',
+          keywords: '',
+        },
+      })
   })
+
+  // Deep-clone + build request on every test
+  const makeReq = (overrides: Record<string, unknown> = {}) =>
+    httpMocks.createRequest(
+      JSON.parse(
+        JSON.stringify({
+          ...reqBase,
+          ...overrides,
+        }),
+      ),
+    )
+
   it('validation passes as no url', async () => {
+    const req = makeReq()
+    const res = makeRes()
+
     validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation passes for sentence', async () => {
     const appointments = {
       [crn]: {
-        [contactId]: {
-          eventId: 1,
-        },
+        [contactId]: { eventId: 1 },
       },
     }
-    const reqBaseSentence = {
-      ...reqBase,
+
+    const req = makeReq({
       url: sentenceUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqSentence = httpMocks.createRequest(reqBaseSentence)
-    validation.appointments(reqSentence, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation fails if no sentence selected', async () => {
-    const reqBaseSentence = {
-      ...reqBase,
+    const req = makeReq({
       url: sentenceUrl,
-      session: {
-        data: {},
-      },
-      body: {
-        appointments: {},
-      },
-    } as unknown
-    const reqSentence = httpMocks.createRequest(reqBaseSentence)
-    validation.appointments(reqSentence, res, next)
+      session: { data: {} },
+      body: { appointments: {} },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation passes for type', async () => {
     const appointments = {
       [crn]: {
-        [contactId]: {
-          type: 1,
-        },
+        [contactId]: { type: 1 },
       },
     }
-    const reqBaseType = {
-      ...reqBase,
+
+    const req = makeReq({
       url: typeUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation fails for type', async () => {
-    const reqBaseType = {
-      ...reqBase,
+    const req = makeReq({
       url: typeUrl,
-      session: {
-        data: {},
-      },
-      body: {
-        appointments: {},
-      },
-    } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
+      session: { data: {} },
+      body: { appointments: {} },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation passes for location-date-time', async () => {
     const appointments = {
       [crn]: {
         [contactId]: {
-          user: {
-            locationCode: 'code',
-          },
+          user: { locationCode: 'code' },
           date: '17/5/2030',
           start: '09:15',
           end: '10:15',
         },
       },
     }
-    const reqBaseLocation = {
-      ...reqBase,
+
+    const req = makeReq({
       url: locationDateTimeUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation fails for location-date-time - unselected fields', async () => {
-    const reqBaseLocation = {
-      ...reqBase,
+    const req = makeReq({
       url: locationDateTimeUrl,
-      session: {
-        data: {},
-      },
-      body: {
-        appointments: {},
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
+      session: { data: {} },
+      body: { appointments: {} },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation fails for location-date-time - end before start', async () => {
     const appointments = {
       [crn]: {
         [contactId]: {
-          user: {
-            locationCode: 'code',
-          },
+          user: { locationCode: 'code' },
           date: '2030-17-05',
           start: '10:15am',
           end: '9:15am',
         },
       },
     }
-    const reqBaseDate = {
-      ...reqBase,
+
+    const req = makeReq({
       url: locationDateTimeUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqDate = httpMocks.createRequest(reqBaseDate)
-    validation.appointments(reqDate, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation passes for repeating - not repeating', async () => {
     const appointments = {
       [crn]: {
-        [contactId]: {
-          repeating: 'No',
-        },
+        [contactId]: { repeating: 'No' },
       },
     }
-    const reqBaseLocation = {
-      ...reqBase,
+
+    const req = makeReq({
       url: repeatingUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation passes for repeating - repeating', async () => {
     const appointments = {
       [crn]: {
@@ -225,22 +216,19 @@ describe('/controllers/arrangeAppointmentController', () => {
         },
       },
     }
-    const reqBaseLocation = {
-      ...reqBase,
+
+    const req = makeReq({
       url: repeatingUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation fails for repeating - more than a year', async () => {
     const appointments = {
       [crn]: {
@@ -253,37 +241,32 @@ describe('/controllers/arrangeAppointmentController', () => {
         },
       },
     }
-    const reqBaseLocation = {
-      ...reqBase,
+
+    const req = makeReq({
       url: repeatingUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation fails for repeating - no value', async () => {
-    const reqBaseLocation = {
-      ...reqBase,
+    const req = makeReq({
       url: repeatingUrl,
-      session: {
-        data: {},
-      },
-      body: {
-        appointments: {},
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
+      session: { data: {} },
+      body: { appointments: {} },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation passes for supporting information', async () => {
     const appointments = {
       [crn]: {
@@ -293,22 +276,19 @@ describe('/controllers/arrangeAppointmentController', () => {
         },
       },
     }
-    const reqBaseType = {
-      ...reqBase,
+
+    const req = makeReq({
       url: supportingUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(next).toHaveBeenCalled()
   })
+
   it('validation fails for supporting information - no sensitivity', async () => {
     const appointments = {
       [crn]: {
@@ -317,22 +297,19 @@ describe('/controllers/arrangeAppointmentController', () => {
         },
       },
     }
-    const reqBaseType = {
-      ...reqBase,
+
+    const req = makeReq({
       url: supportingUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
+
   it('validation fails for supporting information - notes too long', async () => {
     const appointments = {
       [crn]: {
@@ -342,20 +319,16 @@ describe('/controllers/arrangeAppointmentController', () => {
         },
       },
     }
-    const reqBaseType = {
-      ...reqBase,
+
+    const req = makeReq({
       url: supportingUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqType = httpMocks.createRequest(reqBaseType)
-    validation.appointments(reqType, res, next)
+      session: { data: { appointments } },
+      body: { appointments },
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
     expect(res.render).toHaveBeenCalled()
   })
 })
