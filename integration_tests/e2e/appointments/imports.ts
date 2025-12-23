@@ -288,9 +288,13 @@ export const checkAppointmentSummary = (
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
         if (dateInPast) {
-          expect(normalizedText).to.include(`${dateWithYear(pastDate)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dateWithYear(pastDate)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+          )
         } else {
-          expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dateWithYear(date)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+          )
         }
       })
   }
@@ -413,8 +417,8 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           if (normalizedText) {
-            expect(normalizedText.toString()).to.include(
-              `${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`,
+            expect(normalizedText).to.include(
+              `${dateWithYear(newDate.toISODate())} from ${to24HourTimeWithMinutes(changedStart)} to ${to24HourTimeWithMinutes(changedEnd)}`,
             )
           }
         })
@@ -442,7 +446,9 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
         .invoke('text')
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dateWithYear(date)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+          )
         })
     }
   })
@@ -753,4 +759,16 @@ export const checkAppointmentDetails = (
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
+}
+
+export const to24HourTimeWithMinutes = (time: string): string => {
+  const [rawHours, rawMinutes] = time.split(':')
+
+  const hours = Number(rawHours)
+  const minutes = Number(rawMinutes)
+
+  const period = hours >= 12 ? 'pm' : 'am'
+  const hour12 = hours % 12 || 12
+
+  return `${hour12}:${minutes.toString().padStart(2, '0')}${period}`
 }

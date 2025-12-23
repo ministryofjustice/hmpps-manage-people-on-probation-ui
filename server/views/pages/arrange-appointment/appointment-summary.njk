@@ -73,9 +73,9 @@
         {% for appointmentDate in appointmentDates %}
             <li>{{ appointmentDate | dateWithYear }}
           from
-          {{appointment.start}}
+          {{appointment.start | to12HourTimeWithMinutes}}
           to
-          {{ appointment.end }}</li>
+          {{ appointment.end | to12HourTimeWithMinutes}}</li>
         {% endfor %}
     </ul>
     {% endset %}
