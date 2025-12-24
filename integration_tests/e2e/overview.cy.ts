@@ -188,7 +188,7 @@ context('Overview', () => {
       'contain.text',
       'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
     )
-    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no RoSH summary.')
+    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
     page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
     page.getRowData('risk', 'criminogenicNeeds', 'Value').should('contain.text', 'There is no OASys risk assessment.')
     page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
