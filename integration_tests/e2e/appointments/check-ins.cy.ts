@@ -645,10 +645,13 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
     manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
-    manageCheckins.getElementData('emailAddressLabel').should('contain.text', 'Email address')
-    manageCheckins.getElementData('emailAddressValue').should('contain.text', 'address1@gmail.com')
-    manageCheckins.getElementData('mobileNumberLabel').should('contain.text', 'Mobile number')
-    manageCheckins.getElementData('mobileNumberValue').should('contain.text', '071838893')
+    manageCheckins.getElementData('methodLabel').should('contain.text', 'Mobile number')
+    manageCheckins.getElementData('methodValue').should('contain.text', '071838893')
+
+    manageCheckins.getElementData('photoCard').should('contain.text', 'Photo')
+    manageCheckins.getElementData('photoLabel').should('contain.text', 'Photo of Alton')
+    manageCheckins.getImage().should('have.attr', 'src', '/assets/images/placeholder.png')
+    manageCheckins.getImage().should('have.attr', 'alt', 'Image of Alton Berge')
   })
 
   it('should able to visit contact details page', () => {
