@@ -48,7 +48,9 @@ describe('Confirmation page', () => {
         .invoke('text')
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(`${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
+          )
         })
       confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
       confirmPage
@@ -119,7 +121,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`,
+              `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
             )
           })
         confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
@@ -166,7 +168,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `${dayOfWeek(date)} ${dateWithYear(date)} from ${startTime} to ${endTime}`,
+              `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
             )
           })
         confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
@@ -215,3 +217,16 @@ describe('Confirmation page', () => {
     })
   })
 })
+
+export const to12HourTime = (time: string): string => {
+  const [hours, minutes] = time.split(':').map(Number)
+
+  const period = hours >= 12 ? 'pm' : 'am'
+  const hour12 = hours % 12 || 12
+
+  if (minutes === 0) {
+    return `${hour12}${period}`
+  }
+
+  return `${hour12}:${minutes.toString().padStart(2, '0')}${period}`
+}
