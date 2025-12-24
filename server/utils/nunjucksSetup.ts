@@ -78,6 +78,8 @@ import config from '../config'
 import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
+import { to12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
+import { to12HourTimeCompact } from './to12HourTimeCompact'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -197,4 +199,6 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('toIsoDateFromPicker', toIsoDateFromPicker)
   njkEnv.addGlobal('fromIsoDateToPicker', fromIsoDateToPicker)
   njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
+  njkEnv.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
+  njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
 }
