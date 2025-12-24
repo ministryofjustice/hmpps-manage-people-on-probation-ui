@@ -82,6 +82,13 @@
   }
 }
 
+@media (min-width: 40.0626em) {
+  [data-qa="photoCard"] .govuk-summary-list__row {
+    display: flex;               /* override table-row */
+    align-items: flex-start;     /* pin to top */
+  }
+}
+
 .es-flex-row {
   display: flex;
   flex-direction: row;
