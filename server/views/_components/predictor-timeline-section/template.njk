@@ -1,6 +1,6 @@
 {% from "_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 
-{% if params.item.type == 'RoSH' %}
+{% if params.item.type == 'ROSH' %}
     <div class='flex flex--align-center govuk-!-margin-bottom-2'>
     {{ predictorTimelineItem({ type: params.item.type, level: params.item.level }) }}
     <span class='govuk-!-padding-left-2 govuk-!-font-size-16'>from NDelius</span>
@@ -15,7 +15,7 @@
                 <span class="govuk-details__summary-text govuk-!-font-size-16" data-analytics-event="roshHistory"
                       data-analytics-event-category="{{ params.item.level }}"
                       data-analytics-event-label="{{ params.item.date }}">View notes<span
-                            class="govuk-visually-hidden"> on RoSH history on {{ params.item.date }}</span></span>
+                            class="govuk-visually-hidden"> on ROSH history on {{ params.item.date }}</span></span>
             </summary>
             <div class="govuk-details__text">
                 <pre class='govuk-body govuk-!-font-size-16' data-qa='notes'>{{ params.item.notes }}</pre>
