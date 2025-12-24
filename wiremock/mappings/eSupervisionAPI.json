@@ -163,7 +163,7 @@
           "firstCheckin": "2025-11-03",
           "checkinInterval": "WEEKLY",
           "contactPreference": "PHONE",
-          "photoUrl": "string"
+          "photoUrl": "/assets/images/placeholder.png"
         },
         "headers": {
           "Content-Type": "application/json"
