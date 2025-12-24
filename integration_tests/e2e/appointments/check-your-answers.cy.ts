@@ -268,3 +268,14 @@ describe('Check your answers then confirm the appointment', () => {
     })
   })
 })
+export const to12HourTimeWithMinutes = (time: string): string => {
+  const [rawHours, rawMinutes] = time.split(':')
+
+  const hours = Number(rawHours)
+  const minutes = Number(rawMinutes)
+
+  const period = hours >= 12 ? 'pm' : 'am'
+  const hour12 = hours % 12 || 12
+
+  return `${hour12}:${minutes.toString().padStart(2, '0')}${period}`
+}
