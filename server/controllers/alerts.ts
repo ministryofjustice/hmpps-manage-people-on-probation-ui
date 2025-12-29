@@ -50,42 +50,9 @@ const alertsController: Controller<typeof routes, void> = {
           const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
           if (responseErrorIndex >= 0) arnsUnavailableError = allRiskResponses[responseErrorIndex].errors[0].text
         } catch (err: any) {
-          // catch any other errors
           arnsUnavailableError = apiErrors.risks
         }
-
         // this results, risksErrors and crnToRiskWidgetMap variables below probably need refactoring but left in so correct values are passed to template
-
-        if (allRiskResponses.length) {
-          results = allRiskResponses.map((riskResponse, i) => ({
-            crn: uniqueCrns[i],
-            risksWidget: arnsUnavailableError ?? toRoshWidget(riskResponse),
-          }))
-          crnToRiskWidgetMap = results.reduce((acc, { crn, risksWidget }) => ({ ...acc, [crn]: risksWidget }), {})
-        }
-        if (arnsUnavailableError) {
-          risksErrors = [{ text: arnsUnavailableError }]
-        }
-      }
-
-      if (enableRiskOnAlertsDashboard) {
-        let allRiskResponses: RiskSummary[]
-        let arnsUnavailableError: string = null
-        const uniqueCrns = [...new Set(alertsData.content.map(item => item.crn))].filter(Boolean)
-        try {
-          allRiskResponses = await Promise.all(uniqueCrns.map(crn => arnsClient.getRisks(crn)))
-
-          // promise.all will complete and resolve even if response of any request is a 500 error, so check for error
-          const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
-
-          if (responseErrorIndex >= 0) arnsUnavailableError = allRiskResponses[responseErrorIndex].errors[0].text
-        } catch (err: any) {
-          // catch any other errors
-          arnsUnavailableError = apiErrors.risks
-        }
-
-        // this results, risksErrors and crnToRiskWidgetMap variables below probably need refactoring but left in so correct values are passed to template
-
         if (allRiskResponses.length) {
           results = allRiskResponses.map((riskResponse, i) => ({
             crn: uniqueCrns[i],

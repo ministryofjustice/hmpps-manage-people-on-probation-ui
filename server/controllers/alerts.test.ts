@@ -139,7 +139,7 @@ describe('alertsController', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
           url: encodeURIComponent(url),
           alertsData: mockUserAlertsWithCrn,
-          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
+          crnToRiskWidgetMap: {},
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
         })
