@@ -50,7 +50,7 @@ const alertsController: Controller<typeof routes, void> = {
           const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
           if (responseErrorIndex >= 0) arnsUnavailableError = allRiskResponses[responseErrorIndex].errors[0].text
         } catch (err: any) {
-          arnsUnavailableError = apiErrors.risks
+          arnsUnavailableError = err.message
         }
         // this results, risksErrors and crnToRiskWidgetMap variables below probably need refactoring but left in so correct values are passed to template
         if (allRiskResponses.length) {

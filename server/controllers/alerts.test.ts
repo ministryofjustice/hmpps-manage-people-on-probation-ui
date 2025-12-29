@@ -129,17 +129,15 @@ describe('alertsController', () => {
       })
 
       it('should render the alerts page when risks api request throws an error', async () => {
-        const expectedCrnToRiskWidgetMap = {
-          X123456: mockRoshWidget,
-          Y789012: mockRoshWidget,
-        }
-        getRisksSpy.mockImplementationOnce(() => Promise.reject(new Error('error message')))
+        const expectedCrnToRiskWidgetMap = {}
+        const mockErrorMessage = 'Mock error message'
+        getRisksSpy.mockImplementationOnce(() => Promise.reject(new Error(mockErrorMessage)))
         await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
-        const expectedRiskErrors = [{ text: apiErrors.risks }]
+        const expectedRiskErrors = [{ text: mockErrorMessage }]
         expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
           url: encodeURIComponent(url),
           alertsData: mockUserAlertsWithCrn,
-          crnToRiskWidgetMap: {},
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
         })
