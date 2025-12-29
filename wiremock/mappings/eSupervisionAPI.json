@@ -162,8 +162,8 @@
           "status": "VERIFIED",
           "firstCheckin": "2025-11-03",
           "checkinInterval": "WEEKLY",
-          "contactPreferences": "EMAIL",
-          "snapshotUrl": "string"
+          "contactPreference": "PHONE",
+          "photoUrl": "/assets/images/placeholder.png"
         },
         "headers": {
           "Content-Type": "application/json"

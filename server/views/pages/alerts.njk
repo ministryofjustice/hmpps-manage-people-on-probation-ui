@@ -59,13 +59,21 @@
             {% endif %}
             {% endset %}
 
+            {% if alert.type.editable %}
+              {% set deliusLinkType = 'UpdateContact' %}
+              {% set deliusLinkView = 'Update' %}
+            {% else %}
+              {% set deliusLinkType = 'Contact' %}
+              {% set deliusLinkView = 'View' %}
+            {% endif %}
+
             {% set alertUpdate %}
-            <a href="{{ deliusDeepLinkUrl('UpdateContact', alert.crn, alert.id) }}"
+            <a href="{{ deliusDeepLinkUrl(deliusLinkType, alert.crn, alert.id) }}"
                 class="govuk-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-qa="updateInNDelius-{{ alert.id }}">
-                Update
+                {{ deliusLinkView }}
                 <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
             </a>
             {% endset %}
@@ -154,7 +162,7 @@
                                 attributes: { "aria-sort": setSortOrder('type_description', sortedBy), 'data-sort-column': 'type_description', 'data-qa': 'activityHeader', 'data-sort-name': 'type_description', 'data-sort-action': 'alerts' }
                             },
                             {
-                                html: 'Update on NDelius<br>(opens in new tab)',
+                                html: 'Manage on NDelius<br>(opens in new tab)',
                                 classes: "vertical-align--middle govuk-action--bottom",
                                 attributes: { 'data-qa': "actionsHeader" }
                             }

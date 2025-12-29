@@ -27,9 +27,9 @@
   <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
     {{ appointmentDate | dateWithYear }}
     from
-    {{ appointment.start }}
+    {{ appointment.start | to12HourTimeCompact}}
     to
-    {{ appointment.end }}</span>
+    {{ appointment.end | to12HourTimeCompact}}</span>
 {% endfor %}
 {% set cases = "/case/" %}
 {% set overViewLink = "/case/" + crn %}

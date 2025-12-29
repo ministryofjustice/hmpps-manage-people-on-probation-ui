@@ -21,7 +21,7 @@
 {% set checkinButtonText = 'Manage online check ins' if offenderCheckinsByCRNResponse else 
   'Set up online check ins' %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions?back=appointments' %}
-{% set manageCheckinLink = '#' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 {% set checkinLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
   checkinLink %}
 
@@ -175,7 +175,7 @@
             {% endif %}
             {% if flags.enableESuperVision === true %}
               <div class="moj-button-group__item">
-                <a href="{{ checkinLink }}" class="govuk-button govuk-button--secondary govuk-!-margin-left-3" data-qa="online-checkin-btn">{{ checkinButtonText }}</a>
+                <a href="{{ checkinLink }}" class="govuk-button govuk-button--secondary govuk-!-margin-left-3"  data-qa="{% if offenderCheckinsByCRNResponse %}online-manage-btn{% else %}online-checkin-btn{% endif %}">{{ checkinButtonText }}</a>
               </div>
             {% endif %}
           </div>

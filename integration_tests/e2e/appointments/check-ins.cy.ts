@@ -583,6 +583,8 @@ context('check-ins overview and manage pages', () => {
     overviewPage.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
     overviewPage.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     overviewPage.getElementData('frequencyValue').should('contain.text', 'Every week')
+    overviewPage.getElementData('contactPrefLabel').should('contain.text', 'Contact preferences')
+    overviewPage.getElementData('contactPrefValue').should('contain.text', 'Text message')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage
       .getElementData('checkinCard')
@@ -612,6 +614,18 @@ context('check-ins overview and manage pages', () => {
   it('should show checkin details', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESuperVision')
+
+    cy.visit(`/case/X778160/appointments`)
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
+    appointmentsPage
+      .getElement('[data-qa="online-manage-btn"]')
+      .should('be.visible')
+      .and('contain.text', 'Manage online check ins')
+    appointmentsPage.getElement('[data-qa="online-manage-btn"]').click()
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -621,7 +635,6 @@ context('check-ins overview and manage pages', () => {
       .should('contain.text', 'View all online check in details')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
 
-    const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
     manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
@@ -632,10 +645,13 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
     manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
-    manageCheckins.getElementData('emailAddressLabel').should('contain.text', 'Email address')
-    manageCheckins.getElementData('emailAddressValue').should('contain.text', 'address1@gmail.com')
-    manageCheckins.getElementData('mobileNumberLabel').should('contain.text', 'Mobile number')
-    manageCheckins.getElementData('mobileNumberValue').should('contain.text', '071838893')
+    manageCheckins.getElementData('methodLabel').should('contain.text', 'Mobile number')
+    manageCheckins.getElementData('methodValue').should('contain.text', '071838893')
+
+    manageCheckins.getElementData('photoCard').should('contain.text', 'Photo')
+    manageCheckins.getElementData('photoLabel').should('contain.text', 'Photo of Alton')
+    manageCheckins.getImage().should('have.attr', 'src', '/assets/images/placeholder.png')
+    manageCheckins.getImage().should('have.attr', 'alt', 'Image of Alton Berge')
   })
 
   it('should able to visit contact details page', () => {
