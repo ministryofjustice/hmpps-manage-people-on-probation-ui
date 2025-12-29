@@ -5,7 +5,6 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget } from '../utils'
 import { RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
 import { ErrorSummaryItem } from '../data/model/common'
-import { apiErrors } from '../properties'
 
 const routes = ['getAlerts', 'clearSelectedAlerts'] as const
 
@@ -103,10 +102,6 @@ const alertsController: Controller<typeof routes, void> = {
       return next()
     }
   },
-}
-
-function isErrorSummary(obj: any): obj is { errors: any[] } {
-  return typeof obj === 'object' && obj !== null && 'errors' in obj && Array.isArray(obj.errors)
 }
 
 export default alertsController
