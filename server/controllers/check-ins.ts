@@ -6,7 +6,7 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
+import { CheckinScheduleRequest, CheckInterval, ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -44,6 +44,8 @@ const routes = [
   'postTakeAPhotoPage',
   'postViewCheckIn',
   'getManageCheckinPage',
+  'getManageCheckinDatePage',
+  'postManageCheckinDatePage',
   'getManageContactPage',
   'postManageContactPage',
   'getManageEditContactPage',
@@ -523,6 +525,52 @@ const checkInsController: Controller<typeof routes, void> = {
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], mobile)
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
+    }
+  },
+  getManageCheckinDatePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const checkInMinDate = getMinDate()
+      const checkinRes = res.locals?.offenderCheckinsByCRNResponse
+      const date = checkinRes?.firstCheckin
+      const interval = checkinRes?.checkinInterval
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin'], { date, interval })
+      return res.render('pages/check-in/manage/checkin-settings.njk', {
+        crn,
+        id,
+        checkInMinDate,
+        date,
+        interval,
+      })
+    }
+  },
+  postManageCheckinDatePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { data } = req.session
+      const previousDate = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'date'])
+      const previousInterval = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'interval'])
+      // firstCheckinDate is provided in format dd/M/yyyy. Convert to yyyy/M/dd as required by API.
+      const parsedFirstCheckin = DateTime.fromFormat(previousDate ?? '', 'd/M/yyyy')
+      const formattedDate = parsedFirstCheckin.isValid ? parsedFirstCheckin.toFormat('yyyy/M/dd') : previousDate
+      const body: CheckinScheduleRequest = {
+        checkinSchedule: {
+          requestedBy: res.locals.user.username,
+          firstCheckin: formattedDate,
+          checkinInterval: previousInterval,
+        },
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupClient = new ESupervisionClient(token)
+      await eSupClient.postUpdateOffenderDetails(id, body)
+
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
   },
   getManageContactPage: hmppsAuthClient => {
