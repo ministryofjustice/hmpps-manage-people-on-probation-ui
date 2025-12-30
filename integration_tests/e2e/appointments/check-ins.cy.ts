@@ -18,6 +18,7 @@ import OverviewPage from '../../pages/overview'
 import ManageCheckins from '../../pages/check-ins/manage-checkins'
 import ManageContactPage from '../../pages/check-ins/manage-contact'
 import ManageEditContactPage from '../../pages/check-ins/manage-edit-contact'
+import ChangeSettingsPage from '../../pages/check-ins/change-settings'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -684,5 +685,31 @@ context('check-ins overview and manage pages', () => {
     manageEditContactPage.checkOnPage()
     manageEditContactPage.getBackLink().click()
     manageContact.checkOnPage()
+  })
+
+  it('should able to vist change settings page', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
+    manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
+    manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').click()
+    const changeSettingsPage = new ChangeSettingsPage()
+    changeSettingsPage.checkOnPage()
+    changeSettingsPage
+      .getElementData('checkInDate')
+      .find('input.moj-js-datepicker-input')
+      .clear()
+      .type('3/11/2025')
+      .blur()
+    changeSettingsPage
+      .getElementData('checkInFrequency')
+      .find('input[type="radio"][value="WEEKLY"]')
+      .should('be.checked')
+    changeSettingsPage.getSubmitBtn().click()
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
   })
 })
