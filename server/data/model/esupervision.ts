@@ -135,5 +135,23 @@ export interface OffenderCheckinsByCRNResponse {
   photoUrl?: string
 }
 
+export interface CheckinScheduleRequest {
+  checkinSchedule: {
+    requestedBy: string
+    firstCheckin: string
+    checkinInterval: CheckInterval
+  }
+}
+
+export interface CheckinScheduleResponse {
+  uuid: string
+  crn: string
+  status: OffenderStatus
+  firstCheckin: string
+  checkinInterval: CheckInterval
+  contactPreference: 'PHONE' | 'EMAIL'
+  photoUrl: string
+}
+
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
 export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'

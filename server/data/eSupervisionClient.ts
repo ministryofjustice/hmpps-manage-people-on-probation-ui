@@ -2,8 +2,9 @@ import config from '../config'
 import RestClient from './restClient'
 
 import {
+  CheckinScheduleRequest,
+  CheckinScheduleResponse,
   ESupervisionCheckIn,
-  ESupervisionCheckInResponse,
   ESupervisionNote,
   ESupervisionReview,
   LocationInfo,
@@ -71,5 +72,15 @@ export default class ESupervisionClient extends RestClient {
 
   async getOffenderCheckinsByCRN(crn: string): Promise<OffenderCheckinsByCRNResponse | null> {
     return this.get({ path: `/v2/offenders/crn/${crn}`, handle404: true })
+  }
+
+  async postUpdateOffenderDetails(
+    uuid: string,
+    checkinScheduleRequest: CheckinScheduleRequest,
+  ): Promise<CheckinScheduleResponse> {
+    return this.post({
+      path: `/v2/offenders/${uuid}/update_details`,
+      data: checkinScheduleRequest,
+    })
   }
 }

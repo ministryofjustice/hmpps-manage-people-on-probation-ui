@@ -1394,6 +1394,73 @@ describe('checkInsController', () => {
       })
     })
   })
+
+  describe('getManageCheckinDatePage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.getManageCheckinDatePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('sets session values from response and renders settings with min date', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      ;(res.locals as any).offenderCheckinsByCRNResponse = {
+        firstCheckin: '01/01/2026',
+        checkinInterval: 'WEEKLY',
+      }
+      const req = baseReq({})
+
+      await controllers.checkIns.getManageCheckinDatePage(hmppsAuthClient)(req, res)
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'date'],
+        '01/01/2026',
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'manageCheckin', 'interval'],
+        'WEEKLY',
+      )
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/checkin-settings.njk',
+        expect.objectContaining({
+          crn,
+          id: uuid,
+        }),
+      )
+
+      const locals = (renderSpy.mock.calls[renderSpy.mock.calls.length - 1] as any)[1]
+      expect(locals.checkInMinDate).toBeDefined()
+    })
+  })
+
+  describe('postManageCheckinDatePage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.postManageCheckinDatePage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('redirects to manage page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postManageCheckinDatePage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
+    })
+  })
+
   describe('getManageContactPage', () => {
     it('returns 404 when CRN or id invalid', async () => {
       mockIsValidCrn.mockReturnValue(false)
