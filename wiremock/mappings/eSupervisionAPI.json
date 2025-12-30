@@ -188,6 +188,28 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offenders/.+?/update_details",
+        "method": "POST"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "crn": "X000001",
+          "status": "INITIAL",
+          "firstCheckin": "{{jsonPath request.body '$.checkinSchedule.firstCheckin'}}",
+          "checkinInterval": "{{jsonPath request.body '$.checkinSchedule.checkinInterval'}}",
+          "contactPreference": "PHONE",
+          "photoUrl": "/assets/images/placeholder.png"
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        },
+        "transformers": ["response-template"]
+      }
     }
   ]
 }
