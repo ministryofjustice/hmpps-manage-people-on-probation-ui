@@ -535,16 +535,15 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const checkInMinDate = getMinDate()
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
-      const checkinDate = checkinRes?.firstCheckin
-      const checkinInterval = checkinRes?.checkinInterval
-      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'date'], checkinDate)
-      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'interval'], checkinInterval)
+      const date = checkinRes?.firstCheckin
+      const interval = checkinRes?.checkinInterval
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin'], { date, interval })
       return res.render('pages/check-in/manage/checkin-settings.njk', {
         crn,
         id,
         checkInMinDate,
-        checkinDate,
-        checkinInterval,
+        date,
+        interval,
       })
     }
   },

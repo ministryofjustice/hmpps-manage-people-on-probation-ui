@@ -5,7 +5,6 @@
 {% set buttonText =  "Save changes" %}
 
 {% block form %}
-    <input type="hidden" name="checkInMinDate" value="{{checkInMinDate}}">
     <h3 class="govuk-heading-s govuk-!-margin-bottom-1" >When would you like {{case.name.forename}} to complete their next online <br/> check in?</h3>
     {{ mojDatePicker({
         formGroup: {
@@ -49,6 +48,7 @@
         ]
     } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'interval'])) }}
 
-    <input type="hidden" name="previousDate" value="{{ checkinDate }}">
-    <input type="hidden" name="previousInterval" value="{{ checkinInterval }}">
+    <input type="hidden" name="previousDate" value="{{ date }}">
+    <input type="hidden" name="previousInterval" value="{{ interval }}">
+    <input type="hidden" name="checkInMinDate" value="{{checkInMinDate}}">
 {% endblock %}
