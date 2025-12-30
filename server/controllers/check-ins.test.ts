@@ -1416,11 +1416,10 @@ describe('checkInsController', () => {
       const req = baseReq({})
 
       await controllers.checkIns.getManageCheckinDatePage(hmppsAuthClient)(req, res)
-      expect(mockSetDataValue).toHaveBeenCalledWith(
-        req.session.data,
-        ['esupervision', crn, uuid, 'manageCheckin'],
-        {"date": "01/01/2026", "interval": "WEEKLY"},
-      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['esupervision', crn, uuid, 'manageCheckin'], {
+        date: '01/01/2026',
+        interval: 'WEEKLY',
+      })
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/manage/checkin-settings.njk',
         expect.objectContaining({
