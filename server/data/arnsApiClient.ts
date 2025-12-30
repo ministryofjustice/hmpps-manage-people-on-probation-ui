@@ -4,6 +4,7 @@ import RestClient from './restClient'
 import { ErrorSummary } from './model/common'
 import { Needs, RiskScoresDto, RiskSummary } from './model/risk'
 import { SanIndicatorResponse } from '../models/Risk'
+import { apiErrors } from '../properties'
 
 export default class ArnsApiClient extends RestClient {
   constructor(token: string) {
@@ -16,8 +17,7 @@ export default class ArnsApiClient extends RestClient {
       handle404: true,
       handle500: true,
       handle401: true,
-      errorMessageFor500:
-        'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+      errorMessageFor500: apiErrors.risks,
     })
   }
 
