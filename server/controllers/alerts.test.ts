@@ -8,6 +8,7 @@ import { mockAppResponse } from './mocks'
 import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 import { apiErrors } from '../properties'
 import { UserAlerts } from '../models/Alerts'
+import logger from '../../logger'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
@@ -129,11 +130,13 @@ describe('alertsController', () => {
       })
 
       it('should render the alerts page when risks api request throws an error', async () => {
+        const loggerSpy = jest.spyOn(logger, 'error')
         const expectedCrnToRiskWidgetMap = {}
         const mockErrorMessage = 'Mock error message'
         getRisksSpy.mockImplementationOnce(() => Promise.reject(new Error(mockErrorMessage)))
         await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
-        const expectedRiskErrors = [{ text: mockErrorMessage }]
+        const expectedRiskErrors = [{ text: apiErrors.risks }]
+        expect(loggerSpy).toHaveBeenCalledWith(mockErrorMessage)
         expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
           url: encodeURIComponent(url),
           alertsData: mockUserAlertsWithCrn,

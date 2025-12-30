@@ -5,6 +5,8 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget } from '../utils'
 import { RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
 import { ErrorSummaryItem } from '../data/model/common'
+import logger from '../../logger'
+import { apiErrors } from '../properties'
 
 const routes = ['getAlerts', 'clearSelectedAlerts'] as const
 
@@ -49,7 +51,8 @@ const alertsController: Controller<typeof routes, void> = {
           const responseErrorIndex = allRiskResponses.findIndex(riskResponse => responseIsError(riskResponse))
           if (responseErrorIndex >= 0) arnsUnavailableError = allRiskResponses[responseErrorIndex].errors[0].text
         } catch (err: any) {
-          arnsUnavailableError = err.message
+          logger.error(err.message)
+          arnsUnavailableError = apiErrors.risks
         }
         // this results, risksErrors and crnToRiskWidgetMap variables below probably need refactoring but left in so correct values are passed to template
         if (allRiskResponses.length) {
