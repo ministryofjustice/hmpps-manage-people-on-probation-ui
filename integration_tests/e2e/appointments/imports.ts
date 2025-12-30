@@ -117,7 +117,7 @@ export const completeLocationDateTimePage = ({
   const tomorrowIsInCurrentMonth = tomorrow.month === now.month
   locationDateTimePage.getDatePickerToggle().click()
   if (dateOverride) {
-    const diff = dateOverride.month - now.month
+    const diff = (dateOverride.year - now.year) * 12 + (dateOverride.month - now.month)
     if (diff < 0) {
       for (let i = 0; i > diff; i -= 1) {
         cy.get('.moj-js-datepicker-prev-month').click()
@@ -390,12 +390,13 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
         second: 0,
         millisecond: 0,
       })
+
       const changedStart = '09:30'
       const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
       const dateTimePage = new AppointmentLocationDateTimePage()
       dateTimePage.getDatePickerToggle().click()
-      if (newDate.month > DateTime.now().month) {
+      if (newDate.month !== DateTime.now().month) {
         cy.get('.moj-js-datepicker-next-month').click()
       }
       cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
