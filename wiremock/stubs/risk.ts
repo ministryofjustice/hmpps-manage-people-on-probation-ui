@@ -35,6 +35,17 @@ const stubArnsUnavailable = (): SuperAgentRequest =>
     },
   })
 
+const stubArnsServerError = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/arns/risks/crn/.*',
+      method: 'GET',
+    },
+    response: {
+      fault: 'CONNECTION_RESET_BY_PEER',
+    },
+  })
+
 const stubSentencePlan404 = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -49,4 +60,4 @@ const stubSentencePlan404 = (): SuperAgentRequest =>
     },
   })
 
-export default { stubSanIndicatorTrue, stubSentencePlan404, stubArnsUnavailable }
+export default { stubSanIndicatorTrue, stubSentencePlan404, stubArnsUnavailable, stubArnsServerError }

@@ -16,8 +16,15 @@ context('Alerts Dashboard', () => {
     page.getElement('[data-qa="clearSelectedAlerts"]').should('not.exist')
   })
 
-  it('Alerts page renders ARNS Unavailable message', () => {
+  it('Alerts page renders ARNS Unavailable message if 500 response', () => {
     cy.task('stubArnsUnavailable')
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
+  })
+  it('Alerts page renders ARNS Unavailable message if server error', () => {
+    cy.task('stubArnsServerError')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
     cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
