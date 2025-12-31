@@ -44,12 +44,12 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
   router.post(
     '/case/:crn/appointments/reschedule/:contactId/:id',
     // upload.array('documents'),
+    getPersonAppointment(hmppsAuthClient),
     autoStoreSessionData(hmppsAuthClient),
     cacheUploadedFiles,
     validate.appointments,
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    getPersonAppointment(hmppsAuthClient),
     constructNextAppointmentSession,
     getUserProviders(hmppsAuthClient),
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),

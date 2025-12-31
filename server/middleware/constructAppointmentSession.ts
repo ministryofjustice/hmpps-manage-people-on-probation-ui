@@ -6,7 +6,7 @@ const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'N
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
-  const { crn, id, appointmentType } = req.params
+  const { crn, id } = req.params
   const { nextAppointment: nextAppointmentSelection } = req.body
 
   let nextAppointment: AppointmentSession = {
@@ -24,7 +24,11 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const { appointmentTypes } = res.locals
     let eventId = appointment?.eventId || ''
     const sentences = req?.session?.data?.sentences?.[crn]
-    const rescheduleAppointment = req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment
+    const rescheduleAppointment = {
+      ...(req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment ?? {}),
+      previousStart: appointment.startDateTime,
+      previousEnd: appointment.endDateTime,
+    }
 
     if (!eventId && appointment?.eventNumber) {
       if (sentences) {

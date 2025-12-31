@@ -152,6 +152,8 @@ export interface RescheduleAppointment {
   reason?: string
   files?: string[]
   sensitivity?: YesNo
+  previousStart?: string
+  previousEnd?: string
 }
 
 export interface AppointmentChecks {

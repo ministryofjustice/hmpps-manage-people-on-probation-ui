@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
-import { isValidCrn, isValidUUID } from '../utils'
+import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 
 import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
@@ -86,6 +86,8 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id, contactId } = req.params
       const { url } = req
+      const { data } = req.session
+      const appt = getDataValue(data, ['appointments', crn, id])
       res.render('pages/reschedule/check-your-answers', {
         crn,
         id,

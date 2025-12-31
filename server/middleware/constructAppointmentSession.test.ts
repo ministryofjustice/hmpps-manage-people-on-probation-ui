@@ -35,6 +35,8 @@ const rescheduleAppointment = {
   reason: 'why appointment needs to be rescheduled',
   files: ['file1', 'file2'],
   sensitivity: 'YES',
+  previousStart: '2024-02-21T10:15:00.382936Z[Europe/London]',
+  previousEnd: '2024-02-21T10:30:00.382936Z[Europe/London]',
 }
 
 const mockSentences: Sentence[] = [
@@ -501,7 +503,10 @@ describe('/middleware/constructAppointmentSession', () => {
     })
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toBeDefined()
-    expect(res.locals.nextAppointmentSession).not.toHaveProperty('rescheduleAppointment')
+    expect(res.locals.nextAppointmentSession.rescheduleAppointment).toStrictEqual({
+      previousEnd: '2024-02-21T10:30:00.382936Z[Europe/London]',
+      previousStart: '2024-02-21T10:15:00.382936Z[Europe/London]',
+    })
   })
 
   it('should not include rescheduleAppointment when selection is KEEP_TYPE even if reschedule data exists', () => {

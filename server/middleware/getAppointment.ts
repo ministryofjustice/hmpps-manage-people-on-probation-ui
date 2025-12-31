@@ -54,6 +54,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         notes,
         sensitivity,
         outcomeRecorded,
+        rescheduleAppointment: { previousStart = null, previousEnd = null },
       } = appointmentSession
 
       const type: AppointmentType | null = typeId
@@ -121,7 +122,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         location,
         date,
         start,
+        previousStart,
         end,
+        previousEnd,
         repeating,
         repeatingDates,
         notes: notes ?? null,

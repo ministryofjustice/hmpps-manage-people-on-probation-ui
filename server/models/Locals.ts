@@ -42,7 +42,9 @@ export interface AppointmentLocals {
   }
   location?: Location | string
   start?: string
+  previousStart?: string
   end?: string
+  previousEnd?: string
   date?: string
   repeating?: string
   repeatingDates?: string[]

@@ -13,14 +13,32 @@ describe('Manage an appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   beforeEach(() => {
     cy.task('resetMocks')
-    loadPage()
-    manageAppointmentPage = new ManageAppointmentPage()
   })
   it('should render the page', () => {
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
+    manageAppointmentPage
+      .getAppointmentDetailsListItem(1, 'actions')
+      .find('a')
+      .should('contain.text', 'Reschedule')
+      .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
   })
+  it('should render the page with no reschedule link if outcome has been logged', () => {
+    cy.task('stubFutureAppointmentOutcomeHasNotes')
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+  })
+  it('should render the page with no reschedule link if feature flag is disabled', () => {
+    cy.task('stubDisableRescheduleAppointment')
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+  })
+
   describe('Alert banner', () => {
     describe('Appointment is in the future', () => {
       beforeEach(() => {

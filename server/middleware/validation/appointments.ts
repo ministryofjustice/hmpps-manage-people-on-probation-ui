@@ -252,7 +252,7 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateReschedule = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/reschedule/${contactId}/${id}`)) {
-      render = `pages/appointments/reschedule`
+      render = `pages/reschedule/appointment`
       errorMessages = validateWithSpec(
         unflattenBracketKeys(req.body),
         appointmentsValidation({

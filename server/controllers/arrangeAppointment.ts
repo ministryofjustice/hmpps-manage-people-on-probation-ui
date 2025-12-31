@@ -264,12 +264,15 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const isInPast = appointmentDateIsInPast(req)
       const { enablePastAppointments } = res.locals.flags
       if (showValidation) {
-        res.locals.errorMessages = {
+        const errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
           [`appointments-${crn}-${id}-start`]: 'Enter a start time',
           [`appointments-${crn}-${id}-end`]: 'Enter an end time',
-          [`appointments-${crn}-${id}-user-locationCode`]: 'Select an appointment location',
         }
+        if (!getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])) {
+          errorMessages[`appointments-${crn}-${id}-user-locationCode`] = 'Select an appointment location'
+        }
+        res.locals.errorMessages = errorMessages
       }
       const isReschedule = isRescheduleAppointment(req)
       if (change) {
