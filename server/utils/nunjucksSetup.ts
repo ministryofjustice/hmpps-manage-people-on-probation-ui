@@ -11,6 +11,7 @@ import {
   dateWithYear,
   dateToTimestamp,
   dateWithDayAndWithoutYear,
+  dateWithDayAndWithYear,
   addressToList,
   dateForSort,
   dateWithNoDay,
@@ -125,6 +126,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('dateWithYear', dateWithYear)
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
+  njkEnv.addFilter('dateWithDayAndWithYear', dateWithDayAndWithYear)
   njkEnv.addFilter('yearsSince', yearsSince)
   njkEnv.addFilter('yearsBetween', yearsBetween)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)
