@@ -39,7 +39,7 @@ describe('Log attended and complied appointment', () => {
     const name = 'Alton Berge'
     const now = DateTime.now()
     const yesterday = now.minus({ days: 1 })
-    const date = dateWithYear(yesterday.toFormat('yyyy-M-dd'))
+    const date = dateWithYear(yesterday.toISODate())
     const appointmentText = manageJourney
       ? '3 Way Meeting (NS) with Terry Jones on 21 February 2024'
       : `Planned Office Visit (NS) with Deborah Fern on ${date}`
