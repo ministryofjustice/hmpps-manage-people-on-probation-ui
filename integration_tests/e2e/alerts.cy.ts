@@ -23,6 +23,14 @@ context('Alerts Dashboard', () => {
     cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
+
+  it('Alerts page does not render ARNS Unavailable message if 404 response', () => {
+    cy.task('stubArnsUnavailable', 404)
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('[data-module=govuk-error-summary]').should('not.exist')
+    page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
+  })
   it('Alerts page renders ARNS Unavailable message if server error', () => {
     cy.task('stubArnsServerError')
     cy.visit('/alerts')
