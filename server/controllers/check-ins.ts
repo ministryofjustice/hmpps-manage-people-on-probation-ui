@@ -50,6 +50,7 @@ const routes = [
   'postManageContactPage',
   'getManageEditContactPage',
   'postManageEditContactPage',
+  'getStopCheckinPage',
 ] as const
 
 interface OptionPair {
@@ -672,6 +673,17 @@ const checkInsController: Controller<typeof routes, void> = {
         }
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/contact`)
+    }
+  },
+  getStopCheckinPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { data } = req.session
+
+      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
     }
   },
 }
