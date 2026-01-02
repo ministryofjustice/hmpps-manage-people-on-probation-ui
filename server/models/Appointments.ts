@@ -12,6 +12,7 @@ export interface AppointmentSessionUser {
   teamCode?: string
   username?: string
   locationCode?: string
+  staffCode?: string
 }
 
 export interface AppointmentSession {
@@ -37,6 +38,8 @@ export interface AppointmentSession {
   sensitivity?: YesNo
   backendId?: number
   outcomeRecorded?: YesNo
+  contactId?: string
+  rescheduleAppointment?: RescheduleAppointment
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -108,6 +111,26 @@ export interface AppointmentRequestBody {
   outcomeRecorded?: boolean
 }
 
+export interface RescheduleAppointmentRequestBody {
+  date: string
+  startTime: string
+  endTime: string
+  staffCode?: string
+  teamCode?: string
+  locationCode?: string
+  rescheduleNotes?: string
+  notes?: string
+  rescheduleSensitive?: boolean
+  sensitive?: boolean
+  sendToVisor?: boolean
+  requestedBy: string
+  uuid: string
+}
+export interface RescheduleAppointmentResponse {
+  id: number
+  externalReference: string
+}
+
 export interface CheckAppointment {
   start: Date
   end: Date
@@ -120,6 +143,17 @@ export interface AppointmentPatch {
   notes?: string
   files?: string[]
   sensitive?: boolean
+  date?: string
+  startTime?: string
+}
+
+export interface RescheduleAppointment {
+  whoNeedsToReschedule?: string
+  reason?: string
+  files?: string[]
+  sensitivity?: YesNo
+  previousStart?: string
+  previousEnd?: string
 }
 
 export interface AppointmentChecks {
@@ -163,6 +197,7 @@ export interface LocalParams {
   forename?: string
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
+  isReschedule?: boolean
 }
 
 export interface MasUserDetails {

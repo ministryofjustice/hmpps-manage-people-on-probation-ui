@@ -65,7 +65,7 @@ const checkinIntervals: OptionPair[] = [
 ]
 
 const checkInsController: Controller<typeof routes, void> = {
-  getIntroPage: hmppsAuthClient => {
+  getIntroPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
       const { back } = req.query
@@ -76,7 +76,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  postIntroPage: hmppsAuthClient => {
+  postIntroPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
       if (!isValidCrn(crn)) {
@@ -87,7 +87,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  getDateFrequencyPage: hmppsAuthClient => {
+  getDateFrequencyPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -99,7 +99,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  postDateFrequencyPage: hmppsAuthClient => {
+  postDateFrequencyPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -126,11 +126,8 @@ const checkInsController: Controller<typeof routes, void> = {
       const personalDetails = await masClient.getPersonalDetails(crn)
       const checkInMobile = personalDetails.mobileNumber
       const checkInEmail = personalDetails.email
-      // if page not submitted, required to save in session for change link /edit page to avoid API call.
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'], checkInMobile)
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInEmail'], checkInEmail)
-
-      // To show success message on edit contact preference page
       const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'])
       if (contactUpdated) {
         res.locals.success = true
@@ -140,7 +137,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  postContactPreferencePage: hmppsAuthClient => {
+  postContactPreferencePage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -150,7 +147,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  getPhotoOptionsPage: hmppsAuthClient => {
+  getPhotoOptionsPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -160,17 +157,15 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/photo-options.njk', { crn, id, cya })
     }
   },
-  getEditContactPrePage: hmppsAuthClient => {
+  getEditContactPrePage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-
       return res.render('pages/check-in/edit-contact-preference.njk', { crn, id })
     }
   },
-
   postEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -210,8 +205,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/${redirectTo}`)
     }
   },
-
-  getTakePhotoPage: hmppsAuthClient => {
+  getTakePhotoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -221,8 +215,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/take-a-photo.njk', { crn, id, cya })
     }
   },
-
-  getUploadPhotoPage: hmppsAuthClient => {
+  getUploadPhotoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -232,8 +225,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/upload-a-photo.njk', { crn, id, cya })
     }
   },
-
-  postUploadaPhotoPage: hmppsAuthClient => {
+  postUploadaPhotoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -243,7 +235,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/photo-rules`)
     }
   },
-  getPhotoRulesPage: hmppsAuthClient => {
+  getPhotoRulesPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -253,7 +245,6 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/photo-rules.njk', { crn, id, photoUpload })
     }
   },
-
   getUpdateCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -283,8 +274,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return renderError(404)(req, res)
     }
   },
-
-  getViewCheckIn: hmppsAuthClient => {
+  getViewCheckIn: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -303,36 +293,28 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/view.njk', { crn, id, back, checkIn, videoLink })
     }
   },
-
   postViewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const { back } = req.query
-
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
-
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-
       const masClient = new MasApiClient(token)
       const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
       const practitionerId = pp?.username ? pp.username : res.locals.user.username
-
       const eSupervisionClient = new ESupervisionClient(token)
       const notes: ESupervisionNote = {
         updatedBy: practitionerId,
         notes: checkIn.note,
       }
       await eSupervisionClient.postOffenderCheckInNote(id, notes)
-
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
-
-  getReviewExpiredCheckIn: hmppsAuthClient => {
+  getReviewExpiredCheckIn: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -346,8 +328,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/review/expired.njk', { crn, id, back, checkIn })
     }
   },
-
-  getReviewIdentityCheckIn: hmppsAuthClient => {
+  getReviewIdentityCheckIn: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -363,8 +344,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn, videoLink })
     }
   },
-
-  postReviewIdentityCheckIn: hmppsAuthClient => {
+  postReviewIdentityCheckIn: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -374,8 +354,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/review/notes?back=${url}`)
     }
   },
-
-  getReviewNotesCheckIn: hmppsAuthClient => {
+  getReviewNotesCheckIn: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { checkIn } = res.locals
@@ -395,7 +374,6 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/review/notes.njk', { crn, id, back, checkIn })
     }
   },
-
   postReviewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -425,7 +403,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
-  postPhotoRulesPage: hmppsAuthClient => {
+  postPhotoRulesPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -434,7 +412,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/checkin-summary`)
     }
   },
-  getCheckinSummaryPage: hmppsAuthClient => {
+  getCheckinSummaryPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
@@ -452,7 +430,6 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/checkin-summary.njk', { crn, id, userDetails })
     }
   },
-
   postCheckinSummaryPage: hmppsAuthClient => {
     return async (req, res) => {
       try {
@@ -466,7 +443,6 @@ const checkInsController: Controller<typeof routes, void> = {
       }
     }
   },
-
   getConfirmationPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -486,8 +462,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
     }
   },
-
-  getCheckinVideoPage: HmppsAuthClient => {
+  getCheckinVideoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { checkIn } = res.locals
@@ -498,7 +473,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/video.njk', { crn, id, checkIn, back })
     }
   },
-  postTakeAPhotoPage: hmppsAuthClient => {
+  postTakeAPhotoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { userPhotoUpload } = req.body
@@ -521,7 +496,6 @@ const checkInsController: Controller<typeof routes, void> = {
       const mobile = personalDetails.mobileNumber
       const { email } = personalDetails
       const { data } = req.session
-      // if page not submitted, required to save in session for change link  to avoid API call.
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], mobile)
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
@@ -582,8 +556,6 @@ const checkInsController: Controller<typeof routes, void> = {
       const { data } = req.session
       const checkInMobile = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'])
       const checkInEmail = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'])
-
-      // To show success message on edit contact preference page
       const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'contactUpdated'])
       if (contactUpdated) {
         res.locals.success = true
@@ -660,7 +632,6 @@ const checkInsController: Controller<typeof routes, void> = {
           mobileNumber: editCheckInMobile1,
         }
         const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
-        // Save to show success message on contact preferences page
         if (personalDetails?.crn) {
           setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'contactUpdated'], true)
           setDataValue(
@@ -699,7 +670,6 @@ export const getMinDate = (): string => {
   } else {
     checkInMinDate = DateTime.fromJSDate(today).toFormat('d/M/yyyy')
   }
-
   return checkInMinDate
 }
 

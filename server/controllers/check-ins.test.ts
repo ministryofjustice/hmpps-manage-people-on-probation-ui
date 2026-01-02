@@ -1497,7 +1497,6 @@ describe('checkInsController', () => {
     it('shows success message when contactUpdated flag set and clears it', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-
       const data: any = {
         esupervision: {
           [crn]: {
@@ -1513,11 +1512,8 @@ describe('checkInsController', () => {
       }
       const mockRes = mockAppResponse()
       const req = baseReq(data)
-
       await controllers.checkIns.getManageContactPage(hmppsAuthClient)(req, mockRes)
-
       expect(mockRes.locals.success).toBe(true)
-      // contactUpdated flag should be removed
       expect(req.session?.data?.esupervision?.[crn]?.[uuid]?.manageCheckin?.contactUpdated).toBeUndefined()
     })
   })
@@ -1526,9 +1522,7 @@ describe('checkInsController', () => {
     it('returns 404 when CRN or id invalid', async () => {
       mockIsValidCrn.mockReturnValue(false)
       const req = baseReq()
-
       await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
-
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
@@ -1536,7 +1530,6 @@ describe('checkInsController', () => {
     it('stores edit values in session and redirects to edit-contact when change is email', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-
       const data = {
         esupervision: {
           [crn]: {
@@ -1551,9 +1544,7 @@ describe('checkInsController', () => {
       }
       const req = baseReq(data)
       req.body = { change: 'email' }
-
       await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
-
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
         ['esupervision', crn, uuid, 'manageCheckin', 'editCheckInMobile'],

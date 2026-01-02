@@ -27,10 +27,10 @@
 {% endblock %}
 
 {% block pageContent %}
-   {% set checkin %}
+    {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
-            {{ govukSummaryList({
+    {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
@@ -61,7 +61,7 @@
     }) }}
 
     {% set contactDetailsText %}
-        {{ govukSummaryList({
+    {{ govukSummaryList({
             rows: [
                 {
                     key: { html: '<span data-qa="methodLabel">Method</span>'},
@@ -73,8 +73,6 @@
                 }
             ]
         }) }}
-
-
 
     {% endset %}
 
@@ -93,34 +91,34 @@
             ]
         }
     }) }}
-  {% set photoDisplayHtml %}
+    {% set photoDisplayHtml %}
     {% if photoUrl %}
         <img
                 src="{{ photoUrl }}"
                 class="es-profile-image es-profile-image--small"
                 alt="Image of {{ case.name.forename }} {{ case.name.surname }}"
-                crossorigin />
+                crossorigin/>
     {% else %}
         <span>No image available</span>
     {% endif %}
-  {% endset %}
-
-    {% set photoText %}
-      <dl class="govuk-summary-list">
-        <div class="govuk-summary-list__row">
-          <dt class="govuk-summary-list__key"><span data-qa="photoLabel">{{ photoLabel }}</span></dt>
-          <dd class="govuk-summary-list__value">{{ photoDisplayHtml | safe }}</dd>
-        </div>
-      </dl>
     {% endset %}
 
-   {{ appSummaryCard({
+    {% set photoText %}
+    <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+            <dt class="govuk-summary-list__key">
+                <span data-qa="photoLabel">{{ photoLabel }}</span></dt>
+            <dd class="govuk-summary-list__value">{{ photoDisplayHtml | safe }}</dd>
+        </div>
+    </dl>
+    {% endset %}
+
+    {{ appSummaryCard({
         titleText: 'Photo',
         headingLevel: 3,
         classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
         attributes: {'data-qa': 'photoCard'},
         html: photoText
     }) }}
-
 
 {% endblock %}
