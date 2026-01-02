@@ -38,7 +38,7 @@ const alertsController: Controller<typeof routes, void> = {
       let risksErrors: { text: string }[] = []
 
       const responseIsError = (response: RiskSummary): response is RestClientError => {
-        return (response as RestClientError).errors !== undefined
+        return (response as RestClientError)?.errors !== undefined
       }
 
       if (enableRiskOnAlertsDashboard) {

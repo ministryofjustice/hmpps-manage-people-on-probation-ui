@@ -18,14 +18,14 @@ const stubSanIndicatorTrue = (): SuperAgentRequest =>
     },
   })
 
-const stubArnsUnavailable = (): SuperAgentRequest =>
+const stubArnsUnavailable = (status = 500): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPattern: '/arns/risks/crn/.*',
       method: 'GET',
     },
     response: {
-      status: 500,
+      status,
       jsonBody: {
         message: 'Error',
       },
