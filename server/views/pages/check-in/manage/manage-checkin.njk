@@ -1,11 +1,19 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Online check ins" %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
-{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/settings' %}
-{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/contact' %}
+{% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
+{% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/contact' %}
 {% set photoLabel = "Photo of " + case.name.forename %}
-{% set photoUrl = offenderCheckinsByCRNResponse.snapshotUrl %}
+{% set photoUrl = offenderCheckinsByCRNResponse.photoUrl %}
 {% set backLink = '/case/' + crn %}
+
+{% if offenderCheckinsByCRNResponse.contactPreference === 'EMAIL' %}
+    {% set methodLabel = '<span data-qa="methodLabel">Email address</span>' %}
+    {% set methodValue = '<span data-qa="methodValue">' + email + '</span>' %}
+{% else %}
+    {% set methodLabel = '<span data-qa="methodLabel">Mobile number</span>' %}
+    {% set methodValue = '<span data-qa="methodValue">' + mobile + '</span>' %}
+{% endif %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -19,7 +27,7 @@
 {% endblock %}
 
 {% block pageContent %}
-    {% set checkin %}
+   {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
             {{ govukSummaryList({
@@ -46,7 +54,7 @@
             items: [
                 {
                     text: 'Change',
-                    href: '#'
+                    href: changeDtLink
                 }
             ]
         }
@@ -56,12 +64,12 @@
         {{ govukSummaryList({
             rows: [
                 {
-                    key: { html: '<span data-qa="emailAddressLabel">Email address</span>'},
-                    value: { html: '<span data-qa="emailAddressValue">' + email + '</span>' if email else '<span data-qa="emailAddressValue">No email address</span>'}
+                    key: { html: '<span data-qa="methodLabel">Method</span>'},
+                    value: { html: '<span data-qa="methodValue">' + nextCheckin.contactPreference | userFriendlyString + '</span>'}
                 },
                 {
-                    key: { html: '<span data-qa="mobileNumberLabel">Mobile number</span>'},
-                    value: { html: '<span data-qa="mobileNumberValue">' + mobile + '</span>' if mobile else '<span data-qa="mobileNumberValue">No mobile number</span>'}
+                    key: { html: methodLabel },
+                    value: { html: methodValue }
                 }
             ]
         }) }}
@@ -80,17 +88,17 @@
             items: [
                 {
                     text: 'Change',
-                    href: '#'
+                    href: changeContactLink
                 }
             ]
         }
     }) }}
   {% set photoDisplayHtml %}
     {% if photoUrl %}
-        &nbsp;<img
+        <img
                 src="{{ photoUrl }}"
                 class="es-profile-image es-profile-image--small"
-                alt="image"
+                alt="Image of {{ case.name.forename }} {{ case.name.surname }}"
                 crossorigin />
     {% else %}
         <span>No image available</span>
@@ -98,13 +106,21 @@
   {% endset %}
 
     {% set photoText %}
-        {{ govukSummaryList({
-            rows: [
-                {
-                    key: { html: '<span data-qa="methodLabel">' + photoLabel + '</span>'},
-                    value: { html: photoDisplayHtml }
-                }
-            ]
-        }) }}
+      <dl class="govuk-summary-list">
+        <div class="govuk-summary-list__row">
+          <dt class="govuk-summary-list__key"><span data-qa="photoLabel">{{ photoLabel }}</span></dt>
+          <dd class="govuk-summary-list__value">{{ photoDisplayHtml | safe }}</dd>
+        </div>
+      </dl>
     {% endset %}
+
+   {{ appSummaryCard({
+        titleText: 'Photo',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'photoCard'},
+        html: photoText
+    }) }}
+
+
 {% endblock %}

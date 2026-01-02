@@ -230,6 +230,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   color: govuk-colour('red');
 }
 
+.govuk-\!-width-three-tenths {
+  width: 30% !important;
+}
 .govuk-\!-width-one-fifth {
   width: 20% !important;
 }
@@ -571,6 +574,22 @@ body.feature-disabled {
     margin-bottom: govuk-spacing(1);
     font-weight: 400;
   }
+}
+
+.mpop-govuk-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  color: #1d70b8;
+  text-decoration: underline;
+}
+
+.mpop-govuk-link-button:hover {
+  color: #003078;
+  text-decoration: underline;
 }
 
 .technical-updates-banner {

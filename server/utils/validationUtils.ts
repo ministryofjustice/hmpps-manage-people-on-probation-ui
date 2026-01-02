@@ -13,7 +13,7 @@ export const isNotEmpty = (args: any[]) => {
   return !!args[0] && args[0] !== undefined
 }
 export const contactPrefEmailCheck = (args: any[]) => {
-  if (!args[0] || args[0] === 'TEXT') {
+  if (!args[0] || args[0] === 'PHONE') {
     return true
   }
   return args[0] === 'EMAIL' && isEmail(args[1])
@@ -23,7 +23,7 @@ export const contactPrefMobileCheck = (args: any[]) => {
   if (!args[0] || args[0] === 'EMAIL') {
     return true
   }
-  return args[0] === 'TEXT' && isValidMobileNumber(args[1])
+  return args[0] === 'PHONE' && isValidMobileNumber(args[1])
 }
 
 export const isNumeric = (args: any[]) => /^[\d ]+$/.test(args[0])
@@ -152,7 +152,10 @@ export const isValidCharCount = (args: any[]) => {
   return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
 }
 
-export const isValidMobileNumber = (string: string) => /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(string)
+export const isValidMobileNumber = (input: string) => {
+  const value = typeof input === 'string' ? input : String(input ?? '')
+  return /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(value.trim())
+}
 
 export function validateWithSpec<R extends Validateable>(
   request: R,

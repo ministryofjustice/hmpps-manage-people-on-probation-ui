@@ -1,13 +1,12 @@
 {% extends "../_form.njk" %}
 {% set hideButton = true %}
 {% set pageTitle = makePageTitle({pageHeading: ["Record an outcome"]}) %}
-{% set headerPersonName = forename + ' ' + surname %}
 {% set isAttendedComplied = true %}
 {% set config = {
    classes: "govuk-checkboxes--small",
     fieldset: {
       legend: {
-        html: '<span data-qa="pageHeading">Confirm if ' + forename + ' attended and complied</span>',
+        html: '<span data-qa="pageHeading">Confirm ' + forename + ' attended and complied</span>',
         classes: 'govuk-fieldset__legend--l'
       }
     },

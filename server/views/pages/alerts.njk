@@ -1,4 +1,4 @@
-{% extends "../partials/layout.njk" %}
+{% extends "../partials/alerts-errors.njk" %}
 {% from "govuk/components/table/macro.njk" import govukTable %}
 {% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
 {% from "govuk/components/button/macro.njk" import govukButton %}
@@ -23,8 +23,7 @@
     {% endif %}
 {% endblock %}
 
-
-{% block content %}
+{% block pageContent %}
 
     {% if alertsData.content.length > 0 %}
         {% for alert in alertsData.content %}
@@ -72,13 +71,21 @@
                 {% endif %}
             {% endset %}
 
+            {% if alert.type.editable %}
+              {% set deliusLinkType = 'UpdateContact' %}
+              {% set deliusLinkView = 'Update' %}
+            {% else %}
+              {% set deliusLinkType = 'Contact' %}
+              {% set deliusLinkView = 'View' %}
+            {% endif %}
+
             {% set alertUpdate %}
-            <a href="{{ deliusDeepLinkUrl('Contact', alert.crn, alert.id) }}"
+            <a href="{{ deliusDeepLinkUrl(deliusLinkType, alert.crn, alert.id) }}"
                 class="govuk-link"
                 target="_blank"
                 rel="noopener noreferrer"
                 data-qa="updateInNDelius-{{ alert.id }}">
-                Update
+                {{ deliusLinkView }}
                 <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
             </a>
             {% endset %}
@@ -102,7 +109,8 @@
                 } if flags.enableRiskOnAlertsDashboard === true,
                 {
                     html: alertActivity,
-                    attributes: { "data-qa":"alertActivity" }
+                    attributes: { "data-qa":"alertActivity" },
+                    classes: "govuk-!-width-three-tenths"
                 },
                 {
                     html: alertUpdate,
@@ -121,7 +129,7 @@
                     variant: "error" if alertsCleared.error else "success",
                     title: alertsCleared.message,
                     showTitleAsHeading: true,
-                    dismissible: false 
+                    dismissible: false
                 }) }}
             {% endif %}
             {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
@@ -168,7 +176,7 @@
                                 attributes: { "aria-sort": setSortOrder('type_description', sortedBy), 'data-sort-column': 'type_description', 'data-qa': 'activityHeader', 'data-sort-name': 'type_description', 'data-sort-action': 'alerts' } if not note else {}
                             },
                             {
-                                html: 'Update on NDelius<br>(opens in new tab)',
+                                html: 'Manage on NDelius<br>(opens in new tab)',
                                 classes: "vertical-align--middle govuk-action--bottom",
                                 attributes: { 'data-qa': "actionsHeader" }
                             }

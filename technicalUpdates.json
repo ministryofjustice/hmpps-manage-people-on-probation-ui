@@ -1,5 +1,27 @@
 [
   {
+    "heading": "View alerts and get calendar invitations for appointments",
+    "summary": "18 December 2025",
+    "whatsNew": [
+      "View and clear alerts",
+      [
+        "Alerts for your caseload now appear automatically in Manage people on probation, giving you live updates while you use the service and saving you from opening NDelius to read them. \n\nNow you’ll see a red notification at the top of the screen, clearly showing how many alerts you have and when new alerts arrive. \n\nIn your list of alerts, you can click to reveal more information on each alert without having to open the contact in a new screen. If you need to update the contact the alert is about, the ‘Update’ link takes you straight to that contact on NDelius to make changes. \n\nYou can clear alerts and they’ll disappear in both this service and NDelius, saving you a click."
+      ],
+      "Get calendar invitations for appointments with people on probation",
+      [
+        "To make managing your appointment schedule easier, you now get an automatic meeting invitation in your inbox when you arrange an appointment with a person on probation.\u2028\u2028The invitation appears as private in your calendar, so only you will see the appointment details which include: \nthe title \nthe time and date\na direct link to the appointment within the service \u2028\nIf you arrange an appointment for someone else, they will get the private meeting invitation instead."
+      ],
+      "Type your appointment start and end times",
+      [
+        "To make it easier for you to add accurate appointment start and end times, you can now type the times you need, using the format hh:mm. \n\nThanks to the users who said this would be quicker than selecting from a list. "
+      ],
+      "Arrange past appointments",
+      [
+        "You can now arrange appointments in the past if they have an attended and complied outcome.\u2028\nUse NDelius if you need to arrange past appointments with other outcomes."
+      ]
+    ]
+  },
+  {
     "heading": "View all outcomes to log on one page and other service improvements",
     "summary": "11 December 2025",
     "whatsNew": [
@@ -18,7 +40,7 @@
       ],
       "Adding and viewing notes",
       [
-        "To save you a click, you can now add notes right after selecting that a person on probation attended and compiled. This change means you do not return to the appointment details before adding notes.",
+        "To save you a click, you can now add notes right after selecting that a person on probation attended and complied. This change means you do not return to the appointment details before adding notes.",
         "You can now read a long note in a dedicated page, thanks to a bug fix."
       ],
       "Clearer signposting between NDelius and MPOP",
@@ -26,10 +48,5 @@
         "We’ve made it easier for you to see which service an appointment was created on. NDelius-created appointments now display ‘Manage on NDelius’ links on the ‘Appointments’ page, and on the ‘Activity log’ page for appointments without outcomes."
       ]
     ]
-  },
-  {
-    "heading": "Welcome to Manage people on probation",
-    "summary": "23 September 2025",
-    "whatsNew": []
   }
 ]
