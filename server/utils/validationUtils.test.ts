@@ -25,6 +25,7 @@ import {
   hasAllDigits,
   contactPrefMobileCheck,
   isValidMobileNumber,
+  isFutureDate,
 } from './validationUtils'
 import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
@@ -261,6 +262,22 @@ describe('time which is not earlier than time', () => {
     ['populated valid', ['9:45pm', '10:45am'], true],
   ])('%s isNotEarlierThan(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(timeIsNotEarlierThan(a)).toEqual(expected)
+  })
+})
+
+describe('isFutureDate', () => {
+  it.each([
+    [['3/1/2026'], true],
+    [['2/2/2026'], true],
+    [['2/1/2026'], false],
+    [['17/5/2024'], false],
+    [['1/1/2026'], false],
+    [[undefined], false],
+    [[''], false],
+    [['31/2/2026'], false],
+    [['2026-01-03'], false],
+  ])('returns %p for input %p', (inputArgs, expected) => {
+    expect(isFutureDate(inputArgs as any)).toBe(expected)
   })
 })
 
