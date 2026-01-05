@@ -21,7 +21,8 @@ const alertsController: Controller<typeof routes, void> = {
       const { user } = res.locals
       const { page = '0' } = req.query as Record<string, string>
       const url = encodeURIComponent(req.url)
-      const unencodedUrl = req.url
+      const queryString = req.url.split('?')[1]
+
       const pageNumber = parseInt(page, 10)
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const [sortName, sortDirection] = sortedBy.split('.')
@@ -42,7 +43,7 @@ const alertsController: Controller<typeof routes, void> = {
 
       res.render('pages/alerts', {
         note: false,
-        unencodedUrl,
+        queryString,
         url,
         alertsData,
         crnToRiskWidgetMap: riskInfo.crnToRiskWidgetMap,
@@ -58,7 +59,7 @@ const alertsController: Controller<typeof routes, void> = {
       const { back } = req.query
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const url = encodeURIComponent(req.url)
-      const unencodedUrl = req.url
+      const queryString = req.url.split('?')[1]
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -75,7 +76,7 @@ const alertsController: Controller<typeof routes, void> = {
 
       res.render('pages/alerts', {
         note: true,
-        unencodedUrl,
+        queryString,
         url,
         back,
         alertsData,

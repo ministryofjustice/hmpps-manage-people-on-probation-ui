@@ -130,7 +130,6 @@ describe('alertsController', () => {
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
           note: false,
-          unencodedUrl: url,
         })
       })
 
@@ -149,7 +148,6 @@ describe('alertsController', () => {
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
           note: false,
-          unencodedUrl: url,
         })
       })
 
@@ -167,7 +165,6 @@ describe('alertsController', () => {
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
           note: false,
-          unencodedUrl: url,
         })
       })
 
@@ -184,7 +181,6 @@ describe('alertsController', () => {
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
           note: false,
-          unencodedUrl: url,
         })
       })
       it('should render the alerts page if sort params are in url query', async () => {
@@ -203,7 +199,6 @@ describe('alertsController', () => {
           risksErrors: [],
           sortedBy: 'name',
           note: false,
-          unencodedUrl: url,
         })
       })
     })
@@ -221,7 +216,6 @@ describe('alertsController', () => {
           risksErrors: [],
           sortedBy: 'date_and_time.desc',
           note: false,
-          unencodedUrl: url,
         })
       })
     })
@@ -245,7 +239,6 @@ describe('alertsController', () => {
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
           note: true,
-          unencodedUrl: url,
         })
       })
     })
