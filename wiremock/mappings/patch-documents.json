@@ -2,7 +2,7 @@
   "mappings": [
     {
       "request": {
-        "urlPattern": "/documents/.*/update/contact/.*",
+        "urlPattern": "/mas/documents/.*/update/contact/.*",
         "method": "PATCH"
       },
       "response": {
