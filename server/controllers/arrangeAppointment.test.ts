@@ -175,6 +175,12 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
     user: {
       username,
     },
+    case: {
+      name: {
+        forename: 'Caroline',
+        surname: 'Wolff',
+      },
+    },
     ...(localsResponse || {}),
   })
 
@@ -1189,8 +1195,26 @@ describe('controllers/arrangeAppointment', () => {
         isInPast: false,
         backendId: 1234,
         isOutLookEventFailed: false,
-        attendingName: 'first´s ',
+        appointmentType: null,
+        attendingName: 'Caroline´s',
         url: '',
+      })
+    })
+    it('should render the reschedule appointment confirmation page', async () => {
+      const mockReq = createMockRequest({
+        appointmentSession: { backendId: 1234, user: { username: '' } },
+        dataSession: { isOutLookEventFailed: false },
+        request: { url: '/reschedule/url' },
+      })
+      await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/confirmation`, {
+        crn,
+        isInPast: false,
+        backendId: 1234,
+        isOutLookEventFailed: false,
+        appointmentType: 'RESCHEDULE',
+        attendingName: 'Caroline´s',
+        url: encodeURIComponent('/reschedule/url'),
       })
     })
   })

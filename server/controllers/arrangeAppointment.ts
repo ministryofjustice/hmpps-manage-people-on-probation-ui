@@ -603,6 +603,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
+      const { forename } = res.locals.case.name
       const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -614,9 +615,9 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         const masClient = new MasApiClient(token)
         try {
           const user = await masClient.getUserDetails(attending.username.toUpperCase())
-          attendingName = `${user.firstName}´s `
+          attendingName = `${forename}´s`
         } catch {
-          attendingName = `The officer´s `
+          attendingName = `The officer´s`
         }
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
@@ -624,7 +625,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const { isOutLookEventFailed } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
-      let appointmentType
+      let appointmentType = null
+
       if (req.url.includes('reschedule')) {
         appointmentType = 'RESCHEDULE'
         // delete data.appointments[crn][id]
@@ -637,6 +639,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         attendingName,
         url,
         isInPast,
+        appointmentType,
       })
     }
   },

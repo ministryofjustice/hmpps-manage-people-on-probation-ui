@@ -16,6 +16,7 @@ import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
+import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -755,6 +756,54 @@ export const checkAppointmentDetails = (
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
+}
+
+export const completeRescheduleAppointmentPage = () => {
+  cy.visit('/case/X000001/appointments/appointment/6/manage')
+  const manageAppointmentPage = new ManageAppointmentPage()
+  manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').find('a').click()
+  const rescheduleAppointmentPage = new RescheduleAppointmentPage()
+  rescheduleAppointmentPage
+    .getWhoNeedsToReschedule()
+    .find('.govuk-radios__item')
+    .eq(0)
+    .find('.govuk-radios__input')
+    .click()
+  rescheduleAppointmentPage.getSubmitBtn().click()
+}
+
+export const completeRescheduling = (id: string, inPast = false) => {
+  const urlCrn = 'X000001'
+  const dateTimePage = new AppointmentLocationDateTimePage()
+  const rescheduledStartTime = '09:10'
+  const rescheduledEndTime = '10:30'
+  let attendedCompliedPage: AttendedCompliedPage
+  let addNotePage: AddNotePage
+  let supportingInformationPage: AppointmentNotePage
+  const tomorrow = DateTime.now().plus({ days: 1 })
+  const yesterday = DateTime.now().minus({ days: 1 })
+  const appointmentDate = inPast ? yesterday : tomorrow
+  dateTimePage.getDatePickerInput().clear().type(appointmentDate.toFormat('d/M/yyyy'))
+  if (inPast) {
+    dateTimePage.getLogOutcomesAlertBanner().should('be.visible')
+  }
+  dateTimePage.getElementInput(`startTime`).type(rescheduledStartTime)
+  dateTimePage.getElementInput(`endTime`).focus().type(rescheduledEndTime)
+  dateTimePage.getSubmitBtn().click()
+  dateTimePage.getSubmitBtn().click()
+  if (inPast) {
+    attendedCompliedPage = new AttendedCompliedPage()
+    attendedCompliedPage.getLogOutcomesAlertBanner().should('be.visible')
+    cy.get('.govuk-checkboxes__input').click()
+    attendedCompliedPage.getSubmitBtn().click()
+    addNotePage = new AddNotePage()
+    cy.get(`#appointments-${urlCrn}-${id}-sensitivity-2`).click()
+    addNotePage.getSubmitBtn().click()
+  } else {
+    supportingInformationPage = new AppointmentNotePage()
+    cy.get(`#appointments-${urlCrn}-${id}-sensitivity-2`).click()
+    supportingInformationPage.getSubmitBtn().click()
+  }
 }
 
 export const to24HourTimeWithMinutes = (time: string): string => {

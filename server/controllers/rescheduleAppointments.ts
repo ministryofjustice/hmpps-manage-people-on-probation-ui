@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { Controller, FileCache } from '../@types'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 
-import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'
 
 const routes = [
@@ -85,6 +85,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
   getRescheduleCheckYourAnswer: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id, contactId } = req.params
+      const isInPast = appointmentDateIsInPast(req)
       const { url } = req
       const { data } = req.session
       const appt = getDataValue(data, ['appointments', crn, id])
@@ -93,6 +94,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
         id,
         contactId,
         url,
+        isInPast,
       })
     }
   },

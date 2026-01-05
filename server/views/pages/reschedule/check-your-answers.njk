@@ -2,8 +2,9 @@
 {% set notStandardForm = true %}
 {% set title = 'Change appointment details and reschedule' %}
 {% set buttonText = 'Reschedule appointment' %}
+{% set showCalendarInsetText = not isInPast %}
 {% set showAnchorLink = true %}
-{% set formAnchorLink = "/case/" + crn + "/appointments/reschedule/" + contactId + "/" + id  %}
+{% set formAnchorLink = "/case/" + crn + "/appointments/reschedule/" + contactId + "/" + id %}
 {% set formAnchorText = 'Cancel and go back' %}
 {% block beforeContent %}{% endblock %}
 {% block primary %}
@@ -12,5 +13,5 @@
       <h2 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h2>
     </div>
   </div>
- {% include "../arrange-appointment/appointment-summary.njk" %}
+  {% include "../arrange-appointment/appointment-summary.njk" %}
 {% endblock %}

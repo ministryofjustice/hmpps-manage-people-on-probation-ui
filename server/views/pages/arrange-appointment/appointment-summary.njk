@@ -176,16 +176,16 @@
      ] 
      } if showAction }
 ] }) }}
-    <div class="govuk-button-group">
-        {% if showCalendarInsetText %}
-            {{ govukInsetText({
+    {% if showCalendarInsetText %}
+        {{ govukInsetText({
   text: "You'll receive a calendar invite for the appointment",
   classes: 'govuk!-margin-top-0',
    attributes: {
         'data-qa': 'calendarInviteInset'
       }
 }) }}
-        {% endif %}
+    {% endif %}
+    <div class="govuk-button-group">
         {{ govukButton({
           html: buttonText,
           attributes: {

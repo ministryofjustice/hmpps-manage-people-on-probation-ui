@@ -1,45 +1,40 @@
 import { DateTime } from 'luxon'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
-import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
-import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import SupportingInformationPage from '../../pages/appointments/note.page'
-import { checkAppointmentSummary, checkPopHeader, getUuid, to24HourTimeWithMinutes } from './imports'
+import {
+  checkAppointmentSummary,
+  checkPopHeader,
+  getUuid,
+  to24HourTimeWithMinutes,
+  completeRescheduling,
+  completeRescheduleAppointmentPage,
+} from './imports'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
 
 describe('Change appointment details and reschedule', () => {
-  let manageAppointmentPage: ManageAppointmentPage
-  let rescheduleAppointmentPage: RescheduleAppointmentPage
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+  let dateTimePage: AppointmentLocationDateTimePage
   const crn = 'X000001'
-  const loadPage = (): void => {
-    cy.visit('/case/X000001/appointments/appointment/6/manage')
-    manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').find('a').click()
-    rescheduleAppointmentPage = new RescheduleAppointmentPage()
-    rescheduleAppointmentPage
-      .getWhoNeedsToReschedule()
-      .find('.govuk-radios__item')
-      .eq(0)
-      .find('.govuk-radios__input')
-      .click()
-    rescheduleAppointmentPage.getSubmitBtn().click()
-  }
+  const tomorrow = DateTime.now().plus({ days: 1 })
+  const startTime = '09:10'
+  const endTime = '10:30'
 
   it('should render the page', () => {
-    loadPage()
+    completeRescheduleAppointmentPage()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
     checkPopHeader()
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Change appointment details and reschedule')
     checkAppointmentSummary(checkYourAnswerPage)
+    cy.get('[data-qa="calendarInviteInset"]').should(
+      'contain.text',
+      `You'll receive a calendar invite for the appointment`,
+    )
     cy.get('[data-qa="previousDateTime"]').should('not.exist')
   })
 
   describe('User clicks submit without selecting a date and time', () => {
-    let dateTimePage: AppointmentLocationDateTimePage
-    let supportingInformationPage: SupportingInformationPage
     beforeEach(() => {
-      loadPage()
+      completeRescheduleAppointmentPage()
       checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
       checkYourAnswerPage.getSubmitBtn().click()
     })
@@ -65,19 +60,9 @@ describe('Change appointment details and reschedule', () => {
         })
       })
     })
-    it('should display the previous appointment date', () => {
+    it('should display the previous appointment date and outlook invite', () => {
       getUuid().then(uuid => {
-        const tomorrow = DateTime.now().plus({ days: 1 })
-        const startTime = '09:10'
-        const endTime = '10:30'
-        dateTimePage.getDatePickerInput().clear().type(tomorrow.toFormat('d/M/yyyy'))
-        dateTimePage.getElementInput(`startTime`).type(startTime)
-        dateTimePage.getElementInput(`endTime`).focus().type(endTime)
-        dateTimePage.getSubmitBtn().click()
-        dateTimePage.getSubmitBtn().click()
-        supportingInformationPage = new SupportingInformationPage()
-        cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
-        supportingInformationPage.getSubmitBtn().click()
+        completeRescheduling(uuid)
         cy.get('[data-qa="previousDateTime"]').should(
           'contain.text',
           `Wednesday 21 February 2024 at 12:15am to 12:30am`,
@@ -92,6 +77,21 @@ describe('Change appointment details and reschedule', () => {
               `${dayOfWeek(tomorrow.toISODate())} ${dateWithYear(tomorrow.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
             )
           })
+        cy.get('[data-qa="calendarInviteInset"]').should('be.visible')
+      })
+    })
+  })
+
+  describe('Reschedule appointment in the past', () => {
+    beforeEach(() => {
+      completeRescheduleAppointmentPage()
+      checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+      checkYourAnswerPage.getSubmitBtn().click()
+    })
+    it('should display the log outcomes alert banner and not display outlook invite text', () => {
+      getUuid().then(uuid => {
+        completeRescheduling(uuid, true)
+        cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
       })
     })
   })
