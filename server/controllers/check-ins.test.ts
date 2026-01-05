@@ -104,7 +104,8 @@ const baseReq = (data?: any) =>
     url: 'url',
   })
 
-const reviewRes = (status: string) => mockAppResponse({ checkIn: { status } })
+const reviewRes = (status: string, missedCheckinComment?: string) =>
+  mockAppResponse({ checkIn: { status, missedCheckinComment } })
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -1091,6 +1092,61 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.getReviewExpiredCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('getViewExpiredCheckIn', () => {
+    it('redirect if checkIn not expired or not comment', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED')
+      const reviewRedirectSpy = jest.spyOn(resReview, 'redirect')
+      await controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRedirectSpy).toHaveBeenCalledWith(
+        `/case/${req.params.crn}/appointments/${req.params.id}/check-in/update?back=${req.query.back}`,
+      )
+    })
+
+    it('render checkIn expired-view page if correct', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED', 'comment')
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view-expired.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+      })
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient)(req, res)
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
