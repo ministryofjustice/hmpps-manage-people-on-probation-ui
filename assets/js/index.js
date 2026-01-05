@@ -1,4 +1,3 @@
-/* eslint-disable no-param-reassign */
 /* eslint-disable no-new */
 /* eslint-disable no-restricted-globals */
 
@@ -7,7 +6,6 @@ import './appInsights'
 import './predictors'
 import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
-import { MpopMultiFileUpload } from './mpop-multi-file-upload.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
@@ -20,107 +18,12 @@ const $mpopSortableTable = document.querySelector('table[data-module="moj-mpop-s
 if ($mpopSortableTable) {
   new MpopSortableTable($mpopSortableTable)
 }
-const $multifileUpload = document.querySelector('[data-module="moj-multi-file-upload"]')
-if ($multifileUpload) {
-  const enableDelete = window.enableDeleteAppointmentFile
-  if (!enableDelete) {
-    document.body.classList.add('feature-disabled')
-  }
-  new MpopMultiFileUpload($multifileUpload, {
-    uploadUrl: '/appointments/file/upload',
-    deleteUrl: '/appointments/file/delete',
-    dropzoneHintText: 'Drag and drop files here or ',
-    enableDelete,
-    headers: {
-      'CSRF-Token': window.csrfToken,
-    },
-    hooks: {
-      entryHook: uploadEntry,
-      exitHook: uploadExit,
-      deleteHook: deleteExit,
-      errorHook: uploadErrorHook,
-    },
-  })
-
-  function continueButtonEnabled(enabled) {
-    const $continueButton = $('#continueButton')
-    if (enabled) {
-      $continueButton.removeAttr('disabled')
-      $continueButton.removeAttr('aria-disabled')
-      $continueButton.removeClass('govuk-button--disabled')
-    } else {
-      $continueButton.attr('disabled', 'disabled')
-      $continueButton.attr('aria-disabled', 'true')
-      $continueButton.addClass('govuk-button--disabled')
-    }
-  }
-
-  function isAllFinished() {
-    const $actions = $('.moj-multi-file-upload__actions')
-    let finished = true
-    $actions.each(() => {
-      if ($(this).html() === '') {
-        finished = false
-      }
-    })
-    return finished
-  }
-
-  function uploadEntry(_handle, _file, formData) {
-    const { pathname } = new URL(location.href)
-    const parts = pathname.split('/').filter(part => part)
-    formData.append('crn', parts[1])
-    formData.append('id', parts[4])
-    return formData
-  }
-  function uploadExit(_handle, _file, _xhr, _response) {
-    if (isAllFinished()) {
-      continueButtonEnabled(true)
-    } else if ($('.moj-multi-file-upload__list')) {
-      // another file has been added
-      continueButtonEnabled(false)
-    }
-  }
-
-  function deleteExit(_handle, _response) {
-    const $row = $('.moj-multi-file-upload__row')
-    if ($row && $row.length === 0) {
-      continueButtonEnabled(false)
-    }
-  }
-
-  function uploadErrorHook({ handle, file, errorMessage, textStatus, errorThrown }) {
-    const message = errorMessage || textStatus || errorThrown
-    const item = $(handle.getFileRowHtml(file))
-
-    item[0].querySelector('.moj-multi-file-upload__message').innerHTML = handle.getErrorHtml(
-      { message },
-      file.name,
-      'Upload failed',
-      'red',
-    )
-    if (enableDelete) {
-      item[0]
-        .querySelector('.moj-multi-file-upload__actions')
-        .append(handle.getDeleteButton({ filename: file.name }, 'Upload failed', 'red'))
-    }
-    const $rows = handle.$feedbackContainer.querySelectorAll('.moj-multi-file-upload__row')
-
-    const $matchingRow = Array.from($rows).find(row => row.textContent.includes(file.name))
-    if ($matchingRow) {
-      $matchingRow.replaceWith(item[0])
-    }
-
-    handle.$status.textContent = message
-  }
-}
-
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-interval]')
   if (repeatingFrequency) {
     const repeatingFrequencyRadios = repeatingFrequency.querySelectorAll('input[type="radio"]')
     const repeatingCount = document.querySelector('div[data-numberOfRepeatAppointments] input')
-    const lastAppointmentElm = document.querySelector('div[data-last-appointment')
+    const lastAppointmentElm = document.querySelector('div[data-last-appointment]')
     const lastAppointmentHandler = async () => {
       const repeatingFrequencyRadioSelected = repeatingFrequency.querySelector('input:checked')
       if (parseInt(repeatingCount.value, 10) > 0 && repeatingFrequencyRadioSelected) {

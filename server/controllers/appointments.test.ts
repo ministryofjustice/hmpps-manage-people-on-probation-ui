@@ -1,5 +1,8 @@
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
+import { Request } from 'express'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { ParsedQs } from 'qs'
 import controllers from '.'
 import logger from '../../logger'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -170,6 +173,9 @@ const getPredictorsSpy = jest
 describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+      statusCode: 200,
+    })
   })
   describe('get appointments', () => {
     beforeEach(async () => {
@@ -462,17 +468,12 @@ describe('controllers/appointments', () => {
       expect(mockReq.session.body).toBeUndefined()
     })
     it('should render the add note page', () => {
-      const { fileUploadLimit, maxFileSize, validMimeTypes } = config
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
         body: null,
         crn,
         errorMessages: null,
-        uploadedFiles: [],
-        fileUploadLimit,
-        maxFileSize,
         url: '',
         maxCharCount: 12000,
-        validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })
   })
@@ -494,22 +495,30 @@ describe('controllers/appointments', () => {
     })
     describe('If CRN request param is valid', () => {
       describe('click thru from manage appointment page', () => {
-        const mockReq = httpMocks.createRequest({
-          body: {
-            notes: 'some mock notes',
-            sensitive: 'Yes',
-          },
-          params: {
-            contactId: id,
-            crn,
-          },
-          session: {
-            data: {},
-          },
-        })
+        let mockReq: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>
         beforeEach(async () => {
           mockIsValidCrn.mockReturnValue(true)
           mockIsNumericString.mockReturnValue(true)
+
+          // mock successful file upload
+          jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+            statusCode: 200,
+          })
+
+          mockReq = httpMocks.createRequest({
+            body: {
+              notes: 'some mock notes',
+              sensitive: 'Yes',
+            },
+            params: {
+              contactId: id,
+              crn,
+            },
+            session: {
+              data: {},
+            },
+          })
+
           await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
         })
         it('should send the patch request to the api', () => {
@@ -528,6 +537,11 @@ describe('controllers/appointments', () => {
         beforeEach(async () => {
           mockIsValidCrn.mockReturnValue(true)
           mockIsNumericString.mockReturnValue(true)
+
+          jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+            statusCode: 200,
+          })
+
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',

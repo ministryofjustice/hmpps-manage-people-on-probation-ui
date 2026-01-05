@@ -14,7 +14,7 @@ export default class SupervisionAppointmentClient extends RestClient {
       path: `/calendar/event`,
       handle404: false,
       handle500: true,
-      errorMessageFor500: 'Calendar event creation not successful',
+      errorMessage: 'Calendar event creation not successful',
     })
   }
 }

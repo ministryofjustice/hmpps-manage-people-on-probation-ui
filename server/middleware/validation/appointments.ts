@@ -10,15 +10,18 @@ import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
 import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
+import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
 const appointments: Route<void> = (req, res, next) => {
-  const { url, params, body, session } = req
+  const { params, body, session } = req
   const { crn, id, contactId, actionType } = params
   const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
+
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
+
   let localParams: LocalParams = {
     crn,
     id,
@@ -37,16 +40,19 @@ const appointments: Route<void> = (req, res, next) => {
   ) {
     const { enablePastAppointments } = res.locals.flags
     const { _minDate, _maxDate } = getMinMaxDates()
+
     localParams = {
       ...localParams,
       isInPast: appointmentDateIsInPast(req),
-      ...(!enablePastAppointments ? { _minDate } : {}),
+      ...(enablePastAppointments ? {} : { _minDate }),
       _maxDate,
     }
   }
+
   if (req.url.includes('/attended-complied')) {
     localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
   }
+
   if (
     [`/arrange-appointment/${id}/attended-complied`, `/arrange-appointment/${id}/add-note`].some(urlPart =>
       req.url.includes(urlPart),
@@ -54,48 +60,60 @@ const appointments: Route<void> = (req, res, next) => {
   ) {
     localParams = { ...localParams, useDecorator: true }
   }
+
   const baseUrl = req.url.split('?')[0]
   let isAddNotePage: boolean
-  let render = `pages/${[
-    url
-      .split('?')[0]
-      .split('/')
-      .filter(item => item)
-      .filter((_item, i) => ![0, 1, 3].includes(i))
-      .join('/'),
-  ]}`
+  let render = res?.locals?.renderPath || urlToRenderPath(req, res)
+  let errorMessages = res?.locals?.errorMessages || {}
 
   const validateType = (): void => {
-    if (baseUrl.includes('/type')) {
-      if (personLevel) {
-        res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
-      }
-      errorMessages = validateWithSpec(
+    if (!baseUrl.includes('/type')) return
+
+    if (personLevel) {
+      res.locals.appointmentTypes = getPersonLevelTypes(res.locals.appointmentTypes)
+    }
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
-        appointmentsValidation({ crn, id, page: 'type', visor: req?.body?.visor }),
-      )
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'type',
+          visor: req?.body?.visor,
+        }),
+      ),
     }
   }
 
   const validateSentence = (): void => {
-    if (baseUrl.includes('/sentence')) {
-      errorMessages = validateWithSpec(
+    if (!baseUrl.includes('/sentence')) return
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           page: 'sentence',
         }),
-      )
+      ),
     }
   }
 
   const validateLocationDateTime = (): void => {
-    if (baseUrl.includes('/location-date-time')) {
-      localParams._minDate = req.body._minDate
-      localParams._maxDate = req.body._maxDate
-      const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
-      errorMessages = validateWithSpec(
+    if (!baseUrl.includes('/location-date-time')) return
+
+    localParams._minDate = req.body._minDate
+    localParams._maxDate = req.body._maxDate
+
+    const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
@@ -104,24 +122,30 @@ const appointments: Route<void> = (req, res, next) => {
           enablePastAppointments: res.locals.flags.enablePastAppointments,
         }),
         { now },
-      )
+      ),
     }
   }
 
-  const validateRepeating = () => {
-    if (baseUrl.includes('/repeating')) {
-      const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
-      const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
-      const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeatingDates'])
-      const oneYearFromDate = new Date(appointmentDate)
-      oneYearFromDate.setFullYear(oneYearFromDate.getFullYear() + 1)
-      let finalAppointmentDate = null
-      let isMoreThanAYear = false
-      if (appointmentRepeatingDates) {
-        finalAppointmentDate = appointmentRepeatingDates[appointmentRepeatingDates.length - 1]
-        isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
-      }
-      errorMessages = validateWithSpec(
+  const validateRepeating = (): void => {
+    if (!baseUrl.includes('/repeating')) return
+
+    const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
+    const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
+    const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeatingDates'])
+
+    const oneYearFromDate = new Date(appointmentDate)
+    oneYearFromDate.setFullYear(oneYearFromDate.getFullYear() + 1)
+
+    let isMoreThanAYear = false
+
+    if (appointmentRepeatingDates?.length) {
+      const finalAppointmentDate = appointmentRepeatingDates.at(-1)
+      isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
+    }
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
@@ -129,20 +153,25 @@ const appointments: Route<void> = (req, res, next) => {
           page: 'repeating',
           repeatingValue,
         }),
-      )
-      if (isMoreThanAYear) {
-        errorMessages = {
-          ...errorMessages,
-          [`appointments-${crn}-${id}-interval`]: 'The appointment can only repeat up to a year',
-        }
+      ),
+    }
+
+    if (isMoreThanAYear) {
+      errorMessages = {
+        ...errorMessages,
+        [`appointments-${crn}-${id}-interval`]: 'The appointment can only repeat up to a year',
       }
     }
   }
 
-  const validateRecordAnOutcome = () => {
-    if (baseUrl.includes(`case/${crn}/record-an-outcome`)) {
-      render = `pages/appointments/record-an-outcome`
-      errorMessages = validateWithSpec(
+  const validateRecordAnOutcome = (): void => {
+    if (!baseUrl.includes(`case/${crn}/record-an-outcome`)) return
+
+    render = 'pages/appointments/record-an-outcome'
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
@@ -150,28 +179,33 @@ const appointments: Route<void> = (req, res, next) => {
           contactId,
           page: 'record-an-outcome',
         }),
-      )
+      ),
     }
   }
 
-  const validateAttendedComplied = () => {
-    if (req.url.includes(`/case/${crn}/arrange-appointment/${id}/attended-complied`)) {
-      render = `pages/appointments/attended-complied`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: `arrange-appointment/${id}/attended-complied`,
-        }),
-      )
-    }
+  const validateAttendedComplied = (): void => {
+    if (!req.url.includes(`/case/${crn}/arrange-appointment/${id}/attended-complied`)) return
+
+    render = 'pages/appointments/attended-complied'
+
+    errorMessages = validateWithSpec(
+      req.body,
+      appointmentsValidation({
+        crn,
+        id,
+        page: `arrange-appointment/${id}/attended-complied`,
+      }),
+    )
   }
 
-  const validateManageAttendedComplied = () => {
-    if (req.url.includes(`appointment/${contactId}/attended-complied`)) {
-      render = `pages/appointments/attended-complied`
-      errorMessages = validateWithSpec(
+  const validateManageAttendedComplied = (): void => {
+    if (!req.url.includes(`appointment/${contactId}/attended-complied`)) return
+
+    render = 'pages/appointments/attended-complied'
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
@@ -179,13 +213,16 @@ const appointments: Route<void> = (req, res, next) => {
           contactId,
           page: `appointment/${contactId}/attended-complied`,
         }),
-      )
+      ),
     }
   }
 
-  const validateSupportingInformation = () => {
-    if (baseUrl.includes('/supporting-information')) {
-      errorMessages = validateWithSpec(
+  const validateSupportingInformation = (): void => {
+    if (!baseUrl.includes('/supporting-information')) return
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
@@ -195,60 +232,68 @@ const appointments: Route<void> = (req, res, next) => {
           notes: req.body.appointments[crn][id].notes,
           maxCharCount: maxCharCount as number,
         }),
-      )
+      ),
     }
   }
 
-  const validateNextAppointment = () => {
-    if (baseUrl.includes('/next-appointment')) {
-      errorMessages = validateWithSpec(
+  const validateNextAppointment = (): void => {
+    if (!baseUrl.includes('/next-appointment')) return
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
           page: 'next-appointment',
         }),
-      )
-      render = 'pages/appointments/next-appointment'
+      ),
     }
+
+    render = 'pages/appointments/next-appointment'
   }
 
-  const validateAddNote = () => {
-    if (baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/add-note`)) {
-      isAddNotePage = true
-      render = `pages/appointments/add-note`
-      errorMessages = validateWithSpec(
+  const validateAddNote = (): void => {
+    if (!baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/add-note`)) return
+
+    isAddNotePage = true
+    render = 'pages/appointments/add-note'
+
+    errorMessages = validateWithSpec(
+      req.body,
+      appointmentsValidation({
+        crn,
+        id,
+        page: `arrange-appointment/${id}/add-note`,
+        notes: req.body.appointments[crn][id].notes,
+        maxCharCount: maxCharCount as number,
+      }),
+    )
+  }
+
+  const validateManageAddNote = (): void => {
+    if (!baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) return
+
+    isAddNotePage = true
+    render = 'pages/appointments/add-note'
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
         req.body,
         appointmentsValidation({
           crn,
           id,
-          page: `arrange-appointment/${id}/add-note`,
-          notes: req.body.appointments[crn][id].notes,
-          maxCharCount: maxCharCount as number,
-        }),
-      )
-    }
-  }
-
-  const validateManageAddNote = () => {
-    if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
-      isAddNotePage = true
-      render = `pages/appointments/add-note`
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
+          contactId,
           page: `appointment/${contactId}/add-note`,
           notes: req.body.notes,
           maxCharCount: maxCharCount as number,
-          contactId,
         }),
-      )
+      ),
     }
   }
 
-  let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
   validateLocationDateTime()
@@ -260,10 +305,12 @@ const appointments: Route<void> = (req, res, next) => {
   validateManageAttendedComplied()
   validateAddNote()
   validateManageAddNote()
+
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
   }
+
   return next()
 }
 
