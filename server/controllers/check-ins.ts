@@ -31,6 +31,7 @@ const routes = [
   'getPhotoRulesPage',
   'getUpdateCheckIn',
   'getViewCheckIn',
+  'getViewExpiredCheckIn',
   'getReviewExpiredCheckIn',
   'getReviewIdentityCheckIn',
   'postReviewIdentityCheckIn',
@@ -332,6 +333,22 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  getViewExpiredCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+      const { checkIn } = res.locals
+
+      if (checkIn.status !== 'EXPIRED' || !checkIn.missedCheckinComment) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+      }
+      return res.render('pages/check-in/view-expired.njk', { crn, id, back, checkIn })
+    }
+  },
+
   getReviewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -340,6 +357,9 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
+      if (checkIn.status === 'EXPIRED' && checkIn.missedCheckinComment) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/view-expired${back ? `?back=${back}` : ''}`)
+      }
       if (checkIn.status !== 'EXPIRED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }

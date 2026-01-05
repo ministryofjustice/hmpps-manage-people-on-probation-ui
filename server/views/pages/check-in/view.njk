@@ -1,7 +1,7 @@
 {% extends "../_form.njk" %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
-{% set title = "Remote check in submitted and reviewed" %}
+{% set title = "Online check in submitted and reviewed" %}
 {% set backLink = back if back else 
   '/case/' + crn + '/activity-log' %}
 {% set hideButton = true %}
@@ -35,6 +35,12 @@
                 <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe }}</dd>
             </div>
+            {% if checkIn.notes %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Notes</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.notes | safe }}</dd>
+            </div>
+            {% endif %}
         </dl>
 
         <h2 class="govuk-heading-m">Add further information</h2>

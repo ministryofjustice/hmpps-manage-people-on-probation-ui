@@ -10,12 +10,14 @@ export interface ESupervisionCheckIn {
   reviewedBy?: string
   reviewedAt?: string
   checkinStartedAt?: string
+  photoUrl?: string
   videoUrl?: string
   snapshotUrl?: string
   autoIdCheck?: 'MATCH' | 'NO_MATCH'
   manualIdCheck?: 'MATCH' | 'NO_MATCH'
   flaggedResponses: string[]
   furtherActions?: string
+  missedCheckinComment?: string
 }
 
 export interface ESupervisionLog {
