@@ -126,6 +126,8 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
+          note: false,
+          unencodedUrl: url,
         })
       })
 
@@ -143,6 +145,8 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
+          note: false,
+          unencodedUrl: url,
         })
       })
 
@@ -159,6 +163,8 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: {},
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
+          note: false,
+          unencodedUrl: url,
         })
       })
 
@@ -174,6 +180,8 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
+          note: false,
+          unencodedUrl: url,
         })
       })
       it('should render the alerts page if sort params are in url query', async () => {
@@ -191,6 +199,8 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: [],
           sortedBy: 'name',
+          note: false,
+          unencodedUrl: url,
         })
       })
     })
@@ -207,6 +217,8 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: {},
           risksErrors: [],
           sortedBy: 'date_and_time.desc',
+          note: false,
+          unencodedUrl: url,
         })
       })
     })
