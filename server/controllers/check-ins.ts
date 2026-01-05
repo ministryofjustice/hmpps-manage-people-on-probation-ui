@@ -6,7 +6,12 @@ import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { CheckinScheduleRequest, CheckInterval, ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
+import {
+  CheckinScheduleRequest,
+  DeactivateOffenderRequest,
+  ESupervisionNote,
+  ESupervisionReview,
+} from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -50,6 +55,7 @@ const routes = [
   'postManageContactPage',
   'getManageEditContactPage',
   'postManageEditContactPage',
+  'postManageStopCheckin',
   'getStopCheckinPage',
 ] as const
 
@@ -681,9 +687,27 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const { data } = req.session
-
       return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
+    }
+  },
+  postManageStopCheckin: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const stopCheckinVal = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
+      if (stopCheckinVal === 'YES') {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupervisionClient = new ESupervisionClient(token)
+        const body: DeactivateOffenderRequest = {
+          requestedBy: res.locals.user.username,
+          reason: getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'reason']),
+        }
+
+        res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
   },
 }

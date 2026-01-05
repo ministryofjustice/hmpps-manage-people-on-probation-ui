@@ -2,13 +2,12 @@
 {% set radioTitle = "Are you sure you want to stop online <br/> check ins for " + case.name.forename + "?" %}
 {% set hintText = case.name.forename + " will no longer receive reminders to use the check in service." %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
-{% set hideButton =  true %}
 {% block form %}
 
     {% set textBoxHtml %}
         {{ govukTextarea({
             formGroup: {
-                attributes: { "data-qa": "stop-checkin-notes"}
+                attributes: { "data-qa": "stop-checkin-reason"}
             },
             classes: "govuk-textarea--wide---mpop",
             value: personalDetails.mainAddress.notes,
@@ -16,7 +15,7 @@
                 html: "Explain the reason for stopping\n",
                 classes: 'govuk-!-margin-bottom-3'
             }
-        } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'notes'])) }}
+        } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'reason'])) }}
     {% endset -%}
 
     {{ govukRadios({
@@ -48,6 +47,6 @@
                 text: "No"
             }
         ]
-    } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'stop-checkin'])) }}
+    } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])) }}
 
 {% endblock %}

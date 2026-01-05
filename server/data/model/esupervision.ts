@@ -153,5 +153,14 @@ export interface CheckinScheduleResponse {
   photoUrl: string
 }
 
+export interface DeactivateOffenderRequest {
+  requestedBy: string
+  reason: string
+}
+export interface ReactivateOffenderRequest {
+  requestedBy: string
+  reason: string
+}
+
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
 export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'

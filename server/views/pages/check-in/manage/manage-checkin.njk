@@ -28,10 +28,16 @@
 {% endblock %}
 
 {% block pageContent %}
-
-    <div class="moj-button-group__item">
-        <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
-    </div>
+   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
+        <div class="moj-button-group__item">
+            <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
+        </div>
+    {% endif %}
+    {% if offenderCheckinsByCRNResponse.status === 'INACTIVE' %}
+        <div class="moj-button-group__item">
+            <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="stop-checkin-btn" >Restart online check ins</a>
+        </div>
+    {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}

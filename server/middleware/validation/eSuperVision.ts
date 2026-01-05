@@ -153,6 +153,23 @@ const eSuperVision: Route<void> = (req, res, next) => {
       )
     }
   }
+
+  const validateStopCheckins = () => {
+    if (baseUrl.includes(`case/${crn}/appointments/check-in/manage/${id}/stop-checkin`)) {
+      render = `pages/check-in/manage/stop-checkin`
+      localParams.id = id
+      const stopCheckIn = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'stop-checkin',
+          stopCheckIn,
+        }),
+      )
+    }
+  }
   let errorMessages: Record<string, string> = {}
   validateDateFrequency()
   validateContactPreference()
@@ -161,6 +178,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateUploadPhotoPage()
   validateCheckinSettings()
   validateManageEditContactPreference()
+  validateStopCheckins()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

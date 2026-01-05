@@ -19,10 +19,11 @@ export interface ESupervisionValidationArgs {
   checkInEmail?: string
   editCheckInEmail?: string
   editCheckInMobile?: string
+  stopCheckIn?: string
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile } = args
+  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, stopCheckIn } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
@@ -44,8 +45,8 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
         {
           validator: isFutureDate,
-          msg: 'Checkin date must be in the future',
-          log: 'Checkin date must be in the future',
+          msg: 'The first online check in date must be in the future',
+          log: 'First checkin date must be in the future',
         },
       ],
     },
@@ -154,8 +155,8 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
         {
           validator: isFutureDate,
-          msg: 'Checkin date must be in the future',
-          log: 'Checkin date must be in the future',
+          msg: 'The next online check in date must be in the future',
+          log: 'Manage checkin date must be in the future',
         },
       ],
     },
@@ -191,6 +192,27 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][manageCheckin][stopCheckin]`]: {
+      optional: page !== 'stop-checkin',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select yes if you want to stop check ins for the person',
+          log: 'Stop checkin, not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][manageCheckin][reason]`]: {
+      optional: page !== `stop-checkin` || (page === 'stop-checkin' && stopCheckIn !== 'YES'),
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter the reason for stopping',
+          log: 'Stop checkin, reason not provided',
+        },
+      ],
+    },
+
     photoUpload: {
       optional: page !== 'upload-a-photo',
       checks: [
