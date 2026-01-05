@@ -111,6 +111,8 @@ export interface AppointmentRequestBody {
   outcomeRecorded?: boolean
 }
 
+export type RescheduleRequestedBy = 'POP' | 'SERVICE'
+
 export interface RescheduleAppointmentRequestBody {
   date: string
   startTime: string
@@ -118,14 +120,17 @@ export interface RescheduleAppointmentRequestBody {
   staffCode?: string
   teamCode?: string
   locationCode?: string
-  rescheduleNotes?: string
+  outcomeRecorded: boolean
   notes?: string
-  rescheduleSensitive?: boolean
   sensitive?: boolean
   sendToVisor?: boolean
-  requestedBy: string
-  uuid: string
+  requestedBy: RescheduleRequestedBy
+  reasonForRecreate?: string
+  reasonIsSensitive?: boolean
+  uuid?: string
+  isInFuture: boolean
 }
+
 export interface RescheduleAppointmentResponse {
   id: number
   externalReference: string
@@ -148,7 +153,7 @@ export interface AppointmentPatch {
 }
 
 export interface RescheduleAppointment {
-  whoNeedsToReschedule?: string
+  whoNeedsToReschedule?: RescheduleRequestedBy
   reason?: string
   files?: string[]
   sensitivity?: YesNo

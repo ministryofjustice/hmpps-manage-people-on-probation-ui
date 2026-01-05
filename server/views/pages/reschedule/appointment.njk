@@ -1,12 +1,14 @@
 {% extends "../_form.njk" %}
 {% set title = 'Reschedule an appointment' %}
-{% set headerPersonNameForename = personAppointment.personSummary.name.forename  %}
-{% set apptDetails = personAppointment.appointment  %}
-{% set officerName = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname  %}
-{% set officerStaffCode = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname  %}
-{% set appointmentWithTitle = 'Appointment: ' +  apptDetails.type + ' with ' + officerName+ ' on ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime if apptDetails.endDateTime else '')  %}
+{% set headerPersonNameForename = personAppointment.personSummary.name.forename %}
+{% set apptDetails = personAppointment.appointment %}
+{% set officerName = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname %}
+{% set officerStaffCode = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname %}
+{% set appointmentWithTitle = 'Appointment: ' + apptDetails.type + ' with ' + officerName + ' on ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime if apptDetails.endDateTime else 
+    ''
+) %}
 {% set showAnchorLink = true %}
-{% set formAnchorLink = "/case/" + crn + "/appointments/appointment/" + contactId + '/manage'  %}
+{% set formAnchorLink = "/case/" + crn + "/appointments/appointment/" + contactId + '/manage' %}
 {% set formAnchorText = 'Cancel and go back' %}
 {#{% set multipartForm = true %}#}
 {% set submitButtonId = 'continueButton' %}
@@ -45,7 +47,7 @@
             }
         ]
     } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','whoNeedsToReschedule' ])      ) }}
-  {#  {{ govukCharacterCount({
+    {{ govukCharacterCount({
         rows: '10',
         maxlength: maxCharCount,
         label: {
@@ -58,8 +60,9 @@
             attributes: { "data-qa": "reason"}
         },
         value: body.reason
-    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment','reason' ])      ) }}
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'reason' ])      ) }}
 
+    {# 
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
     {% set uploadHtml %}
     <div class="govuk-grid-row govuk-body">
@@ -95,7 +98,7 @@
         },
         uploadHtml: uploadHtml
     }) }}
-
+ #}
     {{ govukRadios({
         fieldset: {
             legend: {
@@ -122,6 +125,5 @@
                 text: "No, it is not sensitive"
             }
         ]
-    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }} #}
+    } | decorateFormAttributes(['appointments', crn, id, 'rescheduleAppointment', 'sensitivity'])) }}
 {% endblock %}
-

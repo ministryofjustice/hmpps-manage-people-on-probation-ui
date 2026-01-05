@@ -1,9 +1,8 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '../utils'
+import { getDataValue, handleQuotes } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
-  AppointmentPatch,
   AppointmentSession,
   RescheduleAppointmentRequestBody,
   RescheduleAppointmentResponse,
@@ -25,58 +24,57 @@ export const postRescheduleAppointments = (
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
-    const { date, start, end, notes, sensitivity, visorReport, rescheduleAppointment } =
-      getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    const {
+      date,
+      start,
+      end,
+      notes,
+      sensitivity,
+      visorReport,
+      rescheduleAppointment,
+      outcomeRecorded,
+      user: { username },
+    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const selectedTeam = getDataValue(data, ['appointments', crn, uuid, 'user', 'teamCode'])
     const selectedLocation = getDataValue(data, ['appointments', crn, uuid, 'user', 'locationCode'])
     const staffCode = getDataValue(data, ['appointments', crn, uuid, 'user', 'staffCode'])
     const isInPast = appointmentDateIsInPast(req)
-    let response: RescheduleAppointmentResponse | PersonAppointment
-    if (!isInPast) {
-      const body: RescheduleAppointmentRequestBody = {
-        date,
-        startTime: start,
-        endTime: end,
-        uuid,
-        staffCode,
-        teamCode: selectedTeam,
-        locationCode: selectedLocation,
-        requestedBy: rescheduleAppointment.whoNeedsToReschedule,
-        // rescheduleNotes: handleQuotes(rescheduleAppointment.reason),
-        //  rescheduleSensitive: rescheduleAppointment.sensitivity === 'Yes',
-        notes: handleQuotes(notes),
-        sensitive: sensitivity === 'Yes',
-        sendToVisor: visorReport === 'Yes',
+    const body: RescheduleAppointmentRequestBody = {
+      date,
+      startTime: start,
+      endTime: end,
+      staffCode,
+      teamCode: selectedTeam,
+      locationCode: selectedLocation,
+      outcomeRecorded: outcomeRecorded === 'Yes',
+      notes: handleQuotes(notes),
+      sensitive: sensitivity === 'Yes',
+      sendToVisor: visorReport === 'Yes',
+      requestedBy: rescheduleAppointment.whoNeedsToReschedule,
+      reasonForRecreate: handleQuotes(rescheduleAppointment.reason),
+      reasonIsSensitive: rescheduleAppointment.sensitivity === 'Yes',
+      uuid,
+      isInFuture: isInPast === false,
+    }
+    const response = await masClient.putRescheduleAppointment(contactId, body)
+
+    const userDetails = await masClient.getUserDetails(username)
+    let eventResponse: EventResponse
+    const flagService = new FlagService()
+    const featureFlags: FeatureFlags = await flagService.getFlags()
+    if (featureFlags.enableOutlookEvent && userDetails?.email) {
+      const rescheduleEventRequest: RescheduleEventRequest = {
+        rescheduledEventRequest: {
+          emailAddress: userDetails.email,
+          name: `${userDetails.firstName} ${userDetails.surname}`,
+        },
+        oldSupervisionAppointmentUrn: response.externalReference,
       }
-      response = await masClient.putRescheduleAppointment(contactId, body)
-    } else {
-      const body: AppointmentPatch = {
-        id: parseInt(contactId, 10),
-        notes: handleQuotes(notes),
-        sensitive: sensitivity === 'Yes',
-        date,
-        startTime: start,
-      }
-      response = await masClient.patchAppointment(body)
+      eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
     }
 
-    /*
-        const userDetails = await masClient.getUserDetails(username)
-        let eventResponse: EventResponse
-        const flagService = new FlagService()
-        const featureFlags: FeatureFlags = await flagService.getFlags()
-       if (featureFlags.enableOutlookEvent && userDetails?.email) {
-          const rescheduleEventRequest: RescheduleEventRequest = {
-            rescheduledEventRequest: {
-              emailAddress: userDetails.email,
-              name: `${userDetails.firstName} ${userDetails.surname}`,
-            },
-            oldSupervisionAppointmentUrn: response.externalReference,
-          }
-          eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
-        } */
     // Setting isOutLookEventFailed to display error based on API responses.
-    // if (featureFlags.enableOutlookEvent && (!userDetails?.email || !eventResponse?.id)) data.isOutLookEventFailed = true
+    if (featureFlags.enableOutlookEvent && (!userDetails?.email || !eventResponse?.id)) data.isOutLookEventFailed = true
 
     return response
   }

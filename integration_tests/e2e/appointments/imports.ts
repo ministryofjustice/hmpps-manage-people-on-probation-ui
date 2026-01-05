@@ -39,10 +39,10 @@ interface Args {
   withLocationOfficeNameTask?: string
 }
 
-export const getUuid = () => {
+export const getUuid = (index = 2) => {
   return cy.url().then(currentUrl => {
     const split = currentUrl.split('?')[0].split('/')
-    return split[split.length - 2]
+    return split[split.length - index]
   })
 }
 
@@ -762,14 +762,21 @@ export const completeRescheduleAppointmentPage = () => {
   cy.visit('/case/X000001/appointments/appointment/6/manage')
   const manageAppointmentPage = new ManageAppointmentPage()
   manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').find('a').click()
-  const rescheduleAppointmentPage = new RescheduleAppointmentPage()
-  rescheduleAppointmentPage
-    .getWhoNeedsToReschedule()
-    .find('.govuk-radios__item')
-    .eq(0)
-    .find('.govuk-radios__input')
-    .click()
-  rescheduleAppointmentPage.getSubmitBtn().click()
+  getUuid(1).then(pageUuid => {
+    const rescheduleAppointmentPage = new RescheduleAppointmentPage()
+    rescheduleAppointmentPage
+      .getWhoNeedsToReschedule()
+      .find('.govuk-radios__item')
+      .eq(0)
+      .find('.govuk-radios__input')
+      .click()
+    rescheduleAppointmentPage
+      .getElement(`#appointments-X000001-${pageUuid}-rescheduleAppointment-reason`)
+      .clear()
+      .type('Reschedule reason')
+    cy.get('[data-qa="sensitiveInformation"]').find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    rescheduleAppointmentPage.getSubmitBtn().click()
+  })
 }
 
 export const completeRescheduling = (id: string, inPast = false) => {
