@@ -372,6 +372,16 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/alerts/5/notes/5",
+        "method": "GET"
+      },
+      "response": {
+        "status": 404,
+        "jsonBody": {}
+      }
     }
   ]
 }

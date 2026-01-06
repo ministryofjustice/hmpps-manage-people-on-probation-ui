@@ -428,7 +428,7 @@ export default class MasApiClient extends RestClient {
   }
 
   async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {
-    return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: true })
+    return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
   async getUserAlertsCount(): Promise<number> {

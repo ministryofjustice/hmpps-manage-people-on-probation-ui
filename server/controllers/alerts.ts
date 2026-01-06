@@ -7,6 +7,7 @@ import { RiskInfo, RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
 import { ErrorSummaryItem } from '../data/model/common'
 import logger from '../../logger'
 import { apiErrors } from '../properties'
+import { AppResponse } from '../models/Locals'
 
 const routes = ['getAlerts', 'getAlertNote', 'clearSelectedAlerts'] as const
 
@@ -15,110 +16,17 @@ interface RestClientError {
   errors: ErrorSummaryItem[]
 }
 
-const alertsController: Controller<typeof routes, void> = {
-  getAlerts: hmppsAuthClient => {
-    return async (req, res) => {
-      const { user } = res.locals
-      const { page = '0' } = req.query as Record<string, string>
-      const url = encodeURIComponent(req.url)
-      const queryString = req.url.split('?')[1]
+const getCrnRiskMap = async (
+  alertsData: UserAlertsContent[],
+  arnsClient: ArnsApiClient,
+  res: AppResponse,
+): Promise<RiskInfo> => {
+  const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
+  console.log(alertsData)
+  if (!enableRiskOnAlertsDashboard || !alertsData[0]) {
+    return { crnToRiskWidgetMap: {}, risksErrors: [] }
+  }
 
-      const pageNumber = parseInt(page, 10)
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
-      const [sortName, sortDirection] = sortedBy.split('.')
-      const token = await hmppsAuthClient.getSystemClientToken(user.username)
-      const masClient = new MasApiClient(token)
-      const alertsData: UserAlerts = await masClient.getUserAlerts(
-        pageNumber,
-        sortName.toUpperCase(),
-        sortDirection as 'asc' | 'desc',
-      )
-
-      const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
-      let riskInfo: RiskInfo = { crnToRiskWidgetMap: {}, risksErrors: [] }
-      if (enableRiskOnAlertsDashboard) {
-        const arnsClient = new ArnsApiClient(token)
-        riskInfo = await getCrnRiskMap(alertsData.content, arnsClient)
-      }
-
-      res.render('pages/alerts', {
-        note: false,
-        queryString,
-        url,
-        alertsData,
-        crnToRiskWidgetMap: riskInfo.crnToRiskWidgetMap,
-        sortedBy,
-        risksErrors: riskInfo.risksErrors,
-      })
-    }
-  },
-
-  getAlertNote: hmppsAuthClient => {
-    return async (req, res) => {
-      const { contactId, noteId } = req.params
-      const { back } = req.query
-      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
-      const url = encodeURIComponent(req.url)
-      const queryString = req.url.split('?')[1]
-
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-
-      const alertNote: UserAlertsContent = await masClient.getUserAlertNote(contactId, noteId)
-      const alertsData = { content: [alertNote] }
-
-      const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
-      let riskInfo: RiskInfo = { crnToRiskWidgetMap: {}, risksErrors: [] }
-      if (enableRiskOnAlertsDashboard) {
-        const arnsClient = new ArnsApiClient(token)
-        riskInfo = await getCrnRiskMap(alertsData.content, arnsClient)
-      }
-
-      res.render('pages/alerts', {
-        note: true,
-        queryString,
-        url,
-        back,
-        alertsData,
-        crnToRiskWidgetMap: riskInfo.crnToRiskWidgetMap,
-        sortedBy,
-        risksErrors: riskInfo.risksErrors,
-      })
-    }
-  },
-
-  clearSelectedAlerts: hmppsAuthClient => {
-    return async (req, res, next) => {
-      const { user } = res.locals
-      const { selectedAlerts } = req.body
-      const { url } = req
-
-      if (!selectedAlerts || selectedAlerts.length === 0) {
-        res.locals.alertsCleared = { error: true, message: `Select an alert to clear it.` }
-        return next()
-      }
-
-      // Convert to array of numbers
-      const alertIds = Array.isArray(selectedAlerts)
-        ? selectedAlerts.map((id: string) => parseInt(id, 10))
-        : [parseInt(selectedAlerts, 10)]
-
-      const token = await hmppsAuthClient.getSystemClientToken(user.username)
-      const masClient = new MasApiClient(token)
-
-      await masClient.clearAlerts(alertIds)
-      const alertCount = alertIds.length
-      res.locals.alertsCleared = {
-        error: false,
-        message: `You've cleared ${alertCount} ${alertCount > 1 ? 'alerts' : 'alert'}.`,
-      }
-
-      return next()
-    }
-  },
-}
-
-const getCrnRiskMap = async (alertsData: UserAlertsContent[], arnsClient: ArnsApiClient): Promise<RiskInfo> => {
   let allRiskResponses: RiskSummary[] = []
   let arnsUnavailableError: string = null
   let results: { crn: string; risksWidget: RoshRiskWidgetDto | string }[] = []
@@ -153,6 +61,99 @@ const getCrnRiskMap = async (alertsData: UserAlertsContent[], arnsClient: ArnsAp
   }
 
   return { crnToRiskWidgetMap, risksErrors }
+}
+
+const alertsController: Controller<typeof routes, void> = {
+  getAlerts: hmppsAuthClient => {
+    return async (req, res) => {
+      const { user } = res.locals
+      const { page = '0' } = req.query as Record<string, string>
+      const url = encodeURIComponent(req.url)
+      const queryString = req.url.split('?')[1]
+
+      const pageNumber = parseInt(page, 10)
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
+      const [sortName, sortDirection] = sortedBy.split('.')
+      const token = await hmppsAuthClient.getSystemClientToken(user.username)
+      const masClient = new MasApiClient(token)
+      const alertsData: UserAlerts = await masClient.getUserAlerts(
+        pageNumber,
+        sortName.toUpperCase(),
+        sortDirection as 'asc' | 'desc',
+      )
+      const arnsClient = new ArnsApiClient(token)
+      const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData.content, arnsClient, res)
+      res.render('pages/alerts', {
+        note: false,
+        queryString,
+        url,
+        alertsData,
+        crnToRiskWidgetMap,
+        sortedBy,
+        risksErrors,
+      })
+    }
+  },
+
+  getAlertNote: hmppsAuthClient => {
+    return async (req, res) => {
+      const { contactId, noteId } = req.params
+      const { back } = req.query
+      const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
+      const url = encodeURIComponent(req.url)
+      const queryString = req.url.split('?')[1]
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+
+      const alertNote: UserAlertsContent = await masClient.getUserAlertNote(contactId, noteId)
+      const alertsData = { content: [alertNote] }
+
+      const arnsClient = new ArnsApiClient(token)
+      const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData.content, arnsClient, res)
+
+      res.render('pages/alerts', {
+        note: true,
+        queryString,
+        url,
+        back,
+        alertsData,
+        crnToRiskWidgetMap,
+        sortedBy,
+        risksErrors,
+      })
+    }
+  },
+
+  clearSelectedAlerts: hmppsAuthClient => {
+    return async (req, res, next) => {
+      const { user } = res.locals
+      const { selectedAlerts } = req.body
+      const { url } = req
+
+      if (!selectedAlerts || selectedAlerts.length === 0) {
+        res.locals.alertsCleared = { error: true, message: `Select an alert to clear it.` }
+        return next()
+      }
+
+      // Convert to array of numbers
+      const alertIds = Array.isArray(selectedAlerts)
+        ? selectedAlerts.map((id: string) => parseInt(id, 10))
+        : [parseInt(selectedAlerts, 10)]
+
+      const token = await hmppsAuthClient.getSystemClientToken(user.username)
+      const masClient = new MasApiClient(token)
+
+      await masClient.clearAlerts(alertIds)
+      const alertCount = alertIds.length
+      res.locals.alertsCleared = {
+        error: false,
+        message: `You've cleared ${alertCount} ${alertCount > 1 ? 'alerts' : 'alert'}.`,
+      }
+
+      return next()
+    }
+  },
 }
 
 export default alertsController
