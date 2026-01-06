@@ -64,20 +64,24 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateContactPreference = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/contact-preference`)) {
       render = `pages/check-in/contact-preference`
-      errorMessages = validateWithSpec(
-        req.body,
-        eSuperVisionValidation({
-          crn,
-          id,
-          checkInEmail,
-          checkInMobile,
-          page: 'contact-preference',
-        }),
-      )
+      if (req.body.change === 'main') {
+        errorMessages = validateWithSpec(
+          req.body,
+          eSuperVisionValidation({
+            crn,
+            id,
+            checkInEmail,
+            checkInMobile,
+            page: 'contact-preference',
+            change: req.body.change,
+          }),
+        )
+      }
     }
   }
   const validateEditContactPreference = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/edit-contact-preference`)) {
+      const preferredComs = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'preferredComs'])
       render = `pages/check-in/edit-contact-preference`
       errorMessages = validateWithSpec(
         req.body,
@@ -89,6 +93,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
           editCheckInEmail,
           editCheckInMobile,
           page: 'edit-contact-preference',
+          change: preferredComs,
         }),
       )
     }

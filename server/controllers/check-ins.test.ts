@@ -1,6 +1,5 @@
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
-import { redirectWizard } from './check-ins'
 import { mockAppResponse } from './mocks'
 import { isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
@@ -94,9 +93,10 @@ const crn = 'X000001'
 const cya = false
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 
-const baseReq = (data?: any) =>
+const baseReq = (data?: any, bodyVal?: any) =>
   httpMocks.createRequest({
     params: { crn, id: uuid },
+    body: { bodyVal },
     session: { data },
     query: {
       back: 'string',
@@ -444,8 +444,10 @@ describe('checkInsController', () => {
     it('redirects to photo-options when CRN and id are valid', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-
-      const req = baseReq()
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        body: { change: 'main' },
+      })
       await controllers.checkIns.postContactPreferencePage(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/photo-options`)
@@ -625,35 +627,6 @@ describe('checkInsController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-    })
-  })
-
-  describe('redirectWizard', () => {
-    it('redirects to checkin summary when cya=true', async () => {
-      const req = httpMocks.createRequest({
-        params: { crn, id: uuid },
-        query: { cya: 'true' },
-      })
-
-      const nextSpy = jest.fn()
-
-      await redirectWizard('/some/next/url')(req, res, nextSpy)
-
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/checkin-summary`)
-      expect(nextSpy).not.toHaveBeenCalled()
-    })
-
-    it('calls next when cya is not true', async () => {
-      const req = httpMocks.createRequest({
-        params: { crn, id: uuid },
-        query: { cya: 'false' },
-      })
-
-      const nextSpy = jest.fn()
-      await redirectWizard('/some/next/url')(req, res, nextSpy)
-
-      expect(redirectSpy).not.toHaveBeenCalled()
-      expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
 

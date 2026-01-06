@@ -6,6 +6,8 @@
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
 {% set cyaLink =  "?cya=true" if cya else  "" %}
+{% set mobileValue = checkInMobile if checkInMobile else 'No mobile number' %}
+{% set emailValue = checkInEmail if checkInEmail else 'No email address' %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -65,15 +67,46 @@
 
     {% endset %}
 
-    {{ appSummaryCard({
-        attributes: {'data-qa': 'contactDetailsCard'},
-        titleText: "Contact details",
-        headingLevel: 3,
-        classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-        html: contactDetails
-    }) }}
-    <div class="govuk-!-width-one-half">
-        <form method="post" autocomplete="off" action="{{ paths.current }}">
+    <form method="post" autocomplete="off" action="{{ paths.current }}">
+
+        <section class="app-summary-card govuk-!-margin-bottom-6 app-summary-card--large-title" data-qa="contactDetailsCard">
+            <header class="app-summary-card__header">
+                <h3 class="app-summary-card__title">
+                    Contact details
+                </h3>
+            </header>
+            <div class="app-summary-card__body">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"><span data-qa="mobileNumberLabel">Mobile number</span></dt>
+                        <dd class="govuk-summary-list__value"><span data-qa="mobileNumberValue" class="app-!-font-family-tabular"></span>{{ mobileValue }}</dd>
+                        <dd class="govuk-summary-list__actions">
+                            <button type="submit"
+                                    name="change"
+                                    value="mobile"
+                                    data-qa="mobileNumberAction"
+                                    class="mpop-govuk-link-button">
+                                Change<span class="govuk-visually-hidden"> mobile number</span>
+                            </button>
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"><span data-qa="emailAddressLabel">Email address</span></dt>
+                        <dd class="govuk-summary-list__value"><span data-qa="emailAddressValue" class="app-!-font-family-tabular"></span>{{ emailValue }}</dd>
+                        <dd class="govuk-summary-list__actions">
+                            <button type="submit"
+                                    name="change"
+                                    data-qa="emailAddressAction"
+                                    value="emailAddress"
+                                    class="mpop-govuk-link-button">
+                                Change<span class="govuk-visually-hidden"> email address</span>
+                            </button>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+        <div class="govuk-!-width-one-half">
             {{ govukRadios({
                 fieldset: {
                     legend: {
@@ -102,13 +135,10 @@
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'preferredComs'])) }}
 
             <div class="govuk-button-group">
-                {{ govukButton({
-                    html: "Continue",
-                    attributes: {
-                        'data-qa': 'submitBtn'
-                    }
-                }) }}
-
+                <button type="submit" name ="change" value = "main" class="govuk-button" data-module="govuk-button" data-qa="submitBtn">
+                    Continue
+                </button>
+            </div>
             </div>
             <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <input type="hidden" name="checkInMobile" value="{{ checkInMobile }}">
