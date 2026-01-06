@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
-import { redirectWizard } from './check-ins'
+
 import { mockAppResponse } from './mocks'
 import { isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
@@ -629,35 +629,6 @@ describe('checkInsController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-    })
-  })
-
-  describe('redirectWizard', () => {
-    it('redirects to checkin summary when cya=true', async () => {
-      const req = httpMocks.createRequest({
-        params: { crn, id: uuid },
-        query: { cya: 'true' },
-      })
-
-      const nextSpy = jest.fn()
-
-      await redirectWizard('/some/next/url')(req, res, nextSpy)
-
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/checkin-summary`)
-      expect(nextSpy).not.toHaveBeenCalled()
-    })
-
-    it('calls next when cya is not true', async () => {
-      const req = httpMocks.createRequest({
-        params: { crn, id: uuid },
-        query: { cya: 'false' },
-      })
-
-      const nextSpy = jest.fn()
-      await redirectWizard('/some/next/url')(req, res, nextSpy)
-
-      expect(redirectSpy).not.toHaveBeenCalled()
-      expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
 

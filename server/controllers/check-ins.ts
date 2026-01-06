@@ -2,7 +2,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { NextFunction, Request, Response } from 'express'
 import { Controller, Route } from '../@types'
-import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
@@ -702,26 +702,13 @@ const checkInsController: Controller<typeof routes, void> = {
         const eSupervisionClient = new ESupervisionClient(token)
         const body: DeactivateOffenderRequest = {
           requestedBy: res.locals.user.username,
-          reason: getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'reason']),
+          reason: handleQuotes(getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'reason'])),
         }
-
         res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
   },
-}
-
-export const redirectWizard = (url: string): Route<Promise<void>> => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { crn, id } = req.params
-    let redirectUrl = url
-    if (req.query.cya === 'true') {
-      redirectUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      return res.redirect(redirectUrl)
-    }
-    return next()
-  }
 }
 
 export const getMinDate = (): string => {
