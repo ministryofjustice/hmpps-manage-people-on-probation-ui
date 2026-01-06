@@ -110,5 +110,5 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
   }
 }
 
-const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string) =>
+export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>
   `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`

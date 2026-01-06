@@ -1,19 +1,21 @@
+import { DateTime } from 'luxon'
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, handleQuotes } from '../utils'
+import { fullName, getDataValue, handleQuotes } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
   AppointmentSession,
+  AppointmentType,
   RescheduleAppointmentRequestBody,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
-
-import FlagService from '../services/flagService'
-import { FeatureFlags } from '../data/model/featureFlags'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { PersonAppointment } from '../data/model/schedule'
+import { buildCaseLink } from './postAppointments'
+import config from '../config'
+import { Name } from '../data/model/personalDetails'
 
 export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
@@ -28,6 +30,7 @@ export const postRescheduleAppointments = (
       date,
       start,
       end,
+      type,
       notes,
       sensitivity,
       visorReport,
@@ -51,34 +54,60 @@ export const postRescheduleAppointments = (
       sensitive: sensitivity === 'Yes',
       sendToVisor: visorReport === 'Yes',
       requestedBy: rescheduleAppointment.whoNeedsToReschedule,
-      reasonForRecreate: handleQuotes(rescheduleAppointment.reason),
       reasonIsSensitive: rescheduleAppointment.sensitivity === 'Yes',
       uuid,
       isInFuture: isInPast === false,
     }
+    if (rescheduleAppointment?.reason) {
+      body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
+    }
     const response = await masClient.putRescheduleAppointment(contactId, body)
-
     const userDetails = await masClient.getUserDetails(username)
     let eventResponse: EventResponse
-    const flagService = new FlagService()
-    const featureFlags: FeatureFlags = await flagService.getFlags()
-    if (featureFlags.enableOutlookEvent && userDetails?.email) {
+    const featureFlags = res.locals.flags
+    if (featureFlags.enableOutlookEvent && userDetails?.email && !isInPast) {
+      const startTime = DateTime.fromISO(start)
+      const endTime = DateTime.fromISO(end)
+      const dt = DateTime.fromISO(`${date}T${start}`)
+      const startDateTime = dt.toISO()
+      const durationInMinutes = endTime.diff(startTime, 'minutes').minutes
+      const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
+      const apptDescription = appointmentTypes.find(entry => entry.code === type).description
+      const message = buildCaseLink(config.domain, crn, contactId.toString())
+      const subject = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const {
+        name: { forename: firstName },
+        mobileNumber,
+      } = res.locals.case
       const rescheduleEventRequest: RescheduleEventRequest = {
         rescheduledEventRequest: {
-          emailAddress: userDetails.email,
-          name: `${userDetails.firstName} ${userDetails.surname}`,
+          recipients: [
+            {
+              emailAddress: userDetails.email,
+              name: `${userDetails.firstName} ${userDetails.surname}`,
+            },
+          ],
+          message,
+          subject,
+          start: startDateTime,
+          durationInMinutes,
+          supervisionAppointmentUrn: response.externalReference,
         },
         oldSupervisionAppointmentUrn: response.externalReference,
+      }
+      if (mobileNumber) {
+        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
+          firstName,
+          crn,
+          smsOptIn: true,
+          mobileNumber,
+        }
       }
       eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
     if (featureFlags.enableOutlookEvent && (!userDetails?.email || !eventResponse?.id)) data.isOutLookEventFailed = true
-
     return response
   }
 }
-
-const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string) =>
-  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`

@@ -21,7 +21,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/supervision/event/reschedule",
+        "urlPathPattern": "/supervision/calendar/event/reschedule",
         "method": "POST"
       },
       "response": {

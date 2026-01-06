@@ -26,7 +26,7 @@ export default class SupervisionAppointmentClient extends RestClient {
   async postRescheduleAppointmentEvent(body: RescheduleEventRequest): Promise<EventResponse> {
     return this.post({
       data: body,
-      path: `/event/reschedule`,
+      path: `/calendar/event/reschedule`,
       handle404: false,
       handle500: true,
       errorMessageFor500: 'Rescheduling appointment not successful',

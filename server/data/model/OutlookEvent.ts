@@ -28,9 +28,21 @@ export interface RescheduleEventRequest {
   oldSupervisionAppointmentUrn: string
 }
 
+export interface SmsEventRequest {
+  firstName: string
+  crn: string
+  smsOptIn: boolean
+  mobileNumber?: string
+}
+
 export interface EventRequest {
-  emailAddress: string
-  name: string
+  recipients: Recipient[]
+  message: string
+  subject: string
+  start: string
+  durationInMinutes: number
+  supervisionAppointmentUrn: string
+  smsEventRequest?: SmsEventRequest
 }
 
 export interface EventResponse {

@@ -1183,7 +1183,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/confirmation`)
     })
   })
-  xdescribe('getConfirmation', () => {
+  describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest({
         appointmentSession: { backendId: 1234, user: { username: '' } },

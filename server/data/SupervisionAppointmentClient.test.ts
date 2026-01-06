@@ -99,8 +99,17 @@ describe('MasOutlookClient', () => {
   it('should post reschedule appointment event and return response body', async () => {
     const requestBody: RescheduleEventRequest = {
       rescheduledEventRequest: {
-        emailAddress: 'recipient@example.com',
-        name: 'Recipient Name',
+        recipients: [
+          {
+            emailAddress: 'recipient@example.com',
+            name: 'Recipient Name',
+          },
+        ],
+        message: '',
+        subject: '',
+        start: '',
+        durationInMinutes: 0,
+        supervisionAppointmentUrn: '',
       },
       oldSupervisionAppointmentUrn: 'URN-OLD-123',
     }
@@ -115,7 +124,7 @@ describe('MasOutlookClient', () => {
     }
 
     fakeApi
-      .post('/event/reschedule', jsonString)
+      .post('/calendar/event/reschedule', jsonString)
       .matchHeader('authorization', `Bearer ${token.access_token}`)
       .reply(201, responseBody)
 
@@ -126,8 +135,17 @@ describe('MasOutlookClient', () => {
   it('should handle 500 for reschedule by returning an error response with message', async () => {
     const requestBody: RescheduleEventRequest = {
       rescheduledEventRequest: {
-        emailAddress: 'recipient@example.com',
-        name: 'Recipient Name',
+        recipients: [
+          {
+            emailAddress: 'recipient@example.com',
+            name: 'Recipient Name',
+          },
+        ],
+        message: 'Message',
+        subject: 'Subject',
+        start: '2025-01-01T10:00:00Z',
+        durationInMinutes: 0,
+        supervisionAppointmentUrn: 'URN-123',
       },
       oldSupervisionAppointmentUrn: 'URN-OLD-123',
     }
@@ -137,7 +155,7 @@ describe('MasOutlookClient', () => {
     const errorMessage = 'Internal Server Error'
 
     fakeApi
-      .post('/event/reschedule', jsonString)
+      .post('/calendar/event/reschedule', jsonString)
       .matchHeader('authorization', `Bearer ${token.access_token}`)
       .reply(500, errorMessage)
 
