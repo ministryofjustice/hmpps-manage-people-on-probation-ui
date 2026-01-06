@@ -89,6 +89,9 @@ tokenStore.getToken.mockResolvedValue('token-alerts')
 const getUserAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserAlerts')
   .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn))
+const getUserAlertNoteSpy = jest
+  .spyOn(MasApiClient.prototype, 'getUserAlertNote')
+  .mockImplementation(() => Promise.resolve(mockUserAlertsWithCrn.content[0]))
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
@@ -126,6 +129,7 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
+          note: false,
         })
       })
 
@@ -143,6 +147,7 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
+          note: false,
         })
       })
 
@@ -159,6 +164,7 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: {},
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
+          note: false,
         })
       })
 
@@ -174,6 +180,7 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           sortedBy: 'date_and_time.desc',
           risksErrors: [],
+          note: false,
         })
       })
       it('should render the alerts page if sort params are in url query', async () => {
@@ -191,6 +198,7 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: [],
           sortedBy: 'name',
+          note: false,
         })
       })
     })
@@ -207,6 +215,30 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: {},
           risksErrors: [],
           sortedBy: 'date_and_time.desc',
+          note: false,
+        })
+      })
+    })
+  })
+
+  describe('getAlertNote', () => {
+    const req = httpMocks.createRequest({ query: {}, url, contactId: 0, noteId: 0 })
+
+    describe('risks on alerts feature flag is enabled', () => {
+      const res = mockAppResponse({ flags: { enableRiskOnAlertsDashboard: true } })
+      const renderSpy = jest.spyOn(res, 'render')
+      it('should render an alert note page', async () => {
+        await controllers.alerts.getAlertNote(hmppsAuthClient)(req, res)
+        const expectedCrnToRiskWidgetMap = {
+          X123456: mockRoshWidget,
+        }
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: { content: [mockUserAlertsWithCrn.content[0]] },
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
+          sortedBy: 'date_and_time.desc',
+          risksErrors: [],
+          note: true,
         })
       })
     })
