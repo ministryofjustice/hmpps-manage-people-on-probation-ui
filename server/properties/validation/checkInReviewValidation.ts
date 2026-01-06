@@ -18,7 +18,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Please enter a note to add to the contact',
+          msg: 'Enter a note to add to the contact',
           log: 'Note verification not completed',
         },
       ],
@@ -28,7 +28,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select whether the snapshot matches the offender',
+          msg: 'Select yes if the person in the video is the correct person',
           log: 'Manual identity verification not completed',
         },
       ],
@@ -38,7 +38,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Enter a reason why the offender did not attend the checkin',
+          msg: 'Enter the reason why the offender did not complete their checkin',
           log: 'Missed checkin note not completed',
         },
       ],
