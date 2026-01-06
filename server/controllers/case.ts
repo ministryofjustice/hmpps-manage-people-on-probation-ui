@@ -25,12 +25,13 @@ const caseController: Controller<typeof routes, void> = {
       })
 
       const { risks, tierCalculation, predictors } = req.session.data.personalDetails[crn]
-      const [overview, needs, personRisks, sanIndicatorResponse] = await Promise.all([
+      const [overview, needs, personRisks, sanIndicatorResponse, contactResponse] = await Promise.all([
         masClient.getOverview(crn, sentenceNumber),
         arnsClient.getNeeds(crn),
         masClient.getPersonRiskFlags(crn),
-        arnsClient.getSanIndicator(crn),
-      ])
+          arnsClient.getSanIndicator(crn),
+          masClient.getOverdueOutcomes(crn),
+        ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
 
@@ -45,6 +46,7 @@ const caseController: Controller<typeof routes, void> = {
         predictorScores,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
         personalDetails: req.session.data.personalDetails[crn].overview,
+        appointmentsWithoutAnOutcomeCount: contactResponse?.content?.length ?? 0,
       })
     }
   },
