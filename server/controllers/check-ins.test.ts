@@ -93,10 +93,9 @@ const crn = 'X000001'
 const cya = false
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 
-const baseReq = (data?: any, bodyVal?: any) =>
+const baseReq = (data?: any) =>
   httpMocks.createRequest({
     params: { crn, id: uuid },
-    body: { bodyVal },
     session: { data },
     query: {
       back: 'string',
