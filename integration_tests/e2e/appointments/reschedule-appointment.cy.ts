@@ -1,6 +1,7 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import { getUuid } from './imports'
 
 describe('Reschedule Appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
@@ -67,13 +68,21 @@ describe('Reschedule Appointment', () => {
     cy.get('.govuk-link').should('contain.text', 'Cancel and go back')
   })
 
-  it('should display validation errors if continue button is clicked without first selecting a reschedule option', () => {
+  it('should display validation errors if continue button is clicked without first selecting a reschedule option and sensitivity', () => {
     loadPage()
-    rescheduleAppointmentPage.getSubmitBtn().click()
-    rescheduleAppointmentPage.checkErrorSummaryBox(['Select who is rescheduling this appointment'])
-    rescheduleAppointmentPage
-      .getElement(`.govuk-error-message`)
-      .should('contain.text', 'Select who is rescheduling this appointment')
+    getUuid(1).then(uuid => {
+      rescheduleAppointmentPage.getSubmitBtn().click()
+      rescheduleAppointmentPage.checkErrorSummaryBox([
+        'Select who is rescheduling this appointment',
+        'Select if contact includes sensitive information',
+      ])
+      rescheduleAppointmentPage
+        .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-whoNeedsToReschedule-error`)
+        .should('contain.text', 'Select who is rescheduling this appointment')
+      rescheduleAppointmentPage
+        .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-sensitivity-error`)
+        .should('contain.text', 'Select if contact includes sensitive information')
+    })
   })
 
   it('should submit the page successfully if all mandatory option are filled/ selected then continue is clicked', () => {
@@ -84,6 +93,7 @@ describe('Reschedule Appointment', () => {
       .eq(0)
       .find('.govuk-radios__input')
       .click()
+    cy.get('[data-qa=sensitiveInformation]').find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     rescheduleAppointmentPage.getSubmitBtn().click()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
   })
