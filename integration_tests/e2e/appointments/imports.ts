@@ -117,7 +117,7 @@ export const completeLocationDateTimePage = ({
   const tomorrowIsInCurrentMonth = tomorrow.month === now.month
   locationDateTimePage.getDatePickerToggle().click()
   if (dateOverride) {
-    const diff = dateOverride.month - now.month
+    const diff = (dateOverride.year - now.year) * 12 + (dateOverride.month - now.month)
     if (diff < 0) {
       for (let i = 0; i > diff; i -= 1) {
         cy.get('.moj-js-datepicker-prev-month').click()
@@ -288,9 +288,13 @@ export const checkAppointmentSummary = (
       .then(text => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
         if (dateInPast) {
-          expect(normalizedText).to.include(`${dateWithYear(pastDate)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dateWithYear(pastDate)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+          )
         } else {
-          expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dateWithYear(date)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+          )
         }
       })
   }
@@ -386,12 +390,13 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
         second: 0,
         millisecond: 0,
       })
+
       const changedStart = '09:30'
       const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
       const dateTimePage = new AppointmentLocationDateTimePage()
       dateTimePage.getDatePickerToggle().click()
-      if (newDate.month > DateTime.now().month) {
+      if (newDate.month !== DateTime.now().month) {
         cy.get('.moj-js-datepicker-next-month').click()
       }
       cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
@@ -413,8 +418,8 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           if (normalizedText) {
-            expect(normalizedText.toString()).to.include(
-              `${dateWithYear(newDate.toISODate())} from ${changedStart} to ${changedEnd}`,
+            expect(normalizedText).to.include(
+              `${dateWithYear(newDate.toISODate())} from ${to24HourTimeWithMinutes(changedStart)} to ${to24HourTimeWithMinutes(changedEnd)}`,
             )
           }
         })
@@ -442,7 +447,9 @@ export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | Arr
         .invoke('text')
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(`${dateWithYear(date)} from ${startTime} to ${endTime}`)
+          expect(normalizedText).to.include(
+            `${dateWithYear(date)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+          )
         })
     }
   })
@@ -467,7 +474,11 @@ export const checkLogOutcomesAlert = (attendedComplied = false) => {
           ? 'Use NDelius to arrange an appointment in the past with another outcome'
           : 'arrange this appointment on NDelius',
       )
-      .should('have.attr', 'href', '#')
+      .should(
+        'have.attr',
+        'href',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=X778160',
+      )
       .should('have.attr', 'target', '_blank')
     cy.get('@alert').get('.moj-alert__action button').should('contain.text', 'Dismiss')
   })
@@ -749,4 +760,16 @@ export const checkAppointmentDetails = (
         .should('have.attr', 'href', `/case/${crn}/appointments/appointment/6/add-note`)
     }
   })
+}
+
+export const to24HourTimeWithMinutes = (time: string): string => {
+  const [rawHours, rawMinutes] = time.split(':')
+
+  const hours = Number(rawHours)
+  const minutes = Number(rawMinutes)
+
+  const period = hours >= 12 ? 'pm' : 'am'
+  const hour12 = hours % 12 || 12
+
+  return `${hour12}:${minutes.toString().padStart(2, '0')}${period}`
 }

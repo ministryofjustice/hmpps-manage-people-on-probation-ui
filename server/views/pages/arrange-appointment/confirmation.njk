@@ -26,9 +26,9 @@
   <span data-qa="appointment-date">{{ appointmentDate | dayOfWeek }}
     {{ appointmentDate | dateWithYear }}
     from
-    {{ appointment.start }}
+    {{ appointment.start | to12HourTimeCompact}}
     to
-    {{ appointment.end }}</span>
+    {{ appointment.end | to12HourTimeCompact}}</span>
 {% endfor %}
 {% set cases = "/case/" %}
 {% set overViewLink = "/case/" + crn %}
@@ -65,17 +65,17 @@
             </span>
           {% endif %}
         </p>
-        {% if isOutLookEventFailed %}
-          <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send you a calendar invitation.</p>
-          <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.</p>
-        {% else %}
-          <p class="govuk-!-margin-bottom-0">The appointment has been added to:</p>
-          <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
-            {% if flags.enableOutlookEvent === true %}
-              <li>your calendar</li>
-            {% endif %}
-            <li>the NDelius contact log and officer diary, along with any supporting information</li>
-          </ul>
+            {% if isOutLookEventFailed %}
+                <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
+                <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.</p>
+            {% else %}
+                <p class="govuk-!-margin-bottom-0">The appointment has been added to:</p>
+                <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
+                    {% if flags.enableOutlookEvent === true %}
+                    <li>{{ attendingName }} calendar</li>
+                    {% endif %}
+                    <li>the NDelius contact log and officer diary, along with any supporting information</li>
+                </ul>
         {% endif %}
       {% else %}
         <p class="govuk-body">The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.</p>

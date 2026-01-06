@@ -9,7 +9,6 @@
     'Risk and plan' %}
 {% set riskPage = true %}
 {% set pageTitle = makePageTitle({pageHeading: currentSectionName}) %}
-{% set headerPersonName = personRisk.personSummary.name | fullName %}
 {% set headerCRN = crn %}
 {% set headerDob = personRisk.personSummary.dateOfBirth %}
 {% set headerGender = personRisk.personSummary.gender %}
@@ -80,7 +79,7 @@
                 href: "/case"
             },
             {
-                text: headerPersonName,
+                text: headerPersonName.forename + ' ' + headerPersonName.surname,
                 href: "/case/" + crn,
                 attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
             },

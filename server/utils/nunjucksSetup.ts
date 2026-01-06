@@ -11,6 +11,7 @@ import {
   dateWithYear,
   dateToTimestamp,
   dateWithDayAndWithoutYear,
+  dateWithDayAndWithYear,
   addressToList,
   dateForSort,
   dateWithNoDay,
@@ -78,6 +79,8 @@ import config from '../config'
 import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
+import { to12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
+import { to12HourTimeCompact } from './to12HourTimeCompact'
 
 export default function nunjucksSetup(
   app: express.Express,
@@ -123,6 +126,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('dateWithYear', dateWithYear)
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
+  njkEnv.addFilter('dateWithDayAndWithYear', dateWithDayAndWithYear)
   njkEnv.addFilter('yearsSince', yearsSince)
   njkEnv.addFilter('yearsBetween', yearsBetween)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)
@@ -197,4 +201,6 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('toIsoDateFromPicker', toIsoDateFromPicker)
   njkEnv.addGlobal('fromIsoDateToPicker', fromIsoDateToPicker)
   njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
+  njkEnv.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
+  njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
 }

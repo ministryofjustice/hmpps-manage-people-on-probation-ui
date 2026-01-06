@@ -1,6 +1,7 @@
 import Page from '../pages'
 import AlertsPage from '../pages/alerts'
 import OverviewPage from '../pages/overview'
+import { apiErrors } from '../../server/properties'
 
 context('Alerts Dashboard', () => {
   afterEach(() => {
@@ -13,6 +14,29 @@ context('Alerts Dashboard', () => {
     page.noAlertsMessage().should('be.visible')
     page.getElement('[data-qa="alertsTable"]').should('not.exist')
     page.getElement('[data-qa="clearSelectedAlerts"]').should('not.exist')
+  })
+
+  it('Alerts page renders ARNS Unavailable message if 500 response', () => {
+    cy.task('stubArnsUnavailable')
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
+  })
+
+  it('Alerts page does not render ARNS Unavailable message if 404 response', () => {
+    cy.task('stubArnsUnavailable', 404)
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('[data-module=govuk-error-summary]').should('not.exist')
+    page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
+  })
+  it('Alerts page renders ARNS Unavailable message if server error', () => {
+    cy.task('stubArnsServerError')
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 
   it('Alerts page renders alerts when they exist', () => {
@@ -42,7 +66,7 @@ context('Alerts Dashboard', () => {
       .should(
         'have.attr',
         'href',
-        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=Contact&CRN=X000001&contactID=1',
+        'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UpdateContact&CRN=X000001&contactID=1',
       )
       .should('have.attr', 'target', '_blank')
   })
@@ -74,7 +98,7 @@ context('Alerts Dashboard', () => {
       .should(
         'have.attr',
         'href',
-        `/case/X000002/appointments/appointment/8/manage/note/0?back=${encodeURIComponent('/alerts')}`,
+        `/case/X000001/appointments/appointment/8/manage/note/0?back=${encodeURIComponent('/alerts')}`,
       )
   })
 })

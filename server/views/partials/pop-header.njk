@@ -7,7 +7,7 @@
             </li>
             <li>Date of birth:
                         <span data-qa='headerDateOfBirthValue'>{{ headerDob | dateWithYear }}</span>
-                                (age <span data-qa='headerDateOfBirthAge'>{{ headerDob | yearsSince }}</span>)
+                                (<span data-qa='headerDateOfBirthAge'>{{ headerDob | yearsSince }} years old</span>)
                         <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
             </li>
             <li>Tier:
@@ -25,7 +25,7 @@
 <div class="moj-page-header-actions govuk-!-static-margin-bottom-4">
     <div class="moj-page-header-actions__title">
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-0">
-            <span data-qa='name'>{{ headerPersonName }}</span>
+            <span data-qa='name'>{{ headerPersonName.forename }}{{' '}}{{ headerPersonName.surname }}</span>
         </h1>
     </div>
     <div class="moj-page-header-actions__actions">

@@ -4,7 +4,6 @@
 }) %}
 {% set currentNavSection = 'sentence' %}
 {% set currentSectionName = 'Sentence' %}
-{% set headerPersonName = sentenceDetails.personSummary.name.forename + ' ' + sentenceDetails.personSummary.name.surname %}
 {% set headerCRN = crn %}
 {% set headerDob = sentenceDetails.personSummary.dateOfBirth %}
 {% set headerGender = sentenceDetails.personSummary.gender %}
@@ -17,7 +16,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },

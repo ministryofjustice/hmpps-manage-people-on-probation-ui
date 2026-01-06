@@ -1,22 +1,21 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
-{% set pageTitle = makePageTitle({ pageHeading: "Compliance" }) %}
+{% set pageTitle = makePageTitle({pageHeading: "Compliance"}) %}
 {% set currentSectionName = 'Compliance' %}
 {% set currentNavSection = 'compliance' %}
-{% set headerPersonName = personCompliance.personSummary.name | fullName %}
 {% set headerCRN = personCompliance.personSummary.crn %}
-{% set headerDob = personCompliance.personSummary.dateOfBirth  %}
-{% set headerGender = personCompliance.personSummary.gender  %}
+{% set headerDob = personCompliance.personSummary.dateOfBirth %}
+{% set headerGender = personCompliance.personSummary.gender %}
 
 {% block beforeContent %}
-{{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
   items: [
         {
           text: "Cases",
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -29,14 +28,14 @@
 
 {% block pageContent %}
 
-{% set showWarning = false %}
-{% for sentence in personCompliance.currentSentences %}
+  {% set showWarning = false %}
+  {% for sentence in personCompliance.currentSentences %}
     {% if sentence.compliance.currentBreaches > 0 %}
-        {% set showWarning = true %}
+      {% set showWarning = true %}
     {% endif %}
-{% endfor %}
+  {% endfor %}
 
-{% if showWarning === true %}
+  {% if showWarning === true %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
         {{ govukWarningText({
@@ -45,10 +44,9 @@
         }) }}
       </div>
     </div>
-{% endif %}
+  {% endif %}
 
-{% include './compliance/_compliance-current-order.njk' %}
-{% include './compliance/_compliance-previous-orders.njk' %}
-
+  {% include './compliance/_compliance-current-order.njk' %}
+  {% include './compliance/_compliance-previous-orders.njk' %}
 
 {% endblock %}

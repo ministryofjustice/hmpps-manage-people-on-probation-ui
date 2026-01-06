@@ -101,6 +101,7 @@ context('Personal Details', () => {
   it('Personal details page is rendered with date of death', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001/personal-details')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
     cy.get('[data-qa="dateOfBirthValue')
       .invoke('text')
       .then(text => {
@@ -294,7 +295,7 @@ context('Personal Details', () => {
   })
   it('should display the pop header on the staff contacts page', () => {
     cy.visit('/case/X000001/personal-details/staff-contacts')
-    checkPopHeader('Eula Schmeler')
+    checkPopHeader('Caroline Wolff')
   })
   it('should display the pop header on the adjustments page', () => {
     cy.visit('/case/X000001/personal-details/adjustments')

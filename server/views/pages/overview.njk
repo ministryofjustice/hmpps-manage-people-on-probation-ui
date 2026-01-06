@@ -6,7 +6,6 @@
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set appointmentsWithoutAnOutcomeCount = overview.appointmentsWithoutOutcome %}
-{% set headerPersonName = overview.personalDetails.name.forename + ' ' + overview.personalDetails.name.surname %}
 {% set headerCRN = crn %}
 {% set headerDob = overview.personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
@@ -19,9 +18,10 @@
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
-{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 {% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up online check ins'%}
-{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else checkinLink %}
+{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
+  checkinLink %}
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
@@ -118,14 +118,13 @@
           href: "/case"
         },
         {
-          text: headerPersonName
+          text: headerPersonName.forename + ' ' + headerPersonName.surname
         }
       ]
     }) }}
 {% endblock %}
 
 {% block pageContent %}
-
   {% if 'very high' in (riskToStaff.levelDescription | lower) %}
     {% set level = 'VERY_HIGH' %}
   {% else %}
@@ -193,11 +192,11 @@
       }
     }) }}
 
-    {% set checkin %}
-    {% set nextCheckin = offenderCheckinsByCRNResponse %}
-    {% set nextCheckinText %}
-        {% if nextCheckin %}
-            {{ govukSummaryList({
+  {% set checkin %}
+  {% set nextCheckin = offenderCheckinsByCRNResponse %}
+  {% set nextCheckinText %}
+  {% if nextCheckin %}
+    {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
@@ -206,11 +205,15 @@
                     {
                         key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
                         value: { html: '<span data-qa="frequencyValue">' + nextCheckin.checkinInterval | userFriendlyString + '</span>'}
+                    },
+                    {
+                        key: { html: '<span data-qa="contactPrefLabel">Contact preferences</span>'},
+                        value: { html: '<span data-qa="contactPrefValue">' + nextCheckin.contactPreference | userFriendlyString + '</span>'}
                     }
-                ]
+                   ]
             }) }}
-        {% else %}
-            {{ govukSummaryList({
+  {% else %}
+    {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
@@ -218,9 +221,9 @@
                     }
                 ]
             }) }}
-        {% endif %}
-    {% endset %}
-    {% endset %}
+  {% endif %}
+  {% endset %}
+  {% endset %}
   {% if flags.enableESuperVision === true %}
     {{ appSummaryCard({
         titleText: 'Online check ins',
@@ -440,7 +443,7 @@
         <td data-qa="overallRiskValue" class="govuk-tag govuk-!-font-weight-bold {{ getTagClass(risks.summary.overallRiskLevel) }}" align="center">{{ roshText + ' risk of serious harm' | upper }}</td>
       </table>
     {% else %}
-      {{'There is no RoSH summary.'}}
+      {{'There is no ROSH summary.'}}
     {% endif %}
     {% endset %}
     {{ govukSummaryList({
@@ -622,7 +625,7 @@
                   {% if overview.activity %}
                     {{ overview.activity.nationalStandardAppointmentsCount }} national standard appointments <br/>
                     {{ overview.activity.outcomeNotRecordedCount }} without a recorded outcome <br/>
-                    {{ overview.activity.compliedAppointmentsCount }} compiled <br/>
+                    {{ overview.activity.compliedAppointmentsCount }} complied <br/>
                     {{ overview.activity.acceptableAbsenceCount }} acceptable absences <br/>
                     {{ overview.activity.rescheduledCount }} rescheduled<br/>
                     <p>

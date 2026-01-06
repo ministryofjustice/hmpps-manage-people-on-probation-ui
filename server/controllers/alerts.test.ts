@@ -7,8 +7,10 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse } from './mocks'
-
-import { mockUserAlerts, mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
+import { apiErrors } from '../properties'
+import { UserAlerts } from '../models/Alerts'
+import logger from '../../logger'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')
@@ -38,8 +40,6 @@ const mockRoshWidget = {
   risks: [{ riskTo: 'General Public', community: ['HIGH'], custody: ['MEDIUM'] }],
 } as any
 
-const mockCrnToRiskWidgetMap = { X123456: mockRoshWidget }
-
 const mockUserAlertsWithCrn = {
   content: [
     {
@@ -50,8 +50,16 @@ const mockUserAlertsWithCrn = {
       date: '2025-10-26',
       officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
     },
+    {
+      id: 2,
+      crn: 'Y789012',
+      type: { description: 'Another Type', editable: true },
+      name: { forename: 'Another', middleName: '', surname: 'Case' },
+      date: '2025-10-25',
+      officer: { name: { forename: 'Mock', middleName: '', surname: 'Officer' }, code: 'MO01' },
+    },
   ],
-  totalResults: 1,
+  totalResults: 2,
   totalPages: 1,
   page: 0,
   size: 10,
@@ -64,6 +72,18 @@ const mockRisksData = {
   assessedOn: '2025-11-19',
 } as any
 
+const mockErrorSummary = {
+  errors: [
+    {
+      text: apiErrors.risks,
+    },
+    { text: 'A different unique error' },
+    {
+      text: 'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    },
+  ],
+} as any
+
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue('token-alerts')
@@ -74,17 +94,9 @@ const getUserAlertsSpy = jest
 const clearAlertsSpy = jest
   .spyOn(MasApiClient.prototype, 'clearAlerts')
   .mockImplementation(() => Promise.resolve(mockClearAlertsSuccess)) // Use imported mock
-const getRisksSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getRisks')
-  .mockImplementation(() => Promise.resolve(mockRisksData))
+const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks')
 
-toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
-
-const res = mockAppResponse()
-const renderSpy = jest.spyOn(res, 'render')
-const jsonSpy = jest.spyOn(res, 'json')
-const statusSpy = jest.spyOn(res, 'status')
-const next = jest.fn()
+const url = '/alerts'
 
 const defaultPagination = {
   from: '1',
@@ -100,8 +112,12 @@ const defaultPagination = {
 }
 
 describe('alertsController', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
+    getRisksSpy.mockImplementation(() => Promise.resolve(mockRisksData))
+    toRoshWidgetSpy.mockClear()
+    toRoshWidgetSpy.mockReturnValue(mockRoshWidget)
+    getUserAlertsSpy.mockResolvedValue(mockUserAlertsWithCrn)
   })
 
   describe('getAlerts', () => {
@@ -130,16 +146,23 @@ describe('alertsController', () => {
         sortedBy: 'date_and_time.desc',
         url: encodeURIComponent('/alerts'),
       })
-    })
 
-    it('should call getUserAlerts with custom page number and sort params, and build query string (Risk Enabled)', async () => {
-      const req = httpMocks.createRequest({
-        query: { page: '5', sortBy: 'SURNAME.desc' },
-        url: '/alerts',
+      it('should render the alerts page when risks api request throws an error', async () => {
+        const loggerSpy = jest.spyOn(logger, 'error')
+        const expectedCrnToRiskWidgetMap = {}
+        const mockErrorMessage = 'Mock error message'
+        getRisksSpy.mockImplementationOnce(() => Promise.reject(new Error(mockErrorMessage)))
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+        const expectedRiskErrors = [{ text: apiErrors.risks }]
+        expect(loggerSpy).toHaveBeenCalledWith(mockErrorMessage)
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
+          risksErrors: expectedRiskErrors,
+          sortedBy: 'date_and_time.desc',
+        })
       })
-      res.locals.user = defaultUser
-      // Explicitly enable the flag for this test to expect populated risk data
-      res.locals.flags = { enableRiskOnAlertsDashboard: true }
 
       await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
@@ -190,28 +213,18 @@ describe('alertsController', () => {
   })
 
   describe('clearSelectedAlerts', () => {
-    it('should return a 400 error if no alerts are selected', async () => {
-      const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: [] }, url: '/alerts/clear' })
-      res.locals.user = defaultUser
-      res.locals.flags = {}
-
-      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
-
-      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it` })
-      expect(clearAlertsSpy).not.toHaveBeenCalled()
-    })
+    const res = mockAppResponse()
+    const nextSpy = jest.fn()
 
     it('should call clearAlerts with a single selected alert and return success', async () => {
       const req = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: '123' }, url: '/alerts/clear' })
       res.locals.user = defaultUser
       res.locals.flags = {}
-
       clearAlertsSpy.mockResolvedValueOnce({ success: true, clearedCount: 1 })
-
-      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
-
+      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, nextSpy)
       expect(clearAlertsSpy).toHaveBeenCalledWith([123])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 1 alert.` })
+      expect(nextSpy).toHaveBeenCalled()
     })
 
     it('should call clearAlerts with multiple selected alerts and return success', async () => {
@@ -222,13 +235,27 @@ describe('alertsController', () => {
       })
       res.locals.user = defaultUser
       res.locals.flags = {}
-
       clearAlertsSpy.mockResolvedValueOnce({ success: true, clearedCount: 2 })
-
-      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, next)
-
+      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(req, res, nextSpy)
       expect(clearAlertsSpy).toHaveBeenCalledWith([456, 789])
       expect(res.locals.alertsCleared).toEqual({ error: false, message: `You've cleared 2 alerts.` })
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('should return an error and call next if no alerts are selected (Error Path)', async () => {
+      const reqEmpty = httpMocks.createRequest({ method: 'POST', body: { selectedAlerts: [] }, url: '/alerts/clear' })
+      res.locals.user = defaultUser
+      res.locals.flags = {}
+      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(reqEmpty, res, nextSpy)
+      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it.` })
+      expect(clearAlertsSpy).not.toHaveBeenCalled()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
+      nextSpy.mockClear()
+      const reqMissing = httpMocks.createRequest({ method: 'POST', body: {}, url: '/alerts/clear' })
+      await controllers.alerts.clearSelectedAlerts(hmppsAuthClient)(reqMissing, res, nextSpy)
+      expect(res.locals.alertsCleared).toEqual({ error: true, message: `Select an alert to clear it.` })
+      expect(clearAlertsSpy).not.toHaveBeenCalled()
+      expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
 })

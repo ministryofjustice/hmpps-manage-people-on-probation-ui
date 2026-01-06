@@ -70,7 +70,8 @@ export interface OffenderInfo {
   crn: string
   firstCheckin: string
   checkinInterval: string
-  startedAt: string
+  contactPreference: string
+  startedAt?: string
 }
 
 export interface LocationInfo {
@@ -130,8 +131,26 @@ export interface OffenderCheckinsByCRNResponse {
   status: OffenderStatus
   firstCheckin: string
   checkinInterval: CheckInterval
-  contactPreferences: string
-  snapshotUrl?: string
+  contactPreference: 'PHONE' | 'EMAIL'
+  photoUrl?: string
+}
+
+export interface CheckinScheduleRequest {
+  checkinSchedule: {
+    requestedBy: string
+    firstCheckin: string
+    checkinInterval: CheckInterval
+  }
+}
+
+export interface CheckinScheduleResponse {
+  uuid: string
+  crn: string
+  status: OffenderStatus
+  firstCheckin: string
+  checkinInterval: CheckInterval
+  contactPreference: 'PHONE' | 'EMAIL'
+  photoUrl: string
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

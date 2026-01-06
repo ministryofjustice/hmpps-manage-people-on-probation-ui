@@ -1,5 +1,5 @@
 {% extends "../../partials/contacts.njk" %}
-{% set title = "Contact Preferences" %}
+{% set title = "Contact preferences" %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'date-frequency' if not cya else 'checkin-summary'%}
 {% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
 {% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use online check ins." %}
@@ -91,7 +91,7 @@
                 },
                 items: [
                     {
-                        value: "TEXT",
+                        value: "PHONE",
                         text: "Text message"
                     },
                     {

@@ -67,7 +67,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.dateOfDeath !== undefined
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,
@@ -77,6 +77,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         risksWidget,
         predictorScores,
         personRisks,
+        hasDeceased,
       })
     }
   },
@@ -173,6 +174,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.dateOfDeath !== undefined
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
@@ -180,6 +182,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         nextAppointment,
         nextAppointmentIsAtHome,
+        hasDeceased,
       })
     }
   },
@@ -229,7 +232,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
-      const headerPersonName = `${forename} ${surname}`
+      const headerPersonName = { forename, surname }
       res.render('pages/appointments/attended-complied', {
         crn,
         alertDismissed,

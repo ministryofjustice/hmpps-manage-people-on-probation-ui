@@ -1,5 +1,4 @@
 {% extends "../../../partials/layout.njk" %}
-{% set headerPersonName = previousOrderDetail.name.forename + ' ' + previousOrderDetail.name.surname %}
 {% set title = previousOrderDetail.title %}
 {% set pageTitle = makePageTitle({
     pageHeading: [title, "Previous orders", "Sentence"]
@@ -13,7 +12,7 @@
                 href: "/case"
             },
             {
-                text: headerPersonName,
+                text: headerPersonName.forename + ' ' + headerPersonName.surname,
                 href: "/case/" + crn,
                 attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
             },

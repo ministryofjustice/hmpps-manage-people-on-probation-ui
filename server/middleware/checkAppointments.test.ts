@@ -22,6 +22,9 @@ const res = {
       username,
     },
     case: { name: { forename: 'Test', surname: 'User' } },
+    flags: {
+      enablePastAppointments: true,
+    },
   },
   render: jest.fn().mockReturnThis(),
   redirect: jest.fn().mockReturnThis(),
@@ -122,8 +125,8 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
           'You already have an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
         nonWorkingDayName: 'You have selected a non-working day (Sunday). Continue with these details or make changes.',
       },
+      isInPast: true,
       _maxDate: '31/12/2199',
-      _minDate: '1/7/2025',
     })
   })
   it('should not call next()', () => {
@@ -167,12 +170,69 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
         nonWorkingDayName:
           'You have selected a non-working day (Saturday). Continue with these details or make changes.',
       },
+      isInPast: true,
       _maxDate: '31/12/2199',
-      _minDate: '1/7/2025',
     })
   })
   it('should not call next()', () => {
     expect(nextSpy).toHaveBeenCalledTimes(0)
+  })
+})
+
+describe('past appointments feature flag is disabled', () => {
+  const mockRes = {
+    locals: {
+      user: {
+        username,
+      },
+      case: { name: { forename: 'Test', surname: 'User' } },
+      flags: {
+        enablePastAppointments: false,
+      },
+    },
+    render: jest.fn().mockReturnThis(),
+    redirect: jest.fn().mockReturnThis(),
+  } as unknown as AppResponse
+  const mockRenderSpy = jest.spyOn(mockRes, 'render')
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+  beforeEach(async () => {
+    const mockAppointmentChecks: AppointmentChecks = {
+      nonWorkingDayName: 'Saturday',
+      isWithinOneHourOfMeetingWith: {
+        isCurrentUser: false,
+        appointmentIsWith: { forename: 'Test', surname: 'User' },
+        startAndEnd: '11am to 12pm',
+      },
+    }
+    spy = jest
+      .spyOn(MasApiClient.prototype, 'checkAppointments')
+      .mockImplementation(() => Promise.resolve(mockAppointmentChecks))
+    await checkAppointments(hmppsAuthClient)(req, mockRes, nextSpy)
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it('should add the _minDate value to the template properties', () => {
+    expect(mockRenderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
+      crn: 'X000001',
+      id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
+      warningMessages: {
+        isWithinOneHourOfMeetingWith:
+          'Test User already has an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
+        nonWorkingDayName:
+          'You have selected a non-working day (Saturday). Continue with these details or make changes.',
+      },
+      isInPast: true,
+      _maxDate: '31/12/2199',
+      _minDate: '1/7/2025',
+    })
   })
 })
 

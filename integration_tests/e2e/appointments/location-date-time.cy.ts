@@ -213,16 +213,20 @@ describe('Pick a date, location and time for this appointment', () => {
         'Enter a time in the 24-hour format, for example 16:30',
         'The end time must be after the start time',
       ])
+
+      locationDateTimePage.getBackLink().should('be.visible')
     })
     it('should display the error messages incorrect 24 hours time format', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
         expect($error.text().trim()).to.include('Enter a time in the 24-hour format, for example 16:30')
       })
+      locationDateTimePage.getBackLink().should('be.visible')
     })
     it('should display the error messages end time before start time', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
         expect($error.text().trim()).to.include('The end time must be after the start time')
       })
+      locationDateTimePage.getBackLink().should('be.visible')
     })
   })
 
@@ -242,6 +246,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-date-error`).should($error => {
         expect($error.text().trim()).to.include('Enter a date in the correct format, for example 17/5/2024')
       })
+      locationDateTimePage.getBackLink().should('be.visible')
     })
   })
 
@@ -459,7 +464,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
       logOutcomePage = new AttendedCompliedPage()
-      logOutcomePage.checkPageTitle('Confirm if Alton attended and complied')
+      logOutcomePage.checkPageTitle('Confirm Alton attended and complied')
       logOutcomePage.getCancelGoBackLink().click()
       locationDateTimePage.checkOnPage()
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')

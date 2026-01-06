@@ -27,12 +27,14 @@
 
     {% if currentSectionName %}
         {% if not riskPage %}
-            <h2 class="govuk-heading-l {% if not currentSectionNameSubText %}govuk-!-margin-bottom-7{% else %}govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
+            <h2 class="govuk-heading-l{% if currentSectionNameSubText %} govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
+            {% include "../partials/_date-of-death-warning.njk" %}
             {% if currentSectionNameSubText %}
                 <p class="govuk-!-margin-bottom-7" data-qa="currentSectionNameSubText">{{ currentSectionNameSubText }}</p>
             {% endif %}
         {% else %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-3" data-qa="pageHeading">{{ currentSectionName }}</h2>
+            {% include "../partials/_date-of-death-warning.njk" %}
             {% if sentencePlan.showLink %}
                 <h3 class="govuk-heading-m govuk-!-margin-bottom-3" data-qa="pageSubHeading">Risk</h3>
             {% endif %}

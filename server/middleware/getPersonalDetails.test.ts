@@ -107,11 +107,23 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
     expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
-    expect(res.locals.headerPersonName).toEqual(`Caroline Wolff`)
+    expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.dateOfDeath).toBeUndefined()
     expect(nextSpy).toHaveBeenCalled()
     getPersonalDetailsSpy.mockRestore()
+  })
+
+  it('should set the local variable if date of death is recorded', async () => {
+    const dateOfDeath = '2025-11-15'
+    const mockResponse = {
+      ...mock('X000002'),
+      dateOfDeath,
+    }
+    getPersonalDetailsSpy.mockImplementationOnce(() => Promise.resolve(mockResponse))
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.dateOfDeath).toEqual(dateOfDeath)
   })
 
   it('should not request the sentence plan if logged in user does not have SENTENCE_PLAN role', async () => {

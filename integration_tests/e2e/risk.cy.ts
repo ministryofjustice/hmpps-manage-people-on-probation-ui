@@ -181,6 +181,12 @@ context('Risk', () => {
     cy.task('resetMocks')
   })
 
+  it('Risk overview page is rendered with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/risk')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
+  })
+
   it('Risk overview page is rendered when has sentence plan, pop in users caseload and san indicator is false', () => {
     cy.task('stubAuthSentencePlan')
     cy.task('stubUserCaseloadSearch')
