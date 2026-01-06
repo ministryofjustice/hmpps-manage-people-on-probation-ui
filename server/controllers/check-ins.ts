@@ -342,7 +342,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const { back } = req.query
       const { checkIn } = res.locals
 
-      if (checkIn.status !== 'EXPIRED' || !checkIn.missedCheckinComment) {
+      if (checkIn.status !== 'EXPIRED' || !checkIn.reviewedAt) {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       return res.render('pages/check-in/view-expired.njk', { crn, id, back, checkIn })
@@ -357,7 +357,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
-      if (checkIn.status === 'EXPIRED' && checkIn.missedCheckinComment) {
+      if (checkIn.status === 'EXPIRED' && checkIn.reviewedAt) {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/view-expired${back ? `?back=${back}` : ''}`)
       }
       if (checkIn.status !== 'EXPIRED') {

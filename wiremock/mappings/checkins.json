@@ -150,7 +150,8 @@
           "createdBy": "string",
           "createdAt": "2025-11-27T15:40:42.399Z",
           "flaggedResponses": ["string"],
-          "missedCheckinComment": "comment"
+          "missedCheckinComment": "comment",
+          "reviewedAt": "2025-11-27T15:40:42.399Z"
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"

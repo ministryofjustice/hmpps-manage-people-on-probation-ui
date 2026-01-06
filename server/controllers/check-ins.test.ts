@@ -104,8 +104,7 @@ const baseReq = (data?: any) =>
     url: 'url',
   })
 
-const reviewRes = (status: string, missedCheckinComment?: string) =>
-  mockAppResponse({ checkIn: { status, missedCheckinComment } })
+const reviewRes = (status: string, reviewedAt?: string) => mockAppResponse({ checkIn: { status, reviewedAt } })
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
