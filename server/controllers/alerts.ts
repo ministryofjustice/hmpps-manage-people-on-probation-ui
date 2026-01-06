@@ -22,7 +22,6 @@ const getCrnRiskMap = async (
   res: AppResponse,
 ): Promise<RiskInfo> => {
   const enableRiskOnAlertsDashboard = res.locals.flags.enableRiskOnAlertsDashboard === true
-  console.log(alertsData)
   if (!enableRiskOnAlertsDashboard || !alertsData[0]) {
     return { crnToRiskWidgetMap: {}, risksErrors: [] }
   }
