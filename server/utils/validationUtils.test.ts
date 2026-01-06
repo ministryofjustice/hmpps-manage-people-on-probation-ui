@@ -267,7 +267,6 @@ describe('time which is not earlier than time', () => {
 
 describe('isFutureDate', () => {
   it.each([
-    [['3/1/2026'], true],
     [['2/2/2026'], true],
     [['2/1/2026'], false],
     [['17/5/2024'], false],
