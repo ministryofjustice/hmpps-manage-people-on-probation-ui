@@ -70,7 +70,7 @@ const alertsController: Controller<typeof routes, void> = {
       const { user } = res.locals
       const url = encodeURIComponent(req.url)
       const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
-      
+
       const queryString = req.url.split('?')[1]
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const [sortName, sortDirection] = sortedBy.split('.')
@@ -81,6 +81,15 @@ const alertsController: Controller<typeof routes, void> = {
         sortName.toUpperCase(),
         sortDirection as 'asc' | 'desc',
       )
+
+      const pagination: Pagination = getPaginationLinks(
+        req.query.page ? pageNum : 1,
+        alertsData?.totalPages || 0,
+        alertsData?.totalResults || 0,
+        page => addParameters(req, { page: page.toString() }),
+        alertsData?.size || 10,
+      )
+
       const arnsClient = new ArnsApiClient(token)
       const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData.content, arnsClient, res)
       res.render('pages/alerts', {
@@ -89,6 +98,7 @@ const alertsController: Controller<typeof routes, void> = {
         url,
         alertsData,
         crnToRiskWidgetMap,
+        pagination,
         sortedBy,
         risksErrors,
       })
@@ -112,21 +122,12 @@ const alertsController: Controller<typeof routes, void> = {
       const arnsClient = new ArnsApiClient(token)
       const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData.content, arnsClient, res)
 
-      const pagination: Pagination = getPaginationLinks(
-        req.query.page ? pageNum : 1,
-        alertsData?.totalPages || 0,
-        alertsData?.totalResults || 0,
-        page => addParameters(req, { page: page.toString() }),
-        alertsData?.size || 10,
-      )
-
       res.render('pages/alerts', {
         note: true,
         queryString,
         url,
         back,
         alertsData,
-        pagination,
         crnToRiskWidgetMap,
         sortedBy,
         risksErrors,

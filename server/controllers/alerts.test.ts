@@ -159,6 +159,7 @@ describe('alertsController', () => {
           sortedBy: 'date_and_time.desc',
           url: encodeURIComponent('/alerts'),
           risksErrors: [],
+          note: false,
         })
       })
 
@@ -195,6 +196,7 @@ describe('alertsController', () => {
           sortedBy: 'SURNAME.desc',
           url: encodeURIComponent('/alerts'),
           risksErrors: [],
+          note: false,
         })
       })
     })
