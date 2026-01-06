@@ -1,3 +1,5 @@
+type Match = 'MATCH' | 'NO_MATCH'
+
 export interface ESupervisionCheckIn {
   uuid: string
   status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED'
@@ -13,8 +15,8 @@ export interface ESupervisionCheckIn {
   photoUrl?: string
   videoUrl?: string
   snapshotUrl?: string
-  autoIdCheck?: 'MATCH' | 'NO_MATCH'
-  manualIdCheck?: 'MATCH' | 'NO_MATCH'
+  autoIdCheck?: Match
+  manualIdCheck?: Match
   flaggedResponses: string[]
   furtherActions?: string
   missedCheckinComment?: string
@@ -47,7 +49,7 @@ export interface ESupervisionCheckInResponse {
 
 export interface ESupervisionReview {
   reviewedBy: string
-  manualIdCheck?: 'MATCH' | 'NO_MATCH'
+  manualIdCheck?: Match
   notes?: string
   missedCheckinComment?: string
   riskManagementFeedback?: boolean

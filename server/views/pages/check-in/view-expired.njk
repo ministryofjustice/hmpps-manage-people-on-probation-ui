@@ -2,8 +2,7 @@
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 {% set title = "Online check in missed and reviewed" %}
-{% set backLink = back if back else 
-  '/case/' + crn + '/activity-log' %}
+{% set backLink = back | default('/case/' + crn + '/activity-log') %}
 {% set hideButton = true %}
 
 {% block form %}
@@ -21,7 +20,7 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Why did {{ checkIn.personalDetails.name.forename }} not complete their check in?</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.missedCheckinComment}}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.missedCheckinComment }}</dd>
             </div>
             {% if checkIn.notes %}
             <div class="govuk-summary-list__row">
@@ -32,7 +31,7 @@
         </dl>
 
         <h2 class="govuk-heading-m">Add further information</h2>
-        <form method="post" autocomplete="off" action="{{ paths.current  }}">
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
             {{ govukCharacterCount({
                 hint: {
                     text: "This information will be added to contact notes"
