@@ -40,6 +40,19 @@ const mockRoshWidget = {
   risks: [{ riskTo: 'General Public', community: ['HIGH'], custody: ['MEDIUM'] }],
 } as any
 
+const defaultPagination = {
+  from: '1',
+  items: [
+    {
+      current: true,
+      href: 'undefined://undefined/alerts?page=1',
+      number: 1,
+    },
+  ],
+  to: '2',
+  total: '2',
+}
+
 const mockUserAlertsWithCrn = {
   content: [
     {
@@ -98,19 +111,6 @@ const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks')
 
 const url = '/alerts'
 
-const defaultPagination = {
-  from: '1',
-  items: [
-    {
-      current: true,
-      href: 'undefined://undefined/alerts?page=1',
-      number: 1,
-    },
-  ],
-  to: '1',
-  total: '1',
-}
-
 describe('alertsController', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -121,30 +121,102 @@ describe('alertsController', () => {
   })
 
   describe('getAlerts', () => {
-    it('should call getUserAlerts with default page 0 and default sort params, and render the page (Risk Enabled)', async () => {
-      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
-      res.locals.user = defaultUser
-      // Explicitly enable the flag for this test to expect populated risk data
-      res.locals.flags = { enableRiskOnAlertsDashboard: true }
+    describe('pagination tests', () => {
+      const res = mockAppResponse()
+      const renderSpy = jest.spyOn(res, 'render')
+      const next = jest.fn()
 
-      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+      it('should call getUserAlerts with default page 0 and default sort params, and render the page (Risk Enabled)', async () => {
+        const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
+        res.locals.user = defaultUser
+        // Explicitly enable the flag for this test to expect populated risk data
+        res.locals.flags = { enableRiskOnAlertsDashboard: true }
 
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
-      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
-      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-        alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
-        pagination: getPaginationLinks(
-          1,
-          mockUserAlertsWithCrn.totalPages,
-          mockUserAlertsWithCrn.totalResults,
-          page => addParameters(req, { page: page.toString() }),
-          mockUserAlertsWithCrn.size,
-        ),
-        sortedBy: 'date_and_time.desc',
-        url: encodeURIComponent('/alerts'),
+        expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
+        expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+        expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+
+        const expectedCrnToRiskWidgetMap = {
+          X123456: mockRoshWidget,
+          Y789012: mockRoshWidget,
+        }
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap, // Should be populated
+          pagination: getPaginationLinks(
+            1,
+            mockUserAlertsWithCrn.totalPages,
+            mockUserAlertsWithCrn.totalResults,
+            page => addParameters(req, { page: page.toString() }),
+            mockUserAlertsWithCrn.size,
+          ),
+          sortedBy: 'date_and_time.desc',
+          url: encodeURIComponent('/alerts'),
+          risksErrors: [],
+        })
+      })
+
+      it('should call getUserAlerts with custom page number and sort params, and build query string (Risk Enabled)', async () => {
+        const req = httpMocks.createRequest({
+          query: { page: '5', sortBy: 'SURNAME.desc' },
+          url: '/alerts',
+        })
+        res.locals.user = defaultUser
+        // Explicitly enable the flag for this test to expect populated risk data
+        res.locals.flags = { enableRiskOnAlertsDashboard: true }
+
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+
+        expect(getUserAlertsSpy).toHaveBeenCalledWith(4, 'SURNAME', 'desc')
+        expect(getRisksSpy).toHaveBeenCalledWith('X123456')
+        expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
+
+        const expectedCrnToRiskWidgetMap = {
+          X123456: mockRoshWidget,
+          Y789012: mockRoshWidget,
+        }
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap, // Should be populated
+          pagination: getPaginationLinks(
+            5,
+            mockUserAlertsWithCrn.totalPages,
+            mockUserAlertsWithCrn.totalResults,
+            page => addParameters(req, { page: page.toString() }),
+            mockUserAlertsWithCrn.size,
+          ),
+          sortedBy: 'SURNAME.desc',
+          url: encodeURIComponent('/alerts'),
+          risksErrors: [],
+        })
+      })
+    })
+
+    describe('risks on alerts feature flag is enabled', () => {
+      const req = httpMocks.createRequest({ query: {}, url })
+      const res = mockAppResponse({ flags: { enableRiskOnAlertsDashboard: true } })
+      const renderSpy = jest.spyOn(res, 'render')
+      it('should render the alerts page when risks api request returns a 500 error', async () => {
+        const errorResponse = { status: 500, statusCode: 500, errors: [{ text: apiErrors.risks }] }
+        getRisksSpy.mockImplementation(() => Promise.resolve(errorResponse))
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+        const expectedCrnToRiskWidgetMap = {
+          X123456: apiErrors.risks,
+          Y789012: apiErrors.risks,
+        }
+        const expectedRiskErrors = [{ text: apiErrors.risks }]
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
+          risksErrors: expectedRiskErrors,
+          sortedBy: 'date_and_time.desc',
+          pagination: defaultPagination,
+        })
       })
 
       it('should render the alerts page when risks api request throws an error', async () => {
@@ -161,53 +233,77 @@ describe('alertsController', () => {
           crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
           risksErrors: expectedRiskErrors,
           sortedBy: 'date_and_time.desc',
+          pagination: defaultPagination,
         })
       })
 
-      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
+      it('should render the alerts page when no alerts are returned from the api', async () => {
+        const mockResponse: UserAlerts = {
+          ...mockUserAlertsWithCrn,
+          content: [],
+        }
+        getUserAlertsSpy.mockImplementationOnce(() => Promise.resolve(mockResponse))
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: mockResponse,
+          crnToRiskWidgetMap: {},
+          sortedBy: 'date_and_time.desc',
+          risksErrors: [],
+          pagination: defaultPagination,
+        })
+      })
 
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(4, 'SURNAME', 'desc')
-      expect(getRisksSpy).toHaveBeenCalledWith('X123456')
-      expect(toRoshWidgetSpy).toHaveBeenCalledWith(mockRisksData)
-
-      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-        alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: mockCrnToRiskWidgetMap, // Should be populated
-        pagination: getPaginationLinks(
-          5,
-          mockUserAlertsWithCrn.totalPages,
-          mockUserAlertsWithCrn.totalResults,
-          page => addParameters(req, { page: page.toString() }),
-          mockUserAlertsWithCrn.size,
-        ),
-        sortedBy: 'SURNAME.desc',
-        url: encodeURIComponent('/alerts'),
+      it('should render the alerts page when alerts are returned from the api', async () => {
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+        const expectedCrnToRiskWidgetMap = {
+          X123456: mockRoshWidget,
+          Y789012: mockRoshWidget,
+        }
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
+          sortedBy: 'date_and_time.desc',
+          risksErrors: [],
+          pagination: defaultPagination,
+        })
+      })
+      it('should render the alerts page if sort params are in url query', async () => {
+        const sortBy = 'name'
+        const sortOrder = 'desc'
+        const mockReq = httpMocks.createRequest({ query: { sortBy, sortOrder }, url })
+        const expectedCrnToRiskWidgetMap = {
+          X123456: mockRoshWidget,
+          Y789012: mockRoshWidget,
+        }
+        await controllers.alerts.getAlerts(hmppsAuthClient)(mockReq, res)
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: expectedCrnToRiskWidgetMap,
+          risksErrors: [],
+          sortedBy: 'name',
+          pagination: defaultPagination,
+        })
       })
     })
 
-    it('should skip fetching risk data and return an empty risk map when flag is disabled', async () => {
-      const req = httpMocks.createRequest({ query: {}, url: '/alerts' })
-      res.locals.user = defaultUser
-      res.locals.flags = { enableRiskOnAlertsDashboard: false }
-
-      await controllers.alerts.getAlerts(hmppsAuthClient)(req, res, next)
-
-      expect(getUserAlertsSpy).toHaveBeenCalledWith(0, 'DATE_AND_TIME', 'desc')
-      expect(getRisksSpy).not.toHaveBeenCalled()
-      expect(toRoshWidgetSpy).not.toHaveBeenCalled()
-
-      expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-        alertsData: mockUserAlertsWithCrn,
-        crnToRiskWidgetMap: {}, // Expect empty object
-        pagination: getPaginationLinks(
-          1,
-          mockUserAlertsWithCrn.totalPages,
-          mockUserAlertsWithCrn.totalResults,
-          page => addParameters(req, { page: page.toString() }),
-          mockUserAlertsWithCrn.size,
-        ),
-        sortedBy: 'date_and_time.desc',
-        url: encodeURIComponent('/alerts'),
+    describe('risks on alerts feature flag is disabled', () => {
+      const req = httpMocks.createRequest({ query: {}, url })
+      const res = mockAppResponse({ flags: { enableRiskOnAlertsDashboard: false } })
+      const renderSpy = jest.spyOn(res, 'render')
+      it('should not request the risks from the api', async () => {
+        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
+        expect(getRisksSpy).not.toHaveBeenCalled()
+        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
+          url: encodeURIComponent(url),
+          alertsData: mockUserAlertsWithCrn,
+          crnToRiskWidgetMap: {},
+          risksErrors: [],
+          sortedBy: 'date_and_time.desc',
+          pagination: defaultPagination,
+        })
       })
     })
   })
