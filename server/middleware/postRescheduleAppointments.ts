@@ -93,7 +93,6 @@ export const postRescheduleAppointments = (
         },
         oldSupervisionAppointmentUrn,
       }
-      console.dir(rescheduleEventRequest, { depth: null })
       eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
     }
 
