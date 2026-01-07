@@ -49,7 +49,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize)
         : 1
 
-      console.log(sortByQuery)
       const caseload = await masClient.searchUserCaseload(
         res.locals.user.username,
         (pageNum - 1).toString(),
@@ -160,7 +159,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         ascending,
         size: '',
       })
-      console.log(userSchedule)
       const appointments: UserActivity[] = userSchedule.appointments.map((appointment: UserActivity) => {
         const [year, month, day] = appointment.dob.split('-')
         return { ...appointment, birthdate: { day, month, year } }
