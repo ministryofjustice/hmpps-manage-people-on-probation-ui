@@ -1306,7 +1306,7 @@ describe('checkInsController', () => {
   })
 
   describe('postViewCheckIn', () => {
-    it('redirect to activity log page', async () => {
+    it('should stay on existing page', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
 
@@ -1326,7 +1326,7 @@ describe('checkInsController', () => {
 
       expect(postReviewNoteSpy).toHaveBeenCalled()
       expect(getProbationPractitionerSpy).toHaveBeenCalled()
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${req.params.crn}/activity-log`)
+      expect(redirectSpy).toHaveBeenCalledWith(req.url)
     })
 
     it('returns 404 when CRN is invalid', async () => {
