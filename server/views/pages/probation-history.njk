@@ -4,7 +4,6 @@
 }) %}
 {% set currentNavSection = 'sentence' %}
 {% set currentSectionName = 'Sentence' %}
-{% set headerPersonName = sentenceDetails.personSummary.name.forename + ' ' + sentenceDetails.personSummary.name.surname %}
 {% set headerCRN = crn %}
 {% set headerDob = sentenceDetails.personSummary.dateOfBirth %}
 {% set headerGender = sentenceDetails.personSummary.gender %}
@@ -17,7 +16,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -79,7 +78,7 @@
       {% if sentenceDetails.probationHistory.numberOfTerminatedEvents == 1 %}
         <a href="/case/{{ crn }}/sentence/previous-orders">1 previous order</a><br/>
                   Last ended on {{ sentenceDetails.probationHistory.dateOfMostRecentTerminatedEvent | dateWithYearShortMonth }}
-      {% elseif sentenceDetails.probationHistory.numberOfTerminatedEvents > 1 %}
+      {% elif sentenceDetails.probationHistory.numberOfTerminatedEvents > 1 %}
         <a href="/case/{{ crn }}/sentence/previous-orders">{{ sentenceDetails.probationHistory.numberOfTerminatedEvents }} previous orders</a><br/>
                   Last ended on {{ sentenceDetails.probationHistory.dateOfMostRecentTerminatedEvent | dateWithYearShortMonth }}
       {% else %}

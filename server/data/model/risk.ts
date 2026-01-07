@@ -178,6 +178,11 @@ export interface RiskSummary {
   assessedOn?: string | null
 }
 
+export interface RiskInfo {
+  crnToRiskWidgetMap: { [crn: string]: RiskSummary | string }
+  risksErrors: { text: string }[]
+}
+
 export interface Needs {
   identifiedNeeds: Need[]
 }

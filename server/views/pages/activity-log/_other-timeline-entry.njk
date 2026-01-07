@@ -1,8 +1,11 @@
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
+
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 
 {% set titleHtml %}
-<a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?category={{ category }}&view=default&requirement={{ requirement }}&{{filters.queryStr}}&page={{page}}&back={{ baseUrl }}" class="govuk-!-font-weight-bold">
+<a href="{{ link }}" class="govuk-!-font-weight-bold">
   {{ entry.type | toSentenceCase }}
   <span class="govuk-visually-hidden"> on {{ thisDate }}</span>
 </a>

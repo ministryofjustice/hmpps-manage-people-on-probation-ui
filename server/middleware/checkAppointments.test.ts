@@ -22,6 +22,9 @@ const res = {
       username,
     },
     case: { name: { forename: 'Test', surname: 'User' } },
+    flags: {
+      enablePastAppointments: true,
+    },
   },
   render: jest.fn().mockReturnThis(),
   redirect: jest.fn().mockReturnThis(),
@@ -94,8 +97,16 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
       startAndEnd: '11am to 12pm',
     },
   }
-
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
     spy = jest
       .spyOn(MasApiClient.prototype, 'checkAppointments')
       .mockImplementation(() => Promise.resolve(mockAppointmentChecks))
@@ -106,7 +117,7 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
   })
   it('should show the warnings the first time', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
-    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/date-time', {
+    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
       warningMessages: {
@@ -114,6 +125,8 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
           'You already have an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
         nonWorkingDayName: 'You have selected a non-working day (Sunday). Continue with these details or make changes.',
       },
+      isInPast: true,
+      _maxDate: '31/12/2199',
     })
   })
   it('should not call next()', () => {
@@ -122,6 +135,13 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
 })
 
 describe('/middleware/checkAppointments shows warnings the for a colleague', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: 'Saturday',
@@ -141,7 +161,7 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
   })
   it('should show the warnings the first time', () => {
     expect(spy).toHaveBeenCalledWith(crn, expectedBody)
-    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/date-time', {
+    expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
       warningMessages: {
@@ -150,6 +170,8 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
         nonWorkingDayName:
           'You have selected a non-working day (Saturday). Continue with these details or make changes.',
       },
+      isInPast: true,
+      _maxDate: '31/12/2199',
     })
   })
   it('should not call next()', () => {
@@ -157,7 +179,71 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
   })
 })
 
+describe('past appointments feature flag is disabled', () => {
+  const mockRes = {
+    locals: {
+      user: {
+        username,
+      },
+      case: { name: { forename: 'Test', surname: 'User' } },
+      flags: {
+        enablePastAppointments: false,
+      },
+    },
+    render: jest.fn().mockReturnThis(),
+    redirect: jest.fn().mockReturnThis(),
+  } as unknown as AppResponse
+  const mockRenderSpy = jest.spyOn(mockRes, 'render')
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
+  beforeEach(async () => {
+    const mockAppointmentChecks: AppointmentChecks = {
+      nonWorkingDayName: 'Saturday',
+      isWithinOneHourOfMeetingWith: {
+        isCurrentUser: false,
+        appointmentIsWith: { forename: 'Test', surname: 'User' },
+        startAndEnd: '11am to 12pm',
+      },
+    }
+    spy = jest
+      .spyOn(MasApiClient.prototype, 'checkAppointments')
+      .mockImplementation(() => Promise.resolve(mockAppointmentChecks))
+    await checkAppointments(hmppsAuthClient)(req, mockRes, nextSpy)
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it('should add the _minDate value to the template properties', () => {
+    expect(mockRenderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
+      crn: 'X000001',
+      id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
+      warningMessages: {
+        isWithinOneHourOfMeetingWith:
+          'Test User already has an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
+        nonWorkingDayName:
+          'You have selected a non-working day (Saturday). Continue with these details or make changes.',
+      },
+      isInPast: true,
+      _maxDate: '31/12/2199',
+      _minDate: '1/7/2025',
+    })
+  })
+})
+
 describe('/middleware/checkAppointments does not show warnings the second time', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: 'Saturday',
@@ -206,6 +292,13 @@ describe('/middleware/checkAppointments does not show any warnings if none are r
 })
 
 describe('/middleware/checkAppointments does not show any warnings if checks do not return the required warnings, but shows errors', () => {
+  beforeAll(() => {
+    jest.useFakeTimers()
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+  })
+  afterAll(() => {
+    jest.useRealTimers()
+  })
   beforeEach(async () => {
     const mockAppointmentChecks: AppointmentChecks = {
       nonWorkingDayName: null,
@@ -229,5 +322,27 @@ describe('/middleware/checkAppointments does not show any warnings if checks do 
   })
   it('should not call next()', () => {
     expect(nextSpy).toHaveBeenCalledTimes(0)
+  })
+})
+describe('if appointment overlaps', () => {
+  const mockAppointmentChecks: AppointmentChecks = {
+    nonWorkingDayName: null,
+    isWithinOneHourOfMeetingWith: null,
+    overlapsWithMeetingWith: {
+      isCurrentUser: false,
+      appointmentIsWith: { forename: 'Test', surname: 'User' },
+      startAndEnd: '11am to 12pm',
+    },
+  }
+  beforeEach(async () => {
+    spy = jest
+      .spyOn(MasApiClient.prototype, 'checkAppointments')
+      .mockImplementationOnce(() => Promise.resolve(mockAppointmentChecks))
+    await checkAppointments(hmppsAuthClient)(req, res, nextSpy)
+  })
+  it('should shows warning', () => {
+    expect(res.locals.warningMessages.overlapsWithMeetingWith).toEqual(
+      'Test has an existing appointment at 11am to 12pm that overlaps with this time. Continue with these details or make changes',
+    )
   })
 })

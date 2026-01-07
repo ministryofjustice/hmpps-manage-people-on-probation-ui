@@ -208,7 +208,7 @@
             }
           ],
           "telephoneNumber": "0123456999",
-          "mobileNumber": "071838893",
+          "mobileNumber": "07783889300",
           "email": "address1@gmail.com",
           "circumstances": {
             "circumstances": [
@@ -270,7 +270,20 @@
     },
     {
       "request": {
-        "urlPattern": "/mas/personal-details/X000001/contact",
+        "urlPattern": "/mas/personal-details/X801756/contact",
+        "method": "POST"
+      },
+      "response": {
+        "status": 500,
+        "jsonBody": { "message": "Unable to update personal contact details" },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/personal-details/.*/contact",
         "method": "POST"
       },
       "response": {

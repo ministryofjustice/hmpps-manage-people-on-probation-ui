@@ -1,7 +1,10 @@
 {% extends "../_form.njk" %}
 
 {% set title = 'Add supporting information (optional)' %}
-{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/' + back %}
+{% set backLink = change | default('/case/' + crn + '/arrange-appointment/' + id + '/location-date-time') %}
+{% if isInPast %}
+    {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attended-complied' %}
+{% endif %}
 {% block form %}
 
     {{ govukCharacterCount({

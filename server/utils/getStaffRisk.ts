@@ -7,7 +7,7 @@ export const getStaffRisk = (data: RiskFlag[]): RiskFlag => {
   const staffFlag = data.filter(
     item =>
       item?.description === 'Risk to Staff' &&
-      (!item.levelDescription || ['medium', 'high'].includes(item.levelDescription.toLowerCase())),
+      (!item.levelDescription || ['medium', 'high', 'very high'].includes(item.levelDescription.toLowerCase())),
   )
 
   if (staffFlag.length === 0) {

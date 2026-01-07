@@ -13,6 +13,9 @@ import documentController from './documents'
 import accessibilityController from './accessibility'
 import searchController from './search'
 import fileUploadController from './fileUpload'
+import alertsController from './alerts'
+import checkInsController from './check-ins'
+import whatsNewController from './whatsNewController'
 
 export default {
   caseload: caseloadController,
@@ -22,6 +25,7 @@ export default {
   case: caseController,
   compliance: complianceController,
   home: homeController,
+  whatsNew: whatsNewController,
   interventions: interventionsController,
   risk: riskController,
   sentence: sentenceController,
@@ -30,4 +34,6 @@ export default {
   accessibility: accessibilityController,
   search: searchController,
   fileUpload: fileUploadController,
+  alerts: alertsController,
+  checkIns: checkInsController,
 }

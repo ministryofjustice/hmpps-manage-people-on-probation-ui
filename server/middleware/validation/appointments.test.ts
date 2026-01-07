@@ -1,16 +1,26 @@
 import httpMocks from 'node-mocks-http'
 import validation from '.'
 import { mockAppResponse } from '../../controllers/mocks'
+import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 
 const crn = 'X000001'
 const contactId = '1'
 const arrangeAppointmentUrl = `case/${crn}/arrange-appointment/${contactId}`
 const sentenceUrl = `${arrangeAppointmentUrl}/sentence`
 const typeUrl = `${arrangeAppointmentUrl}/type`
-const locationUrl = `${arrangeAppointmentUrl}/location`
-const dateUrl = `${arrangeAppointmentUrl}/date-time`
+const locationDateTimeUrl = `${arrangeAppointmentUrl}/location-date-time`
 const repeatingUrl = `${arrangeAppointmentUrl}/repeating`
 const supportingUrl = `${arrangeAppointmentUrl}/supporting-information`
+
+jest.mock('../appointmentDateIsInPast', () => {
+  return {
+    appointmentDateIsInPast: jest.fn(),
+  }
+})
+
+const mockedAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
+
+mockedAppointmentDateIsInPast.mockReturnValue(false)
 
 const reqBase = {
   method: 'POST',
@@ -29,6 +39,9 @@ const res = mockAppResponse({
     dateFrom: '',
     dateTo: '',
     keywords: '',
+  },
+  flags: {
+    enablePastAppointments: true,
   },
 })
 const next = jest.fn()
@@ -119,60 +132,22 @@ describe('/controllers/arrangeAppointmentController', () => {
     validation.appointments(reqType, res, next)
     expect(res.render).toHaveBeenCalled()
   })
-  it('validation passes for location', async () => {
+  it('validation passes for location-date-time', async () => {
     const appointments = {
       [crn]: {
         [contactId]: {
           user: {
             locationCode: 'code',
           },
-        },
-      },
-    }
-    const reqBaseLocation = {
-      ...reqBase,
-      url: locationUrl,
-      session: {
-        data: {
-          appointments,
-        },
-      },
-      body: {
-        appointments,
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
-    expect(next).toHaveBeenCalled()
-  })
-  it('validation fails for location', async () => {
-    const reqBaseLocation = {
-      ...reqBase,
-      url: locationUrl,
-      session: {
-        data: {},
-      },
-      body: {
-        appointments: {},
-      },
-    } as unknown
-    const reqLocation = httpMocks.createRequest(reqBaseLocation)
-    validation.appointments(reqLocation, res, next)
-    expect(res.render).toHaveBeenCalled()
-  })
-  it('validation passes for date', async () => {
-    const appointments = {
-      [crn]: {
-        [contactId]: {
           date: '17/5/2030',
           start: '09:15',
           end: '10:15',
         },
       },
     }
-    const reqBaseDate = {
+    const reqBaseLocation = {
       ...reqBase,
-      url: dateUrl,
+      url: locationDateTimeUrl,
       session: {
         data: {
           appointments,
@@ -182,14 +157,14 @@ describe('/controllers/arrangeAppointmentController', () => {
         appointments,
       },
     } as unknown
-    const reqDate = httpMocks.createRequest(reqBaseDate)
-    validation.appointments(reqDate, res, next)
+    const reqLocation = httpMocks.createRequest(reqBaseLocation)
+    validation.appointments(reqLocation, res, next)
     expect(next).toHaveBeenCalled()
   })
-  it('validation fails for date - unselected fields', async () => {
-    const reqBaseDate = {
+  it('validation fails for location-date-time - unselected fields', async () => {
+    const reqBaseLocation = {
       ...reqBase,
-      url: dateUrl,
+      url: locationDateTimeUrl,
       session: {
         data: {},
       },
@@ -197,14 +172,17 @@ describe('/controllers/arrangeAppointmentController', () => {
         appointments: {},
       },
     } as unknown
-    const reqDate = httpMocks.createRequest(reqBaseDate)
-    validation.appointments(reqDate, res, next)
+    const reqLocation = httpMocks.createRequest(reqBaseLocation)
+    validation.appointments(reqLocation, res, next)
     expect(res.render).toHaveBeenCalled()
   })
-  it('validation fails for date - end before start', async () => {
+  it('validation fails for location-date-time - end before start', async () => {
     const appointments = {
       [crn]: {
         [contactId]: {
+          user: {
+            locationCode: 'code',
+          },
           date: '2030-17-05',
           start: '10:15am',
           end: '9:15am',
@@ -213,7 +191,7 @@ describe('/controllers/arrangeAppointmentController', () => {
     }
     const reqBaseDate = {
       ...reqBase,
-      url: dateUrl,
+      url: locationDateTimeUrl,
       session: {
         data: {
           appointments,

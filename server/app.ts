@@ -28,6 +28,8 @@ import setUpFlags from './middleware/setUpFlags'
 import baseController from './baseController'
 import multipartRoutes from './routes/multipartRoutes'
 import testRoutes from './routes/testRoutes'
+import getFrontendComponents from './middleware/probationFEComponentsMiddleware'
+import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
@@ -48,20 +50,22 @@ export default function createApp(services: Services): express.Application {
   app.use(setUpWebRequestParsing())
   app.use(setUpStaticResources())
   app.use(baseController())
-  nunjucksSetup(app, services.applicationInfo)
+  nunjucksSetup(app, services.applicationInfo, services)
   const apiRouter = Router()
   app.use(testRoutes(apiRouter))
   app.use(setUpAuthentication())
+  app.use(getFrontendComponents(services.probationComponentsApiService))
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
+  const { hmppsAuthClient } = services
+  app.use(getUserAlertsCount(hmppsAuthClient))
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))
   // Routes that use multer for multipart upload must be registered before csrf executes
   const router = Router()
   app.use(multipartRoutes(router, services))
   app.use(setUpCsrf())
   app.use(routes(router, services))
-
   if (config.sentry.dsn) Sentry.setupExpressErrorHandler(app)
   app.use((_req, _res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

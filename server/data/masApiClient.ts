@@ -39,7 +39,12 @@ import {
   AppointmentPatch,
   NextAppointmentResponse,
   AppointmentsPostResponse,
+  MasUserDetails,
 } from '../models/Appointments'
+import { UserAlerts, UserAlertsContent } from '../models/Alerts'
+import { ContactResponse } from './model/overdueOutcomes'
+import { ProbationPractitioner } from '../models/CaseDetail'
+import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 
 interface GetUserScheduleProps {
   username: string
@@ -58,6 +63,10 @@ export default class MasApiClient extends RestClient {
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
     const queryParam = `?sentenceNumber=${sentenceNumber}`
     return this.get({ path: `/overview/${crn}${queryParam}`, handle404: false })
+  }
+
+  async getOverdueOutcomes(crn: string): Promise<ContactResponse | null> {
+    return this.get({ path: `/appointment/${crn}/overdue-outcomes`, handle404: false })
   }
 
   async getSentenceDetails(crn: string, queryParam = ''): Promise<SentenceDetails | null> {
@@ -126,8 +135,8 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/personal-details/${crn}/contact`,
-      handle404: true,
-      handle500: true,
+      handle404: false,
+      handle500: false,
     })
   }
 
@@ -339,6 +348,14 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/user/${username}/providers${queryParameters}`, handle404: true })
   }
 
+  async getTeamsByProvider(providerCode: string): Promise<AppointmentTeams> {
+    return this.get({ path: `/appointment/teams/provider/${providerCode}` })
+  }
+
+  async getStaffByTeam(teamCode: string): Promise<AppointmentStaff> {
+    return this.get({ path: `/appointment/staff/team/${teamCode}` })
+  }
+
   async getUserLocations(username: string): Promise<UserLocations> {
     return this.get({ path: `/user/${username}/locations`, handle404: true })
   }
@@ -393,5 +410,40 @@ export default class MasApiClient extends RestClient {
 
   async getNextAppointment(username: string, crn: string, contactId: string): Promise<NextAppointmentResponse> {
     return this.get({ path: `/schedule/${crn}/next-appointment?username=${username}&contactId=${contactId}` })
+  }
+
+  async getUserDetails(username: string): Promise<MasUserDetails | null> {
+    return this.get({ path: `/user/${username}`, handle404: true })
+  }
+
+  async getUserAlerts(page?: number, sortBy?: string, sortOrder?: 'asc' | 'desc'): Promise<UserAlerts> {
+    let pageQuery = '?size=10'
+    if (page !== undefined) {
+      pageQuery = `${pageQuery}&page=${page}`
+    }
+    if (sortBy && sortOrder) {
+      pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
+    }
+    return this.get({ path: `/alerts${pageQuery}`, handle404: true })
+  }
+
+  async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {
+    return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
+  }
+
+  async getUserAlertsCount(): Promise<number> {
+    const response: UserAlerts = await this.get({ path: `/alerts`, handle404: true })
+    return response.totalResults
+  }
+
+  async clearAlerts(alertIds: number[]) {
+    return this.put({
+      path: '/alerts',
+      data: { alertIds },
+    })
+  }
+
+  async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
+    return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 }

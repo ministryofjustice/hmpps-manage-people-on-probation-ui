@@ -1,3 +1,4 @@
+import { type AttendedCompliedAppointment } from '../middleware'
 import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
@@ -6,18 +7,15 @@ export type YesNo = '' | 'Yes' | 'No'
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
+export interface AppointmentSessionUser {
+  providerCode?: string
+  teamCode?: string
+  username?: string
+  locationCode?: string
+}
+
 export interface AppointmentSession {
-  user?: {
-    providerCode?: string
-    teamCode?: string
-    username?: string
-    locationCode?: string
-  }
-  temp?: {
-    providerCode?: string
-    teamCode?: string
-    username?: string
-  }
+  user?: AppointmentSessionUser
   type?: string
   visorReport?: YesNo
   date?: string
@@ -38,7 +36,14 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
-  outcomeRecorded?: boolean
+  outcomeRecorded?: YesNo
+  temp?: {
+    providerCode?: string
+    teamCode?: string
+    username?: string
+    isInPast?: boolean
+    date?: string
+  }
 }
 
 export interface AppointmentType {
@@ -83,7 +88,7 @@ export interface AppointmentRequestBody {
   user: {
     username: string
     teamCode: string
-    locationCode: string
+    locationCode: string | null
   }
   type: string
   start: Date
@@ -100,6 +105,7 @@ export interface AppointmentRequestBody {
   notes?: string
   sensitive?: boolean
   visorReport?: boolean
+  outcomeRecorded?: boolean
 }
 
 export interface CheckAppointment {
@@ -131,6 +137,7 @@ export interface AppointmentCheck {
 
 export interface AppointmentPostResponse {
   id: number
+  externalReference: string
 }
 
 export interface AppointmentsPostResponse {
@@ -151,4 +158,19 @@ export interface LocalParams {
   actionType?: string
   back?: string
   change?: string
+  isInPast?: boolean
+  alertDismissed?: boolean
+  forename?: string
+  appointment?: AttendedCompliedAppointment | Activity
+  useDecorator?: boolean
+}
+
+export interface MasUserDetails {
+  userId: number
+  username: string
+  firstName: string
+  surname: string
+  email?: string
+  enabled: boolean
+  roles: string[]
 }

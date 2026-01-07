@@ -3,22 +3,59 @@ import { DateTime } from 'luxon'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes } from '../../utils'
 import { appointmentsValidation } from '../../properties'
+import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
+import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
+import { getMinMaxDates } from '../../utils/getMinMaxDates'
 
 const appointments: Route<void> = (req, res, next) => {
   const { url, params, body, session } = req
   const { crn, id, contactId, actionType } = params
-  const { data } = session
+  const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
-  const localParams: LocalParams = { crn, id, body, contactId, actionType, personLevel, maxCharCount, back, change }
+  let localParams: LocalParams = {
+    crn,
+    id,
+    body,
+    contactId,
+    actionType,
+    personLevel,
+    maxCharCount: maxCharCount as number,
+    back,
+    change,
+    alertDismissed,
+  }
+
+  if (
+    [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
+  ) {
+    const { enablePastAppointments } = res.locals.flags
+    const { _minDate, _maxDate } = getMinMaxDates()
+    localParams = {
+      ...localParams,
+      isInPast: appointmentDateIsInPast(req),
+      ...(!enablePastAppointments ? { _minDate } : {}),
+      _maxDate,
+    }
+  }
+  if (req.url.includes('/attended-complied')) {
+    localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
+  }
+  if (
+    [`/arrange-appointment/${id}/attended-complied`, `/arrange-appointment/${id}/add-note`].some(urlPart =>
+      req.url.includes(urlPart),
+    )
+  ) {
+    localParams = { ...localParams, useDecorator: true }
+  }
   const baseUrl = req.url.split('?')[0]
-  let isAddNotePage = false
+  let isAddNotePage: boolean
   let render = `pages/${[
     url
       .split('?')[0]
@@ -53,21 +90,8 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateLocation = (): void => {
-    if (baseUrl.includes('/location')) {
-      errorMessages = validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'location',
-        }),
-      )
-    }
-  }
-
-  const validateDateTime = (): void => {
-    if (baseUrl.includes('/date-time')) {
+  const validateLocationDateTime = (): void => {
+    if (baseUrl.includes('/location-date-time')) {
       localParams._minDate = req.body._minDate
       localParams._maxDate = req.body._maxDate
       const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
@@ -76,7 +100,8 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
-          page: 'datetime',
+          page: 'location-date-time',
+          enablePastAppointments: res.locals.flags.enablePastAppointments,
         }),
         { now },
       )
@@ -130,6 +155,20 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateAttendedComplied = () => {
+    if (req.url.includes(`/case/${crn}/arrange-appointment/${id}/attended-complied`)) {
+      render = `pages/appointments/attended-complied`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: `arrange-appointment/${id}/attended-complied`,
+        }),
+      )
+    }
+  }
+
+  const validateManageAttendedComplied = () => {
     if (req.url.includes(`appointment/${contactId}/attended-complied`)) {
       render = `pages/appointments/attended-complied`
       errorMessages = validateWithSpec(
@@ -138,7 +177,7 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           contactId,
-          page: 'attended-complied',
+          page: `appointment/${contactId}/attended-complied`,
         }),
       )
     }
@@ -154,7 +193,7 @@ const appointments: Route<void> = (req, res, next) => {
           contactId,
           page: 'supporting-information',
           notes: req.body.appointments[crn][id].notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
         }),
       )
     }
@@ -175,6 +214,23 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   const validateAddNote = () => {
+    if (baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/add-note`)) {
+      isAddNotePage = true
+      render = `pages/appointments/add-note`
+      errorMessages = validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: `arrange-appointment/${id}/add-note`,
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount: maxCharCount as number,
+        }),
+      )
+    }
+  }
+
+  const validateManageAddNote = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/appointment/${contactId}/add-note`)) {
       isAddNotePage = true
       render = `pages/appointments/add-note`
@@ -183,9 +239,10 @@ const appointments: Route<void> = (req, res, next) => {
         appointmentsValidation({
           crn,
           id,
-          page: 'add-note',
+          page: `appointment/${contactId}/add-note`,
           notes: req.body.notes,
-          maxCharCount,
+          maxCharCount: maxCharCount as number,
+          contactId,
         }),
       )
     }
@@ -194,21 +251,17 @@ const appointments: Route<void> = (req, res, next) => {
   let errorMessages: Record<string, string> = {}
   validateType()
   validateSentence()
-  validateLocation()
-  validateDateTime()
+  validateLocationDateTime()
   validateRepeating()
   validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
   validateAttendedComplied()
+  validateManageAttendedComplied()
   validateAddNote()
+  validateManageAddNote()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    if (isAddNotePage) {
-      req.session.errorMessages = errorMessages
-      req.session.body = body
-      return res.redirect(req.url)
-    }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

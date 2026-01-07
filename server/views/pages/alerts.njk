@@ -1,0 +1,300 @@
+{% extends "../partials/alerts-errors.njk" %}
+{% from "govuk/components/table/macro.njk" import govukTable %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "moj/components/badge/macro.njk" import mojBadge %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
+{% from "govuk/components/pagination/macro.njk" import govukPagination %}
+
+{% set alerts = true %}
+{% set alertRows = [] %}
+
+{% block beforeContent %}
+    {% if note %}
+        {{ govukBreadcrumbs({
+            items: [
+                {
+                    text: "< Back",
+                    href: back
+                }
+            ]
+        }) }}
+    {% endif %}
+{% endblock %}
+
+{% block pageContent %}
+
+    {% if alertsData.content.length > 0 %}
+        {% for alert in alertsData.content %}
+
+            {% set alertCheckbox %}
+            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                <div class="govuk-checkboxes__item">
+                    <input class="govuk-checkboxes__input alert-checkbox"
+                            id="alert-{{ alert.id }}"
+                            name="selectedAlerts"
+                            type="checkbox"
+                            value="{{ alert.id }}"
+                            aria-label="Select alert for {{ alert.officer.name.forename }} {{ alert.officer.name.surname }} on {{ alert.date | dateWithYear }}">
+                    <label class="govuk-label govuk-checkboxes__label" for="alert-{{ alert.id }}">
+                        <span class="govuk-visually-hidden">Select alert</span>
+                    </label>
+                </div>
+            </div>
+            {% endset %}
+
+            {% set alertPerson %}
+            <a href="/case/{{ alert.crn }}" class="govuk-!-font-weight-bold govuk-link govuk-link--no-visited-state">
+                {{ alert.name.surname }}, {{ alert.name.forename }}
+            </a>
+            <p class="govuk-!-font-weight-bold secondary-text">{{ alert.crn }}</p>
+            {% endset %}
+
+            {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
+
+            {% set alertActivity %}
+                <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
+                        {{ alert.type.description }}
+                    </a></p>
+
+                {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
+                    {{ govukDetails({
+                        summaryText: "More information",
+                        classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
+                        attributes: {
+                            "data-qa": "moreInfo-" + alert.id
+                        },
+                        html: renderAlertDetails(alert),
+                        open: note
+                    }) }}
+                {% endif %}
+            {% endset %}
+
+            {% if alert.type.editable %}
+              {% set deliusLinkType = 'UpdateContact' %}
+              {% set deliusLinkView = 'Update' %}
+            {% else %}
+              {% set deliusLinkType = 'Contact' %}
+              {% set deliusLinkView = 'View' %}
+            {% endif %}
+
+            {% set alertUpdate %}
+            <a href="{{ deliusDeepLinkUrl(deliusLinkType, alert.crn, alert.id) }}"
+                class="govuk-link"
+                target="_blank"
+                rel="noopener noreferrer"
+                data-qa="updateInNDelius-{{ alert.id }}">
+                {{ deliusLinkView }}
+                <span class="govuk-visually-hidden">in NDelius (opens in new tab)</span>
+            </a>
+            {% endset %}
+
+            {% set alertRows = (alertRows.push([
+                {
+                    html: alertCheckbox,
+                    attributes: { "data-qa":"alertCheckbox" }
+                },
+                {
+                    text: alert.date | dateWithYearShortMonth,
+                    attributes: { "data-qa":"alertDate" }
+                },
+                {
+                    html: alertPerson,
+                    attributes: { "data-qa":"alertPerson" }
+                },
+                {
+                    html: predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }),
+                    attributes: {"data-qa": "alertRisk" }
+                } if flags.enableRiskOnAlertsDashboard === true,
+                {
+                    html: alertActivity,
+                    attributes: { "data-qa":"alertActivity" },
+                    classes: "govuk-!-width-three-tenths"
+                },
+                {
+                    html: alertUpdate,
+                    attributes: { "data-qa":"alertActions" }
+                }
+
+            ]), alertRows) %}
+        {% endfor %}
+    {% endif %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <h1 class="govuk-heading-l" data-qa="pageHeading">Alerts</h1>
+            {% if alertsCleared %}
+                {{ mojAlert({
+                    variant: "error" if alertsCleared.error else "success",
+                    title: alertsCleared.message,
+                    showTitleAsHeading: true,
+                    dismissible: false
+                }) }}
+            {% endif %}
+            {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
+                {% if not note %}
+                <p class="govuk-body" data-qa="alertsCount">
+                    Showing <b>{{ ((alertsData.page) * alertsData.size) + 1 }}</b> to <b>{{ ((alertsData.page) * alertsData.size) + alertsData.content.length }}</b> of <b>{{ alertsData.totalResults }}</b> results
+                </p>
+                {% endif %}
+
+                <form method="post" action="/alerts{{'?' + queryString if queryString else ''}}" id="alerts-form">
+
+                    {{ govukTable({
+                        firstCellIsHeader: false,
+                        attributes: {
+                            'data-module': 'moj-backend-sortable-table',
+                            'data-qa': 'alertsTable'
+                        },
+                        caption: 'Column headers with buttons are sortable',
+                        captionClasses: 'govuk-visually-hidden',
+                        head: [
+                            {
+                                text: "Select",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: {}
+                            },
+                            {
+                                text: "Date",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": setSortOrder('date_and_time', sortedBy), 'data-sort-column': 'date_and_time', 'data-qa': 'dateHeader', 'data-sort-name': 'date_and_time', 'data-sort-action': 'alerts' } if not note else {}
+                            },
+                            {
+                                text: "Name / CRN",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { 'aria-sort': setSortOrder('surname', sortedBy), 'data-sort-column': "surname", 'data-qa': "personHeader", 'data-sort-name': 'surname', 'data-sort-action': 'alerts' } if not note else {}
+                            },
+                            {
+                                text: "Risk",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { 'data-qa': "riskHeader" }
+                            } if flags.enableRiskOnAlertsDashboard === true,
+                            {
+                                text: "Activity",
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { "aria-sort": setSortOrder('type_description', sortedBy), 'data-sort-column': 'type_description', 'data-qa': 'activityHeader', 'data-sort-name': 'type_description', 'data-sort-action': 'alerts' } if not note else {}
+                            },
+                            {
+                                html: 'Manage on NDelius<br>(opens in new tab)',
+                                classes: "vertical-align--middle govuk-action--bottom",
+                                attributes: { 'data-qa': "actionsHeader" }
+                            }
+                        ],
+                        rows: alertRows
+                    }) }}
+
+                    <div class="govuk-button-group govuk-!-margin-top-4">
+                        <button type="submit"
+                                class="govuk-button"
+                                data-module="govuk-button"
+                                id="clear-selected-alerts"
+                                data-qa="clearSelectedAlerts">
+                            Clear selected alerts
+                        </button>
+                        <button type="button"
+                                class="govuk-button govuk-button--secondary"
+                                data-module="govuk-button"
+                                id="select-all-alerts"
+                                data-qa="selectAllAlertsBtn">
+                            Select all alerts on this page
+                        </button>
+                    </div>
+                </form>
+
+                {% if alertsData.totalPages > 1 %}
+                    {% set currentPage = alertsData.page or 0 %}
+                    {% set totalPages = alertsData.totalPages %}
+
+                    {% set url = "/alerts?" + (('sortBy=' + sortedBy + '&') if sortedBy else '') %}
+
+                    {% set paginationItems = [] %}
+                    {% set totalLinks = 3 %}
+                    {% if totalLinks > totalPages %}
+                        {% set totalLinks = totalPages %}
+                    {% endif %}
+
+                    {% set start = 0 %}
+                    {% set end = start + totalLinks %}
+                    {% if currentPage > 0 %}
+                        {% set start = currentPage -1 %}
+                        {% set end = start + totalLinks %}
+                    {% endif %}
+                    {% if currentPage + 1 == totalPages %}
+                        {% set start = currentPage - (totalLinks -1) %}
+                        {% set end = totalPages %}
+                    {% endif %}
+
+                    {% if (totalPages > 3) and (currentPage != 0) and (start != 0) %}
+                        {% set paginationItems = (paginationItems.push(
+                            {
+                                number: 1,
+                                href: url + 'page=0'
+                            },
+                            {
+                                ellipsis: true
+                            }), paginationItems) %}
+                    {% endif %}
+
+                    {% for i in range(start , end) -%}
+                        {% set paginationItems = (paginationItems.push({
+                            number: i + 1,
+                            href: url + 'page=' + i,
+                            current: true if i == currentPage else false
+                        }), paginationItems) %}
+                    {% endfor %}
+
+                    {% if (totalPages > 3) and ((currentPage + 1) != totalPages) and (end !== totalPages) %}
+                        {% set paginationItems = (paginationItems.push(
+                            {
+                                ellipsis: true
+                            },
+                            {
+                                number: totalPages,
+                                href: url + 'page=' + (totalPages - 1)
+                            }
+                        ), paginationItems) %}
+                    {% endif %}
+
+                    {{ govukPagination({
+                        previous: {
+                            href: url + 'page=' + (currentPage - 1)
+                        } if currentPage > 0 and totalPages > 1,
+                        next: {
+                            href: url + 'page=' + (currentPage + 1)
+                        } if currentPage + 1 < totalPages and totalPages > 1,
+                        items: paginationItems
+                    }) }}
+                {% endif %}
+
+            {% else %}
+                <p>You do not have any alerts.</p>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}
+
+{% macro renderAlertDetails(alert) %}
+    {% if alert.description %}
+        <span class="govuk-heading-s govuk-!-margin-bottom-0">Description</span>
+        <div class={{"govuk-!-margin-bottom-5" if alert.alertNotes.length > 0 or alert.alertNote else ""}} data-qa="alertDescription-{{ alert.id }}">
+            {{ alert.description }}
+        </div>
+    {% endif %}
+
+    {% if alert.alertNotes.length > 0 or alert.alertNote %}
+        {% set notes = '' %}
+        {% for note in alert.alertNotes %}
+            {% if note.note %}
+                {% set notes = notes.concat(appNote(note, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
+            {% endif %}
+        {% endfor  %}
+        {% if alert.alertNote %}
+            {% set notes = notes.concat(appNote(alert.alertNote, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
+        {% endif %}
+        <span class="govuk-heading-s govuk-!-margin-bottom-0">Notes</span>
+        <div data-qa="alertNotes-{{ alert.id }}">
+            {{ notes | safe }}
+        </div>
+    {% endif %}
+{% endmacro %}

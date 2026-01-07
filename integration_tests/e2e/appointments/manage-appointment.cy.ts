@@ -344,7 +344,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -417,7 +419,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -486,7 +490,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -565,7 +571,9 @@ describe('Manage an appointment', () => {
             .should(
               'have.attr',
               'href',
-              '/case/X778160/appointments/appointment/6/next-appointment?back=/case/X778160/appointments/appointment/6/manage',
+              `/case/X778160/appointments/appointment/6/next-appointment?back=${encodeURIComponent(
+                '/case/X778160/appointments/appointment/6/manage',
+              )}`,
             )
         })
         it('should display the hint text', () => {
@@ -639,6 +647,15 @@ describe('Manage an appointment', () => {
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
+      })
+    })
+    describe('POP has deceased', () => {
+      beforeEach(() => {
+        cy.task('stubPersonalDetailsDateOfDeathManage')
+        loadPage()
+      })
+      it('should not display a link to arrange next appointment', () => {
+        manageAppointmentPage.getTaskLink(3).should('not.exist')
       })
     })
   })

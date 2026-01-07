@@ -7,8 +7,23 @@ import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
 import config from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
+export const hasAllDigits = (string: string) => /^\d+$/.test(string)
+
 export const isNotEmpty = (args: any[]) => {
   return !!args[0] && args[0] !== undefined
+}
+export const contactPrefEmailCheck = (args: any[]) => {
+  if (!args[0] || args[0] === 'PHONE') {
+    return true
+  }
+  return args[0] === 'EMAIL' && isEmail(args[1])
+}
+
+export const contactPrefMobileCheck = (args: any[]) => {
+  if (!args[0] || args[0] === 'EMAIL') {
+    return true
+  }
+  return args[0] === 'PHONE' && isValidMobileNumber(args[1])
 }
 
 export const isNumeric = (args: any[]) => /^[\d ]+$/.test(args[0])
@@ -48,6 +63,15 @@ export const isTodayOrLater = (args: any[]) => {
   return date.startOf('day') >= DateTime.now().startOf('day')
 }
 
+export const isFutureDate = (args: any[]) => {
+  if (!args[0]) return false
+
+  const date = DateTime.fromFormat(args[0], 'd/M/yyyy', { zone: 'utc' })
+  if (!date.isValid) return false
+
+  const now = DateTime.utc().startOf('day')
+  return date.startOf('day') > now
+}
 export const timeIsNotEarlierThan = (args: any[]) => {
   if (!args[0]) {
     return true
@@ -135,6 +159,11 @@ export const isValidCharCount = (args: any[]) => {
   const lineBreaks = value.split('\r\n').length - 1
   const textLength = value.split('\r\n').join('').length
   return value.trim() !== '' && textLength + lineBreaks <= maxCharCount
+}
+
+export const isValidMobileNumber = (input: string) => {
+  const value = typeof input === 'string' ? input : String(input ?? '')
+  return /^(\+44\s?7\d{3}|\(?07\d{3}\)?)\s?\d{3}\s?\d{3}$/.test(value.trim())
 }
 
 export function validateWithSpec<R extends Validateable>(

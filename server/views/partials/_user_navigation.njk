@@ -1,0 +1,44 @@
+{%- from "moj/components/notification-badge/macro.njk" import mojNotificationBadge -%}
+{%- from "moj/components/primary-navigation/macro.njk" import mojPrimaryNavigation -%}
+
+{% set titleHtml %}
+<div class="app-organisation-nav-title">
+    <span class="govuk-body-s"><strong>{{ caseload.provider }}</strong></span>
+</div>
+{% endset %}
+
+{% if user %}
+<div class="moj-primary-navigation">
+    <div class="moj-primary-navigation__container">
+        <div class="app-organisation-nav-title">
+            <span class="govuk-body-s"><strong>{{ caseload.provider }}</strong></span>
+        </div>
+        <div class="moj-primary-navigation__nav">
+            <nav class="moj-primary-navigation" aria-label="Primary navigation">
+                <ul class="moj-primary-navigation__list">
+                    <li class="moj-primary-navigation__item">
+                        <a class="moj-primary-navigation__link" {% if home %}aria-current="home"{% endif %}
+                            href="/">Home</a>
+                    </li>
+                    <li class="moj-primary-navigation__item">
+                        <a class="moj-primary-navigation__link" {% if cases %}aria-current="cases"{% endif %}
+                            href="/case">Cases</a>
+                    </li>
+                    <li class="moj-primary-navigation__item">
+                        <a class="moj-primary-navigation__link" {% if search %}aria-current="search"{% endif %}
+                            href="/search">Search</a>
+                    </li>
+                    {% if flags.enableAlertsPage === true %}
+                    <li class="moj-primary-navigation__item">
+                        <a class="moj-primary-navigation__link" {% if alerts %}aria-current="alerts"{% endif %}
+                            href="/alerts">
+                                Alerts {{ mojNotificationBadge({text: alertsCount}) }}
+                        </a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endif %}

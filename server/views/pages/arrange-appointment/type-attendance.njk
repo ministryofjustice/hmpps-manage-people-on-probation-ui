@@ -1,0 +1,104 @@
+{% extends "../_form.njk" %}
+{% set title = 'Appointment type and attendance' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
+{% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
+
+{% set attendanceUrl = '/case/' + crn + '/arrange-appointment/' + id + '/attendance?change=' + url if change else '/case/' + crn + '/arrange-appointment/' + id + '/attendance' %}
+
+{% set types = [] %}
+{% for appointmentType in appointmentTypes %}
+  {% set types = (types.push({
+    text: appointmentType.description | toSentenceCase,
+    value: appointmentType.code
+  }), types) %}
+{% endfor %}
+
+{% set attendingHtml %}
+{% if appointment.meta.userIsAttending %}
+  {{ appointment.attending.name }}
+{% else %}
+  {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
+{% endif %}
+{% endset %}
+
+{% block heading %}{% endblock %}
+
+{% block form %}
+
+  {# Main Appointment details heading #}
+  <h1 class="govuk-heading-l" data-qa="pageHeading">{{ title }}</h1>
+
+  {# Inset text for NDelius info #}
+  {{ govukInsetText({
+    html: 'Use <a href="' + deliusDeepLinkUrl('ContactList', crn, entry.id) + '" target="_blank" rel="external noopener noreferrer">NDelius (opens in new tab)</a> to arrange:
+      <ul class="govuk-list govuk-list--bullet">
+        <li>any other type of appointment not listed below</li>
+        <li>appointments that require document templates</li>
+        <li>appointments for RAR toolkits or NSIs (non-statutory interventions)</li>
+        <li>appointments you know have non-attendance or non-compliance</li>
+      </ul>'
+  }) }}
+
+  {# Appointment type radios #}
+  {{ govukRadios({
+    formGroup: {
+      attributes: {
+        'data-qa': 'type'
+      }
+    },
+    fieldset: {
+      legend: {
+        text: "What appointment are you arranging?",
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: types
+  } | decorateFormAttributes(['appointments', crn, id, 'type'])) }}
+
+  {# Attendence #}
+  <section data-qa="attendee">
+    <h2 class="govuk-heading-m govuk-!-margin-bottom-2">Who will attend the appointment?</h2>
+    <p class="govuk-caption-m">You can attend or book for someone else</p>
+    <div class="govuk-grid-row govuk-!-font-size-19 govuk-!-margin-top-2">
+      <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body" data-qa="attendeeDetails">{{ attendingHtml | safe }}</p>
+      </div>
+      <div class="govuk-grid-column-one-third">
+        <a href="{{ attendanceUrl }}" class="govuk-link govuk-!-text-align-right" data-qa="changeAttendeeLink">Change</a>
+      </div>
+    </div>
+  </section>
+
+  {# ViSOR section (only if appointment.meta.isVisor is true) #}
+  {% if appointment.meta.isVisor %}
+    {{ govukRadios({
+    classes: "govuk-radios--inline",
+    fieldset: {
+      legend: {
+        text: 'Include appointment in ViSOR report?',
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'visorReport'
+      }
+    },
+    hint: {
+      text: 'This will add the appointment to their record on the ViSOR secure national database.'
+    },
+    items: [
+      {
+        text: "Yes",
+        value: "yes"
+      },
+      {
+        text: "No",
+        value: "no"
+      }
+    ]
+  } | decorateFormAttributes(['appointments', crn, id, 'visorReport'])) }}
+    <input type="hidden" name="visor" id="visor" value="{{ appointment.meta.isVisor }}">
+  {% endif %}
+{% endblock %}

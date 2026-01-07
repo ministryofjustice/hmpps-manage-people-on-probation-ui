@@ -1,0 +1,111 @@
+{% extends "../../../partials/contacts.njk" %}
+{% set title = "Change contact details" %}
+{% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id %}
+{% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
+{% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
+{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInMobile]' %}
+{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInEmail]' %}
+{% set mobileValue = checkInMobile if checkInMobile else 'No mobile number' %}
+{% set emailValue = checkInEmail if checkInEmail else 'No email address' %}
+
+{% block beforeContent %}
+    {{ govukBreadcrumbs({
+        items: [
+            {
+                text: "< Back",
+                href: backLink
+            }
+        ]
+    }) }}
+
+    {{ mojBanner({
+        type: 'success',
+        text: 'Contact details saved',
+        classes: 'govuk-!-margin-bottom-2',
+        attributes: { "data-qa": "updateBanner"},
+        iconFallbackText: 'Success'
+    }) if success }}
+
+{% endblock %}
+{% block pageContent %}
+
+    <form method="post" autocomplete="off" action="{{ paths.current }}">
+        <section class="app-summary-card govuk-!-margin-bottom-6 app-summary-card--large-title" data-qa="contactDetailsCard">
+            <header class="app-summary-card__header">
+                <h3 class="app-summary-card__title">
+                    Contact details
+                </h3>
+            </header>
+            <div class="app-summary-card__body">
+                <dl class="govuk-summary-list">
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"><span data-qa="mobileNumberLabel">Mobile number</span></dt>
+                        <dd class="govuk-summary-list__value"><span data-qa="mobileNumberValue" class="app-!-font-family-tabular"></span>{{ mobileValue }}</dd>
+                        <dd class="govuk-summary-list__actions">
+                            <button type="submit"
+                                    name="change"
+                                    value="mobile"
+                                    data-qa="mobileNumberAction"
+                                    class="mpop-govuk-link-button">
+                                Change<span class="govuk-visually-hidden"> mobile number</span>
+                            </button>
+                        </dd>
+                    </div>
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key"><span data-qa="emailAddressLabel">Email address</span></dt>
+                        <dd class="govuk-summary-list__value"><span data-qa="emailAddressValue" class="app-!-font-family-tabular"></span>{{ emailValue }}</dd>
+                        <dd class="govuk-summary-list__actions">
+                            <button type="submit"
+                                    name="change"
+                                    data-qa="emailAddressAction"
+                                    value="emailAddress"
+                                    class="mpop-govuk-link-button">
+                                Change<span class="govuk-visually-hidden"> email address</span>
+                            </button>
+                        </dd>
+                    </div>
+                </dl>
+            </div>
+        </section>
+        <!--div class="govuk-!-width-one-half">
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: radioLabel ,
+                        classes: "govuk-label--m govuk-!-font-weight-bold"
+                    }
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'checkInPreferredComs'
+                    }
+                },
+                hint: {
+                    html: radioHint
+                },
+                items: [
+                    {
+                        value: "PHONE",
+                        text: "Text message"
+                    },
+                    {
+                        value: "EMAIL",
+                        text: "Email"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'manageCheckin', 'preferredComs'])) }}
+            <div class="govuk-button-group">
+                <button type="submit" name ="change" value = "main" class="govuk-button" data-module="govuk-button" data-qa="submit-btn" data-govuk-button-init="">
+                    Save changes
+                </button>
+            </div-->
+        </div>
+        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        <input type="hidden" name="checkInMobile" value="{{ checkInMobile }}">
+        <input type="hidden" name="checkInEmail" value="{{ checkInEmail }}">
+        <input type="hidden" name="{{ setMobile }}" value="{{ checkInMobile }}">
+        <input type="hidden" name="{{ setEmail }}" value="{{ checkInEmail }}">
+        </div>
+    </form>
+
+{% endblock %}

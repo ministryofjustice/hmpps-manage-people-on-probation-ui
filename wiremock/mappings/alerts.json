@@ -1,0 +1,387 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/alerts(\\?.*)?",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "content": [
+            {
+              "id": 1,
+              "type": {
+                "description": "Email/Text from offender",
+                "editable": true
+              },
+              "crn": "X000001",
+              "date": "2025-07-10",
+              "description": "Email from offending community team",
+              "alertNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Custody Status Service",
+                  "createdByDate": "2024-07-19",
+                  "note": "Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "STMOR01"
+              },
+              "riskLevel": "MEDIUM"
+            },
+            {
+              "id": 2,
+              "type": {
+                "description": "Appointment attendance failure",
+                "editable": true
+              },
+              "crn": "X000001",
+              "date": "2025-07-10",
+              "description": "Failed to attend scheduled appointment",
+              "alertNote": {
+                "id": 0,
+                "createdBy": "Custody Status Service",
+                "createdByDate": "2024-07-19",
+                "note": "Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.",
+                "hasNoteBeenTruncated": false
+              },
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "JFROS01"
+              },
+              "riskLevel": "HIGH"
+            },
+            {
+              "id": 3,
+              "type": {
+                "description": "MAPPA meeting",
+                "editable": true
+              },
+              "crn": "X777916",
+              "date": "2025-07-10",
+              "description": "Multi-agency meeting scheduled",
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "TNIXO01"
+              },
+              "riskLevel": "MEDIUM"
+            },
+            {
+              "id": 4,
+              "type": {
+                "description": "Drug Test (DRR)",
+                "editable": true
+              },
+              "crn": "X778160",
+              "date": "2025-07-09",
+              "description": "Drug test positive result",
+              "name": {
+                "forename": "Alton",
+                "middleName": "",
+                "surname": "Berge"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "DSABA01"
+              },
+              "riskLevel": "HIGH"
+            },
+            {
+              "id": 5,
+              "type": {
+                "description": "Arrest incident",
+                "editable": false
+              },
+              "crn": "X801756",
+              "date": "2025-07-09",
+              "name": {
+                "forename": "Kari",
+                "middleName": "",
+                "surname": "Kari"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "MKHAN01"
+              },
+              "riskLevel": "LOW"
+            },
+            {
+              "id": 6,
+              "type": {
+                "description": "AP - medication not in possession",
+                "editable": true
+              },
+              "crn": "X000001",
+              "date": "2025-07-08",
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "PANGE01"
+              },
+              "riskLevel": "VERY HIGH"
+            },
+            {
+              "id": 7,
+              "type": {
+                "description": "Home visit",
+                "editable": true
+              },
+              "crn": "X000001",
+              "date": "2025-07-08",
+              "description": "Unannounced home visit completed",
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "SCOLL01"
+              },
+              "riskLevel": "LOW"
+            },
+            {
+              "id": 8,
+              "type": {
+                "description": "Breach proceedings",
+                "editable": false
+              },
+              "crn": "X000001",
+              "date": "2025-07-07",
+              "description": "Breach proceedings initiated",
+              "alertNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Custody Status Service",
+                  "createdByDate": "2024-07-19",
+                  "note": "Breach proceedings started due to multiple missed appointments without acceptable reason. Court date to be scheduled within 14 days.",
+                  "hasNoteBeenTruncated": true
+                }
+              ],
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "DTHOM01"
+              },
+              "riskLevel": "MEDIUM"
+            },
+            {
+              "id": 9,
+              "type": {
+                "description": "Risk assessment review",
+                "editable": true
+              },
+              "crn": "X000001",
+              "date": "2025-07-07",
+              "description": "Annual risk assessment due",
+              "alertNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Custody Status Service",
+                  "createdByDate": "2024-07-19",
+                  "note": "Risk assessment review is due this week. All relevant documents and information gathered for the assessment. Previous score was Medium.",
+                  "hasNoteBeenTruncated": true
+                },
+                {
+                  "id": 1,
+                  "createdBy": "Custody Status Service",
+                  "createdByDate": "2024-07-19",
+                  "note": "Safeguarding concern raised regarding vulnerable adult in household. Multi-agency referral submitted and case conference scheduled for next week.",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "EWILS01"
+              },
+              "riskLevel": "HIGH"
+            },
+            {
+              "id": 10,
+              "type": {
+                "description": "Safeguarding concern",
+                "editable": false
+              },
+              "crn": "X000001",
+              "date": "2025-07-06",
+              "description": "Safeguarding issue identified",
+              "alertNotes": [
+                {
+                  "id": 0,
+                  "createdBy": "Custody Status Service",
+                  "createdByDate": "2024-07-19",
+                  "note": "Safeguarding concern raised regarding vulnerable adult in household. Multi-agency referral submitted and case conference scheduled for next week.",
+                  "hasNoteBeenTruncated": false
+                }
+              ],
+              "alertNote": {
+                "id": 0,
+                "createdBy": "Custody Status Service",
+                "createdByDate": "2024-07-19",
+                "note": "Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.",
+                "hasNoteBeenTruncated": false
+              },
+              "name": {
+                "forename": "Caroline",
+                "middleName": "",
+                "surname": "Wolff"
+              },
+              "officer": {
+                "name": {
+                  "forename": "Officer",
+                  "middleName": "",
+                  "surname": "Test"
+                },
+                "code": "MROBE01"
+              },
+              "riskLevel": "VERY HIGH"
+            }
+          ],
+          "totalResults": 12,
+          "totalPages": 3,
+          "page": 0,
+          "size": 10
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/alerts(\\?.*)?",
+        "method": "PUT"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {},
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/alerts/.*/notes/.*",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "id": 1,
+          "type": {
+            "description": "Email/Text from offender",
+            "editable": true
+          },
+          "crn": "X000001",
+          "date": "2025-07-10",
+          "description": "Email from offending community team",
+          "alertNotes": [
+            {
+              "id": 0,
+              "createdBy": "Custody Status Service",
+              "createdByDate": "2024-07-19",
+              "note": "Person did not attend appointment at 2pm. No contact made prior to appointment time. Phone call attempted but no answer.",
+              "hasNoteBeenTruncated": false
+            }
+          ],
+          "name": {
+            "forename": "Caroline",
+            "middleName": "",
+            "surname": "Wolff"
+          },
+          "officer": {
+            "name": {
+              "forename": "Officer",
+              "middleName": "",
+              "surname": "Test"
+            },
+            "code": "STMOR01"
+          },
+          "riskLevel": "MEDIUM"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPattern": "/mas/alerts/5/notes/5",
+        "method": "GET"
+      },
+      "response": {
+        "status": 404,
+        "jsonBody": {}
+      }
+    }
+  ]
+}

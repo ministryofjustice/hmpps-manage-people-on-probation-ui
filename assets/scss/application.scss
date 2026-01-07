@@ -23,6 +23,7 @@ $mappa-colour: #4c2c92;
 @import './components/summary-card';
 @import './components/card';
 @import 'assets/scss/local';
+@import './components/photo';
 @import './components/sortable-table';
 @import '../../node_modules/govuk-frontend/dist/govuk/base';
 @import '../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table';
@@ -60,7 +61,7 @@ $mappa-colour: #4c2c92;
   row-gap: 20px;
 }
 
-.govuk-accordion {
+.govuk-accordion__probation-accordion-custom {
   .govuk-accordion__controls {
     display: none;
     height: 25px;
@@ -229,6 +230,9 @@ li.ui-timepicker-selected .ui-timepicker-duration,
   color: govuk-colour('red');
 }
 
+.govuk-\!-width-three-tenths {
+  width: 30% !important;
+}
 .govuk-\!-width-one-fifth {
   width: 20% !important;
 }
@@ -338,14 +342,14 @@ li.ui-timepicker-selected .ui-timepicker-duration,
       content: ' \25bc';
       position: absolute;
       top: 9px;
-      right: -1px;
+      right: -11px;
       font-size: 0.5em;
     }
     &::after {
       content: ' \25b2';
       position: absolute;
       top: 1px;
-      right: -1px;
+      right: -11px;
       font-size: 0.5em;
     }
   }
@@ -357,7 +361,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
       content: ' \25b2';
       position: absolute;
       top: 2px;
-      right: -5px;
+      right: -15px;
       font-size: 0.8em;
     }
   }
@@ -369,7 +373,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
       content: ' \25bc';
       position: absolute;
       top: 2px;
-      right: -5px;
+      right: -15px;
       font-size: 0.8em;
     }
   }
@@ -399,14 +403,14 @@ li.ui-timepicker-selected .ui-timepicker-duration,
       content: ' \25bc';
       position: absolute;
       top: 9px;
-      right: -1px;
+      right: -11px;
       font-size: 0.5em;
     }
     &::after {
       content: ' \25b2';
       position: absolute;
       top: 1px;
-      right: -1px;
+      right: -11px;
       font-size: 0.5em;
     }
   }
@@ -418,7 +422,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
       content: ' \25b2';
       position: absolute;
       top: 2px;
-      right: -5px;
+      right: -15px;
       font-size: 0.8em;
     }
   }
@@ -430,7 +434,7 @@ li.ui-timepicker-selected .ui-timepicker-duration,
       content: ' \25bc';
       position: absolute;
       top: 2px;
-      right: -5px;
+      right: -15px;
       font-size: 0.8em;
     }
   }
@@ -570,4 +574,40 @@ body.feature-disabled {
     margin-bottom: govuk-spacing(1);
     font-weight: 400;
   }
+}
+
+.mpop-govuk-link-button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  cursor: pointer;
+  color: #1d70b8;
+  text-decoration: underline;
+}
+
+.mpop-govuk-link-button:hover {
+  color: #003078;
+  text-decoration: underline;
+}
+
+.technical-updates-banner {
+  background-color: #f9e1ec;
+  padding: 10px 0 10px 0;
+}
+
+.govuk-grid-row {
+  margin-right: -15px;
+  margin-left: -15px;
+}
+
+.technical-updates-container {
+  color: #0b0c0c;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.display-none {
+  display: none;
 }

@@ -1,0 +1,9 @@
+{% if dateOfDeath %}
+    {{ govukWarningText({
+  text: "There is a date of death recorded for " + headerPersonName.forename + ".",
+  iconFallbackText: "Warning",
+  attributes: {
+    'data-qa': 'dateOfDeathWarning'
+  }
+}) }}
+{% endif %}

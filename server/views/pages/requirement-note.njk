@@ -1,21 +1,22 @@
 {% extends "../partials/case.njk" %}
-{% set pageTitle = makePageTitle({ pageHeading: ["Sentence", "Requirement"] }) %}
+{% set pageTitle = makePageTitle({
+  pageHeading: ["Sentence", "Requirement"]
+}) %}
 {% set currentNavSection = 'sentence' %}
 {% set currentSectionName = 'Sentence' %}
-{% set headerPersonName = requirementNoteDetails.personSummary.name.forename + ' ' + requirementNoteDetails.personSummary.name.surname %}
 {% set headerCRN = crn %}
-{% set headerDob = requirementNoteDetails.personSummary.dateOfBirth  %}
-{% set headerGender = requirementNoteDetails.personSummary.gender  %}
+{% set headerDob = requirementNoteDetails.personSummary.dateOfBirth %}
+{% set headerGender = requirementNoteDetails.personSummary.gender %}
 
 {% block beforeContent %}
-    {{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
       items: [
         {
           text: "Cases",
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -28,9 +29,9 @@
 {% endblock %}
 
 {% block pageContent %}
-    {% set completedRar = requirementNoteDetails.requirement.rar.completed + requirementNoteDetails.requirement.rar.nsiCompleted  %}
-    {% set requirementNote %}
-        {{ govukSummaryList({
+  {% set completedRar = requirementNoteDetails.requirement.rar.completed + requirementNoteDetails.requirement.rar.nsiCompleted %}
+  {% set requirementNote %}
+  {{ govukSummaryList({
         rows: [
           {
             key: { text: 'Length of RAR' },
@@ -78,16 +79,15 @@
           } if requirementNoteDetails.requirement.requirementNote.note
         ]
       }) }}
-    {% endset %}
+  {% endset %}
 
-    {% if requirementNoteDetails.requirement %}
+  {% if requirementNoteDetails.requirement %}
     {% set description = requirementNoteDetails.requirement.description %}
-        {{ appSummaryCard({
+    {{ appSummaryCard({
           titleText: description,
           attributes: {'data-qa': 'requirementNoteCard'},
           classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
           html: requirementNote
         }) }}
-    {% endif %}
+  {% endif %}
 {% endblock %}
-

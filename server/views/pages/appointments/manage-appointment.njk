@@ -9,10 +9,7 @@
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
-{% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
-  '' %}
-{% set backLink = back + extraBreadcrumb if back else 
-  '/case/' + crn + '/appointments' %}
+{% set backLink = back | default('/case/' + crn + '/appointments') %}
 {% set nextAppointmentHint = 'You do not have any other appointments arranged with ' + personSummary.name.forename + '.' %}
 {% if nextAppointment.appointment %}
   {% set nextAppointmentHint = nextAppointment.appointment.type | toSentenceCase + " arranged with " + personSummary.name.forename + " at " + (
@@ -91,7 +88,7 @@
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
-      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url )) %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
     {% endif %}
   {% endfor %}
 {% endif %}
@@ -177,7 +174,7 @@
       hint: {
         text: nextAppointmentHint
       },
-      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not nextAppointment.appointment,
+      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not nextAppointment.appointment and not hasDeceased,
       status: {
         tag: {
           text: "Not started",

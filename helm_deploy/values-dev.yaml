@@ -17,7 +17,11 @@ generic-service:
     ARNS_API_URL: 'https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk'
     TIER_API_URL: 'https://hmpps-tier-dev.hmpps.service.justice.gov.uk'
     INTERVENTIONS_API_URL: 'https://hmpps-interventions-service-dev.apps.live-1.cloud-platform.service.justice.gov.uk'
+    SUPERVISION_API_URL: 'https://probation-supervision-appointments-api-dev.hmpps.service.justice.gov.uk'
     SENTENCE_PLAN_API_URL: 'https://sentence-plan-api-dev.hmpps.service.justice.gov.uk'
+    PROBATION_FRONTEND_COMPONENTS_API_URL: 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'
+    PROBATION_FRONTEND_COMPONENTS_CONNECT_SRC: 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'
+    PROBATION_FRONTEND_COMPONENTS_FONT_SRC: 'https://probation-frontend-components-dev.hmpps.service.justice.gov.uk'
     FLIPT_URL: 'https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk'
     INTERVENTIONS_LINK: 'https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk'
     DELIUS_LINK: 'https://ndelius.test.probation.service.justice.gov.uk'
@@ -30,6 +34,8 @@ generic-service:
     TIER_LINK: 'https://tier-dev.hmpps.service.justice.gov.uk/case'
     SENTENCE_PLAN_LINK: 'https://sentence-plan-dev.hmpps.service.justice.gov.uk'
     ESUPERVISION_LINK: 'https://esupervision-dev.hmpps.service.justice.gov.uk'
+    E_SUPERVISION_API_URL: 'https://esupervision-api-dev.hmpps.service.justice.gov.uk'
+    CHAR_COUNT: 12000
     ENVIRONMENT_NAME: DEV
     ENVIRONMENT: dev
 

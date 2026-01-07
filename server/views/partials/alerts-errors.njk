@@ -1,0 +1,13 @@
+{% extends "../partials/layout.njk" %}
+{% set mainClasses = "app-container govuk-body" %}
+
+{% block content %}
+    {% set errors = [] %}
+    {% if risksErrors and risksErrors.length > 0 %}
+        {% set errors = errors.concat(risksErrors) %}
+    {% endif %}
+    {% if errors.length > 0 %}
+        <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
+    {% endif %}
+    {% block pageContent %}{% endblock %}
+{% endblock %}

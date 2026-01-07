@@ -47,7 +47,7 @@
       'shorthand': shorthand, 
       'iconClass': iconClass, 
       'colour': colour }), tags) %}
-  {% elseif entry.absentWaitingEvidence === true %}
+  {% elif entry.absentWaitingEvidence === true %}
     {% set text = 'Waiting for evidence' %}
     {% set shorthand = '?' %}
     {% set colour = 'yellow' %}
@@ -57,7 +57,7 @@
       'shorthand': shorthand, 
       'iconClass': iconClass, 
       'colour': colour }), tags) %}
-  {% elseif entry.acceptableAbsence === false %}
+  {% elif not entry.acceptableAbsence and entry.isAppointment %}
     {% set text = 'Unacceptable absence' %}
     {% set shorthand = '✘' %}
     {% set iconClass = 'strike' %}

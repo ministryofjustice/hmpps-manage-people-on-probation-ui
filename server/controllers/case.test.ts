@@ -4,13 +4,24 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks, mockSanIndicatorResponse } from './mocks'
 import { Overview } from '../data/model/overview'
 import { Needs, PersonRiskFlags } from '../data/model/risk'
 import { toPredictors, toRoshWidget } from '../utils'
 import { checkAuditMessage } from './testutils'
+import {
+  AddressType,
+  Circumstances,
+  Disabilities,
+  Name,
+  PersonalContact,
+  PersonalDetails,
+  Provisions,
+  Document,
+} from '../data/model/personalDetails'
+import { PersonalDetailsSession } from '../models/Data'
+import { Contact } from '../data/model/professionalContact'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -33,13 +44,42 @@ const crn = 'X000001'
 const mockOverview = {} as Overview
 const mockNeeds = {} as Needs
 const mockRiskFlags = {} as PersonRiskFlags
+
+const overview: PersonalDetails = {
+  name: {
+    forename: 'Caroline',
+    surname: 'Wolff',
+  },
+  crn,
+  contacts: [] as PersonalContact[],
+  otherAddressCount: 0,
+  previousAddressCount: 0,
+  preferredGender: 'male',
+  dateOfBirth: '1979-08-18',
+  aliases: [] as Name[],
+  circumstances: {} as Circumstances,
+  disabilities: {} as Disabilities,
+  provisions: {} as Provisions,
+  sex: 'male',
+  documents: [] as Document[],
+  addressTypes: [] as AddressType[],
+  staffContacts: [] as Contact[],
+}
+
+const mockPersonalDetails: PersonalDetailsSession = {
+  overview,
+  sentencePlan: {
+    lastUpdatedDate: '',
+    showLink: false,
+  },
+  risks: mockRisks,
+  tierCalculation: mockTierCalculation,
+  predictors: mockPredictors,
+}
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
   .mockImplementation(() => Promise.resolve(mockOverview))
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
+jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockImplementation(() => Promise.resolve(overview))
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 const getSanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
@@ -47,9 +87,6 @@ const getSanIndicatorSpy = jest
 const getPersonRiskFlagsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
   .mockImplementation(() => Promise.resolve(mockRiskFlags))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 
@@ -70,6 +107,13 @@ describe('caseController', () => {
         sentenceNumber: '123',
       },
       url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
     })
     beforeEach(async () => {
       await controllers.case.getCase(hmppsAuthClient)(req, res)
@@ -77,11 +121,8 @@ describe('caseController', () => {
     checkAuditMessage(res, 'VIEW_MAS_OVERVIEW', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(getOverviewSpy).toHaveBeenCalledWith(crn, req.query.sentenceNumber)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
       expect(needsSpy).toHaveBeenCalledWith(crn)
       expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
       expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
@@ -95,6 +136,7 @@ describe('caseController', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
+        personalDetails: req.session.data.personalDetails[crn].overview,
       })
     })
   })
@@ -104,6 +146,13 @@ describe('caseController', () => {
         crn,
       },
       url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
     })
     beforeEach(async () => {
       await controllers.case.getCase(hmppsAuthClient)(req, res)
@@ -111,11 +160,9 @@ describe('caseController', () => {
     checkAuditMessage(res, 'VIEW_MAS_OVERVIEW', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(getOverviewSpy).toHaveBeenCalledWith(crn, '')
-      expect(risksSpy).toHaveBeenCalledWith(crn)
       expect(needsSpy).toHaveBeenCalledWith(crn)
       expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
+      expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
@@ -128,6 +175,7 @@ describe('caseController', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
+        personalDetails: req.session.data.personalDetails[crn].overview,
       })
     })
   })

@@ -1,0 +1,49 @@
+{% extends "../_form.njk" %}
+{% set title = "Take a photo of " + case.name.forename %}
+{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/' + 'contact-preference' if not cya else 'checkin-summary'%}
+{% set radioLabel =  "How do you want to take a photo of "+ case.name.forename + "?" %}
+{% set insertTextMsg =  "Turn off notifications and close anything you do not want " + case.name.forename + " to see before <br/> taking the photo." %}
+
+{% block form %}
+    <p>Before you take the photo, make sure they:</p>
+    <ul class="govuk-list govuk-list--bullet">
+        <li>are in a well lit area</li>
+        <li>are in front of a plain background</li>
+        <li>have their face in the frame</li>
+        <li>are the only person in the photo</li>
+        <li>are not wearing a hat or sunglasses</li>
+    </ul>
+    <p>When you've taken the photo, you'll be able to review it to make sure it meets <br/> the rules.</p>
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: radioLabel ,
+                classes: "govuk-label--m govuk-!-font-weight-bold"
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'uploadOptions'
+            }
+        },
+        items: [
+            {
+                value: "TAKE_A_PIC",
+                text: "Take a photo now using the laptop you're on"
+            },
+            {
+                value: "UPLOAD_A_PIC",
+                text: "Upload a photo"
+            }
+        ]
+    } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'photoUploadOption'])) }}
+
+    {{ govukInsetText({
+        html: insertTextMsg,
+        classes: "guidance-panel guidance-panel--narrow"
+
+    }) }}
+
+
+{% endblock %}

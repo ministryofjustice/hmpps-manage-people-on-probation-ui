@@ -1,10 +1,24 @@
 import { Location, Provider, Team, User } from '../data/model/caseload'
+import { ErrorSummary } from '../data/model/common'
 import { PersonalDetails } from '../data/model/personalDetails'
+import { RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
+import { TierCalculation } from '../data/tierApiClient'
 import { AppointmentSession, AppointmentType } from './Appointments'
 import { Errors } from './Errors'
+import { ESupervisionSession } from './ESupervision'
+import { SentencePlan } from './Risk'
+
+export interface PersonalDetailsSession {
+  overview: PersonalDetails
+  sentencePlan: SentencePlan
+  risks: RiskSummary
+  tierCalculation: TierCalculation
+  predictors: ErrorSummary | RiskScoresDto[]
+}
 
 export interface Data {
+  isOutLookEventFailed?: any
   appointments?: {
     [crn: string]: {
       [id: string]: AppointmentSession
@@ -15,7 +29,7 @@ export interface Data {
   }
   appointmentTypes?: AppointmentType[]
   personalDetails?: {
-    [crn: string]: PersonalDetails
+    [crn: string]: PersonalDetailsSession
   }
   errors?: Errors
   locations?: {
@@ -31,5 +45,10 @@ export interface Data {
   }
   staff?: {
     [userId: string]: User[]
+  }
+  esupervision?: {
+    [crn: string]: {
+      [id: string]: ESupervisionSession
+    }
   }
 }

@@ -10,7 +10,7 @@ context('All Upcoming Appointment', () => {
     const page = Page.verifyOnPage(UpcomingAppointmentsPage)
 
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     page.assertRiskTags()
 
     page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'All upcoming appointments')
@@ -25,7 +25,9 @@ context('All Upcoming Appointment', () => {
       .should(
         'have.attr',
         'href',
-        '/case/X000001/appointments/appointment/1/manage?back=/case/X000001/upcoming-appointments',
+        `/case/X000001/appointments/appointment/1/manage?back=${encodeURIComponent(
+          '/case/X000001/upcoming-appointments',
+        )}`,
       )
   })
 })

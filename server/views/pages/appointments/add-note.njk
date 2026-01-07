@@ -3,6 +3,9 @@
 {% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
 {% set multipartForm = true %}
+{% if useDecorator %}
+    {% set multipartForm = false %}
+{% endif %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% set notes = '' %}
 {% set submitButtonId = 'continueButton' %}
@@ -14,6 +17,72 @@
     {% endfor %}
 {% endif %}
 {% block form %}
+    {% set notesConfig = {
+    rows: '10',
+    maxlength: maxCharCount,
+    classes: "",
+    formGroup: {
+        attributes: { "data-qa": "notes" }
+    }
+} %}
+    {% if errorMessages.notes %}
+        {% set errorMsgNotes = {
+            text: "Note must be " + maxCharCount + " characters or less"
+        } %}
+    {% else %}
+        {% set errorMsgNotes = null %}
+    {% endif %}
+    {% if not useDecorator %}
+        {% set notesConfig = notesConfig | merge({id: "notes", name: "notes", value: body.notes, errorMessage: errorMsgNotes}) %}
+    {% endif %}
+    {% if useDecorator %}
+        {% set notesConfig = notesConfig | merge({value: 'arse'}) | decorateFormAttributes(['appointments', crn, id, 'notes']) %}
+    {% endif %}
+
+    {% set sensitivityConfig = {
+    fieldset: {
+        legend: {
+            text: 'Does this appointment include sensitive information?',
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+        }
+    },
+    formGroup: {
+        attributes: {
+            'data-qa': 'sensitiveInformation'
+        }
+    },
+    hint: {
+        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+    },
+    items: [
+        {
+            value: 'Yes',
+            text: "Yes, it includes sensitive information",
+            checked: body.sensitivity == 'Yes'
+        },
+        {
+            value: 'No',
+            text: "No, it is not sensitive",
+            checked: body.sensitivity == 'No'
+        }        
+    ]
+} %}
+    {% if errorMessages.sensitivity %}
+        {% set errorMsgSensitivity = {
+            text: errorMessages.sensitivity
+        } %}
+    {% else %}
+        {% set errorMsgSensitivity = null %}
+    {% endif %}
+    {% if not useDecorator %}
+        {% set sensitivityConfig = sensitivityConfig | merge({name: 'sensitivity', id: 'sensitivity', errorMessage: errorMsgSensitivity}) %}
+    {% endif %}
+
+    {% if useDecorator %}
+        {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', crn, id, 'sensitivity']) %}
+    {% endif %}
+
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
     {{ govukDetails({
                           classes: 'govuk-!-margin-bottom-6',
@@ -37,29 +106,15 @@
     },
     type: 'button'
     }) }}
-
-    {{ govukCharacterCount({
-  id: "notes",
-  name: "notes",
-  rows: '10',
-  maxlength: maxCharCount,
-  classes: "",
-  formGroup: {
-    attributes: { "data-qa": "notes"}
-   },
-  value: body.notes,
-   errorMessage: {
-        text: 'Note must be ' + maxCharCount + ' characters or less'
-    }  if errorMessages.notes
-}) }}
-
+    {{ govukCharacterCount(notesConfig) }}
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
+    {% if not useDecorator %}
+        {% set uploadHtml %}
+        <div class="govuk-grid-row govuk-body">
 
-    {% set uploadHtml %}
-    <div class="govuk-grid-row govuk-body">
-        <div class="govuk-grid-column-full">
+            <div class="govuk-grid-column-full" data-qa="fileUpload">
 
-            {{ govukFileUpload({
+                {{ govukFileUpload({
                             id: "file-upload-1",
                             name: "file",
                             classes: 'moj-multi-file-upload__input',
@@ -70,15 +125,15 @@
                             attributes: { multiple: '' }
                         }) }}
 
-            {{ govukButton({
+                {{ govukButton({
                             text: 'Upload file',
                             classes: 'govuk-button--secondary moj-multi-file-upload__button'
                         }) }}
+            </div>
         </div>
-    </div>
-    {% endset %}
+        {% endset %}
 
-    {{ mojMultiFileUpload({
+        {{ mojMultiFileUpload({
                         id: "file-upload-1",
                         name: "fileName",
                         label: { text: "Upload or drag and drop documents" },
@@ -88,37 +143,6 @@
                         },
                         uploadHtml: uploadHtml
                     }) }}
-
-    {{ govukRadios({
-        name: 'sensitive',
-        id: 'sensitive',
-    fieldset: {
-        legend: {
-            text: 'Does this appointment include sensitive information?',
-            classes: "govuk-fieldset__legend--m",
-            isPageHeading: false
-        }
-    },
-    formGroup: {
-        attributes: {
-            'data-qa': 'sensitiveInformation'
-        }
-    },
-    hint: {
-        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
-    },
-    items: [
-        {
-            value: 'Yes',
-            text: "Yes, it includes sensitive information"
-        },
-        {
-            value: 'No',
-            text: "No, it is not sensitive"
-        }
-    ],
-    errorMessage: {
-        text: "Please select an option"
-    }  if errorMessages.sensitive 
-}) }}
+    {% endif %}
+    {{ govukRadios(sensitivityConfig) }}
 {% endblock %}

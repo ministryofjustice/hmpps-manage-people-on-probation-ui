@@ -21,6 +21,8 @@ const mockAppt = {
   id: 1,
 }
 
+const username = 'user-1'
+
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/masApiClient')
 
@@ -28,7 +30,6 @@ jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
   return {
     ...actualUtils,
-    getDataValue: jest.fn(),
   }
 })
 
@@ -41,8 +42,6 @@ const mockOverview = {
   },
   registrations: ['Restraining Order', 'Domestic Abuse Perpetrator', 'Risk to Known Adult'],
 } as unknown as Overview
-
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const nextSpy = jest.fn()
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -70,7 +69,6 @@ describe('/middleware/getAppointment', () => {
     const getOverviewSpy = jest
       .spyOn(MasApiClient.prototype, 'getOverview')
       .mockImplementation(() => Promise.resolve(mockOverview))
-    mockGetDataValue.mockReturnValue(mockAppt)
 
     const req = httpMocks.createRequest({
       params: {
@@ -85,13 +83,28 @@ describe('/middleware/getAppointment', () => {
             },
           },
           appointmentTypes: mockTypes,
+          providers: {
+            [username]: [],
+          },
+          teams: {
+            [username]: [],
+          },
+          staff: {
+            [username]: [],
+          },
         },
       },
     })
     const res = {
       locals: {
         user: {
-          username: 'user-1',
+          username,
+        },
+        attendingUser: {
+          staffCode: '',
+          homeArea: '',
+          team: '',
+          username: '',
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -107,7 +120,6 @@ describe('/middleware/getAppointment', () => {
       registrations: ['visor'],
     }
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
-    mockGetDataValue.mockReturnValue(null)
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',
@@ -150,7 +162,6 @@ describe('/middleware/getAppointment', () => {
       registrations: ['visor'],
     }
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(overview))
-    mockGetDataValue.mockReturnValue(null)
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',
@@ -192,7 +203,6 @@ describe('/middleware/getAppointment', () => {
 
   it('should not set the locals var if appointment not found in session', async () => {
     jest.spyOn(MasApiClient.prototype, 'getOverview').mockImplementation(() => Promise.resolve(mockOverview))
-    mockGetDataValue.mockReturnValue(null)
     const req = httpMocks.createRequest({
       params: {
         crn: 'X000002',

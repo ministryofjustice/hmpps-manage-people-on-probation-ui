@@ -1,26 +1,25 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
-{% set pageTitle = makePageTitle({ pageHeading: "Activity log" }) %}
+{% set pageTitle = makePageTitle({pageHeading: "Contacts"}) %}
 {% set currentNavSection = 'timeline' %}
-{% set currentSectionName = 'Activity log' %}
-{% set headerPersonName = personActivity.personSummary.name.forename + ' ' + personActivity.personSummary.name.surname %}
+{% set currentSectionName = 'Contacts' %}
 {% set headerCRN = personActivity.personSummary.crn %}
-{% set headerDob = personActivity.personSummary.dateOfBirth  %}
-{% set headerGender = personActivity.personSummary.gender  %}
+{% set headerDob = personActivity.personSummary.dateOfBirth %}
+{% set headerGender = personActivity.personSummary.gender %}
 {% set personSummary = personActivity.personSummary %}
 {% set entries = personActivity.activities %}
 {% set requirements = getDistinctRequirements(personActivity.activities) %}
 
 {% block beforeContent %}
-    {{ govukBreadcrumbs({
+  {{ govukBreadcrumbs({
       items: [
         {
           text: "Cases",
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -29,64 +28,64 @@
         }
       ]
     }) }}
-    {% if errorMessages %}
+  {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
-        {% if errorList.length > 0 %}
-            {{ govukErrorSummary({
+    {% if errorList.length > 0 %}
+      {{ govukErrorSummary({
                 titleText: "There is a problem",
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
-        {% endif %}
     {% endif %}
+  {% endif %}
 {% endblock %}
 
 {% block pageContent %}
 
-<div class="govuk-grid-row govuk-!-margin-top-4">
-  {% include "./activity-log/_filters.njk" %}
-  <div class="govuk-grid-column-two-thirds">
-    {% if not (title == 'Activity log') %}
-      <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-        {{ title }}
-      </h2>
-    {% endif %}
-    {% if personActivity.activities.length %}
-    <div class="flex flex--space-between">
- {% include "./activity-log/_switch-views.njk" %}
- <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
- </div>
-    {% if entries.length > 0 %}
-      {% if compactView %}
-        {% include "./activity-log/_compact-view.njk" %}
-      {% else %}
-        {% include "./activity-log/_default-view.njk" %}
+  <div class="govuk-grid-row govuk-!-margin-top-4">
+    {% include "./activity-log/_filters.njk" %}
+    <div class="govuk-grid-column-two-thirds">
+      {% if not(title == 'Contacts') %}
+        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
+          {{ title }}
+        </h2>
       {% endif %}
-    {% else %}
-      <p class="govuk-!-margin-top-4">{{ emptyText }}</p>
-    {% endif %}
+      {% if personActivity.activities.length %}
+        <div class="flex flex--space-between">
+          {% include "./activity-log/_switch-views.njk" %}
+          <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
+        </div>
+        {% if entries.length > 0 %}
+          {% if compactView %}
+            {% include "./activity-log/_compact-view.njk" %}
+          {% else %}
+            {% include "./activity-log/_default-view.njk" %}
+          {% endif %}
+        {% else %}
+          <p class="govuk-!-margin-top-4">{{ emptyText }}</p>
+        {% endif %}
 
-{% if personActivity.totalPages > 1 %}
-<div class="govuk-!-margin-top-8">
- {{ appPagination({
+        {% if personActivity.totalPages > 1 %}
+          <div class="govuk-!-margin-top-8">
+            {{ appPagination({
   currentPage: page | int,
   totalPages: personActivity.totalPages,
   url: filters.baseUrl + '?view=' + view + '&' if view else filters.baseUrl + '?'
   }) }}
-</div>
-{% endif %}
-{% else %}
-<div data-qa="no-results">
-<h3 class="govuk-heading-s">0 search results found</h3>
-<p>Improve your search by:</p>
-<ul class="govuk-list govuk-list--bullet">
-<li>removing filters</li>
-<li>double-checking the spelling</li>
-<li>removing special characters like characters and accent letters</li>
-<li>using an asterisk (*) to search with a partial keyword, for example app*</li>
-</ul>
-</div>
-{% endif %}
+          </div>
+        {% endif %}
+      {% else %}
+        <div data-qa="no-results">
+          <h3 class="govuk-heading-s">0 search results found</h3>
+          <p>Improve your search by:</p>
+          <ul class="govuk-list govuk-list--bullet">
+            <li>removing filters</li>
+            <li>double-checking the spelling</li>
+            <li>removing special characters like characters and accent letters</li>
+            <li>using an asterisk (*) to search with a partial keyword, for example app*</li>
+          </ul>
+        </div>
+      {% endif %}
+    </div>
   </div>
-</div>
 {% endblock %}

@@ -3,7 +3,7 @@ import { Response } from 'express'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
-import { Location, Provider, Team, User } from '../data/model/caseload'
+import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse } from './Appointments'
@@ -15,6 +15,8 @@ import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
+import { ContactResponse } from '../data/model/overdueOutcomes'
+import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -46,6 +48,7 @@ export interface AppointmentLocals {
   repeatingDates?: string[]
   notes?: string
   sensitivity?: string
+  outcomeRecorded?: string
 }
 
 interface Locals {
@@ -58,14 +61,16 @@ interface Locals {
   requirement?: string
   appointment?: AppointmentLocals
   case?: PersonalDetails
-  headerPersonName?: string
+  headerPersonName?: { forename: string; surname: string }
   headerCRN?: string
   headerDob?: string
+  dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   predictorScores?: TimelineItem
   message?: string
   title?: string
+  success?: boolean
   status?: number
   stack?: boolean | number | string
   flags?: FeatureFlags
@@ -96,7 +101,13 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  attendingUser?: DefaultUserDetails
   sentencePlan?: SentencePlan
+  alertsCount?: string
+  alertsCleared?: { error: boolean; message: string }
+  contactResponse?: ContactResponse
+  checkIn?: ESupervisionCheckIn
+  offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
 }
 
 export interface AppResponse extends Response {

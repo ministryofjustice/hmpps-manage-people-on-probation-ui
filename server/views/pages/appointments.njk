@@ -6,8 +6,7 @@
 {% from "../partials/manage-appointment-link.njk" import manageAppointmentLink %}
 {% set pageTitle = makePageTitle({pageHeading: "Appointments"}) %}
 {% set currentNavSection = 'appointments' %}
-{% set headerPersonName = upcomingAppointments.personSummary.name.forename + ' ' + upcomingAppointments.personSummary.name.surname %}
-{% set personForename = upcomingAppointments.personSummary.name.forename %}
+{% set personForename = headerPersonName.forename %}
 {% set headerCRN = upcomingAppointments.personSummary.crn %}
 {% set headerDob = upcomingAppointments.personSummary.dateOfBirth %}
 {% set offenderId = upcomingAppointments.personSummary.offenderId %}
@@ -19,20 +18,27 @@
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
-{% set headerActions %}
-<div class="moj-button-group moj-button-group--inline">
-  {% if flags.enableAppointmentCreate === true %}
-    <form method="POST" action="">
-      <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0 govuk-!-static-margin-right-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
-                Arrange an appointment
-          </button>
-      <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-    </form>
-  {% else %}
-    <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an appointment on NDelius</a>
-  {% endif %}
-</div>
-{% endset %}
+{% set checkinButtonText = 'Manage online check ins' if offenderCheckinsByCRNResponse else 
+  'Set up online check ins' %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions?back=appointments' %}
+{% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
+{% set checkinLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
+  checkinLink %}
+
+{% if not hasDeceased %}
+    {% set headerActions %}
+        <div class="moj-button-group moj-button-group--inline">
+            {% if not flags.enableESuperVision %}
+                <form method="POST" action="">
+                    <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0 govuk-!-static-margin-right-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
+                        Arrange an appointment
+                    </button>
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+                </form>
+            {% endif %}
+        </div>
+    {% endset %}
+{% endif %}
 
 {% if upcomingAppointments.length > 0 %}
   {% for appointment in upcomingAppointments %}
@@ -124,7 +130,7 @@
           href: "/case"
         },
         {
-          text: headerPersonName,
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
           href: "/case/" + crn,
           attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
         },
@@ -135,24 +141,9 @@
     }) }}
 {% endblock %}
 
-{% block headerActions %}
-  <div class="moj-button-group moj-button-group--inline">
-    {% if flags.enableAppointmentCreate === true %}
-      <form method="POST" action="">
-        <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0 govuk-!-static-margin-right-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
-                Arrange an appointment
-          </button>
-        <input type="hidden" name="_csrf" value="{{ csrfToken }}">
-      </form>
-    {% else %}
-      <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-button">Arrange an appointment on NDelius</a>
-    {% endif %}
-  </div>
-{% endblock %}
-
 {% block pageContent %}
-    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
-    {% if level and (level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
+  {% set level = riskToStaff.levelDescription or riskToStaff.level %}
+  {% if level and(level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
     {% set html %}
     <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ personForename }}&apos;s risk to staff flag</a>
     {% endset %}
@@ -167,7 +158,29 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointments">
-        <h2 class="govuk-heading-m" id="section1">Upcoming appointments</h2>
+
+        <h2 class="govuk-heading-l" data-qa="appointments-header-label">Appointments</h2>
+        {% include "../partials/_date-of-death-warning.njk" %}
+          {% if not hasDeceased %}
+          <div class="moj-button-group moj-button-group--inline govuk-!-margin-bottom-3">
+           {% if flags.enableESuperVision === true %}
+            <div class="moj-button-group__item">
+              <form method="POST" action="" style="display:inline">
+                <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
+                              Arrange an appointment
+                          </button>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+              </form>
+            </div>
+           {% endif %}
+            {% if flags.enableESuperVision === true %}
+              <div class="moj-button-group__item">
+                <a href="{{ checkinLink }}" class="govuk-button govuk-button--secondary govuk-!-margin-left-3"  data-qa="{% if offenderCheckinsByCRNResponse %}online-manage-btn{% else %}online-checkin-btn{% endif %}">{{ checkinButtonText }}</a>
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+        <h3 class="govuk-heading-m" id="section1">Upcoming appointments</h3>
         {% if upcomingAppointments.length == 0 %}
           <p>There are no upcoming appointments.</p>
         {% else %}
@@ -206,7 +219,7 @@
       </section>
 
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="pastAppointments">
-        <h2 class="govuk-heading-m" id="section2">Past appointments</h2>
+        <h3 class="govuk-heading-m" id="section2">Past appointments</h3>
         {% if pastAppointments.length == 0 %}
           <p>There are no past appointments.</p>
         {% else %}
@@ -239,9 +252,9 @@
         {% endif %}
       </section>
       <section data-qa="appointmentHistory">
-        <h2 class="govuk-heading-m" id="section3">Appointment history</h2>
+        <h3 class="govuk-heading-m" id="section3">Appointment history</h3>
         <p>
-          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the activity log</a>.</p>
+          <a href="/case/{{crn}}/activity-log" class="govuk-link">View all past appointments in the contacts page</a>.</p>
       </section>
     </div>
   </div>

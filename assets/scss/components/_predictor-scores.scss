@@ -1,4 +1,3 @@
-$very-high-score-colour: #942514;
 $very-high-score-colour--light: #ffac9f;
 $very-high-score-colour__text: #711a0d;
 $high-score-colour: #d4351c;
@@ -94,6 +93,10 @@ $predictor-score-background-colour: #f3f2f1;
 
 .predictor-timeline-item {
   @include predictor-timeline-item-base($govuk-secondary-text-colour, govuk-colour("light-grey"), $govuk-secondary-text-colour);
+}
+
+.predictor-timeline-item--unknown {
+  @include predictor-timeline-item-base(govuk-colour("yellow"), govuk-colour("yellow"), govuk-colour("black"));
 }
 
 .predictor-timeline-item--very-high {

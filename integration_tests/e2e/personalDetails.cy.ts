@@ -5,7 +5,7 @@ import AdjustmentsPage from '../pages/adjustments'
 import { checkPopHeader } from './appointments/imports'
 
 context('Personal Details', () => {
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
   it('Personal Details page is rendered', () => {
@@ -19,7 +19,7 @@ context('Personal Details', () => {
     page.getTab('personalDetails').should('contain.text', 'Personal details')
     page.getTab('risk').should('contain.text', 'Risk')
     page.getTab('sentence').should('contain.text', 'Sentence')
-    page.getTab('activityLog').should('contain.text', 'Activity log')
+    page.getTab('activityLog').should('contain.text', 'Contacts')
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('contactDetails').should('contain.text', 'Contact details')
     page.getCardHeader('personalDetails').should('contain.text', 'Personal details')
@@ -27,20 +27,20 @@ context('Personal Details', () => {
     page.getCardHeader('staffContacts').should('contain.text', 'Staff contacts')
     page.getCardHeader('equalityMonitoring').should('contain.text', 'Equality monitoring')
     page.getRowData('contactDetails', 'telephoneNumber', 'Value').should('contain.text', '0123456999')
-    page.getRowData('contactDetails', 'mobileNumber', 'Value').should('contain.text', '071838893')
+    page.getRowData('contactDetails', 'mobileNumber', 'Value').should('contain.text', '07783889300')
     page.getRowData('contactDetails', 'emailAddress', 'Value').should('contain.text', 'address1@gmail.com')
     page.getRowData('contactDetails', 'mainAddress', 'Value').should('contain.text', 'No fixed address')
     page.getRowData('contactDetails', 'otherAddresses', 'Value').should('contain.text', '1 other address')
     page.getRowData('contactDetails', 'contacts', 'Value').should('contain.text', 'Steve Wilson – GP (secondary)')
     page.getRowData('contactDetails', 'mainAddressNotes', 'Value').should('contain.text', 'Main Address')
-
     page.getElementData('telephoneNumberAction').should('exist')
     page.getElementData('mobileNumberAction').should('exist')
     page.getElementData('emailAddressAction').should('exist')
     page.getElementData('mainAddressAction').should('exist')
-
     page.getRowData('personalDetails', 'name', 'Value').should('contain.text', 'Caroline Wolff')
     page.getRowData('personalDetails', 'dateOfBirth', 'Value').should('contain.text', '18 August 1979')
+    cy.get('[data-qa=dateOfDeathLabel]').should('not.exist')
+    cy.get('[data-qa=dateOfDeathValue]').should('not.exist')
     page.getRowData('personalDetails', 'aliases', 'Value').should('contain.text', 'Jonny Smith')
     page.getRowData('personalDetails', 'previousSurname', 'Label').should('contain.text', 'Previous name')
     page.getRowData('personalDetails', 'previousSurname', 'Value').should('contain.text', 'Jones')
@@ -96,6 +96,20 @@ context('Personal Details', () => {
         'href',
         'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=EqualityMonitoring&CRN=X000001',
       )
+  })
+
+  it('Personal details page is rendered with date of death', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/personal-details')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
+    cy.get('[data-qa="dateOfBirthValue')
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.eq(`18 August 1979`)
+      })
+    cy.get('[data-qa="dateOfDeathLabel"]').should('contain.text', 'Date of death')
+    cy.get('[data-qa="dateOfDeathValue"]').should('contain.text', '11 September 2024 (45 years old)')
   })
 
   it('Personal details page is rendered for new san indicator assessment', () => {
@@ -281,7 +295,7 @@ context('Personal Details', () => {
   })
   it('should display the pop header on the staff contacts page', () => {
     cy.visit('/case/X000001/personal-details/staff-contacts')
-    checkPopHeader('Eula Schmeler')
+    checkPopHeader('Caroline Wolff')
   })
   it('should display the pop header on the adjustments page', () => {
     cy.visit('/case/X000001/personal-details/adjustments')

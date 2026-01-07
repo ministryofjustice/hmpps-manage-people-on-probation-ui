@@ -1,0 +1,117 @@
+{% extends "../../_form.njk" %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% set title = "Online check in submitted" %}
+{% set backLink = back | default('/case/' + crn + '/activity-log') %}
+{% set hideButton = true %}
+
+{% block form %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+        
+        <p class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the video is the person who should be checking in</p>
+
+        <dl class="govuk-summary-list">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Checked in on</dt>
+                <dd class="govuk-summary-list__value">{{checkIn.submittedAt | dateWithYear(true) }}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Review due</dt>
+                <dd class="govuk-summary-list__value">{{checkIn.dueDate | dateWithYear }}</dd>
+            </div>
+        </dl>
+
+        <h2 class="govuk-heading-m">Review questions</h2>
+        <hr class="govuk-section-break govuk-section-break--visible">
+        <dl class="govuk-summary-list govuk-!-margin-top-0">
+             <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    How {{ checkIn.personalDetails.name.forename }} has been feeling
+                </dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.flaggedResponses and 'mentalHealth' in checkIn.flaggedResponses %}
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
+                </dd>
+            </dd>
+            </div>
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Anything they need help with or to let us know</dt>
+                <dd class="govuk-summary-list__value">
+                    {% for a in checkIn.surveyResponse.assistance %}
+                        {{ a }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.flaggedResponses and 'assistance' in checkIn.flaggedResponses %}
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
+                </dd>
+            </div>
+        </dl>
+
+        <h2 class="govuk-heading-m">What action are you taking after reviewing this check in? (optional)</h2>
+        <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukCharacterCount({
+                hint: {
+                    text: "This information will be added to the contact"
+                },
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'furtherActions'])) }}
+
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
+                        text: 'Did the check in help you with risk management? (optional)',
+                        classes: "govuk-label--m govuk-!-font-weight-bold",
+                        hint: 'This information is only used to help us learn about how you use this system.'
+                    }
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'riskManagement'
+                    }
+                },
+                items: [
+                    {
+                        value: "yes",
+                        text: "Yes"
+                    },
+                    {
+                        value: "no",
+                        text: "No"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'riskManagementFeedback'])) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                html: "Confirm review",
+                attributes: {
+                    'data-qa': 'submit-btn'
+                }
+                }) }}
+            </div>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        </form>
+
+    </div>
+</div>
+
+{% endblock %}

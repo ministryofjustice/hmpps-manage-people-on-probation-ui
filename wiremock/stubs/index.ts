@@ -12,6 +12,12 @@ import overview from './overview'
 import userLocations from './userLocations'
 import activityLog from './activityLog'
 import risk from './risk'
+import supervisionAppointmentClient from './supervisionAppointmentClient'
+import probationFEIntegration from './probationFEIntegration'
+import alerts from './alerts'
+import caseDetail from './caseDetail'
+import user from './user'
+import eSupervisionAPI from './eSupervisionAPI'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -28,4 +34,10 @@ export default {
   ...userLocations,
   ...activityLog,
   ...risk,
+  ...supervisionAppointmentClient,
+  ...probationFEIntegration,
+  ...alerts,
+  ...caseDetail,
+  ...user,
+  ...eSupervisionAPI,
 }

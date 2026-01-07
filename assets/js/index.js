@@ -1,15 +1,16 @@
 /* eslint-disable no-param-reassign */
-
 /* eslint-disable no-new */
 /* eslint-disable no-restricted-globals */
 
-import * as govukFrontend from 'govuk-frontend'
-import * as mojFrontend from '@ministryofjustice/frontend'
+import { DateTime } from 'luxon'
 import './appInsights'
 import './predictors'
 import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import { MpopMultiFileUpload } from './mpop-multi-file-upload.mjs'
+import setupAlertsPage from './alerts'
+import setupTechnicalUpdates from './technical-updates'
+import './photo'
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
 if ($backendSortableTable) {
@@ -33,10 +34,12 @@ if ($multifileUpload) {
     headers: {
       'CSRF-Token': window.csrfToken,
     },
-    uploadFileEntryHook: uploadEntry,
-    uploadFileExitHook: uploadExit,
-    fileDeleteHook: deleteExit,
-    uploadFileErrorHook: errorHook,
+    hooks: {
+      entryHook: uploadEntry,
+      exitHook: uploadExit,
+      deleteHook: deleteExit,
+      errorHook: uploadErrorHook,
+    },
   })
 
   function continueButtonEnabled(enabled) {
@@ -86,7 +89,7 @@ if ($multifileUpload) {
     }
   }
 
-  function errorHook({ handle, file, errorMessage, textStatus, errorThrown }) {
+  function uploadErrorHook({ handle, file, errorMessage, textStatus, errorThrown }) {
     const message = errorMessage || textStatus || errorThrown
     const item = $(handle.getFileRowHtml(file))
 
@@ -111,9 +114,6 @@ if ($multifileUpload) {
     handle.$status.textContent = message
   }
 }
-
-govukFrontend.initAll()
-mojFrontend.initAll()
 
 const lastAppointment = () => {
   const repeatingFrequency = document.querySelector('div[data-interval]')
@@ -335,6 +335,123 @@ const recentCaseDisplay = () => {
   }
 }
 
+const changeAttendeeLink = document.querySelector('[data-qa=changeAttendeeLink]')
+if (changeAttendeeLink) {
+  changeAttendeeLink.addEventListener('click', e => {
+    e.preventDefault()
+    e.currentTarget.closest('form').submit()
+  })
+}
+
+class ServiceAlert {
+  constructor() {
+    this.alert = document.querySelector('[data-module="serviceAlert"]')
+
+    if (!this.alert) return
+
+    this.dateInput = document.querySelector('.moj-js-datepicker-input')
+    this.startInput = document.querySelector('[data-qa="startTime"] input')
+    this.status = document.querySelector('[data-qa="serviceAlertStatus"]')
+    this.dismissLink = this.alert.querySelector('.moj-alert__dismiss')
+    this.dismissed = false
+
+    this.handleDismiss = this.handleDismiss.bind(this)
+    this.showAlert = this.showAlert.bind(this)
+    this.handleStartTimeChange = this.handleStartTimeChange.bind(this)
+    this.handleRequest = this.handleRequest.bind(this)
+    this.handleDateChange = this.handleDateChange.bind(this)
+
+    this.init()
+  }
+
+  init() {
+    if (!this.alert.classList.contains('display-none')) {
+      this.dismissLink.addEventListener('click', this.handleDismiss)
+    }
+
+    if (this.dateInput) {
+      this.dateInput.addEventListener('keyup', this.handleDateChange)
+      this.dateInput.addEventListener('change', this.handleDateChange)
+    }
+  }
+
+  // eslint-disable-next-line class-methods-use-this
+  async handleDismiss() {
+    await fetch('/alert/dismiss', { method: 'POST' })
+  }
+
+  showAlert(show = false) {
+    if (this.dismissed) return
+
+    let statusMessage = ''
+    const displayedStatus = 'Date selected is in the past, service alert displayed'
+    const hiddenStatus = 'Date selected is today or in the future, service banner hidden'
+
+    if (show && (this.status.innerText === hiddenStatus || !this.status.innerText)) {
+      statusMessage = displayedStatus
+    }
+
+    if (!show && this.status.innerText === displayedStatus) {
+      statusMessage = hiddenStatus
+    }
+
+    if (!show) {
+      this.alert.classList.add('display-none')
+      this.dismissLink.removeEventListener('click', this.handleDismiss)
+    } else {
+      this.alert.classList.remove('display-none')
+      this.dismissLink.addEventListener('click', this.handleDismiss)
+    }
+
+    if (statusMessage) {
+      this.status.innerText = statusMessage
+    }
+  }
+
+  async handleStartTimeChange(event) {
+    const time = DateTime.fromFormat(event.target.value, 'H:mm')
+    if (time.isValid) {
+      await this.handleRequest()
+    } else {
+      this.showAlert(false)
+    }
+  }
+
+  async handleRequest(dateEvent = false) {
+    const [day, month, year] = this.dateInput.value.split('/')
+    const response = await fetch('/appointment/is-in-past', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        date: `${year}-${month}-${day}`,
+        time: this.startInput.value,
+      }),
+    })
+
+    const { isInPast, isToday, alertDismissed } = await response.json()
+    this.dismissed = alertDismissed
+
+    if (dateEvent) {
+      this.startInput.removeEventListener('keyup', this.handleStartTimeChange)
+      if (isToday) {
+        this.startInput.addEventListener('keyup', this.handleStartTimeChange)
+      }
+    }
+
+    this.showAlert(isInPast)
+  }
+
+  async handleDateChange() {
+    const { value } = this.dateInput
+    const dt = DateTime.fromFormat(value, 'd/M/yyyy')
+    if (dt.isValid) {
+      await this.handleRequest(true)
+    } else {
+      this.showAlert(false)
+    }
+  }
+}
+
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
@@ -342,3 +459,6 @@ attendanceSelectors()
 homeSearch()
 crissHeaders()
 recentCaseDisplay()
+setupAlertsPage()
+setupTechnicalUpdates()
+new ServiceAlert()

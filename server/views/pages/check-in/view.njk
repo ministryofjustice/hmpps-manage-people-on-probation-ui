@@ -1,0 +1,126 @@
+{% extends "../_form.njk" %}
+{%- from "govuk/components/tag/macro.njk" import govukTag -%}
+
+{% set title = "Online check in submitted and reviewed" %}
+{% set backLink = back | default('/case/' + crn + '/activity-log') %}
+{% set hideButton = true %}
+
+{% block form %}
+
+<div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+
+        <h2 class="govuk-heading-m">Practioner review</h2>
+        <hr class="govuk-section-break govuk-section-break--visible">
+        <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Is this person in the video {{ checkIn.personalDetails.name.forename }}?</dt>
+                <dd class="govuk-summary-list__value">{{"Yes" if checkIn.manualIdCheck == "MATCH" else "No"}}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.manualIdCheck == "MATCH" %}
+                        {{ govukTag({ text: "Identity confirmed", classes: "govuk-tag govuk-tag--green" }) }}
+                    {% endif %}
+                    {% if checkIn.manualIdCheck == "NO_MATCH" %}
+                        {{ govukTag({ text: "Identity not confirmed", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe }}</dd>
+            </div>
+            {% if checkIn.notes %}
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Notes</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.notes | safe }}</dd>
+            </div>
+            {% endif %}
+        </dl>
+
+        <h2 class="govuk-heading-m">Add further information</h2>
+        <form method="post" autocomplete="off" action="{{ paths.current  }}">
+            {{ govukCharacterCount({
+                hint: {
+                    text: "This information will be added to contact notes"
+                },
+                rows: '10',
+                maxlength: maxCharCount,
+                formGroup: {
+                    attributes: { "data-qa": "notes"}
+                }
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'note'])) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                html: "Add update",
+                attributes: {
+                    'data-qa': 'submit-btn'
+                }
+                }) }}
+            </div>
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+        </form>
+
+        <hr class="govuk-section-break govuk-section-break--visible">
+
+        <h2 class="govuk-heading-m govuk-!-margin-top-5">{{ checkIn.personalDetails.name.forename }}'s check in</h2>
+        <hr class="govuk-section-break govuk-section-break--visible">
+        <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">System ID check result</dt>
+                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
+                <dd class="govuk-summary-list__value">
+                    <img
+                    src="{{ "/assets/images/placeholder.png" if checkIn.photoUrl == null else checkIn.photoUrl }}"
+                    class="es-profile-image es-profile-image--small"
+                    alt="Profile image of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                    crossorigin />
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Image from check in video</dt>
+                <dd class="govuk-summary-list__value">
+                    {% if checkIn.snapshotUrl %}
+                        <img
+                        src="{{ checkIn.snapshotUrl }}"
+                        class="es-profile-image es-profile-image--small"
+                        alt="Snapshot from video of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                        crossorigin />
+                    {% else %}
+                    <span>No image available</span>
+                    {% endif %}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Check in video</dt>
+                <dd class="govuk-summary-list__value">
+                    <a href="{{ videoLink }}" class="govuk-link">View video</a>
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">
+                    How {{ checkIn.personalDetails.name.forename }} is feeling
+                </dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
+            </dd>
+            </div>
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Anything they need help with</dt>
+                <dd class="govuk-summary-list__value">
+                {% for a in checkIn.surveyResponse.assistance | split %}
+                    {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}
+                {% endfor %}
+                </dd>
+            </div>
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">Contact with practitioner requested</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
+
+{% endblock %}

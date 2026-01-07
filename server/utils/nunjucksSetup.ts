@@ -2,13 +2,16 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express, { Request, NextFunction } from 'express'
+import type { Services } from '../services'
 
 import {
   initialiseName,
   yearsSince,
+  yearsBetween,
   dateWithYear,
   dateToTimestamp,
   dateWithDayAndWithoutYear,
+  dateWithDayAndWithYear,
   addressToList,
   dateForSort,
   dateWithNoDay,
@@ -67,13 +70,23 @@ import {
   convertToTitleCase,
   getPersonLevelTypes,
   handleQuotes,
+  dateToLongDate,
+  merge,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
 import { AppResponse } from '../models/Locals'
+import { splitString } from './splitString'
+import getUserFriendlyString from './eSupervisionFriendlyString'
+import { to12HourTimeWithMinutes } from './to12HourTimeWithMinutes'
+import { to12HourTimeCompact } from './to12HourTimeCompact'
 
-export default function nunjucksSetup(app: express.Express, applicationInfo: ApplicationInfo): void {
+export default function nunjucksSetup(
+  app: express.Express,
+  applicationInfo: ApplicationInfo,
+  services: Services,
+): void {
   const production = process.env.NODE_ENV === 'production'
   app.set('view engine', 'njk')
 
@@ -113,7 +126,9 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('dateWithYear', dateWithYear)
   njkEnv.addFilter('dateToTimestamp', dateToTimestamp)
   njkEnv.addFilter('dateWithDayAndWithoutYear', dateWithDayAndWithoutYear)
+  njkEnv.addFilter('dateWithDayAndWithYear', dateWithDayAndWithYear)
   njkEnv.addFilter('yearsSince', yearsSince)
+  njkEnv.addFilter('yearsBetween', yearsBetween)
   njkEnv.addFilter('dateWithNoDay', dateWithNoDay)
   njkEnv.addFilter('dateWithYearShortMonth', dateWithYearShortMonth)
   njkEnv.addFilter('fullName', fullName)
@@ -136,9 +151,17 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addFilter('toSentenceCase', toSentenceCase)
   njkEnv.addFilter('toSentenceDescription', toSentenceDescription)
   njkEnv.addFilter('concat', concat)
+  njkEnv.addFilter('merge', (obj, other) => ({ ...obj, ...other }))
   njkEnv.addFilter('shortTime', shortTime)
+  njkEnv.addFilter('split', splitString)
+  njkEnv.addFilter('userFriendlyString', getUserFriendlyString)
   njkEnv.addFilter('convertToTitleCase', convertToTitleCase)
   njkEnv.addFilter('handleQuotes', handleQuotes)
+  njkEnv.addFilter('dmyToLongDate', dateToLongDate)
+  njkEnv.addFilter('merge', merge)
+  njkEnv.addFilter('isArray', (str: string | string[]) => {
+    return Array.isArray(str)
+  })
 
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
@@ -177,4 +200,7 @@ export default function nunjucksSetup(app: express.Express, applicationInfo: App
   njkEnv.addGlobal('riskLevelLabel', riskLevelLabel)
   njkEnv.addGlobal('toIsoDateFromPicker', toIsoDateFromPicker)
   njkEnv.addGlobal('fromIsoDateToPicker', fromIsoDateToPicker)
+  njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
+  njkEnv.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
+  njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
 }

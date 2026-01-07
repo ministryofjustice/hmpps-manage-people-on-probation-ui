@@ -43,6 +43,7 @@ describe('masApiClient', () => {
 
     it.each([
       ['getOverview', '/overview/X000001?sentenceNumber=1', () => masApiClient.getOverview('X000001')],
+      ['getOverdueOutcomes', '/appointment/X000001/overdue-outcomes', () => masApiClient.getOverdueOutcomes('X000001')],
       ['getSentenceDetails', '/sentence/X000001', () => masApiClient.getSentenceDetails('X000001')],
       ['getSentences', '/sentences/X000001', () => masApiClient.getSentences('X000001')],
       ['getSentences', '/sentences/X000001?number=2', () => masApiClient.getSentences('X000001', '2')],
@@ -307,6 +308,21 @@ describe('masApiClient', () => {
       ['getUserAccess', '/user/USER/access/X000001', () => masApiClient.getUserAccess('USER', 'X000001')],
       ['checkUserAccess', '/user/USER/access', () => masApiClient.checkUserAccess('USER', []), 'post'],
       ['getDeliusRoles', '/user/USER', () => masApiClient.getDeliusRoles('USER')],
+      [
+        'getProbationPractitioner',
+        '/case/X000001/probation-practitioner',
+        () => masApiClient.getProbationPractitioner('X000001'),
+      ],
+      ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
+      ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
+      [
+        'getUserAlerts (full params)',
+        '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',
+        () => masApiClient.getUserAlerts(1, 'DATE_AND_TIME', 'asc'),
+      ],
+      ['getUserAlerts (minimal)', '/alerts?size=10', () => masApiClient.getUserAlerts()],
+      ['clearAlerts', '/alerts', () => masApiClient.clearAlerts([1, 2, 3]), 'put'],
+      ['getUserAlertNote', '/alerts/0/notes/0', () => masApiClient.getUserAlertNote('0', '0'), 'get'],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {
@@ -314,6 +330,9 @@ describe('masApiClient', () => {
       }
       if (method === 'post') {
         fakeMasApiClient.post(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+      }
+      if (method === 'put') {
+        fakeMasApiClient.put(url).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
       }
 
       const output = await func()
