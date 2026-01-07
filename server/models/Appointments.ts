@@ -40,6 +40,7 @@ export interface AppointmentSession {
   outcomeRecorded?: YesNo
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
+  externalReference?: string
   temp?: {
     providerCode?: string
     teamCode?: string

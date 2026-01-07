@@ -25,6 +25,8 @@ export const postRescheduleAppointments = (
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
+    const { externalReference: oldSupervisionAppointmentUrn } = res.locals.personAppointment.appointment
+
     const { data } = req.session
     const {
       date,
@@ -75,10 +77,6 @@ export const postRescheduleAppointments = (
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
       const message = buildCaseLink(config.domain, crn, contactId.toString())
       const subject = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
-      const {
-        name: { forename: firstName },
-        mobileNumber,
-      } = res.locals.case
       const rescheduleEventRequest: RescheduleEventRequest = {
         rescheduledEventRequest: {
           recipients: [
@@ -93,16 +91,9 @@ export const postRescheduleAppointments = (
           durationInMinutes,
           supervisionAppointmentUrn: response.externalReference,
         },
-        oldSupervisionAppointmentUrn: response.externalReference,
+        oldSupervisionAppointmentUrn,
       }
-      if (mobileNumber) {
-        rescheduleEventRequest.rescheduledEventRequest.smsEventRequest = {
-          firstName,
-          crn,
-          smsOptIn: true,
-          mobileNumber,
-        }
-      }
+      console.dir(rescheduleEventRequest, { depth: null })
       eventResponse = await masOutlookClient.postRescheduleAppointmentEvent(rescheduleEventRequest)
     }
 

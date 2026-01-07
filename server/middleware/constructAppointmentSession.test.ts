@@ -29,6 +29,7 @@ const mockTypes: AppointmentType[] = [
 
 const crn = 'X000001'
 const username = 'user-1'
+const externalReference = 'urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72'
 
 const rescheduleAppointment = {
   whoNeedsToReschedule: 'POP',
@@ -127,6 +128,7 @@ const mockAppointment: Activity = {
   isVisor: true,
   eventId: 49,
   nsiId: null,
+  externalReference,
 }
 
 const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppointment => ({
@@ -170,6 +172,7 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     uuid: '',
     repeating: 'No',
     repeatingDates: [] as string[],
+    externalReference,
     ...values,
   }
 }

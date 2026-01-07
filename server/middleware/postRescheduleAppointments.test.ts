@@ -17,6 +17,7 @@ import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEven
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
+const externalReference = 'urn:uk:gov:hmpps:manage-supervision-service:appointment:c8d13f72'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/SupervisionAppointmentClient')
@@ -140,6 +141,11 @@ describe('middleware/postRescheduleAppointments', () => {
       name: { forename: 'James', surname: 'Morrison' },
       mobileNumber: '07822567890',
     },
+    personAppointment: {
+      appointment: {
+        externalReference,
+      },
+    },
   })
 
   beforeEach(() => {
@@ -237,17 +243,11 @@ describe('middleware/postRescheduleAppointments', () => {
           ],
           durationInMinutes: 30,
           message: `<a href=http://localhost:3000/case/X000001/appointments/appointment/12345/manage?back=/case/X000001/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`,
-          smsEventRequest: {
-            crn: 'X000001',
-            firstName: 'James',
-            mobileNumber: '07822567890',
-            smsOptIn: true,
-          },
           start: null,
           subject: 'Planned Office Visit (NS) with ',
           supervisionAppointmentUrn: 'ABCDE',
         },
-        oldSupervisionAppointmentUrn: mockRescheduleResponse.externalReference,
+        oldSupervisionAppointmentUrn: externalReference,
       }
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(expectedBody)
     })
@@ -255,6 +255,11 @@ describe('middleware/postRescheduleAppointments', () => {
       const [req] = buildRequest()
       const mockRes = mockAppResponse({
         flags: { ...mockFlags, enableOutlookEvent: false },
+        personAppointment: {
+          appointment: {
+            externalReference,
+          },
+        },
       })
       await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
       expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()

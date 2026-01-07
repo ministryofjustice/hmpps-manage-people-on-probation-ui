@@ -57,6 +57,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
     const date = appointment?.startDateTime || ''
     const end = appointment?.endDateTime || ''
+    const externalReference = appointment?.externalReference || ''
 
     /*
       If event has not been selected, then the user cannot select type or location, but can select the attendee
@@ -106,6 +107,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       uuid: '',
       repeating: 'No',
       repeatingDates: [],
+      externalReference,
     }
 
     if (rescheduleAppointment && nextAppointmentSelection === 'RESCHEDULE') {
