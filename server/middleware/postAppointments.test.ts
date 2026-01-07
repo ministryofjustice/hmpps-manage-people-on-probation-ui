@@ -7,7 +7,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
-import { AppointmentSession, AppointmentType, MasUserDetails } from '../models/Appointments'
+import { AppointmentRequestBody, AppointmentSession, AppointmentType, MasUserDetails } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import config from '../config'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
@@ -214,7 +214,7 @@ describe('/middleware/postAppointments', () => {
     )
 
   it('should post the correct request body', async () => {
-    const expectedBody = {
+    const expectedBody: AppointmentRequestBody = {
       user: {
         username,
         locationCode,
@@ -246,7 +246,7 @@ describe('/middleware/postAppointments', () => {
       eventId: 'PERSON_LEVEL_CONTACT',
     }
     const mockReq = createMockReq(appointment)
-    const expectedBody = {
+    const expectedBody: AppointmentRequestBody = {
       user: {
         username,
         locationCode,
@@ -259,6 +259,40 @@ describe('/middleware/postAppointments', () => {
       numberOfAppointments: parseInt(repeatCount, 10),
       createOverlappingAppointment: true,
       requirementId: 1,
+      licenceConditionId: parseInt(licenceConditionId, 10),
+      uuid: id,
+      until: dateTime('2025-03-19', endTime),
+      notes: 'Some notes',
+      sensitive: true,
+      visorReport: false,
+    }
+    await postAppointments(hmppsAuthClient)(mockReq, res, nextSpy)
+    expect(spy).toHaveBeenCalledWith(crn, expectedBody)
+  })
+
+  it('should set the locationCode as null if no location required', async () => {
+    const appointment = {
+      ...mockAppointment,
+      user: {
+        ...mockAppointment.user,
+        locationCode: 'NO_LOCATION_REQUIRED',
+      },
+    }
+    const mockReq = createMockReq(appointment)
+    const expectedBody: AppointmentRequestBody = {
+      user: {
+        username,
+        locationCode: null,
+        teamCode,
+      },
+      type,
+      start: dateTime(date, startTime),
+      end: dateTime(date, endTime),
+      interval,
+      numberOfAppointments: parseInt(repeatCount, 10),
+      createOverlappingAppointment: true,
+      requirementId: 1,
+      eventId: parseInt(eventId, 10),
       licenceConditionId: parseInt(licenceConditionId, 10),
       uuid: id,
       until: dateTime('2025-03-19', endTime),
