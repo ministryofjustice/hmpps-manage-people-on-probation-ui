@@ -167,9 +167,6 @@ const req = createMockReq(mockAppointment)
 const nextSpy = jest.fn()
 
 describe('/middleware/postAppointments', () => {
-  beforeEach(() => {
-    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValue({ enableOutlookEvent: true } as FeatureFlags)
-  })
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -449,24 +446,5 @@ describe('/middleware/postAppointments', () => {
       durationInMinutes: expectedDuration,
       supervisionAppointmentUrn: externalReference,
     })
-  })
-
-  it('should not create Outlook event and NOT set isOutLookEventFailed when enableOutlookEvent is false', async () => {
-    // Override the default flag for this test only
-    jest.spyOn(FlagService.prototype, 'getFlags').mockResolvedValueOnce({ enableOutlookEvent: false } as FeatureFlags)
-
-    const localReq = createMockReq(mockAppointment)
-
-    const postSpy = jest
-      .spyOn(MasApiClient.prototype, 'postAppointments')
-      .mockResolvedValue({ appointments: [{ id: 1, externalReference: 'ref-1' }] })
-
-    const outlookSpy = jest.spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
-
-    await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
-
-    expect(postSpy).toHaveBeenCalled()
-    expect(outlookSpy).not.toHaveBeenCalled()
-    expect(localReq.session.data.isOutLookEventFailed).toBeUndefined()
   })
 })
