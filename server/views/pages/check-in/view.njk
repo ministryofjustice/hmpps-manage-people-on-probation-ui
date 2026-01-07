@@ -27,7 +27,7 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe }}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe if checkIn.furtherActions else 'None' }}</dd>
             </div>
             {% if checkIn.notes %}
             <div class="govuk-summary-list__row">
@@ -102,23 +102,95 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">
-                    How {{ checkIn.personalDetails.name.forename }} is feeling
+                    How {{ checkIn.personalDetails.name.forename }} has been feeling
                 </dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealth | userFriendlyString }}</dd>
-            </dd>
-            </div>
-                <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Anything they need help with</dt>
-                <dd class="govuk-summary-list__value">
-                {% for a in checkIn.surveyResponse.assistance | split %}
-                    {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}
-                {% endfor %}
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.flaggedResponses and 'mentalHealth' in checkIn.flaggedResponses %}
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Contact with practitioner requested</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
+                <dt class="govuk-summary-list__key">Anything they need help with or to let us know</dt>
+                <dd class="govuk-summary-list__value">
+                    {% for a in checkIn.surveyResponse.assistance | split %}
+                        {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}
+                    {% endfor %}
+                </dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.flaggedResponses and 'assistance' in checkIn.flaggedResponses %}
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
+                </dd>
             </div>
+
+            {% if checkIn.surveyResponse.mentalHealthSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about mental health</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.mentalHealthSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+            {% if checkIn.surveyResponse.alcoholSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about alcohol</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.alcoholSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+            {% if checkIn.surveyResponse.drugsSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about drugs</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.drugsSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+            {% if checkIn.surveyResponse.moneySupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about money</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.moneySupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+            {% if checkIn.surveyResponse.housingSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about housing</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.housingSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+            {% if checkIn.surveyResponse.supportSystemSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about their support system</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.supportSystemSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+            {% if checkIn.surveyResponse.otherSupport %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want us to know about (something else)</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.otherSupport }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
+
+            <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
+                <dd class="govuk-summary-list__actions">
+                    {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
+                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                    {% endif %}
+                </dd>
+            </div>
+            {% if checkIn.surveyResponse.callbackDetails %}
+                <div class="govuk-summary-list__row">
+                <dt class="govuk-summary-list__key">What they want to talk about</dt>
+                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callbackDetails }}</dd>
+                <dd class="govuk-summary-list__actions"></dd>
+                </div>
+            {% endif %}
         </dl>
     </div>
 </div>

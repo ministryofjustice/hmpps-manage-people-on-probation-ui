@@ -320,6 +320,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { back } = req.query
+      const { url } = req
 
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
@@ -337,7 +338,9 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       await eSupervisionClient.postOffenderCheckInNote(id, notes)
 
-      return res.redirect(`/case/${crn}/activity-log`)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'note'], null)
+
+      return res.redirect(url)
     }
   },
 
