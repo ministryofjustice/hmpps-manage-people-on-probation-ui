@@ -2,9 +2,8 @@
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 {% set title = "Online check in missed" %}
-{% set backLink = back if back else 
-  '/case/' + crn + '/activity-log' %}
- {% set hideButton = true %}
+{% set backLink = back | default('/case/' + crn + '/activity-log') %}
+{% set hideButton = true %}
 
 {% block form %}
 

@@ -336,6 +336,7 @@ describe('masApiClient', () => {
           }),
         'put',
       ],
+      ['getUserAlertNote', '/alerts/0/notes/0', () => masApiClient.getUserAlertNote('0', '0'), 'get'],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {

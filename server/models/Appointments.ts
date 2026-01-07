@@ -91,7 +91,7 @@ export interface AppointmentRequestBody {
   user: {
     username: string
     teamCode: string
-    locationCode: string
+    locationCode: string | null
   }
   type: string
   start: Date

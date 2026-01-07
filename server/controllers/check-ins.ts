@@ -1,12 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
-import { NextFunction, Request, Response } from 'express'
 import { Controller, Route } from '../@types'
 import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { CheckinScheduleRequest, CheckInterval, ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
+import { CheckinScheduleRequest, ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -31,6 +30,7 @@ const routes = [
   'getPhotoRulesPage',
   'getUpdateCheckIn',
   'getViewCheckIn',
+  'getViewExpiredCheckIn',
   'getReviewExpiredCheckIn',
   'getReviewIdentityCheckIn',
   'postReviewIdentityCheckIn',
@@ -143,7 +143,14 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/photo-options`)
+      const cyaQuery = req.query?.cya === 'true' ? '&cya=true' : ''
+      const { change } = req.body
+      const redirectUrl =
+        change === 'main'
+          ? `/case/${crn}/appointments/${id}/check-in/photo-options`
+          : `/case/${crn}/appointments/${id}/check-in/edit-contact-preference?change=${change}${cyaQuery}`
+
+      return res.redirect(redirectUrl)
     }
   },
 
@@ -160,10 +167,12 @@ const checkInsController: Controller<typeof routes, void> = {
   getEditContactPrePage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id })
+
+      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id, change })
     }
   },
   postEditContactPrePage: hmppsAuthClient => {
@@ -186,7 +195,7 @@ const checkInsController: Controller<typeof routes, void> = {
         cyaQuery = '?cya=true'
       }
       const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
-      // Save to show success message on contact preferences page
+      // Save to show the success message on the contact preferences page
       if (personalDetails?.crn) {
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'], true)
       }
@@ -314,7 +323,8 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/activity-log`)
     }
   },
-  getReviewExpiredCheckIn: _hmppsAuthClient => {
+
+  getViewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -322,6 +332,25 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
+
+      if (checkIn.status !== 'EXPIRED' || !checkIn.reviewedAt) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
+      }
+      return res.render('pages/check-in/view-expired.njk', { crn, id, back, checkIn })
+    }
+  },
+
+  getReviewExpiredCheckIn: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const { back } = req.query
+      const { checkIn } = res.locals
+      if (checkIn.status === 'EXPIRED' && checkIn.reviewedAt) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/view-expired${back ? `?back=${back}` : ''}`)
+      }
       if (checkIn.status !== 'EXPIRED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
@@ -646,19 +675,6 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 }
-
-export const redirectWizard = (url: string): Route<Promise<void>> => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { crn, id } = req.params
-    let redirectUrl = url
-    if (req.query.cya === 'true') {
-      redirectUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      return res.redirect(redirectUrl)
-    }
-    return next()
-  }
-}
-
 export const getMinDate = (): string => {
   const today = new Date()
   // setting temporary fix for minDate

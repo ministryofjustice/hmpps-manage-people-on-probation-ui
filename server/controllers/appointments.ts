@@ -68,7 +68,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-      const hasDeceased = req.session.data.personalDetails?.[crn]?.dateOfDeath !== undefined
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,
@@ -175,7 +175,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
-      const hasDeceased = req.session.data.personalDetails?.[crn]?.dateOfDeath !== undefined
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,

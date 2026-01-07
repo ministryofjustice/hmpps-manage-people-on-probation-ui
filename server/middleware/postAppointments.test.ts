@@ -7,12 +7,25 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
 import { AppResponse } from '../models/Locals'
-import { AppointmentSession, AppointmentType, MasUserDetails } from '../models/Appointments'
+import { AppointmentRequestBody, AppointmentSession, AppointmentType, MasUserDetails } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import config from '../config'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 import FlagService from '../services/flagService'
 import { FeatureFlags } from '../data/model/featureFlags'
+import { SentencePlan } from '../models/Risk'
+import { RiskScoresDto, RiskSummary } from '../data/model/risk'
+import {
+  PersonalContact,
+  Name,
+  Circumstances,
+  Disabilities,
+  Provisions,
+  AddressType,
+  Document,
+} from '../data/model/personalDetails'
+import { Contact } from '../data/model/professionalContact'
+import { TierCalculation } from '../data/tierApiClient'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -201,7 +214,7 @@ describe('/middleware/postAppointments', () => {
     )
 
   it('should post the correct request body', async () => {
-    const expectedBody = {
+    const expectedBody: AppointmentRequestBody = {
       user: {
         username,
         locationCode,
@@ -233,7 +246,7 @@ describe('/middleware/postAppointments', () => {
       eventId: 'PERSON_LEVEL_CONTACT',
     }
     const mockReq = createMockReq(appointment)
-    const expectedBody = {
+    const expectedBody: AppointmentRequestBody = {
       user: {
         username,
         locationCode,
@@ -246,6 +259,40 @@ describe('/middleware/postAppointments', () => {
       numberOfAppointments: parseInt(repeatCount, 10),
       createOverlappingAppointment: true,
       requirementId: 1,
+      licenceConditionId: parseInt(licenceConditionId, 10),
+      uuid: id,
+      until: dateTime('2025-03-19', endTime),
+      notes: 'Some notes',
+      sensitive: true,
+      visorReport: false,
+    }
+    await postAppointments(hmppsAuthClient)(mockReq, res, nextSpy)
+    expect(spy).toHaveBeenCalledWith(crn, expectedBody)
+  })
+
+  it('should set the locationCode as null if no location required', async () => {
+    const appointment = {
+      ...mockAppointment,
+      user: {
+        ...mockAppointment.user,
+        locationCode: 'NO_LOCATION_REQUIRED',
+      },
+    }
+    const mockReq = createMockReq(appointment)
+    const expectedBody: AppointmentRequestBody = {
+      user: {
+        username,
+        locationCode: null,
+        teamCode,
+      },
+      type,
+      start: dateTime(date, startTime),
+      end: dateTime(date, endTime),
+      interval,
+      numberOfAppointments: parseInt(repeatCount, 10),
+      createOverlappingAppointment: true,
+      requirementId: 1,
+      eventId: parseInt(eventId, 10),
       licenceConditionId: parseInt(licenceConditionId, 10),
       uuid: id,
       until: dateTime('2025-03-19', endTime),
@@ -330,8 +377,30 @@ describe('/middleware/postAppointments', () => {
     const localReq = createMockReq(mockAppointment)
     // Provide name for subject building
     localReq.session.data.personalDetails = {
-      [crn]: { name: { forename: 'John', middleName: '', surname: 'Doe' } },
-    } as any
+      [crn]: {
+        overview: {
+          name: { forename: 'John', middleName: '', surname: 'Doe' },
+          crn,
+          contacts: [] as PersonalContact[],
+          otherAddressCount: 0,
+          previousAddressCount: 0,
+          preferredGender: 'male',
+          dateOfBirth: '1979-08-18',
+          aliases: [] as Name[],
+          circumstances: {} as Circumstances,
+          disabilities: {} as Disabilities,
+          provisions: {} as Provisions,
+          sex: 'male',
+          documents: [] as Document[],
+          addressTypes: [] as AddressType[],
+          staffContacts: [] as Contact[],
+        },
+        sentencePlan: {} as SentencePlan,
+        risks: {} as RiskSummary,
+        tierCalculation: {} as TierCalculation,
+        predictors: [] as RiskScoresDto[],
+      },
+    }
 
     const appointmentId = 555
     const externalReference = 'apt-ref-555'
@@ -344,6 +413,16 @@ describe('/middleware/postAppointments', () => {
     const outlookSpy = jest
       .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
       .mockResolvedValue({ id: 'evt-555', subject: 's', startDate: 'd1', endDate: 'd2', attendees: [] })
+
+    jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockResolvedValue({
+      userId: 1,
+      username: 'user.name',
+      firstName: 'John',
+      surname: 'Platt',
+      email: 'jplatt@example.com',
+      enabled: true,
+      roles: [],
+    } as MasUserDetails)
 
     await postAppointments(hmppsAuthClient)(localReq, res, nextSpy)
 

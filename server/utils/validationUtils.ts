@@ -62,6 +62,15 @@ export const isTodayOrLater = (args: any[]) => {
   return date.startOf('day') >= DateTime.now().startOf('day')
 }
 
+export const isFutureDate = (args: any[]) => {
+  if (!args[0]) return false
+
+  const date = DateTime.fromFormat(args[0], 'd/M/yyyy', { zone: 'utc' })
+  if (!date.isValid) return false
+
+  const now = DateTime.utc().startOf('day')
+  return date.startOf('day') > now
+}
 export const timeIsNotEarlierThan = (args: any[]) => {
   if (!args[0]) {
     return true

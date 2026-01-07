@@ -3,6 +3,7 @@ import {
   contactPrefEmailCheck,
   contactPrefMobileCheck,
   isEmail,
+  isFutureDate,
   isNotEmpty,
   isValidDate,
   isValidDateFormat,
@@ -18,10 +19,11 @@ export interface ESupervisionValidationArgs {
   checkInEmail?: string
   editCheckInEmail?: string
   editCheckInMobile?: string
+  change?: string
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile } = args
+  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
@@ -41,6 +43,11 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           msg: 'Enter a date in the correct format, for example 17/5/2024',
           log: 'Checkin date is not valid',
         },
+        {
+          validator: isFutureDate,
+          msg: 'Checkin date must be in the future',
+          log: 'Checkin date must be in the future',
+        },
       ],
     },
     [`[esupervision][${crn}][${id}][checkins][interval]`]: {
@@ -54,7 +61,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][checkins][preferredComs]`]: {
-      optional: page !== 'contact-preference',
+      optional: page !== 'contact-preference' || change !== 'main',
       checks: [
         {
           validator: isNotEmpty,
@@ -145,6 +152,11 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           validator: isValidDate,
           msg: 'Enter a date in the correct format, for example 17/5/2024',
           log: 'Checkin date is not valid',
+        },
+        {
+          validator: isFutureDate,
+          msg: 'Checkin date must be in the future',
+          log: 'Checkin date must be in the future',
         },
       ],
     },

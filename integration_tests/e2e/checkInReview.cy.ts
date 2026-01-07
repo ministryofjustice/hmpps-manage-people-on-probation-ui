@@ -6,9 +6,11 @@ import CheckInReviewExpiredPage from '../pages/check-ins/review/expired.page'
 import CheckInReviewIdentityPage from '../pages/check-ins/review/identity.page'
 import CheckInReviewNotesPage from '../pages/check-ins/review/notes.page'
 import CheckInVideoPage from '../pages/check-ins/video.page'
+import ViewExpiredCheckInPage from '../pages/check-ins/view-expired.page'
 
 const crn = 'X000001'
 const expiredId = '5fa85f64-5717-4562-b3fc-2c963f66afa6'
+const expiredSubmittedId = '7fa85f64-5717-4562-b3fc-2c963f66afa6'
 const submittedId = '6fa85f64-5717-4562-b3fc-2c963f66afa6'
 const reviewedId = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
 
@@ -46,6 +48,14 @@ context('check in reviews', () => {
   it('Review page for expired check in', () => {
     cy.visit(`/case/${crn}/appointments/${expiredId}/check-in/update`)
     const page = Page.verifyOnPage(CheckInReviewExpiredPage)
+
+    page.getBackLink().click()
+    Page.verifyOnPage(ActivityLogPage)
+  })
+
+  it('View page for expired check in that has been reviewed', () => {
+    cy.visit(`/case/${crn}/appointments/${expiredSubmittedId}/check-in/update`)
+    const page = Page.verifyOnPage(ViewExpiredCheckInPage)
 
     page.getBackLink().click()
     Page.verifyOnPage(ActivityLogPage)
