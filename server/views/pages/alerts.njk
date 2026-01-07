@@ -106,7 +106,7 @@
                 {
                     html: predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }),
                     attributes: {"data-qa": "alertRisk" }
-                } if flags.enableRiskOnAlertsDashboard === true,
+                },
                 {
                     html: alertActivity,
                     attributes: { "data-qa":"alertActivity" },
@@ -169,7 +169,7 @@
                                 text: "Risk",
                                 classes: "vertical-align--middle govuk-action--bottom",
                                 attributes: { 'data-qa': "riskHeader" }
-                            } if flags.enableRiskOnAlertsDashboard === true,
+                            },
                             {
                                 text: "Activity",
                                 classes: "vertical-align--middle govuk-action--bottom",
