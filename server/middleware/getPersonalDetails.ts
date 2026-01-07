@@ -21,7 +21,7 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     let tierCalculation: TierCalculation
     let predictors: ErrorSummary | RiskScoresDto[]
     let userCaseload: UserCaseload
-    if (!req?.session?.data?.personalDetails?.[crn]) {
+    if (!req?.session?.data?.personalDetails?.[crn] || process.env.NODE_ENV === 'development') {
       const { username } = res.locals.user
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
