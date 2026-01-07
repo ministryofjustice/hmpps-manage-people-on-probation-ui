@@ -147,15 +147,12 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      let cyaQuery = ''
-      if (req.query?.cya === 'true') {
-        cyaQuery = '&cya=true'
-      }
+      const cyaQuery = req.query?.cya === 'true' ? '&cya=true' : ''
       const { change } = req.body
-      let redirectUrl = `/case/${crn}/appointments/${id}/check-in/edit-contact-preference?change=${change}${cyaQuery}`
-      if (change === 'main') {
-        redirectUrl = `/case/${crn}/appointments/${id}/check-in/photo-options`
-      }
+      const redirectUrl =
+        change === 'main'
+          ? `/case/${crn}/appointments/${id}/check-in/photo-options`
+          : `/case/${crn}/appointments/${id}/check-in/edit-contact-preference?change=${change}${cyaQuery}`
 
       return res.redirect(redirectUrl)
     }

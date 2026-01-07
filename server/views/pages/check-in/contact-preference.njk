@@ -6,8 +6,8 @@
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
 {% set cyaLink =  "?cya=true" if cya else  "" %}
-{% set mobileValue = checkInMobile if checkInMobile else 'No mobile number' %}
-{% set emailValue = checkInEmail if checkInEmail else 'No email address' %}
+{% set mobileValue = checkInMobile | default('No mobile number') %}
+{% set emailValue = checkInEmail | default('No email address') %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
