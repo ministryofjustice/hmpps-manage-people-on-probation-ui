@@ -27,7 +27,7 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe }}</dd>
+                <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe if checkIn.furtherActions else 'None' }}</dd>
             </div>
             {% if checkIn.notes %}
             <div class="govuk-summary-list__row">
