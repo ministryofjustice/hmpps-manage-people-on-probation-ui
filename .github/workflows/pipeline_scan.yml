@@ -92,7 +92,7 @@ jobs:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: download assets artifact
         if: inputs.veracode_package_artifact_name != ''
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v7
         with:
           name: ${{ inputs.veracode_package_artifact_name }}
       - name: "Download/Extract pipeline scanner"
