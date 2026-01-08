@@ -10,6 +10,5 @@ export class FeatureFlags {
   enableSanIndicator?: boolean = undefined
   enableProbFEComponent?: boolean = undefined
   enableESuperVision?: boolean = undefined
-  enableRiskOnAlertsDashboard?: boolean = undefined
   enablePastAppointments?: boolean = undefined
 }
