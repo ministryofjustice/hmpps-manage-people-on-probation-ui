@@ -142,18 +142,8 @@ const documentController: Controller<typeof routes, void> = {
       }
       sortBy = textSearchRequest.query && !req.query.sortBy ? null : sortBy
 
-      const filenameRequest: SearchDocumentsRequest = {
-        name: req.session?.documentFilters?.fileName ?? null,
-        dateFrom: !errors.dateFrom ? toIsoDateTimeFromPicker(req.session?.documentFilters?.dateFrom) : null,
-        dateTo: !errors.dateTo ? toIsoDateTimeFromPicker(req.session?.documentFilters?.dateTo) : null,
-      }
-
-      const textSearchEnabled = res.locals.flags.enableDocumentTextSearch === true
-
       const [documents, tierCalculation, risks, predictors] = await Promise.all([
-        textSearchEnabled
-          ? masClient.textSearchDocuments(crn, (pageNum - 1).toString(), textSearchRequest, sortBy)
-          : masClient.searchDocuments(crn, (pageNum - 1).toString(), sortBy, filenameRequest),
+        masClient.textSearchDocuments(crn, (pageNum - 1).toString(), textSearchRequest, sortBy),
         tierClient.getCalculationDetails(crn),
         arnsClient.getRisks(crn),
         arnsClient.getPredictorsAll(crn),
@@ -173,9 +163,7 @@ const documentController: Controller<typeof routes, void> = {
         documents?.pageSize || 15,
       )
 
-      if (textSearchEnabled) {
-        req.session.documentLevels = documents.metadata.documentLevels
-      }
+      req.session.documentLevels = documents.metadata.documentLevels
 
       return res.render('pages/documents', {
         documents: docsHighlightedFilename,

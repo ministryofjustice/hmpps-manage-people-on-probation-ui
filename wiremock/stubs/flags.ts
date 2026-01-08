@@ -13,17 +13,6 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
       },
       flags: [
         {
-          key: 'enableDocumentTextSearch',
-          name: 'enableDocumentTextSearch',
-          description: '',
-          enabled: true,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as any,
-          rollouts: [] as any,
-        },
-        {
           key: 'enableRepeatAppointments',
           name: 'enableRepeatAppointments',
           description: '',
@@ -31,12 +20,23 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
+          rules: [] as any,
+          rollouts: [] as any,
         },
         {
           key: 'enableAppointmentCreate',
           name: 'enableAppointmentCreate',
+          description: '',
+          enabled: true,
+          type: 'BOOLEAN_FLAG_TYPE',
+          createdAt: '2025-01-13T15:28:37.920581Z',
+          updatedAt: '2025-01-13T17:06:39.269084Z',
+          rules: [],
+          rollouts: [],
+        },
+        {
+          key: 'enableOutlookEvent',
+          name: 'enableOutlookEvent',
           description: '',
           enabled: true,
           type: 'BOOLEAN_FLAG_TYPE',
@@ -86,49 +86,6 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
   },
 })
 
-const stubTextSearchOff = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          {
-            key: 'enableDocumentTextSearch',
-            name: 'enableDocumentTextSearch',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableAppointmentCreate',
-            name: 'enableAppointmentCreate',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
 const stubRepeats = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -142,17 +99,6 @@ const stubRepeats = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
-          {
-            key: 'enableDocumentTextSearch',
-            name: 'enableDocumentTextSearch',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
           {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
@@ -208,17 +154,6 @@ const stubNoRepeats = (): SuperAgentRequest =>
         },
         flags: [
           {
-            key: 'enableDocumentTextSearch',
-            name: 'enableDocumentTextSearch',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
             description: '',
@@ -232,6 +167,17 @@ const stubNoRepeats = (): SuperAgentRequest =>
           {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2025-01-13T15:28:37.920581Z',
+            updatedAt: '2025-01-13T17:06:39.269084Z',
+            rules: [],
+            rollouts: [],
+          },
+          {
+            key: 'enableOutlookEvent',
+            name: 'enableOutlookEvent',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -273,17 +219,6 @@ const stubNoDeleteAppointmentFiles = (): SuperAgentRequest =>
         },
         flags: [
           {
-            key: 'enableDocumentTextSearch',
-            name: 'enableDocumentTextSearch',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
             description: '',
@@ -297,6 +232,17 @@ const stubNoDeleteAppointmentFiles = (): SuperAgentRequest =>
           {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2025-01-13T15:28:37.920581Z',
+            updatedAt: '2025-01-13T17:06:39.269084Z',
+            rules: [],
+            rollouts: [],
+          },
+          {
+            key: 'enableOutlookEvent',
+            name: 'enableOutlookEvent',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -346,17 +292,6 @@ const stubEnableESuperVision = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
-          {
-            key: 'enableDocumentTextSearch',
-            name: 'enableDocumentTextSearch',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
           {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
@@ -423,17 +358,6 @@ const stubDisablePastAppointments = (): SuperAgentRequest =>
         },
         flags: [
           {
-            key: 'enableDocumentTextSearch',
-            name: 'enableDocumentTextSearch',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
             description: '',
@@ -497,7 +421,6 @@ const stubDisablePastAppointments = (): SuperAgentRequest =>
   })
 
 export default {
-  stubTextSearchOff,
   stubNoRepeats,
   stubRepeats,
   stubNoDeleteAppointmentFiles,
