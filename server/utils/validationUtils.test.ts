@@ -716,6 +716,7 @@ describe('validates checkin contact type preference', () => {
     page: 'contact-preference',
     checkInMobile: '',
     checkInEmail: '',
+    change: 'main',
   }
   const spec = eSuperVisionValidation(args)
   it('should return the correct validation errors', () => {

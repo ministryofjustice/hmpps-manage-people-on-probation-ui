@@ -147,7 +147,14 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/photo-options`)
+      const cyaQuery = req.query?.cya === 'true' ? '&cya=true' : ''
+      const { change } = req.body
+      const redirectUrl =
+        change === 'main'
+          ? `/case/${crn}/appointments/${id}/check-in/photo-options`
+          : `/case/${crn}/appointments/${id}/check-in/edit-contact-preference?change=${change}${cyaQuery}`
+
+      return res.redirect(redirectUrl)
     }
   },
 
@@ -164,11 +171,12 @@ const checkInsController: Controller<typeof routes, void> = {
   getEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
 
-      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id })
+      return res.render('pages/check-in/edit-contact-preference.njk', { crn, id, change })
     }
   },
 
@@ -192,7 +200,7 @@ const checkInsController: Controller<typeof routes, void> = {
         cyaQuery = '?cya=true'
       }
       const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
-      // Save to show success message on contact preferences page
+      // Save to show the success message on the contact preferences page
       if (personalDetails?.crn) {
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'], true)
       }
@@ -312,6 +320,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { back } = req.query
+      const { url } = req
 
       const { data } = req.session
       const checkIn = getDataValue(data, ['esupervision', crn, id, 'checkins'])
@@ -329,7 +338,9 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       await eSupervisionClient.postOffenderCheckInNote(id, notes)
 
-      return res.redirect(`/case/${crn}/activity-log`)
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'note'], null)
+
+      return res.redirect(url)
     }
   },
 
@@ -695,19 +706,6 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 }
-
-export const redirectWizard = (url: string): Route<Promise<void>> => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { crn, id } = req.params
-    let redirectUrl = url
-    if (req.query.cya === 'true') {
-      redirectUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
-      return res.redirect(redirectUrl)
-    }
-    return next()
-  }
-}
-
 export const getMinDate = (): string => {
   const today = new Date()
   // setting temporary fix for minDate

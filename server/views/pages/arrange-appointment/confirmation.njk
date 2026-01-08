@@ -71,9 +71,7 @@
             {% else %}
                 <p class="govuk-!-margin-bottom-0">The appointment has been added to:</p>
                 <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
-                    {% if flags.enableOutlookEvent === true %}
                     <li>{{ attendingName }} calendar</li>
-                    {% endif %}
                     <li>the NDelius contact log and officer diary, along with any supporting information</li>
                 </ul>
         {% endif %}
