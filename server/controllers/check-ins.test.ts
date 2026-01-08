@@ -11,7 +11,7 @@ import logger from '../../logger'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { ESupervisionCheckIn } from '../data/model/esupervision'
+import { CheckinScheduleResponse, ESupervisionCheckIn } from '../data/model/esupervision'
 
 jest.mock('../../logger', () => ({
   info: jest.fn(),
@@ -82,6 +82,10 @@ const getPersonalDetailsSpy = jest
 const updatePersonalDetailsSpy = jest
   .spyOn(MasApiClient.prototype, 'updatePersonalDetailsContact')
   .mockImplementation(() => Promise.resolve({ crn } as PersonalDetails))
+
+const postDeactivateOffender = jest
+  .spyOn(ESupervisionClient.prototype, 'postDeactivateOffender')
+  .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
 
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
@@ -1738,6 +1742,95 @@ describe('checkInsController', () => {
       )
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/contact`)
+    })
+  })
+
+  describe('getStopCheckinPage', () => {
+    it('renders stop-check in page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+      })
+
+      await controllers.checkIns.getStopCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalled()
+      const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
+      expect(template).toBe('pages/check-in/manage/stop-checkin.njk')
+      expect(context.crn).toBe(crn)
+      expect(context.id).toBe(uuid)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getStopCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('returns 404 when id is not a valid UUID', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getStopCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+
+  describe('postManageStopCheckin', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+
+      await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('redirects to manage page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
+    })
+
+    it('updates MAS when values changed, sets flags and redirects', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data: any = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                stopCheckin: 'YES',
+                reason: 'Reason for stopping check in',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      await controllers.checkIns.postManageStopCheckin(hmppsAuthClient)(req, res)
+
+      expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')
+      expect(postDeactivateOffender).toHaveBeenCalledWith(uuid, {
+        requestedBy: 'testuser',
+        reason: 'Reason for stopping check in',
+      })
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
     })
   })
 })

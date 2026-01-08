@@ -4,6 +4,7 @@ import RestClient from './restClient'
 import {
   CheckinScheduleRequest,
   CheckinScheduleResponse,
+  DeactivateOffenderRequest,
   ESupervisionCheckIn,
   ESupervisionNote,
   ESupervisionReview,
@@ -12,6 +13,7 @@ import {
   OffenderInfo,
   OffenderSetup,
   OffenderSetupCompleteResponse,
+  ReactivateOffenderRequest,
 } from './model/esupervision'
 
 export default class ESupervisionClient extends RestClient {
@@ -81,6 +83,26 @@ export default class ESupervisionClient extends RestClient {
     return this.post({
       path: `/v2/offenders/${uuid}/update_details`,
       data: checkinScheduleRequest,
+    })
+  }
+
+  async postDeactivateOffender(
+    uuid: string,
+    deactivateOffenderRequest: DeactivateOffenderRequest,
+  ): Promise<CheckinScheduleResponse> {
+    return this.post({
+      path: `/v2/offenders/${uuid}/deactivate`,
+      data: deactivateOffenderRequest,
+    })
+  }
+
+  async postReactivateOffender(
+    uuid: string,
+    reactivateOffenderRequest: ReactivateOffenderRequest,
+  ): Promise<CheckinScheduleResponse> {
+    return this.post({
+      path: `/v2/offenders/${uuid}/reactivate`,
+      data: reactivateOffenderRequest,
     })
   }
 }

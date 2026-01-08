@@ -195,7 +195,7 @@
   {% set checkin %}
   {% set nextCheckin = offenderCheckinsByCRNResponse %}
   {% set nextCheckinText %}
-  {% if nextCheckin %}
+  {% if nextCheckin.status === 'VERIFIED' or nextCheckin.status === 'INITIAL' %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -212,7 +212,8 @@
                     }
                    ]
             }) }}
-  {% else %}
+  {% endif %}
+  {% if not nextCheckin %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -221,6 +222,16 @@
                     }
                 ]
             }) }}
+  {% endif %}
+  {% if nextCheckin.status === 'INACTIVE' %}
+      {{ govukSummaryList({
+          rows: [
+              {
+                  key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
+                  value: { html: '<span data-qa="checkinDueValue">Check ins stopped</span>'}
+              }
+          ]
+      }) }}
   {% endif %}
   {% endset %}
   {% endset %}

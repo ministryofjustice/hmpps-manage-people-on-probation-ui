@@ -1,11 +1,16 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
-import { Controller, Route } from '../@types'
-import { dayOfWeek, getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { Controller } from '../@types'
+import { dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
-import { CheckinScheduleRequest, ESupervisionNote, ESupervisionReview } from '../data/model/esupervision'
+import {
+  CheckinScheduleRequest,
+  DeactivateOffenderRequest,
+  ESupervisionNote,
+  ESupervisionReview,
+} from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
@@ -50,6 +55,8 @@ const routes = [
   'postManageContactPage',
   'getManageEditContactPage',
   'postManageEditContactPage',
+  'postManageStopCheckin',
+  'getStopCheckinPage',
 ] as const
 
 interface OptionPair {
@@ -680,7 +687,36 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/contact`)
     }
   },
+  getStopCheckinPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
+    }
+  },
+  postManageStopCheckin: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const stopCheckinVal = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
+      if (stopCheckinVal === 'YES') {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupervisionClient = new ESupervisionClient(token)
+        const body: DeactivateOffenderRequest = {
+          requestedBy: res.locals.user.username,
+          reason: handleQuotes(getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'reason'])),
+        }
+        res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+    }
+  },
 }
+
 export const getMinDate = (): string => {
   const today = new Date()
   // setting temporary fix for minDate

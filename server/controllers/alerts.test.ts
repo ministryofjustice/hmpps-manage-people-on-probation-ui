@@ -202,8 +202,8 @@ describe('alertsController', () => {
     })
 
     describe('risks on alerts feature flag is enabled', () => {
+      const res = mockAppResponse()
       const req = httpMocks.createRequest({ query: {}, url })
-      const res = mockAppResponse({ flags: { enableRiskOnAlertsDashboard: true } })
       const renderSpy = jest.spyOn(res, 'render')
       it('should render the alerts page when risks api request returns a 500 error', async () => {
         const errorResponse = { status: 500, statusCode: 500, errors: [{ text: apiErrors.risks }] }
@@ -298,32 +298,13 @@ describe('alertsController', () => {
         })
       })
     })
-
-    describe('risks on alerts feature flag is disabled', () => {
-      const req = httpMocks.createRequest({ query: {}, url })
-      const res = mockAppResponse({ flags: { enableRiskOnAlertsDashboard: false } })
-      const renderSpy = jest.spyOn(res, 'render')
-      it('should not request the risks from the api', async () => {
-        await controllers.alerts.getAlerts(hmppsAuthClient)(req, res)
-        expect(getRisksSpy).not.toHaveBeenCalled()
-        expect(renderSpy).toHaveBeenCalledWith('pages/alerts', {
-          url: encodeURIComponent(url),
-          alertsData: mockUserAlertsWithCrn,
-          crnToRiskWidgetMap: {},
-          risksErrors: [],
-          sortedBy: 'date_and_time.desc',
-          pagination: defaultPagination,
-          note: false,
-        })
-      })
-    })
   })
 
   describe('getAlertNote', () => {
     const req = httpMocks.createRequest({ query: {}, url, contactId: 0, noteId: 0 })
 
     describe('risks on alerts feature flag is enabled', () => {
-      const res = mockAppResponse({ flags: { enableRiskOnAlertsDashboard: true } })
+      const res = mockAppResponse()
       const renderSpy = jest.spyOn(res, 'render')
       it('should render an alert note page', async () => {
         await controllers.alerts.getAlertNote(hmppsAuthClient)(req, res)

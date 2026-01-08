@@ -10,11 +10,7 @@ export const getCheckinOffenderDetails = (hmppsAuthClient: HmppsAuthClient): Rou
     if (enableESuperVision) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupervisionClient = new ESupervisionClient(token)
-      const offenderCheckinsByCRNResponse: OffenderCheckinsByCRNResponse =
-        await eSupervisionClient.getOffenderCheckinsByCRN(crn)
-      if (offenderCheckinsByCRNResponse?.status === 'VERIFIED') {
-        res.locals.offenderCheckinsByCRNResponse = offenderCheckinsByCRNResponse
-      }
+      res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.getOffenderCheckinsByCRN(crn)
     }
     return next()
   }

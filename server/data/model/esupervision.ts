@@ -1,3 +1,5 @@
+import { Note } from './note'
+
 type Match = 'MATCH' | 'NO_MATCH'
 
 export interface ESupervisionCheckIn {
@@ -20,11 +22,12 @@ export interface ESupervisionCheckIn {
   flaggedResponses: string[]
   furtherActions?: string
   missedCheckinComment?: string
+  notes?: Note[]
+  checkinLogs: ESupervisionCheckInLogs
 }
 
 export interface ESupervisionLog {
-  comment: string
-  offender: string
+  notes: string
   createdAt: string
   uuid: string
   practitioner: string
@@ -34,17 +37,16 @@ export interface ESupervisionLog {
     | 'OFFENDER_CHECKIN_NOT_SUBMITTED'
     | 'OFFENDER_CHECKIN_RESCHEDULED'
     | 'OFFENDER_CHECKIN_OUTSIDE_ACCESS'
+    | 'OFFENDER_CHECKIN_REVIEW_SUBMITTED'
+    | 'OFFENDER_CHECKIN_ANNOTATED'
+    | 'OFFENDER_CHECKIN_RESCHEDULED'
+    | 'OFFENDER_CHECKIN_OUTSIDE_ACCESS'
   checkin: string
 }
 
 export interface ESupervisionCheckInLogs {
   hint: string
   logs: ESupervisionLog[]
-}
-
-export interface ESupervisionCheckInResponse {
-  checkin: ESupervisionCheckIn
-  checkinLogs: ESupervisionCheckInLogs
 }
 
 export interface ESupervisionReview {
@@ -155,6 +157,15 @@ export interface CheckinScheduleResponse {
   checkinInterval: CheckInterval
   contactPreference: 'PHONE' | 'EMAIL'
   photoUrl: string
+}
+
+export interface DeactivateOffenderRequest {
+  requestedBy: string
+  reason: string
+}
+export interface ReactivateOffenderRequest {
+  requestedBy: string
+  reason: string
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
