@@ -42,19 +42,6 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
     controllers.appointments.postAddNote(hmppsAuthClient),
   )
 
-  /*  router.post(
-    '/case/:crn/appointments/reschedule/:contactId/:id',
-    upload.array('documents'),
-    autoStoreMultipartFormSessionData(hmppsAuthClient),
-    cacheUploadedFiles,
-    validate.appointments,
-    getAppointmentTypes(hmppsAuthClient),
-    getSentences(hmppsAuthClient),
-    getPersonAppointment(hmppsAuthClient),
-    constructNextAppointmentSession,
-    getUserProviders(hmppsAuthClient),
-    controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
-  ) */
   router.post(
     '/appointments/file/upload',
     upload.array('documents'),
