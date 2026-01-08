@@ -251,9 +251,12 @@ export const checkAppointmentSummary = (
 ) => {
   const appointmentFor =
     page instanceof RescheduleCheckYourAnswerPage ? 'Default Sentence Type (12 Months)' : '12 month Community order'
-  let attending = 'Peter Parker (PS - Other) (Automated Allocation Team, London)'
-  if (page instanceof ArrangeAnotherAppointmentPage || probationPractitioner) {
-    attending = 'Deborah Fern (Automated Allocation Team, London)'
+  let attending = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
+  if (
+    page instanceof ArrangeAnotherAppointmentPage ||
+    (!(page instanceof AppointmentCheckYourAnswersPage) && probationPractitioner)
+  ) {
+    attending = 'Peter Parker (PS-PSO) (Automated Allocation Team, London)'
   }
   if (page instanceof RescheduleCheckYourAnswerPage) {
     attending = 'Terry Jones (PS-PSO) (Automated Allocation Team, London)'
@@ -285,11 +288,11 @@ export const checkAppointmentSummary = (
         const normalizedText = text.replace(/\s+/g, ' ').trim()
         if (dateInPast) {
           expect(normalizedText).to.include(
-            `${dateWithYear(pastDate)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+            `${dateWithYear(pastDate)} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
           )
         } else {
           expect(normalizedText).to.include(
-            `${dateWithYear(date)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+            `${dateWithYear(date)} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
           )
         }
       })
@@ -299,20 +302,20 @@ export const checkAppointmentSummary = (
   }
 
   let index = 0
-  if (!(page instanceof AppointmentCheckYourAnswersPage)) {
-    index = repeatingEnabled || dateInPast ? 1 : 0
-    if (repeatingEnabled) {
-      page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
-      page
-        .getSummaryListRow(6)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
-    }
-    if (dateInPast) {
-      page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
-      page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
-    }
+  // if (!(page instanceof AppointmentCheckYourAnswersPage)) {
+  index = repeatingEnabled || dateInPast ? 1 : 0
+  if (repeatingEnabled) {
+    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
+    page
+      .getSummaryListRow(6)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
   }
+  if (dateInPast) {
+    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
+    page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
+  }
+  // }
 
   page
     .getSummaryListRow(6 + index)
@@ -419,7 +422,7 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           if (normalizedText) {
             expect(normalizedText).to.include(
-              `${dateWithYear(newDate.toISODate())} from ${to24HourTimeWithMinutes(changedStart)} to ${to24HourTimeWithMinutes(changedEnd)}`,
+              `${dateWithYear(newDate.toISODate())} at ${to24HourTimeWithMinutes(changedStart)} to ${to24HourTimeWithMinutes(changedEnd)}`,
             )
           }
         })
