@@ -114,20 +114,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
           nextContactCode: null,
         }
       }
-      // if (req.session?.sortBy) {
-      //   if (req.query.sortBy && req.query.sortBy !== req.session?.sortBy) {
-      //     req.session.sortBy = req.query.sortBy as string
-      //   }
-      // } else {
-      //   req.session.sortBy = req.query.sortBy ? (req.query.sortBy as string) : 'nextContact.asc'
-      // }
-      // if (req.session?.page) {
-      //   if (req.query.page && req.query.page !== req.session.page) {
-      //     req.session.page = req.query.page as string
-      //   }
-      // } else {
-      //   req.session.page = req.query.page as string
-      // }
       await caseloadController.showCaseload(hmppsAuthClient)(req, res, next, {
         filter: req.session.caseFilter,
       })
