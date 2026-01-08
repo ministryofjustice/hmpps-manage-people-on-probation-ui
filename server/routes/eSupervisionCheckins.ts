@@ -208,4 +208,15 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     validate.eSuperVision,
     controllers.checkIns.postManageEditContactPage(hmppsAuthClient),
   )
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/stop-checkin', [
+    controllers.checkIns.getStopCheckinPage(hmppsAuthClient),
+  ])
+
+  router.post(
+    '/case/:crn/appointments/check-in/manage/:id/stop-checkin',
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postManageStopCheckin(hmppsAuthClient),
+  )
 }

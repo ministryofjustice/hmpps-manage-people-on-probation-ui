@@ -19,6 +19,7 @@ import ManageCheckins from '../../pages/check-ins/manage-checkins'
 import ManageContactPage from '../../pages/check-ins/manage-contact'
 import ManageEditContactPage from '../../pages/check-ins/manage-edit-contact'
 import ChangeSettingsPage from '../../pages/check-ins/change-settings'
+import StopCheckins from '../../pages/check-ins/stop-checkins'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -711,5 +712,32 @@ context('check-ins overview and manage pages', () => {
     changeSettingsPage.getSubmitBtn().click()
     const appointmentsPage = new AppointmentsPage()
     appointmentsPage.checkOnPage()
+  })
+
+  it('should able to stop check in', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('stop-checkin-btn').click()
+    const stopCheckIn = new StopCheckins()
+    stopCheckIn
+      .getHeader()
+      .find('h1.govuk-fieldset__heading')
+      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
+    stopCheckIn.getSubmitBtn().click()
+    stopCheckIn.checkErrorSummaryBox(['Select yes if you want to stop check ins for the person'])
+    stopCheckIn.getElementData('stopCheckIn').find('input[type="radio"][value="YES"]').click()
+    stopCheckIn.getSubmitBtn().click()
+    stopCheckIn
+      .getHeader()
+      .find('h1.govuk-fieldset__heading')
+      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
+    stopCheckIn.getSubmitBtn().click()
+    stopCheckIn.checkErrorSummaryBox(['Enter the reason for stopping'])
+    stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
+    stopCheckIn.getSubmitBtn().click()
+    manageCheckins.checkOnPage()
   })
 })

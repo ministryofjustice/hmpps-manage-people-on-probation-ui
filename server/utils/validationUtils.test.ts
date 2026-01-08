@@ -267,7 +267,8 @@ describe('time which is not earlier than time', () => {
 
 describe('isFutureDate', () => {
   it.each([
-    [['2/2/2026'], true],
+    [['3/1/2036'], true],
+    [['2/2/2036'], true],
     [['2/1/2026'], false],
     [['17/5/2024'], false],
     [['1/1/2026'], false],
@@ -890,6 +891,70 @@ describe('validates manage checkin settings', () => {
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
     expect(loggerSpy).toHaveBeenCalledWith('Checkin date not entered')
+  })
+})
+
+describe('validates stop checkin', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          manageCheckin: { stopCheckin: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-manageCheckin-stopCheckin`]: 'Select yes if you want to stop check ins for the person',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'stop-checkin',
+    stopCheckIn: '',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Stop checkin, not selected')
+  })
+})
+
+describe('validates stop checkin reason', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          manageCheckin: { stopCheckin: 'YES', reason: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-manageCheckin-reason`]: 'Enter the reason for stopping',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'stop-checkin',
+    stopCheckIn: 'YES',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Stop checkin, reason not provided')
   })
 })
 

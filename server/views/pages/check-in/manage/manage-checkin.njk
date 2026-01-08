@@ -3,6 +3,7 @@
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
 {% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
 {% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/contact' %}
+{% set stopCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/stop-checkin' %}
 {% set photoLabel = "Photo of " + case.name.forename %}
 {% set photoUrl = offenderCheckinsByCRNResponse.photoUrl %}
 {% set backLink = '/case/' + crn %}
@@ -27,7 +28,17 @@
 {% endblock %}
 
 {% block pageContent %}
-   {% set checkin %}
+   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
+        <div class="moj-button-group__item">
+            <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
+        </div>
+    {% endif %}
+    {% if offenderCheckinsByCRNResponse.status === 'INACTIVE' %}
+        <div class="moj-button-group__item">
+            <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn" >Restart online check ins</a>
+        </div>
+    {% endif %}
+    {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
             {{ govukSummaryList({

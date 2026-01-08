@@ -3,7 +3,13 @@ import nock from 'nock'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
 import ESupervisionClient from './eSupervisionClient'
-import { ESupervisionCheckIn, ESupervisionNote, ESupervisionReview } from './model/esupervision'
+import {
+  ESupervisionCheckIn,
+  ESupervisionNote,
+  ESupervisionReview,
+  DeactivateOffenderRequest,
+  ReactivateOffenderRequest,
+} from './model/esupervision'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -307,6 +313,47 @@ describe('ESupervisionClient', () => {
         .reply(200, response)
 
       const output = await client.postOffenderCheckInNote(checkInUuid, notes)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postDeactivateOffender', () => {
+    it('should POST deactivate offender', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const body: DeactivateOffenderRequest = {
+        requestedBy: 'requestedBy',
+        reason: 'reason',
+      }
+
+      const response = {}
+
+      fakeESupervisionApi
+        .post(`/v2/offenders/${checkInUuid}/deactivate`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postDeactivateOffender(checkInUuid, body)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postReactivateOffender', () => {
+    it('should POST reactivate offender', async () => {
+      const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
+
+      const body: ReactivateOffenderRequest = {
+        requestedBy: 'requestedBy',
+        reason: 'reason',
+      }
+      const response = {}
+
+      fakeESupervisionApi
+        .post(`/v2/offenders/${checkInUuid}/reactivate`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postReactivateOffender(checkInUuid, body)
       expect(output).toEqual(response)
     })
   })
