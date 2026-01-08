@@ -631,7 +631,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
 
       if (req.url.includes('reschedule')) {
         appointmentType = 'RESCHEDULE'
-        // delete data.appointments[crn][id]
       }
 
       return res.render(`pages/arrange-appointment/confirmation`, {
