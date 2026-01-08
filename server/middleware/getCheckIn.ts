@@ -33,8 +33,6 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
         }
       }
     }
-    console.log(checkInResponse.checkinLogs.logs)
-
     res.locals.checkIn = checkInResponse
     return next()
   }
