@@ -4,7 +4,7 @@ import { HmppsAuthClient } from '../data'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { ESupervisionCheckIn, ESupervisionCheckInResponse } from '../data/model/esupervision'
+import { ESupervisionCheckIn } from '../data/model/esupervision'
 import { getCheckIn } from './getCheckIn'
 
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -60,6 +60,10 @@ const checkInResponseMock = {
   autoIdCheck: 'MATCH',
   manualIdCheck: 'MATCH',
   flaggedResponses: ['string'],
+  checkinLogs: {
+    hint: '',
+    logs: [],
+  },
 } as unknown as ESupervisionCheckIn
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
