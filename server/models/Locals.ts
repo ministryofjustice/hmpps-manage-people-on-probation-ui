@@ -39,6 +39,7 @@ export interface AppointmentLocals {
     name: string
     team: string
     region: string
+    html: string
   }
   location?: Location | string
   start?: string

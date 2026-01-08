@@ -7,6 +7,7 @@ import { AppointmentLocals } from '../models/Locals'
 import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -84,14 +85,37 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
+      const pp: ProbationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractioner'])
       const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
       const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
       const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
-      const selectedUser = convertToTitleCase(
+      let selectedUser = convertToTitleCase(
         staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
         [],
         regexIgnoreValuesInParentheses,
       )
+      console.log({ selectedUser })
+      if (!selectedUser) {
+        console.log('use name ref')
+        const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
+        if (name) {
+          const { forename: first, surname: last } = name
+          selectedUser = `${first} ${last}`
+        }
+      }
+      console.log({ selectedUser })
+
+      let attendingHtml = selectedUser
+      let teamRegionHtml = ''
+      if (selectedTeam) {
+        teamRegionHtml = selectedTeam
+      }
+      if (selectedRegion) {
+        teamRegionHtml = `${teamRegionHtml}, ${selectedRegion}`
+      }
+      if (teamRegionHtml) {
+        attendingHtml = `${attendingHtml} (${teamRegionHtml})`
+      }
 
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
@@ -118,6 +142,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           name: selectedUser,
           team: selectedTeam,
           region: selectedRegion,
+          html: attendingHtml,
         },
         location,
         date,
@@ -132,6 +157,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         outcomeRecorded: outcomeRecorded ?? null,
       }
     }
+    console.dir(appointment, { depth: null })
     res.locals.appointment = appointment
     return next()
   }

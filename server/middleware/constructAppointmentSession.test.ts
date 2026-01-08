@@ -4,6 +4,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { constructNextAppointmentSession } from './constructAppointmentSession'
 import { Activity, PersonAppointment } from '../data/model/schedule'
 import { mockAppResponse } from '../controllers/mocks'
+import { Name } from '../data/model/personalDetails'
 
 const nextSpy = jest.fn()
 const mockTypes: AppointmentType[] = [
@@ -146,10 +147,10 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
   },
 })
 
-const expectedSession = (values: Record<string, string | number | Record<string, string>>) => {
+const expectedSession = (values: Record<string, string | number | Record<string, string | Name>>) => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
-  const { eventId, isVisor, startDateTime: date, endDateTime: end, isSensitive } = mockAppointment
+  const { eventId, isVisor, startDateTime: date, endDateTime: end } = mockAppointment
   return {
     user: {
       providerCode,
@@ -157,6 +158,7 @@ const expectedSession = (values: Record<string, string | number | Record<string,
       username: officerUserName,
       locationCode,
       staffCode: code,
+      name: { forename: 'Terry', surname: 'Jones' },
     },
     type: 'COAP',
     visorReport: isVisor ? 'Yes' : 'No',
@@ -255,6 +257,7 @@ describe('/middleware/constructAppointmentSession', () => {
           username: officerUserName,
           locationCode: 'NO_LOCATION_REQUIRED',
           staffCode: code,
+          name: { forename: 'Terry', surname: 'Jones' },
         },
         type: 'COPT',
       }),
@@ -275,7 +278,14 @@ describe('/middleware/constructAppointmentSession', () => {
     const { providerCode, teamCode, username: mockUsername, code } = mockAppointment.officer
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode, teamCode, username: mockUsername, locationCode: '', staffCode: code },
+        user: {
+          providerCode,
+          teamCode,
+          username: mockUsername,
+          locationCode: '',
+          staffCode: code,
+          name: { forename: 'Terry', surname: 'Jones' },
+        },
         type: '',
         eventId: '',
       }),
@@ -296,7 +306,14 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode, teamCode, username: mockUsername, locationCode: '', staffCode: code },
+        user: {
+          providerCode,
+          teamCode,
+          username: mockUsername,
+          locationCode: '',
+          staffCode: code,
+          name: { forename: 'Terry', surname: 'Jones' },
+        },
         type: '',
         eventId: '49',
       }),
@@ -321,7 +338,13 @@ describe('/middleware/constructAppointmentSession', () => {
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
-        user: { providerCode: '', teamCode: '', username: '', locationCode: '', staffCode: '' },
+        user: {
+          providerCode: '',
+          teamCode: '',
+          username: '',
+          locationCode: '',
+          staffCode: '',
+        },
         eventId: '49',
         type: 'COAP',
       }),
@@ -418,7 +441,14 @@ describe('/middleware/constructAppointmentSession', () => {
       expectedSession({
         eventId: '',
         type: '',
-        user: { locationCode: '', providerCode, teamCode, username: mockUsername, staffCode: code },
+        user: {
+          locationCode: '',
+          providerCode,
+          teamCode,
+          username: mockUsername,
+          staffCode: code,
+          name: { forename: 'Terry', surname: 'Jones' },
+        },
       }),
     )
   })
@@ -436,7 +466,14 @@ describe('/middleware/constructAppointmentSession', () => {
     expect(res.locals.nextAppointmentSession).toStrictEqual(
       expectedSession({
         type: '',
-        user: { username: 'tony-pan', teamCode: 'N07CHT', providerCode: 'N07', locationCode: '', staffCode: '12345' },
+        user: {
+          username: 'tony-pan',
+          teamCode: 'N07CHT',
+          providerCode: 'N07',
+          locationCode: '',
+          staffCode: '12345',
+          name: { forename: 'Terry', surname: 'Jones' },
+        },
       }),
     )
   })

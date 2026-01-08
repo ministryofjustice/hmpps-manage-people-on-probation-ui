@@ -126,6 +126,9 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     if (appointment?.nsiId) {
       nextAppointment.nsiId = appointment.nsiId.toString()
     }
+    if (appointment?.officer?.name) {
+      nextAppointment.user.name = appointment.officer.name
+    }
   }
   res.locals.nextAppointmentSession = nextAppointment
   return next()
