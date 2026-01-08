@@ -1,3 +1,5 @@
+import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
+import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
@@ -65,20 +67,28 @@ const alertsController: Controller<typeof routes, void> = {
   getAlerts: hmppsAuthClient => {
     return async (req, res) => {
       const { user } = res.locals
-      const { page = '0' } = req.query as Record<string, string>
       const url = encodeURIComponent(req.url)
-      const queryString = req.url.split('?')[1]
+      const pageNum: number = req.query.page ? Number.parseInt(req.query.page as string, 10) : 1
 
-      const pageNumber = parseInt(page, 10)
+      const queryString = req.url.split('?')[1]
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const [sortName, sortDirection] = sortedBy.split('.')
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
       const alertsData: UserAlerts = await masClient.getUserAlerts(
-        pageNumber,
+        pageNum - 1,
         sortName.toUpperCase(),
         sortDirection as 'asc' | 'desc',
       )
+
+      const pagination: Pagination = getPaginationLinks(
+        req.query.page ? pageNum : 1,
+        alertsData?.totalPages || 0,
+        alertsData?.totalResults || 0,
+        page => addParameters(req, { page: page.toString() }),
+        alertsData?.size || 10,
+      )
+
       const arnsClient = new ArnsApiClient(token)
       const { crnToRiskWidgetMap, risksErrors } = await getCrnRiskMap(alertsData.content, arnsClient, res)
       res.render('pages/alerts', {
@@ -87,6 +97,7 @@ const alertsController: Controller<typeof routes, void> = {
         url,
         alertsData,
         crnToRiskWidgetMap,
+        pagination,
         sortedBy,
         risksErrors,
       })
