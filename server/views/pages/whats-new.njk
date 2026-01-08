@@ -10,115 +10,115 @@
 {% for technicalUpdate in technicalUpdates %}
     {% set content %}
 
-    {# Set a flag to track the very first paragraph of content for a section #}
-    {% set is_first_paragraph = true %}
+        {# Set a flag to track the very first paragraph of content for a section #}
+        {% set is_first_paragraph = true %}
 
-    {% for item in technicalUpdate.whatsNew %}
-        {% if item | isArray(item) %}
-            {#
+        {% for item in technicalUpdate.whatsNew %}
+            {% if item | isArray (item) %}
+                {#
                 If the item is an array, we assume it contains long strings that need formatting
                 into paragraphs and potentially embedded lists.
                 #}
-            {% for subItem in item %}
-                {# Split the subItem by double newline to create distinct paragraphs #}
-                {% set paragraphs = subItem.split('\n\n') %}
+                {% for subItem in item %}
+                    {# Split the subItem by double newline to create distinct paragraphs #}
+                    {% set paragraphs = subItem.split('\n\n') %}
 
-                {% for paragraph in paragraphs %}
-                    {% set paragraph_text = paragraph %}
+                    {% for paragraph in paragraphs %}
+                        {% set paragraph_text = paragraph %}
 
-                    {% set margin_class = "" %}
-                    {% if is_first_paragraph %}
-                        {% set margin_class = " govuk-!-margin-top-0" %}
-                    {% else %}
-                        {% set margin_class = " govuk-!-margin-top-4" %}
-                    {% endif %}
-
-                    {% if paragraph_text.includes(email_address) %}
-                        {% set paragraph_text = paragraph_text | replace(email_address, email_link) %}
-                    {% endif %}
-
-                    {% if paragraph_text.includes('\n') %}
-                        {% set lines = paragraph_text.split('\n') %}
-
-                        <p class="govuk-body{{ margin_class }}">{{ lines[0] | safe }}</p>
-
-                        {% set last_line_index = (lines | length) - 1 %}
-
-                        <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
-                            {% for line_index in range(1, last_line_index) %}
-                                <li>{{ lines[line_index] | safe }}</li>
-                            {% endfor %}
-                        </ul>
-
-                        {% if last_line_index > 0 %}
-                            <p class="govuk-body">{{ lines[last_line_index] | safe }}</p>
+                        {% set margin_class = "" %}
+                        {% if is_first_paragraph %}
+                            {% set margin_class = " govuk-!-margin-top-0" %}
+                        {% else %}
+                            {% set margin_class = " govuk-!-margin-top-4" %}
                         {% endif %}
-                    {% else %}
-                        <p class="govuk-body{{ margin_class }}">{{ paragraph_text | safe }}</p>
-                    {% endif %}
 
-                    {% set is_first_paragraph = false %}
+                        {% if paragraph_text.includes(email_address) %}
+                            {% set paragraph_text = paragraph_text | replace(email_address, email_link) %}
+                        {% endif %}
+
+                        {% if paragraph_text.includes('\n') %}
+                            {% set lines = paragraph_text.split('\n') %}
+
+                            <p class="govuk-body{{ margin_class }}">{{ lines[0] | safe }}</p>
+
+                            {% set last_line_index = (lines | length) - 1 %}
+
+                            <ul class="govuk-list govuk-list--bullet govuk-!-margin-bottom-4">
+                                {% for line_index in range(1, last_line_index) %}
+                                    <li>{{ lines[line_index] | safe }}</li>
+                                {% endfor %}
+                            </ul>
+
+                            {% if last_line_index > 0 %}
+                                <p class="govuk-body">{{ lines[last_line_index] | safe }}</p>
+                            {% endif %}
+                        {% else %}
+                            <p class="govuk-body{{ margin_class }}">{{ paragraph_text | safe }}</p>
+                        {% endif %}
+
+                        {% set is_first_paragraph = false %}
+                    {% endfor %}
                 {% endfor %}
-            {% endfor %}
             {%else%}
-            <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-0">{{ item }}</h3>
-            {% set is_first_paragraph = true %}
-        {% endif %}
+                <h3 class="govuk-heading-s govuk-!-margin-top-4 govuk-!-margin-bottom-0">{{ item }}</h3>
+                {% set is_first_paragraph = true %}
+            {% endif %}
         {% endfor%}
-        {% endset %}
+    {% endset %}
 
-        {% set sectionHeadingHtml %}
+    {% set sectionHeadingHtml %}
         {{ technicalUpdate.heading }}
         {% if technicalUpdate.summary %}
             <span class="govuk-body govuk-!-display-block govuk-!-margin-top-1 govuk-!-font-weight-regular">{{ technicalUpdate.summary }}</span>
         {% endif %}
-        {% endset %}
+    {% endset %}
 
-        {% set technicalUpdateItems = (technicalUpdateItems.push({
-            heading: {
-                html: sectionHeadingHtml
-            },
-            expanded: loop.first,
-            content: {
-                html: content
-            }
-        }), technicalUpdateItems) %}
-    {% endfor %}
+    {% set technicalUpdateItems = (technicalUpdateItems.push({
+        heading: {
+            html: sectionHeadingHtml
+        },
+        expanded: loop.first,
+        content: {
+            html: content
+        }
+    }), technicalUpdateItems) %}
+{% endfor %}
 
-    {% block beforeContent %}
-        {% if referrer %}
-            {{ govukBackLink({
+{% block beforeContent %}
+    {% if referrer %}
+        {{ govukBackLink({
             text: "Back",
             href: referrer
         }) }}
-        {% endif %}
-    {% endblock %}
+    {% endif %}
+{% endblock %}
 
-    {% block content %}
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-full">
-                <span class="govuk-caption-xl">Manage people on probation</span>
-                <h1 class="govuk-heading-xl govuk-!-margin-bottom-6" data-qa="pageHeading">What’s new</h1>
-            </div>
+{% block content %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <span class="govuk-caption-xl">Manage people on probation</span>
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-6" data-qa="pageHeading">What’s new</h1>
         </div>
+    </div>
 
-        <div class="govuk-grid-row">
-            <div class="govuk-grid-column-two-thirds">
-                <h3 class="govuk-heading-s">Welcome to our service updates</h3>
-                <p class="govuk-body">View highlights of what's new and what's improved for Manage people on probation.</p>
-                <p class="govuk-body govuk-!-margin-bottom-9">
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h3 class="govuk-heading-s">Welcome to our service updates</h3>
+            <p class="govuk-body">View highlights of what's new and what's improved for Manage people on probation.</p>
+            <p class="govuk-body govuk-!-margin-bottom-9">
                 If you have any feedback or questions on the service or any of these updates, email
                 <a href="mailto:mpop-digital-team@justice.gov.uk" class="govuk-link">mpop-digital-team@justice.gov.uk</a>.
             </p>
 
-                {{ govukAccordion({
+            {{ govukAccordion({
                 id: "accordion-default",
                 headingLevel: 2,
                 showAllSectionsText: 'Show all sections',
                 hideAllSectionsText: "Hide all sections",
                 items: technicalUpdateItems
             }) }}
-            </div>
         </div>
+    </div>
 
-    {% endblock %}
+{% endblock %}

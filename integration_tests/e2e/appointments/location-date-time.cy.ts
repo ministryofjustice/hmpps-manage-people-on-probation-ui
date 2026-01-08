@@ -550,6 +550,7 @@ describe('Pick a date, location and time for this appointment', () => {
       cyaPage.checkOnPage()
     })
   })
+
   describe('Past appointments feature flag disabled', () => {
     beforeEach(() => {
       cy.task('stubDisablePastAppointments')

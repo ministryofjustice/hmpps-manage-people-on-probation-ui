@@ -54,14 +54,12 @@
             {% set risksWidget = crnToRiskWidgetMap[alert.crn] %}
 
             {% set alertActivity %}
-            <p>
-                <a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
-                    {{ alert.type.description }}
-                </a>
-            </p>
+                <p><a href="/case/{{ alert.crn }}/activity/{{ alert.id }}?back={{ url }}" class="govuk-link--no-visited-state" data-qa="activityLink-{{ alert.id }}">
+                        {{ alert.type.description }}
+                    </a></p>
 
-            {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
-                {{ govukDetails({
+                {% if alert.description or alert.alertNotes.length > 0 or alert.alertNote %}
+                    {{ govukDetails({
                         summaryText: "More information",
                         classes: "govuk-!-margin-top-2 govuk-!-margin-bottom-4",
                         attributes: {
@@ -70,15 +68,15 @@
                         html: renderAlertDetails(alert),
                         open: note
                     }) }}
-            {% endif %}
+                {% endif %}
             {% endset %}
 
             {% if alert.type.editable %}
-                {% set deliusLinkType = 'UpdateContact' %}
-                {% set deliusLinkView = 'Update' %}
+              {% set deliusLinkType = 'UpdateContact' %}
+              {% set deliusLinkView = 'Update' %}
             {% else %}
-                {% set deliusLinkType = 'Contact' %}
-                {% set deliusLinkView = 'View' %}
+              {% set deliusLinkType = 'Contact' %}
+              {% set deliusLinkView = 'View' %}
             {% endif %}
 
             {% set alertUpdate %}
@@ -136,7 +134,7 @@
             {% endif %}
             {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
                 {% if not note %}
-                    <p class="govuk-body" data-qa="alertsCount">
+                <p class="govuk-body" data-qa="alertsCount">
                     Showing <b>{{ ((alertsData.page) * alertsData.size) + 1 }}</b> to <b>{{ ((alertsData.page) * alertsData.size) + alertsData.content.length }}</b> of <b>{{ alertsData.totalResults }}</b> results
                 </p>
                 {% endif %}
@@ -228,7 +226,7 @@
             {% if note.note %}
                 {% set notes = notes.concat(appNote(note, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
             {% endif %}
-        {% endfor %}
+        {% endfor  %}
         {% if alert.alertNote %}
             {% set notes = notes.concat(appNote(alert.alertNote, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
         {% endif %}

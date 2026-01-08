@@ -41,7 +41,6 @@ export default function multipartRoutes(router: Router, { hmppsAuthClient }: Ser
     validate.appointments,
     controllers.appointments.postAddNote(hmppsAuthClient),
   )
-
   router.post(
     '/appointments/file/upload',
     upload.array('documents'),

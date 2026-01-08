@@ -85,7 +85,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       }
       const providers: Provider[] = getDataValue(data, ['providers', loggedInUsername])
       const teams: Team[] = getDataValue(data, ['teams', loggedInUsername])
-      const pp: ProbationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractioner'])
       const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
       const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
       const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''

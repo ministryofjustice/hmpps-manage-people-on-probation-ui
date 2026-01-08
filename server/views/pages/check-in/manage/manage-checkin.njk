@@ -28,7 +28,7 @@
 {% endblock %}
 
 {% block pageContent %}
-    {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
+   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
         <div class="moj-button-group__item">
             <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
         </div>
@@ -41,7 +41,7 @@
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
-    {{ govukSummaryList({
+            {{ govukSummaryList({
                 rows: [
                     {
                         key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
@@ -72,7 +72,7 @@
     }) }}
 
     {% set contactDetailsText %}
-    {{ govukSummaryList({
+        {{ govukSummaryList({
             rows: [
                 {
                     key: { html: '<span data-qa="methodLabel">Method</span>'},
@@ -84,6 +84,8 @@
                 }
             ]
         }) }}
+
+
 
     {% endset %}
 
@@ -102,34 +104,34 @@
             ]
         }
     }) }}
-    {% set photoDisplayHtml %}
+  {% set photoDisplayHtml %}
     {% if photoUrl %}
         <img
                 src="{{ photoUrl }}"
                 class="es-profile-image es-profile-image--small"
                 alt="Image of {{ case.name.forename }} {{ case.name.surname }}"
-                crossorigin/>
+                crossorigin />
     {% else %}
         <span>No image available</span>
     {% endif %}
-    {% endset %}
+  {% endset %}
 
     {% set photoText %}
-    <dl class="govuk-summary-list">
+      <dl class="govuk-summary-list">
         <div class="govuk-summary-list__row">
-            <dt class="govuk-summary-list__key">
-                <span data-qa="photoLabel">{{ photoLabel }}</span></dt>
-            <dd class="govuk-summary-list__value">{{ photoDisplayHtml | safe }}</dd>
+          <dt class="govuk-summary-list__key"><span data-qa="photoLabel">{{ photoLabel }}</span></dt>
+          <dd class="govuk-summary-list__value">{{ photoDisplayHtml | safe }}</dd>
         </div>
-    </dl>
+      </dl>
     {% endset %}
 
-    {{ appSummaryCard({
+   {{ appSummaryCard({
         titleText: 'Photo',
         headingLevel: 3,
         classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
         attributes: {'data-qa': 'photoCard'},
         html: photoText
     }) }}
+
 
 {% endblock %}
