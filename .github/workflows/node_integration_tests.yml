@@ -19,11 +19,11 @@ jobs:
     steps:
     - uses: actions/checkout@v5
     - name: Use Node.js ${{ inputs.node_version_file }}
-      uses: actions/setup-node@v5
+      uses: actions/setup-node@v6
       with:
         node-version-file: ${{ inputs.node_version_file }}
     - name: download artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: npm_build_artifacts
     - name: restore cache
@@ -37,7 +37,7 @@ jobs:
           ~/.cache/Cypress
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
     - name: download the artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: npm_build_artifacts
         path: |
@@ -45,7 +45,7 @@ jobs:
           dist/
           assets/stylesheets/
     - name: download the test artifacts
-      uses: actions/download-artifact@v5
+      uses: actions/download-artifact@v7
       with:
         name: npm_unit_test_artifacts
         path: |
@@ -65,7 +65,7 @@ jobs:
         npm run coverage-report
     - name: upload the coverage test artifacts
       if: always()
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: coverage_artifacts
         path: coverage/

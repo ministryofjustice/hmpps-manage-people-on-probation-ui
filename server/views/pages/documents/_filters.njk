@@ -5,7 +5,6 @@
 
 {%- set filterHtml %}
 
-{% if flags.enableDocumentTextSearch === true %}
     {{ govukTextarea({
         id: 'query',
         name: 'query',
@@ -47,23 +46,7 @@
         items: documentLevelSelectItems
     })
     }}
-{% else %}
-    {{ govukInput({
-        id: 'fileName',
-        name: 'fileName',
-        label: {
-            text: 'File name',
-            classes: "govuk-label--s govuk-!-font-weight-bold"
-        },
-        formGroup: {
-            classes: "govuk-!-margin-bottom-3",
-            attributes: {
-                'data-qa': 'fileName'
-            }
-        },
-        value: filter.fileName
-    }) }}
-{% endif %}
+
 
 {{ mojDatePicker({
   id: "dateFrom",

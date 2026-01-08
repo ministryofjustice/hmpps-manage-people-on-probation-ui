@@ -6,7 +6,6 @@ context('Documents', () => {
     cy.task('resetMocks')
   })
   it('Documents page is rendered', () => {
-    cy.task('stubTextSearchOff')
     cy.visit('/case/X000001/documents')
     const page = Page.verifyOnPage(DocumentsPage)
 
@@ -42,14 +41,12 @@ context('Documents', () => {
   })
 
   it('Documents page is rendered with no results', () => {
-    cy.task('stubTextSearchOff')
     cy.visit('/case/X777916/documents')
     const page = Page.verifyOnPage(DocumentsPage)
     page.getElementData('noResults').should('contain.text', '0 search results found')
   })
 
   it('Documents filter handles dates', () => {
-    cy.task('stubTextSearchOff')
     cy.visit('/case/X000001/documents')
     const page = Page.verifyOnPage(DocumentsPage)
     // Date from entered without date to
@@ -93,37 +90,15 @@ context('Documents', () => {
     page.getDateToInput().should('be.empty')
   })
 
-  it('Documents filter handles file name only', () => {
-    cy.task('stubTextSearchOff')
-    cy.visit('/case/X000001/documents')
-    const page = Page.verifyOnPage(DocumentsPage)
-    page.getFileNameInput().type('testing')
-    page.getDateFromInput().type('1/4/2025')
-    page.getDateToInput().type('2/4/2025')
-    page.getApplyFiltersButton().click()
-    page.getSelectedFilterTag(1).first().should('contain.text', 'testing')
-    page.getSelectedFilterTag(1).last().should('contain.text', '1/4/2025 to 2/4/2025')
-    // Clear file name
-    page.getSelectedFilterTag(1).first().click()
-    page.getFileNameInput().should('be.empty')
-    page.getSelectedFilterTag(1).first().should('contain.text', '1/4/2025 to 2/4/2025')
-    page.getDateFromInput().should('have.value', '1/4/2025')
-    page.getDateToInput().should('have.value', '2/4/2025')
-  })
-
   it('Documents clear filters', () => {
-    cy.task('stubTextSearchOff')
     cy.visit('/case/X000001/documents')
     const page = Page.verifyOnPage(DocumentsPage)
-    page.getFileNameInput().type('testing')
     page.getDateFromInput().type('1/4/2025')
     page.getDateToInput().type('2/4/2025')
     page.getApplyFiltersButton().click()
-    page.getSelectedFilterTag(1).should('contain.text', 'testing')
     page.getSelectedFilterTag(1).should('contain.text', '1/4/2025 to 2/4/2025')
     page.getClearAllLink('X000001').click()
     page.getSelectedFilterTag(1).should('not.exist')
-    page.getFileNameInput().should('be.empty')
     page.getDateFromInput().should('be.empty')
     page.getDateToInput().should('be.empty')
   })

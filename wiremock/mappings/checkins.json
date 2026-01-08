@@ -51,7 +51,36 @@
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
           "manualIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": [
+              {
+                "createdAt": "2026-01-07T12:06:44.154Z",
+                "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "practitioner": "string",
+                "logEntryType": "OFFENDER_CHECKIN_REVIEW_SUBMITTED",
+                "notes": "Meet again",
+                "checkin": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              },
+              {
+                "createdAt": "2026-01-07T12:06:44.154Z",
+                "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "practitioner": "string",
+                "logEntryType": "OFFENDER_CHECKIN_ANNOTATED",
+                "notes": "Note 1",
+                "checkin": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              },
+              {
+                "createdAt": "2026-01-07T12:06:44.154Z",
+                "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "practitioner": "string",
+                "logEntryType": "OFFENDER_CHECKIN_ANNOTATED",
+                "notes": "Note 2",
+                "checkin": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              }
+            ]
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -100,7 +129,11 @@
           "surveyResponse": {},
           "createdBy": "string",
           "createdAt": "2025-11-27T15:40:42.399Z",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -151,7 +184,20 @@
           "createdAt": "2025-11-27T15:40:42.399Z",
           "flaggedResponses": ["string"],
           "missedCheckinComment": "comment",
-          "reviewedAt": "2025-11-27T15:40:42.399Z"
+          "reviewedAt": "2025-11-27T15:40:42.399Z",
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": [
+              {
+                "createdAt": "2026-01-07T12:06:44.154Z",
+                "uuid": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+                "practitioner": "string",
+                "logEntryType": "OFFENDER_CHECKIN_NOT_SUBMITTED",
+                "notes": "Lazy",
+                "checkin": "3fa85f64-5717-4562-b3fc-2c963f66afa6"
+              }
+            ]
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -208,7 +254,11 @@
           "videoUrl": "string",
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -266,7 +316,11 @@
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
           "manualIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -324,7 +378,11 @@
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
           "manualIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"

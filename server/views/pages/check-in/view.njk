@@ -1,9 +1,16 @@
 {% extends "../_form.njk" %}
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
+{% from "govuk/components/details/macro.njk" import govukDetails %}
+{% from "_components/note/macro.njk" import appNote %}
 
 {% set title = "Online check in submitted and reviewed" %}
 {% set backLink = back | default('/case/' + crn + '/activity-log') %}
 {% set hideButton = true %}
+
+{% set notes = '' %}
+{% for note in checkIn.notes %}
+    {% set notes = notes.concat(appNote(note, '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage/note/' + note.id + '?back=' + url)) %}
+{% endfor  %}
 
 {% block form %}
 
@@ -29,11 +36,13 @@
                 <dt class="govuk-summary-list__key">What action are you taking after reviewing this check in?</dt>
                 <dd class="govuk-summary-list__value">{{ checkIn.furtherActions | safe if checkIn.furtherActions else 'None' }}</dd>
             </div>
-            {% if checkIn.notes %}
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Notes</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.notes | safe }}</dd>
-            </div>
+            {% if checkIn.notes.length > 0 %}
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">Notes</dt>
+                    <dd class="govuk-summary-list__value">{{ 
+                        notes | safe
+                    }}</dd>
+                </div>
             {% endif %}
         </dl>
 
