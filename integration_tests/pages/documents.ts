@@ -4,6 +4,7 @@ export default class DocumentsPage extends Page {
   constructor() {
     super('Documents')
   }
+
   getDocLevel = (): PageElement => cy.get('[data-qa="documentLevel"] select')
 
   getQueryInput = (): PageElement => cy.get('[data-qa="query"] textarea')

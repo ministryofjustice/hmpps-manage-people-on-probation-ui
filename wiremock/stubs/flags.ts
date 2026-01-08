@@ -86,7 +86,6 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
   },
 })
 
-
 const stubRepeats = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {

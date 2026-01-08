@@ -142,8 +142,8 @@ const documentController: Controller<typeof routes, void> = {
       }
       sortBy = textSearchRequest.query && !req.query.sortBy ? null : sortBy
 
-       const [documents, tierCalculation, risks, predictors] = await Promise.all([
-         masClient.textSearchDocuments(crn, (pageNum - 1).toString(), textSearchRequest, sortBy),
+      const [documents, tierCalculation, risks, predictors] = await Promise.all([
+        masClient.textSearchDocuments(crn, (pageNum - 1).toString(), textSearchRequest, sortBy),
         tierClient.getCalculationDetails(crn),
         arnsClient.getRisks(crn),
         arnsClient.getPredictorsAll(crn),
@@ -164,7 +164,6 @@ const documentController: Controller<typeof routes, void> = {
       )
 
       req.session.documentLevels = documents.metadata.documentLevels
-
 
       return res.render('pages/documents', {
         documents: docsHighlightedFilename,
