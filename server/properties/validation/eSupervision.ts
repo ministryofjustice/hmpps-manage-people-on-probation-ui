@@ -19,11 +19,12 @@ export interface ESupervisionValidationArgs {
   checkInEmail?: string
   editCheckInEmail?: string
   editCheckInMobile?: string
+  change?: string
   stopCheckIn?: string
 }
 
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
-  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, stopCheckIn } = args
+  const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change, stopCheckIn } = args
   return {
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
@@ -61,7 +62,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][checkins][preferredComs]`]: {
-      optional: page !== 'contact-preference',
+      optional: page !== 'contact-preference' || change !== 'main',
       checks: [
         {
           validator: isNotEmpty,

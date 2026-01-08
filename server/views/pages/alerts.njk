@@ -10,6 +10,19 @@
 {% set alerts = true %}
 {% set alertRows = [] %}
 
+{% block beforeContent %}
+    {% if note %}
+        {{ govukBreadcrumbs({
+            items: [
+                {
+                    text: "< Back",
+                    href: back
+                }
+            ]
+        }) }}
+    {% endif %}
+{% endblock %}
+
 {% block pageContent %}
 
     {% if alertsData.content.length > 0 %}
@@ -52,7 +65,8 @@
                         attributes: {
                             "data-qa": "moreInfo-" + alert.id
                         },
-                        html: renderAlertDetails(alert)
+                        html: renderAlertDetails(alert),
+                        open: note
                     }) }}
                 {% endif %}
             {% endset %}
@@ -119,11 +133,13 @@
                 }) }}
             {% endif %}
             {% if alertsData and alertsData.content and alertsData.content.length > 0 %}
+                {% if not note %}
                 <p class="govuk-body" data-qa="alertsCount">
                     Showing <b>{{ ((alertsData.page) * alertsData.size) + 1 }}</b> to <b>{{ ((alertsData.page) * alertsData.size) + alertsData.content.length }}</b> of <b>{{ alertsData.totalResults }}</b> results
                 </p>
+                {% endif %}
 
-                <form method="post" action="/alerts" id="alerts-form">
+                <form method="post" action="/alerts{{'?' + queryString if queryString else ''}}" id="alerts-form">
 
                     {{ govukTable({
                         firstCellIsHeader: false,
@@ -142,12 +158,12 @@
                             {
                                 text: "Date",
                                 classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": setSortOrder('date_and_time', sortedBy), 'data-sort-column': 'date_and_time', 'data-qa': 'dateHeader', 'data-sort-name': 'date_and_time', 'data-sort-action': 'alerts' }
+                                attributes: { "aria-sort": setSortOrder('date_and_time', sortedBy), 'data-sort-column': 'date_and_time', 'data-qa': 'dateHeader', 'data-sort-name': 'date_and_time', 'data-sort-action': 'alerts' } if not note else {}
                             },
                             {
                                 text: "Name / CRN",
                                 classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { 'aria-sort': setSortOrder('surname', sortedBy), 'data-sort-column': "surname", 'data-qa': "personHeader", 'data-sort-name': 'surname', 'data-sort-action': 'alerts' }
+                                attributes: { 'aria-sort': setSortOrder('surname', sortedBy), 'data-sort-column': "surname", 'data-qa': "personHeader", 'data-sort-name': 'surname', 'data-sort-action': 'alerts' } if not note else {}
                             },
                             {
                                 text: "Risk",
@@ -157,7 +173,7 @@
                             {
                                 text: "Activity",
                                 classes: "vertical-align--middle govuk-action--bottom",
-                                attributes: { "aria-sort": setSortOrder('type_description', sortedBy), 'data-sort-column': 'type_description', 'data-qa': 'activityHeader', 'data-sort-name': 'type_description', 'data-sort-action': 'alerts' }
+                                attributes: { "aria-sort": setSortOrder('type_description', sortedBy), 'data-sort-column': 'type_description', 'data-qa': 'activityHeader', 'data-sort-name': 'type_description', 'data-sort-action': 'alerts' } if not note else {}
                             },
                             {
                                 html: 'Manage on NDelius<br>(opens in new tab)',
@@ -185,70 +201,8 @@
                         </button>
                     </div>
                 </form>
-
-                {% if alertsData.totalPages > 1 %}
-                    {% set currentPage = alertsData.page or 0 %}
-                    {% set totalPages = alertsData.totalPages %}
-
-                    {% set url = "/alerts?" + (('sortBy=' + sortedBy + '&') if sortedBy else '') %}
-
-                    {% set paginationItems = [] %}
-                    {% set totalLinks = 3 %}
-                    {% if totalLinks > totalPages %}
-                        {% set totalLinks = totalPages %}
-                    {% endif %}
-
-                    {% set start = 0 %}
-                    {% set end = start + totalLinks %}
-                    {% if currentPage > 0 %}
-                        {% set start = currentPage -1 %}
-                        {% set end = start + totalLinks %}
-                    {% endif %}
-                    {% if currentPage + 1 == totalPages %}
-                        {% set start = currentPage - (totalLinks -1) %}
-                        {% set end = totalPages %}
-                    {% endif %}
-
-                    {% if (totalPages > 3) and (currentPage != 0) and (start != 0) %}
-                        {% set paginationItems = (paginationItems.push(
-                            {
-                                number: 1,
-                                href: url + 'page=0'
-                            },
-                            {
-                                ellipsis: true
-                            }), paginationItems) %}
-                    {% endif %}
-
-                    {% for i in range(start , end) -%}
-                        {% set paginationItems = (paginationItems.push({
-                            number: i + 1,
-                            href: url + 'page=' + i,
-                            current: true if i == currentPage else false
-                        }), paginationItems) %}
-                    {% endfor %}
-
-                    {% if (totalPages > 3) and ((currentPage + 1) != totalPages) and (end !== totalPages) %}
-                        {% set paginationItems = (paginationItems.push(
-                            {
-                                ellipsis: true
-                            },
-                            {
-                                number: totalPages,
-                                href: url + 'page=' + (totalPages - 1)
-                            }
-                        ), paginationItems) %}
-                    {% endif %}
-
-                    {{ govukPagination({
-                        previous: {
-                            href: url + 'page=' + (currentPage - 1)
-                        } if currentPage > 0 and totalPages > 1,
-                        next: {
-                            href: url + 'page=' + (currentPage + 1)
-                        } if currentPage + 1 < totalPages and totalPages > 1,
-                        items: paginationItems
-                    }) }}
+                {% if pagination.items | length > 1 %}
+                    {{ govukPagination({ previous: { href: pagination.prev }, next: { href: pagination.next }, items: pagination.items }) }}
                 {% endif %}
 
             {% else %}
@@ -270,11 +224,11 @@
         {% set notes = '' %}
         {% for note in alert.alertNotes %}
             {% if note.note %}
-                {% set notes = notes.concat(appNote(note, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
+                {% set notes = notes.concat(appNote(note, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
             {% endif %}
         {% endfor  %}
         {% if alert.alertNote %}
-            {% set notes = notes.concat(appNote(alert.alertNote, '/case/' + alert.crn + '/appointments/appointment/' + alert.id + '/manage/note/' + note.id + '?back=' + url)) %}
+            {% set notes = notes.concat(appNote(alert.alertNote, '/alerts/' + alert.id + '/note/' + note.id + '?back=' + url)) %}
         {% endif %}
         <span class="govuk-heading-s govuk-!-margin-bottom-0">Notes</span>
         <div data-qa="alertNotes-{{ alert.id }}">

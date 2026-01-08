@@ -2,8 +2,7 @@
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 {% set title = "Online check in submitted" %}
-{% set backLink = back if back else 
-  '/case/' + crn + '/appointments/' + id + '/check-in/review/identity' %}
+{% set backLink = back | default('/case/' + crn + '/appointments/' + id + '/check-in/review/identity') %}
 {% set hideButton = true %}
 
 {% block form %}
@@ -70,7 +69,7 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
-                        text: 'Is the person in the video ' + checkIn.personalDetails.name.forename,
+                        text: 'Is the person in the video ' + checkIn.personalDetails.name.forename + '?',
                         classes: "govuk-label--m govuk-!-font-weight-bold"
                     }
                 },

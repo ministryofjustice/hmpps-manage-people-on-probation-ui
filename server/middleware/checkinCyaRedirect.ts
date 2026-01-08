@@ -4,8 +4,13 @@ import { Route } from '../@types'
 export const redirectWizard = (): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { crn, id } = req.params
+    const redirectUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+    const skipContactPrefTypes = ['mobile', 'emailAddress']
     if (req.query.cya === 'true') {
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/checkin-summary`)
+      if (skipContactPrefTypes.includes(req.body.change)) {
+        return next()
+      }
+      return res.redirect(redirectUrl)
     }
     return next()
   }

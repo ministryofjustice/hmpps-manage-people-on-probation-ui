@@ -4,7 +4,7 @@ import controllers from '../controllers'
 import validate from '../middleware/validation'
 import { autoStoreSessionData } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
-import { redirectWizard } from '../middleware/checkin-cyaRedirect'
+import { redirectWizard } from '../middleware/checkinCyaRedirect'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
@@ -96,6 +96,16 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getViewCheckIn(hmppsAuthClient),
   ])
   router.post('/case/:crn/appointments/:id/check-in/view', [
+    autoStoreSessionData(hmppsAuthClient),
+    getCheckIn(hmppsAuthClient),
+    validate.checkInReview,
+    controllers.checkIns.postViewCheckIn(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/:id/check-in/view-expired', [
+    getCheckIn(hmppsAuthClient),
+    controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/:id/check-in/view-expired', [
     autoStoreSessionData(hmppsAuthClient),
     getCheckIn(hmppsAuthClient),
     validate.checkInReview,

@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { redirectWizard } from './checkin-cyaRedirect'
+import { redirectWizard } from './checkinCyaRedirect'
 import { mockAppResponse } from '../controllers/mocks'
 
 const crn = 'X000001'
@@ -27,6 +27,20 @@ describe('redirectWizard', () => {
     const req = httpMocks.createRequest({
       params: { crn, id: uuid },
       query: { cya: 'false' },
+    })
+
+    const nextSpy = jest.fn()
+    await redirectWizard()(req, res, nextSpy)
+
+    expect(redirectSpy).toHaveBeenCalled()
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls next when cya is true and change=mobile  ', async () => {
+    const req = httpMocks.createRequest({
+      params: { crn, id: uuid },
+      query: { cya: 'true' },
+      body: { change: 'mobile' },
     })
 
     const nextSpy = jest.fn()
