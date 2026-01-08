@@ -94,16 +94,13 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         [],
         regexIgnoreValuesInParentheses,
       )
-      console.log({ selectedUser })
       if (!selectedUser) {
-        console.log('use name ref')
         const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
         if (name) {
           const { forename: first, surname: last } = name
           selectedUser = `${first} ${last}`
         }
       }
-      console.log({ selectedUser })
 
       let attendingHtml = selectedUser
       let teamRegionHtml = ''
@@ -157,7 +154,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         outcomeRecorded: outcomeRecorded ?? null,
       }
     }
-    console.dir(appointment, { depth: null })
     res.locals.appointment = appointment
     return next()
   }
