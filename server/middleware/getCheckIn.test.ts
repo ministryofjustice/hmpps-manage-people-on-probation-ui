@@ -62,7 +62,40 @@ const checkInResponseMock = {
   flaggedResponses: ['string'],
   checkinLogs: {
     hint: '',
-    logs: [],
+    logs: [
+      {
+        createdAt: '2026-01-07T12:06:44.154Z',
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        practitioner: 'string',
+        logEntryType: 'OFFENDER_CHECKIN_REVIEW_SUBMITTED',
+        notes: 'Further Action',
+        checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      },
+      {
+        createdAt: '2026-01-07T12:06:44.154Z',
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        practitioner: 'string',
+        logEntryType: 'OFFENDER_CHECKIN_NOT_SUBMITTED',
+        notes: 'Missed reason',
+        checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      },
+      {
+        createdAt: '2026-01-07T12:06:44.154Z',
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        practitioner: 'string',
+        logEntryType: 'OFFENDER_CHECKIN_ANNOTATED',
+        notes: 'Note 1',
+        checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      },
+      {
+        createdAt: '2026-01-07T12:06:44.154Z',
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        practitioner: 'string',
+        logEntryType: 'OFFENDER_CHECKIN_ANNOTATED',
+        notes: 'Note 2',
+        checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+      },
+    ],
   },
 } as unknown as ESupervisionCheckIn
 
