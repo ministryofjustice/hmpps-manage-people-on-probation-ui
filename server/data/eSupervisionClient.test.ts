@@ -3,12 +3,7 @@ import nock from 'nock'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
 import ESupervisionClient from './eSupervisionClient'
-import {
-  ESupervisionCheckIn,
-  ESupervisionCheckInResponse,
-  ESupervisionNote,
-  ESupervisionReview,
-} from './model/esupervision'
+import { ESupervisionCheckIn, ESupervisionNote, ESupervisionReview } from './model/esupervision'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -101,65 +96,53 @@ describe('ESupervisionClient', () => {
     it('should GET checkin details from uuid', async () => {
       const checkInUuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
 
-      const response: ESupervisionCheckInResponse = {
-        checkin: {
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          status: 'REVIEWED',
-          dueDate: '2025-11-27',
-          personalDetails: {
-            crn: 'X123456',
+      const response: ESupervisionCheckIn = {
+        uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+        status: 'REVIEWED',
+        dueDate: '2025-11-27',
+        personalDetails: {
+          crn: 'X123456',
+          name: {
+            forename: 'Bob',
+            surname: 'Smith',
+          },
+          mobile: '07700900123',
+          email: 'john.smith@example.com',
+          practitioner: {
             name: {
-              forename: 'Bob',
+              forename: 'John',
               surname: 'Smith',
             },
-            mobile: '07700900123',
-            email: 'john.smith@example.com',
-            practitioner: {
-              name: {
-                forename: 'John',
-                surname: 'Smith',
-              },
-              email: 'practitioner@example.com',
-              localAdminUnit: {
-                code: 'N01ABC',
-                description: 'London North LAU',
-              },
-              probationDeliveryUnit: {
-                code: 'N01ABC',
-                description: 'London North LAU',
-              },
-              provider: {
-                code: 'N01ABC',
-                description: 'London North LAU',
-              },
+            email: 'practitioner@example.com',
+            localAdminUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            probationDeliveryUnit: {
+              code: 'N01ABC',
+              description: 'London North LAU',
+            },
+            provider: {
+              code: 'N01ABC',
+              description: 'London North LAU',
             },
           },
-          surveyResponse: {
-            mentalHealth: 'well',
-            assistance: ['thing1', 'thing2'],
-            callback: 'no',
-          },
-          createdBy: 'string',
-          createdAt: '2025-11-27T15:40:42.399Z',
-          videoUrl: 'string',
-          snapshotUrl: 'string',
-          autoIdCheck: 'MATCH',
-          manualIdCheck: 'MATCH',
-          flaggedResponses: ['string'],
         },
+        surveyResponse: {
+          mentalHealth: 'well',
+          assistance: ['thing1', 'thing2'],
+          callback: 'no',
+        },
+        createdBy: 'string',
+        createdAt: '2025-11-27T15:40:42.399Z',
+        videoUrl: 'string',
+        snapshotUrl: 'string',
+        autoIdCheck: 'MATCH',
+        manualIdCheck: 'MATCH',
+        flaggedResponses: ['string'],
         checkinLogs: {
-          hint: 'ALL',
-          logs: [
-            {
-              comment: 'string',
-              offender: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-              createdAt: '2025-11-27T15:40:42.399Z',
-              uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-              practitioner: 'string',
-              logEntryType: 'OFFENDER_SETUP_COMPLETE',
-              checkin: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-            },
-          ],
+          hint: '',
+          logs: [],
         },
       }
 
@@ -227,6 +210,10 @@ describe('ESupervisionClient', () => {
         autoIdCheck: 'MATCH',
         manualIdCheck: 'MATCH',
         flaggedResponses: ['string'],
+        checkinLogs: {
+          hint: '',
+          logs: [],
+        },
       }
 
       fakeESupervisionApi
@@ -287,6 +274,10 @@ describe('ESupervisionClient', () => {
         autoIdCheck: 'MATCH',
         manualIdCheck: 'MATCH',
         flaggedResponses: ['string'],
+        checkinLogs: {
+          hint: '',
+          logs: [],
+        },
       }
 
       fakeESupervisionApi
