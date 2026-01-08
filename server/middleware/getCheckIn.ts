@@ -20,14 +20,20 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
         checkInResponse.furtherActions = log.notes
       }
       if (log.logEntryType === 'OFFENDER_CHECKIN_ANNOTATED') {
-        checkInResponse.notes.push({
+        const note = {
           id: i,
           createdBy: log.practitioner,
           createdByDate: log.createdAt,
           note: log.notes,
-        })
+        }
+        if (checkInResponse.notes) {
+          checkInResponse.notes.push(note)
+        } else {
+          checkInResponse.notes = [note]
+        }
       }
     }
+    console.log(checkInResponse.checkinLogs.logs)
 
     res.locals.checkIn = checkInResponse
     return next()
