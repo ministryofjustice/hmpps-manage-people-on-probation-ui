@@ -98,7 +98,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sentenceCode: req.body.sentenceCode,
         nextContactCode: req.body.nextContactCode,
       }
-      // req.session.page = '1'
       await caseloadController.showCaseload(hmppsAuthClient)(req, res, next, {
         filter: req.session.caseFilter,
       })
