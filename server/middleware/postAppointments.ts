@@ -79,9 +79,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const userDetails = await masClient.getUserDetails(username)
     let outlookEventResponse: OutlookEventResponse
 
-    const flagService = new FlagService()
-    const featureFlags: FeatureFlags = await flagService.getFlags()
-    if (featureFlags.enableOutlookEvent && userDetails?.email) {
+    if (userDetails?.email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
@@ -103,8 +101,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (featureFlags.enableOutlookEvent && (!userDetails?.email || !outlookEventResponse.id))
-      data.isOutLookEventFailed = true
+    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
 
     return response
   }
