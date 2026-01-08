@@ -129,7 +129,11 @@
           "surveyResponse": {},
           "createdBy": "string",
           "createdAt": "2025-11-27T15:40:42.399Z",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -250,7 +254,11 @@
           "videoUrl": "string",
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -308,7 +316,11 @@
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
           "manualIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
@@ -366,7 +378,11 @@
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
           "manualIdCheck": "MATCH",
-          "flaggedResponses": ["string"]
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
         },
         "headers": {
           "Content-Type": "application/json;charset=UTF-8"
