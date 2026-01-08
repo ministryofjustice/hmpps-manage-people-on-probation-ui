@@ -121,7 +121,7 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Anything they need help with or to let us know</dt>
+                <dt class="govuk-summary-list__key">Anything they need support with or to let us know</dt>
                 <dd class="govuk-summary-list__value">
                     {% for a in checkIn.surveyResponse.assistance | split %}
                         {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}
