@@ -1663,7 +1663,7 @@ describe('checkInsController', () => {
         req.session.data?.esupervision?.[crn]?.[uuid]?.manageCheckin?.contactUpdated as unknown as boolean | undefined,
       ).toBeUndefined()
 
-    expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-edit-contact.njk', {
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-edit-contact.njk', {
         crn,
         id: uuid,
         change: 'email',
