@@ -13,17 +13,6 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
       },
       flags: [
         {
-          key: 'enableRepeatAppointments',
-          name: 'enableRepeatAppointments',
-          description: '',
-          enabled: false,
-          type: 'BOOLEAN_FLAG_TYPE',
-          createdAt: '2025-01-13T15:28:37.920581Z',
-          updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [] as any,
-          rollouts: [] as any,
-        },
-        {
           key: 'enableAppointmentCreate',
           name: 'enableAppointmentCreate',
           description: '',
@@ -31,8 +20,8 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
-          rules: [],
-          rollouts: [],
+          rules: [] as string[],
+          rollouts: [] as string[],
         },
         {
           key: 'enableOutlookEvent',
@@ -100,17 +89,6 @@ const stubRepeats = (): SuperAgentRequest =>
         },
         flags: [
           {
-            key: 'enableRepeatAppointments',
-            name: 'enableRepeatAppointments',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',
             description: '',
@@ -153,17 +131,6 @@ const stubNoRepeats = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
-          {
-            key: 'enableRepeatAppointments',
-            name: 'enableRepeatAppointments',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
           {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',
@@ -218,17 +185,6 @@ const stubNoDeleteAppointmentFiles = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
-          {
-            key: 'enableRepeatAppointments',
-            name: 'enableRepeatAppointments',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
           {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',
@@ -293,17 +249,6 @@ const stubEnableESuperVision = (): SuperAgentRequest =>
         },
         flags: [
           {
-            key: 'enableRepeatAppointments',
-            name: 'enableRepeatAppointments',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',
             description: '',
@@ -357,17 +302,6 @@ const stubDisablePastAppointments = (): SuperAgentRequest =>
           key: 'manage-people-on-probation-ui',
         },
         flags: [
-          {
-            key: 'enableRepeatAppointments',
-            name: 'enableRepeatAppointments',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
           {
             key: 'enableAppointmentCreate',
             name: 'enableAppointmentCreate',

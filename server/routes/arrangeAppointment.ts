@@ -108,20 +108,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
 
   router.get(
-    '/case/:crn/arrange-appointment/:id/repeating',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
-    controllers.arrangeAppointments.getRepeating(),
-  )
-
-  router.post(
-    '/case/:crn/arrange-appointment/:id/repeating',
-    validate.appointments,
-    controllers.arrangeAppointments.postRepeating(),
-  )
-
-  router.get(
     '/case/:crn/arrange-appointment/:id/supporting-information',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode'], 'repeating']),
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getSupportingInformation(),
   )
 
@@ -133,7 +121,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
 
   router.get(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
-    redirectWizard(['eventId', 'repeating']),
+    redirectWizard(['eventId']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
@@ -145,8 +133,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/confirmation',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode'], 'repeating']),
-    // getAppointment(hmppsAuthClient),
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
     controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
   )
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())

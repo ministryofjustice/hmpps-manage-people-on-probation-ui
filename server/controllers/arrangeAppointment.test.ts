@@ -168,7 +168,6 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
       keywords: '',
     },
     flags: {
-      enableRepeatAppointments: true,
       enablePastAppointments: true,
     },
     user: {
@@ -521,7 +520,6 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse({
         appointment: { type: { isLocationRequired: false } },
         flags: {
-          enableRepeatAppointments: true,
           enablePastAppointments: false,
         },
       })
@@ -703,124 +701,6 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.postLocationDateTime()(mockReq, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-not-in-list`)
     })
-    it('should update the repeating dates and until date if changing the date and repeating appointments enabled', async () => {
-      const mockReq = createMockRequest({
-        query: { change },
-        appointmentSession: {
-          date: '2025-07-07',
-          start: '9:00am',
-          end: '9:30am',
-          numberOfAppointments: '3',
-          numberOfRepeatAppointments: '2',
-          interval: 'WEEK',
-          repeating: 'Yes',
-          temp: {
-            date: '2025-07-07',
-            isInPast: true,
-          },
-        },
-      })
-      jest.spyOn(ArrangedSession, 'generateRepeatedAppointments').mockReturnValue([
-        { uuid: '1', date: '19/4/2025' },
-        { uuid: '2', date: '26/4/2025' },
-      ])
-      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: true } })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'until'],
-        '26/4/2025',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'repeatingDates'],
-        ['19/4/2025', '26/4/2025'],
-      )
-    })
-    it('should set the default date values if repeating appointment disabled and not changing the date', async () => {
-      const mockReq = createMockRequest({
-        query: { change },
-        appointmentSession: {
-          date: '2025-07-07',
-          start: '9:00am',
-          end: '9:30am',
-          numberOfAppointments: '1',
-          numberOfRepeatAppointments: '0',
-          interval: 'DAY',
-          temp: {
-            date: '2025-07-07',
-            isInPast: true,
-          },
-        },
-      })
-      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: false } })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'numberOfAppointments'],
-        '1',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
-        '',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
-        '',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'interval'],
-        'DAY',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'until'],
-        '2025-07-07',
-      )
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'repeatingDates'],
-        [],
-      )
-    })
-    it('should redirect to the repeating page if repeating appointments flag enabled', async () => {
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: true } })
-      const spy = jest.spyOn(mockRes, 'redirect')
-      const mockReq = createMockRequest({
-        appointmentSession: {
-          date: '2025-07-07',
-          start: '9:00am',
-          end: '9:30am',
-          numberOfAppointments: '1',
-          numberOfRepeatAppointments: '0',
-          interval: 'DAY',
-          temp: {
-            date: '2025-07-07',
-            isInPast: true,
-          },
-        },
-      })
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/repeating`)
-    })
-    it('should redirect to the add notes page if repeating appointments flag disabled', async () => {
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: false } })
-      const spy = jest.spyOn(mockRes, 'redirect')
-      const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
-      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/supporting-information`)
-    })
     it('should redirect to the next uncompleted page if change url in request params', async () => {
       const mockReq = createMockRequest({
         query: { change },
@@ -942,7 +822,7 @@ describe('controllers/arrangeAppointment', () => {
           },
         },
       })
-      const mockRes = createMockResponse({ flags: { enableRepeatAppointments: false } })
+      const mockRes = createMockResponse()
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       mockedAppointmentDateIsInPast.mockReturnValueOnce(true)
@@ -955,150 +835,11 @@ describe('controllers/arrangeAppointment', () => {
       )
     })
   })
-  describe('getRepeating', () => {
-    it('should render the 404 page if repeat appointments flag is not enabled', async () => {
-      const mockReq = createMockRequest()
-      const mockRes = createMockResponse({
-        flags: {
-          enableRepeatAppointments: false,
-        },
-      })
-      await controllers.arrangeAppointments.getRepeating()(mockReq, mockRes)
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
-    })
-    it(`should update appointment.repeating to 'Yes' if interval or numberOfRepeatAppointments value is in req.query`, async () => {
-      const mockReq = createMockRequest({ query: { numberOfRepeatAppointments: '2' } })
-      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'repeating'],
-        'Yes',
-      )
-    })
-    it(`should update appointment.interval session value to req.query.interval if included in the url`, async () => {
-      const mockReq = createMockRequest({ query: { interval: 'DAY' } })
-      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'interval'],
-        mockReq.query.interval,
-      )
-    })
-    it(`should update appointment.numberOfRepeatAppointments session value to req.query.numberOfRepeatAppointments if included in the url`, async () => {
-      const mockReq = createMockRequest({ query: { numberOfRepeatAppointments: '3' } })
-      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'numberOfRepeatAppointments'],
-        mockReq.query.numberOfRepeatAppointments,
-      )
-    })
-    it('should set the repeatingDates', async () => {
-      const spy = jest.spyOn(ArrangedSession, 'generateRepeatedAppointments').mockReturnValue([
-        { uuid: '1', date: '19/4/2025' },
-        { uuid: '2', date: '26/4/2025' },
-      ])
-      const mockReq = createMockRequest({
-        appointmentSession: {
-          date: '12/4/2025',
-          interval: 'FORTNIGHT',
-          numberOfRepeatAppointments: '2',
-        },
-      })
-      await controllers.arrangeAppointments.getRepeating()(mockReq, res)
-      expect(spy).toHaveBeenCalledWith(mockReq.session.data.appointments[crn][uuid], 'week', 2)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(
-        mockReq.session.data,
-        ['appointments', crn, uuid, 'repeatingDates'],
-        ['19/4/2025', '26/4/2025'],
-      )
-      expect(res.locals.lastAppointmentDate).toEqual('26/4/2025')
-    })
-  })
-  describe('postRepeating', () => {
-    it('should render the 404 page if repeat appointments flag is not enabled', async () => {
-      const mockReq = createMockRequest()
-      const mockRes = createMockResponse({
-        flags: {
-          enableRepeatAppointments: false,
-        },
-      })
-      await controllers.arrangeAppointments.postRepeating()(mockReq, mockRes)
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, mockRes)
-    })
-    it('should reset the count, frequency and dates if a one off appointment', async () => {
-      const appointmentSession: AppointmentSession = {
-        user: {
-          username: 'user-1',
-          locationCode: `location`,
-          teamCode: '',
-        },
-        repeating: 'No',
-      }
-      const mockReq = createMockRequest({ appointmentSession })
-      const expected: AppointmentSession = {
-        ...appointmentSession,
-        repeating: 'No',
-        interval: 'DAY',
-        numberOfAppointments: '1',
-        repeatingDates: [],
-        numberOfRepeatAppointments: '0',
-      }
-      await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(mockedSetDataValue).toHaveBeenCalledWith(mockReq.session.data, ['appointments', crn, uuid], expected)
-    })
-    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
-      mockedIsValidCrn.mockReturnValue(false)
-      mockedIsValidUUID.mockReturnValue(false)
-      const mockReq = createMockRequest({ query: { change } })
-      await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
-      expect(redirectSpy).not.toHaveBeenCalled()
-    })
-    it('should redirect to the notes page', async () => {
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      const mockReq = createMockRequest({})
-      await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/supporting-information`)
-    })
-    it('should redirect to the next uncompleted page if change url in request params', async () => {
-      const mockReq = createMockRequest({ query: { change } })
-      mockedIsValidCrn.mockReturnValue(true)
-      mockedIsValidUUID.mockReturnValue(true)
-      await controllers.arrangeAppointments.postRepeating()(mockReq, res)
-      expect(redirectSpy).toHaveBeenCalledWith(redirectUrl)
-    })
-  })
+
   describe('getSupportingInformation', () => {
-    const mockReq = createMockRequest({ query: { change } })
-    it('should use the correct back link if repeating appointment flag is enabled', async () => {
-      const mockRes = createMockResponse({
-        flags: {
-          enableRepeatAppointments: true,
-        },
-      })
-      const spy = jest.spyOn(mockRes, 'render')
-      await controllers.arrangeAppointments.getSupportingInformation(hmppsAuthClient)(mockReq, mockRes)
-      expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/supporting-information`, {
-        crn,
-        id: uuid,
-        back: 'repeating',
-        change,
-        maxCharCount: 12000,
-        showValidation: false,
-        isInPast: false,
-      })
-    })
-    it('should use the correct back link if repeating appointment flag is disabled', async () => {
-      const mockRes = createMockResponse({
-        flags: {
-          enableRepeatAppointments: false,
-        },
-      })
+    it('should use the correct back link', async () => {
+      const mockReq = createMockRequest({ query: { change } })
+      const mockRes = createMockResponse()
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getSupportingInformation(hmppsAuthClient)(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/supporting-information`, {
