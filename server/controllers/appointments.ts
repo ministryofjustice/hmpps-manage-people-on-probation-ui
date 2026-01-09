@@ -15,6 +15,7 @@ import {
   handleQuotes,
   setDataValue,
   getDataValue,
+  canRescheduleAppointment,
 } from '../utils'
 import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
@@ -182,6 +183,8 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         nextAppointment,
         nextAppointmentIsAtHome,
+        canReschedule: canRescheduleAppointment(personAppointment),
+        contactId,
         hasDeceased,
       })
     }

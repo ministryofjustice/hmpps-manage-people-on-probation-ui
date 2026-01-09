@@ -4,7 +4,12 @@ import nock from 'nock'
 import config from '../config'
 import { isValidHost, isValidPath } from '../utils'
 import SupervisionAppointmentClient from './SupervisionAppointmentClient'
-import { OutlookEventRequestBody, OutlookEventResponse } from './model/OutlookEvent'
+import {
+  OutlookEventRequestBody,
+  OutlookEventResponse,
+  RescheduleEventRequest,
+  EventResponse,
+} from './model/OutlookEvent'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -88,6 +93,75 @@ describe('MasOutlookClient', () => {
     const result: any = await client.postOutlookCalendarEvent(requestBody)
     expect(result.status).toBe(500)
     expect(result.errors?.[0]?.text).toBe('Calendar event creation not successful')
+    expect(result.text).toContain('Internal Server Error')
+  })
+
+  it('should post reschedule appointment event and return response body', async () => {
+    const requestBody: RescheduleEventRequest = {
+      rescheduledEventRequest: {
+        recipients: [
+          {
+            emailAddress: 'recipient@example.com',
+            name: 'Recipient Name',
+          },
+        ],
+        message: '',
+        subject: '',
+        start: '',
+        durationInMinutes: 0,
+        supervisionAppointmentUrn: '',
+      },
+      oldSupervisionAppointmentUrn: 'URN-OLD-123',
+    }
+
+    const jsonString = JSON.stringify(requestBody)
+
+    const responseBody: EventResponse = {
+      id: 'evt-2',
+      subject: 'Rescheduled event',
+      startDate: '2025-02-01T10:00:00Z',
+      endDate: '2025-02-01T11:00:00Z',
+    }
+
+    fakeApi
+      .post('/calendar/event/reschedule', jsonString)
+      .matchHeader('authorization', `Bearer ${token.access_token}`)
+      .reply(201, responseBody)
+
+    const result = await client.postRescheduleAppointmentEvent(requestBody)
+    expect(result).toEqual(responseBody)
+  })
+
+  it('should handle 500 for reschedule by returning an error response with message', async () => {
+    const requestBody: RescheduleEventRequest = {
+      rescheduledEventRequest: {
+        recipients: [
+          {
+            emailAddress: 'recipient@example.com',
+            name: 'Recipient Name',
+          },
+        ],
+        message: 'Message',
+        subject: 'Subject',
+        start: '2025-01-01T10:00:00Z',
+        durationInMinutes: 0,
+        supervisionAppointmentUrn: 'URN-123',
+      },
+      oldSupervisionAppointmentUrn: 'URN-OLD-123',
+    }
+
+    const jsonString = JSON.stringify(requestBody)
+
+    const errorMessage = 'Internal Server Error'
+
+    fakeApi
+      .post('/calendar/event/reschedule', jsonString)
+      .matchHeader('authorization', `Bearer ${token.access_token}`)
+      .reply(500, errorMessage)
+
+    const result: any = await client.postRescheduleAppointmentEvent(requestBody)
+    expect(result.status).toBe(500)
+    expect(result.errors?.[0]?.text).toBe('Rescheduling appointment not successful')
     expect(result.text).toContain('Internal Server Error')
   })
 })

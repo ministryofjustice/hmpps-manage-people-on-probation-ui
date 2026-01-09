@@ -6,7 +6,7 @@ const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'N
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
-  const { crn } = req.params
+  const { crn, id } = req.params
   const { nextAppointment: nextAppointmentSelection } = req.body
 
   let nextAppointment: AppointmentSession = {
@@ -20,10 +20,15 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     repeatingDates: [],
   }
 
-  if (nextAppointmentSelection === 'KEEP_TYPE') {
+  if (nextAppointmentSelection === 'KEEP_TYPE' || nextAppointmentSelection === 'RESCHEDULE') {
     const { appointmentTypes } = res.locals
     let eventId = appointment?.eventId || ''
     const sentences = req?.session?.data?.sentences?.[crn]
+    const rescheduleAppointment = {
+      ...(req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment ?? {}),
+      previousStart: appointment.startDateTime,
+      previousEnd: appointment.endDateTime,
+    }
 
     if (!eventId && appointment?.eventNumber) {
       if (sentences) {
@@ -47,10 +52,12 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
 
     let username = appointment?.officer?.username || ''
     let teamCode = appointment?.officer?.teamCode || ''
+    const staffCode = appointment?.officer?.code || ''
     let providerCode = appointment?.officer?.providerCode || ''
     const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
     const date = appointment?.startDateTime || ''
     const end = appointment?.endDateTime || ''
+    const externalReference = appointment?.externalReference || ''
 
     /*
       If event has not been selected, then the user cannot select type or location, but can select the attendee
@@ -85,6 +92,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
         teamCode,
         username,
         locationCode,
+        staffCode,
       },
       type,
       date,
@@ -99,6 +107,11 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       uuid: '',
       repeating: 'No',
       repeatingDates: [],
+      externalReference,
+    }
+
+    if (rescheduleAppointment && nextAppointmentSelection === 'RESCHEDULE') {
+      nextAppointment.rescheduleAppointment = rescheduleAppointment
     }
 
     if (visorReport) {
@@ -112,6 +125,9 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     }
     if (appointment?.nsiId) {
       nextAppointment.nsiId = appointment.nsiId.toString()
+    }
+    if (appointment?.officer?.name) {
+      nextAppointment.user.name = appointment.officer.name
     }
   }
   res.locals.nextAppointmentSession = nextAppointment
