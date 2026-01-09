@@ -1779,6 +1779,32 @@ describe('checkInsController', () => {
         checkInEmail: 'edited@example.com',
       })
     })
+
+    it('renders edit-contact where no contact updated value', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const resSpecific = mockAppResponse({ success: false })
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                editCheckInMobile: '07700900033',
+                editCheckInEmail: 'edited@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.query = { change: 'email' }
+
+      await controllers.checkIns.getManageEditContactPage(hmppsAuthClient)(req, resSpecific)
+
+      expect(resSpecific.locals.success).toBe(false)
+    })
   })
 
   describe('postManageEditContactPage', () => {
