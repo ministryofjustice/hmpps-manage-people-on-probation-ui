@@ -1848,4 +1848,33 @@ describe('checkInsController', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
     })
   })
+
+  describe('getCheckinVideoPage', () => {
+    it('renders video in page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+      })
+
+      await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalled()
+      const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
+      expect(template).toBe('pages/check-in/video.njk')
+      expect(context.crn).toBe(crn)
+      expect(context.id).toBe(uuid)
+    })
+
+    it('returns 404 when CRN and uuid is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(false)
+
+      const req = baseReq()
+      await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
 })
