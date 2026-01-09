@@ -29,9 +29,9 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverview(crn, sentenceNumber),
         arnsClient.getNeeds(crn),
         masClient.getPersonRiskFlags(crn),
-          arnsClient.getSanIndicator(crn),
-          masClient.getOverdueOutcomes(crn),
-        ])
+        arnsClient.getSanIndicator(crn),
+        masClient.getOverdueOutcomes(crn),
+      ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
 
