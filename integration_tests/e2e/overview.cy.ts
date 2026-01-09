@@ -26,7 +26,7 @@ context('Overview', () => {
       .invoke('text')
       .then(text => {
         const normalized = text.replace(/\s+/g, ' ').trim()
-        expect(normalized).to.include('You need to record an outcome for 5 appointments')
+        expect(normalized).to.include('You need to record an outcome for 2 appointments')
       })
 
     page

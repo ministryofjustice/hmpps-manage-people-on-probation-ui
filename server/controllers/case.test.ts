@@ -76,6 +76,9 @@ const mockPersonalDetails: PersonalDetailsSession = {
   tierCalculation: mockTierCalculation,
   predictors: mockPredictors,
 }
+const mockOverdueOutcomesResponse = {
+  content: [{}, {}, {}],
+}
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
   .mockImplementation(() => Promise.resolve(mockOverview))
@@ -87,6 +90,13 @@ const getSanIndicatorSpy = jest
 const getPersonRiskFlagsSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
   .mockImplementation(() => Promise.resolve(mockRiskFlags))
+const predictorsSpy = jest
+  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
+  .mockImplementation(() => Promise.resolve(mockPredictors))
+const getOverdueOutcomesSpy = jest
+  .spyOn(MasApiClient.prototype, 'getOverdueOutcomes')
+  .mockImplementation(() => Promise.resolve(mockOverdueOutcomesResponse as any))
+
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 
@@ -137,6 +147,7 @@ describe('caseController', () => {
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
+        appointmentsWithoutAnOutcomeCount: 3,
       })
     })
   })
@@ -176,7 +187,97 @@ describe('caseController', () => {
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
+        appointmentsWithoutAnOutcomeCount: 3,
       })
     })
+  })
+  it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockResolvedValueOnce({} as any)
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+    expect(renderSpy).toHaveBeenCalledWith(
+      'pages/overview',
+      expect.objectContaining({
+        appointmentsWithoutAnOutcomeCount: 0,
+      }),
+    )
+  })
+  it('should return 0 when overdue outcomes content is empty', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockResolvedValueOnce({ content: [] } as any)
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+    expect(renderSpy).toHaveBeenCalledWith(
+      'pages/overview',
+      expect.objectContaining({
+        appointmentsWithoutAnOutcomeCount: 0,
+      }),
+    )
+  })
+
+  it('should render sanIndicator as false when response indicates false', async () => {
+    jest.spyOn(ArnsApiClient.prototype, 'getSanIndicator').mockResolvedValueOnce({ sanIndicator: false } as any)
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+    expect(renderSpy).toHaveBeenCalledWith(
+      'pages/overview',
+      expect.objectContaining({
+        sanIndicator: false,
+      }),
+    )
+  })
+  it('should propagate error when overdue outcomes call fails', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockRejectedValueOnce(new Error('API failure'))
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    await expect(controllers.case.getCase(hmppsAuthClient)(req, res)).rejects.toThrow('API failure')
   })
 })
