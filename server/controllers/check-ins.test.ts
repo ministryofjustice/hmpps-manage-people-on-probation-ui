@@ -1647,6 +1647,7 @@ describe('checkInsController', () => {
               manageCheckin: {
                 editCheckInMobile: '07700900033',
                 editCheckInEmail: 'edited@example.com',
+                contactUpdated: true,
               },
             },
           },
@@ -1657,7 +1658,12 @@ describe('checkInsController', () => {
 
       await controllers.checkIns.getManageEditContactPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-edit-contact.njk', {
+      expect(res.locals.success).toBe(true)
+      expect(
+        req.session.data?.esupervision?.[crn]?.[uuid]?.manageCheckin?.contactUpdated as unknown as boolean | undefined,
+      ).toBeUndefined()
+
+    expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-edit-contact.njk', {
         crn,
         id: uuid,
         change: 'email',
