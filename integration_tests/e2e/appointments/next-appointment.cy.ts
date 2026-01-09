@@ -8,7 +8,6 @@ import {
   checkPopHeader,
   completeCYAPage,
   completeSupportingInformationPage,
-  completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
   completeLocationDateTimePage,

@@ -5,7 +5,6 @@ import IndexPage from '../../pages'
 
 import {
   completeLocationDateTimePage,
-  completeRepeatingPage,
   completeSentencePage,
   completeTypePage,
   completeSupportingInformationPage,
@@ -31,23 +30,15 @@ const loadPage = ({
   hasVisor = false,
   typeOptionIndex = 1,
   sentenceOptionIndex = 1,
-  repeatAppointments = false,
   notes = true,
   dateInPast = false,
 } = {}) => {
-  if (repeatAppointments) {
-    cy.task('stubRepeats')
-  }
   completeSentencePage(sentenceOptionIndex, '')
   completeTypePage(typeOptionIndex, hasVisor)
   completeLocationDateTimePage({ dateInPast })
-  if (repeatAppointments) {
-    completeRepeatingPage()
-  }
   if (!dateInPast) {
     completeSupportingInformationPage(notes)
-  }
-  if (dateInPast) {
+  } else {
     completeAttendedCompliedPage()
     completeAddNotePage()
   }
@@ -149,7 +140,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
     it('should display the attended and complied row', () => {
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkAppointmentSummary(cyaPage, false, false, true)
+      checkAppointmentSummary(cyaPage, false, true)
       it('should update the notes when value is changed', () => {
         checkUpdateNotes(cyaPage)
       })
