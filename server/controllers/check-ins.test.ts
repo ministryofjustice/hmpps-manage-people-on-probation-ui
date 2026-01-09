@@ -927,8 +927,21 @@ describe('checkInsController', () => {
       )
     })
 
+    it('practitionerId is locals username if no username returned by API', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve({} as ProbationPractitioner))
+
+      const req = baseReq()
+      const resReview = reviewRes('EXPIRED')
+      await controllers.checkIns.getUpdateCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(startReviewSpy).toHaveBeenCalledWith(req.params.id, resReview.locals.user.username)
+    })
+
     it('returns 404 when checkIn status is invalid', async () => {
-      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
