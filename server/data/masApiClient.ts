@@ -264,6 +264,7 @@ export default class MasApiClient extends RestClient {
       handle404: true,
       handle415: true,
       handle500: true,
+      isMultipart: true,
       file,
       errorMessage: 'Upload failed. Please try again later',
     })

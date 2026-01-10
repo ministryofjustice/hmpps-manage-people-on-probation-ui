@@ -61,7 +61,6 @@ describe('fileUpload controller', () => {
     const createMockReq = () =>
       ({
         file: mockFile,
-        files: [mockFile],
         body: {
           id: testId,
           crn: testCrn,

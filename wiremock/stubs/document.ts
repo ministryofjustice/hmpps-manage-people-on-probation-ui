@@ -22,7 +22,7 @@ const stubPatchDocument200Response = (): SuperAgentRequest =>
     },
     response: {
       status: 200,
-      jsonBody: {}, // IMPORTANT: use jsonBody, not body
+      jsonBody: {},
       headers: {
         'Content-Type': 'application/json',
       },

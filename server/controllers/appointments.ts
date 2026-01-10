@@ -318,16 +318,19 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       await masClient.patchAppointment(body)
 
-      const patchResponse = await masClient.patchDocuments(crn, id, file)
+      if (file) {
+        const patchResponse = await masClient.patchDocuments(crn, id, file)
 
-      if (!isSuccessfulUpload(patchResponse)) {
-        return res.render('pages/appointments/add-note', {
-          uploadError: 'File not uploaded. Please try again.',
-          patchResponse,
-          sensitive,
-          notes,
-        })
+        if (!isSuccessfulUpload(patchResponse)) {
+          return res.render('pages/appointments/add-note', {
+            uploadError: 'File not uploaded. Please try again.',
+            patchResponse,
+            sensitive,
+            notes,
+          })
+        }
       }
+
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
@@ -409,19 +412,36 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
 }
 
-const isSuccessfulUpload = (response: { statusCode?: number } | ErrorSummary | null): boolean => {
-  // Explicit error from API
-  if (response && 'errors' in response && Array.isArray(response.errors)) {
+const isSuccessfulUpload = (response: unknown): boolean => {
+  // Null / undefined = success (MAS / stub behaviour)
+  if (response == null) {
+    return true
+  }
+
+  // Non-object (string, boolean, number) = success (legacy stubs)
+  if (typeof response !== 'object') {
+    return true
+  }
+
+  // At this point, response is an object
+  const res = response as Record<string, unknown>
+
+  // statusCode is authoritative
+  if (typeof res.statusCode === 'number') {
+    return res.statusCode >= 200 && res.statusCode < 300
+  }
+
+  // Explicit error shape
+  if (Array.isArray(res.errors)) {
     return false
   }
 
-  // Explicit success status
-  if (response && 'statusCode' in response) {
-    return response.statusCode === 200
+  // Empty object = success
+  if (Object.keys(res).length === 0) {
+    return true
   }
 
-  // {} or null = success (WireMock + MAS behaviour)
-  return true
+  return false
 }
 
 export default appointmentsController
