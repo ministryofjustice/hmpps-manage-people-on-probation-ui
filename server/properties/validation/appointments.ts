@@ -140,7 +140,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-
     [`[appointments][${crn}][${id}][user][locationCode]`]: {
       optional: page !== 'location-date-time',
       checks: [
@@ -151,7 +150,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-
     [`[appointments][${crn}][${id}][repeating]`]: {
       optional: page !== 'repeating',
       checks: [
@@ -190,7 +188,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
     [`[appointments][${crn}][${id}][notes]`]: {
       optional:
         !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) ||
-        (!['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) && notes.trim() === ''),
+        (!['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) && notes?.trim() === ''),
       checks: [
         {
           validator: isValidCharCount,
@@ -232,7 +230,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
     notes: {
       optional:
         page !== `appointment/${contactId}/add-note` ||
-        (page === `appointment/${contactId}/add-note` && notes.trim() === ''),
+        (page === `appointment/${contactId}/add-note` && notes?.trim() === ''),
       checks: [
         {
           validator: isValidCharCount,

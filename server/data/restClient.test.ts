@@ -96,7 +96,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         const response = await restClient[method]<ErrorSummary>({
           path: `/test`,
           handle500: true,
-          errorMessageFor500: 'A 500 error',
+          errorMessage: 'A 500 error',
         })
         expect(response.errors[0].text).toEqual('A 500 error')
         expect(nock.isDone()).toBe(true)
@@ -110,7 +110,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         const response = await restClient[method]<ErrorSummary>({
           path: `/test`,
           handle404: true,
-          errorMessageFor500: 'A 404 error',
+          errorMessage: 'A 404 error',
         })
         expect(response).toEqual(null)
         expect(nock.isDone()).toBe(true)
@@ -124,7 +124,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         const response = await restClient[method]<ErrorSummary>({
           path: `/test`,
           handle401: true,
-          errorMessageFor500: 'A 401 error',
+          errorMessage: 'A 401 error',
         })
         expect(response.errors[0].text).toEqual('A 401 error')
         expect(nock.isDone()).toBe(true)
@@ -150,7 +150,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       const response = await restClient[method]<ErrorSummary>({
         path: `/test`,
         handle404: true,
-        errorMessageFor500: 'Another 404 error',
+        errorMessage: 'Another 404 error',
       })
       expect(response).toEqual(null)
       expect(nock.isDone()).toBe(true)
