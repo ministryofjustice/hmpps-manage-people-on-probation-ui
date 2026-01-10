@@ -410,18 +410,27 @@ const appointmentsController: Controller<typeof routes, void> = {
 }
 
 const isSuccessfulUpload = (response: { statusCode?: number } | ErrorSummary | null): boolean => {
-  // Explicit error from API
-  if (response && 'errors' in response && Array.isArray(response.errors)) {
+  // Null response = ambiguous success (MAS/WireMock behaviour)
+  if (response === null) {
+    return true
+  }
+
+  // If we have a statusCode, it is authoritative
+  if ('statusCode' in response && typeof response.statusCode === 'number') {
+    return response.statusCode >= 200 && response.statusCode < 300
+  }
+
+  // Explicit error object (UI / validation errors)
+  if ('errors' in response && Array.isArray(response.errors)) {
     return false
   }
 
-  // Explicit success status
-  if (response && 'statusCode' in response) {
-    return response.statusCode === 200
+  // Empty object = success (legacy behaviour)
+  if (Object.keys(response).length === 0) {
+    return true
   }
 
-  // {} or null = success (WireMock + MAS behaviour)
-  return true
+  return false
 }
 
 export default appointmentsController
