@@ -120,9 +120,9 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
         {
           validator: charsOrLess,
-          length: 35,
-          msg: `Email address must be 35 characters or less.`,
-          log: 'Email address must be 35 characters or less in check in process',
+          length: 254,
+          msg: `Email address must be 254 characters or less.`,
+          log: 'Email address must be 254 characters or less in check in process',
         },
       ],
     },
@@ -141,8 +141,8 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Enter the date you would like the person to complete their first check in',
-          log: 'Checkin date not entered',
+          msg: 'Enter the date you would like the person to complete their next check in',
+          log: 'Next checkin date not entered',
         },
         {
           validator: isValidDateFormat,
@@ -187,9 +187,9 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
         {
           validator: charsOrLess,
-          length: 35,
-          msg: `Email address must be 35 characters or less.`,
-          log: 'Email address must be 35 characters or less in check in process',
+          length: 254,
+          msg: `Email address must be 254 characters or less.`,
+          log: 'Email address must be 254 characters or less in check in process',
         },
       ],
     },
