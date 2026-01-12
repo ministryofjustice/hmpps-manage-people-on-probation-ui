@@ -412,7 +412,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
 }
 
-const isSuccessfulUpload = (response: unknown): boolean => {
+export const isSuccessfulUpload = (response: unknown): boolean => {
   // Null / undefined = success (MAS / stub behaviour)
   if (response == null) {
     return true
