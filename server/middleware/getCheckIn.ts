@@ -46,7 +46,6 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
       }
     }
     res.locals.checkIn = checkInResponse
-    console.log(res.locals.checkIn.reviewDueDate)
     return next()
   }
 }
