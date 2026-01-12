@@ -146,7 +146,6 @@
     "connect-flash": "^0.1.1",
     "connect-redis": "9.0.0",
     "csurf": "^1.11.0",
-    "date-fns": "^4.1.0",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "express-prom-bundle": "^8.0.0",
