@@ -16,7 +16,7 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
 
     let reviewDueDate = null
     if (checkInResponse.status === 'EXPIRED') {
-      reviewDueDate = add(new Date(checkInResponse.dueDate), { days: 6 })
+      reviewDueDate = add(new Date(checkInResponse.dueDate), { days: 3 })
     } else if (checkInResponse.submittedAt) {
       reviewDueDate = add(new Date(checkInResponse.submittedAt), { days: 3 })
     }
