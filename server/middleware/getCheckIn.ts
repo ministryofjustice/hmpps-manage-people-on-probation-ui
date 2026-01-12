@@ -1,4 +1,5 @@
 import { NextFunction, Request } from 'express'
+import { DateTime } from 'luxon'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import ESupervisionClient from '../data/eSupervisionClient'
@@ -10,6 +11,17 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
     const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+
+    let reviewDueDate = null
+    if (checkInResponse.status === 'EXPIRED') {
+      reviewDueDate = DateTime.fromISO(checkInResponse.dueDate).plus({ days: 3 })
+    } else if (checkInResponse.submittedAt) {
+      reviewDueDate = DateTime.fromISO(checkInResponse.submittedAt).plus({ days: 3 })
+    }
+    if (reviewDueDate) {
+      reviewDueDate = reviewDueDate.toFormat('d MMMM yyyy')
+      checkInResponse.reviewDueDate = reviewDueDate.toString()
+    }
 
     for (let i = 0; i < checkInResponse.checkinLogs.logs.length; i += 1) {
       const log = checkInResponse.checkinLogs.logs[i]
