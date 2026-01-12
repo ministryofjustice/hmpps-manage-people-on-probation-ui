@@ -16,6 +16,7 @@ You'll need to install:
 
 - [Node 22.x](https://nodejs.org/download/release/latest-v22.x)\*
 - [Docker](https://www.docker.com/)
+- Latest version of Java
 
 \*If you're already using [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm), run:
 `nvm install --latest-npm` at the project root to install the correct Node version automatically.
@@ -30,109 +31,21 @@ npm install
 
 ### Run the service
 
-To run the service locally, with an in-memory session store and local user account, run:
+```shell
+# Start the UI in test mode
+npm run start-feature:dev
+````
+
+### Integrate with dev services
+
+- Request access for 1password, on the [#ask-operations-engineering](https://moj.enterprise.slack.com/archives/C01BUKJSZD4) channel. Once access granted, create a `.env` file and copy the environmental variables from 1password to your `.env`.
+- Request user access for development and test, complete this form [Delius User Access Request (Non-Prod)](https://forms.office.com/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2Iul1BWfp9ZCiJ3G_7B-PQZUM0ZXUDFZTjk2STZGSlpMUkJDUDFZREE4NS4u)
 
 ```shell
 npm run start:dev
 ```
 
 Open http://localhost:3000 in your browser.
-
-### Integrate with dev services
-
-Alternatively, you can integrate your local UI with the dev/test services deployed on MOJ Cloud Platform.
-This removes the need for using Docker.
-
-Create a `.env` file at the root of the project:
-
-```properties
-NODE_ENV=development
-ENVIRONMENT=dev
-REDIS_ENABLED=false
-HMPPS_AUTH_URL=https://sign-in-dev.hmpps.service.justice.gov.uk/auth
-MANAGE_USERS_API_URL=https://manage-users-api-dev.hmpps.service.justice.gov.uk
-MAS_API_URL=https://manage-supervision-and-delius-dev.hmpps.service.justice.gov.uk
-ARNS_API_URL=https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
-TIER_API_URL="https://hmpps-tier-dev.hmpps.service.justice.gov.uk"
-SENTENCE_PLAN_API_URL="https://sentence-plan-api-dev.hmpps.service.justice.gov.uk"
-FLIPT_URL="https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk"
-TIER_LINK="https://tier-dev.hmpps.service.justice.gov.uk/case"
-DELIUS_LINK=https://ndelius.test.probation.service.justice.gov.uk
-INTERVENTIONS_API_URL=http://localhost:9091/interventions
-INTERVENTIONS_LINK=https://hmpps-interventions-ui-dev.apps.live-1.cloud-platform.service.justice.gov.uk
-SUPERVISION_API_URL="https://probation-supervision-appointments-api-dev.hmpps.service.justice.gov.uk"
-
-```
-
-Run the following to grab client credentials from the dev namespace:
-
-```shell
-kubectl -n hmpps-manage-people-on-probation-dev get secret hmpps-manage-people-on-probation-ui -o json \
-| jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
-| grep CLIENT  >> .env
-```
-
-Run the following to grab the flipt credentials from the dev namespace:
-
-```shell
-kubectl -n hmpps-manage-people-on-probation-dev get secret flipt-bootstrap-token -o json \
-| jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
-| grep TOKEN | sed 's/TOKEN/FLIPT_TOKEN/' >> .env
-```
-
-Then, start the UI service:
-
-```shell
-npm run start:dev
-```
-
-### Feature Flags
-
-To add a boolean feature flag to the service, add the feature flag as a class member to the FeatureFlag class in server/data/model/featureFlags.ts
-
-```code
-export class FeatureFlags {
-  [index: string]: boolean
-  enableNavOverview?: boolean = undefined
-  enableNavAppointments?: boolean = undefined
-  enableNavPersonalDetails?: boolean = undefined
-  enableNavRisk?: boolean = undefined
-  enableNavSentence?: boolean = undefined
-  enableNavActivityLog?: boolean = undefined
-  enableNavCompliance?: boolean = undefined
-  enableNavInterventions?: boolean = undefined
-  enableAppointmentCreate?: boolean = undefined
-}
-```
-
-Important - Create the boolean feature flag in flipt with the same name and casing.
-
-The feature flag boolean will then be available in all nunjucks views within the 'flags' object 'flags' or in res.locals.flags for routes.
-
-e.g.
-
-```code
-{% if flags.enableNavInterventions === true %}
-<li class="moj-sub-navigation__item" data-qa="interventionsTab">
-  <a class="moj-sub-navigation__link govuk-link--no-visited-state"
-    href="/case/{{ crn }}/interventions">Interventions</a>
-</li>
-{% endif %}
-```
-
-Important - For running locally make sure you add the flipt token from cloud platform to your local .env file by running the following command.
-
-```shell
-kubectl -n hmpps-manage-people-on-probation-dev get secret flipt-bootstrap-token -o json \
-| jq -r '.data | map_values(@base64d) | to_entries[] | "\(.key)=\(.value)"' \
-| grep TOKEN | sed 's/TOKEN/FLIPT_TOKEN/' >> .env
-```
-
-Also add the FLIPT_URL for dev to your .env file
-
-```shell
-FLIPT_URL="https://feature-flags-manage-people-on-probation-dev.hmpps.service.justice.gov.uk""
-```
 
 ## Formatting
 
