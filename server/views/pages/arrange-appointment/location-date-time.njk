@@ -130,6 +130,14 @@
     }
 }), locationItems) %}
 {% endfor %}
+{% set smsItems = [] %}
+{% if case.mobileNumber %}
+    {% set smsItems = (smsItems.push({text: 'Yes', value: 'YES'}), smsItems) %}
+    {% set smsItems = (smsItems.push({text: 'Yes, update their mobile number', value: 'YES_UPDATE_MOBILE_NUMBER'}), smsItems) %}
+{% else %}
+    {% set smsItems = (smsItems.push({text: 'Yes, add a mobile number', value: 'YES_ADD_MOBILE_NUMBER'}), smsItems) %}
+{% endif %}
+{% set smsItems = (smsItems.push({text: 'No', value: 'NO'}), smsItems) %}
 {% if userLocations.length > 0 %}
     {% set locationItems = (locationItems.push({divider: 'or'}), locationItems) %}
 {% endif %}
@@ -222,15 +230,11 @@
         classes: "govuk-input--width-3"
      } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
 
-    <input type="hidden" name="_minDate" value="{{_minDate}}">
-    <input type="hidden" name="_maxDate" value="{{_maxDate}}">
-
-    <h3 class="govuk-heading-m govuk-!-margin-bottom-0">Pick a location for this appointment</h3>
     {{ govukRadios({
     fieldset: {
       legend: {
-        html: '<span data-qa="pageHeading">' + title | safe + '</span>',
-        classes: "govuk-fieldset__legend--l govuk-!-margin-bottom-6",
+        html: 'Pick a location for this appointment',
+        classes: "govuk-fieldset__legend--m govuk-!-margin-bottom-2",
         isPageHeading: false
       },
       attributes: {
@@ -239,4 +243,45 @@
     },
     items: locationItems
    } | decorateFormAttributes(['appointments', crn, id, 'user', 'locationCode'])) }}
+    {{ govukRadios({
+    classes: "govuk-radios--inline" if not case.mobileNumber else "",
+    fieldset: {
+      legend: {
+        html: 'Do you want to send ' + personForename + ' a text message confirmation?',
+        classes: "govuk-fieldset__legend--m govuk-!-margin-bottom-2",
+        isPageHeading: false
+      },
+      attributes: {
+        'data-qa': 'smsOptIn'
+      }
+    },
+    hint: {
+        text: ("Their mobile number is " + case.mobileNumber + ".") if case.mobileNumber else "They do not have a mobile number saved, you´ll need to check if they have one."
+      },
+    items: smsItems
+   } | decorateFormAttributes(['appointments', crn, id, 'smsOptIn'])) }}
+    <section id="smsPreview" data-qa="smsPreview" class="govuk-!-margin-bottom-6">
+        <h3 class="govuk-heading-m">Text message preview</h3>
+        <p class="govuk-body">Generate a preview of the text that will be sent to {{ personForename }} based on the selected date, time and location.</p>
+        {{ govukButton({
+  text: "Generate text preview",
+  id: 'generateBtn',
+  classes: "govuk-button--secondary govuk-!-margin-bottom-4",
+  attributes: {
+    'aria-controls': 'preview',
+    'data-qa': 'generateBtn'
+  }
+}) }}
+        <div id="preview">
+            <p class="govuk-body">{{ personForename }} will receive this message:</p>
+            <div class="sms-message-wrapper">
+                <p class="govuk-body">Dear {{ personForename }},</p>
+                <p class="govuk-body">You have an appointment at Leamington Probation Office on Monday 11 August at 2pm.</p>
+                <p class="govuk-body govuk-!-margin-bottom-0">This is an automated message. Do not reply.</p>
+            </div>
+        </div>
+        <div aria-live="polite" id="message-preview-status" class="govuk-visibility-hidden"></div>
+    </section>
+    <input type="hidden" name="_minDate" value="{{_minDate}}">
+    <input type="hidden" name="_maxDate" value="{{_maxDate}}">
 {% endblock %}

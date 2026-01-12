@@ -5,6 +5,8 @@ import { Errors } from './Errors'
 
 export type YesNo = '' | 'Yes' | 'No'
 
+export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO'
+
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export interface AppointmentSessionUser {
@@ -42,6 +44,7 @@ export interface AppointmentSession {
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
+  smsOptIn?: SmsOptInOptions
   temp?: {
     providerCode?: string
     teamCode?: string
