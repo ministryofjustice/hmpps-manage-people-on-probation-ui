@@ -16,9 +16,10 @@ interface Request {
   responseType?: string
   raw?: boolean
   handle404?: boolean
+  handle415?: boolean
   handle500?: boolean
   handle401?: boolean
-  errorMessageFor500?: string
+  errorMessage?: string
   file?: Express.Multer.File
   isMultipart?: boolean
 }
@@ -56,7 +57,7 @@ export default class RestClient {
     handle404 = false,
     handle500 = false,
     handle401 = false,
-    errorMessageFor500 = '',
+    errorMessage = '',
   }: Request): Promise<TResponse> {
     logger.info(escapeForLog(`${this.name} GET: ${path}`))
 
@@ -85,7 +86,7 @@ export default class RestClient {
     } catch (error: any) {
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
-        warnings.push({ text: errorMessageFor500 })
+        warnings.push({ text: errorMessage })
         error.response.errors = warnings
         logger.info('Handling 500')
         JSON.stringify(error.response)
@@ -98,7 +99,7 @@ export default class RestClient {
       if (handle401 && error?.response?.status === 401) {
         logger.info('Handling 401s the same as 500s')
         const warnings: ErrorSummaryItem[] = []
-        warnings.push({ text: errorMessageFor500 })
+        warnings.push({ text: errorMessage })
         error.response.errors = warnings
         return error.response
       }
@@ -119,10 +120,11 @@ export default class RestClient {
       raw = false,
       retry = false,
       handle404 = false,
+      handle415 = false,
       handle500 = false,
       file,
       isMultipart = false,
-      errorMessageFor500 = '',
+      errorMessage = '',
     }: RequestWithBody,
   ): Promise<Response> {
     logger.info(escapeForLog(`${this.name} ${method.toUpperCase()}: ${path}`))
@@ -168,9 +170,17 @@ export default class RestClient {
       return raw ? (result as Response) : result.body
     } catch (error) {
       if (handle404 && error.response?.status === 404) return null
+      if (handle415 && error?.response?.status === 415) {
+        const warnings: ErrorSummaryItem[] = []
+        warnings.push({ text: errorMessage })
+        error.response.errors = warnings
+        JSON.stringify(error.response)
+        logger.info('Handling 415 : ', error.response)
+        return error.response
+      }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
-        warnings.push({ text: errorMessageFor500 })
+        warnings.push({ text: errorMessage })
         error.response.errors = warnings
         JSON.stringify(error.response)
         logger.info('Handling 500 : ', error.response)

@@ -25,7 +25,7 @@ export default class ESupervisionClient extends RestClient {
     return this.post({
       data: body,
       path: `/v2/offender_setup`,
-      errorMessageFor500: 'Failed to post offender checkin details',
+      errorMessage: 'Failed to post offender checkin details',
     })
   }
 
@@ -34,14 +34,14 @@ export default class ESupervisionClient extends RestClient {
       path: `/v2/offender_setup/${offenderSetup.uuid}/upload_location`,
       query: { 'content-type': photoContentType },
       headers: { 'Content-Type': 'application/json' },
-      errorMessageFor500: 'Failed to fetch check-in upload location',
+      errorMessage: 'Failed to fetch check-in upload location',
     })
   }
 
   async postOffenderSetupComplete(setupId: string): Promise<OffenderSetupCompleteResponse> {
     return this.post({
       path: `/v2/offender_setup/${setupId}/complete`,
-      errorMessageFor500: 'Failed to complete offender checkin registration',
+      errorMessage: 'Failed to complete offender checkin registration',
     })
   }
 

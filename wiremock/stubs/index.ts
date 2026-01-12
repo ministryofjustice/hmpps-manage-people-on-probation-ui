@@ -18,6 +18,7 @@ import alerts from './alerts'
 import caseDetail from './caseDetail'
 import user from './user'
 import eSupervisionAPI from './eSupervisionAPI'
+import document from './document'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -40,4 +41,5 @@ export default {
   ...caseDetail,
   ...user,
   ...eSupervisionAPI,
+  ...document,
 }

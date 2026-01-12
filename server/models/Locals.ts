@@ -108,6 +108,8 @@ interface Locals {
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
+  uploadError: string
+  renderPath: string
 }
 
 export interface AppResponse extends Response {
