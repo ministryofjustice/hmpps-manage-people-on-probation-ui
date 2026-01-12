@@ -1,6 +1,6 @@
 import { Note } from './note'
 
-type Match = 'MATCH' | 'NO_MATCH'
+type Match = 'MATCH' | 'NO_MATCH' | 'NO_FACE_DETECTED' | 'ERROR'
 
 export interface ESupervisionCheckIn {
   uuid: string

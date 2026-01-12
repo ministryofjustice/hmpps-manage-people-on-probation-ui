@@ -93,6 +93,9 @@ describe('is uk postcode', () => {
 })
 
 describe('is chars or less', () => {
+  const s = 's'
+  const maxCharLimit = s.repeat(254)
+  const excessChars = s.repeat(255)
   it.each([
     ['empty string', [3, ''], true],
     ['null', [3, null], true],
@@ -100,6 +103,8 @@ describe('is chars or less', () => {
     ['populated valid', [3, 'XXX'], true],
     ['populated valid', [3, 'XX'], true],
     ['populated invalid', [3, 'XXLL'], false],
+    ['populated valid', [254, maxCharLimit], true],
+    ['populated invalid', [254, excessChars], false],
   ])('%s charsOrLess(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(charsOrLess(a)).toEqual(expected)
   })
@@ -875,7 +880,7 @@ describe('validates manage checkin settings', () => {
   } as unknown as Validateable
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-manageCheckin-date`]:
-      'Enter the date you would like the person to complete their first check in',
+      'Enter the date you would like the person to complete their next check in',
   }
   const args: ESupervisionValidationArgs = {
     crn,
@@ -890,7 +895,7 @@ describe('validates manage checkin settings', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(loggerSpy).toHaveBeenCalledWith('Checkin date not entered')
+    expect(loggerSpy).toHaveBeenCalledWith('Next checkin date not entered')
   })
 })
 
