@@ -355,6 +355,20 @@ class ServiceAlert {
   }
 }
 
+const handleMessagePreview = () => {
+  const elm = document.getElementById('smsPreview')
+  if (elm) {
+    elm.querySelector('button').addEventListener('click', event => {
+      event.preventDefault()
+      const current = event.currentTarget
+      const next = current.nextElementSibling
+      if (!next.getAttribute('open')) {
+        next.setAttribute('open', '')
+      }
+    })
+  }
+}
+
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
@@ -364,4 +378,5 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
+handleMessagePreview()
 new ServiceAlert()

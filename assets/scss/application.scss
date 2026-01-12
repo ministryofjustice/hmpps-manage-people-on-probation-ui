@@ -615,3 +615,36 @@ body.feature-disabled {
 .display-none {
   display: none;
 }
+
+.sms-message-wrapper {
+  background: #e2e1e0;
+  border: 1px solid #e2e1e0;
+  border-radius: 5px;
+  box-sizing: border-box;
+  clear: both;
+  margin: 0 0 30px;
+  max-width: 464px;
+  padding: 15px;
+  position: relative;
+  white-space: normal;
+  width: 100%;
+  word-wrap: break-word;
+}
+.sms-message-wrapper:after {
+  border-color: transparent transparent #e2e1e0 #e2e1e0;
+  border-style: solid;
+  border-width: 10px 13px;
+  bottom: -5px;
+  content: '';
+  display: block;
+  position: absolute;
+  right: -20px;
+  transform: rotate(20deg);
+}
+
+#smsPreview > div {
+  display: none;
+  &[open] {
+    display: block;
+  }
+}
