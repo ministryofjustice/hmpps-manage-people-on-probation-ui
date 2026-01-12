@@ -1,4 +1,7 @@
 import { NextFunction, Request } from 'express'
+import { DateTime } from 'luxon'
+import { add } from 'date-fns'
+import { format } from 'date-fns/format'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import ESupervisionClient from '../data/eSupervisionClient'
@@ -10,6 +13,15 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
     const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)
+
+    let reviewDueDate = null
+    if (checkInResponse.status === 'EXPIRED') {
+      reviewDueDate = add(new Date(checkInResponse.dueDate), { days: 6 })
+    } else if (checkInResponse.submittedAt) {
+      reviewDueDate = add(new Date(checkInResponse.submittedAt), { days: 3 })
+    }
+    reviewDueDate = format(reviewDueDate, 'd MMMM yyyy')
+    checkInResponse.reviewDueDate = reviewDueDate
 
     for (let i = 0; i < checkInResponse.checkinLogs.logs.length; i += 1) {
       const log = checkInResponse.checkinLogs.logs[i]
@@ -34,6 +46,7 @@ export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
       }
     }
     res.locals.checkIn = checkInResponse
+    console.log(res.locals.checkIn.reviewDueDate)
     return next()
   }
 }

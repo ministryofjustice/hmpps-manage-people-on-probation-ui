@@ -24,6 +24,7 @@ export interface ESupervisionCheckIn {
   missedCheckinComment?: string
   notes?: Note[]
   checkinLogs: ESupervisionCheckInLogs
+  reviewDueDate?: string
 }
 
 export interface ESupervisionLog {
