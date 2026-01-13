@@ -10,7 +10,9 @@ import {
   isNumericString,
   isValidCrn,
   isValidUUID,
+  isWelshPostcode,
   setDataValue,
+  translateToWelshDayMonth,
 } from '../utils'
 import {
   renderError,
@@ -23,7 +25,12 @@ import {
   getAttendedCompliedProps,
   isRescheduleAppointment,
 } from '../middleware'
-import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
+import {
+  AppointmentSession,
+  AppointmentsPostResponse,
+  SmsLanguage,
+  RescheduleAppointmentResponse,
+} from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
@@ -471,7 +478,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   postSupportingInformation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
       const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -590,14 +596,20 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { crn, uuid, date, start, location } = req.body
 
       const generatePreview = (): string => {
-        preview = smsPreview
+        preview = smsPreview[language]
         const dt = DateTime.fromFormat(`${date} ${start}`, 'd/M/yyyy HH:mm', { locale: 'en-GB' })
-        const dateTime = dt.toFormat("cccc d LLLL 'at' ha")
+        let previewDate = dt.toFormat('cccc d LLLL')
+        if (language === 'welsh') {
+          previewDate = translateToWelshDayMonth(previewDate)
+        }
+        const time = dt.toFormat('ha')
         preview = preview.replace('{name}', name)
         preview = preview.replace('{location}', location)
-        preview = preview.replace('{dateTime}', dateTime)
+        preview = preview.replace('{date}', previewDate)
+        preview = preview.replace('{time}', time)
         req.session.data.appointments[crn][uuid].smsPreview = {
           name,
+          language,
           date,
           start,
           location,
@@ -611,11 +623,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const isValid = isValidDate && isValidStart && location
       let preview: string | null = null
       let name: string = null
-
+      let language: SmsLanguage
       if (isValid) {
         const previewSession = req.session.data?.appointments?.[crn]?.[uuid]?.smsPreview
         if (previewSession) {
-          ;({ name } = previewSession)
+          ;({ name, language } = previewSession)
           if (date === previewSession.date && start === previewSession.start && location === previewSession.location) {
             preview = previewSession.preview
           } else {
@@ -626,6 +638,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
           const masClient = new MasApiClient(token)
           const response = await masClient.getPersonalDetails(crn)
           name = response.name.forename
+          language = isWelshPostcode(response?.mainAddress?.postcode) ? 'welsh' : 'english'
           preview = generatePreview()
         }
       }

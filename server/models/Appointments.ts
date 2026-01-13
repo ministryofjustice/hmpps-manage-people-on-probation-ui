@@ -7,7 +7,10 @@ export type YesNo = '' | 'Yes' | 'No'
 
 export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO'
 
+export type SmsLanguage = 'english' | 'welsh'
+
 export interface SmsPreview {
+  language: SmsLanguage
   name: string
   date: string
   start: string
