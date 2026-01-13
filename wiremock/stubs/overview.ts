@@ -13,7 +13,6 @@ const stubOverviewVisorRegistration = (): SuperAgentRequest =>
     response: {
       status: 200,
       jsonBody: {
-        appointmentsWithoutOutcome: 5,
         absencesWithoutEvidence: 1,
         personalDetails: {
           name: {

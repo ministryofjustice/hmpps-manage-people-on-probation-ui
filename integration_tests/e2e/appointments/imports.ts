@@ -2,7 +2,6 @@ import 'cypress-plugin-tab'
 import { DateTime } from 'luxon'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
-import AppointmentRepeatingPage from '../../pages/appointments/repeating.page'
 import AppointmentPreviewPage from '../../pages/appointments/preview.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
@@ -184,21 +183,6 @@ export const completeSupportingInformationPage = (notes = true, crnOverride = ''
   notePage.getSubmitBtn().click()
 }
 
-export const completeRepeatingPage = (repeat = 2, crnOverride = '') => {
-  const repeatingPage = new AppointmentRepeatingPage()
-  if (repeat) {
-    repeatingPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-repeating`).click()
-    repeatingPage.getElement(`#appointments-${crnOverride || crn}-${uuid}-interval`).click()
-    repeatingPage
-      .getElement(`#appointments-${crnOverride || crn}-${uuid}-numberOfRepeatAppointments`)
-      .clear()
-      .type(repeat.toString())
-  } else {
-    repeatingPage.getElement(`#appointments-${crn}-${uuid}-repeating-2`).click()
-  }
-  repeatingPage.getSubmitBtn().click()
-}
-
 export const completePreviewPage = () => {
   const previewPage = new AppointmentPreviewPage()
   previewPage.getSubmitBtn().click()
@@ -246,7 +230,6 @@ export const completeNextAppointmentPage = (index = 1) => {
 export const checkAppointmentSummary = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage | RescheduleCheckYourAnswerPage,
   probationPractitioner = false,
-  repeatingEnabled = false,
   dateInPast = false,
 ) => {
   const appointmentFor =
@@ -301,16 +284,8 @@ export const checkAppointmentSummary = (
     page.getSummaryListRow(5).find('.govuk-summary-list__value').should('contain.text', 'Not entered')
   }
 
-  let index = 0
-  // if (!(page instanceof AppointmentCheckYourAnswersPage)) {
-  index = repeatingEnabled || dateInPast ? 1 : 0
-  if (repeatingEnabled) {
-    page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Repeating appointment')
-    page
-      .getSummaryListRow(6)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', page instanceof ArrangeAnotherAppointmentPage ? 'No' : 'Yes')
-  }
+  const index = dateInPast ? 1 : 0
+
   if (dateInPast) {
     page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
     page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
@@ -427,34 +402,6 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
           }
         })
     })
-  })
-}
-
-export const checkUpdateRepeating = (page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage) => {
-  getUuid().then(pageUuid => {
-    page.getSummaryListRow(6).find('.govuk-link').click()
-    const repeatingPage = new AppointmentRepeatingPage()
-    repeatingPage.getElement(`#appointments-${crn}-${pageUuid}-repeating-2`).click()
-    repeatingPage.getSubmitBtn().click()
-    if (page instanceof ArrangeAnotherAppointmentPage) {
-      completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
-      completeSupportingInformationPage(true, '', pageUuid)
-    }
-    page.checkOnPage()
-    page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'No')
-    if (page instanceof AppointmentCheckYourAnswersPage) {
-      page.getSummaryListRow(5).find('.govuk-summary-list__value li').should('have.length', 1)
-      page
-        .getSummaryListRow(5)
-        .find('.govuk-summary-list__value li:nth-child(1)')
-        .invoke('text')
-        .then(text => {
-          const normalizedText = text.replace(/\s+/g, ' ').trim()
-          expect(normalizedText).to.include(
-            `${dateWithYear(date)} from ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
-          )
-        })
-    }
   })
 }
 

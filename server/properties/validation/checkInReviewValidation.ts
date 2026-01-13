@@ -38,7 +38,7 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Enter the reason why the offender did not complete their checkin',
+          msg: 'Enter the reason the person did not complete their checkin',
           log: 'Missed checkin note not completed',
         },
       ],

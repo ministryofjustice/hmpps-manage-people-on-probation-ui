@@ -20,7 +20,7 @@ import {
 import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { getQueryString } from './activityLog'
+import { ErrorSummary } from '../data/model/common'
 
 const routes = [
   'getAppointments',
@@ -285,16 +285,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         delete req.session.body
       }
       const url = encodeURIComponent(req.url)
-      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+      const { maxCharCount } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
         url,
-        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
-        maxFileSize,
-        fileUploadLimit,
-        uploadedFiles,
         maxCharCount,
       })
     }
@@ -306,7 +302,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
+
       const { notes, sensitive } = req.body
+      const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
@@ -315,11 +313,27 @@ const appointmentsController: Controller<typeof routes, void> = {
         notes: handleQuotes(notes),
         sensitive: sensitive === 'Yes',
       }
+
       if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
         body.outcomeRecorded = true
         delete req.session.data.appointments[crn][id].outcomeRecorded
       }
+
       await masClient.patchAppointment(body)
+
+      if (file) {
+        const patchResponse = await masClient.patchDocuments(crn, id, file)
+
+        if (!isSuccessfulUpload(patchResponse)) {
+          return res.render('pages/appointments/add-note', {
+            uploadError: 'File not uploaded. Please try again.',
+            patchResponse,
+            sensitive,
+            notes,
+          })
+        }
+      }
+
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
@@ -399,6 +413,38 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
+}
+
+export const isSuccessfulUpload = (response: unknown): boolean => {
+  // Null / undefined = success (MAS / stub behaviour)
+  if (response == null) {
+    return true
+  }
+
+  // Non-object (string, boolean, number) = success (legacy stubs)
+  if (typeof response !== 'object') {
+    return true
+  }
+
+  // At this point, response is an object
+  const res = response as Record<string, unknown>
+
+  // statusCode is authoritative
+  if (typeof res.statusCode === 'number') {
+    return res.statusCode >= 200 && res.statusCode < 300
+  }
+
+  // Explicit error shape
+  if (Array.isArray(res.errors)) {
+    return false
+  }
+
+  // Empty object = success
+  if (Object.keys(res).length === 0) {
+    return true
+  }
+
+  return false
 }
 
 export default appointmentsController

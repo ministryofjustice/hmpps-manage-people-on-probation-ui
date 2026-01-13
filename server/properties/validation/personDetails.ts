@@ -61,8 +61,8 @@ export const personDetailsValidation = ({
       },
       {
         validator: charsOrLess,
-        length: 35,
-        msg: `Email address must be 35 characters or less.`,
+        length: 254,
+        msg: `Email address must be 254 characters or less.`,
       },
     ],
   },

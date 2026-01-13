@@ -5,7 +5,6 @@
 {% set noOasysRiskAssessmentFlag = "There is no OASys risk assessment" %}
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
-{% set appointmentsWithoutAnOutcomeCount = overview.appointmentsWithoutOutcome %}
 {% set headerCRN = crn %}
 {% set headerDob = overview.personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
@@ -217,8 +216,8 @@
     {{ govukSummaryList({
                 rows: [
                     {
-                        key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},
-                        value: { html: '<span data-qa="checkinDueValue"> Online check ins not set up </span>'}
+                        key: { html: '<span data-qa="checkinDueLabel">First check in due</span>'},
+                        value: { html: '<span data-qa="checkinDueValue">Online check ins not set up</span>'}
                     }
                 ]
             }) }}

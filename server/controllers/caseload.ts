@@ -43,11 +43,16 @@ const caseloadController: Controller<typeof routes, void, Args> = {
     return async (req, res, _next, args) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const pageNum: number = req.session.page ? Number.parseInt(req.session.page, config.apis.masApi.pageSize) : 1
+
+      const { sortBy: sortByQuery = 'nextContact.asc' } = req.query as Record<string, string>
+      const pageNum: number = req.query.page
+        ? Number.parseInt(req.query.page as string, config.apis.masApi.pageSize)
+        : 1
+
       const caseload = await masClient.searchUserCaseload(
         res.locals.user.username,
         (pageNum - 1).toString(),
-        req.session.sortBy,
+        sortByQuery,
         req.session.caseFilter,
       )
       const { filter } = args
@@ -65,11 +70,11 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const pagination: Pagination = getPaginationLinks(
-        req.session.page ? Number.parseInt(req.session.page, config.apis.masApi.pageSize) : 1,
+        req.query.page ? pageNum : 1,
         caseload?.totalPages || 0,
         caseload?.totalElements || 0,
         page => addParameters(req, { page: page.toString() }),
-        caseload?.pageSize || config.apis.masApi.pageSize,
+        caseload?.pageSize || 10,
       )
       if (req?.query?.sortBy) {
         newCaseload = {
@@ -93,7 +98,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         sentenceCode: req.body.sentenceCode,
         nextContactCode: req.body.nextContactCode,
       }
-      req.session.page = '1'
       await caseloadController.showCaseload(hmppsAuthClient)(req, res, next, {
         filter: req.session.caseFilter,
       })
@@ -108,20 +112,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
           sentenceCode: null,
           nextContactCode: null,
         }
-      }
-      if (req.session?.sortBy) {
-        if (req.query.sortBy && req.query.sortBy !== req.session?.sortBy) {
-          req.session.sortBy = req.query.sortBy as string
-        }
-      } else {
-        req.session.sortBy = req.query.sortBy ? (req.query.sortBy as string) : 'nextContact.asc'
-      }
-      if (req.session?.page) {
-        if (req.query.page && req.query.page !== req.session.page) {
-          req.session.page = req.query.page as string
-        }
-      } else {
-        req.session.page = req.query.page as string
       }
       await caseloadController.showCaseload(hmppsAuthClient)(req, res, next, {
         filter: req.session.caseFilter,
@@ -159,7 +149,6 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         return { ...appointment, birthdate: { day, month, year } }
       })
       const baseUrl = req.url.split('?')[0]
-      const sortUrl = `${baseUrl}${getSearchParamsString({ req, ignore: ['sortBy'] })}`
       userSchedule = {
         ...userSchedule,
         appointments,
@@ -178,7 +167,7 @@ const caseloadController: Controller<typeof routes, void, Args> = {
         type,
         sortBy,
         pagination,
-        sortUrl,
+        sortUrl: baseUrl,
         url,
       })
     }

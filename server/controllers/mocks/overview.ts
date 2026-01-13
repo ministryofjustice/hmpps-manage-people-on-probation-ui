@@ -1,5 +1,4 @@
 export const mockOverview = {
-  appointmentsWithoutOutcome: 5,
   absencesWithoutEvidence: 1,
   personalDetails: {
     name: {

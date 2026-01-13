@@ -3,7 +3,7 @@ import {
   Address,
   buildAddress,
   createAddress,
-} from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/address/create-address'
+} from '@ministryofjustice/hmpps-probation-integration-e2e-tests/steps/delius/address/create-address.mjs'
 
 const addAddress = async (
   page: Page,

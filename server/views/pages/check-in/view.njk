@@ -12,12 +12,33 @@
     {% set notes = notes.concat(appNote(note, '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage/note/' + note.id + '?back=' + url)) %}
 {% endfor  %}
 
-{% block form %}
+{% block content %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
 
-        <h2 class="govuk-heading-m">Practioner review</h2>
+        {% include "../../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
+        {% block heading %}
+          {% if title %}
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+              {{ title }}
+            </h2>
+          {% endif %}
+        {% endblock %}
+
+        <h2 class="govuk-heading-m">Practitioner review</h2>
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
@@ -50,7 +71,7 @@
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
                 hint: {
-                    text: "This information will be added to contact notes"
+                    text: "This information will be added to contact notes."
                 },
                 rows: '10',
                 maxlength: maxCharCount,
@@ -121,7 +142,7 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Anything they need help with or to let us know</dt>
+                <dt class="govuk-summary-list__key">Anything they need support with or to let us know</dt>
                 <dd class="govuk-summary-list__value">
                     {% for a in checkIn.surveyResponse.assistance | split %}
                         {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}

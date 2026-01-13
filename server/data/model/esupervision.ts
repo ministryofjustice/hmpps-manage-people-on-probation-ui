@@ -1,6 +1,6 @@
 import { Note } from './note'
 
-type Match = 'MATCH' | 'NO_MATCH'
+type Match = 'MATCH' | 'NO_MATCH' | 'NO_FACE_DETECTED' | 'ERROR'
 
 export interface ESupervisionCheckIn {
   uuid: string
@@ -24,6 +24,7 @@ export interface ESupervisionCheckIn {
   missedCheckinComment?: string
   notes?: Note[]
   checkinLogs: ESupervisionCheckInLogs
+  reviewDueDate?: string
 }
 
 export interface ESupervisionLog {
@@ -39,8 +40,6 @@ export interface ESupervisionLog {
     | 'OFFENDER_CHECKIN_OUTSIDE_ACCESS'
     | 'OFFENDER_CHECKIN_REVIEW_SUBMITTED'
     | 'OFFENDER_CHECKIN_ANNOTATED'
-    | 'OFFENDER_CHECKIN_RESCHEDULED'
-    | 'OFFENDER_CHECKIN_OUTSIDE_ACCESS'
   checkin: string
 }
 

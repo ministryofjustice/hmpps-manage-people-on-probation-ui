@@ -11,7 +11,6 @@ import {
   isValidUUID,
   setDataValue,
 } from '../utils'
-import { ArrangedSession } from '../models/ArrangedSession'
 import {
   renderError,
   postAppointments,
@@ -28,7 +27,6 @@ import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
-import { Name } from '../data/model/personalDetails'
 import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
@@ -47,8 +45,6 @@ const routes = [
   'getAttendedComplied',
   'postAttendedComplied',
   'getLocationNotInList',
-  'getRepeating',
-  'postRepeating',
   'getSupportingInformation',
   'postSupportingInformation',
   'getCheckYourAnswers',
@@ -318,25 +314,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
       const path = ['appointments', crn, id]
       const appointment = getDataValue<AppointmentSession>(data, path)
       const { date, interval } = appointment
-      let until = date
-      let repeatingDates = [] as string[]
-      if (change && repeatAppointmentsEnabled) {
-        const period = ['WEEK', 'FORTNIGHT'].includes(interval) ? 'week' : 'month'
-        const increment = interval === 'FORTNIGHT' ? 2 : 1
-        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment) ?? []
-        repeatingDates = repeatAppointments.map(appt => appt.date)
-        until = repeatAppointments.length ? repeatAppointments[repeatAppointments.length - 1].date : ''
-      } else {
-        setDataValue(data, [...path, 'numberOfAppointments'], '1')
-        setDataValue(data, [...path, 'numberOfRepeatAppointments'], '')
-        setDataValue(data, [...path, 'interval'], 'DAY')
-      }
+      const until = date
+      setDataValue(data, [...path, 'numberOfAppointments'], '1')
+      setDataValue(data, [...path, 'interval'], 'DAY')
       setDataValue(data, [...path, 'until'], until)
-      setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
       if (change) {
         const originalDate = getDataValue(data, [...path, 'temp', 'date'])
         const updatedDate = getDataValue(data, [...path, 'date'])
@@ -356,7 +340,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
 
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      let nextPage = repeatAppointmentsEnabled ? `repeating` : `supporting-information`
+      let nextPage = `supporting-information`
 
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
@@ -456,82 +440,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
-  getRepeating: () => {
-    return async (req, res) => {
-      if (res.locals.flags.enableRepeatAppointments !== true) {
-        return renderError(404)(req, res)
-      }
-      const { data } = req.session
-      const { crn, id } = req.params as Record<string, string>
-      const { interval, numberOfRepeatAppointments } = req.query
-      if (interval || numberOfRepeatAppointments) {
-        setDataValue(data, ['appointments', crn, id, 'repeating'], 'Yes')
-        if (interval) {
-          setDataValue(data, ['appointments', crn, id, 'interval'], decodeURI(interval as string))
-        }
-        if (numberOfRepeatAppointments) {
-          setDataValue(data, ['appointments', crn, id, 'numberOfRepeatAppointments'], numberOfRepeatAppointments)
-        }
-      }
-      const appointment = getDataValue(data, ['appointments', crn, id])
-      if (appointment?.date && appointment?.interval && appointment?.numberOfRepeatAppointments) {
-        const clonedAppointment = { ...appointment }
-        const period = ['WEEK', 'FORTNIGHT'].includes(appointment.interval) ? 'week' : 'month'
-        const increment = appointment.interval === 'FORTNIGHT' ? 2 : 1
-        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(clonedAppointment, period, increment)
-        setDataValue(
-          data,
-          ['appointments', crn, id, 'repeatingDates'],
-          repeatAppointments.map(appt => appt.date),
-        )
-        res.locals.lastAppointmentDate = repeatAppointments.length
-          ? repeatAppointments[repeatAppointments.length - 1].date
-          : ''
-      }
-      return res.render(`pages/arrange-appointment/repeating`, { crn, id })
-    }
-  },
-  postRepeating: () => {
-    return async (req, res) => {
-      if (res?.locals?.flags?.enableRepeatAppointments !== true) {
-        return renderError(404)(req, res)
-      }
-      const { crn, id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      const change = req?.query?.change as string
-      const { data } = req.session
-      const { repeating, numberOfRepeatAppointments = '0' } = getDataValue<AppointmentSession>(data, [
-        'appointments',
-        crn,
-        id,
-      ])
-      if (repeating === 'No') {
-        const updatedAppointment: AppointmentSession = {
-          ...(data?.appointments?.[crn]?.[id] || {}),
-          repeating: 'No',
-          numberOfRepeatAppointments: '0',
-          numberOfAppointments: '1',
-          interval: 'DAY',
-          repeatingDates: [] as string[],
-          until: getDataValue(data, ['appointments', crn, id, 'date']),
-        }
-        setDataValue(req.session.data, ['appointments', crn, id], updatedAppointment)
-      } else {
-        setDataValue(
-          data,
-          ['appointments', crn, id, 'numberOfAppointments'],
-          parseInt(numberOfRepeatAppointments, 10) + 1,
-        )
-      }
-      let redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
-      if (change) {
-        redirect = findUncompleted(req, res)
-      }
-      return res.redirect(redirect)
-    }
-  },
   getSupportingInformation: () => {
     return async (req, res) => {
       const { maxCharCount } = config
@@ -544,8 +452,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         }
       }
       const isInPast = appointmentDateIsInPast(req)
-      const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
-      const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
+      const back = 'date-time'
       return res.render(`pages/arrange-appointment/supporting-information`, {
         crn,
         id,
@@ -574,7 +481,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   },
   getCheckYourAnswers: () => {
     return async (req, res) => {
-      const repeatingEnabled = res.locals.flags.enableRepeatAppointments === true
       const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
@@ -593,7 +499,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         id,
         location,
         url,
-        repeatingEnabled,
         isInPast,
       })
     }

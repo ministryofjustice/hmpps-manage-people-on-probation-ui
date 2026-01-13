@@ -17,7 +17,7 @@ jobs:
     name: Run the integration tests
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
     - name: Use Node.js ${{ inputs.node_version_file }}
       uses: actions/setup-node@v6
       with:
@@ -28,7 +28,7 @@ jobs:
         name: npm_build_artifacts
     - name: restore cache
       id: restore-cache
-      uses: actions/cache/restore@v4
+      uses: actions/cache/restore@v5
       env: 
         cache-name: node-modules
       with:

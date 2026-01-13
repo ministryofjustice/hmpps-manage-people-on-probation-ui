@@ -11,12 +11,8 @@ export const redirectWizard = (requiredValues: (string | string[])[]): Route<Pro
     if (!change) {
       for (const requiredValue of requiredValues) {
         const path = Array.isArray(requiredValue) ? requiredValue : [requiredValue]
-        const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
         const value = getDataValue(data, ['appointments', crn, id, ...path])
-        const makeRedirect =
-          (repeatAppointmentsEnabled && requiredValue === 'repeating' && !value) ||
-          (requiredValue !== 'repeating' && !value)
-        if (makeRedirect) {
+        if (!value) {
           if (!isValidCrn(crn) || !isValidUUID(id)) {
             return renderError(404)(req, res)
           }

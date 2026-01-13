@@ -22,9 +22,31 @@ export default class AddNotePage extends Page {
   }
 
   getFilesAdded = () => {
-    return cy.get('.moj-multi-file__uploaded-files')
+    return cy.get('[data-qa="filesAdded"]')
   }
 
+  // New single file upload methods
+  getFileUploadButton = () => {
+    return cy.get('#fileUpload')
+  }
+
+  getFileUploadInput = () => {
+    return cy.get('#fileUpload-input')
+  }
+
+  getFileUploadLabel = () => {
+    return cy.get('label[for="fileUpload"]')
+  }
+
+  getFileUploadError = () => {
+    return cy.get('.govuk-error-message')
+  }
+
+  getChooseFilesButton = () => {
+    return cy.get('#fileUpload')
+  }
+
+  // Keep these for backward compatibility with tests that might still use them
   getFileUploadList = () => {
     return cy.get('.moj-multi-file-upload__list')
   }
@@ -56,9 +78,5 @@ export default class AddNotePage extends Page {
       )
       .eq(index)
       .find('.moj-multi-file-upload__actions button')
-  }
-
-  getChooseFilesButton = () => {
-    return cy.get('.moj-multi-file-upload__dropzone label[for="file-upload-1"]')
   }
 }

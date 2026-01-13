@@ -5,12 +5,33 @@
 {% set backLink = back | default('/case/' + crn + '/activity-log') %}
 {% set hideButton = true %}
 
-{% block form %}
+{% block content %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+
+        {% include "../../../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
+        {% block heading %}
+          {% if title %}
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+              {{ title }}
+            </h2>
+          {% endif %}
+        {% endblock %}
         
-        <p class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the video is the person who should be checking in</p>
+        <p class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the video is the person who should be checking in.</p>
 
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row">
@@ -19,7 +40,7 @@
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Review due</dt>
-                <dd class="govuk-summary-list__value">{{checkIn.dueDate | dateWithYear }}</dd>
+                <dd class="govuk-summary-list__value">{{checkIn.reviewDueDate }}</dd>
             </div>
         </dl>
 
@@ -38,7 +59,7 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Anything they need help with or to let us know</dt>
+                <dt class="govuk-summary-list__key">Anything they need support with or to let us know</dt>
                 <dd class="govuk-summary-list__value">
                     {% for a in checkIn.surveyResponse.assistance | split %}
                         {{ a | userFriendlyString }}{% if not loop.last %},{% endif %}

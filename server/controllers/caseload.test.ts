@@ -159,7 +159,7 @@ describe('caseloadController', () => {
       expect(searchUserCaseloadSpy).toHaveBeenCalledWith(
         res.locals.user.username,
         '0',
-        req.session.sortBy,
+        'nextContact.asc',
         expectedCaseFilter,
       )
     })
@@ -185,8 +185,6 @@ describe('caseloadController', () => {
     const createMockRequest = (req?: MockReq): httpMocks.MockRequest<any> => {
       return httpMocks.createRequest({
         session: {
-          sortBy: 'name',
-          page: '2',
           caseFilter: {
             nameOrCrn: crn,
             sentenceCode: '1234',
@@ -211,63 +209,6 @@ describe('caseloadController', () => {
         nextContactCode: null,
       })
     })
-    describe('sortBy session value exists', () => {
-      it('sortBy session value should be updated to the sortBy query value if values are different', async () => {
-        const req = createMockRequest()
-        await controllers.caseload.getCase(hmppsAuthClient)(req, res, nextSpy)
-        expect(req.session.sortBy).toEqual(req.query.sortBy)
-      })
-      it('sortBy session value should not be updated if the sortBy query is the same value', async () => {
-        const req = createMockRequest({
-          query: {
-            sortBy: 'name',
-          },
-        })
-        await controllers.caseload.getCase(hmppsAuthClient)(req, res, nextSpy)
-        expect(req.session.sortBy).toEqual('name')
-      })
-    })
-    describe('sortBy session value does not exist', () => {
-      it('sortBy session value should equal sortBy query value if it exists in the url', async () => {
-        const req = createMockRequest({
-          session: {
-            sortBy: undefined,
-          },
-        })
-        await controllers.caseload.getCase(hmppsAuthClient)(req, res, nextSpy)
-        expect(req.session.sortBy).toEqual(req.query.sortBy)
-      })
-      it('sortBy value should be set to default if the sortBy query value does not exist', async () => {
-        const req = createMockRequest({
-          session: {
-            sortBy: undefined,
-          },
-          query: {
-            sortBy: undefined,
-          },
-        })
-        await controllers.caseload.getCase(hmppsAuthClient)(req, res, nextSpy)
-        expect(req.session.sortBy).toEqual('nextContact.asc')
-      })
-    })
-    describe('page session value exists', () => {
-      it('should update page session value to query session value if different', async () => {
-        const req = createMockRequest()
-        await controllers.caseload.getCase(hmppsAuthClient)(req, res, nextSpy)
-        expect(req.session.page).toEqual(req.query.page)
-      })
-    })
-    describe('page session value does not exist', () => {
-      it('should set the page session value to the page query value', async () => {
-        const req = createMockRequest({
-          session: {
-            page: undefined,
-          },
-        })
-        await controllers.caseload.getCase(hmppsAuthClient)(req, res, nextSpy)
-        expect(req.session.page).toEqual(req.query.page)
-      })
-    })
     it('should request the caseload from the api', async () => {
       jest.clearAllMocks()
       const req = createMockRequest()
@@ -275,7 +216,7 @@ describe('caseloadController', () => {
       expect(searchUserCaseloadSpy).toHaveBeenCalledWith(
         res.locals.user.username,
         '0',
-        req.session.sortBy,
+        req.query.sortBy,
         req.session.caseFilter,
       )
     })
@@ -322,7 +263,7 @@ describe('caseloadController', () => {
           page => addParameters(req, { page: page.toString() }),
           mockResponse.size,
         ),
-        sortUrl: '/caseload/appointments/upcoming?page=1',
+        sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
       })
     })
@@ -361,7 +302,7 @@ describe('caseloadController', () => {
           page => addParameters(req, { page: page.toString() }),
           mockResponse.size,
         ),
-        sortUrl: '/caseload/appointments/upcoming?page=2',
+        sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
       })
     })
@@ -378,7 +319,7 @@ describe('caseloadController', () => {
           page: '2',
           sortBy: 'appointment.desc',
         },
-        url: '/caseload/appointments/upcoming?page=0&sortBy=appointment.asc',
+        url: '/caseload/appointments/upcoming?page=2&sortBy=appointment.asc',
       })
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
@@ -400,7 +341,7 @@ describe('caseloadController', () => {
           page => addParameters(req, { page: page.toString() }),
           mockResponse.size,
         ),
-        sortUrl: '/caseload/appointments/upcoming?page=2',
+        sortUrl: '/caseload/appointments/upcoming',
         url: req.url,
       })
     })
@@ -413,9 +354,9 @@ describe('caseloadController', () => {
       }
       const req = httpMocks.createRequest({
         query: {
-          page: '0',
+          page: '1',
         },
-        url: '/caseload/appointments/no-outcome?page=0',
+        url: '/caseload/appointments/no-outcome?page=1',
       })
       await controllers.caseload.userSchedule(hmppsAuthClient)(req, res)
       expect(getUserScheduleSpy).toHaveBeenCalledWith({
@@ -437,7 +378,7 @@ describe('caseloadController', () => {
           page => addParameters(req, { page: page.toString() }),
           mockResponse.size,
         ),
-        sortUrl: '/caseload/appointments/no-outcome?page=0',
+        sortUrl: '/caseload/appointments/no-outcome',
         url: req.url,
       })
     })
