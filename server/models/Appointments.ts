@@ -7,6 +7,14 @@ export type YesNo = '' | 'Yes' | 'No'
 
 export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO'
 
+export interface SmsPreview {
+  name: string
+  date: string
+  start: string
+  location: string
+  preview: string
+}
+
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export interface AppointmentSessionUser {
@@ -45,6 +53,7 @@ export interface AppointmentSession {
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions
+  smsPreview?: SmsPreview
   temp?: {
     providerCode?: string
     teamCode?: string

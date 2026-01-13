@@ -9,6 +9,7 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
+import './message-preview'
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
 if ($backendSortableTable) {
@@ -355,44 +356,6 @@ class ServiceAlert {
   }
 }
 
-const handleMessagePreview = () => {
-  const elm = document.getElementById('smsPreview')
-  if (elm) {
-    const path = document.location.pathname.split('/')
-    const crn = path[2]
-    const uuid = path[4]
-
-    elm.querySelector('button').addEventListener('click', event => {
-      event.preventDefault()
-      const date = document.querySelector(`#appointments-${crn}-${uuid}-date`).value
-      const start = document.querySelector(`#appointments-${crn}-${uuid}-start`).value
-      const locationOptions = document.querySelectorAll('[data-qa=locationOption]')
-      const index = [...locationOptions].findIndex(option => option.checked)
-      let location = null
-      if (index > -1) {
-        location = document
-          .querySelectorAll(`[data-qa=locationCode] .govuk-radios__item`)
-          [index].querySelector('label').innerText
-      }
-      console.log({ date, start, location })
-      const canPreview = date && start && location
-      if (canPreview) {
-        const current = event.currentTarget
-        const next = current.nextElementSibling
-        if (!next.getAttribute('open')) {
-          next.setAttribute('open', '')
-        }
-        const dt = DateTime.fromFormat(`${date} ${start}`, 'd/M/yyyy HH:mm', { locale: 'en-GB' })
-        const previewDateTime = dt.toFormat("cccc d LLLL 'at' ha")
-        const preview = `You have an appointment at ${location} on ${previewDateTime}`
-        console.log({ preview })
-      } else {
-        console.log('cant preview!')
-      }
-    })
-  }
-}
-
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
@@ -402,5 +365,4 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
-handleMessagePreview()
 new ServiceAlert()

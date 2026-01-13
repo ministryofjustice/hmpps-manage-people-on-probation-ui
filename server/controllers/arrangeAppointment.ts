@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
@@ -31,6 +32,8 @@ import { postRescheduleAppointments } from '../middleware/postRescheduleAppointm
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
+import smsPreview from '../properties/smsPreview'
+import { isValidDateFormat, timeIsValid24HourFormat } from '../utils/validationUtils'
 
 const routes = [
   'redirectToSentence',
@@ -55,6 +58,7 @@ const routes = [
   'postArrangeAnotherAppointment',
   'getAddNote',
   'postAddNote',
+  'postSmsPreview',
 ] as const
 
 export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
@@ -106,7 +110,7 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   return res.redirect(`${baseUrl}/confirmation`)
 }
 
-const arrangeAppointmentController: Controller<typeof routes, void> = {
+const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
   redirectToSentence: () => {
     return async (req, res) => {
       const uuid = uuidv4()
@@ -580,6 +584,53 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   },
   postArrangeAnotherAppointment: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
+  },
+  postSmsPreview: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, uuid, date, start, location } = req.body
+
+      const generatePreview = (): string => {
+        preview = smsPreview
+        const dt = DateTime.fromFormat(`${date} ${start}`, 'd/M/yyyy HH:mm', { locale: 'en-GB' })
+        const dateTime = dt.toFormat("cccc d LLLL 'at' ha")
+        preview = preview.replace('{name}', name)
+        preview = preview.replace('{location}', location)
+        preview = preview.replace('{dateTime}', dateTime)
+        req.session.data.appointments[crn][uuid].smsPreview = {
+          name,
+          date,
+          start,
+          location,
+          preview,
+        }
+        return preview
+      }
+
+      const isValidDate = isValidDateFormat([date])
+      const isValidStart = timeIsValid24HourFormat([null, start])
+      const isValid = isValidDate && isValidStart && location
+      let preview: string | null = null
+      let name: string = null
+
+      if (isValid) {
+        const previewSession = req.session.data?.appointments?.[crn]?.[uuid]?.smsPreview
+        if (previewSession) {
+          ;({ name } = previewSession)
+          if (date === previewSession.date && start === previewSession.start && location === previewSession.location) {
+            preview = previewSession.preview
+          } else {
+            preview = generatePreview()
+          }
+        } else {
+          const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+          const masClient = new MasApiClient(token)
+          const response = await masClient.getPersonalDetails(crn)
+          name = response.name.forename
+          preview = generatePreview()
+        }
+      }
+      return res.json({ preview })
+    }
   },
 }
 

@@ -158,6 +158,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     const { isInPast, isToday } = dateIsInPast(date, time)
     return res.json({ isInPast, isToday, alertDismissed })
   })
+  router.post('/appointment/sms-preview', controllers.arrangeAppointments.postSmsPreview(hmppsAuthClient))
 }
 
 export default arrangeAppointmentRoutes
