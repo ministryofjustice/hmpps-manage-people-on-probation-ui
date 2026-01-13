@@ -14,12 +14,9 @@ Try it out in the dev environment: https://manage-people-on-probation-dev.hmpps.
 
 You'll need to install:
 
-- [Node 22.x](https://nodejs.org/download/release/latest-v22.x)\*
+- [Node 22.x](https://nodejs.org/en/download) - Node and nvm installation. 
 - [Docker](https://www.docker.com/)
-- Latest version of Java
-
-\*If you're already using [nvm](https://github.com/nvm-sh/nvm) or [fnm](https://github.com/Schniz/fnm), run:
-`nvm install --latest-npm` at the project root to install the correct Node version automatically.
+- [Latest version of Java with Homebrew](https://formulae.brew.sh/formula/openjdk#default) - Needed for wiremock
 
 ### Dependencies
 
@@ -35,11 +32,12 @@ npm install
 # Start the UI in test mode
 npm run start-feature:dev
 ````
+Open http://localhost:3007 in your browser.
 
 ### Integrate with dev services
 
 - Request access for 1password, on the [#ask-operations-engineering](https://moj.enterprise.slack.com/archives/C01BUKJSZD4) channel. Once access granted, create a `.env` file and copy the environmental variables from 1password to your `.env`.
-- Request user access for development and test, complete this form [Delius User Access Request (Non-Prod)](https://forms.office.com/Pages/ResponsePage.aspx?id=KEeHxuZx_kGp4S6MNndq2Iul1BWfp9ZCiJ3G_7B-PQZUM0ZXUDFZTjk2STZGSlpMUkJDUDFZREE4NS4u)
+- Request user access for development and test, complete the Delius User Access Request form.
 
 ```shell
 npm run start:dev
@@ -79,23 +77,6 @@ npm run int-test
 
 # Or, run the tests with the Cypress UI:
 npm run int-test-ui
-```
-
-### Running end-to-end tests
-
-Create a `.env` file in the e2e_tests directory with your Delius credentials. You can use `.env.example` as a template.
-
-```shell
-cp -n .env.example .env
-```
-
-Run the tests
-
-```shell
-npm run e2e-test
-
-# Or, run in debug mode to enable breakpoints and test recorder
-npm run e2e-test:debug
 ```
 
 ### Dependency Checks
