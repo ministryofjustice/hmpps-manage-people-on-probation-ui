@@ -87,8 +87,6 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       const { crn, id, contactId } = req.params
       const isInPast = appointmentDateIsInPast(req)
       const { url } = req
-      const { data } = req.session
-      const appt = getDataValue(data, ['appointments', crn, id])
       res.render('pages/reschedule/check-your-answers', {
         crn,
         id,

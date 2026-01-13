@@ -66,8 +66,7 @@ export const postRescheduleAppointments = (
     const response = await masClient.putRescheduleAppointment(contactId, body)
     const userDetails = await masClient.getUserDetails(username)
     let eventResponse: EventResponse
-    const featureFlags = res.locals.flags
-    if (featureFlags.enableOutlookEvent && userDetails?.email && !isInPast) {
+    if (userDetails?.email && !isInPast) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)
@@ -97,7 +96,7 @@ export const postRescheduleAppointments = (
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (featureFlags.enableOutlookEvent && (!userDetails?.email || !eventResponse?.id)) data.isOutLookEventFailed = true
+    if (!userDetails?.email || !eventResponse?.id) data.isOutLookEventFailed = true
     return response
   }
 }

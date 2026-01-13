@@ -230,7 +230,7 @@ describe('middleware/postRescheduleAppointments', () => {
   })
 
   describe('Send outlook invite', () => {
-    it('should create the outlook event if feature flag enabled and user email is defined', async () => {
+    it('should create the outlook event if user email is defined', async () => {
       const [req] = buildRequest()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       const expectedBody: RescheduleEventRequest = {
@@ -250,19 +250,6 @@ describe('middleware/postRescheduleAppointments', () => {
         oldSupervisionAppointmentUrn: externalReference,
       }
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(expectedBody)
-    })
-    it('should not create outlook event if feature flag disabled', async () => {
-      const [req] = buildRequest()
-      const mockRes = mockAppResponse({
-        flags: { ...mockFlags, enableOutlookEvent: false },
-        personAppointment: {
-          appointment: {
-            externalReference,
-          },
-        },
-      })
-      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
-      expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
     })
     it('should not create outlook event if rescheduled appointment is in the past', async () => {
       const [req] = buildRequest({ date: yesterday.toFormat('yyyy-M-dd'), until: yesterday.toFormat('yyyy-M-dd') })
