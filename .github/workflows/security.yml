@@ -7,7 +7,7 @@ on:
 
 jobs:
   trivy:
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@cf837be42754f7b1640973b977142fd6bfc3b034 # v1
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@ef87e276f3ab87c86507182ca3d5353ed35033a4 # v1
     with:
       channel_id: manage-people-on-probation-alerts
     secrets:
@@ -19,7 +19,7 @@ jobs:
       CONFIG_FILE: ${{ github.workspace }}/.zap/autorun.yml
       REPORT_DIR: ${{ github.workspace }}/.zap/zap-report
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup ZAP
         uses: ./.github/actions/setup-zap
@@ -44,7 +44,7 @@ jobs:
         shell: bash
 
       - name: Upload report
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: zap-report
           path: ${{ env.REPORT_DIR }}

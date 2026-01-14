@@ -15,6 +15,11 @@ import CheckinConfirmationPage from '../../pages/check-ins/confirmation.page'
 import TakeAPhotoPage from '../../pages/check-ins/take-a-photo'
 import { statusErrors } from '../../../server/properties'
 import OverviewPage from '../../pages/overview'
+import ManageCheckins from '../../pages/check-ins/manage-checkins'
+import ManageContactPage from '../../pages/check-ins/manage-contact'
+import ManageEditContactPage from '../../pages/check-ins/manage-edit-contact'
+import ChangeSettingsPage from '../../pages/check-ins/change-settings'
+import StopCheckins from '../../pages/check-ins/stop-checkins'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -26,9 +31,9 @@ context('Appointment check-ins', () => {
     loadPage()
     const page = Page.verifyOnPage(AppointmentsPage)
     page.headerCrn().should('contain.text', 'X000001')
-    page.headerName().should('contain.text', 'Eula Schmeler')
+    page.headerName().should('contain.text', 'Caroline Wolff')
     cy.get('[data-qa="appointments-header-label"]').should('contain.text', 'Appointments')
-    page.getElement('[data-qa="upcomingAppointments"]').find('h2').should('contain.text', 'Upcoming appointments')
+    page.getElement('[data-qa="upcomingAppointments"]').find('h3').should('contain.text', 'Upcoming appointments')
     page
       .getElement('[data-qa="online-checkin-btn"]')
       .should('be.visible')
@@ -50,8 +55,8 @@ context('Appointment check-ins', () => {
     dateFrequencyPage.checkOnPage()
     dateFrequencyPage.getSubmitBtn().click()
     dateFrequencyPage.checkErrorSummaryBox([
-      'Select how often you would like the person to check in',
       'Enter the date you would like the person to complete their first check in',
+      'Select how often you would like the person to check in',
     ])
 
     getCheckinUuid().then(uuid => {
@@ -580,8 +585,8 @@ context('check-ins overview and manage pages', () => {
     overviewPage.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
     overviewPage.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     overviewPage.getElementData('frequencyValue').should('contain.text', 'Every week')
-    overviewPage.getElementData('contactPreferenceValueLabel').should('contain.text', 'Contact preferences')
-    overviewPage.getElementData('contactPreferenceValue').should('contain.text', 'Email')
+    overviewPage.getElementData('contactPrefLabel').should('contain.text', 'Contact preferences')
+    overviewPage.getElementData('contactPrefValue').should('contain.text', 'Text message')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
     overviewPage
       .getElementData('checkinCard')
@@ -597,14 +602,142 @@ context('check-ins overview and manage pages', () => {
     overviewPage.checkOnPage()
     overviewPage.getElementData('checkinCard').should('contain.text', 'Online check ins')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
-    overviewPage.getElementData('checkinDueLabel').should('contain.text', 'Next check in due')
+    overviewPage.getElementData('checkinDueLabel').should('contain.text', 'First check in due')
     overviewPage.getElementData('checkinDueValue').should('contain.text', 'Online check ins not set up')
     overviewPage.getElementData('checkinCard').find('.app-summary-card__actions').should('exist')
-    overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Set up oline check ins')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').should('contain.text', 'Set up online check ins')
     overviewPage.getElementData('checkinCard').find('.govuk-link').click()
     const instructionsPage = new InstructionsPage()
     instructionsPage.checkOnPage()
     instructionsPage.getBackLink().click()
     overviewPage.checkOnPage()
+  })
+
+  it('should show checkin details', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+
+    cy.visit(`/case/X778160/appointments`)
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
+    appointmentsPage
+      .getElement('[data-qa="online-manage-btn"]')
+      .should('be.visible')
+      .and('contain.text', 'Manage online check ins')
+    appointmentsPage.getElement('[data-qa="online-manage-btn"]').click()
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+
+    cy.visit(`/case/X778160`)
+    const overviewPage = new OverviewPage()
+    overviewPage.checkOnPage()
+    overviewPage
+      .getElementData('checkinCard')
+      .find('.govuk-link')
+      .should('contain.text', 'View all online check in details')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').click()
+
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
+    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
+    manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
+    manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
+
+    manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
+    manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
+    manageCheckins.getElementData('methodLabel').should('contain.text', 'Mobile number')
+    manageCheckins.getElementData('methodValue').should('contain.text', '071838893')
+
+    manageCheckins.getElementData('photoCard').should('contain.text', 'Photo')
+    manageCheckins.getElementData('photoLabel').should('contain.text', 'Photo of Alton')
+    manageCheckins.getImage().should('have.attr', 'src', '/assets/images/placeholder.png')
+    manageCheckins.getImage().should('have.attr', 'alt', 'Image of Alton Berge')
+  })
+
+  it('should able to visit contact details page', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160`)
+    const overviewPage = new OverviewPage()
+    overviewPage.checkOnPage()
+    overviewPage
+      .getElementData('checkinCard')
+      .find('.govuk-link')
+      .should('contain.text', 'View all online check in details')
+    overviewPage.getElementData('checkinCard').find('.govuk-link').click()
+
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('checkinContactCard').should('contain.text', 'Contact details')
+    manageCheckins.getElementData('checkinContactCard').find('.govuk-link').should('contain.text', 'Change')
+    manageCheckins.getElementData('checkinContactCard').find('.govuk-link').click()
+    const manageContact = new ManageContactPage()
+    manageContact.checkOnPage()
+
+    manageContact.getElement('button[name="change"][value="mobile"]').click()
+    const manageEditContactPage = new ManageEditContactPage()
+    manageEditContactPage.checkOnPage()
+    manageEditContactPage.getElement('a.govuk-back-link').should('be.visible').click()
+    manageContact.checkOnPage()
+
+    manageContact.getElement('button[name="change"][value="emailAddress"]').click()
+    manageEditContactPage.checkOnPage()
+    manageEditContactPage.getBackLink().click()
+    manageContact.checkOnPage()
+  })
+
+  it('should able to vist change settings page', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
+    manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
+    manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').click()
+    const changeSettingsPage = new ChangeSettingsPage()
+    changeSettingsPage.checkOnPage()
+    changeSettingsPage
+      .getElementData('checkInDate')
+      .find('input.moj-js-datepicker-input')
+      .clear()
+      .type('3/11/2025')
+      .blur()
+    changeSettingsPage
+      .getElementData('checkInFrequency')
+      .find('input[type="radio"][value="WEEKLY"]')
+      .should('be.checked')
+    changeSettingsPage.getSubmitBtn().click()
+    const appointmentsPage = new AppointmentsPage()
+    appointmentsPage.checkOnPage()
+  })
+
+  it.skip('should able to stop check in', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
+    const manageCheckins = new ManageCheckins()
+    manageCheckins.checkOnPage()
+    manageCheckins.getElementData('stop-checkin-btn').click()
+    const stopCheckIn = new StopCheckins()
+    stopCheckIn
+      .getHeader()
+      .find('h1.govuk-fieldset__heading')
+      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
+    stopCheckIn.getSubmitBtn().click()
+    stopCheckIn.checkErrorSummaryBox(['Select yes if you want to stop check ins for the person'])
+    stopCheckIn.getElementData('stopCheckIn').find('input[type="radio"][value="YES"]').click()
+    stopCheckIn.getSubmitBtn().click()
+    stopCheckIn
+      .getHeader()
+      .find('h1.govuk-fieldset__heading')
+      .should('contain.text', '\n      Are you sure you want to stop online  check ins for Alton?\n    ')
+    stopCheckIn.getSubmitBtn().click()
+    stopCheckIn.checkErrorSummaryBox(['Enter the reason for stopping'])
+    stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
+    stopCheckIn.getSubmitBtn().click()
+    manageCheckins.checkOnPage()
   })
 })

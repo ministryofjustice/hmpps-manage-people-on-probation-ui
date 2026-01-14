@@ -2,7 +2,6 @@ import { Mappa } from './risk'
 import { Name, PersonalCircumstance } from './personalDetails'
 
 export interface Overview {
-  appointmentsWithoutOutcome: number
   absencesWithoutEvidence: number
   activity?: ActivityCount
   compliance?: Compliance

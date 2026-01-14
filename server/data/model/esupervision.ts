@@ -1,3 +1,7 @@
+import { Note } from './note'
+
+type Match = 'MATCH' | 'NO_MATCH' | 'NO_FACE_DETECTED' | 'ERROR'
+
 export interface ESupervisionCheckIn {
   uuid: string
   status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED'
@@ -10,17 +14,21 @@ export interface ESupervisionCheckIn {
   reviewedBy?: string
   reviewedAt?: string
   checkinStartedAt?: string
+  photoUrl?: string
   videoUrl?: string
   snapshotUrl?: string
-  autoIdCheck?: 'MATCH' | 'NO_MATCH'
-  manualIdCheck?: 'MATCH' | 'NO_MATCH'
+  autoIdCheck?: Match
+  manualIdCheck?: Match
   flaggedResponses: string[]
   furtherActions?: string
+  missedCheckinComment?: string
+  notes?: Note[]
+  checkinLogs: ESupervisionCheckInLogs
+  reviewDueDate?: string
 }
 
 export interface ESupervisionLog {
-  comment: string
-  offender: string
+  notes: string
   createdAt: string
   uuid: string
   practitioner: string
@@ -30,6 +38,8 @@ export interface ESupervisionLog {
     | 'OFFENDER_CHECKIN_NOT_SUBMITTED'
     | 'OFFENDER_CHECKIN_RESCHEDULED'
     | 'OFFENDER_CHECKIN_OUTSIDE_ACCESS'
+    | 'OFFENDER_CHECKIN_REVIEW_SUBMITTED'
+    | 'OFFENDER_CHECKIN_ANNOTATED'
   checkin: string
 }
 
@@ -38,15 +48,10 @@ export interface ESupervisionCheckInLogs {
   logs: ESupervisionLog[]
 }
 
-export interface ESupervisionCheckInResponse {
-  checkin: ESupervisionCheckIn
-  checkinLogs: ESupervisionCheckInLogs
-}
-
 export interface ESupervisionReview {
   reviewedBy: string
-  manualIdCheck?: 'MATCH' | 'NO_MATCH'
-  furtherActions?: string
+  manualIdCheck?: Match
+  notes?: string
   missedCheckinComment?: string
   riskManagementFeedback?: boolean
 }
@@ -70,7 +75,8 @@ export interface OffenderInfo {
   crn: string
   firstCheckin: string
   checkinInterval: string
-  startedAt: string
+  contactPreference: string
+  startedAt?: string
 }
 
 export interface LocationInfo {
@@ -124,14 +130,41 @@ interface Name {
   forename: string
   surname: string
 }
-
 export interface OffenderCheckinsByCRNResponse {
   uuid: string
   crn: string
   status: OffenderStatus
   firstCheckin: string
   checkinInterval: CheckInterval
-  contactPreferences: string
+  contactPreference: 'PHONE' | 'EMAIL'
+  photoUrl?: string
+}
+
+export interface CheckinScheduleRequest {
+  checkinSchedule: {
+    requestedBy: string
+    firstCheckin: string
+    checkinInterval: CheckInterval
+  }
+}
+
+export interface CheckinScheduleResponse {
+  uuid: string
+  crn: string
+  status: OffenderStatus
+  firstCheckin: string
+  checkinInterval: CheckInterval
+  contactPreference: 'PHONE' | 'EMAIL'
+  photoUrl: string
+}
+
+export interface DeactivateOffenderRequest {
+  requestedBy: string
+  reason: string
+}
+export interface ReactivateOffenderRequest {
+  requestedBy: string
+  reason: string
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

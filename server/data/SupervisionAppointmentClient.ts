@@ -1,7 +1,12 @@
 import config from '../config'
 import RestClient from './restClient'
 
-import { OutlookEventRequestBody, OutlookEventResponse } from './model/OutlookEvent'
+import {
+  EventResponse,
+  OutlookEventRequestBody,
+  OutlookEventResponse,
+  RescheduleEventRequest,
+} from './model/OutlookEvent'
 
 export default class SupervisionAppointmentClient extends RestClient {
   constructor(token: string) {
@@ -14,7 +19,17 @@ export default class SupervisionAppointmentClient extends RestClient {
       path: `/calendar/event`,
       handle404: false,
       handle500: true,
-      errorMessageFor500: 'Calendar event creation not successful',
+      errorMessage: 'Calendar event creation not successful',
+    })
+  }
+
+  async postRescheduleAppointmentEvent(body: RescheduleEventRequest): Promise<EventResponse> {
+    return this.post({
+      data: body,
+      path: `/calendar/event/reschedule`,
+      handle404: false,
+      handle500: true,
+      errorMessage: 'Rescheduling appointment not successful',
     })
   }
 }

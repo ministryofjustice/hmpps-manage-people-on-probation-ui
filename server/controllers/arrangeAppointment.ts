@@ -1,23 +1,36 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Request } from 'express'
-import { Controller } from '../@types'
-import { getDataValue, getPersonLevelTypes, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
-import { ArrangedSession } from '../models/ArrangedSession'
+import { Request as ExpressRequest } from 'express'
+import { Controller, FileCache } from '../@types'
+import {
+  convertToTitleCase,
+  dateIsInPast,
+  getDataValue,
+  getPersonLevelTypes,
+  isNumericString,
+  isValidCrn,
+  isValidUUID,
+  setDataValue,
+} from '../utils'
 import {
   renderError,
   postAppointments,
   getOfficeLocationsByTeamAndProvider,
   checkAnswers,
   getUserOptions,
+  findUncompleted,
+  appointmentDateIsInPast,
+  getAttendedCompliedProps,
+  isRescheduleAppointment,
 } from '../middleware'
-import { AppointmentSession, AppointmentsPostResponse } from '../models/Appointments'
+import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
-import { findUncompleted } from '../utils/findUncompleted'
-import { getMinMaxDates } from '../utils/getMinMaxDates'
 import MasApiClient from '../data/masApiClient'
-import { dateIsInPast } from '../utils/dateIsInPast'
+import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
+import '../@types/express/index.d'
+import { getMinMaxDates } from '../utils/getMinMaxDates'
+import { PersonAppointment } from '../data/model/schedule'
 
 const routes = [
   'redirectToSentence',
@@ -29,9 +42,9 @@ const routes = [
   'postWhoWillAttend',
   'getLocationDateTime',
   'postLocationDateTime',
+  'getAttendedComplied',
+  'postAttendedComplied',
   'getLocationNotInList',
-  'getRepeating',
-  'postRepeating',
   'getSupportingInformation',
   'postSupportingInformation',
   'getCheckYourAnswers',
@@ -40,11 +53,13 @@ const routes = [
   'postConfirmation',
   'getArrangeAnotherAppointment',
   'postArrangeAnotherAppointment',
+  'getAddNote',
+  'postAddNote',
 ] as const
 
-export const appointmentSummary = async (req: Request, res: AppResponse, client: HmppsAuthClient) => {
+export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
   const { data } = req.session
-  const { crn, id } = req.params as Record<string, string>
+  const { crn, id, contactId } = req.params as Record<string, string>
   if (!isValidCrn(crn) || !isValidUUID(id)) {
     return renderError(404)(req, res)
   }
@@ -66,16 +81,28 @@ export const appointmentSummary = async (req: Request, res: AppResponse, client:
     sensitivity: 'supporting-information',
   }
   const requiredValues = { providerCode, teamCode, username, locationCode, eventId, type, date, sensitivity }
-  const baseUrl = `/case/${crn}/arrange-appointment/${id}`
+  let baseUrl = `/case/${crn}/arrange-appointment/${id}`
+  let backendId
   for (const [k, v] of Object.entries(mapping)) {
     const value = requiredValues[k as keyof typeof requiredValues]
     if (!value) {
       return res.redirect(`${baseUrl}/${v}?validation=true&change=${req.url}`)
     }
   }
-  const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
+  if (req.url.includes('reschedule')) {
+    baseUrl = `/case/${crn}/appointments/reschedule/${contactId}/${id}`
+    const response: RescheduleAppointmentResponse | PersonAppointment = await postRescheduleAppointments(client)(
+      req,
+      res,
+    )
+    backendId = 'id' in response ? response.id : contactId
+  } else {
+    const response: AppointmentsPostResponse = await postAppointments(client)(req, res)
+    backendId = response.appointments[response.appointments.length - 1].id
+  }
   // setting backendId (part of AppointmentSession ) to create 'anotherAppointment' link in confirmation.njk
-  setDataValue(data, ['appointments', crn, id, 'backendId'], response.appointments[response.appointments.length - 1].id)
+  setDataValue(data, ['appointments', crn, id, 'backendId'], backendId)
+
   return res.redirect(`${baseUrl}/confirmation`)
 }
 
@@ -132,7 +159,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const queryParameters = selectedRegion ? `?providerCode=${selectedRegion}${teamQueryParam}` : ''
       let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance${queryParameters}`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -168,7 +195,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postTypeAttendance: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
       const change = req?.query?.change as string
       const { number } = req.query as Record<string, string>
       const query = number ? `?number=${number}` : ''
@@ -177,7 +203,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/location-date-time${query}`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -219,7 +245,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/type-attendance`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
@@ -228,16 +254,27 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   getLocationDateTime: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
-      const { change, validation } = req.query
+      const { data, alertDismissed = false } = req.session
+      const { change, validation } = req.query as Record<string, string>
       const showValidation = validation === 'true'
+      const isInPast = appointmentDateIsInPast(req)
+      const { enablePastAppointments } = res.locals.flags
       if (showValidation) {
-        res.locals.errorMessages = {
+        const errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
           [`appointments-${crn}-${id}-start`]: 'Enter a start time',
           [`appointments-${crn}-${id}-end`]: 'Enter an end time',
-          [`appointments-${crn}-${id}-user-locationCode`]: 'Select an appointment location',
         }
+        if (!getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])) {
+          errorMessages[`appointments-${crn}-${id}-user-locationCode`] = 'Select an appointment location'
+        }
+        res.locals.errorMessages = errorMessages
+      }
+      const isReschedule = isRescheduleAppointment(req)
+      if (change) {
+        const date = getDataValue(data, ['appointments', crn, id, 'date'])
+        setDataValue(data, ['appointments', crn, id, 'temp', 'date'], date)
+        setDataValue(data, ['appointments', crn, id, 'temp', 'isInPast'], isInPast)
       }
       const errors = data?.errors
       const { appointment } = res.locals
@@ -252,15 +289,20 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personRisks = await masClient.getPersonRiskFlags(crn)
+      res.locals.change = change as any
+
       return res.render(`pages/arrange-appointment/location-date-time`, {
         crn,
         id,
-        _minDate,
         _maxDate,
         errors,
         change,
         showValidation,
         personRisks,
+        isInPast,
+        alertDismissed,
+        isReschedule,
+        ...(!enablePastAppointments ? { _minDate } : {}),
       })
     }
   },
@@ -272,38 +314,75 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const repeatAppointmentsEnabled = res?.locals?.flags?.enableRepeatAppointments === true
       const path = ['appointments', crn, id]
       const appointment = getDataValue<AppointmentSession>(data, path)
       const { date, interval } = appointment
-      let until = date
-      let repeatingDates = [] as string[]
-      if (change && repeatAppointmentsEnabled) {
-        const period = ['WEEK', 'FORTNIGHT'].includes(interval) ? 'week' : 'month'
-        const increment = interval === 'FORTNIGHT' ? 2 : 1
-        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(appointment, period, increment) ?? []
-        repeatingDates = repeatAppointments.map(appt => appt.date)
-        until = repeatAppointments.length ? repeatAppointments[repeatAppointments.length - 1].date : ''
-      } else {
-        setDataValue(data, [...path, 'numberOfAppointments'], '1')
-        setDataValue(data, [...path, 'numberOfRepeatAppointments'], '')
-        setDataValue(data, [...path, 'interval'], 'DAY')
-      }
+      const until = date
+      setDataValue(data, [...path, 'numberOfAppointments'], '1')
+      setDataValue(data, [...path, 'interval'], 'DAY')
       setDataValue(data, [...path, 'until'], until)
-      setDataValue(data, [...path, 'repeatingDates'], repeatingDates)
+      if (change) {
+        const originalDate = getDataValue(data, [...path, 'temp', 'date'])
+        const updatedDate = getDataValue(data, [...path, 'date'])
+        const originalDateWasInPast = getDataValue(data, [...path, 'temp', 'isInPast'])
+        const updatedDateIsInPast = appointmentDateIsInPast(req)
+        delete req.session.data.appointments[crn][id].temp.isInPast
+        delete req.session.data.appointments[crn][id].temp.date
+        const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
+        if (!retainOutcomeRecorded) {
+          setDataValue(data, [...path, 'outcomeRecorded'], null)
+        }
+        const retainNotesAndSensitivity = (!originalDateWasInPast && !updatedDateIsInPast) || retainOutcomeRecorded
+        if (!retainNotesAndSensitivity) {
+          setDataValue(data, [...path, 'notes'], null)
+          setDataValue(data, [...path, 'sensitivity'], null)
+        }
+      }
+
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      let nextPage = repeatAppointmentsEnabled ? `repeating` : `supporting-information`
+      let nextPage = `supporting-information`
+
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/${nextPage}`
+
+      if (appointmentDateIsInPast(req)) redirect = `/case/${crn}/arrange-appointment/${id}/attended-complied`
+
       if (change && nextPage !== 'location-not-in-list') {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       if (change && nextPage === 'location-not-in-list') {
         redirect = `${redirect}?change=${change}`
       }
       return res.redirect(redirect)
+    }
+  },
+  getAttendedComplied: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { alertDismissed = false } = req.session
+      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const isReschedule = isRescheduleAppointment(req)
+      res.render('pages/appointments/attended-complied', {
+        crn,
+        id,
+        alertDismissed,
+        isInPast: true,
+        appointment,
+        cancelLink: `/case/${crn}/arrange-appointment/${id}/location-date-time`,
+        forename: convertToTitleCase(forename),
+        surname: convertToTitleCase(surname),
+        useDecorator: true,
+        isReschedule,
+      })
+    }
+  },
+  postAttendedComplied: () => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { change } = req.query as Record<string, string>
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/add-note${change ? `?change=${change}` : ''}`)
     }
   },
   getLocationNotInList: () => {
@@ -313,80 +392,52 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       return res.render(`pages/arrange-appointment/location-not-in-list`, { crn, id, noLocations, change })
     }
   },
-  getRepeating: () => {
+  getAddNote: () => {
     return async (req, res) => {
-      if (res.locals.flags.enableRepeatAppointments !== true) {
-        return renderError(404)(req, res)
-      }
-      const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
-      const { interval, numberOfRepeatAppointments } = req.query
-      if (interval || numberOfRepeatAppointments) {
-        setDataValue(data, ['appointments', crn, id, 'repeating'], 'Yes')
-        if (interval) {
-          setDataValue(data, ['appointments', crn, id, 'interval'], decodeURI(interval as string))
-        }
-        if (numberOfRepeatAppointments) {
-          setDataValue(data, ['appointments', crn, id, 'numberOfRepeatAppointments'], numberOfRepeatAppointments)
-        }
+      let uploadedFiles: FileCache[] = []
+      let errorMessages = null
+      let body = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
       }
-      const appointment = getDataValue(data, ['appointments', crn, id])
-      if (appointment?.date && appointment?.interval && appointment?.numberOfRepeatAppointments) {
-        const clonedAppointment = { ...appointment }
-        const period = ['WEEK', 'FORTNIGHT'].includes(appointment.interval) ? 'week' : 'month'
-        const increment = appointment.interval === 'FORTNIGHT' ? 2 : 1
-        const repeatAppointments = ArrangedSession.generateRepeatedAppointments(clonedAppointment, period, increment)
-        setDataValue(
-          data,
-          ['appointments', crn, id, 'repeatingDates'],
-          repeatAppointments.map(appt => appt.date),
-        )
-        res.locals.lastAppointmentDate = repeatAppointments.length
-          ? repeatAppointments[repeatAppointments.length - 1].date
-          : ''
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
       }
-      return res.render(`pages/arrange-appointment/repeating`, { crn, id })
+      if (req?.session?.body) {
+        body = req.session.body
+        delete req.session.body
+      }
+      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+
+      const { forename, appointment } = getAttendedCompliedProps(req, res)
+
+      return res.render('pages/appointments/add-note', {
+        crn,
+        id,
+        useDecorator: true,
+        errorMessages,
+        body,
+        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
+        maxFileSize,
+        fileUploadLimit,
+        uploadedFiles,
+        maxCharCount,
+        forename,
+        appointment,
+      })
     }
   },
-  postRepeating: () => {
+  postAddNote: _hmppsAuthClient => {
     return async (req, res) => {
-      if (res?.locals?.flags?.enableRepeatAppointments !== true) {
-        return renderError(404)(req, res)
-      }
-      const { crn, id } = req.params as Record<string, string>
+      const { crn, id } = req.params
+      const { change } = req.query as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const change = req?.query?.change as string
-      const { data } = req.session
-      const { repeating, numberOfRepeatAppointments = '0' } = getDataValue<AppointmentSession>(data, [
-        'appointments',
-        crn,
-        id,
-      ])
-      if (repeating === 'No') {
-        const updatedAppointment: AppointmentSession = {
-          ...(data?.appointments?.[crn]?.[id] || {}),
-          repeating: 'No',
-          numberOfRepeatAppointments: '0',
-          numberOfAppointments: '1',
-          interval: 'DAY',
-          repeatingDates: [] as string[],
-          until: getDataValue(data, ['appointments', crn, id, 'date']),
-        }
-        setDataValue(req.session.data, ['appointments', crn, id], updatedAppointment)
-      } else {
-        setDataValue(
-          data,
-          ['appointments', crn, id, 'numberOfAppointments'],
-          parseInt(numberOfRepeatAppointments, 10) + 1,
-        )
-      }
-      let redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
-      if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
-      }
-      return res.redirect(redirect)
+      return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
   getSupportingInformation: () => {
@@ -400,8 +451,8 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
           [`appointments-${crn}-${id}-sensitivity`]: 'Select the sensitivity of the appointment',
         }
       }
-      const repeatAppointmentsEnabled = res.locals.flags.enableRepeatAppointments === true
-      const back = !repeatAppointmentsEnabled ? 'date-time' : 'repeating'
+      const isInPast = appointmentDateIsInPast(req)
+      const back = 'date-time'
       return res.render(`pages/arrange-appointment/supporting-information`, {
         crn,
         id,
@@ -409,6 +460,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         change,
         showValidation,
         maxCharCount,
+        isInPast,
       })
     }
   },
@@ -422,14 +474,13 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/check-your-answers`
       if (change) {
-        redirect = findUncompleted(getDataValue(data, ['appointments', crn, id]), crn, id, change)
+        redirect = findUncompleted(req, res)
       }
       return res.redirect(redirect)
     }
   },
   getCheckYourAnswers: () => {
     return async (req, res) => {
-      const repeatingEnabled = res.locals.flags.enableRepeatAppointments === true
       const url = encodeURIComponent(req.url)
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
@@ -448,7 +499,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         id,
         location,
         url,
-        repeatingEnabled,
         isInPast,
       })
     }
@@ -456,19 +506,47 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postCheckYourAnswers: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
-  getConfirmation: () => {
+  getConfirmation: hmppsAuthClient => {
     return async (req, res) => {
       const { data } = req.session
       const { crn, id } = req.params as Record<string, string>
+      const { forename } = res.locals.case.name
       const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
+      const attending = getDataValue(data, ['appointments', crn, id, 'user'])
+      let attendingName = 'Your '
+      if (attending.username.toUpperCase() !== res.locals.user.username) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        try {
+          const user = await masClient.getUserDetails(attending.username.toUpperCase())
+          attendingName = `${forename}´s`
+        } catch {
+          attendingName = `The officer´s`
+        }
+      }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
+      const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
-      return res.render(`pages/arrange-appointment/confirmation`, { crn, backendId, isOutLookEventFailed, url })
+      let appointmentType = null
+
+      if (req.url.includes('reschedule')) {
+        appointmentType = 'RESCHEDULE'
+      }
+
+      return res.render(`pages/arrange-appointment/confirmation`, {
+        crn,
+        backendId,
+        isOutLookEventFailed,
+        attendingName,
+        url,
+        isInPast,
+        appointmentType,
+      })
     }
   },
   postConfirmation: () => {

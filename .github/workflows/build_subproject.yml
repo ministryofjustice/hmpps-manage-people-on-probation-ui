@@ -32,7 +32,7 @@ jobs:
         project:
           - feature-flags
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Set version
         id: version
@@ -53,7 +53,7 @@ jobs:
         run: echo '${{ steps.build.outputs.changes }}' > ${{ matrix.project }}-changes.json
 
       - name: Store changes
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: changes-${{ matrix.project }}
           path: ${{ matrix.project }}-changes.json

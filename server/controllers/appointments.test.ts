@@ -1,12 +1,22 @@
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
+import { Request } from 'express'
+import { ParamsDictionary } from 'express-serve-static-core'
+import { ParsedQs } from 'qs'
 import controllers from '.'
 import logger from '../../logger'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString, setDataValue } from '../utils'
+import {
+  toRoshWidget,
+  toPredictors,
+  isValidCrn,
+  isNumericString,
+  setDataValue,
+  canRescheduleAppointment,
+} from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -16,10 +26,15 @@ import {
   mockPersonAppointment,
 } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import {
+  cloneAppointmentAndRedirect,
+  renderError,
+  getAttendedCompliedProps,
+  AttendedCompliedAppointment,
+} from '../middleware'
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
-import config from '../config'
+import { isSuccessfulUpload } from './appointments'
 
 const crn = 'X000001'
 const id = '1234'
@@ -53,12 +68,14 @@ jest.mock('../utils', () => {
     isNumericString: jest.fn(),
     isMatchingAddress: jest.fn(() => true),
     setDataValue: jest.fn(),
+    canRescheduleAppointment: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
+  getAttendedCompliedProps: jest.fn(),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -74,7 +91,10 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
+const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -89,6 +109,23 @@ const req = httpMocks.createRequest({
     data: {},
   },
 })
+
+const mockAppointment: AttendedCompliedAppointment | Activity = {
+  type: '3 Way Meeting (NS)',
+  officer: {
+    name: {
+      forename: 'Forename',
+      surname: 'Surname',
+    },
+  },
+  startDateTime: '2025-11-20',
+}
+
+mockGetAttendedCompliedProps.mockImplementation(() => ({
+  forename: 'Forename',
+  surname: 'Surname',
+  appointment: mockAppointment,
+}))
 
 const res = mockAppResponse({
   user: {
@@ -146,6 +183,9 @@ const getPredictorsSpy = jest
 describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+      statusCode: 200,
+    })
   })
   describe('get appointments', () => {
     beforeEach(async () => {
@@ -174,6 +214,7 @@ describe('controllers/appointments', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
+        hasDeceased: false,
         url: '',
       })
     })
@@ -246,6 +287,7 @@ describe('controllers/appointments', () => {
 
   describe('get manage appointment', () => {
     beforeEach(async () => {
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
@@ -262,7 +304,10 @@ describe('controllers/appointments', () => {
         back: undefined,
         nextAppointment: nextApptResponse(),
         nextAppointmentIsAtHome: true,
+        hasDeceased: false,
         url: '',
+        canReschedule: true,
+        contactId: '1234',
       })
     })
   })
@@ -339,6 +384,12 @@ describe('controllers/appointments', () => {
     it('should render the record an outcome page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
         crn,
+        alertDismissed: false,
+        isInPast: true,
+        headerPersonName: { forename: 'Forename', surname: 'Surname' },
+        forename: 'Forename',
+        surname: 'Surname',
+        appointment: mockAppointment,
       })
     })
   })
@@ -430,17 +481,12 @@ describe('controllers/appointments', () => {
       expect(mockReq.session.body).toBeUndefined()
     })
     it('should render the add note page', () => {
-      const { fileUploadLimit, maxFileSize, validMimeTypes } = config
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
         body: null,
         crn,
         errorMessages: null,
-        uploadedFiles: [],
-        fileUploadLimit,
-        maxFileSize,
         url: '',
         maxCharCount: 12000,
-        validMimeTypes: Object.entries(validMimeTypes).map(([kMaxLength, v]) => v),
       })
     })
   })
@@ -462,22 +508,30 @@ describe('controllers/appointments', () => {
     })
     describe('If CRN request param is valid', () => {
       describe('click thru from manage appointment page', () => {
-        const mockReq = httpMocks.createRequest({
-          body: {
-            notes: 'some mock notes',
-            sensitive: 'Yes',
-          },
-          params: {
-            contactId: id,
-            crn,
-          },
-          session: {
-            data: {},
-          },
-        })
+        let mockReq: Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>
         beforeEach(async () => {
           mockIsValidCrn.mockReturnValue(true)
           mockIsNumericString.mockReturnValue(true)
+
+          // mock successful file upload
+          jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+            statusCode: 200,
+          })
+
+          mockReq = httpMocks.createRequest({
+            body: {
+              notes: 'some mock notes',
+              sensitive: 'Yes',
+            },
+            params: {
+              contactId: id,
+              crn,
+            },
+            session: {
+              data: {},
+            },
+          })
+
           await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
         })
         it('should send the patch request to the api', () => {
@@ -496,6 +550,11 @@ describe('controllers/appointments', () => {
         beforeEach(async () => {
           mockIsValidCrn.mockReturnValue(true)
           mockIsNumericString.mockReturnValue(true)
+
+          jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+            statusCode: 200,
+          })
+
           mockReq = httpMocks.createRequest({
             body: {
               notes: 'some mock notes',
@@ -651,6 +710,149 @@ describe('controllers/appointments', () => {
         contactId,
         back: undefined,
       })
+    })
+  })
+
+  it('treats null patchDocuments response as success', async () => {
+    mockIsValidCrn.mockReturnValue(true)
+    mockIsNumericString.mockReturnValue(true)
+
+    jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue(null)
+
+    const mockReq = httpMocks.createRequest({
+      body: {
+        notes: 'some mock notes',
+        sensitive: 'Yes',
+      },
+      params: {
+        contactId: id,
+        crn,
+      },
+      file: {
+        originalname: 'test.pdf',
+      } as Express.Multer.File,
+      session: {
+        data: {},
+      },
+    })
+
+    await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+
+    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+  })
+  it('renders error page when file upload fails', async () => {
+    mockIsValidCrn.mockReturnValue(true)
+    mockIsNumericString.mockReturnValue(true)
+
+    jest.spyOn(MasApiClient.prototype, 'patchDocuments').mockResolvedValue({
+      statusCode: 415,
+      errors: [{ text: 'Upload failed' }],
+    })
+
+    const mockReq = httpMocks.createRequest({
+      body: {
+        notes: 'some mock notes',
+        sensitive: 'Yes',
+      },
+      params: {
+        contactId: id,
+        crn,
+      },
+      file: {
+        originalname: 'test.pdf',
+      } as Express.Multer.File,
+      session: {
+        data: {},
+      },
+    })
+
+    await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+
+    expect(renderSpy).toHaveBeenCalledWith('pages/appointments/add-note', {
+      uploadError: 'File not uploaded. Please try again.',
+      patchResponse: expect.any(Object),
+      sensitive: 'Yes',
+      notes: 'some mock notes',
+    })
+
+    expect(redirectSpy).not.toHaveBeenCalled()
+  })
+  it('does not call patchDocuments when no file is uploaded', async () => {
+    mockIsValidCrn.mockReturnValue(true)
+    mockIsNumericString.mockReturnValue(true)
+
+    const patchDocumentsSpy = jest.spyOn(MasApiClient.prototype, 'patchDocuments')
+
+    const mockReq = httpMocks.createRequest({
+      body: {
+        notes: 'some mock notes',
+        sensitive: 'Yes',
+      },
+      params: {
+        contactId: id,
+        crn,
+      },
+      session: {
+        data: {},
+      },
+      // IMPORTANT: no req.file
+    })
+
+    await controllers.appointments.postAddNote(hmppsAuthClient)(mockReq, res)
+
+    expect(patchDocumentsSpy).not.toHaveBeenCalled()
+    expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${id}/manage`)
+  })
+
+  describe('isSuccessfulUpload', () => {
+    it('returns true for null', () => {
+      expect(isSuccessfulUpload(null)).toBe(true)
+    })
+
+    it('returns true for undefined', () => {
+      expect(isSuccessfulUpload(undefined)).toBe(true)
+    })
+
+    it('returns true for primitive values', () => {
+      expect(isSuccessfulUpload('string')).toBe(true)
+      expect(isSuccessfulUpload(true)).toBe(true)
+      expect(isSuccessfulUpload(123)).toBe(true)
+    })
+
+    it('returns true for 2xx statusCode', () => {
+      expect(isSuccessfulUpload({ statusCode: 200 })).toBe(true)
+      expect(isSuccessfulUpload({ statusCode: 204 })).toBe(true)
+    })
+
+    it('returns false for non-2xx statusCode', () => {
+      expect(isSuccessfulUpload({ statusCode: 400 })).toBe(false)
+      expect(isSuccessfulUpload({ statusCode: 415 })).toBe(false)
+      expect(isSuccessfulUpload({ statusCode: 500 })).toBe(false)
+    })
+
+    it('returns false for explicit error shape', () => {
+      expect(
+        isSuccessfulUpload({
+          errors: [{ text: 'Upload failed' }],
+        }),
+      ).toBe(false)
+    })
+
+    it('returns false when statusCode and errors are present', () => {
+      expect(
+        isSuccessfulUpload({
+          statusCode: 415,
+          errors: [{ text: 'Upload failed' }],
+        }),
+      ).toBe(false)
+    })
+
+    it('returns true for empty object', () => {
+      expect(isSuccessfulUpload({})).toBe(true)
+    })
+
+    it('returns false for unknown object shape', () => {
+      expect(isSuccessfulUpload({ foo: 'bar' })).toBe(false)
     })
   })
 })

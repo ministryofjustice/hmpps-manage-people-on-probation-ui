@@ -40,11 +40,14 @@ import {
   NextAppointmentResponse,
   AppointmentsPostResponse,
   MasUserDetails,
+  RescheduleAppointmentResponse,
+  RescheduleAppointmentRequestBody,
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
+import { ErrorSummary } from './model/common'
 
 interface GetUserScheduleProps {
   username: string
@@ -244,7 +247,7 @@ export default class MasApiClient extends RestClient {
       path: `/risk-flags/${crn}`,
       handle404: false,
       handle500: true,
-      errorMessageFor500: 'Risk flag information is currently unavailable. Try again later or use NDelius.',
+      errorMessage: 'Risk flag information is currently unavailable. Try again later or use NDelius.',
     })
   }
 
@@ -253,12 +256,19 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/documents/${crn}${pageQuery}`, handle404: true })
   }
 
-  async patchDocuments(crn: string, id: string, file: Express.Multer.File) {
+  async patchDocuments(
+    crn: string,
+    id: string,
+    file: Express.Multer.File,
+  ): Promise<{ statusCode: number } | ErrorSummary | null> {
     return this.patch({
       path: `/documents/${crn}/update/contact/${id}`,
       handle404: true,
+      handle415: true,
       handle500: true,
+      isMultipart: true,
       file,
+      errorMessage: 'Upload failed. Please try again later',
     })
   }
 
@@ -302,6 +312,16 @@ export default class MasApiClient extends RestClient {
     return this.post({
       data: body,
       path: `/appointment/${crn}`,
+    })
+  }
+
+  async putRescheduleAppointment(
+    id: string,
+    body: RescheduleAppointmentRequestBody,
+  ): Promise<RescheduleAppointmentResponse> {
+    return this.put({
+      data: body,
+      path: `/appointments/${id}/recreate`,
     })
   }
 
@@ -421,13 +441,14 @@ export default class MasApiClient extends RestClient {
     if (page !== undefined) {
       pageQuery = `${pageQuery}&page=${page}`
     }
-    if (sortBy) {
-      pageQuery = `${pageQuery}&sortBy=${sortBy}`
-    }
-    if (sortOrder) {
-      pageQuery = `${pageQuery}&sortOrder=${sortOrder}`
+    if (sortBy && sortOrder) {
+      pageQuery = `${pageQuery}&sort=${sortBy}%2C${sortOrder}`
     }
     return this.get({ path: `/alerts${pageQuery}`, handle404: true })
+  }
+
+  async getUserAlertNote(alertId: string, noteId: string): Promise<UserAlertsContent> {
+    return this.get({ path: `/alerts/${alertId}/notes/${noteId}`, handle404: false })
   }
 
   async getUserAlertsCount(): Promise<number> {

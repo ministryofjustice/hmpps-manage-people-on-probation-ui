@@ -69,12 +69,15 @@ context('Edit contact details', () => {
     page.getElement('emailAddressError').should('be.visible').should('contain.text', expectedError)
   })
 
-  it('Submitting a valid email address over 35 chars should show error messages', () => {
+  it('Submitting a valid email address over 254 chars should show error messages', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = new EditContactDetails()
-    page.getElementInput('emailAddress').clear().type('address11111111111111111111111@gmail.com')
+    const s = 's'
+    const maxCharLimit = s.repeat(260)
+    const emailAddress = `${maxCharLimit}@gmail.com`
+    page.getElementInput('emailAddress').clear().type(emailAddress)
     page.getElement('submitBtn').click()
-    const expectedError = 'Email address must be 35 characters or less.'
+    const expectedError = 'Email address must be 254 characters or less.'
     page.getErrorSummaryLink(0).should('contain.text', expectedError)
     page.getElement('emailAddressError').should('be.visible').should('contain.text', expectedError)
   })

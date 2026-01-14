@@ -4,14 +4,24 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks, mockSanIndicatorResponse } from './mocks'
 import { Overview } from '../data/model/overview'
 import { Needs, PersonRiskFlags } from '../data/model/risk'
 import { toPredictors, toRoshWidget } from '../utils'
 import { checkAuditMessage } from './testutils'
-import { PersonalDetails } from '../data/model/personalDetails'
+import {
+  AddressType,
+  Circumstances,
+  Disabilities,
+  Name,
+  PersonalContact,
+  PersonalDetails,
+  Provisions,
+  Document,
+} from '../data/model/personalDetails'
+import { PersonalDetailsSession } from '../models/Data'
+import { Contact } from '../data/model/professionalContact'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -34,15 +44,45 @@ const crn = 'X000001'
 const mockOverview = {} as Overview
 const mockNeeds = {} as Needs
 const mockRiskFlags = {} as PersonRiskFlags
-const mockPersonalDetails = {} as PersonalDetails
+
+const overview: PersonalDetails = {
+  name: {
+    forename: 'Caroline',
+    surname: 'Wolff',
+  },
+  crn,
+  contacts: [] as PersonalContact[],
+  otherAddressCount: 0,
+  previousAddressCount: 0,
+  preferredGender: 'male',
+  dateOfBirth: '1979-08-18',
+  aliases: [] as Name[],
+  circumstances: {} as Circumstances,
+  disabilities: {} as Disabilities,
+  provisions: {} as Provisions,
+  sex: 'male',
+  documents: [] as Document[],
+  addressTypes: [] as AddressType[],
+  staffContacts: [] as Contact[],
+}
+
+const mockPersonalDetails: PersonalDetailsSession = {
+  overview,
+  sentencePlan: {
+    lastUpdatedDate: '',
+    showLink: false,
+  },
+  risks: mockRisks,
+  tierCalculation: mockTierCalculation,
+  predictors: mockPredictors,
+}
+const mockOverdueOutcomesResponse = {
+  content: [{}, {}, {}],
+}
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
   .mockImplementation(() => Promise.resolve(mockOverview))
-jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockImplementation(() => Promise.resolve(mockPersonalDetails))
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
+jest.spyOn(MasApiClient.prototype, 'getPersonalDetails').mockImplementation(() => Promise.resolve(overview))
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 const getSanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
@@ -53,6 +93,10 @@ const getPersonRiskFlagsSpy = jest
 const predictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
+const getOverdueOutcomesSpy = jest
+  .spyOn(MasApiClient.prototype, 'getOverdueOutcomes')
+  .mockImplementation(() => Promise.resolve(mockOverdueOutcomesResponse as any))
+
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
 
@@ -87,11 +131,8 @@ describe('caseController', () => {
     checkAuditMessage(res, 'VIEW_MAS_OVERVIEW', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(getOverviewSpy).toHaveBeenCalledWith(crn, req.query.sentenceNumber)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
       expect(needsSpy).toHaveBeenCalledWith(crn)
       expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
       expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
@@ -105,7 +146,8 @@ describe('caseController', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
-        personalDetails: mockPersonalDetails,
+        personalDetails: req.session.data.personalDetails[crn].overview,
+        appointmentsWithoutAnOutcomeCount: 3,
       })
     })
   })
@@ -129,11 +171,9 @@ describe('caseController', () => {
     checkAuditMessage(res, 'VIEW_MAS_OVERVIEW', uuidv4(), crn, 'CRN')
     it('should request the data from the api', () => {
       expect(getOverviewSpy).toHaveBeenCalledWith(crn, '')
-      expect(risksSpy).toHaveBeenCalledWith(crn)
       expect(needsSpy).toHaveBeenCalledWith(crn)
       expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
+      expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
@@ -146,8 +186,98 @@ describe('caseController', () => {
         risksWidget: toRoshWidget(mockRisks),
         predictorScores: toPredictors(mockPredictors),
         sanIndicator: true,
-        personalDetails: mockPersonalDetails,
+        personalDetails: req.session.data.personalDetails[crn].overview,
+        appointmentsWithoutAnOutcomeCount: 3,
       })
     })
+  })
+  it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockResolvedValueOnce({} as any)
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+    expect(renderSpy).toHaveBeenCalledWith(
+      'pages/overview',
+      expect.objectContaining({
+        appointmentsWithoutAnOutcomeCount: 0,
+      }),
+    )
+  })
+  it('should return 0 when overdue outcomes content is empty', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockResolvedValueOnce({ content: [] } as any)
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+    expect(renderSpy).toHaveBeenCalledWith(
+      'pages/overview',
+      expect.objectContaining({
+        appointmentsWithoutAnOutcomeCount: 0,
+      }),
+    )
+  })
+
+  it('should render sanIndicator as false when response indicates false', async () => {
+    jest.spyOn(ArnsApiClient.prototype, 'getSanIndicator').mockResolvedValueOnce({ sanIndicator: false } as any)
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+
+    await controllers.case.getCase(hmppsAuthClient)(req, res)
+
+    expect(renderSpy).toHaveBeenCalledWith(
+      'pages/overview',
+      expect.objectContaining({
+        sanIndicator: false,
+      }),
+    )
+  })
+  it('should propagate error when overdue outcomes call fails', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getOverdueOutcomes').mockRejectedValueOnce(new Error('API failure'))
+
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    await expect(controllers.case.getCase(hmppsAuthClient)(req, res)).rejects.toThrow('API failure')
   })
 })

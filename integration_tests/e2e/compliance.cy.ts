@@ -3,6 +3,9 @@ import CompliancePage from '../pages/compliance'
 import { checkPopHeader } from './appointments/imports'
 
 context('Compliance', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('Compliance page is rendered', () => {
     cy.visit('/case/X000001/compliance')
     const page = Page.verifyOnPage(CompliancePage)
@@ -58,6 +61,11 @@ context('Compliance', () => {
     page
       .getCardHeader('previousOrder1')
       .within(() => cy.get('[aria-label="12 month Community Order (Ended 12 December 1991)"]').should('be.visible'))
+  })
+  it('should render the page with date of death recorded warning', () => {
+    cy.task('stubPersonalDetailsDateOfDeath')
+    cy.visit('/case/X000001/compliance')
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
   it('Compliance page is rendered with incomplete order', () => {
     cy.visit('/case/X777916/compliance')

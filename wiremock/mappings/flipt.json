@@ -13,28 +13,6 @@
           },
           "flags": [
             {
-              "key": "enableDocumentTextSearch",
-              "name": "enableDocumentTextSearch",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-01-13T15:28:37.920581Z",
-              "updatedAt": "2025-01-13T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableRepeatAppointments",
-              "name": "enableRepeatAppointments",
-              "description": "",
-              "enabled": false,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-01-13T15:28:37.920581Z",
-              "updatedAt": "2025-01-13T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableAppointmentCreate",
               "name": "enableAppointmentCreate",
               "description": "",
@@ -90,17 +68,6 @@
               "rollouts": []
             },
             {
-              "key": "enableOutlookEvent",
-              "name": "enableOutlookEvent",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-01-13T15:28:37.920581Z",
-              "updatedAt": "2025-01-13T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableProbFEComponent",
               "name": "enableProbFEComponent",
               "description": "",
@@ -112,30 +79,30 @@
               "rollouts": []
             },
             {
-              "key": "enableAlertsPage",
-              "name": "enableAlertsPage",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-01-13T15:28:37.920581Z",
-              "updatedAt": "2025-01-13T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
-              "key": "enableRiskOnAlertsDashboard",
-              "name": "enableRiskOnAlertsDashboard",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-01-13T15:28:37.920581Z",
-              "updatedAt": "2025-01-13T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableESuperVision",
               "name": "enableESuperVision",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2025-11-17T15:28:37.920581Z",
+              "updatedAt": "2025-11-17T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enablePastAppointments",
+              "name": "enablePastAppointments",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2025-11-17T15:28:37.920581Z",
+              "updatedAt": "2025-11-17T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableRescheduleAppointment",
+              "name": "enableRescheduleAppointment",
               "description": "",
               "enabled": true,
               "type": "BOOLEAN_FLAG_TYPE",

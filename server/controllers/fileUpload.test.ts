@@ -22,7 +22,7 @@ jest.mock('../data/hmppsAuthClient', () => {
 
 const patchDocumentsSpy = jest
   .spyOn(MasApiClient.prototype, 'patchDocuments')
-  .mockImplementation(() => Promise.resolve(200))
+  .mockImplementation(() => Promise.resolve({ statusCode: 500 }))
 
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
@@ -40,23 +40,53 @@ describe('fileUpload controller', () => {
     jest.clearAllMocks()
   })
   describe('postUploadFile', () => {
+    const testOriginalname = 'test-document.pdf'
+    const testSize = 1024
+    const testId = 'test-id'
+    const testCrn = 'test-crn'
+
+    const mockFile: Express.Multer.File = {
+      fieldname: 'file',
+      originalname: testOriginalname,
+      encoding: '7bit',
+      mimetype: 'application/pdf',
+      size: testSize,
+      buffer: Buffer.from('test'),
+      stream: null,
+      destination: '',
+      filename: '',
+      path: '',
+    }
+
+    const createMockReq = () =>
+      ({
+        file: mockFile,
+        body: {
+          id: testId,
+          crn: testCrn,
+        },
+      }) as unknown as Request
+
     describe('Uploaded file is invalid type', () => {
+      const testReq = createMockReq()
       const mockRes = mockAppResponse({
-        id,
-        crn,
+        id: testId,
+        crn: testCrn,
         fileErrorStatus: 415,
       })
       const statusSpy = jest.spyOn(mockRes, 'status')
       const jsonSpy = jest.spyOn(mockRes, 'json')
+
       beforeEach(async () => {
-        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(req, mockRes)
+        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
+
       it('should return the correct response', () => {
         const expectedResponse: FileUploadResponse = {
           file: {
-            id,
-            name: originalname,
-            size,
+            id: testId,
+            name: testOriginalname,
+            size: testSize,
           },
           error: {
             message: 'The selected file must be a PDF or Word document',
@@ -66,23 +96,27 @@ describe('fileUpload controller', () => {
         expect(jsonSpy).toHaveBeenCalledWith(expectedResponse)
       })
     })
+
     describe('Uploaded file is invalid file size', () => {
+      const testReq = createMockReq()
       const mockRes = mockAppResponse({
-        id,
-        crn,
+        id: testId,
+        crn: testCrn,
         fileErrorStatus: 413,
       })
       const statusSpy = jest.spyOn(mockRes, 'status')
       const jsonSpy = jest.spyOn(mockRes, 'json')
+
       beforeEach(async () => {
-        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(req, mockRes)
+        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
+
       it('should return the correct response', () => {
         const expectedResponse: FileUploadResponse = {
           file: {
-            id,
-            name: originalname,
-            size,
+            id: testId,
+            name: testOriginalname,
+            size: testSize,
           },
           error: {
             message: 'The selected file must be 5mb or under',
@@ -92,26 +126,31 @@ describe('fileUpload controller', () => {
         expect(jsonSpy).toHaveBeenCalledWith(expectedResponse)
       })
     })
+
     describe('Uploaded file is valid', () => {
+      const testReq = createMockReq()
       const mockRes = mockAppResponse()
       const statusSpy = jest.spyOn(mockRes, 'status')
       const jsonSpy = jest.spyOn(mockRes, 'json')
+
       beforeEach(async () => {
-        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(req, mockRes)
+        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
+
       it('should upload the document', () => {
-        expect(patchDocumentsSpy).toHaveBeenCalledWith(crn, id, (req.files as Express.Multer.File[])[0])
+        expect(patchDocumentsSpy).toHaveBeenCalledWith(testCrn, testId, mockFile)
       })
+
       it('should return the correct response', () => {
         const expectedResponse: FileUploadResponse = {
           file: {
-            id,
-            name: originalname,
-            size,
+            id: testId,
+            name: testOriginalname,
+            size: testSize,
           },
           success: {
-            messageHtml: originalname,
-            messageText: originalname,
+            messageHtml: testOriginalname,
+            messageText: testOriginalname,
           },
         }
         expect(statusSpy).toHaveBeenCalledWith(200)

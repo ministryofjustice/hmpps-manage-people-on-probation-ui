@@ -1,11 +1,9 @@
 {% extends "../../partials/layout.njk" %}
 {% from "../../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
-{% set mainClasses = "app-container govuk-body" %}
 {% set title = "Check your answers before adding " + case.name.forename + " to online check ins"  %}
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-rules' %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
-
 {% set checkInDateLabel = "When would you like " + case.name.forename + " to complete their first online check in?"  %}
 {% set checkInDateVal = userDetails.date | dmyToLongDate  %}
 {% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check in?"  %}

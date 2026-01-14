@@ -7,6 +7,7 @@ import { AppointmentLocals } from '../models/Locals'
 import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -28,7 +29,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       meta: {
         isVisor: currentCase.registrations.map(reg => reg.toLowerCase()).includes('visor'),
         forename,
-        change: (req?.query?.change as string) || null,
+        change: (req?.query?.change as string) ?? null,
         userIsAttending,
       },
     }
@@ -53,7 +54,10 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         repeating,
         notes,
         sensitivity,
+        outcomeRecorded,
+        rescheduleAppointment,
       } = appointmentSession
+
       const type: AppointmentType | null = typeId
         ? req.session.data.appointmentTypes.find(team => team.code === typeId)
         : null
@@ -84,16 +88,35 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       const staff: User[] = getDataValue(data, ['staff', loggedInUsername])
       const selectedRegion = providers?.find(provider => provider.code === providerCode)?.name ?? ''
       const selectedTeam = teams?.find(team => team.code === teamCode)?.description ?? ''
-      const selectedUser = convertToTitleCase(
+      let selectedUser = convertToTitleCase(
         staff?.find(user => user?.username?.toLowerCase() === staffId?.toLowerCase())?.nameAndRole ?? '',
         [],
         regexIgnoreValuesInParentheses,
       )
+      if (!selectedUser) {
+        const name = getDataValue(data, ['appointments', crn, id, 'user', 'name'])
+        if (name) {
+          const { forename: first, surname: last } = name
+          selectedUser = `${first} ${last}`
+        }
+      }
+
+      let attendingHtml = selectedUser
+      let teamRegionHtml = ''
+      if (selectedTeam) {
+        teamRegionHtml = selectedTeam
+      }
+      if (selectedRegion) {
+        teamRegionHtml = `${teamRegionHtml}, ${selectedRegion}`
+      }
+      if (teamRegionHtml) {
+        attendingHtml = `${attendingHtml} (${teamRegionHtml})`
+      }
 
       const hasLocation = locationCode && locationCode !== 'NO_LOCATION_REQUIRED'
       let location: Location | string = locationCode
       if (hasLocation && loggedInUsername) {
-        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) || ''
+        location = req?.session?.data?.locations?.[loggedInUsername]?.find(l => l.code === locationCode) ?? ''
       }
 
       appointment = {
@@ -106,24 +129,28 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         visorReport: visorReport ? upperFirst(visorReport) : null,
         appointmentFor: {
           sentence: parseInt(eventId, 10) !== 0 ? sentence : null,
-          requirement: sentenceRequirement?.description || null,
-          licenceCondition: sentenceLicenceCondition?.mainDescription || null,
-          nsi: sentenceNsi?.description || null,
+          requirement: sentenceRequirement?.description ?? null,
+          licenceCondition: sentenceLicenceCondition?.mainDescription ?? null,
+          nsi: sentenceNsi?.description ?? null,
           forename: eventId === 'PERSON_LEVEL_CONTACT' ? forename : null,
         },
         attending: {
           name: selectedUser,
           team: selectedTeam,
           region: selectedRegion,
+          html: attendingHtml,
         },
         location,
         date,
         start,
+        previousStart: rescheduleAppointment?.previousStart ?? null,
         end,
+        previousEnd: rescheduleAppointment?.previousEnd ?? null,
         repeating,
         repeatingDates,
-        notes: notes || null,
-        sensitivity: sensitivity || null,
+        notes: notes ?? null,
+        sensitivity: sensitivity ?? null,
+        outcomeRecorded: outcomeRecorded ?? null,
       }
     }
     res.locals.appointment = appointment

@@ -88,7 +88,7 @@
 {% if hasNotes %}
   {% for appointmentNote in appointment.appointmentNotes %}
     {% if appointmentNote.note %}
-      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url )) %}
+      {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
     {% endif %}
   {% endfor %}
 {% endif %}
@@ -174,7 +174,7 @@
       hint: {
         text: nextAppointmentHint
       },
-      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not nextAppointment.appointment,
+      href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/next-appointment?back=" + url if not nextAppointment.appointment and not hasDeceased,
       status: {
         tag: {
           text: "Not started",
@@ -217,17 +217,13 @@
       },
       actions: {
         items: [
-          {
-            href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
-            text: "Change on NDelius",
-            visuallyHiddenText: "(opens in new tab)",
-            attributes: {
-              'target': '_blank',
-              'rel': 'external noopener noreferrer'
+            {
+                href: "/case/" + crn + "/appointment/" + contactId +"/reschedule",
+                text: "Reschedule",
+                visuallyHiddenText: ""
             }
-          }
         ]
-      } if not appointment.deliusManaged
+    } if canReschedule and flags.enableRescheduleAppointment
     },
     {
       key: {

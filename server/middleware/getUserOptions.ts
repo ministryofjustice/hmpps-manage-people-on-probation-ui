@@ -61,7 +61,7 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       selectedUser = users[0].username
     }
 
-    if (selectedUser.toLowerCase() === probationPractitioner.username.toLowerCase()) {
+    if (selectedUser?.toLowerCase() === probationPractitioner?.username?.toLowerCase()) {
       selectedUser = defaultUserDetails.username
     }
 

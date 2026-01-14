@@ -15,11 +15,12 @@ import {
   handleQuotes,
   setDataValue,
   getDataValue,
+  canRescheduleAppointment,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { getQueryString } from './activityLog'
+import { ErrorSummary } from '../data/model/common'
 
 const routes = [
   'getAppointments',
@@ -67,7 +68,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,
@@ -77,6 +78,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         risksWidget,
         predictorScores,
         personRisks,
+        hasDeceased,
       })
     }
   },
@@ -173,6 +175,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         res.locals.case.mainAddress,
         nextAppointment?.appointment?.location,
       )
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       return res.render('pages/appointments/manage-appointment', {
         personAppointment,
         crn,
@@ -180,6 +183,9 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         nextAppointment,
         nextAppointmentIsAtHome,
+        canReschedule: canRescheduleAppointment(personAppointment),
+        contactId,
+        hasDeceased,
       })
     }
   },
@@ -219,6 +225,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      const { alertDismissed = false } = req.session
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
@@ -227,8 +234,16 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const headerPersonName = { forename, surname }
       res.render('pages/appointments/attended-complied', {
         crn,
+        alertDismissed,
+        isInPast: true,
+        headerPersonName,
+        forename,
+        surname,
+        appointment,
       })
     }
   },
@@ -270,16 +285,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         delete req.session.body
       }
       const url = encodeURIComponent(req.url)
-      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+      const { maxCharCount } = config
       return res.render('pages/appointments/add-note', {
         crn,
         errorMessages,
         body,
         url,
-        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
-        maxFileSize,
-        fileUploadLimit,
-        uploadedFiles,
         maxCharCount,
       })
     }
@@ -291,8 +302,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
+
       const { notes, sensitive } = req.body
-      const { data } = req.session
+      const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 
@@ -301,11 +313,27 @@ const appointmentsController: Controller<typeof routes, void> = {
         notes: handleQuotes(notes),
         sensitive: sensitive === 'Yes',
       }
+
       if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
         body.outcomeRecorded = true
         delete req.session.data.appointments[crn][id].outcomeRecorded
       }
+
       await masClient.patchAppointment(body)
+
+      if (file) {
+        const patchResponse = await masClient.patchDocuments(crn, id, file)
+
+        if (!isSuccessfulUpload(patchResponse)) {
+          return res.render('pages/appointments/add-note', {
+            uploadError: 'File not uploaded. Please try again.',
+            patchResponse,
+            sensitive,
+            notes,
+          })
+        }
+      }
+
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/manage`)
     }
   },
@@ -385,6 +413,38 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
+}
+
+export const isSuccessfulUpload = (response: unknown): boolean => {
+  // Null / undefined = success (MAS / stub behaviour)
+  if (response == null) {
+    return true
+  }
+
+  // Non-object (string, boolean, number) = success (legacy stubs)
+  if (typeof response !== 'object') {
+    return true
+  }
+
+  // At this point, response is an object
+  const res = response as Record<string, unknown>
+
+  // statusCode is authoritative
+  if (typeof res.statusCode === 'number') {
+    return res.statusCode >= 200 && res.statusCode < 300
+  }
+
+  // Explicit error shape
+  if (Array.isArray(res.errors)) {
+    return false
+  }
+
+  // Empty object = success
+  if (Object.keys(res).length === 0) {
+    return true
+  }
+
+  return false
 }
 
 export default appointmentsController

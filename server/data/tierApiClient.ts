@@ -12,7 +12,7 @@ export default class TierApiClient extends RestClient {
       path: `/crn/${crn}/tier/details`,
       handle404: true,
       handle500: true,
-      errorMessageFor500:
+      errorMessage:
         'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
     })
   }

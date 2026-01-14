@@ -54,7 +54,7 @@ RUN npm prune --no-audit --omit=dev
 # Stage: copy production assets and dependencies
 FROM base
 
-COPY --from=build --chown=appuser:appgroup /app/package.json /app/package-lock.json ./ 
+COPY --from=build --chown=appuser:appgroup /app/package.json /app/package-lock.json /app/technicalUpdates.json ./
 
 COPY --from=build --chown=appuser:appgroup /app/assets ./assets
 COPY --from=build --chown=appuser:appgroup /app/dist ./dist

@@ -16,11 +16,7 @@ import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import {
-  ESupervisionCheckIn,
-  ESupervisionCheckInResponse,
-  OffenderCheckinsByCRNResponse,
-} from '../data/model/esupervision'
+import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -43,15 +39,19 @@ export interface AppointmentLocals {
     name: string
     team: string
     region: string
+    html: string
   }
   location?: Location | string
   start?: string
+  previousStart?: string
   end?: string
+  previousEnd?: string
   date?: string
   repeating?: string
   repeatingDates?: string[]
   notes?: string
   sensitivity?: string
+  outcomeRecorded?: string
 }
 
 interface Locals {
@@ -64,9 +64,10 @@ interface Locals {
   requirement?: string
   appointment?: AppointmentLocals
   case?: PersonalDetails
-  headerPersonName?: string
+  headerPersonName?: { forename: string; surname: string }
   headerCRN?: string
   headerDob?: string
+  dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   predictorScores?: TimelineItem
@@ -103,6 +104,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  defaultUser?: { username: string; homeArea: string; team: string }
   attendingUser?: DefaultUserDetails
   sentencePlan?: SentencePlan
   alertsCount?: string
@@ -110,6 +112,8 @@ interface Locals {
   contactResponse?: ContactResponse
   checkIn?: ESupervisionCheckIn
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
+  uploadError: string
+  renderPath: string
 }
 
 export interface AppResponse extends Response {

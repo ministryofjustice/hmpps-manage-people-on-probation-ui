@@ -317,11 +317,26 @@ describe('masApiClient', () => {
       ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       [
         'getUserAlerts (full params)',
-        '/alerts?size=10&page=1&sortBy=date&sortOrder=asc',
-        () => masApiClient.getUserAlerts(1, 'date', 'asc'),
+        '/alerts?size=10&page=1&sort=DATE_AND_TIME%2Casc',
+        () => masApiClient.getUserAlerts(1, 'DATE_AND_TIME', 'asc'),
       ],
       ['getUserAlerts (minimal)', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       ['clearAlerts', '/alerts', () => masApiClient.clearAlerts([1, 2, 3]), 'put'],
+      [
+        'putRescheduleAppointment',
+        '/appointments/1/recreate',
+        () =>
+          masApiClient.putRescheduleAppointment('1', {
+            date: '2024-01-01',
+            startTime: '10:00',
+            endTime: '11:00',
+            outcomeRecorded: true,
+            requestedBy: 'POP',
+            isInFuture: true,
+          }),
+        'put',
+      ],
+      ['getUserAlertNote', '/alerts/0/notes/0', () => masApiClient.getUserAlertNote('0', '0'), 'get'],
     ])('it should call %s', async (_: string, url: string, func: () => Promise<any>, method = 'get', raw = false) => {
       const response = { data: 'data' }
       if (method === 'get') {

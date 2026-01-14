@@ -17,6 +17,8 @@ interface Args {
   noAttendee?: boolean
   noLocation?: boolean
   createNext?: boolean
+  startDateTime?: string
+  endDateTime?: string
 }
 
 const getAppointmentStub = (
@@ -36,6 +38,8 @@ const getAppointmentStub = (
     noAttendee = false,
     noLocation = false,
     createNext = false,
+    startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
+    endDateTime = '2024-02-21T10:30:00.382936Z[Europe/London]',
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -58,8 +62,8 @@ const getAppointmentStub = (
           id: 6,
           eventNumber: '7654321',
           type: 'Planned Office Visit (NS)',
-          startDateTime: '2024-02-21T10:15:00.382936Z[Europe/London]',
-          endDateTime: '2024-02-21T10:30:00.382936Z[Europe/London]',
+          startDateTime,
+          endDateTime,
           rarToolKit: 'Choices and Changes',
           appointmentNotes: [],
           appointmentNote: null,
@@ -372,6 +376,40 @@ const stubFutureAppointmentManagedTypeWithDocs = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ documents: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
+const stubAppointmentCompliedWithFutureDate = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    complied: true,
+    startDateTime: '2034-02-21T10:15:00.382936Z',
+    endDateTime: '2034-02-21T10:30:00.382936Z',
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+
+const stubAppointmentNonCompliedWithFutureDate = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    complied: false,
+    startDateTime: '2034-02-21T10:15:00.382936Z',
+    endDateTime: '2034-02-21T10:30:00.382936Z',
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+
+const stubAppointmentCompliedWithPastDate = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    complied: true,
+    startDateTime: '2024-02-21T10:15:00.382936Z',
+    endDateTime: '2024-02-21T10:30:00.382936Z',
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+
+const stubAppointmentNonCompliedWithPastDate = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({
+    startDateTime: '2024-02-21T10:15:00.382936Z',
+    endDateTime: '2024-02-21T10:30:00.382936Z',
+  })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubFutureAppointmentManagedTypeNoNextAppt = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ notes: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -608,4 +646,8 @@ export default {
   stubAppointmentClash,
   stubAppointmentDuplicate,
   stubNextAppointment,
+  stubAppointmentNonCompliedWithFutureDate,
+  stubAppointmentCompliedWithFutureDate,
+  stubAppointmentCompliedWithPastDate,
+  stubAppointmentNonCompliedWithPastDate,
 }

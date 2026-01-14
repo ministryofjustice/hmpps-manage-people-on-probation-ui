@@ -1,3 +1,4 @@
+import { type AttendedCompliedAppointment } from '../middleware'
 import { Name } from '../data/model/personalDetails'
 import { Activity } from '../data/model/schedule'
 import { Errors } from './Errors'
@@ -10,16 +11,13 @@ export interface AppointmentSessionUser {
   providerCode?: string
   teamCode?: string
   username?: string
+  name?: Name
   locationCode?: string
+  staffCode?: string
 }
 
 export interface AppointmentSession {
   user?: AppointmentSessionUser
-  temp?: {
-    providerCode?: string
-    teamCode?: string
-    username?: string
-  }
   type?: string
   visorReport?: YesNo
   date?: string
@@ -40,7 +38,17 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
-  outcomeRecorded?: boolean
+  outcomeRecorded?: YesNo
+  contactId?: string
+  rescheduleAppointment?: RescheduleAppointment
+  externalReference?: string
+  temp?: {
+    providerCode?: string
+    teamCode?: string
+    username?: string
+    isInPast?: boolean
+    date?: string
+  }
 }
 
 export interface AppointmentType {
@@ -85,7 +93,7 @@ export interface AppointmentRequestBody {
   user: {
     username: string
     teamCode: string
-    locationCode: string
+    locationCode: string | null
   }
   type: string
   start: Date
@@ -102,6 +110,32 @@ export interface AppointmentRequestBody {
   notes?: string
   sensitive?: boolean
   visorReport?: boolean
+  outcomeRecorded?: boolean
+}
+
+export type RescheduleRequestedBy = 'POP' | 'SERVICE'
+
+export interface RescheduleAppointmentRequestBody {
+  date: string
+  startTime: string
+  endTime: string
+  staffCode?: string
+  teamCode?: string
+  locationCode?: string
+  outcomeRecorded: boolean
+  notes?: string
+  sensitive?: boolean
+  sendToVisor?: boolean
+  requestedBy: RescheduleRequestedBy
+  reasonForRecreate?: string
+  reasonIsSensitive?: boolean
+  uuid?: string
+  isInFuture: boolean
+}
+
+export interface RescheduleAppointmentResponse {
+  id: number
+  externalReference: string
 }
 
 export interface CheckAppointment {
@@ -116,6 +150,17 @@ export interface AppointmentPatch {
   notes?: string
   files?: string[]
   sensitive?: boolean
+  date?: string
+  startTime?: string
+}
+
+export interface RescheduleAppointment {
+  whoNeedsToReschedule?: RescheduleRequestedBy
+  reason?: string
+  files?: string[]
+  sensitivity?: YesNo
+  previousStart?: string
+  previousEnd?: string
 }
 
 export interface AppointmentChecks {
@@ -154,6 +199,12 @@ export interface LocalParams {
   actionType?: string
   back?: string
   change?: string
+  isInPast?: boolean
+  alertDismissed?: boolean
+  forename?: string
+  appointment?: AttendedCompliedAppointment | Activity
+  useDecorator?: boolean
+  isReschedule?: boolean
 }
 
 export interface MasUserDetails {

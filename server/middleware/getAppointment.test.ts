@@ -19,6 +19,10 @@ const mockAppt = {
   interval: '',
   numberOfAppointments: '',
   id: 1,
+  rescheduleAppointment: {
+    previousStart: '',
+    previousEnd: '',
+  },
 }
 
 const username = 'user-1'

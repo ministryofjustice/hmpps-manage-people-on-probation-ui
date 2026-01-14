@@ -85,7 +85,7 @@
     open: true,
     classes: 'govuk-!-margin-bottom-0'
   }) }}
-{% elseif not entry.appointmentNotes.length > 0 %}
+{% elif not entry.appointmentNotes.length > 0 %}
   {% if entry.isSensitive %}
     <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold govuk-colour--red">Sensitive (No notes)</p>
   {% else %}

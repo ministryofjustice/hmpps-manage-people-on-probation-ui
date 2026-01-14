@@ -44,7 +44,7 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         providerCode = probationPractitioner.provider.code
         teamCode = probationPractitioner.team.code
       } else {
-        attendingUsername = defaultUserDetails.username
+        attendingUsername = defaultUserDetails?.username
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
       }
@@ -60,14 +60,16 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       sessionTeams = getDataValue(data, ['teams', username]) ?? providerTeams
       sessionStaff = getDataValue(data, ['staff', username]) ?? providerStaff
     }
-    if (attendingUsername.toLowerCase() === probationPractitioner.username.toLowerCase()) {
+    if (attendingUsername?.toLowerCase() === probationPractitioner?.username?.toLowerCase()) {
       if (!sessionProviders.some(provider => provider.code === probationPractitioner.provider.code)) {
         sessionProviders = [...sessionProviders, probationPractitioner.provider]
       }
       if (!sessionTeams.some(team => team.code === probationPractitioner.team.code)) {
         sessionTeams = [...sessionTeams, probationPractitioner.team]
       }
-      if (!sessionStaff.some(user => user.username.toLowerCase() === probationPractitioner.username.toLowerCase())) {
+      if (
+        !sessionStaff.some(user => user?.username?.toLowerCase() === probationPractitioner?.username?.toLowerCase())
+      ) {
         const nameAndRole = convertToTitleCase(
           `${probationPractitioner.name.forename} ${probationPractitioner.name.surname}`,
           [],

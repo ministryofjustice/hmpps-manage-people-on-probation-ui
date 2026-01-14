@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, fullName, setDataValue } from '../utils'
+import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -39,12 +39,13 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       sensitivity,
       until: untilDate,
       visorReport,
+      outcomeRecorded,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const body: AppointmentRequestBody = {
       user: {
         username,
         teamCode,
-        locationCode: locationCode !== 'NO_LOCATION_REQUIRED' ? locationCode : '',
+        locationCode: locationCode !== 'NO_LOCATION_REQUIRED' ? locationCode : null,
       },
       type,
       start: dateTime(date, start),
@@ -67,6 +68,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     if (licenceConditionId) {
       body.licenceConditionId = parseInt(licenceConditionId as string, 10)
     }
+    if (outcomeRecorded) {
+      body.outcomeRecorded = outcomeRecorded === 'Yes'
+    }
     if (nsiId) {
       body.nsiId = parseInt(nsiId as string, 10)
     }
@@ -75,14 +79,12 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const userDetails = await masClient.getUserDetails(username)
     let outlookEventResponse: OutlookEventResponse
 
-    const flagService = new FlagService()
-    const featureFlags: FeatureFlags = await flagService.getFlags()
-    if (featureFlags.enableOutlookEvent && userDetails?.email) {
+    if (userDetails?.email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
-      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {
@@ -99,12 +101,11 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (featureFlags.enableOutlookEvent && (!userDetails?.email || !outlookEventResponse.id))
-      data.isOutLookEventFailed = true
+    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
 
     return response
   }
 }
 
-const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string) =>
+export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>
   `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`

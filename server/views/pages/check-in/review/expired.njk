@@ -2,14 +2,34 @@
 {%- from "govuk/components/tag/macro.njk" import govukTag -%}
 
 {% set title = "Online check in missed" %}
-{% set backLink = back if back else 
-  '/case/' + crn + '/activity-log' %}
- {% set hideButton = true %}
+{% set backLink = back | default('/case/' + crn + '/activity-log') %}
+{% set hideButton = true %}
 
-{% block form %}
+{% block content %}
 
 <div class="govuk-grid-row">
     <div class="govuk-grid-column-full">
+
+        {% include "../../../partials/pop-header.njk" %}
+        <hr class="govuk-section-break--l">
+
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
+        {% block heading %}
+          {% if title %}
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+              {{ title }}
+            </h2>
+          {% endif %}
+        {% endblock %}
 
         <p class="govuk-body">This information will be added to the contact.</p>
 

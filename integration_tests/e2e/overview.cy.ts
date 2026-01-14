@@ -26,7 +26,7 @@ context('Overview', () => {
       .invoke('text')
       .then(text => {
         const normalized = text.replace(/\s+/g, ' ').trim()
-        expect(normalized).to.include('You need to record an outcome for 5 appointments')
+        expect(normalized).to.include('You need to record an outcome for 2 appointments')
       })
 
     page
@@ -147,6 +147,7 @@ context('Overview', () => {
         const normalizedText = text.replace(/\s+/g, ' ').trim()
         expect(normalizedText).to.eq(`9 January 2002`)
       })
+    cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
     cy.get('[data-qa="dateOfDeathAndAgeLabel"]').should('contain.text', 'Date of death')
     cy.get('[data-qa="dateOfDeathAndAgeValue"]').should('contain.text', '11 September 2024 (22 years old)')
   })
@@ -169,7 +170,7 @@ context('Overview', () => {
     cy.visit('/case/X000002')
     const page = Page.verifyOnPage(OverviewPage)
     page.headerCrn().should('contain.text', 'X000002')
-    page.headerName().should('contain.text', 'Caroline Wolff')
+    page.headerName().should('contain.text', 'Eula Schmeler')
     page.pageHeading().should('contain.text', 'Overview')
     page.getTab('overview').should('contain.text', 'Overview')
     page.getTab('personalDetails').should('contain.text', 'Personal details')
@@ -187,7 +188,7 @@ context('Overview', () => {
       'contain.text',
       'The tier service is experiencing technical difficulties. It has not been possible to provide tier information',
     )
-    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no RoSH summary.')
+    page.getRowData('risk', 'rosh', 'Value').should('contain.text', 'There is no ROSH summary.')
     page.getRowData('risk', 'mappa', 'Value').should('contain.text', 'No MAPPA data found in NDelius.')
     page.getRowData('risk', 'criminogenicNeeds', 'Value').should('contain.text', 'There is no OASys risk assessment.')
     page.getRowData('risk', 'riskFlags', 'Value').should('contain.text', 'There are no active risk flags.')
