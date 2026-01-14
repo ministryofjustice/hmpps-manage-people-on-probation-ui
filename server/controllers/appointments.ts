@@ -55,7 +55,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, personRisks] =
+      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, personRisks, practitioner] =
         await Promise.all([
           masClient.getPersonSchedule(crn, 'upcoming', '0'),
           masClient.getPersonSchedule(crn, 'previous', '0'),
@@ -63,11 +63,13 @@ const appointmentsController: Controller<typeof routes, void> = {
           tierClient.getCalculationDetails(crn),
           arnsClient.getPredictorsAll(crn),
           masClient.getPersonRiskFlags(crn),
+          masClient.getProbationPractitioner(crn),
         ])
 
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
+      const hasPractitioner = !practitioner.unallocated
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,
@@ -78,6 +80,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         predictorScores,
         personRisks,
         hasDeceased,
+        hasPractitioner,
       })
     }
   },

@@ -28,6 +28,7 @@ import {
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 const crn = 'X000001'
 const id = '1234'
@@ -100,6 +101,15 @@ const req = httpMocks.createRequest({
   },
 })
 
+const mockPractitioner: ProbationPractitioner = {
+  code: '',
+  name: { forename: '', surname: '' },
+  provider: { code: '', name: '' },
+  team: { code: '', description: '' },
+  unallocated: false,
+  username: '',
+}
+
 const mockAppointment: AttendedCompliedAppointment | Activity = {
   type: '3 Way Meeting (NS)',
   officer: {
@@ -170,6 +180,10 @@ const getPredictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
 
+const getProbationPractitionerSpy = jest
+  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+  .mockImplementation(() => Promise.resolve(mockPractitioner))
+
 describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -195,6 +209,9 @@ describe('controllers/appointments', () => {
     it('should request predictors from the api', () => {
       expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
     })
+    it('should request the probation practitioner from the api', () => {
+      expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+    })
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
@@ -205,6 +222,7 @@ describe('controllers/appointments', () => {
         predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
         hasDeceased: false,
+        hasPractitioner: true,
         url: '',
       })
     })
