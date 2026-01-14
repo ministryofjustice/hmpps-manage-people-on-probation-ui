@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { redirectWizard, redirectWizardAppointments } from './redirectWizard'
+import { redirectWizardAppointments, redirectWizardSetupCheckIns } from './redirectWizard'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
 import { AppointmentSession } from '../models/Appointments'
@@ -138,6 +138,63 @@ describe('/middleware/redirectWizardAppointments', () => {
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+    })
+    it('should not call next()', () => {
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+  })
+})
+
+describe('/middleware/redirectWizardSetupCheckIns', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  describe('date is required, but it is undefined in the session appointment', () => {
+    const requiredValues = [['interval', 'date']]
+    beforeEach(() => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      redirectWizardSetupCheckIns(requiredValues)(req, res, nextSpy)
+    })
+    it('should redirect to the first page of the setup wizard', () => {
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/instructions`)
+    })
+    it('should not call next()', () => {
+      expect(nextSpy).not.toHaveBeenCalled()
+    })
+  })
+  describe('id is required, and it is available in the session', () => {
+    const requiredValues = ['id']
+    beforeEach(() => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      mockedGetDataValue.mockReturnValue('id')
+      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
+    })
+    it('should not redirect to the first page of the setup wizard', () => {
+      expect(redirectSpy).not.toHaveBeenCalled()
+    })
+    it('should call next()', () => {
+      expect(nextSpy).toHaveBeenCalled()
+    })
+  })
+
+  describe('CRN and UUID in request url are invalid', () => {
+    const requiredValues = [['id']]
+
+    beforeEach(() => {
+      mockedIsValidCrn.mockReturnValue(false)
+      mockedIsValidUUID.mockReturnValue(false)
+      mockedGetDataValue.mockReturnValue(null)
+      redirectWizardSetupCheckIns(requiredValues)(req, res, nextSpy)
+    })
+    it('should return a 404 status and render the error page', () => {
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+    it('should not redirect to the first page of the setup wizard', () => {
+      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/instructions`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
