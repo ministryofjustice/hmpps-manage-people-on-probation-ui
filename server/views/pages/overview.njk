@@ -18,9 +18,8 @@
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
-{% set checkinLinkText = 'View all online check in details' if offenderCheckinsByCRNResponse else 'Set up online check ins'%}
-{% set checkinHrefLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
-  checkinLink %}
+
+
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
@@ -194,7 +193,9 @@
   {% set checkin %}
   {% set nextCheckin = offenderCheckinsByCRNResponse %}
   {% set nextCheckinText %}
-  {% if nextCheckin.status === 'VERIFIED' or nextCheckin.status === 'INITIAL' %}
+  {% if nextCheckin.status === 'VERIFIED' %}
+      {% set checkinLinkText = 'View all online check in details' %}
+      {% set checkinHrefLink = manageCheckinLink  %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -212,7 +213,9 @@
                    ]
             }) }}
   {% endif %}
-  {% if not nextCheckin %}
+  {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
+      {% set checkinLinkText = 'Set up online check ins'%}
+      {% set checkinHrefLink =  checkinLink %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -223,6 +226,8 @@
             }) }}
   {% endif %}
   {% if nextCheckin.status === 'INACTIVE' %}
+      {% set checkinLinkText = 'View all online check in details' %}
+      {% set checkinHrefLink = manageCheckinLink %}
       {{ govukSummaryList({
           rows: [
               {
