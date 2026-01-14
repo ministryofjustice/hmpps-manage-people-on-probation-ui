@@ -7,7 +7,6 @@ const handleMessagePreview = () => {
     const uuid = path[4]
     const dateInput = document.querySelector(`#appointments-${crn}-${uuid}-date`)
     const startInput = document.querySelector(`#appointments-${crn}-${uuid}-start`)
-    const name = document.querySelector('[name="_name"]').value
     const locationOptions = document.querySelectorAll('[data-qa=locationOption]')
     const button = elm.querySelector('button')
     const revealElm = elm.querySelector('#generate-reveal')
@@ -34,8 +33,11 @@ const handleMessagePreview = () => {
       if (!revealElm.getAttribute('open')) {
         revealElm.setAttribute('open', '')
       }
-      const announcePreview = preview.split('\n\n').join(' ').trim()
-      console.log(announcePreview)
+      let announcePreview = ''
+      const language = ['english', 'welsh']
+      for (let i = 0; i < preview.length; i += 1) {
+        announcePreview = `${announcePreview}Text preview in ${language[i]}: ${preview[i].split('\n\n').join(' ').trim()} `
+      }
       status.innerText = announcePreview
     }
 
@@ -59,7 +61,6 @@ const handleMessagePreview = () => {
         body: JSON.stringify({
           crn,
           uuid,
-          name,
           date,
           start,
           location,

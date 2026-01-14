@@ -277,9 +277,8 @@
             <p class="govuk-body">{{ personForename }} will receive this message:</p>
             <div id="generate-preview"></div>
         </div>
-        <div aria-live="polite" id="message-preview-status" class="govuk-visibility-hidden"></div>
+        <div aria-live="polite" id="message-preview-status" class="govuk-visually-hidden"></div>
     </section>
     <input type="hidden" name="_minDate" value="{{ _minDate }}">
     <input type="hidden" name="_maxDate" value="{{ _maxDate }}">
-    <input type="hidden" name="_name" value="{{ personForename }}">
 {% endblock %}
