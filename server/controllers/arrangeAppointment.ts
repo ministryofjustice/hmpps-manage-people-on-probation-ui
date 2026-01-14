@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
 import { Controller, FileCache } from '../@types'
@@ -12,7 +11,6 @@ import {
   isValidUUID,
   isWelshPostcode,
   setDataValue,
-  translateToWelshDayMonth,
 } from '../utils'
 import {
   renderError,
@@ -29,6 +27,7 @@ import {
   AppointmentSession,
   AppointmentsPostResponse,
   SmsLanguage,
+  SmsPreviewRequest,
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
@@ -39,8 +38,8 @@ import { postRescheduleAppointments } from '../middleware/postRescheduleAppointm
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
-import smsPreview from '../properties/smsPreview'
 import { isValidDateFormat, timeIsValid24HourFormat } from '../utils/validationUtils'
+import logger from '../../logger'
 
 const routes = [
   'redirectToSentence',
@@ -595,51 +594,52 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const { crn, uuid, date, start, location } = req.body
 
-      const generatePreview = (): string => {
-        preview = smsPreview[language]
-        const dt = DateTime.fromFormat(`${date} ${start}`, 'd/M/yyyy HH:mm', { locale: 'en-GB' })
-        let previewDate = dt.toFormat('cccc d LLLL')
-        if (language === 'welsh') {
-          previewDate = translateToWelshDayMonth(previewDate)
-        }
-        const time = dt.toFormat('ha')
-        preview = preview.replace('{name}', name)
-        preview = preview.replace('{location}', location)
-        preview = preview.replace('{date}', previewDate)
-        preview = preview.replace('{time}', time)
-        req.session.data.appointments[crn][uuid].smsPreview = {
+      let name: string
+      let welsh: boolean
+      let preview: string[] | null = null
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+
+      const requestSmsPreview = async (): Promise<string[] | null> => {
+        let smsPreview = null
+        const body: SmsPreviewRequest = {
           name,
-          language,
           date,
           start,
           location,
-          preview,
+          welsh,
         }
-        return preview
+        try {
+          const response = await masClient.postSmsPreview(body)
+          smsPreview = response.preview
+        } catch (err: any) {
+          const error = err as Error
+          logger.error(`SMS preview request error: ${error.message}`)
+        }
+        return smsPreview
       }
 
       const isValidDate = isValidDateFormat([date])
       const isValidStart = timeIsValid24HourFormat([null, start])
-      const isValid = isValidDate && isValidStart && location
-      let preview: string | null = null
-      let name: string = null
+      const isValid = isValidDate && isValidStart
       let language: SmsLanguage
       if (isValid) {
         const previewSession = req.session.data?.appointments?.[crn]?.[uuid]?.smsPreview
-        if (previewSession) {
-          ;({ name, language } = previewSession)
-          if (date === previewSession.date && start === previewSession.start && location === previewSession.location) {
-            preview = previewSession.preview
-          } else {
-            preview = generatePreview()
-          }
+        if (!previewSession?.name || !previewSession?.welsh) {
+          const personalDetails = await masClient.getPersonalDetails(crn)
+          name = personalDetails.name.forename
+          welsh = isWelshPostcode(personalDetails?.mainAddress?.postcode)
         } else {
-          const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-          const masClient = new MasApiClient(token)
-          const response = await masClient.getPersonalDetails(crn)
-          name = response.name.forename
-          language = isWelshPostcode(response?.mainAddress?.postcode) ? 'welsh' : 'english'
-          preview = generatePreview()
+          ;({ name, welsh } = previewSession)
+        }
+        if (previewSession?.date === date && previewSession?.start === start && previewSession?.location === location) {
+          preview = previewSession.preview
+        }
+        if (previewSession?.date !== date || previewSession?.start !== start || previewSession?.location !== location) {
+          preview = await requestSmsPreview()
+          const { data } = req.session
+          setDataValue(data, ['appointments', crn, uuid, 'smsPreview'], { name, date, start, location, welsh, preview })
         }
       }
       return res.json({ preview })

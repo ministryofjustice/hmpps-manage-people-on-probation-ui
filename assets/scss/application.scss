@@ -642,7 +642,7 @@ body.feature-disabled {
   transform: rotate(20deg);
 }
 
-#smsPreview > div {
+#generate-reveal {
   display: none;
   &[open] {
     display: block;

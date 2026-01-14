@@ -7,9 +7,11 @@ const handleMessagePreview = () => {
     const uuid = path[4]
     const dateInput = document.querySelector(`#appointments-${crn}-${uuid}-date`)
     const startInput = document.querySelector(`#appointments-${crn}-${uuid}-start`)
+    const name = document.querySelector('[name="_name"]').value
     const locationOptions = document.querySelectorAll('[data-qa=locationOption]')
     const button = elm.querySelector('button')
-    const wrapper = elm.querySelector('.sms-message-wrapper')
+    const revealElm = elm.querySelector('#generate-reveal')
+    const previewElm = elm.querySelector('#generate-preview')
     const status = elm.querySelector('#message-preview-status')
     let preview = ''
 
@@ -23,13 +25,17 @@ const handleMessagePreview = () => {
 
     const showPreview = event => {
       event.preventDefault()
-      const current = event.currentTarget
-      const next = current.nextElementSibling
-      wrapper.innerHTML = preview
-      if (!next.getAttribute('open')) {
-        next.setAttribute('open', '')
+      const html = preview.reduce(
+        (acc, prev) =>
+          `${acc}<div class="sms-message-wrapper"><p class="govuk-body govuk-!-margin-bottom-0">${prev.replace(/\n/g, '<br>')}</p></div>`,
+        '',
+      )
+      previewElm.innerHTML = html
+      if (!revealElm.getAttribute('open')) {
+        revealElm.setAttribute('open', '')
       }
-      const announcePreview = preview.split('<p>').join('').split('</p>').join(' ').trim()
+      const announcePreview = preview.split('\n\n').join(' ').trim()
+      console.log(announcePreview)
       status.innerText = announcePreview
     }
 
@@ -53,6 +59,7 @@ const handleMessagePreview = () => {
         body: JSON.stringify({
           crn,
           uuid,
+          name,
           date,
           start,
           location,
@@ -62,6 +69,7 @@ const handleMessagePreview = () => {
       if (preview) {
         button.removeAttribute('disabled')
         button.removeAttribute('aria-disabled')
+        button.removeEventListener('click', showPreview)
         button.addEventListener('click', showPreview)
         status.innerText = 'Generate preview button enabled'
       }

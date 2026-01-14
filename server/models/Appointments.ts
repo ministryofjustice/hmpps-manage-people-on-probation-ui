@@ -10,12 +10,12 @@ export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBI
 export type SmsLanguage = 'english' | 'welsh'
 
 export interface SmsPreview {
-  language: SmsLanguage
+  welsh: boolean
   name: string
   date: string
   start: string
   location: string
-  preview: string
+  preview: string[]
 }
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
@@ -230,4 +230,17 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+}
+
+export interface SmsPreviewRequest {
+  name: string
+  date: string
+  start: string
+  location: string
+  welsh: boolean
+}
+
+export interface SmsPreviewResponse {
+  preview: string[]
+  statusCode?: number
 }

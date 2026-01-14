@@ -42,6 +42,8 @@ import {
   MasUserDetails,
   RescheduleAppointmentResponse,
   RescheduleAppointmentRequestBody,
+  SmsPreviewRequest,
+  SmsPreviewResponse,
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
@@ -465,5 +467,14 @@ export default class MasApiClient extends RestClient {
 
   async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
     return this.get({ path: `/case/${crn}/probation-practitioner` })
+  }
+
+  async postSmsPreview(body: SmsPreviewRequest): Promise<SmsPreviewResponse> {
+    return this.post({
+      data: body,
+      path: `/calendar/event/sms-preview`,
+      handle404: true,
+      handle500: true,
+    })
   }
 }

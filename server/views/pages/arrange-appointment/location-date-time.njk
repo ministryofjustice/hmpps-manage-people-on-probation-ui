@@ -269,20 +269,17 @@
   classes: "govuk-button--secondary govuk-!-margin-bottom-4",
   disabled: true,
   attributes: {
-    'aria-controls': 'preview',
+    'aria-controls': 'generate-reveal',
     'data-qa': 'generateBtn'
   }
 }) }}
-        <div data-qa="preview">
+        <div id="generate-reveal" data-qa="generate-reveal">
             <p class="govuk-body">{{ personForename }} will receive this message:</p>
-            <div class="sms-message-wrapper">
-                <p class="govuk-body">Dear {{ personForename }},</p>
-                <p class="govuk-body">You have an appointment at Leamington Probation Office on Monday 11 August at 2pm.</p>
-                <p class="govuk-body govuk-!-margin-bottom-0">This is an automated message. Do not reply.</p>
-            </div>
+            <div id="generate-preview"></div>
         </div>
         <div aria-live="polite" id="message-preview-status" class="govuk-visibility-hidden"></div>
     </section>
-    <input type="hidden" name="_minDate" value="{{_minDate}}">
-    <input type="hidden" name="_maxDate" value="{{_maxDate}}">
+    <input type="hidden" name="_minDate" value="{{ _minDate }}">
+    <input type="hidden" name="_maxDate" value="{{ _maxDate }}">
+    <input type="hidden" name="_name" value="{{ personForename }}">
 {% endblock %}
