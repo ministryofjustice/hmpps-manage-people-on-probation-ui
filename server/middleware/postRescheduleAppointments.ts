@@ -96,7 +96,8 @@ export const postRescheduleAppointments = (
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || !eventResponse?.id) data.isOutLookEventFailed = true
+    if (!userDetails?.email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
+
     return response
   }
 }
