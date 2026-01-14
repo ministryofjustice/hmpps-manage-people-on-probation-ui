@@ -3,6 +3,7 @@ import { AppointmentSession } from '../models/Appointments'
 import { findUncompleted } from './findUncompleted'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { getDataValue } from '../utils'
+import { Name } from '../data/model/personalDetails'
 
 const crn = 'X000001'
 const id = '1'
@@ -46,7 +47,7 @@ mockAppointmentDateIsInPast.mockImplementation(() => false)
 
 const res = httpMocks.createResponse()
 
-const buildRequest = (session?: Record<string, string | Record<string, string>>): httpMocks.MockRequest<any> => {
+const buildRequest = (session?: Record<string, string | Record<string, string | Name>>): httpMocks.MockRequest<any> => {
   const req = {
     params: {
       crn,

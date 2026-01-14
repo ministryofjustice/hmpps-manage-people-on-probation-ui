@@ -259,6 +259,26 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][whoNeedsToReschedule]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select who is rescheduling this appointment',
+          log: 'Select who is rescheduling this appointment not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if contact includes sensitive information',
+          log: 'Sensitivity not selected',
+        },
+      ],
+    },
     outcomeRecorded: {
       optional: page !== `appointment/${contactId}/attended-complied`,
       checks: [

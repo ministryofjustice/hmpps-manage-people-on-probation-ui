@@ -9,7 +9,14 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString, setDataValue } from '../utils'
+import {
+  toRoshWidget,
+  toPredictors,
+  isValidCrn,
+  isNumericString,
+  setDataValue,
+  canRescheduleAppointment,
+} from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -61,6 +68,7 @@ jest.mock('../utils', () => {
     isNumericString: jest.fn(),
     isMatchingAddress: jest.fn(() => true),
     setDataValue: jest.fn(),
+    canRescheduleAppointment: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -85,6 +93,8 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
 >
 const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -277,6 +287,7 @@ describe('controllers/appointments', () => {
 
   describe('get manage appointment', () => {
     beforeEach(async () => {
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
@@ -295,6 +306,8 @@ describe('controllers/appointments', () => {
         nextAppointmentIsAtHome: true,
         hasDeceased: false,
         url: '',
+        canReschedule: true,
+        contactId: '1234',
       })
     })
   })

@@ -18,6 +18,24 @@
           "Content-Type": "application/json"
         }
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/supervision/calendar/event/reschedule",
+        "method": "POST"
+      },
+      "response": {
+        "status": 201,
+        "jsonBody": {
+          "id": "id-1",
+          "subject": "subject",
+          "startDate": "2025-10-16T14:55:23.537Z",
+          "endDate": "2025-10-16T15:55:23.537Z"
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
     }
   ]
 }

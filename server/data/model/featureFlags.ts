@@ -9,4 +9,5 @@ export class FeatureFlags {
   enableProbFEComponent?: boolean = undefined
   enableESuperVision?: boolean = undefined
   enablePastAppointments?: boolean = undefined
+  enableRescheduleAppointment?: boolean = undefined
 }

@@ -1,5 +1,8 @@
+import { DateTime } from 'luxon'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
+import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+
 import {
   completeCYAPage,
   completeSentencePage,
@@ -12,6 +15,9 @@ import {
   completeLocationDateTimePage,
   completeAttendedCompliedPage,
   completeAddNotePage,
+  completeRescheduling,
+  completeRescheduleAppointmentPage,
+  getUuid,
 } from './imports'
 import OverviewPage from '../../pages/overview'
 import YourCasesPage from '../../pages/myCases'
@@ -30,6 +36,21 @@ const loadPage = (crnOverride = '', dateInPast = false) => {
 }
 describe('Confirmation page', () => {
   let confirmPage: AppointmentConfirmationPage
+
+  const checkRescheduleConfirm = (inPast = false) => {
+    const tomorrow = DateTime.now().plus({ days: 1 })
+    const yesterday = DateTime.now().minus({ days: 1 })
+    checkPopHeader()
+    confirmPage.checkPageTitle('Appointment rescheduled')
+    cy.get('.govuk-panel__body').find('strong').should('contain.text', 'Planned office visit (NS)')
+    const expectedDate = inPast ? yesterday : tomorrow
+    cy.get('[data-qa="appointment-date"]')
+      .invoke('text')
+      .then(text => {
+        const normalizedText = text.replace(/\s+/g, ' ').trim()
+        expect(normalizedText).to.include(`${dateWithYear(expectedDate.toISODate())} from 9:10am to 10:30am`)
+      })
+  }
   beforeEach(() => {
     cy.task('resetMocks')
   })
@@ -71,7 +92,7 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`The appointment has been added to:`)
         })
-      cy.get('[data-qa="outlook-msg"] li').eq(0).should('contain.text', `John`)
+      cy.get('[data-qa="outlook-msg"] li').eq(0).should('contain.text', `Alton`)
       cy.get('[data-qa="outlook-msg"] li')
         .eq(1)
         .should('contain', 'the NDelius contact log and officer diary, along with any supporting information')
@@ -141,7 +162,7 @@ describe('Confirmation page', () => {
           'There is a technical problem with Outlook and we could not send a calendar invitation.',
         )
         cy.get('[data-qa="outlook-err-msg-2"]').should(
-          'contain',
+          'contain.text',
           'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
         )
 
@@ -188,7 +209,7 @@ describe('Confirmation page', () => {
           'There is a technical problem with Outlook and we could not send a calendar invitation.',
         )
         cy.get('[data-qa="outlook-err-msg-2"]').should(
-          'contain',
+          'contain.text',
           'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
         )
 
@@ -214,6 +235,83 @@ describe('Confirmation page', () => {
           'contain.text',
           'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.',
         )
+    })
+  })
+  describe('Appointment rescheduled to a date and time in the future', () => {
+    let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+    beforeEach(() => {
+      completeRescheduleAppointmentPage()
+    })
+    it('should render the confirmation page', () => {
+      getUuid().then(uuid => {
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        completeRescheduling(uuid)
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        confirmPage = new AppointmentConfirmationPage()
+        checkPopHeader()
+        checkRescheduleConfirm()
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(0)
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(
+              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
+            )
+          })
+
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(1)
+          .should('contain.text', 'The appointment details have been updated on:')
+        cy.get('[data-qa="what-happens-next"]')
+          .find('ul')
+          .find('li')
+          .eq(0)
+          .should('contain.text', 'Caroline´s calendar')
+        cy.get('[data-qa="what-happens-next"]')
+          .find('ul')
+          .find('li')
+          .eq(1)
+          .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
+      })
+    })
+  })
+  describe('Appointment rescheduled to a date and time in the past', () => {
+    let checkYourAnswerPage: RescheduleCheckYourAnswerPage
+    beforeEach(() => {
+      completeRescheduleAppointmentPage()
+    })
+    it('should render the confirmation page', () => {
+      const inPast = true
+      getUuid().then(uuid => {
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        completeRescheduling(uuid, inPast)
+        checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
+        checkYourAnswerPage.getSubmitBtn().click()
+        confirmPage = new AppointmentConfirmationPage()
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(0)
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(
+              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
+            )
+          })
+        cy.get('[data-qa="what-happens-next"]')
+          .find('p')
+          .eq(1)
+          .should(
+            'contain.text',
+            'The appointment details have been updated on the NDelius contact log and officer diary.',
+          )
+      })
     })
   })
 })

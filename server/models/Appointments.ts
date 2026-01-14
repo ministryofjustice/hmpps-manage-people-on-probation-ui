@@ -11,7 +11,9 @@ export interface AppointmentSessionUser {
   providerCode?: string
   teamCode?: string
   username?: string
+  name?: Name
   locationCode?: string
+  staffCode?: string
 }
 
 export interface AppointmentSession {
@@ -37,6 +39,9 @@ export interface AppointmentSession {
   sensitivity?: YesNo
   backendId?: number
   outcomeRecorded?: YesNo
+  contactId?: string
+  rescheduleAppointment?: RescheduleAppointment
+  externalReference?: string
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -108,6 +113,31 @@ export interface AppointmentRequestBody {
   outcomeRecorded?: boolean
 }
 
+export type RescheduleRequestedBy = 'POP' | 'SERVICE'
+
+export interface RescheduleAppointmentRequestBody {
+  date: string
+  startTime: string
+  endTime: string
+  staffCode?: string
+  teamCode?: string
+  locationCode?: string
+  outcomeRecorded: boolean
+  notes?: string
+  sensitive?: boolean
+  sendToVisor?: boolean
+  requestedBy: RescheduleRequestedBy
+  reasonForRecreate?: string
+  reasonIsSensitive?: boolean
+  uuid?: string
+  isInFuture: boolean
+}
+
+export interface RescheduleAppointmentResponse {
+  id: number
+  externalReference: string
+}
+
 export interface CheckAppointment {
   start: Date
   end: Date
@@ -120,6 +150,17 @@ export interface AppointmentPatch {
   notes?: string
   files?: string[]
   sensitive?: boolean
+  date?: string
+  startTime?: string
+}
+
+export interface RescheduleAppointment {
+  whoNeedsToReschedule?: RescheduleRequestedBy
+  reason?: string
+  files?: string[]
+  sensitivity?: YesNo
+  previousStart?: string
+  previousEnd?: string
 }
 
 export interface AppointmentChecks {
@@ -163,6 +204,7 @@ export interface LocalParams {
   forename?: string
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
+  isReschedule?: boolean
 }
 
 export interface MasUserDetails {

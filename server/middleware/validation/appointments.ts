@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes } from '../../utils'
+import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
@@ -9,6 +9,7 @@ import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
 import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
+import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
@@ -43,6 +44,7 @@ const appointments: Route<void> = (req, res, next) => {
 
     localParams = {
       ...localParams,
+      isReschedule: isRescheduleAppointment(req),
       isInPast: appointmentDateIsInPast(req),
       ...(enablePastAppointments ? {} : { _minDate }),
       _maxDate,
@@ -294,6 +296,24 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateReschedule = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/reschedule/${contactId}/${id}`)) {
+      render = `pages/reschedule/appointment`
+      errorMessages = {
+        ...errorMessages,
+        ...validateWithSpec(
+          unflattenBracketKeys(req.body),
+          appointmentsValidation({
+            crn,
+            id,
+            page: 'reschedule-appointment',
+            maxCharCount: maxCharCount as number,
+          }),
+        ),
+      }
+    }
+  }
+
   validateType()
   validateSentence()
   validateLocationDateTime()
@@ -305,7 +325,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateManageAttendedComplied()
   validateAddNote()
   validateManageAddNote()
-
+  validateReschedule()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
