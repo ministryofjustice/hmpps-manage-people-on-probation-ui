@@ -9,7 +9,6 @@ import {
   isNumericString,
   isValidCrn,
   isValidUUID,
-  isWelshPostcode,
   setDataValue,
 } from '../utils'
 import {
@@ -23,13 +22,7 @@ import {
   getAttendedCompliedProps,
   isRescheduleAppointment,
 } from '../middleware'
-import {
-  AppointmentSession,
-  AppointmentsPostResponse,
-  SmsLanguage,
-  SmsPreviewRequest,
-  RescheduleAppointmentResponse,
-} from '../models/Appointments'
+import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
@@ -38,8 +31,6 @@ import { postRescheduleAppointments } from '../middleware/postRescheduleAppointm
 import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
-import { isValidDateFormat, timeIsValid24HourFormat } from '../utils/validationUtils'
-import logger from '../../logger'
 
 const routes = [
   'redirectToSentence',
@@ -64,7 +55,8 @@ const routes = [
   'postArrangeAnotherAppointment',
   'getAddNote',
   'postAddNote',
-  'postSmsPreview',
+  'getTextMessageConfirmation',
+  'postTextMessageConfirmation',
 ] as const
 
 export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
@@ -350,7 +342,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
 
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      let nextPage = `supporting-information`
+      let nextPage = `text-message-confirmation`
 
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
@@ -590,59 +582,20 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   postArrangeAnotherAppointment: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
   },
-  postSmsPreview: hmppsAuthClient => {
+  getTextMessageConfirmation: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, uuid, date, start, location } = req.body
-
-      let name: string
-      let welsh: boolean
-      let preview: string[] | null = null
-
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-
-      const requestSmsPreview = async (): Promise<string[] | null> => {
-        let smsPreview = null
-        const body: SmsPreviewRequest = {
-          name,
-          date,
-          start,
-          location,
-          welsh,
-        }
-        try {
-          const response = await masClient.postSmsPreview(body)
-          smsPreview = response.preview
-        } catch (err: any) {
-          const error = err as Error
-          logger.error(`SMS preview request error: ${error.message}`)
-        }
-        return smsPreview
+      const { crn, id } = req.params as Record<string, string>
+      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id })
+    }
+  },
+  postTextMessageConfirmation: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
       }
-
-      const isValidDate = isValidDateFormat([date])
-      const isValidStart = timeIsValid24HourFormat([null, start])
-      const isValid = isValidDate && isValidStart
-      let language: SmsLanguage
-      if (isValid) {
-        const previewSession = req.session.data?.appointments?.[crn]?.[uuid]?.smsPreview
-        if (!previewSession?.name || !previewSession?.welsh) {
-          const personalDetails = await masClient.getPersonalDetails(crn)
-          name = personalDetails.name.forename
-          welsh = isWelshPostcode(personalDetails?.mainAddress?.postcode)
-        } else {
-          ;({ name, welsh } = previewSession)
-        }
-        if (previewSession?.date === date && previewSession?.start === start && previewSession?.location === location) {
-          preview = previewSession.preview
-        }
-        if (previewSession?.date !== date || previewSession?.start !== start || previewSession?.location !== location) {
-          preview = await requestSmsPreview()
-          const { data } = req.session
-          setDataValue(data, ['appointments', crn, uuid, 'smsPreview'], { name, date, start, location, welsh, preview })
-        }
-      }
-      return res.json({ preview })
+      const url = encodeURIComponent(req.url)
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`)
     }
   },
 }

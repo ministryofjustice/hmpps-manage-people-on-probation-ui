@@ -114,6 +114,7 @@ interface Locals {
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
   uploadError: string
   renderPath: string
+  smsPreview?: string[] | null
 }
 
 export interface AppResponse extends Response {

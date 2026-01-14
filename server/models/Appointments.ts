@@ -236,7 +236,7 @@ export interface SmsPreviewRequest {
   name: string
   date: string
   start: string
-  location: string
+  location?: string
   welsh: boolean
 }
 
