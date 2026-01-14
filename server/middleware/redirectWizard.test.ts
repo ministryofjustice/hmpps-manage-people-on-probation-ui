@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { redirectWizard } from './redirectWizard'
+import { redirectWizard, redirectWizardAppointments } from './redirectWizard'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
 import { AppointmentSession } from '../models/Appointments'
@@ -74,7 +74,7 @@ const res = {
 const redirectSpy = jest.spyOn(res, 'redirect')
 const nextSpy = jest.fn()
 
-describe('/middleware/redirectWizard', () => {
+describe('/middleware/redirectWizardAppointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -84,7 +84,7 @@ describe('/middleware/redirectWizard', () => {
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -98,7 +98,7 @@ describe('/middleware/redirectWizard', () => {
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -113,7 +113,7 @@ describe('/middleware/redirectWizard', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       mockedGetDataValue.mockReturnValue('type')
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -130,7 +130,7 @@ describe('/middleware/redirectWizard', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       mockedGetDataValue.mockReturnValue(null)
-      redirectWizard(requiredValues)(req, res, nextSpy)
+      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
     })
     it('should return a 404 status and render the error page', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)

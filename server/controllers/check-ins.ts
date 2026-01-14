@@ -19,6 +19,7 @@ import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
 const routes = [
+  'getStartSetup',
   'getIntroPage',
   'getDateFrequencyPage',
   'postIntroPage',
@@ -72,9 +73,21 @@ const checkinIntervals: OptionPair[] = [
 ]
 
 const checkInsController: Controller<typeof routes, void> = {
-  getIntroPage: hmppsAuthClient => {
+  getStartSetup: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn)) {
+        return renderError(404)(req, res)
+      }
+      const id = uuidv4()
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/instructions`)
+    }
+  },
+
+  getIntroPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
       const { back } = req.query
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -85,11 +98,12 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postIntroPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn, id } = req.params
+      const { data } = req.session
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      const id = uuidv4()
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },

@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express'
 import { Route } from '../@types'
 
-export const redirectWizard = (): Route<Promise<void>> => {
+export const postRedirectWizard = (): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     const { crn, id } = req.params
     const redirectUrl = `/case/${crn}/appointments/${id}/check-in/checkin-summary`

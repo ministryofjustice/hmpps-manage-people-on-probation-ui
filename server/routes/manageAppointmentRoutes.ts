@@ -5,7 +5,7 @@ import { Services } from '../services'
 import {
   getPersonalDetails,
   getPersonAppointment,
-  redirectWizard,
+  redirectWizardAppointments,
   cacheUploadedFiles,
   parseMultipartBody,
   getAppointment,
@@ -53,7 +53,7 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
   )
   router.all(
     '/case/:crn/arrange-appointment/:id/add-note',
-    redirectWizard(['eventId', 'type', 'date', 'outcomeRecorded']),
+    redirectWizardAppointments(['eventId', 'type', 'date', 'outcomeRecorded']),
     getPersonalDetails(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
   )
