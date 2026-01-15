@@ -22,6 +22,7 @@ export interface AppointmentsValidationArgs {
   notes?: string
   maxCharCount?: number
   enablePastAppointments?: boolean
+  file?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
@@ -224,6 +225,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select whether or not you wanted to arrange the next appointment',
           log: 'Next appointment type not selected',
+        },
+      ],
+    },
+    file: {
+      optional: page !== `appointment/${contactId}/add-note`,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: `A non-empty note or a file must be provided`,
+          log: `No content included for appointment patch`,
         },
       ],
     },

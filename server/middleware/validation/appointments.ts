@@ -20,6 +20,8 @@ const appointments: Route<void> = (req, res, next) => {
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
 
+  req.body.file = req.file ? 'has_file' : req.body.notes
+
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
 
@@ -290,6 +292,7 @@ const appointments: Route<void> = (req, res, next) => {
           contactId,
           page: `appointment/${contactId}/add-note`,
           notes: req.body.notes,
+          file: req.body.file,
           maxCharCount: maxCharCount as number,
         }),
       ),

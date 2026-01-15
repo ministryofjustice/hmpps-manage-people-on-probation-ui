@@ -9,6 +9,7 @@ export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-
 export const hasAllDigits = (string: string) => /^\d+$/.test(string)
 
 export const isNotEmpty = (args: any[]) => {
+  console.log(`args (${args[0]})`)
   return !!args[0] && args[0] !== undefined
 }
 export const contactPrefEmailCheck = (args: any[]) => {
