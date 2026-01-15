@@ -10,11 +10,9 @@ export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBI
 export type SmsLanguage = 'english' | 'welsh'
 
 export interface SmsPreview {
-  welsh: boolean
   name: string
-  date: string
-  start: string
   location: string
+  welsh: boolean
   preview: string[]
 }
 

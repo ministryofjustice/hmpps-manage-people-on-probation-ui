@@ -1,8 +1,8 @@
-import { logger } from '@sentry/node'
+import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { AppointmentSession, SmsPreviewRequest } from '../models/Appointments'
+import { AppointmentSession, SmsPreview, SmsPreviewRequest } from '../models/Appointments'
 import { getDataValue, isWelshPostcode, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 
@@ -29,7 +29,7 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     } else {
       const locationMatch = locations.find(loc => loc.code === locationCode)
       if (locationMatch) {
-        location = locationMatch?.address?.officeName ?? locationMatch?.address?.buildingName ?? ''
+        location = locationMatch?.address?.officeName || locationMatch?.address?.buildingName || ''
       }
       const postcode = res.locals.case?.mainAddress?.postcode
       const welsh = postcode ? isWelshPostcode(postcode) : false
@@ -51,7 +51,8 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
         const error = err as Error
         logger.error(`SMS preview request error: ${error.message}`)
       }
-      setDataValue(data, ['appointments', crn, uuid, 'smsPreview'], { name, date, start, location, welsh, preview })
+      const previewSession: SmsPreview = { name, location, welsh, preview }
+      setDataValue(data, ['appointments', crn, uuid, 'smsPreview'], previewSession)
     }
     res.locals.smsPreview = preview
     return next()

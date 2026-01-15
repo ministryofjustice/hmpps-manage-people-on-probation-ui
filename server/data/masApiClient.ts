@@ -469,7 +469,7 @@ export default class MasApiClient extends RestClient {
     return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
 
-  async postSmsPreview(body: SmsPreviewRequest): Promise<SmsPreviewResponse> {
+  async postSmsPreview(body: SmsPreviewRequest): Promise<SmsPreviewResponse | ErrorSummary | null> {
     return this.post({
       data: body,
       path: `/calendar/event/sms-preview`,
