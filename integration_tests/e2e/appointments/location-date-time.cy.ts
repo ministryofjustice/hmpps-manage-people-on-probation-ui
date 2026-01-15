@@ -497,16 +497,16 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the banner if dismiss link is clicked', () => {
-      cy.get('.moj-alert__dismiss').click()
+      locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
     it('should not re-show the alert banner when invalid form is submitted and validation errors are shown', () => {
-      cy.get('.moj-alert__dismiss').click()
+      locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
     it('should not re-show the alert banner when the form is submitted, then the back link is clicked on the next page', () => {
-      cy.get('.moj-alert__dismiss').click()
+      locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
       locationDateTimePage.getElementInput(`startTime`).type('09:00')
       locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
