@@ -9,10 +9,7 @@ import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetai
 export default function caseRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all(
-    ['/case/:crn', '/case/:crn/*path'],
-    getPersonalDetails(hmppsAuthClient),
-    getCheckinOffenderDetails(hmppsAuthClient),
-  )
-  get('/case/:crn', controllers.case.getCase(hmppsAuthClient))
+  router.all(['/case/:crn', '/case/:crn/*path'], getPersonalDetails(hmppsAuthClient))
+
+  router.get('/case/:crn', [getCheckinOffenderDetails(hmppsAuthClient), controllers.case.getCase(hmppsAuthClient)])
 }

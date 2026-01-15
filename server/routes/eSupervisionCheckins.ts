@@ -2,11 +2,17 @@ import { type Router } from 'express'
 import type { Services } from '../services'
 import controllers from '../controllers'
 import validate from '../middleware/validation'
-import { autoStoreSessionData } from '../middleware'
+import { autoStoreSessionData, getPersonalDetails } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
 import { redirectWizard } from '../middleware/checkinCyaRedirect'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
+  router.get(
+    ['/case/:crn/appointments/:id/check-in/*path', '/case/:crn/appointments/check-in/manage/*path'],
+    getCheckinOffenderDetails(hmppsAuthClient),
+  )
+
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
 
   router.post('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.postIntroPage(hmppsAuthClient)])

@@ -13,12 +13,17 @@ import {
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
-  get('/case/:crn/appointments', controllers.appointments.getAppointments(hmppsAuthClient))
+  router.get(
+    '/case/:crn/appointments',
+    getCheckinOffenderDetails(hmppsAuthClient),
+    controllers.appointments.getAppointments(hmppsAuthClient),
+  )
 
   get('/case/:crn/upcoming-appointments', controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient))
 
