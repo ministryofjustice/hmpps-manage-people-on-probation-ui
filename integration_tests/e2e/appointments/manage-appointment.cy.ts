@@ -1,5 +1,6 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import { checkAppointmentDetails } from './imports'
+import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 
 const crn = 'X778160'
 const appointmentId = '6'
@@ -12,14 +13,32 @@ describe('Manage an appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   beforeEach(() => {
     cy.task('resetMocks')
-    loadPage()
-    manageAppointmentPage = new ManageAppointmentPage()
   })
   it('should render the page', () => {
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getBackLink().should('have.attr', 'href', `/case/${crn}/appointments`)
     manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
+    manageAppointmentPage
+      .getAppointmentDetailsListItem(1, 'actions')
+      .find('a')
+      .should('contain.text', 'Reschedule')
+      .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
   })
+  it('should render the page with no reschedule link if outcome has been logged', () => {
+    cy.task('stubFutureAppointmentOutcomeHasNotes')
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+  })
+  it('should render the page with no reschedule link if feature flag is disabled', () => {
+    cy.task('stubDisableRescheduleAppointment')
+    loadPage()
+    manageAppointmentPage = new ManageAppointmentPage()
+    manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+  })
+
   describe('Alert banner', () => {
     describe('Appointment is in the future', () => {
       beforeEach(() => {
@@ -760,6 +779,114 @@ describe('Manage an appointment', () => {
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 3).should('contain.text', '3 Way Meeting (NS)')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 4).should('contain.text', '6 April 2023')
       manageAppointmentPage.getAssociatedDocumentsTableRowCell(1, 5).should('contain.text', '6 April 2023')
+    })
+  })
+
+  describe('Appointment Reschedule link', () => {
+    beforeEach(() => {
+      loadPage()
+      manageAppointmentPage = new ManageAppointmentPage()
+    })
+
+    describe('Complied appointment with future date', () => {
+      const name = 'Log attended and complied appointment'
+      beforeEach(() => {
+        cy.task('stubAppointmentCompliedWithFutureDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      describe('Appointment in future with outcome recorded', () => {
+        it('Should not display Reschedule link', () => {
+          manageAppointmentPage.getTaskName(1).should('contain.text', name)
+          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage
+            .getAppointmentDetailsListItem(1, 'value')
+            .should('contain.text', '21 February 2034 at 10:15am to 10:30am')
+          manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+        })
+      })
+    })
+
+    describe('Appointment in future with no outcome recorded', () => {
+      const name = 'Log attended and complied appointment'
+      beforeEach(() => {
+        cy.task('stubAppointmentNonCompliedWithFutureDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      describe('Appointment in future with no outcome recorded', () => {
+        it('should display the reschedule link ', () => {
+          manageAppointmentPage.getTaskName(1).should('contain.text', name)
+          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage
+            .getAppointmentDetailsListItem(1, 'value')
+            .should('contain.text', '21 February 2034 at 10:15am to 10:30am')
+          manageAppointmentPage
+            .getAppointmentDetailsListItem(1, 'actions')
+            .find('a')
+            .should('contain.text', 'Reschedule')
+            .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
+            .click()
+          const rescheduleAppointmentPage = new RescheduleAppointmentPage()
+          rescheduleAppointmentPage.checkOnPage()
+        })
+      })
+    })
+
+    describe('Appointment in past with outcome recorded', () => {
+      const name = 'Log attended and complied appointment'
+      beforeEach(() => {
+        cy.task('stubAppointmentCompliedWithPastDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      describe('Appointment in past with outcome recorded', () => {
+        it('Should not display Reschedule link', () => {
+          manageAppointmentPage.getTaskName(1).should('contain.text', name)
+          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage
+            .getAppointmentDetailsListItem(1, 'value')
+            .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
+          manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+        })
+      })
+    })
+
+    describe('Appointment in past with no outcome recorded', () => {
+      const name = 'Log attended and complied appointment'
+      beforeEach(() => {
+        cy.task('stubAppointmentNonCompliedWithPastDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      describe('Non complied appointment is in the past', () => {
+        it('should display the reschedule link ', () => {
+          manageAppointmentPage.getTaskName(1).should('contain.text', name)
+          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage
+            .getAppointmentDetailsListItem(1, 'value')
+            .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
+          manageAppointmentPage
+            .getAppointmentDetailsListItem(1, 'actions')
+            .find('a')
+            .should('contain.text', 'Reschedule')
+            .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
+            .click()
+          const rescheduleAppointmentPage = new RescheduleAppointmentPage()
+          rescheduleAppointmentPage.checkOnPage()
+        })
+      })
+    })
+    describe('Appointment has no outcome recorded, feature flag is disabled', () => {
+      beforeEach(() => {
+        cy.task('stubDisableRescheduleAppointment')
+        cy.task('stubAppointmentNonCompliedWithPastDate')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      it('should not display the reschedule link', () => {
+        manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+      })
     })
   })
 })

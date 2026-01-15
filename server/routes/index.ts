@@ -1,7 +1,5 @@
 import { Router } from 'express'
-
 import type { Services } from '../services'
-
 import home from './home'
 import searchRoutes from './search'
 import caseRoutes from './case'
@@ -18,6 +16,7 @@ import arrangeAppointmentRoutes from './arrangeAppointment'
 import documentsRoutes from './documents'
 import alertsRoutes from './alerts'
 import eSuperVisionCheckInsRoutes from './eSupervisionCheckins'
+import rescheduleAppointmentRoutes from './rescheduleAppointments'
 import whatsNew from './whatsNew'
 
 export default function routes(router: Router, services: Services): Router {
@@ -34,6 +33,7 @@ export default function routes(router: Router, services: Services): Router {
   accessibilityRoutes(router)
   interventionsRoutes(router, services)
   arrangeAppointmentRoutes(router, services)
+  rescheduleAppointmentRoutes(router, services)
   documentsRoutes(router, services)
   alertsRoutes(router, services)
   eSuperVisionCheckInsRoutes(router, services)

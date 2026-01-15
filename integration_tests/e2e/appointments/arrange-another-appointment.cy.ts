@@ -53,12 +53,7 @@ describe('Arrange another appointment', () => {
       dateTimePage.checkOnPage()
     })
     it('should display the error summary box', () => {
-      dateTimePage.checkErrorSummaryBox([
-        'Enter or select a date',
-        'Enter a start time',
-        'Enter an end time',
-        'Select an appointment location',
-      ])
+      dateTimePage.checkErrorSummaryBox(['Enter or select a date', 'Enter a start time', 'Enter an end time'])
     })
     it('should display the error messages', () => {
       getUuid().then(uuid => {
@@ -70,9 +65,6 @@ describe('Arrange another appointment', () => {
         })
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-end-error`).should($error => {
           expect($error.text().trim()).to.include('Enter an end time')
-        })
-        dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode-error`).should($error => {
-          expect($error.text().trim()).to.include('Select an appointment location')
         })
       })
     })

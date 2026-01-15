@@ -173,7 +173,7 @@
               </form>
             </div>
            {% endif %}
-            {% if flags.enableESuperVision === true %}
+            {% if flags.enableESuperVision === true and hasPractitioner %}
               <div class="moj-button-group__item">
                 <a href="{{ checkinLink }}" class="govuk-button govuk-button--secondary govuk-!-margin-left-3"  data-qa="{% if offenderCheckinsByCRNResponse %}online-manage-btn{% else %}online-checkin-btn{% endif %}">{{ checkinButtonText }}</a>
               </div>

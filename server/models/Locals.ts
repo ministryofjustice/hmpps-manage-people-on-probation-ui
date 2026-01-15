@@ -39,10 +39,13 @@ export interface AppointmentLocals {
     name: string
     team: string
     region: string
+    html: string
   }
   location?: Location | string
   start?: string
+  previousStart?: string
   end?: string
+  previousEnd?: string
   date?: string
   repeating?: string
   repeatingDates?: string[]
@@ -101,6 +104,7 @@ interface Locals {
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
+  defaultUser?: { username: string; homeArea: string; team: string }
   attendingUser?: DefaultUserDetails
   sentencePlan?: SentencePlan
   alertsCount?: string

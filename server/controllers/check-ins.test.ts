@@ -140,6 +140,19 @@ describe('checkInsController', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
+
+    it('redirect if no practitioner', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+
+      getProbationPractitionerSpy.mockImplementationOnce(() =>
+        Promise.resolve({ unallocated: true } as ProbationPractitioner),
+      )
+
+      const req = baseReq()
+      await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments`)
+    })
   })
 
   describe('postIntroPage', () => {

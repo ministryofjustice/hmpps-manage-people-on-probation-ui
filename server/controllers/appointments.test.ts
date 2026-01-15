@@ -9,7 +9,14 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toRoshWidget, toPredictors, isValidCrn, isNumericString, setDataValue } from '../utils'
+import {
+  toRoshWidget,
+  toPredictors,
+  isValidCrn,
+  isNumericString,
+  setDataValue,
+  canRescheduleAppointment,
+} from '../utils'
 import {
   mockTierCalculation,
   mockRisks,
@@ -28,6 +35,7 @@ import {
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 const crn = 'X000001'
 const id = '1234'
@@ -61,6 +69,7 @@ jest.mock('../utils', () => {
     isNumericString: jest.fn(),
     isMatchingAddress: jest.fn(() => true),
     setDataValue: jest.fn(),
+    canRescheduleAppointment: jest.fn(),
   }
 })
 const mockMiddlewareFn = jest.fn()
@@ -85,6 +94,8 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
 >
 const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -99,6 +110,15 @@ const req = httpMocks.createRequest({
     data: {},
   },
 })
+
+const mockPractitioner: ProbationPractitioner = {
+  code: '',
+  name: { forename: '', surname: '' },
+  provider: { code: '', name: '' },
+  team: { code: '', description: '' },
+  unallocated: false,
+  username: '',
+}
 
 const mockAppointment: AttendedCompliedAppointment | Activity = {
   type: '3 Way Meeting (NS)',
@@ -170,6 +190,10 @@ const getPredictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
 
+const getProbationPractitionerSpy = jest
+  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+  .mockImplementation(() => Promise.resolve(mockPractitioner))
+
 describe('controllers/appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -195,6 +219,9 @@ describe('controllers/appointments', () => {
     it('should request predictors from the api', () => {
       expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
     })
+    it('should request the probation practitioner from the api', () => {
+      expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
+    })
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
@@ -205,6 +232,7 @@ describe('controllers/appointments', () => {
         predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
         hasDeceased: false,
+        hasPractitioner: true,
         url: '',
       })
     })
@@ -277,6 +305,7 @@ describe('controllers/appointments', () => {
 
   describe('get manage appointment', () => {
     beforeEach(async () => {
+      mockCanRescheduleAppointment.mockReturnValueOnce(true)
       await controllers.appointments.getManageAppointment(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MANAGE_APPOINTMENT', uuidv4(), crn, 'CRN')
@@ -295,6 +324,8 @@ describe('controllers/appointments', () => {
         nextAppointmentIsAtHome: true,
         hasDeceased: false,
         url: '',
+        canReschedule: true,
+        contactId: '1234',
       })
     })
   })

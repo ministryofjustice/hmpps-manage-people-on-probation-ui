@@ -19,13 +19,6 @@
     <span data-qa="appointmentForename">{{ appointment.appointmentFor.forename }}</span>
 {% endif %}
 {% endset %}
-{% set attendingHtml %}
-{% if appointment.meta.userIsAttending %}
-    {{ appointment.attending.name }}
-{% else %}
-    {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
-{% endif %}
-{% endset %}
 {% set locationHtml = '' %}
 {% if appointment.location.address %}
     {% set locationHtml = [
@@ -55,8 +48,12 @@
     {% set locationHint = noTypeHint %}
 {% endif %}
 {% if (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) 
-    and appointment.type and(not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) %}
+    and appointment.type and(not appointment.attending.name) %}
     {% set locationHint = noAttendingHint %}
+{% endif %}
+{% set dateAndTimeLabelHtml = 'Date and time' %}
+{% if appointment.start and appointment.previousStart and appointment.start != appointment.previousStart %}
+    {% set dateAndTimeLabelHtml = '<p class="govuk-!-font-weight-bold govuk-!-margin-bottom-0">Date and time</p><span class="govuk-hint govuk-!-font-size-16" data-qa="previousDateTime">Previous date and time: ' + appointment.previousStart | dayOfWeek + ' '  + appointment.previousStart | dateWithYear + ' at ' + appointment.previousStart | to12HourTimeWithMinutes + ' to ' + appointment.previousEnd | to12HourTimeWithMinutes + '</span>' %}
 {% endif %}
 
 <form method="post" autocomplete="off" action="{{ paths.current }}">
@@ -71,11 +68,7 @@
     {% set appointmentDatesHtml %}
     <ul class="govuk-list">
         {% for appointmentDate in appointmentDates %}
-            <li>{{ appointmentDate | dateWithYear }}
-          from
-          {{appointment.start | to12HourTimeWithMinutes}}
-          to
-          {{ appointment.end | to12HourTimeWithMinutes}}</li>
+            <li>{{ appointmentDate | dayOfWeek }}{{' '}}{{ appointmentDate | dateWithYear }}{{ ' at ' }}{{appointment.start | to12HourTimeWithMinutes}}{{ ' to ' }}{{ appointment.end | to12HourTimeWithMinutes }}</li>
         {% endfor %}
     </ul>
     {% endset %}
@@ -119,11 +112,11 @@
                 } if showAction
             } if appointment.meta.isVisor,
     { key: { text: "Attending" },
-    value: { html: 'Not entered' if (not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) else attendingHtml | safe },
+    value: { html: 'Not entered' if not appointment.attending.name else appointment.attending.html },
     actions: {
     items: [ { 
     href: changePath + "/attendance?change=" + url, 
-    text: "Choose attending" if (not appointment.attending.name or not appointment.attending.team or not appointment.attending.region) else "Change", 
+    text: "Choose attending" if not appointment.attending.name else "Change", 
     visuallyHiddenText: "attendance"
      } 
      ] 
@@ -136,7 +129,7 @@
       }
       ]
       } if showAction  and (appointment.appointmentFor.sentence or appointment.appointmentFor.forename) and appointment.type and appointment.attending.name },
-      { key: { text: "Date and time" },
+      { key: { html: dateAndTimeLabelHtml },
       value: { html: 'Not entered' if appointmentDates.length == 0 else appointmentDatesHtml }, 
       actions: { items: [ { href: changePath + "/location-date-time?change=" + url,
       text: "Choose date and time" if appointmentDates.length == 0 else "Change",
@@ -181,11 +174,17 @@
       }
 }) }}
     {% endif %}
-    {{ govukButton({
-      html: buttonText,
-      attributes: {
-        'data-qa': 'submit-btn'
-      }
-    }) }}
+    <div class="govuk-button-group">
+        {{ govukButton({
+          html: buttonText,
+          attributes: {
+            'data-qa': 'submit-btn'
+          }
+        }) }}
+        {% if showAnchorLink === true %}
+            <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink">
+                {{ formAnchorText }}</a>
+        {% endif %}
+    </div>
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 </form>
