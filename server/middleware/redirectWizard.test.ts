@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { redirectWizardAppointments, redirectWizardSetupCheckIns } from './redirectWizard'
+import { redirectWizard } from './redirectWizard'
 import { getDataValue, isValidCrn, isValidUUID } from '../utils'
 import { renderError } from './renderError'
 import { AppointmentSession } from '../models/Appointments'
@@ -74,7 +74,7 @@ const res = {
 const redirectSpy = jest.spyOn(res, 'redirect')
 const nextSpy = jest.fn()
 
-describe('/middleware/redirectWizardAppointments', () => {
+describe('/middleware/redirectWizard - appointments', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -84,7 +84,7 @@ describe('/middleware/redirectWizardAppointments', () => {
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -98,7 +98,7 @@ describe('/middleware/redirectWizardAppointments', () => {
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -113,7 +113,7 @@ describe('/middleware/redirectWizardAppointments', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       mockedGetDataValue.mockReturnValue('type')
-      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should not redirect to the first page of the arrange appointment wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -130,7 +130,7 @@ describe('/middleware/redirectWizardAppointments', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       mockedGetDataValue.mockReturnValue(null)
-      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues)(req, res, nextSpy)
     })
     it('should return a 404 status and render the error page', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
@@ -145,7 +145,7 @@ describe('/middleware/redirectWizardAppointments', () => {
   })
 })
 
-describe('/middleware/redirectWizardSetupCheckIns', () => {
+describe('/middleware/redirectWizard - setupcheckins', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -155,7 +155,7 @@ describe('/middleware/redirectWizardSetupCheckIns', () => {
     beforeEach(() => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
-      redirectWizardSetupCheckIns(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
     })
     it('should redirect to the first page of the setup wizard', () => {
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/instructions`)
@@ -170,7 +170,7 @@ describe('/middleware/redirectWizardSetupCheckIns', () => {
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
       mockedGetDataValue.mockReturnValue('id')
-      redirectWizardAppointments(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
     })
     it('should not redirect to the first page of the setup wizard', () => {
       expect(redirectSpy).not.toHaveBeenCalled()
@@ -187,7 +187,7 @@ describe('/middleware/redirectWizardSetupCheckIns', () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
       mockedGetDataValue.mockReturnValue(null)
-      redirectWizardSetupCheckIns(requiredValues)(req, res, nextSpy)
+      redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
     })
     it('should return a 404 status and render the error page', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
