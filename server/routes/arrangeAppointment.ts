@@ -11,6 +11,7 @@ import {
   getDefaultUser,
   getUserOptions,
   routeChangeAttendee,
+  getSmsPreview,
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -147,6 +148,21 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
+  )
+  router.all(
+    '/case/:crn/arrange-appointment/:id/text-message-confirmation',
+    getPersonalDetails(hmppsAuthClient),
+    getSmsPreview(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/text-message-confirmation',
+    redirectWizard(['eventId', 'type', 'date', 'start', ['user', 'locationCode']]),
+    controllers.arrangeAppointments.getTextMessageConfirmation(hmppsAuthClient),
+  )
+  router.post(
+    '/case/:crn/arrange-appointment/:id/text-message-confirmation',
+    validate.appointments,
+    controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient),
   )
   router.post('/alert/dismiss', (req, res) => {
     req.session.alertDismissed = true

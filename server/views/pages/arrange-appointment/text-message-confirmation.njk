@@ -1,0 +1,56 @@
+{% extends "../_form.njk" %}
+{% set title = 'Text message confirmation' %}
+{% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/location-date-time?back=text-message-confirmation' %}
+{% set personForename = headerPersonName.forename %}
+{% set smsItems = [] %}
+{% if case.mobileNumber %}
+    {% set smsItems = (smsItems.push({text: 'Yes', value: 'YES'}), smsItems) %}
+    {% set smsItems = (smsItems.push({text: 'Yes, update their mobile number', value: 'YES_UPDATE_MOBILE_NUMBER'}), smsItems) %}
+{% else %}
+    {% set smsItems = (smsItems.push({text: 'Yes, add a mobile number', value: 'YES_ADD_MOBILE_NUMBER'}), smsItems) %}
+{% endif %}
+{% set smsItems = (smsItems.push({text: 'No', value: 'NO'}), smsItems) %}
+{% block form %}
+    {{ govukRadios({
+    classes: "govuk-radios--inline" if not case.mobileNumber else "",
+    fieldset: {
+      legend: {
+        html: 'Do you want to send ' + personForename + ' a text message confirmation?',
+        classes: "govuk-fieldset__legend--m govuk-!-margin-bottom-2",
+        isPageHeading: false
+      },
+      attributes: {
+        'data-qa': 'smsOptIn'
+      }
+    },
+    hint: {
+        text: ("Their mobile number is " + case.mobileNumber + ".") if case.mobileNumber else "They do not have a mobile number saved, you´ll need to check if they have one."
+      },
+    items: smsItems
+   } | decorateFormAttributes(['appointments', crn, id, 'smsOptIn'])) }}
+    {% if smsPreview !== null %}
+        <section id="smsPreview" data-qa="smsPreview" class="govuk-!-margin-bottom-6">
+            <h3 class="govuk-heading-m">Text message preview</h3>
+            <p class="govuk-hint">Preview the text that will be sent based on the appointment details.</p>
+            {{ govukButton({
+  text: "Generate text preview",
+  id: 'generateBtn',
+  classes: "govuk-button--secondary govuk-!-margin-bottom-4",
+  attributes: {
+    'aria-controls': 'generate-reveal',
+    'data-qa': 'generateBtn'
+  }
+}) }}
+            <div id="generate-reveal" data-qa="generate-reveal">
+                <p class="govuk-body">{{ personForename }} will receive this message in English{% if smsPreview.length == 2 %} and in Welsh{% endif %}: </p>
+                {% for preview in smsPreview %}
+                    <div class="sms-message-wrapper">
+                        <p class="govuk-body govuk-!-margin-bottom-0">
+                            {{ preview | nl2br | safe }}
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        </section>
+    {% endif %}
+{% endblock %}

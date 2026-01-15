@@ -5,6 +5,17 @@ import { Errors } from './Errors'
 
 export type YesNo = '' | 'Yes' | 'No'
 
+export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO'
+
+export type SmsLanguage = 'english' | 'welsh'
+
+export interface SmsPreview {
+  name: string
+  location: string
+  welsh: boolean
+  preview: string[]
+}
+
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
 export interface AppointmentSessionUser {
@@ -42,6 +53,8 @@ export interface AppointmentSession {
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
+  smsOptIn?: SmsOptInOptions
+  smsPreview?: SmsPreview
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -215,4 +228,17 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+}
+
+export interface SmsPreviewRequest {
+  name: string
+  date: string
+  start: string
+  location?: string
+  welsh: boolean
+}
+
+export interface SmsPreviewResponse {
+  preview: string[]
+  statusCode?: number
 }
