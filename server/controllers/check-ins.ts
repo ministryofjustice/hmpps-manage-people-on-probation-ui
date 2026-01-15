@@ -79,6 +79,12 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const practitioner = await masClient.getProbationPractitioner(crn)
+      if (practitioner.unallocated) {
+        return res.redirect(`/case/${crn}/appointments`)
+      }
       return res.render('pages/check-in/instructions.njk', { crn, back })
     }
   },
