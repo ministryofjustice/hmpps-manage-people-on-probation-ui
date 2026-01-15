@@ -9,6 +9,7 @@ import {
   completeAttendedCompliedPage,
   completeAddNotePage,
   completeSupportingInformationPage,
+  checkRiskToStaffAlert,
 } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
@@ -51,6 +52,9 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should render the pop header', () => {
       checkPopHeader('Alton Berge', true)
+    })
+    it('should render the risk to staff alert', () => {
+      checkRiskToStaffAlert()
     })
     it('should display the options', () => {
       locationDateTimePage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')

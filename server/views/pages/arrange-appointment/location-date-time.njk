@@ -10,9 +10,10 @@
 {% set relationship = '' %}
 {% set provisions = [] %}
 {% set personForename = headerPersonName.forename %}
-
-{% block heading %}
+{% block alertBanner %}
     {% include "../../partials/_risk-to-staff-alert.njk" %}
+{% endblock %}
+{% block heading %}
     <h3 class="govuk-heading-l" data-qa="pageHeading">Appointment date, time and location</h3>
 {% endblock %}
 

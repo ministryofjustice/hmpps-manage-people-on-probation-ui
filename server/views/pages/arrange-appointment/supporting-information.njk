@@ -6,7 +6,7 @@
 {% if isInPast %}
     {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attended-complied' %}
 {% endif %}
-{% block heading %}
+{% block alertBanner %}
     {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
 {% block form %}

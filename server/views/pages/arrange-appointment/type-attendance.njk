@@ -21,10 +21,10 @@
   {{ appointment.attending.name + " (" + appointment.attending.team + ", " +  appointment.attending.region + ")"}}
 {% endif %}
 {% endset %}
-
-{% block heading %}
+{% block alertBanner %}
   {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
+{% block heading %}{% endblock %}
 
 {% block form %}
 

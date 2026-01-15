@@ -18,6 +18,7 @@
   {% else %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
+        {% block alertBanner %}{% endblock %}
         {% if errorMessages %}
           {% set errorList = errorMessages | toErrorList %}
           {% if errorList.length > 0 %}
@@ -26,14 +27,13 @@
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
+          {% endif %}
         {% endif %}
-    {% endif %}
 
-    {% block beforeHeading %}
-    {% endblock %}
+        {% block beforeHeading %}{% endblock %}
 
-    {% block heading %}
-        {% if title %}
+        {% block heading %}
+          {% if title %}
             <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
               {{ title }}
             </h2>

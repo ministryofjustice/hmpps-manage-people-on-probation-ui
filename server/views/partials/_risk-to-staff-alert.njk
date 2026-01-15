@@ -14,6 +14,9 @@
       title: forename + " is " + riskLevelLabel(level) | lower + " risk to staff ",
       showTitleAsHeading: true,
       dismissible: false,
-      html: html
+      html: html,
+      attributes: {
+        'data-qa': 'riskToStaffAlert'
+      }
     }) }}
 {% endif %}
