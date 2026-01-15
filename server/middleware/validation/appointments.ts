@@ -20,7 +20,7 @@ const appointments: Route<void> = (req, res, next) => {
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
 
-  req.body.file = req.file ? 'has_file' : req.body.notes
+  req.body.file = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
 
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
