@@ -45,22 +45,12 @@
   <div class="govuk-grid-row govuk-!-margin-top-4">
     {% include "./activity-log/_filters.njk" %}
     <div class="govuk-grid-column-two-thirds">
-      {% if not(title == 'Contacts') %}
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-          {{ title }}
-        </h2>
-      {% endif %}
       {% if personActivity.activities.length %}
-        <div class="flex flex--space-between">
-          {% include "./activity-log/_switch-views.njk" %}
-          <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
-        </div>
         {% if entries.length > 0 %}
-          {% if compactView %}
-            {% include "./activity-log/_compact-view.njk" %}
-          {% else %}
-            {% include "./activity-log/_default-view.njk" %}
-          {% endif %}
+          <p class="govuk-body" data-qa="alertsCount">
+            Showing <b>{{ ((personActivity.page) * personActivity.size) + 1 }}</b> to <b>{{ ((personActivity.page) * personActivity.size) + personActivity.activities.length }}</b> of <b>{{ personActivity.totalResults }}</b> results
+          </p>
+          {% include "./activity-log/_compact-view.njk" %}
         {% else %}
           <p class="govuk-!-margin-top-4">{{ emptyText }}</p>
         {% endif %}
