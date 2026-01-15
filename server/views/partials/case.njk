@@ -55,8 +55,8 @@
         {% if interventions.errors.length > 0 %}
             {% set errors = errors.concat(interventions.errors) %}
         {% endif %}
-        {% if personRisk.errors.length > 0 %}
-            {% set errors = errors.concat(personRisk.errors) %}
+        {% if personRisks.errors.length > 0 %}
+            {% set errors = errors.concat(personRisks.errors) %}
         {% endif %}
         {% if errors.length > 0 %}
             <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>

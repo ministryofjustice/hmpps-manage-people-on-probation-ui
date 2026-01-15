@@ -12,7 +12,7 @@
       href: "/case"
     },
     {
-      text: personRisk.personSummary.name | fullName,
+      text: personRisks.personSummary.name | fullName,
       href: "/case/" + crn
     },
     {
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  {% set removedRiskFlagsCount = personRisk.removedRiskFlags.length %}
+  {% set removedRiskFlagsCount = personRisks.removedRiskFlags.length %}
   {% if removedRiskFlagsCount > 0 %}
     <table class="govuk-table">
       <thead class="govuk-table__head">
@@ -50,7 +50,7 @@
         </tr>
       </thead>
       <tbody class="govuk-table__body" data-qa="removedRisksCard">
-        {% for flag in personRisk.removedRiskFlags %}
+        {% for flag in personRisks.removedRiskFlags %}
           {% if flag.removalHistory.length > 0 %}
             {% set removal = flag.removalHistory[0] %}
             {% set hasRemovalNotes = removal.riskRemovalNotes.length > 0 %}
