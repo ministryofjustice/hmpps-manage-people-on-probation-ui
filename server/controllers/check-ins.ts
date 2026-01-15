@@ -89,7 +89,7 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
-      if (!isValidCrn(crn)) {
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -106,7 +106,7 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { data } = req.session
-      if (!isValidCrn(crn)) {
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
