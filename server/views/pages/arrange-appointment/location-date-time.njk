@@ -9,23 +9,10 @@
 {% set employments = [] %}
 {% set relationship = '' %}
 {% set provisions = [] %}
-{% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set personForename = headerPersonName.forename %}
 
 {% block heading %}
-    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
-    {% if level and(level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
-        {% set html %}
-        <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ personForename }}&apos;s risk to staff flag</a>
-        {% endset %}
-        {{ mojAlert({
-    variant: "warning",
-    title: personForename + " is " + riskLevelLabel(level) | lower + " risk to staff ",
-    showTitleAsHeading: true,
-    dismissible: false,
-    html: html
-}) }}
-    {% endif %}
+    {% include "../../partials/_risk-to-staff-alert.njk" %}
     <h3 class="govuk-heading-l" data-qa="pageHeading">Appointment date, time and location</h3>
 {% endblock %}
 

@@ -1,5 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Appointment type and attendance' %}
+{% set personForename = headerPersonName.forename %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/sentence' %}
 {% from "govuk/components/inset-text/macro.njk" import govukInsetText %}
 
@@ -21,7 +22,9 @@
 {% endif %}
 {% endset %}
 
-{% block heading %}{% endblock %}
+{% block heading %}
+  {% include "../../partials/_risk-to-staff-alert.njk" %}
+{% endblock %}
 
 {% block form %}
 

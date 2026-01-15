@@ -2,9 +2,13 @@
 
 {% set title = 'Add supporting information (optional)' %}
 {% set backLink = change | default('/case/' + crn + '/arrange-appointment/' + id + '/location-date-time') %}
+{% set personForename = headerPersonName.forename %}
 {% if isInPast %}
     {% set backLink = '/case/' + crn + '/arrange-appointment/' + id + '/attended-complied' %}
 {% endif %}
+{% block heading %}
+    {% include "../../partials/_risk-to-staff-alert.njk" %}
+{% endblock %}
 {% block form %}
 
     {{ govukCharacterCount({

@@ -25,10 +25,9 @@ const caseController: Controller<typeof routes, void> = {
       })
 
       const { risks, tierCalculation, predictors } = req.session.data.personalDetails[crn]
-      const [overview, needs, personRisks, sanIndicatorResponse, contactResponse] = await Promise.all([
+      const [overview, needs, sanIndicatorResponse, contactResponse] = await Promise.all([
         masClient.getOverview(crn, sentenceNumber),
         arnsClient.getNeeds(crn),
-        masClient.getPersonRiskFlags(crn),
         arnsClient.getSanIndicator(crn),
         masClient.getOverdueOutcomes(crn),
       ])
@@ -38,7 +37,6 @@ const caseController: Controller<typeof routes, void> = {
       return res.render('pages/overview', {
         overview,
         needs,
-        personRisks,
         risks,
         crn,
         tierCalculation,
