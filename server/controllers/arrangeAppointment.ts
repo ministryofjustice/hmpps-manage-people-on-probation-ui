@@ -338,7 +338,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
 
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      let nextPage = `text-message-confirmation`
+      let nextPage = res.locals?.flags?.enableSmsReminders ? `text-message-confirmation` : `supporting-information`
 
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
