@@ -5,8 +5,10 @@ import validate from '../middleware/validation'
 import { autoStoreSessionData, redirectWizard } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
+  router.get(['/case/:crn/appointments/check-in/manage/*path'], getCheckinOffenderDetails(hmppsAuthClient))
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getStartSetup(hmppsAuthClient)])
   router.get('/case/:crn/appointments/:id/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
   router.post(
