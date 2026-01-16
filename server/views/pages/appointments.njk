@@ -18,12 +18,17 @@
 {% set upcomingAppointmentRows = [] %}
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
-{% set checkinButtonText = 'Manage online check ins' if offenderCheckinsByCRNResponse else 
-  'Set up online check ins' %}
+{% set nextCheckin = offenderCheckinsByCRNResponse %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions?back=appointments' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
-{% set checkinLink = manageCheckinLink if offenderCheckinsByCRNResponse else 
-  checkinLink %}
+
+{% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
+    {% set checkinLink = checkinLink %}
+    {% set checkinButtonText = 'Set up online check ins' %}
+{% else %}
+    {% set checkinLink = manageCheckinLink %}
+    {% set checkinButtonText = 'Manage online check ins' %}
+{% endif %}
 
 {% if not hasDeceased %}
     {% set headerActions %}
