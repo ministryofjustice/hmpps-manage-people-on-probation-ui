@@ -10,7 +10,7 @@
   </div>
 </div>
 
-{% if personRisk.riskFlags.length > 0 %}
+{% if personRisks.riskFlags.length > 0 %}
   <div class="moj-scrollable-pane">
     <table class="govuk-table govuk-!-margin-bottom-4">
       <thead class="govuk-table__head">
@@ -23,7 +23,7 @@
         </tr>
       </thead>
       <tbody class="govuk-table__body">
-        {% for flag in personRisk.riskFlags %}
+        {% for flag in personRisks.riskFlags %}
           {% if not flag.rosh %}
             {% set showNotesDetails = flag.riskNotes.length > 0 %}
             {% set note = '' %}
@@ -63,7 +63,7 @@
   </div>
 {% endif %}
 
-{% set removedRiskFlagsCount = personRisk.removedRiskFlags.length %}
+{% set removedRiskFlagsCount = personRisks.removedRiskFlags.length %}
 {% if removedRiskFlagsCount > 0 %}
   <p class="govuk-!-margin-bottom-0">
     <a href="/case/{{ crn }}/risk/removed-risk-flags" data-qa="viewRemovedRiskFlagsLink">View removed risk flags ({{ removedRiskFlagsCount }})</a>

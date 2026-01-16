@@ -51,9 +51,6 @@ const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
-const getPersonRiskFlagsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
-  .mockImplementation(() => Promise.resolve(mockPersonRiskFlags))
 const getPersonRiskFlagSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonRiskFlag')
   .mockImplementation(() => Promise.resolve(mockPersonRiskFlag))
@@ -93,7 +90,6 @@ describe('riskController', () => {
       })
       checkAuditMessage(mockRes, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
-        expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
         expect(getRisksSpy).toHaveBeenCalledWith(crn)
         expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
         expect(predictorsSpy).toHaveBeenCalledWith(crn)
@@ -103,7 +99,6 @@ describe('riskController', () => {
 
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          personRisk: mockPersonRiskFlags,
           risks: mockRisks,
           crn,
           tierCalculation: mockTierCalculation,
@@ -131,7 +126,6 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          personRisk: mockPersonRiskFlags,
           risks: mockRisks,
           crn,
           tierCalculation: mockTierCalculation,
@@ -154,7 +148,6 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          personRisk: mockPersonRiskFlags,
           risks: mockRisks,
           crn,
           tierCalculation: mockTierCalculation,
@@ -177,7 +170,6 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          personRisk: mockPersonRiskFlags,
           risks: mockRisks,
           crn,
           tierCalculation: mockTierCalculation,
@@ -206,7 +198,6 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          personRisk: mockPersonRiskFlags,
           risks: mockRisks,
           crn,
           tierCalculation: mockTierCalculation,
@@ -229,7 +220,6 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/risk', {
-          personRisk: mockPersonRiskFlags,
           risks: mockRisks,
           crn,
           tierCalculation: mockTierCalculation,
@@ -263,12 +253,8 @@ describe('riskController', () => {
       await controllers.risk.getRemovedRiskFlags(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_MAS_REMOVED_RISKS', uuidv4(), crn, 'CRN')
-    it('should request the person risk flags from the api', () => {
-      expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
-    })
     it('should render the removed risk flags page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/risk/removed-risk-flags', {
-        personRisk: mockPersonRiskFlags,
         crn,
       })
     })

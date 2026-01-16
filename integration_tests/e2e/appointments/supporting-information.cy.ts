@@ -5,6 +5,7 @@ import {
   completeSentencePage,
   checkPopHeader,
   completeLocationDateTimePage,
+  checkRiskToStaffAlert,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
@@ -32,7 +33,9 @@ describe('Add supporting information (optional)', () => {
   it('should render the pop header', () => {
     checkPopHeader('Alton Berge', true)
   })
-
+  it('should render the risk to staff alert', () => {
+    checkRiskToStaffAlert()
+  })
   it('should display validation errors if note is more than 12000 character', () => {
     loadPage()
     const note = 'x'.repeat(12001)

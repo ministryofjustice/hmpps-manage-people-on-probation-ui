@@ -97,13 +97,8 @@ const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementat
 const getSanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
-const getPersonRiskFlagsSpy = jest
-  .spyOn(MasApiClient.prototype, 'getPersonRiskFlags')
-  .mockImplementation(() => Promise.resolve(mockRiskFlags))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
-const getOverdueOutcomesSpy = jest
+jest.spyOn(ArnsApiClient.prototype, 'getPredictorsAll').mockImplementation(() => Promise.resolve(mockPredictors))
+jest
   .spyOn(MasApiClient.prototype, 'getOverdueOutcomes')
   .mockImplementation(() => Promise.resolve(mockOverdueOutcomesResponse as any))
 const getProbationPractitionerSpy = jest
@@ -145,14 +140,12 @@ describe('caseController', () => {
     it('should request the data from the api', () => {
       expect(getOverviewSpy).toHaveBeenCalledWith(crn, req.query.sentenceNumber)
       expect(needsSpy).toHaveBeenCalledWith(crn)
-      expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
       expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
         overview: mockOverview,
         needs: mockNeeds,
-        personRisks: mockRiskFlags,
         risks: mockRisks,
         crn,
         tierCalculation: mockTierCalculation,
@@ -187,7 +180,6 @@ describe('caseController', () => {
     it('should request the data from the api', () => {
       expect(getOverviewSpy).toHaveBeenCalledWith(crn, '')
       expect(needsSpy).toHaveBeenCalledWith(crn)
-      expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
       expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
@@ -195,7 +187,6 @@ describe('caseController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
         overview: mockOverview,
         needs: mockNeeds,
-        personRisks: mockRiskFlags,
         risks: mockRisks,
         crn,
         tierCalculation: mockTierCalculation,

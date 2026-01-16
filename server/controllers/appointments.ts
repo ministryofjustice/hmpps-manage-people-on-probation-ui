@@ -56,14 +56,13 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, personRisks, practitioner] =
+      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, practitioner] =
         await Promise.all([
           masClient.getPersonSchedule(crn, 'upcoming', '0'),
           masClient.getPersonSchedule(crn, 'previous', '0'),
           arnsClient.getRisks(crn),
           tierClient.getCalculationDetails(crn),
           arnsClient.getPredictorsAll(crn),
-          masClient.getPersonRiskFlags(crn),
           masClient.getProbationPractitioner(crn),
         ])
 
@@ -79,7 +78,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         tierCalculation,
         risksWidget,
         predictorScores,
-        personRisks,
         hasDeceased,
         hasPractitioner,
       })

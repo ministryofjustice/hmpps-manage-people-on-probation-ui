@@ -1,6 +1,6 @@
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
-import { crn, uuid, checkPopHeader } from './imports'
+import { crn, uuid, checkPopHeader, checkRiskToStaffAlert } from './imports'
 
 const loadPage = () => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -12,6 +12,12 @@ describe('What is this appointment for?', () => {
     beforeEach(() => {
       loadPage()
       sentencePage = new AppointmentSentencePage()
+    })
+    it('should render the pop header', () => {
+      checkPopHeader('Alton Berge', true)
+    })
+    it('should render the risk to staff alert', () => {
+      checkRiskToStaffAlert()
     })
     it('should display 4 sentences that are not selected', () => {
       const radios = sentencePage.getElement(`input[data-sentence="true"]`)
@@ -28,15 +34,13 @@ describe('What is this appointment for?', () => {
       sentencePage = new AppointmentSentencePage()
       sentencePage.getSubmitBtn().click()
     })
-    it('should display the error summary box', () => {
+    it('should display the error summary box and error', () => {
       sentencePage.checkErrorSummaryBox(['Select what this appointment is for'])
-    })
-
-    it('should display the error message', () => {
       sentencePage.getElement(`#appointments-${crn}-${uuid}-eventId-error`).should($error => {
         expect($error.text().trim()).to.include('Select what this appointment is for')
       })
     })
+
     describe('The error summary link is clicked', () => {
       beforeEach(() => {
         sentencePage.getErrorSummaryLink(0).click()

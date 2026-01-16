@@ -1,14 +1,14 @@
 <div class="mappa-widget">
-    {% if hasValue(personRisk.mappa)and personRisk.mappa.error == null %}
+    {% if hasValue(personRisks.mappa)and personRisks.mappa.error == null %}
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m text-uppercase" data-qa='mappa-heading'>
             <strong>
-                {% if isNotNull(personRisk.mappa.category) %}CAT {{ personRisk.mappa.category }}/{% endif %}
-                {% if isNotNull(personRisk.mappa.level) %}LEVEL {{ personRisk.mappa.level }}
+                {% if isNotNull(personRisks.mappa.category) %}CAT {{ personRisks.mappa.category }}/{% endif %}
+                {% if isNotNull(personRisks.mappa.level) %}LEVEL {{ personRisks.mappa.level }}
                 {% else %}No{% endif %}
             </strong> MAPPA</h{{ scoresHeadingLevel | default('3') }}>
         <p class="govuk-body-m govuk-!-margin-bottom-2">Multi-agency public protection arrangements</p>
-        {% if personRisk.mappa.level and personRisk.mappa.startDate %}
-            <p class="text-secondary govuk-!-margin-bottom-0 govuk-hint">Last updated (NDelius): {{ personRisk.mappa.startDate | dateWithYearShortMonth }}</p>
+        {% if personRisks.mappa.level and personRisks.mappa.startDate %}
+            <p class="text-secondary govuk-!-margin-bottom-0 govuk-hint">Last updated (NDelius): {{ personRisks.mappa.startDate | dateWithYearShortMonth }}</p>
         {% endif %}
     {% else %}
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m text-uppercase">

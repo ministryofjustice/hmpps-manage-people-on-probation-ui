@@ -774,3 +774,12 @@ export const to24HourTimeWithMinutes = (time: string): string => {
 
   return `${hour12}:${minutes.toString().padStart(2, '0')}${period}`
 }
+
+export const checkRiskToStaffAlert = () => {
+  cy.get('[data-qa=riskToStaffAlert]').should('be.visible')
+  cy.get('[data-qa=riskToStaffAlert]').find('h2').should('contain.text', 'Alton is very high risk to staff')
+  cy.get('[data-qa=riskToStaffAlert]')
+    .find('a')
+    .should('contain.text', `View Alton's risk to staff flag`)
+    .should('have.attr', 'href', '/case/X778160/risk/flag/1')
+}

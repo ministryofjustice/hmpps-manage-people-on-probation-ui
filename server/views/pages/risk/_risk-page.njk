@@ -38,7 +38,7 @@
         </div>
     {% else %}
         {% set html %}
-        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisk.personSummary.name | fullName }}</h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
+        <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisks.personSummary.name | fullName }}</h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
         {% include './_no-oasys-risk-assessment.njk' %}
         {% endset %}
         {{ govukNotificationBanner({ html: html, attributes: { 'data-qa': 'noOasysRiskBanner' } }) }}
