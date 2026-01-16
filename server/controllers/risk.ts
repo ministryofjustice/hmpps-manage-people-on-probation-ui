@@ -31,10 +31,8 @@ const riskController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const arnsClient = new ArnsApiClient(token)
-      const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
-      const [personRisk, risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
-        masClient.getPersonRiskFlags(crn),
+      const [risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
@@ -53,7 +51,6 @@ const riskController: Controller<typeof routes, void> = {
       const risksWidget = toRoshWidget(risks)
       const oasysLink = config.oaSys.link
       return res.render('pages/risk', {
-        personRisk,
         risks,
         crn,
         tierCalculation,
@@ -129,8 +126,6 @@ const riskController: Controller<typeof routes, void> = {
   getRemovedRiskFlags: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_REMOVED_RISKS',
         who: res.locals.user.username,
@@ -139,9 +134,7 @@ const riskController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const personRisk = await masClient.getPersonRiskFlags(crn)
       res.render('pages/risk/removed-risk-flags', {
-        personRisk,
         crn,
       })
     }

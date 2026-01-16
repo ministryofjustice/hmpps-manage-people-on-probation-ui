@@ -3,7 +3,7 @@ import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
-import { getPersonalDetails } from '../middleware'
+import { getPersonalDetails, getPersonRiskFlags } from '../middleware'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 export default function caseRoutes(router: Router, { hmppsAuthClient }: Services) {
@@ -12,6 +12,7 @@ export default function caseRoutes(router: Router, { hmppsAuthClient }: Services
   router.all(
     ['/case/:crn', '/case/:crn/*path'],
     getPersonalDetails(hmppsAuthClient),
+    getPersonRiskFlags(hmppsAuthClient),
     getCheckinOffenderDetails(hmppsAuthClient),
   )
   get('/case/:crn', controllers.case.getCase(hmppsAuthClient))

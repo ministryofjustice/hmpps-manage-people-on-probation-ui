@@ -9,7 +9,7 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
-import { RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { PersonRiskFlags, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
@@ -115,6 +115,7 @@ interface Locals {
   uploadError: string
   renderPath: string
   smsPreview?: string[] | null
+  personRisks?: PersonRiskFlags
 }
 
 export interface AppResponse extends Response {

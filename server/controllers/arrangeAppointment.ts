@@ -253,7 +253,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     }
   },
 
-  getLocationDateTime: hmppsAuthClient => {
+  getLocationDateTime: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { data, alertDismissed = false } = req.session
@@ -288,9 +288,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
       const { _minDate, _maxDate } = getMinMaxDates()
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const personRisks = await masClient.getPersonRiskFlags(crn)
       res.locals.change = change as any
 
       return res.render(`pages/arrange-appointment/location-date-time`, {
@@ -300,7 +297,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         errors,
         change,
         showValidation,
-        personRisks,
         isInPast,
         alertDismissed,
         isReschedule,

@@ -1,7 +1,7 @@
 import { Location, Provider, Team, User } from '../data/model/caseload'
 import { ErrorSummary } from '../data/model/common'
 import { PersonalDetails } from '../data/model/personalDetails'
-import { RiskScoresDto, RiskSummary } from '../data/model/risk'
+import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
 import { TierCalculation } from '../data/tierApiClient'
 import { AppointmentSession, AppointmentType } from './Appointments'
@@ -50,5 +50,8 @@ export interface Data {
     [crn: string]: {
       [id: string]: ESupervisionSession
     }
+  }
+  risks?: {
+    [crn: string]: PersonRiskFlags
   }
 }

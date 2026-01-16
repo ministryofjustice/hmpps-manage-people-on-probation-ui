@@ -1,7 +1,13 @@
 {% extends "../_form.njk" %}
 {% set title = 'What is this appointment for?' %}
-{% set backLink = change if change else (back if back else '/case/' + crn + '/appointments') %}
-
+{% set personForename = headerPersonName.forename %}
+{% set backLink = change if change else 
+  (back if back else 
+    '/case/' + crn + '/appointments'
+  ) %}
+{% block alertBanner %}
+  {% include "../../partials/_risk-to-staff-alert.njk" %}
+{% endblock %}
 {% block heading %}{% endblock %}
 {% block form %}
   {% set allSentences = [] %}
@@ -16,7 +22,13 @@
           <span class="govuk-tag govuk-tag--grey" align="center">Terminated</span>
         {% endif %}
         {% endset %}
-        {% set requirements = (requirements.push({text: requirement.description, hint: {html: licenceTag}, value: requirement.id}), requirements) %}
+        {% set requirements = (requirements.push({
+          text: requirement.description,
+          hint: {
+            html: licenceTag
+          },
+          value: requirement.id
+        }), requirements) %}
       {% endfor %}
     {% endif %}
     {% if sentence.licenceConditions.length %}
@@ -28,13 +40,20 @@
           <span class="govuk-tag govuk-tag--grey" align="center">Terminated</span>
         {% endif %}
         {% endset %}
-        {% set licenceConditions = (licenceConditions.push({text: licenceCondition.mainDescription, hint: {html: licenceTag}, value: licenceCondition.id}), licenceConditions) %}
+        {% set licenceConditions = (licenceConditions.push({
+          text: licenceCondition.mainDescription,
+          hint: {
+            html: licenceTag
+          },
+          value: licenceCondition.id
+        }), licenceConditions) %}
       {% endfor %}
     {% endif %}
     {% if sentence.order.description %}
       {% set hintText = '' %}
       {% if sentence.order.startDate %}
-        {% set hintText = 'Sentence start date: ' + (sentence.order.startDate | dateWithYear) + '.' %}
+        {% set hintText = 'Sentence start date: ' + (
+        sentence.order.startDate | dateWithYear) + '.' %}
       {% endif %}
       {% set allSentences = (allSentences.push({
       text: sentence.order.description,
