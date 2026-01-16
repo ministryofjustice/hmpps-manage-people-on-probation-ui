@@ -128,7 +128,11 @@ describe('checkInsController', () => {
       const req = baseReq()
       await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn, back: req.query.back })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', {
+        crn,
+        back: req.query.back,
+        guidanceUrl: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
+      })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 
