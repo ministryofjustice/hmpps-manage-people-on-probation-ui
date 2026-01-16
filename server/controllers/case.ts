@@ -4,6 +4,7 @@ import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { toRoshWidget, toPredictors } from '../utils'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 const routes = ['getCase'] as const
 
@@ -33,7 +34,7 @@ const caseController: Controller<typeof routes, void> = {
       ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/overview', {
         overview,
         needs,
