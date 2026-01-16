@@ -233,7 +233,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: `A non-empty note or a file must be provided`,
+          msg: `Add a note or upload a file to continue`,
           log: `No content included for appointment patch`,
         },
       ],
