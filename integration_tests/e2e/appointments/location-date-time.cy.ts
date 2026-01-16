@@ -571,6 +571,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getDatePickerInput().clear().type(yesterday.toFormat('d/M/yyyy'))
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
+      cy.pause()
       locationDateTimePage.checkErrorSummaryBox([
         'Date must be today or in the future',
         'Enter a start time',

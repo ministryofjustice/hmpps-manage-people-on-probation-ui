@@ -18,18 +18,19 @@
   {% else %}
     <div class="govuk-grid-row">
       <div class="govuk-grid-column-two-thirds">
-        {% block alertBanner %}{% endblock %}
+
         {% if errorMessages %}
           {% set errorList = errorMessages | toErrorList %}
           {% if errorList.length > 0 %}
             {{ govukErrorSummary({
                 titleText: "There is a problem",
+                classes: 'govuk-!-margin-bottom-6',
                 errorList: errorList,
                 attributes: { "data-qa": "errorList"}
             }) }}
           {% endif %}
         {% endif %}
-
+        {% block alertBanner %}{% endblock %}
         {% block beforeHeading %}{% endblock %}
 
         {% block heading %}
