@@ -8,6 +8,7 @@ import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
 import {
   checkPopHeader,
+  checkRiskToStaffAlert,
   completeLocationDateTimePage,
   completeSentencePage,
   completeSupportingInformationPage,
@@ -40,6 +41,7 @@ describe('Arrange an appointment', () => {
       it('should render the page', () => {
         loadPage()
         checkPopHeader('Alton Berge', true)
+        checkRiskToStaffAlert()
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')

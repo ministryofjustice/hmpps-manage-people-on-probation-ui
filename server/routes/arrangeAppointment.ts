@@ -11,6 +11,7 @@ import {
   getDefaultUser,
   getUserOptions,
   routeChangeAttendee,
+  getPersonRiskFlags,
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -80,6 +81,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/location-date-time',
     redirectWizard(['eventId', 'type']),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getPersonRiskFlags(hmppsAuthClient),
     controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
   router.post(

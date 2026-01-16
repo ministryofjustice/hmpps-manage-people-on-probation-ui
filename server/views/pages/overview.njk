@@ -11,14 +11,13 @@
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
-{% set riskToStaff = getStaffRisk(personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
-
+{% set personForename = overview.personalDetails.name.forename %}
 
 {% set criminogenicNeedsHtml %}
 {% if needs.identifiedNeeds.length %}
@@ -123,24 +122,8 @@
 {% endblock %}
 
 {% block pageContent %}
-  {% if 'very high' in (riskToStaff.levelDescription | lower) %}
-    {% set level = 'VERY_HIGH' %}
-  {% else %}
-    {% set level = riskToStaff.levelDescription or riskToStaff.level %}
-  {% endif %}
+  {% include "../partials/_risk-to-staff-alert.njk" %}
 
-  {% if level and(level | upper == 'VERY_HIGH' or level | upper == 'HIGH' or level | upper == 'MEDIUM') %}
-    {% set html %}
-    <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ overview.personalDetails.name.forename }}&apos;s risk to staff flag</a>
-    {% endset %}
-    {{ mojAlert({
-      variant: "warning",
-      title: overview.personalDetails.name.forename + " is " + riskLevelLabel(level) | lower + " risk to staff ",
-      showTitleAsHeading: true,
-      dismissible: false,
-      html: html
-    }) }}
-  {% endif %}
   {% if appointmentsWithoutAnOutcomeCount > 0 %}
     {% set html %}
     <h2 class="govuk-heading-m">You have appointments that need attention</h2>
@@ -194,8 +177,8 @@
   {% set nextCheckin = offenderCheckinsByCRNResponse %}
   {% set nextCheckinText %}
   {% if nextCheckin.status === 'VERIFIED' %}
-      {% set checkinLinkText = 'View all online check in details' %}
-      {% set checkinHrefLink = manageCheckinLink  %}
+    {% set checkinLinkText = 'View all online check in details' %}
+    {% set checkinHrefLink = manageCheckinLink %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -214,8 +197,8 @@
             }) }}
   {% endif %}
   {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
-      {% set checkinLinkText = 'Set up online check ins'%}
-      {% set checkinHrefLink =  checkinLink %}
+    {% set checkinLinkText = 'Set up online check ins'%}
+    {% set checkinHrefLink = checkinLink %}
     {{ govukSummaryList({
                 rows: [
                     {
@@ -226,9 +209,9 @@
             }) }}
   {% endif %}
   {% if nextCheckin.status === 'INACTIVE' %}
-      {% set checkinLinkText = 'View all online check in details' %}
-      {% set checkinHrefLink = manageCheckinLink %}
-      {{ govukSummaryList({
+    {% set checkinLinkText = 'View all online check in details' %}
+    {% set checkinHrefLink = manageCheckinLink %}
+    {{ govukSummaryList({
           rows: [
               {
                   key: { html: '<span data-qa="checkinDueLabel">Next check in due</span>'},

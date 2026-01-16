@@ -2,9 +2,9 @@
     Offender personality disorder (OPD)
 </h3>
 
-{% if personRisk.opd.eligible === true %}
+{% if personRisks.opd.eligible === true %}
     <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
-        Last updated (NDelius): {{ personRisk.opd.date | dateWithYear }}
+        Last updated (NDelius): {{ personRisks.opd.date | dateWithYear }}
     </div>
     <p class="govuk-body" data-qa="ogp-missing">Eligible</p>
 {% else %}

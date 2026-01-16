@@ -10,8 +10,8 @@
 {% set riskPage = true %}
 {% set pageTitle = makePageTitle({pageHeading: currentSectionName}) %}
 {% set headerCRN = crn %}
-{% set headerDob = personRisk.personSummary.dateOfBirth %}
-{% set headerGender = personRisk.personSummary.gender %}
+{% set headerDob = personRisks.personSummary.dateOfBirth %}
+{% set headerGender = personRisks.personSummary.gender %}
 {% set hasRiskAssessment = risks.assessedOn %}
 {% set highScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set lowScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
