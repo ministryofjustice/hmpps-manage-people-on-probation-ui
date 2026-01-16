@@ -10,7 +10,7 @@
 
 {# Define variables for the guidance link #}
 {% set guidance_text = 'get familiar with online check ins using our guidance (opens in new tab).' %}
-{% set guidance_url = 'https://probation-check-in.hmpps.service.justice.gov.uk/practitioner-guidance' %}
+{% set guidance_url = guidanceUrl + '/practitioner-guidance' %}
 {% set guidance_link = '<a href="' ~ guidance_url ~ '" class="govuk-link" target="_blank" rel="noopener noreferrer">get familiar with online check ins using our guidance (opens in new tab)</a>.' %}
 
 {% for technicalUpdate in technicalUpdates %}

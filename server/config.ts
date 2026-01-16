@@ -106,6 +106,13 @@ export default {
       requireInProduction: false,
     }),
   },
+  guidance: {
+    link: get(
+      'ESUPERVISION_GUIDANCE_LINK',
+      'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+  },
   epf2: {
     link: get('EPF2_LINK', 'https://epf.linkspace.uk', requiredInProduction),
   },

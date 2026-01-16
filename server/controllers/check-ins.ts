@@ -17,6 +17,7 @@ import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
 import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 import { ProbationPractitioner } from '../models/CaseDetail'
+import config from '../config'
 
 const routes = [
   'getStartSetup',
@@ -98,7 +99,8 @@ const checkInsController: Controller<typeof routes, void> = {
       if (practitioner.unallocated) {
         return res.redirect(`/case/${crn}/appointments`)
       }
-      return res.render('pages/check-in/instructions.njk', { crn, back })
+      const guidanceUrl = config.guidance.link
+      return res.render('pages/check-in/instructions.njk', { crn, back, guidanceUrl })
     }
   },
 
