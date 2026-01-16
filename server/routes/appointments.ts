@@ -19,11 +19,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const post = (path: string, handler: RequestHandler) => router.post(path, asyncMiddleware(handler))
 
-  router.get(
-    '/case/:crn/appointments',
-    getCheckinOffenderDetails(hmppsAuthClient),
-    controllers.appointments.getAppointments(hmppsAuthClient),
-  )
+  get('/case/:crn/appointments', controllers.appointments.getAppointments(hmppsAuthClient))
 
   get('/case/:crn/upcoming-appointments', controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient))
 
