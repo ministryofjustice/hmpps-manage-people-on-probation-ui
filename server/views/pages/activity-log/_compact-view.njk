@@ -1,3 +1,4 @@
+{% from "govuk/components/accordion/macro.njk" import govukAccordion %}
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if entry.isAppointment %}
@@ -9,8 +10,9 @@
 <table class="govuk-table govuk-!-margin-top-4">
   <thead class="govuk-table__head">
     <tr class="govuk-table__row">
-      <th class="govuk-table__header" style="width: 200px">Date</th>
-      <th class="govuk-table__header">Activity</th>
+      <th class="govuk-table__header govuk-!-width-one-quarter">Date</th>
+      <th class="govuk-table__header govuk-!-width-one-half">Activity</th>
+      <th class="govuk-table__header govuk-!-width-one-quarter">Actions</th>
     </tr>
   </thead>
   <tbody class="govuk-table__body">
@@ -18,27 +20,49 @@
       {% set lastDate = lastEntry.startDateTime | compactActivityLogDate %}
       {% set thisDate = entry.startDateTime | compactActivityLogDate %}
       {% if lastDate != thisDate %}
-      </td>
-    </tr>
     <tr class="govuk-table__row">
-      <td class="govuk-table__cell">{{ thisDate }}</td>
-      <td class="govuk-table__cell">
+      <td class="govuk-table__cell govuk-!-width-one-quarter">{{ thisDate }}</td>
+      <td class="govuk-table__cell govuk-!-width-one-half">
         <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
         {% endif %}
         <li>
           {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false and not entry.esupervisionId %}
-            <div class="govuk-hint govuk-!-margin-bottom-1">
-              <a href="{{ link }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
-                <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
-            </div>
-          {% elif flags.enableESuperVision === true or not entry.esupervisionId %}
-            {% include "./_compact-timeline-entry.njk" %}
+            <div class="govuk-accordion govuk-accordion__table" data-module="govuk-accordion" id="accordion-default-{{ entry.id }}">
+              <div class="govuk-accordion__section">
+                <div class="govuk-accordion__section-header">
+                  <h2 class="govuk-accordion__section-heading app-!-inherit-colour govuk-!-display-block">
+                    <span class="govuk-accordion__section-button" id="accordion-default-heading-{{ entry.id }}">
+                      {{ entry.type | toSentenceCase }}
+                    </span>
+                    </h2>
+                  </div>
+                  <div id="accordion-default-content-{{ entry.id }}" class="govuk-accordion__section-content">
+                      <div class="accordion-default-content-inner">
+                        <span class="govuk-visually-hidden"> on {{ thisDate }}</span>
+                        {% for appointment in entry.appointmentNotes %}
+                          <p>{{ appointment.note | truncate(200) }}</p>
+                        {% endfor %}
+                        <p class="govuk-body-s">Last update: {{ entry.lastUpdatedBy.forename }} {{ entry.lastUpdatedBy.surname }} {{ entry.lastUpdated | dateWithYear }}</p>
+                      </div>
+                    </div>
+                </div>
+              </div>
+{#              <a href="{{ link }}" class="app-!-inherit-colour govuk-!-padding-bottom-4 govuk-!-display-block">{{ entry.type | toSentenceCase }}#}
+{#              <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>#}
+{#              {% for appointment in entry.appointmentNotes %}#}
+{#                <p>{{ appointment.note | truncate(200) }}</p>#}
+{#              {% endfor %}#}
+{#              <p class="govuk-body-s">Last update: {{ entry.lastUpdatedBy.forename }} {{ entry.lastUpdatedBy.surname }} {{ entry.lastUpdated | dateWithYear }}</p>#}
+{#            </div>#}
+{#          {% elif flags.enableESuperVision === true or not entry.esupervisionId %}#}
+{#            {% include "./_compact-timeline-entry.njk" %}#}
           {% endif %}
         </li>
         {% set lastEntry = entry %}
       {% endfor %}
     </ul>
   </td>
+
 </tr>
 </tbody>
 </table>
