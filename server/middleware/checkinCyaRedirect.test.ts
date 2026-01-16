@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { redirectWizard } from './checkinCyaRedirect'
+import { postRedirectWizard } from './checkinCyaRedirect'
 import { mockAppResponse } from '../controllers/mocks'
 
 const crn = 'X000001'
@@ -8,7 +8,7 @@ const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const res = mockAppResponse()
 const redirectSpy = jest.spyOn(res, 'redirect')
 
-describe('redirectWizard', () => {
+describe('postRedirectWizard', () => {
   it('redirects to checkin summary when cya=true', async () => {
     const req = httpMocks.createRequest({
       params: { crn, id: uuid },
@@ -17,7 +17,7 @@ describe('redirectWizard', () => {
 
     const nextSpy = jest.fn()
 
-    await redirectWizard()(req, res, nextSpy)
+    await postRedirectWizard()(req, res, nextSpy)
 
     expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/checkin-summary`)
     expect(nextSpy).not.toHaveBeenCalled()
@@ -30,7 +30,7 @@ describe('redirectWizard', () => {
     })
 
     const nextSpy = jest.fn()
-    await redirectWizard()(req, res, nextSpy)
+    await postRedirectWizard()(req, res, nextSpy)
 
     expect(redirectSpy).toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalledTimes(1)
@@ -44,7 +44,7 @@ describe('redirectWizard', () => {
     })
 
     const nextSpy = jest.fn()
-    await redirectWizard()(req, res, nextSpy)
+    await postRedirectWizard()(req, res, nextSpy)
 
     expect(redirectSpy).toHaveBeenCalled()
     expect(nextSpy).toHaveBeenCalledTimes(1)
