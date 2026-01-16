@@ -213,7 +213,7 @@
                    ]
             }) }}
   {% endif %}
-  {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
+  {% if not nextCheckin or nextCheckin.status === 'INITIAL' %}
       {% set checkinLinkText = 'Set up online check ins'%}
       {% set checkinHrefLink =  checkinLink %}
     {{ govukSummaryList({
@@ -253,7 +253,7 @@
                     href: checkinHrefLink
                 }
             ]
-        }
+        } if hasPractitioner
     }) }}
   {% endif %}
 

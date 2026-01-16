@@ -148,6 +148,8 @@ describe('caseController', () => {
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: 3,
+        hasDeceased: false,
+        hasPractitioner: false,
       })
     })
   })
@@ -188,6 +190,8 @@ describe('caseController', () => {
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: 3,
+        hasDeceased: false,
+        hasPractitioner: false,
       })
     })
   })

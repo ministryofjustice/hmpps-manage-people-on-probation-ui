@@ -25,16 +25,18 @@ const caseController: Controller<typeof routes, void> = {
       })
 
       const { risks, tierCalculation, predictors } = req.session.data.personalDetails[crn]
-      const [overview, needs, personRisks, sanIndicatorResponse, contactResponse] = await Promise.all([
+      const [overview, needs, personRisks, sanIndicatorResponse, contactResponse, practitioner] = await Promise.all([
         masClient.getOverview(crn, sentenceNumber),
         arnsClient.getNeeds(crn),
         masClient.getPersonRiskFlags(crn),
         arnsClient.getSanIndicator(crn),
         masClient.getOverdueOutcomes(crn),
+        masClient.getProbationPractitioner(crn),
       ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-
+      const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
+      const hasPractitioner = practitioner ? !practitioner.unallocated : false
       return res.render('pages/overview', {
         overview,
         needs,
@@ -47,6 +49,8 @@ const caseController: Controller<typeof routes, void> = {
         sanIndicator: sanIndicatorResponse?.sanIndicator,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: contactResponse?.content?.length ?? 0,
+        hasDeceased,
+        hasPractitioner,
       })
     }
   },
