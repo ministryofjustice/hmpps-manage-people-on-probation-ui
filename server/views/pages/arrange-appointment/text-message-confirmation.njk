@@ -10,6 +10,9 @@
     {% set smsItems = (smsItems.push({text: 'Yes, add a mobile number', value: 'YES_ADD_MOBILE_NUMBER'}), smsItems) %}
 {% endif %}
 {% set smsItems = (smsItems.push({text: 'No', value: 'NO'}), smsItems) %}
+{% block alertBanner %}
+    {% include "../../partials/_risk-to-staff-alert.njk" %}
+{% endblock %}
 {% block form %}
     {{ govukRadios({
     classes: "govuk-radios--inline" if not case.mobileNumber else "",

@@ -340,12 +340,12 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
       let nextPage = res.locals?.flags?.enableSmsReminders ? `text-message-confirmation` : `supporting-information`
 
+      if (appointmentDateIsInPast(req)) nextPage = `attended-complied`
+
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/${nextPage}`
-
-      if (appointmentDateIsInPast(req)) redirect = `/case/${crn}/arrange-appointment/${id}/attended-complied`
 
       if (change && nextPage !== 'location-not-in-list') {
         redirect = findUncompleted(req, res)
@@ -591,7 +591,13 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         return renderError(404)(req, res)
       }
       const url = encodeURIComponent(req.url)
-      return res.redirect(`/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`)
+      const redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
+        req.body.appointments[crn][id].smsOptIn,
+      )
+        ? `/case/${crn}/personal-details/edit-contact-details?mobile=true&back=${url}`
+        : `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
+
+      return res.redirect(redirect)
     }
   },
 }

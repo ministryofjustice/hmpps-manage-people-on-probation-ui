@@ -3,14 +3,15 @@ import { v4 } from 'uuid'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
-import TierApiClient from '../data/tierApiClient'
+import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import RoleService from '../services/roleService'
 import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn } from '../utils'
 import type { Controller } from '../@types'
-import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
 import { renderError } from '../middleware'
+import { Needs, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 
 const routes = [
   'getPersonalDetails',
@@ -49,7 +50,9 @@ const personalDetailsController: Controller<typeof routes, void> = {
       let renderPath = 'pages/personal-details'
       const backLink = req.path.includes('personal-details/') ? `/case/${crn}/personal-details` : null
       const hidePageHeader = req.path.includes('personal-details/')
+      let editMobileOnly = false
       if (req.path.includes('personal-details/edit-contact-details')) {
+        editMobileOnly = req?.query?.mobile !== undefined
         if (!manageUsersAccess) {
           return res.redirect(`/no-perm-autherror?backLink=${backLink}`)
         }
@@ -81,19 +84,39 @@ const personalDetailsController: Controller<typeof routes, void> = {
       ])
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
-      return res.render(renderPath, {
+
+      interface Props {
+        personalDetails: PersonalDetails
+        needs: Needs
+        tierCalculation: TierCalculation
+        crn: string
+        risksWidget: RoshRiskWidgetDto
+        predictorScores: TimelineItem
+        success: string
+        backLink: string
+        hidePageHeader: boolean
+        manageUsersAccess: boolean
+        sanIndicator: boolean
+        editMobileOnly?: boolean
+      }
+
+      const props: Props = {
         personalDetails,
-        needs,
+        needs: needs as Needs,
         tierCalculation,
         crn,
         risksWidget,
         predictorScores,
-        success,
+        success: success as string,
         backLink,
         hidePageHeader,
         manageUsersAccess,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
-      })
+      }
+      if (editMobileOnly) {
+        props.editMobileOnly = true
+      }
+      return res.render(renderPath, props)
     }
   },
   postEditDetails: hmppsAuthClient => {

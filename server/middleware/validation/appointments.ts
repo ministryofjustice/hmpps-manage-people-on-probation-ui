@@ -314,6 +314,22 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateTextMessageConfirmation = () => {
+    if (!baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/text-message-confirmation`)) return
+    render = 'pages/arrange-appointment/text-message-confirmation'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'text-message-confirmation',
+        }),
+      ),
+    }
+  }
+
   validateType()
   validateSentence()
   validateLocationDateTime()
@@ -326,6 +342,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateAddNote()
   validateManageAddNote()
   validateReschedule()
+  validateTextMessageConfirmation()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
