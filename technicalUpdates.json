@@ -1,5 +1,21 @@
 [
   {
+    "heading": "Learn about online check ins for people on probation",
+    "summary": "15 January 2026",
+    "whatsNew": [
+      "About online check ins",
+      [
+        "Online check ins allow people on probation to submit a short video to check their identity, and answer 3 questions to tell practitioners how they are. This can be used to replace some face-to-face- appointments where appropriate, or as well as face-to-face appointments to help manage risk."
+      ],
+      "Help with using online check ins",
+      ["You can get familiar with online check ins using our guidance (opens in new tab)."],
+      "Bug fixes for Manage people on probation",
+      [
+        "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome."
+      ]
+    ]
+  },
+  {
     "heading": "View alerts and get calendar invitations for appointments",
     "summary": "18 December 2025",
     "whatsNew": [

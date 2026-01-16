@@ -4,8 +4,14 @@
 
 {% set technicalUpdateItems = [] %}
 
+{# Define variables for email linking #}
 {% set email_address = 'mpop-digital-team@justice.gov.uk' %}
 {% set email_link = '<a href="mailto:' ~ email_address ~ '" class="govuk-link">' ~ email_address ~ '</a>' %}
+
+{# Define variables for the guidance link #}
+{% set guidance_text = 'get familiar with online check ins using our guidance (opens in new tab).' %}
+{% set guidance_url = 'https://probation-check-in.hmpps.service.justice.gov.uk/practitioner-guidance' %}
+{% set guidance_link = '<a href="' ~ guidance_url ~ '" class="govuk-link" target="_blank" rel="noopener noreferrer">get familiar with online check ins using our guidance (opens in new tab)</a>.' %}
 
 {% for technicalUpdate in technicalUpdates %}
     {% set content %}
@@ -33,8 +39,13 @@
                             {% set margin_class = " govuk-!-margin-top-4" %}
                         {% endif %}
 
+                        {# Handle dynamic replacements for email and guidance link #}
                         {% if paragraph_text.includes(email_address) %}
                             {% set paragraph_text = paragraph_text | replace(email_address, email_link) %}
+                        {% endif %}
+
+                        {% if paragraph_text.includes(guidance_text) %}
+                            {% set paragraph_text = paragraph_text | replace(guidance_text, guidance_link) %}
                         {% endif %}
 
                         {% if paragraph_text.includes('\n') %}

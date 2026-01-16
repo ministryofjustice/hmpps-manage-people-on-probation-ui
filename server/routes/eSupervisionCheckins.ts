@@ -9,7 +9,7 @@ import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetai
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
   router.get(
-    ['/case/:crn/appointments/:id/check-in/*path', '/case/:crn/appointments/check-in/manage/*path'],
+    [ '/case/:crn/appointments/check-in/manage/*path'],
     getCheckinOffenderDetails(hmppsAuthClient),
   )
 
