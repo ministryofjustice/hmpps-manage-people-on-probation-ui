@@ -2,7 +2,7 @@ import Page from '../../pages/page'
 import AppointmentsPage from '../../pages/appointments'
 import InstructionsPage from '../../pages/check-ins/instructions'
 import DateFrequencyPage from '../../pages/check-ins/date-frequencey'
-import { getCheckinUuid } from './imports'
+import { getCheckinUuid, getUuid } from './imports'
 import ContactPreferencePage from '../../pages/check-ins/contact-preference'
 import PhotoOptionsPage from '../../pages/check-ins/photo-options'
 import EditContactPreferencePage from '../../pages/check-ins/edit-contact-preference'
@@ -39,7 +39,9 @@ context('Appointment check-ins', () => {
       .should('be.visible')
       .and('contain.text', 'Set up online check ins')
     page.getElement('[data-qa="online-checkin-btn"]').click()
-    cy.url().should('contain', '/case/X000001/appointments/check-in/instructions')
+    getCheckinUuid().then(uuid => {
+      cy.url().should('contain', `/case/X000001/appointments/${uuid}/check-in/instructions`)
+    })
     const instructionsPage = new InstructionsPage()
     instructionsPage.checkOnPage()
     instructionsPage.getElement('[data-qa="formAnchorLink"]').click()
