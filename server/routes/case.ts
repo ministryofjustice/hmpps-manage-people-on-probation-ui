@@ -13,7 +13,6 @@ export default function caseRoutes(router: Router, { hmppsAuthClient }: Services
     ['/case/:crn', '/case/:crn/*path'],
     getPersonalDetails(hmppsAuthClient),
     getPersonRiskFlags(hmppsAuthClient),
-    getCheckinOffenderDetails(hmppsAuthClient),
   )
   get('/case/:crn', controllers.case.getCase(hmppsAuthClient))
 }

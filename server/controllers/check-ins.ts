@@ -18,6 +18,7 @@ import logger from '../../logger'
 import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import config from '../config'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 const routes = [
   'getStartSetup',
@@ -583,6 +584,7 @@ const checkInsController: Controller<typeof routes, void> = {
       // if page not submitted, required to save in session for change link  to avoid API call.
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], mobile)
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
     }
   },
@@ -593,6 +595,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const checkInMinDate = getMinDate()
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
       const date = checkinRes?.firstCheckin
       const interval = checkinRes?.checkinInterval
