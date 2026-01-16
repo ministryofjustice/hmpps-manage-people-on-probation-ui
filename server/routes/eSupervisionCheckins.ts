@@ -8,10 +8,7 @@ import { redirectWizard } from '../middleware/checkinCyaRedirect'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
-  router.get(
-    [ '/case/:crn/appointments/check-in/manage/*path'],
-    getCheckinOffenderDetails(hmppsAuthClient),
-  )
+  router.get(['/case/:crn/appointments/check-in/manage/*path'], getCheckinOffenderDetails(hmppsAuthClient))
 
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
 
