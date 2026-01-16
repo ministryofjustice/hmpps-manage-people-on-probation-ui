@@ -22,6 +22,7 @@ import {
 } from '../data/model/personalDetails'
 import { PersonalDetailsSession } from '../models/Data'
 import { Contact } from '../data/model/professionalContact'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -66,6 +67,15 @@ const overview: PersonalDetails = {
   staffContacts: [] as Contact[],
 }
 
+const mockPractitioner: ProbationPractitioner = {
+  code: '',
+  name: { forename: '', surname: '' },
+  provider: { code: '', name: '' },
+  team: { code: '', description: '' },
+  unallocated: false,
+  username: '',
+}
+
 const mockPersonalDetails: PersonalDetailsSession = {
   overview,
   sentencePlan: {
@@ -91,6 +101,9 @@ jest.spyOn(ArnsApiClient.prototype, 'getPredictorsAll').mockImplementation(() =>
 jest
   .spyOn(MasApiClient.prototype, 'getOverdueOutcomes')
   .mockImplementation(() => Promise.resolve(mockOverdueOutcomesResponse as any))
+const getProbationPractitionerSpy = jest
+  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+  .mockImplementation(() => Promise.resolve(undefined))
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -141,6 +154,8 @@ describe('caseController', () => {
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: 3,
+        hasDeceased: false,
+        hasPractitioner: false,
       })
     })
   })
@@ -168,6 +183,7 @@ describe('caseController', () => {
       expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the case overview page', () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
       expect(renderSpy).toHaveBeenCalledWith('pages/overview', {
         overview: mockOverview,
         needs: mockNeeds,
@@ -179,6 +195,8 @@ describe('caseController', () => {
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: 3,
+        hasDeceased: false,
+        hasPractitioner: false,
       })
     })
   })

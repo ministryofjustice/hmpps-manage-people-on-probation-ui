@@ -237,7 +237,26 @@ describe('controllers/appointments', () => {
       })
     })
   })
-
+  describe('get appointments - no practitioner', () => {
+    beforeEach(async () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
+    })
+    it('should render the appointments page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
+        upcomingAppointments: mockPersonSchedule,
+        pastAppointments: mockPersonSchedule,
+        crn,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+        personRisks: undefined,
+        hasDeceased: false,
+        hasPractitioner: false,
+        url: '',
+      })
+    })
+  })
   describe('get upcoming appointments', () => {
     beforeEach(async () => {
       await controllers.appointments.getAllUpcomingAppointments(hmppsAuthClient)(req, res)
