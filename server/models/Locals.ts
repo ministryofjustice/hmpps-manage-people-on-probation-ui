@@ -6,7 +6,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { AppointmentSession, AppointmentType, NextAppointmentResponse } from './Appointments'
+import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
@@ -34,6 +34,7 @@ export interface AppointmentLocals {
     licenceCondition: string
     nsi: string
     forename: string
+    mobileNumber: string
   }
   attending?: {
     name: string
@@ -42,6 +43,7 @@ export interface AppointmentLocals {
     html: string
   }
   location?: Location | string
+  textMessageConfirmation?: YesNo
   start?: string
   previousStart?: string
   end?: string
