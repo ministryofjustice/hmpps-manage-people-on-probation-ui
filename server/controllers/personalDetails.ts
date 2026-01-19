@@ -7,11 +7,11 @@ import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import RoleService from '../services/roleService'
 import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn } from '../utils'
 import type { Controller } from '../@types'
-import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
+import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
 import { renderError } from '../middleware'
-import { Needs, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { type Needs, type RoshRiskWidgetDto, type TimelineItem } from '../data/model/risk'
 
 const routes = [
   'getPersonalDetails',
@@ -35,11 +35,13 @@ const routes = [
 const personalDetailsController: Controller<typeof routes, void> = {
   getPersonalDetails: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn, id } = req.params
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
-      const success = req.query.update
+      const query = req.query as Record<string, string>
+      const success = query.update
+      const back = query?.back ? decodeURIComponent(query.back) : ''
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -48,11 +50,17 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const manageUsersAccess = await roleService.hasAccess(DeliusRoleEnum.MANAGE_USERS, res.locals.user.username)
       let action = 'VIEW_MAS_PERSONAL_DETAILS'
       let renderPath = 'pages/personal-details'
-      const backLink = req.path.includes('personal-details/') ? `/case/${crn}/personal-details` : null
+      let backLink = req.path.includes('personal-details/') ? `/case/${crn}/personal-details` : null
+
       const hidePageHeader = req.path.includes('personal-details/')
-      let editMobileOnly = false
-      if (req.path.includes('personal-details/edit-contact-details')) {
-        editMobileOnly = req?.query?.mobile !== undefined
+      if (
+        ['personal-details/edit-contact-details', `personal-details/${id}/edit-contact-details`].some(route =>
+          req.path.includes(route),
+        )
+      ) {
+        if (req.query?.origin === 'appointments') {
+          backLink = back
+        }
         if (!manageUsersAccess) {
           return res.redirect(`/no-perm-autherror?backLink=${backLink}`)
         }
@@ -97,7 +105,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         hidePageHeader: boolean
         manageUsersAccess: boolean
         sanIndicator: boolean
-        editMobileOnly?: boolean
+        origin?: Origin
       }
 
       const props: Props = {
@@ -113,8 +121,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
         manageUsersAccess,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
       }
-      if (editMobileOnly) {
-        props.editMobileOnly = true
+      if (req.query?.origin) {
+        props.origin = req.query.origin as Origin
       }
       return res.render(renderPath, props)
     }
@@ -122,7 +130,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
   postEditDetails: hmppsAuthClient => {
     return async (req, res) => {
       const editingMainAddress = req.path.includes('personal-details/edit-main-address')
-      const errorMessages = validateWithSpec(req.body, personDetailsValidation({ ...req.body, editingMainAddress }))
+      const { origin = '' } = req.query as Record<string, string>
+      const errorMessages = validateWithSpec(
+        req.body,
+        personDetailsValidation({ ...req.body, editingMainAddress, origin }),
+      )
       res.locals.errorMessages = errorMessages
       const updateFn = editingMainAddress ? 'updatePersonalDetailsAddress' : 'updatePersonalDetailsContact'
       let request: PersonalDetailsUpdateRequest = {
@@ -167,7 +179,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       }
       const warningDisplayed: boolean = !request.endDate || Object.hasOwn(req.body, 'endDateWarningDisplayed')
       const isValid = Object.keys(errorMessages).length === 0 && warningDisplayed
-      const { crn } = req.params
+      const { crn, id } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -234,7 +246,11 @@ const personalDetailsController: Controller<typeof routes, void> = {
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)
         }
-        res.redirect(`/case/${crn}/personal-details?update=success`)
+        const redirect =
+          origin === 'appointments'
+            ? `/case/${crn}/arrange-appointment/${id}/supporting-information`
+            : `/case/${crn}/personal-details?update=success`
+        res.redirect(redirect)
       }
     }
   },
