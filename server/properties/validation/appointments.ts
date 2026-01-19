@@ -22,7 +22,7 @@ export interface AppointmentsValidationArgs {
   notes?: string
   maxCharCount?: number
   enablePastAppointments?: boolean
-  fileornote?: boolean
+  fileOrNote?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
@@ -228,7 +228,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    fileornote: {
+    fileOrNote: {
       optional: page !== `appointment/${contactId}/add-note`,
       checks: [
         {

@@ -108,14 +108,14 @@
         },
         type: 'button'
     }) }}
-    {% if errorMessages.fileornote %}
-        <div class="govuk-form-group govuk-form-group--error" id="fileornote" data-qa="fileornote">
+    {% if errorMessages.fileOrNote %}
+        <div class="govuk-form-group govuk-form-group--error" id="fileOrNote" data-qa="fileOrNote">
         <p id="file-error" class="govuk-error-message">
             <span class="govuk-visually-hidden">Error:</span>
-            {{ errorMessages.fileornote }}
+            {{ errorMessages.fileOrNote }}
         </p>
     {% else %}
-        <div class="govuk-form-group" id="fileornote" data-qa="fileornote">
+        <div class="govuk-form-group" id="fileOrNote" data-qa="fileOrNote">
     {% endif %}
     {{ govukCharacterCount(notesConfig) }}
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
