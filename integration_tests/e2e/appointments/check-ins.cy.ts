@@ -716,7 +716,7 @@ context('check-ins overview and manage pages', () => {
     appointmentsPage.checkOnPage()
   })
 
-  it.skip('should able to stop check in', () => {
+  it('should able to stop check in', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)

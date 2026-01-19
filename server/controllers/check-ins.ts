@@ -585,7 +585,9 @@ const checkInsController: Controller<typeof routes, void> = {
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], mobile)
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
-      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
+      const checkinRes = res.locals?.offenderCheckinsByCRNResponse
+      const showChange = checkinRes?.status === 'VERIFIED'
+      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
     }
   },
   getManageCheckinDatePage: hmppsAuthClient => {
