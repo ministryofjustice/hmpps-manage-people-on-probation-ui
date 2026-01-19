@@ -13,8 +13,6 @@ import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/Out
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
-import FlagService from '../services/flagService'
-import { FeatureFlags } from '../data/model/featureFlags'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -40,6 +38,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       until: untilDate,
       visorReport,
       outcomeRecorded,
+      smsOptIn,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const body: AppointmentRequestBody = {
       user: {
@@ -97,6 +96,14 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         start: dateTime(date, start).toISOString(),
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
+      }
+      if (smsOptIn?.includes('YES')) {
+        outlookEventRequestBody.smsEventRequest = {
+          firstName: userDetails.firstName,
+          mobileNumber: res?.locals?.case?.mobileNumber || '',
+          crn,
+          smsOptIn: true,
+        }
       }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }

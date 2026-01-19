@@ -8,6 +8,12 @@ export interface OutlookEventRequestBody {
   start: string
   durationInMinutes: number
   supervisionAppointmentUrn: string
+  smsEventRequest?: {
+    firstName: string
+    mobileNumber: string
+    crn: string
+    smsOptIn: true
+  }
 }
 
 export interface Recipient {
