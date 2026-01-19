@@ -186,6 +186,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateStopCheckins()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+    console.log(res.locals.errorMessages)
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()
