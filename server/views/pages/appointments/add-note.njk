@@ -108,6 +108,15 @@
         },
         type: 'button'
     }) }}
+    {% if errorMessages.file %}
+        <div class="govuk-form-group govuk-form-group--error" id="file" data-qa="file">
+        <p id="file-error" class="govuk-error-message">
+            <span class="govuk-visually-hidden">Error:</span>
+            {{ errorMessages.file }}
+        </p>
+    {% else %}
+        <div class="govuk-form-group" id="file" data-qa="file">
+    {% endif %}
     {{ govukCharacterCount(notesConfig) }}
     <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
 
@@ -134,6 +143,7 @@
             </div>
         </div>
 
+    </div>
     </div>
     {% if not useDecorator %}
         {% set uploadHtml %}
