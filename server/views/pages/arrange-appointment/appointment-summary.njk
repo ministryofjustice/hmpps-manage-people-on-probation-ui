@@ -134,6 +134,16 @@
       actions: { items: [ { href: changePath + "/location-date-time?change=" + url,
       text: "Choose date and time" if appointmentDates.length == 0 else "Change",
       visuallyHiddenText: "date and time of the appointment" } ] } },
+           { key: { text: "Text message confirmation" },
+    value: { html: appointment.textMessageConfirmation + ('<br>' + appointment.appointmentFor.mobileNumber if appointment.textMessageConfirmation == 'Yes' else '') },
+    actions: {
+    items: [ { 
+    href: changePath + "/text-message-confirmation?change=" + url, 
+    text: "Change", 
+    visuallyHiddenText: "text message confirmation"
+     } 
+     ] 
+     } if showAction } if appointment.textMessageConfirmation, 
        { key: { text: "Attended and complied" },
     value: { html: appointment.outcomeRecorded },
     actions: {
