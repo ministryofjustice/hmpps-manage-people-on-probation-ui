@@ -22,7 +22,12 @@ import {
   getAttendedCompliedProps,
   isRescheduleAppointment,
 } from '../middleware'
-import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
+import {
+  AppointmentSession,
+  AppointmentsPostResponse,
+  RescheduleAppointmentResponse,
+  SmsOptInOptions,
+} from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
@@ -438,6 +443,29 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
+  getTextMessageConfirmation: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id })
+    }
+  },
+  postTextMessageConfirmation: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const url = encodeURIComponent(req.url)
+
+      const redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
+        req.body.appointments[crn][id].smsOptIn,
+      )
+        ? `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}`
+        : `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
+
+      return res.redirect(redirect)
+    }
+  },
   getSupportingInformation: () => {
     return async (req, res) => {
       const { maxCharCount } = config
@@ -513,6 +541,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         return renderError(404)(req, res)
       }
       const attending = getDataValue(data, ['appointments', crn, id, 'user'])
+      const smsOptIn = getDataValue<SmsOptInOptions>(data, ['appointments', crn, id, 'smsOptIn'])
+      const smsSent = smsOptIn?.includes('YES')
       let attendingName = 'Your '
       if (attending.username.toUpperCase() !== res.locals.user.username) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -543,6 +573,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         url,
         isInPast,
         appointmentType,
+        smsSent,
       })
     }
   },
@@ -577,28 +608,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   postArrangeAnotherAppointment: hmppsAuthClient => {
     return async (req, res) => appointmentSummary(req, res, hmppsAuthClient)
-  },
-  getTextMessageConfirmation: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params as Record<string, string>
-      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id })
-    }
-  },
-  postTextMessageConfirmation: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params as Record<string, string>
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      const url = encodeURIComponent(req.url)
-      const redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
-        req.body.appointments[crn][id].smsOptIn,
-      )
-        ? `/case/${crn}/personal-details/edit-contact-details?mobile=true&back=${url}`
-        : `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
-
-      return res.redirect(redirect)
-    }
   },
 }
 
