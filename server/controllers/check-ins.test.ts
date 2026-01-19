@@ -1552,6 +1552,7 @@ describe('checkInsController', () => {
         mobile: '07700900000',
         id: uuid,
         email: 'test@example.com',
+        showChange: false,
       })
     })
   })
