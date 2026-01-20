@@ -101,11 +101,6 @@ export default {
   caval: {
     link: get('CAVAL_LINK', 'https://create-and-vary-a-licence-dev.hmpps.service.justice.gov.uk', requiredInProduction),
   },
-  esupervision: {
-    link: get('ESUPERVISION_LINK', 'https://esupervision-dev.hmpps.service.justice.gov.uk', {
-      requireInProduction: false,
-    }),
-  },
   guidance: {
     link: get(
       'ESUPERVISION_GUIDANCE_LINK',
