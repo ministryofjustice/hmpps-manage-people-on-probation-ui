@@ -10,4 +10,5 @@ export class FeatureFlags {
   enableESuperVision?: boolean = undefined
   enablePastAppointments?: boolean = undefined
   enableRescheduleAppointment?: boolean = undefined
+  enableManageCheckins?: boolean = undefined
 }

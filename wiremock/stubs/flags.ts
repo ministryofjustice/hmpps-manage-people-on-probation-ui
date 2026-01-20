@@ -248,6 +248,17 @@ const stubEnableESuperVision = (): SuperAgentRequest =>
             rules: [],
             rollouts: [],
           },
+          {
+            key: 'enableManageCheckins',
+            name: 'enableManageCheckins',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2025-01-13T15:28:37.920581Z',
+            updatedAt: '2025-01-13T17:06:39.269084Z',
+            rules: [],
+            rollouts: [],
+          }
         ],
       },
       headers: {
