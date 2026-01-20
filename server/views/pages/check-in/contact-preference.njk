@@ -5,6 +5,8 @@
 {% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use online check ins." %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
+{% set setMobileError =  'esupervision-'+  crn + '-' + id +'-checkins-checkInMobile' %}
+{% set setEmailError =  'esupervision-'+  crn + '-' + id +'-checkins-checkInEmail' %}
 {% set cyaLink =  "?cya=true" if cya else  "" %}
 {% set mobileValue = checkInMobile | default('No mobile number') %}
 {% set emailValue = checkInEmail | default('No email address') %}
@@ -68,7 +70,26 @@
     {% endset %}
 
     <form method="post" autocomplete="off" action="{{ paths.current }}">
-
+        {% if errorMessages[setMobileError] or errorMessages[setEmailError] %}
+            {% if errorMessages[setMobileError] %}
+                <div class="govuk-form-group govuk-form-group--error" id={{setMobileError}}>
+            {% endif %}
+            {% if errorMessages[setEmailError] %}
+                <div class="govuk-form-group govuk-form-group--error" id={{setEmailError}}>
+            {% endif %}
+        {% else %}
+            <div class="govuk-form-group">
+        {% endif %}
+        {% if errorMessages[setMobileError] %}
+            <p class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>{{errorMessages[setMobileError]}}
+            </p>
+        {% endif %}
+        {% if errorMessages[setEmailError] %}
+            <p class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>{{errorMessages[setEmailError]}}
+            </p>
+        {% endif %}
         <section class="app-summary-card govuk-!-margin-bottom-6 app-summary-card--large-title" data-qa="contactDetailsCard">
             <header class="app-summary-card__header">
                 <h3 class="app-summary-card__title">
@@ -106,6 +127,7 @@
                 </dl>
             </div>
         </section>
+        </div>
         <div class="govuk-!-width-one-half">
             {{ govukRadios({
                 fieldset: {
