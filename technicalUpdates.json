@@ -5,13 +5,13 @@
     "whatsNew": [
       "About online check ins",
       [
-        "Online check ins allow people on probation to submit a short video to check their identity, and answer 3 questions to tell practitioners how they are. This can be used to replace some face-to-face- appointments where appropriate, or as well as face-to-face appointments to help manage risk."
+        "Online check ins allow people on probation to submit a short video to check their identity, and answer 3 questions to tell practitioners how they are. This can be used to replace some face-to-face appointments where appropriate, or used alongside face-to-face appointments to help manage risk."
       ],
       "Help with using online check ins",
       ["You can get familiar with online check ins using our guidance (opens in new tab)."],
       "Bug fixes for Manage people on probation",
       [
-        "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome."
+        "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome.\n\nYou can now arrange planned telephone contacts (NS) without needing to select a location. This fixes a bug that was causing errors."
       ]
     ]
   },
