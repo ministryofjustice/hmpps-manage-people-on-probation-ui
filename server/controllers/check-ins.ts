@@ -587,6 +587,7 @@ const checkInsController: Controller<typeof routes, void> = {
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
       const showChange = checkinRes?.status === 'VERIFIED'
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
     }
   },
@@ -653,6 +654,16 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.contactUpdated
       }
+      const isPrefComsSet = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'])
+      if (isPrefComsSet === undefined) {
+        await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'manageCheckin', 'preferredComs'],
+          res.locals?.offenderCheckinsByCRNResponse?.contactPreference,
+        )
+      }
+
       return res.render('pages/check-in/manage/manage-contact.njk', { crn, id, checkInMobile, checkInEmail })
     }
   },
@@ -669,7 +680,23 @@ const checkInsController: Controller<typeof routes, void> = {
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'], checkInEmail)
       let redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}/edit-contact?change=${change}`
       if (change === 'main') {
+        const body: CheckinScheduleRequest = {
+          contactPreference: {
+            requestedBy: res.locals.user.username,
+            contactPreference: getDataValue(req.session.data, [
+              'esupervision',
+              crn,
+              id,
+              'manageCheckin',
+              'preferredComs',
+            ]),
+          },
+        }
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupClient = new ESupervisionClient(token)
+        await eSupClient.postUpdateOffenderDetails(id, body)
         redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`
+        setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
       }
       return res.redirect(redirectUrl)
     }

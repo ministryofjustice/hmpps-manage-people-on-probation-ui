@@ -214,6 +214,29 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
 
+    [`[esupervision][${crn}][${id}][manageCheckin][checkInEmail]`]: {
+      optional: (page === 'manage-contact' && checkInEmail.trim() !== '') || page !== 'manage-contact',
+      checks: [
+        {
+          validator: contactPrefEmailCheck,
+          msg: 'Enter an email address',
+          log: 'Email not entered in manage check in process',
+          crossField: `[esupervision][${crn}][${id}][manageCheckin][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][manageCheckin][checkInMobile]`]: {
+      optional: (page === 'manage-contact' && checkInMobile.trim() !== '') || page !== 'manage-contact',
+      checks: [
+        {
+          validator: contactPrefMobileCheck,
+          msg: 'Enter a mobile number',
+          log: 'Mobile number not entered in manage check in process',
+          crossField: `[esupervision][${crn}][${id}][manageCheckin][preferredComs]`,
+        },
+      ],
+    },
+
     photoUpload: {
       optional: page !== 'upload-a-photo',
       checks: [
