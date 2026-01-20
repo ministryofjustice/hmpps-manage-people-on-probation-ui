@@ -175,6 +175,24 @@ const eSuperVision: Route<void> = (req, res, next) => {
       )
     }
   }
+  const validateManageContactPage = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/contact`)) {
+      render = `pages/check-in/manage/manage-contact`
+      if (req.body.change === 'main') {
+        errorMessages = validateWithSpec(
+          req.body,
+          eSuperVisionValidation({
+            crn,
+            id,
+            checkInEmail,
+            checkInMobile,
+            page: 'manage-contact',
+            change: req.body.change,
+          }),
+        )
+      }
+    }
+  }
   let errorMessages: Record<string, string> = {}
   validateDateFrequency()
   validateContactPreference()
@@ -184,6 +202,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateCheckinSettings()
   validateManageEditContactPreference()
   validateStopCheckins()
+  validateManageContactPage()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

@@ -141,10 +141,14 @@ export interface OffenderCheckinsByCRNResponse {
 }
 
 export interface CheckinScheduleRequest {
-  checkinSchedule: {
+  checkinSchedule?: {
     requestedBy: string
     firstCheckin: string
     checkinInterval: CheckInterval
+  }
+  contactPreference?: {
+    requestedBy: string
+    contactPreference: 'PHONE' | 'EMAIL'
   }
 }
 
@@ -155,7 +159,7 @@ export interface CheckinScheduleResponse {
   firstCheckin: string
   checkinInterval: CheckInterval
   contactPreference: 'PHONE' | 'EMAIL'
-  photoUrl: string
+  photoUrl?: string
 }
 
 export interface DeactivateOffenderRequest {
