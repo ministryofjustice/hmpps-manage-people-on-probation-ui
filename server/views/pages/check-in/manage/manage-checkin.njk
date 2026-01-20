@@ -31,16 +31,20 @@
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
       {% set checkinLabel = 'First check in' %}
       {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
-        <div class="moj-button-group__item">
-            <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
-        </div>
+        {% if flags.enableManageCheckins === true %}
+            <div class="moj-button-group__item">
+                <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
+            </div>
+        {% endif %}
     {% endif %}
     {% if offenderCheckinsByCRNResponse.status === 'INACTIVE' %}
         {% set checkinLabel = 'Next check in due' %}
         {% set checkinText = 'Check ins stopped' %}
-        <div class="moj-button-group__item">
-            <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
-        </div>
+        {% if flags.enableManageCheckins === true %}
+            <div class="moj-button-group__item">
+                <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
+            </div>
+       {% endif %}
     {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
