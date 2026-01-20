@@ -996,3 +996,38 @@ describe('validates manage edit contact', () => {
     expect(loggerSpy).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
   })
 })
+
+describe('validates manage checkin contact type preference', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+  const testRequest = {
+    esupervision: {
+      [crn]: {
+        [id]: {
+          manageCheckin: { preferredComs: undefined },
+        },
+      },
+    },
+  } as unknown as Validateable
+  const expectedResult: Record<string, string> = {
+    [`esupervision-${crn}-${id}-manageCheckin-checkInMobile`]: 'Enter a mobile number',
+    [`esupervision-${crn}-${id}-manageCheckin-checkInEmail`]: 'Enter an email address',
+  }
+  const args: ESupervisionValidationArgs = {
+    crn,
+    id,
+    page: 'manage-contact',
+    checkInMobile: '',
+    checkInEmail: '',
+    change: 'main',
+  }
+  const spec = eSuperVisionValidation(args)
+  it('should return the correct validation errors', () => {
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+  it('should log the error', () => {
+    validateWithSpec(testRequest, spec)
+    expect(loggerSpy).toHaveBeenCalledWith('Email not entered in manage check in process')
+  })
+})
