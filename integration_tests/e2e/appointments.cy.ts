@@ -16,7 +16,7 @@ context('Appointment', () => {
     page.headerName().should('contain.text', 'Caroline Wolff')
     page.assertRiskTags()
 
-    page.getElement('[data-qa="upcomingAppointments"]').find('h3').should('contain.text', 'Upcoming appointments')
+    page.getElement('[data-qa="upcomingAppointments"]').should('contain.text', 'Upcoming appointments')
     page.upcomingAppointmentDate(1).should('contain.text', '22 December 2044')
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
@@ -48,10 +48,10 @@ context('Appointment', () => {
 
     page.getAlert().should('contain.text', 'medium')
 
-    cy.get('[data-qa="upcomingAppointments"] th').eq(0).should('contain.text', 'Appointment type')
-    cy.get('[data-qa="upcomingAppointments"] th').eq(1).should('contain.text', 'Date')
-    cy.get('[data-qa="upcomingAppointments"] th').eq(2).should('contain.text', 'Time')
-    cy.get('[data-qa="upcomingAppointments"] th').eq(3).should('contain.html', 'Action')
+    cy.get('[data-qa="upcomingAppointmentsSection"] th').eq(0).should('contain.text', 'Appointment type')
+    cy.get('[data-qa="upcomingAppointmentsSection"] th').eq(1).should('contain.text', 'Date')
+    cy.get('[data-qa="upcomingAppointmentsSection"] th').eq(2).should('contain.text', 'Time')
+    cy.get('[data-qa="upcomingAppointmentsSection"] th').eq(3).should('contain.html', 'Action')
     page.upcomingAppointmentType(1).should('contain.text', 'Phone call')
     page.upcomingAppointmentDate(1).should('contain.text', '22 December 2044')
     page.upcomingAppointmentTime(1).should('contain.text', '9:15am')
@@ -71,7 +71,7 @@ context('Appointment', () => {
     page.upcomingAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
     page.upcomingAppointmentType(2).should('contain.text', 'Planned video contact (NS)')
 
-    page.getElement('[data-qa="pastAppointments"]').find('h3').should('contain.text', 'Past appointments')
+    page.getElement('[data-qa="pastAppointments"]').should('contain.text', 'Past appointments')
     page.pastAppointmentDate(1).should('contain.text', '22 March 2024')
     page.pastAppointmentTime(1).should('contain.text', '8:15am to 8:30am')
     page.pastAppointmentType(1).should('contain.text', 'Phone call')
@@ -96,9 +96,9 @@ context('Appointment', () => {
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 6, 1, url(6))
     page.assertAnchorElementAtIndexWithin('[class="govuk-table__row"]', 7, 1, url(3))
 
-    page.getElement('[data-qa="appointmentHistory"]').find('h3').should('contain.text', 'Appointment history')
+    page.getElement('[data-qa="appointmentHistory"]').should('contain.text', 'Appointment history')
     page
-      .getElement('[data-qa="appointmentHistory"]')
+      .getElement('[data-qa="appointmentHistorySection"]')
       .find('a')
       .should('contain.text', 'View all past appointments in the contacts')
       .should('have.attr', 'href', '/case/X000001/activity-log')
