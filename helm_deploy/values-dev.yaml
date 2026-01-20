@@ -33,7 +33,6 @@ generic-service:
     EPF2_LINK: '/'
     TIER_LINK: 'https://tier-dev.hmpps.service.justice.gov.uk/case'
     SENTENCE_PLAN_LINK: 'https://sentence-plan-dev.hmpps.service.justice.gov.uk'
-    ESUPERVISION_LINK: 'https://esupervision-dev.hmpps.service.justice.gov.uk'
     E_SUPERVISION_API_URL: 'https://esupervision-api-dev.hmpps.service.justice.gov.uk'
     ESUPERVISION_GUIDANCE_LINK: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk'
     CHAR_COUNT: 12000
