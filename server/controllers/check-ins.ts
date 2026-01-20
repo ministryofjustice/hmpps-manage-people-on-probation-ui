@@ -61,6 +61,7 @@ const routes = [
   'postManageStopCheckin',
   'getStopCheckinPage',
   'getEligibilityPage',
+  'getNotEligiblePage',
 ] as const
 
 interface OptionPair {
@@ -787,6 +788,15 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const guidanceUrl = config.guidance.link
       return res.render('pages/check-in/eligibility', { crn, id, guidanceUrl })
+    }
+  },
+  getNotEligiblePage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/not-eligible', { crn, id })
     }
   },
 }
