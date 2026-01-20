@@ -60,6 +60,7 @@ const routes = [
   'postManageEditContactPage',
   'postManageStopCheckin',
   'getStopCheckinPage',
+  'getEligibilityPage',
 ] as const
 
 interface OptionPair {
@@ -776,6 +777,16 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+    }
+  },
+  getEligibilityPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const guidanceUrl = config.guidance.link
+      return res.render('pages/check-in/eligibility', { crn, id, guidanceUrl })
     }
   },
 }
