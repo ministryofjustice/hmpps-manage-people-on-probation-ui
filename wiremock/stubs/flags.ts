@@ -258,7 +258,7 @@ const stubEnableESuperVision = (): SuperAgentRequest =>
             updatedAt: '2025-01-13T17:06:39.269084Z',
             rules: [],
             rollouts: [],
-          }
+          },
         ],
       },
       headers: {
