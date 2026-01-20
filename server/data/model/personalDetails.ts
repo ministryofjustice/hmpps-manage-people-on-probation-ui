@@ -218,4 +218,4 @@ export interface Disability {
   lastUpdatedBy: Name
 }
 
-export type Origin = 'appointments' | undefined
+export type Origin = 'appointments' | 'xxx' | undefined

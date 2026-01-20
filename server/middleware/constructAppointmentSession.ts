@@ -1,6 +1,8 @@
 import { Request, NextFunction } from 'express'
+import { DateTime } from 'luxon'
 import { AppointmentSession, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
+import { dateIsInPast } from '../utils'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
@@ -57,6 +59,11 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
     const date = appointment?.startDateTime || ''
     const end = appointment?.endDateTime || ''
+    // const dt = DateTime.fromISO(date, { setZone: true })
+    // const startDate = dt.toISODate() // '2024-02-21'
+    // const startTime = dt.toFormat('HH:mm') // '10:15'
+    // const { isInPast } = dateIsInPast(startDate, startTime)
+
     const externalReference = appointment?.externalReference || ''
 
     /*
@@ -129,6 +136,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     if (appointment?.officer?.name) {
       nextAppointment.user.name = appointment.officer.name
     }
+    nextAppointment.smsOptIn = null
   }
   res.locals.nextAppointmentSession = nextAppointment
   return next()

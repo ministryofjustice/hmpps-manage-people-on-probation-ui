@@ -456,13 +456,15 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         return renderError(404)(req, res)
       }
       const url = encodeURIComponent(req.url)
-
-      const redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
+      const change = req?.query?.change as string
+      let redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
         req.body.appointments[crn][id].smsOptIn,
       )
         ? `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}`
         : `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
-
+      if (change) {
+        redirect = findUncompleted(req, res)
+      }
       return res.redirect(redirect)
     }
   },

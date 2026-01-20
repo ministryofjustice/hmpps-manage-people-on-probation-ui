@@ -147,7 +147,7 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
   },
 })
 
-const expectedSession = (values: Record<string, string | number | Record<string, string | Name>>) => {
+const expectedSession = (values: Record<string, string | number | Record<string, string | Name | null>>) => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
   const { eventId, isVisor, startDateTime: date, endDateTime: end } = mockAppointment
@@ -175,6 +175,7 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     repeating: 'No',
     repeatingDates: [] as string[],
     externalReference,
+    smsOptIn: null as null,
     ...values,
   }
 }

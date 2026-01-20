@@ -24,7 +24,8 @@ describe('Change appointment details and reschedule', () => {
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
     checkPopHeader()
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Change appointment details and reschedule')
-    checkAppointmentSummary(checkYourAnswerPage)
+    checkAppointmentSummary(checkYourAnswerPage, false, false, false, false)
+
     cy.get('[data-qa="calendarInviteInset"]').should(
       'contain.text',
       `You'll receive a calendar invite for the appointment`,

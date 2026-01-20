@@ -18,11 +18,12 @@ import {
   completeRescheduling,
   completeRescheduleAppointmentPage,
   getUuid,
+  completeTextMessageConfirmationPage,
 } from './imports'
 import OverviewPage from '../../pages/overview'
 import YourCasesPage from '../../pages/myCases'
 
-const loadPage = (crnOverride = '', dateInPast = false) => {
+const loadPage = (crnOverride = '', dateInPast = false, completeTextMessageConfirmOptionIndex = 1) => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
   completeLocationDateTimePage({ index: 1, crnOverride, dateInPast })
@@ -30,6 +31,7 @@ const loadPage = (crnOverride = '', dateInPast = false) => {
     completeAttendedCompliedPage()
     completeAddNotePage()
   } else {
+    completeTextMessageConfirmationPage({ index: completeTextMessageConfirmOptionIndex, _crn: crnOverride })
     completeSupportingInformationPage(true, crnOverride)
   }
   completeCYAPage()
@@ -81,7 +83,7 @@ describe('Confirmation page', () => {
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(
-            `You need to send Alton the appointment details. Their phone number is 071838893.`,
+            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
           )
         })
       confirmPage
@@ -108,15 +110,30 @@ describe('Confirmation page', () => {
 
     it('should render the page with pop telephone number', () => {
       cy.task('stubPersonalDetailsNoMobileNumber')
-      loadPage('X000001')
+      loadPage('X000001', false, 2)
       confirmPage = new AppointmentConfirmationPage()
-      confirmPage.getPopTelephone().should('contain.text', `0123456999`)
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+        })
     })
     it('should render the page with no contact numbers', () => {
       cy.task('stubPersonalDetailsNoTelephoneNumbers')
-      loadPage('X000001')
+      loadPage('X000001', false, 2)
       confirmPage = new AppointmentConfirmationPage()
       confirmPage.getPopContactNumber().should('not.exist')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+        })
     })
 
     it('should link to the appointment page when practitioner click Return to all cases', () => {
@@ -153,7 +170,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `You need to send Alton the appointment details. Their phone number is 071838893.`,
+              `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
             )
           })
 
@@ -200,7 +217,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `You need to send Alton the appointment details. Their phone number is 071838893.`,
+              `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
             )
           })
 
@@ -259,7 +276,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
+              `Caroline will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
             )
           })
 
@@ -300,9 +317,7 @@ describe('Confirmation page', () => {
           .invoke('text')
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
-            )
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
           })
         cy.get('[data-qa="what-happens-next"]')
           .find('p')

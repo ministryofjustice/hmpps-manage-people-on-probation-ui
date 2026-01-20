@@ -16,6 +16,7 @@ import AppointmentLocationDateTimePage from '../../pages/appointments/location-d
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -67,6 +68,14 @@ export const completeTypePage = (index = 1, hasVisor = false) => {
   }
   typePage.getSubmitBtn().click()
 }
+
+export const normalise = (text: string) =>
+  text
+    .replace(/&nbsp;/g, ' ')
+    .replace(/\n/g, '')
+    .replace(/\s*<br>\s*/g, '<br>')
+    .replace(/\s+/g, ' ')
+    .trim()
 
 export const completeSentencePage = (eventIndex = 1, query = '', crnOverride = '') => {
   const tomorrow = DateTime.now().plus({ days: 1 }).set({
@@ -153,6 +162,16 @@ export const completeLocationDateTimePage = ({
   locationDateTimePage.getSubmitBtn().click()
 }
 
+export const completeTextMessageConfirmationPage = ({ _crn = null, _uuid = uuid, index = 2 } = {}) => {
+  const suffix = index > 1 ? `-${index}` : ''
+  const textMessageConfirmPage = new TextMessageConfirmationPage()
+  textMessageConfirmPage
+    .getSmsOptIn()
+    .find(`#appointments-${_crn || crn}-${_uuid}-smsOptIn${suffix}`)
+    .click()
+  textMessageConfirmPage.getSubmitBtn().click()
+}
+
 export const completeAttendedCompliedPage = (manageJourney = false) => {
   const idPrefix = manageJourney ? '' : `appointments-${crn}-${uuid}-`
   const logOutcomePage = new AttendedCompliedPage()
@@ -231,6 +250,8 @@ export const checkAppointmentSummary = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage | RescheduleCheckYourAnswerPage,
   probationPractitioner = false,
   dateInPast = false,
+  sendTextMessage = true,
+  summaryHasDate = true,
 ) => {
   const appointmentFor =
     page instanceof RescheduleCheckYourAnswerPage ? 'Default Sentence Type (12 Months)' : '12 month Community order'
@@ -290,22 +311,43 @@ export const checkAppointmentSummary = (
     page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
     page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
   }
-  // }
-
+  if (!dateInPast) {
+    page
+      .getSummaryListRow(6 + index)
+      .find('.govuk-summary-list__key')
+      .should('contain.text', 'Text message confirmation')
+    let textMessageConfirmValue = sendTextMessage ? 'Yes' : 'No'
+    if (!summaryHasDate) textMessageConfirmValue = 'Not entered'
+    page
+      .getSummaryListRow(6 + index)
+      .find('.govuk-summary-list__value')
+      .should('contain.text', textMessageConfirmValue)
+    if (!summaryHasDate) {
+      page
+        .getSummaryListRow(6 + index)
+        .find('.govuk-summary-list__value')
+        .find('.govuk-summary-list__hint')
+        .should('contain.text', 'Select the appointment date first.')
+    }
+    page
+      .getSummaryListRow(6 + index)
+      .find('.govuk-summary-list__value')
+      .should(sendTextMessage ? 'contain.text' : 'not.contain.text', '07703123456')
+  }
   page
-    .getSummaryListRow(6 + index)
+    .getSummaryListRow((!dateInPast ? 7 : 6) + index)
     .find('.govuk-summary-list__key')
     .should('contain.text', 'Supporting information')
   page
-    .getSummaryListRow(6 + index)
+    .getSummaryListRow((!dateInPast ? 7 : 6) + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', !(page instanceof AppointmentCheckYourAnswersPage) ? 'Not entered' : 'Some notes')
   page
-    .getSummaryListRow(7 + index)
+    .getSummaryListRow((!dateInPast ? 8 : 7) + index)
     .find('.govuk-summary-list__key')
     .should('contain.text', 'Sensitivity')
   page
-    .getSummaryListRow(7 + index)
+    .getSummaryListRow((!dateInPast ? 8 : 7) + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', !(page instanceof AppointmentCheckYourAnswersPage) ? 'Not entered' : 'Yes')
 }
@@ -318,6 +360,7 @@ export const checkUpdateType = (page: AppointmentCheckYourAnswersPage | ArrangeA
   if (page instanceof ArrangeAnotherAppointmentPage) {
     getUuid().then(pageUuid => {
       completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
+      completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
       completeSupportingInformationPage(true, '', pageUuid)
     })
   }
@@ -332,6 +375,7 @@ export const checkUpdateSentence = (page: AppointmentCheckYourAnswersPage | Arra
     sentencePage.getSubmitBtn().click()
     if (!(page instanceof AppointmentCheckYourAnswersPage)) {
       completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
+      completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
       completeSupportingInformationPage(true, '', pageUuid)
     }
     page.checkOnPage()
@@ -352,6 +396,7 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   locationPage.getSubmitBtn().click()
   if (!(page instanceof AppointmentCheckYourAnswersPage)) {
     getUuid().then(pageUuid => {
+      completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
       completeSupportingInformationPage(true, '', pageUuid)
     })
   }
@@ -386,6 +431,7 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
       dateTimePage.getSubmitBtn().click()
       dateTimePage.getSubmitBtn().click()
       if (!(page instanceof AppointmentCheckYourAnswersPage)) {
+        completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
         completeSupportingInformationPage(true, '', pageUuid)
       }
       page.checkOnPage()
@@ -401,6 +447,26 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
             )
           }
         })
+    })
+  })
+}
+
+export const checkUpdateTextMessageConfirmation = (
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+) => {
+  getCrn().then(pageCrn => {
+    getUuid().then(pageUuid => {
+      page.getSummaryListRow(6).find('.govuk-link').click()
+      const textMessageConfirmPage = new TextMessageConfirmationPage()
+      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${pageCrn}-${pageUuid}-smsOptIn`).should('be.checked')
+      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${pageCrn}-${pageUuid}-smsOptIn-3`).click()
+      textMessageConfirmPage.getSubmitBtn().click()
+      page.checkOnPage()
+      page
+        .getSummaryListRow(6)
+        .find('.govuk-summary-list__value')
+        .should('contain.text', 'No')
+        .should('not.contain.text', '07783889300')
     })
   })
 }
@@ -437,32 +503,37 @@ export const checkLogOutcomesAlert = (attendedComplied = false) => {
 export const checkUpdateNotes = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
   dateInPast = false,
+  sendTextMessage = true,
 ) => {
   getUuid().then(pageUuid => {
-    page.getSummaryListRow(6).find('.govuk-link').click()
+    const index = !dateInPast && sendTextMessage ? 7 : 6
+    page.getSummaryListRow(index).find('.govuk-link').click()
     const updatedNotes = 'Some updated notes'
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-notes`).focus().clear().type(updatedNotes)
     notePage.getSubmitBtn().click()
     page.checkOnPage()
-    page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
+    page.getSummaryListRow(index).find('.govuk-summary-list__value').should('contain.text', updatedNotes)
   })
 }
 
 export const checkUpdateSensitivity = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
   dateInPast = false,
+  sendTextMessage = true,
 ) => {
   getUuid().then(pageUuid => {
-    page.getSummaryListRow(7).find('.govuk-link').click()
+    const index = !dateInPast && sendTextMessage ? 8 : 7
+    page.getSummaryListRow(index).find('.govuk-link').click()
     const notePage = dateInPast ? new AddNotePage() : new AppointmentNotePage()
     notePage.getElement(`#appointments-${crn}-${pageUuid}-sensitivity-2`).click()
     notePage.getSubmitBtn().click()
     if (page instanceof ArrangeAnotherAppointmentPage) {
       completeLocationDateTimePage({ index: 1, uuidOveride: pageUuid })
+      completeTextMessageConfirmationPage({ _crn: crn, _uuid: pageUuid, index: 1 })
     }
     page.checkOnPage()
-    page.getSummaryListRow(7).find('.govuk-summary-list__value').should('contain.text', 'No')
+    page.getSummaryListRow(index).find('.govuk-summary-list__value').should('contain.text', 'No')
   })
 }
 
@@ -737,6 +808,7 @@ export const completeRescheduling = (id: string, inPast = false) => {
   let attendedCompliedPage: AttendedCompliedPage
   let addNotePage: AddNotePage
   let supportingInformationPage: AppointmentNotePage
+  let textMessageConfirmPage: TextMessageConfirmationPage
   const tomorrow = DateTime.now().plus({ days: 1 })
   const yesterday = DateTime.now().minus({ days: 1 })
   const appointmentDate = inPast ? yesterday : tomorrow
@@ -757,6 +829,9 @@ export const completeRescheduling = (id: string, inPast = false) => {
     cy.get(`#appointments-${urlCrn}-${id}-sensitivity-2`).click()
     addNotePage.getSubmitBtn().click()
   } else {
+    textMessageConfirmPage = new TextMessageConfirmationPage()
+    textMessageConfirmPage.getSmsOptIn().find(`#appointments-${urlCrn}-${id}-smsOptIn`).click()
+    textMessageConfirmPage.getSubmitBtn().click()
     supportingInformationPage = new AppointmentNotePage()
     cy.get(`#appointments-${urlCrn}-${id}-sensitivity-2`).click()
     supportingInformationPage.getSubmitBtn().click()
@@ -775,11 +850,11 @@ export const to24HourTimeWithMinutes = (time: string): string => {
   return `${hour12}:${minutes.toString().padStart(2, '0')}${period}`
 }
 
-export const checkRiskToStaffAlert = () => {
+export const checkRiskToStaffAlert = (_crn = 'X778160', name = 'Alton', riskLevel = 'very high') => {
   cy.get('[data-qa=riskToStaffAlert]').should('be.visible')
-  cy.get('[data-qa=riskToStaffAlert]').find('h2').should('contain.text', 'Alton is very high risk to staff')
+  cy.get('[data-qa=riskToStaffAlert]').find('h2').should('contain.text', `${name} is ${riskLevel} risk to staff`)
   cy.get('[data-qa=riskToStaffAlert]')
     .find('a')
-    .should('contain.text', `View Alton's risk to staff flag`)
-    .should('have.attr', 'href', '/case/X778160/risk/flag/1')
+    .should('contain.text', `View ${name}'s risk to staff flag`)
+    .should('have.attr', 'href', `/case/${_crn}/risk/flag/1`)
 }

@@ -20,11 +20,15 @@ import {
   completeAddNotePage,
   crn,
   uuid,
+  completeTextMessageConfirmationPage,
+  checkUpdateTextMessageConfirmation,
 } from './imports'
 import { statusErrors } from '../../../server/properties/statusErrors'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
+import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 
 const loadPage = ({
   hasVisor = false,
@@ -32,11 +36,18 @@ const loadPage = ({
   sentenceOptionIndex = 1,
   notes = true,
   dateInPast = false,
+  textMessageOptionIndex = 1,
 } = {}) => {
   completeSentencePage(sentenceOptionIndex, '')
   completeTypePage(typeOptionIndex, hasVisor)
   completeLocationDateTimePage({ dateInPast })
   if (!dateInPast) {
+    completeTextMessageConfirmationPage({ index: textMessageOptionIndex })
+    if (textMessageOptionIndex === 2) {
+      const page = new EditContactDetails()
+      page.getElementInput('mobileNumber').clear().type('07783889300')
+      cy.get('[data-qa=submitBtn]').click()
+    }
     completeSupportingInformationPage(notes)
   } else {
     completeAttendedCompliedPage()
@@ -80,6 +91,12 @@ describe('Check your answers then confirm the appointment', () => {
       cy.get('[data-qa="appointmentLicenceCondition"]').should('not.exist')
     })
 
+    it(`should render the page if text message confirmation selected as 'No'`, () => {
+      loadPage({ textMessageOptionIndex: 3 })
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      checkAppointmentSummary(cyaPage, true, false, false)
+    })
+
     describe('Change appointment values', () => {
       let cyaPage: AppointmentCheckYourAnswersPage
       beforeEach(() => {
@@ -97,6 +114,9 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should update the date when value is changed', () => {
         checkUpdateDateTime(cyaPage)
+      })
+      it('should update the text message confirmation when value is changed', () => {
+        checkUpdateTextMessageConfirmation(cyaPage)
       })
       it('should update the notes when value is changed', () => {
         checkUpdateNotes(cyaPage)
@@ -154,6 +174,7 @@ describe('Check your answers then confirm the appointment', () => {
     let logOutcomePage: AttendedCompliedPage
     let supportingInfoPage: AppointmentNotePage
     let addNotePage: AddNotePage
+    let textMessageConfirmPage: TextMessageConfirmationPage
 
     const recordOutcome = `appointments-${crn}-${uuid}-outcomeRecorded`
 
@@ -186,9 +207,12 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        completeLocationDateTimePage() // tomorrow
+        completeLocationDateTimePage()
       })
-      it('should redirect to the supporting information page', () => {
+      it('should redirect to the text message confirmation and supporting information pages', () => {
+        textMessageConfirmPage = new TextMessageConfirmationPage()
+        textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
+        textMessageConfirmPage.getSubmitBtn().click()
         supportingInfoPage = new AppointmentNotePage()
         supportingInfoPage.checkOnPage()
         cy.get(`#appointments-${crn}-${uuid}-notes`).should('have.value', '').type('some notes')

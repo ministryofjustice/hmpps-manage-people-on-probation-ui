@@ -5,7 +5,7 @@
 }) %}
 
 {% block editForm %}
-    {% if not origin === 'appointments' %}
+    {% if origin != 'appointments' %}
         {{ govukInput({
                 value: personalDetails.telephoneNumber if personalDetails.telephoneNumber,
                 label: {
@@ -34,7 +34,7 @@
     {{ govukInput({
                 value: personalDetails.mobileNumber if personalDetails.mobileNumber,
                 label: {
-                    text: "Mobile number" + ( " (optional)" if not origin === 'appointments' else ""),
+                    text: "Mobile number" + ( " (optional)" if origin != 'appointments' else ""),
                     classes: "govuk-label--s govuk-!-font-weight-bold"
                 },
                 hint: {
@@ -55,7 +55,7 @@
                     }
                 } if errorMessages.mobileNumber
             }) }}
-    {% if not origin === 'appointments' %}
+    {% if origin != 'appointments' %}
         {{ govukInput({
                 value: personalDetails.email if personalDetails.email,
                 label: {

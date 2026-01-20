@@ -67,9 +67,9 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
-      let textMessageConfirmation: YesNo = ''
-      if (smsOptIn) {
-        textMessageConfirmation = smsOptIn.includes('YES') ? 'Yes' : 'No'
+      let textMessageConfirmation: YesNo | null | undefined
+      if (![null, undefined].includes(smsOptIn)) {
+        textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
       }
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
         sentenceObj = req.session.data.sentences[crn].find(user => user.id === parseInt(eventId, 10))

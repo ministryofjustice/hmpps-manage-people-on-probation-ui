@@ -5,7 +5,7 @@ import { Errors } from './Errors'
 
 export type YesNo = '' | 'Yes' | 'No'
 
-export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO'
+export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
 
 export type SmsLanguage = 'english' | 'welsh'
 

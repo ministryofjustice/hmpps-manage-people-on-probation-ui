@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import RoleService from '../services/roleService'
-import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn } from '../utils'
+import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn, setDataValue } from '../utils'
 import type { Controller } from '../@types'
 import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
@@ -240,16 +240,19 @@ const personalDetailsController: Controller<typeof routes, void> = {
           predictorScores,
           hidePageHeader: true,
           backLink: `/case/${crn}/personal-details`,
+          origin,
         })
       } else {
         await masClient[updateFn](crn, Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')))
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)
         }
-        const redirect =
-          origin === 'appointments'
-            ? `/case/${crn}/arrange-appointment/${id}/supporting-information`
-            : `/case/${crn}/personal-details?update=success`
+        let redirect = `/case/${crn}/personal-details?update=success`
+        if (origin === 'appointments') {
+          const { data } = req.session
+          setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
+          redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
+        }
         res.redirect(redirect)
       }
     }

@@ -17,6 +17,7 @@ import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
@@ -29,6 +30,7 @@ describe('Pick a date, location and time for this appointment', () => {
   let locationNotInListPage: AppointmentLocationNotInListPage
   let notePage: AppointmentNotePage
   let cyaPage: AppointmentCheckYourAnswersPage
+  let textMessageConfirmPage: TextMessageConfirmationPage
 
   const now = DateTime.now()
   const yesterday = now.minus({ days: 1 })
@@ -546,7 +548,10 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getSubmitBtn().click()
     })
 
-    it('should redirect to the supporting information, then cya page', () => {
+    it('should redirect to the text message confirm, supporting information, then cya page', () => {
+      textMessageConfirmPage = new TextMessageConfirmationPage()
+      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
+      textMessageConfirmPage.getSubmitBtn().click()
       notePage = new AppointmentNotePage()
       notePage.checkOnPage()
       completeSupportingInformationPage()

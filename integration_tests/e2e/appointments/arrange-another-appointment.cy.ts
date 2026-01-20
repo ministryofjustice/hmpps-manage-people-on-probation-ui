@@ -17,6 +17,7 @@ import {
   checkUpdateSensitivity,
   checkUpdateBackLinkRefresh,
 } from './imports'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
@@ -34,13 +35,14 @@ describe('Arrange another appointment', () => {
     loadPage()
     cy.get('[data-qa="calendarInviteInset"]').should('not.exist')
     const arrangeAnotherAppointmentPage = new ArrangeAnotherAppointmentPage()
-    checkAppointmentSummary(arrangeAnotherAppointmentPage)
+    checkAppointmentSummary(arrangeAnotherAppointmentPage, false, false, false, false)
     arrangeAnotherAppointmentPage.getSubmitBtn().should('include.text', 'Arrange appointment')
   })
   describe('User clicks submit without selecting a date and time', () => {
     let dateTimePage: AppointmentdateTimePage
     let supportingInformationPage: SupportingInformationPage
     let arrangeAnotherAppointmentPage: ArrangeAnotherAppointmentPage
+    let textMessageConfirmPage: TextMessageConfirmationPage
     beforeEach(() => {
       cy.task('stubNextAppointment')
       loadPage()
@@ -77,6 +79,9 @@ describe('Arrange another appointment', () => {
         dateTimePage.getElementInput(`endTime`).focus().type('10:30')
         dateTimePage.getSubmitBtn().click()
         dateTimePage.getSubmitBtn().click()
+        textMessageConfirmPage = new TextMessageConfirmationPage()
+        textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
+        textMessageConfirmPage.getSubmitBtn().click()
         supportingInformationPage = new SupportingInformationPage()
         cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
         supportingInformationPage.getSubmitBtn().click()
