@@ -28,24 +28,32 @@
 {% endblock %}
 
 {% block pageContent %}
-{#   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
-        <div class="moj-button-group__item">
-            <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
-        </div>
+  {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
+      {% set checkinLabel = 'First check in' %}
+      {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+        {% if flags.enableManageCheckins === true %}
+            <div class="moj-button-group__item">
+                <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
+            </div>
+        {% endif %}
     {% endif %}
     {% if offenderCheckinsByCRNResponse.status === 'INACTIVE' %}
-        <div class="moj-button-group__item">
-            <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn" >Restart online check ins</a>
-        </div>
-    {% endif %} #}
+        {% set checkinLabel = 'Next check in due' %}
+        {% set checkinText = 'Check ins stopped' %}
+        {% if flags.enableManageCheckins === true %}
+            <div class="moj-button-group__item">
+                <a href="#" class="govuk-button govuk-!-margin-left"  data-qa="restart-checkin-btn">Restart online check ins</a>
+            </div>
+       {% endif %}
+    {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
             {{ govukSummaryList({
                 rows: [
                     {
-                        key: { html: '<span data-qa="firstCheckInDueLabel">First check in</span>'},
-                        value: { html: '<span data-qa="firstCheckInValue">' + nextCheckin.firstCheckin | dateWithDayAndWithoutYear + '</span>'}
+                        key: { html: '<span data-qa="firstCheckInDueLabel">' + checkinLabel + '</span>'},
+                        value: { html: '<span data-qa="firstCheckInValue">' + checkinText + '</span>'}
                     },
                     {
                         key: { html: '<span data-qa="frequencyLabel">Frequency</span>'},
@@ -68,7 +76,7 @@
                     href: changeDtLink
                 }
             ]
-        }
+        } if showChange
     }) }}
 
     {% set contactDetailsText %}
@@ -102,7 +110,7 @@
                     href: changeContactLink
                 }
             ]
-        }
+        } if showChange
     }) }}
   {% set photoDisplayHtml %}
     {% if photoUrl %}

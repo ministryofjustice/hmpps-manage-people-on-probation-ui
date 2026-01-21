@@ -121,6 +121,17 @@
               "updatedAt": "2025-11-17T17:06:39.269084Z",
               "rules": [],
               "rollouts": []
+            },
+            {
+              "key": "enableManageCheckins",
+              "name": "enableManageCheckins",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-01-15T15:28:37.920581Z",
+              "updatedAt": "2026-01-15T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }

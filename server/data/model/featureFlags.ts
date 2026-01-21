@@ -11,4 +11,5 @@ export class FeatureFlags {
   enablePastAppointments?: boolean = undefined
   enableRescheduleAppointment?: boolean = undefined
   enableSmsReminders?: boolean = undefined
+  enableManageCheckins?: boolean = undefined
 }

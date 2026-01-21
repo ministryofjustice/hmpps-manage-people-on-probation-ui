@@ -123,16 +123,22 @@ describe('checkInsController', () => {
   describe('getIntroPage', () => {
     it('renders instructions when CRN is valid', async () => {
       mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', { crn, back: req.query.back })
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', {
+        crn,
+        back: req.query.back,
+        guidanceUrl: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
+      })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
 
     it('returns 404 when CRN is invalid', async () => {
       mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
@@ -143,6 +149,7 @@ describe('checkInsController', () => {
 
     it('redirect if no practitioner', async () => {
       mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
 
       getProbationPractitionerSpy.mockImplementationOnce(() =>
         Promise.resolve({ unallocated: true } as ProbationPractitioner),
@@ -158,6 +165,7 @@ describe('checkInsController', () => {
   describe('postIntroPage', () => {
     it('redirects to date-frequency with generated id when CRN is valid', async () => {
       mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       await controllers.checkIns.postIntroPage(hmppsAuthClient)(req, res)
@@ -167,6 +175,7 @@ describe('checkInsController', () => {
 
     it('returns 404 when CRN is invalid', async () => {
       mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq()
       await controllers.checkIns.postIntroPage(hmppsAuthClient)(req, res)
@@ -1543,6 +1552,7 @@ describe('checkInsController', () => {
         mobile: '07700900000',
         id: uuid,
         email: 'test@example.com',
+        showChange: false,
       })
     })
   })

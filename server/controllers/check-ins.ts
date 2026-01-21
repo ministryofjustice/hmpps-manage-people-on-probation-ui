@@ -17,8 +17,11 @@ import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import logger from '../../logger'
 import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 import { ProbationPractitioner } from '../models/CaseDetail'
+import config from '../config'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 const routes = [
+  'getStartSetup',
   'getIntroPage',
   'getDateFrequencyPage',
   'postIntroPage',
@@ -72,11 +75,23 @@ const checkinIntervals: OptionPair[] = [
 ]
 
 const checkInsController: Controller<typeof routes, void> = {
-  getIntroPage: hmppsAuthClient => {
+  getStartSetup: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
       const { back } = req.query
       if (!isValidCrn(crn)) {
+        return renderError(404)(req, res)
+      }
+      const id = uuidv4()
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/instructions`)
+    }
+  },
+
+  getIntroPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -85,17 +100,19 @@ const checkInsController: Controller<typeof routes, void> = {
       if (practitioner.unallocated) {
         return res.redirect(`/case/${crn}/appointments`)
       }
-      return res.render('pages/check-in/instructions.njk', { crn, back })
+      const guidanceUrl = config.guidance.link
+      return res.render('pages/check-in/instructions.njk', { crn, back, guidanceUrl })
     }
   },
 
   postIntroPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
-      if (!isValidCrn(crn)) {
+      const { crn, id } = req.params
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const id = uuidv4()
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
@@ -567,7 +584,11 @@ const checkInsController: Controller<typeof routes, void> = {
       // if page not submitted, required to save in session for change link  to avoid API call.
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'], mobile)
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
-      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email })
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
+      const checkinRes = res.locals?.offenderCheckinsByCRNResponse
+      const showChange = checkinRes?.status === 'VERIFIED'
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
+      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
     }
   },
   getManageCheckinDatePage: hmppsAuthClient => {
@@ -577,6 +598,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const checkInMinDate = getMinDate()
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
       const date = checkinRes?.firstCheckin
       const interval = checkinRes?.checkinInterval
@@ -632,6 +654,16 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.contactUpdated
       }
+      const isPrefComsSet = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'])
+      if (isPrefComsSet === undefined) {
+        await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'manageCheckin', 'preferredComs'],
+          res.locals?.offenderCheckinsByCRNResponse?.contactPreference,
+        )
+      }
+
       return res.render('pages/check-in/manage/manage-contact.njk', { crn, id, checkInMobile, checkInEmail })
     }
   },
@@ -648,7 +680,23 @@ const checkInsController: Controller<typeof routes, void> = {
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'], checkInEmail)
       let redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}/edit-contact?change=${change}`
       if (change === 'main') {
+        const body: CheckinScheduleRequest = {
+          contactPreference: {
+            requestedBy: res.locals.user.username,
+            contactPreference: getDataValue(req.session.data, [
+              'esupervision',
+              crn,
+              id,
+              'manageCheckin',
+              'preferredComs',
+            ]),
+          },
+        }
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupClient = new ESupervisionClient(token)
+        await eSupClient.postUpdateOffenderDetails(id, body)
         redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`
+        setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
       }
       return res.redirect(redirectUrl)
     }

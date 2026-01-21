@@ -7,6 +7,8 @@
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][manageCheckin][checkInEmail]' %}
 {% set mobileValue = checkInMobile if checkInMobile else 'No mobile number' %}
 {% set emailValue = checkInEmail if checkInEmail else 'No email address' %}
+{% set setMobileError =  'esupervision-'+  crn + '-' + id +'-manageCheckin-checkInMobile' %}
+{% set setEmailError =  'esupervision-'+  crn + '-' + id +'-manageCheckin-checkInEmail' %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -30,6 +32,26 @@
 {% block pageContent %}
 
     <form method="post" autocomplete="off" action="{{ paths.current }}">
+        {% if errorMessages[setMobileError] or errorMessages[setEmailError] %}
+        {% if errorMessages[setMobileError] %}
+        <div class="govuk-form-group govuk-form-group--error" id={{setMobileError}}>
+            {% endif %}
+            {% if errorMessages[setEmailError] %}
+            <div class="govuk-form-group govuk-form-group--error" id={{setEmailError}}>
+                {% endif %}
+                {% else %}
+                <div class="govuk-form-group">
+                    {% endif %}
+        {% if errorMessages[setMobileError] %}
+            <p class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>{{errorMessages[setMobileError]}}
+            </p>
+        {% endif %}
+        {% if errorMessages[setEmailError] %}
+            <p class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>{{errorMessages[setEmailError]}}
+            </p>
+        {% endif %}
         <section class="app-summary-card govuk-!-margin-bottom-6 app-summary-card--large-title" data-qa="contactDetailsCard">
             <header class="app-summary-card__header">
                 <h3 class="app-summary-card__title">
@@ -40,7 +62,7 @@
                 <dl class="govuk-summary-list">
                     <div class="govuk-summary-list__row">
                         <dt class="govuk-summary-list__key"><span data-qa="mobileNumberLabel">Mobile number</span></dt>
-                        <dd class="govuk-summary-list__value"><span data-qa="mobileNumberValue" class="app-!-font-family-tabular"></span>{{ mobileValue }}</dd>
+                        <dd class="govuk-summary-list__value"><span data-qa="mobileNumberValue" class="app-!-font-family-tabular">{{ mobileValue }}</span></dd>
                         <dd class="govuk-summary-list__actions">
                             <button type="submit"
                                     name="change"
@@ -67,7 +89,7 @@
                 </dl>
             </div>
         </section>
-        <!--div class="govuk-!-width-one-half">
+        <div class="govuk-!-width-one-half">
             {{ govukRadios({
                 fieldset: {
                     legend: {
@@ -98,7 +120,7 @@
                 <button type="submit" name ="change" value = "main" class="govuk-button" data-module="govuk-button" data-qa="submit-btn" data-govuk-button-init="">
                     Save changes
                 </button>
-            </div-->
+            </div>
         </div>
         <input type="hidden" name="_csrf" value="{{ csrfToken }}">
         <input type="hidden" name="checkInMobile" value="{{ checkInMobile }}">

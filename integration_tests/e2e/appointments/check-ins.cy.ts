@@ -2,7 +2,7 @@ import Page from '../../pages/page'
 import AppointmentsPage from '../../pages/appointments'
 import InstructionsPage from '../../pages/check-ins/instructions'
 import DateFrequencyPage from '../../pages/check-ins/date-frequencey'
-import { getCheckinUuid } from './imports'
+import { getCheckinUuid, getUuid } from './imports'
 import ContactPreferencePage from '../../pages/check-ins/contact-preference'
 import PhotoOptionsPage from '../../pages/check-ins/photo-options'
 import EditContactPreferencePage from '../../pages/check-ins/edit-contact-preference'
@@ -33,13 +33,15 @@ context('Appointment check-ins', () => {
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Caroline Wolff')
     cy.get('[data-qa="appointments-header-label"]').should('contain.text', 'Appointments')
-    page.getElement('[data-qa="upcomingAppointments"]').find('h3').should('contain.text', 'Upcoming appointments')
+    page.getElement('[data-qa="upcomingAppointments"]').should('contain.text', 'Upcoming appointments')
     page
       .getElement('[data-qa="online-checkin-btn"]')
       .should('be.visible')
       .and('contain.text', 'Set up online check ins')
     page.getElement('[data-qa="online-checkin-btn"]').click()
-    cy.url().should('contain', '/case/X000001/appointments/check-in/instructions')
+    getCheckinUuid().then(uuid => {
+      cy.url().should('contain', `/case/X000001/appointments/${uuid}/check-in/instructions`)
+    })
     const instructionsPage = new InstructionsPage()
     instructionsPage.checkOnPage()
     instructionsPage.getElement('[data-qa="formAnchorLink"]').click()
@@ -714,7 +716,7 @@ context('check-ins overview and manage pages', () => {
     appointmentsPage.checkOnPage()
   })
 
-  it.skip('should able to stop check in', () => {
+  it('should able to stop check in', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)

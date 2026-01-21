@@ -25,9 +25,6 @@
     "int-test-ui": "cypress open --e2e --browser chrome",
     "clean": "rm -rf dist build node_modules stylesheets",
     "sentry:sourcemaps": "sentry-cli sourcemaps inject --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist && sentry-cli sourcemaps upload --org ministryofjustice --project hmpps-manage-people-on-probation-ui ./dist",
-    "e2e-test": "NODE_OPTIONS='--import tsx' npx playwright test",
-    "e2e-test:headed": "NODE_OPTIONS='--import tsx' npx playwright test --headed",
-    "e2e-test:debug": "NODE_OPTIONS='--import tsx' npx playwright test --debug",
     "coverage-report": "cpy cypress_coverage/coverage-final.json coverage --rename=int-{{basename}} --flat && cpy test_results/jest/coverage-final.json coverage --rename=unit-{{basename}} --flat && npx nyc report --reporter lcov -t coverage --report-dir coverage --exclude-after-remap false"
   },
   "engines": {
@@ -188,7 +185,6 @@
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",
     "@ministryofjustice/eslint-config-hmpps": "^0.0.4",
-    "@playwright/test": "^1.53.0",
     "@types/bunyan": "^1.8.11",
     "@types/bunyan-format": "^0.2.9",
     "@types/compression": "^1.8.1",

@@ -20,7 +20,7 @@ import {
 import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { ErrorSummary } from '../data/model/common'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 const routes = [
   'getAppointments',
@@ -69,7 +69,8 @@ const appointmentsController: Controller<typeof routes, void> = {
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
-      const hasPractitioner = !practitioner.unallocated
+      const hasPractitioner = practitioner ? !practitioner.unallocated : false
+      await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/appointments', {
         upcomingAppointments,
         pastAppointments,
