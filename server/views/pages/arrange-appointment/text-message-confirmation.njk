@@ -45,11 +45,11 @@
   }
 }) }}
             <div id="generate-reveal" data-qa="generate-reveal">
-                <p class="govuk-body">{{ personForename }} will receive this message in English{% if smsPreview.length == 2 %} and in Welsh{% endif %}: </p>
-                {% for preview in smsPreview %}
+                <p class="govuk-body">{{ personForename }} will receive this message in English{% if smsPreview.welshSmsPreview %} and in Welsh{% endif %}: </p>
+                {% for value in smsPreview %}
                     <div class="sms-message-wrapper">
                         <p class="govuk-body govuk-!-margin-bottom-0">
-                            {{ preview | nl2br | safe }}
+                            {{ value | nl2br | safe }}
                         </p>
                     </div>
                 {% endfor %}

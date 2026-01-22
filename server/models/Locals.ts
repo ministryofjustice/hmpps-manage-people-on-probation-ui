@@ -16,7 +16,7 @@ import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
+import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse, SmsPreviewResponse } from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -116,7 +116,7 @@ interface Locals {
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
   uploadError: string
   renderPath: string
-  smsPreview?: string[] | null
+  smsPreview?: SmsPreviewResponse | null
   personRisks?: PersonRiskFlags
 }
 

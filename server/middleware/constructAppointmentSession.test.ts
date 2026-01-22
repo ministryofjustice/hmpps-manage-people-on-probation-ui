@@ -5,6 +5,7 @@ import { constructNextAppointmentSession } from './constructAppointmentSession'
 import { Activity, PersonAppointment } from '../data/model/schedule'
 import { mockAppResponse } from '../controllers/mocks'
 import { Name } from '../data/model/personalDetails'
+import { isoToDateTime } from '../utils'
 
 const nextSpy = jest.fn()
 const mockTypes: AppointmentType[] = [
@@ -152,7 +153,9 @@ const expectedSession = (
 ): AppointmentSession => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
-  const { eventId, isVisor, startDateTime: date, endDateTime: end } = mockAppointment
+  const { eventId, isVisor } = mockAppointment
+  const { date, time: start } = isoToDateTime(mockAppointment.startDateTime)
+  const { time: end } = isoToDateTime(mockAppointment.endDateTime)
   return {
     user: {
       providerCode,
@@ -165,7 +168,7 @@ const expectedSession = (
     type: 'COAP',
     visorReport: isVisor ? 'Yes' : 'No',
     date,
-    start: date,
+    start,
     end,
     until: end,
     interval: 'DAY',

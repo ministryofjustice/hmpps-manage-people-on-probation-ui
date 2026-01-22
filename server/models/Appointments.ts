@@ -1,20 +1,10 @@
 import { type AttendedCompliedAppointment } from '../middleware'
-import { Name } from '../data/model/personalDetails'
-import { Activity } from '../data/model/schedule'
-import { Errors } from './Errors'
+import { type Name } from '../data/model/personalDetails'
+import { type Activity } from '../data/model/schedule'
+import { type Errors } from './Errors'
+import { type SmsOptInOptions, type SmsPreviewResponse } from '../data/model/esupervision'
 
 export type YesNo = '' | 'Yes' | 'No'
-
-export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
-
-export type SmsLanguage = 'english' | 'welsh'
-
-export interface SmsPreview {
-  name: string
-  location: string
-  welsh: boolean
-  preview: string[]
-}
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
@@ -54,7 +44,7 @@ export interface AppointmentSession {
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions
-  smsPreview?: SmsPreview
+  smsPreview?: SmsPreviewResponse
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -225,17 +215,4 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
-}
-
-export interface SmsPreviewRequest {
-  name: string
-  date: string
-  start: string
-  location?: string
-  welsh: boolean
-}
-
-export interface SmsPreviewResponse {
-  preview: string[]
-  statusCode?: number
 }

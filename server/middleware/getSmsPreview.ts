@@ -1,9 +1,10 @@
 import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
-import MasApiClient from '../data/masApiClient'
-import { AppointmentSession, SmsPreview, SmsPreviewRequest, SmsPreviewResponse } from '../models/Appointments'
-import { getDataValue, isWelshPostcode, responseIsError, setDataValue } from '../utils'
+import ESupervisionClient from '../data/eSupervisionClient'
+import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
+import { AppointmentSession } from '../models/Appointments'
+import { getDataValue, isoFromDateTime, isWelshPostcode, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
@@ -11,48 +12,50 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     const { crn, id: uuid } = req.params
     const { username } = res.locals.user
     const {
-      name: { forename: name },
+      name: { forename: firstName },
     } = res.locals.case
-    let location = ''
-    let preview: string[] | null = null
+    let appointmentLocation = ''
+    let preview: SmsPreviewResponse | null = null
+
     const { data } = req.session
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const locations = getDataValue<Location[]>(data, ['locations', username])
     const {
+      // type,
       date,
       start,
       user: { locationCode },
       smsPreview,
     } = appointment
     if (smsPreview) {
-      ;({ preview } = smsPreview)
+      preview = smsPreview
     } else {
       const locationMatch = locations.find(loc => loc.code === locationCode)
       if (locationMatch) {
-        location = locationMatch?.address?.officeName || locationMatch?.address?.buildingName || ''
+        appointmentLocation = locationMatch?.address?.officeName || locationMatch?.address?.buildingName || ''
       }
-      const postcode = res.locals.case?.mainAddress?.postcode
-      const welsh = postcode ? isWelshPostcode(postcode) : false
+      const postcode = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mainAddress', 'postcode'])
+      const includeWelshPreview = postcode ? isWelshPostcode(postcode) : false
+      const dateAndTimeOfAppointment = isoFromDateTime(date, start)
       const body: SmsPreviewRequest = {
-        name,
-        date,
-        start,
-        welsh,
+        firstName,
+        dateAndTimeOfAppointment,
+        includeWelshPreview,
       }
-      if (location) body.location = location
+      if (appointmentLocation) body.appointmentLocation = appointmentLocation
+      // appointmentType ?
       const token = await hmppsAuthClient.getSystemClientToken(username)
-      const masClient = new MasApiClient(token)
+      const eSupervisionClient = new ESupervisionClient(token)
       try {
-        const response = await masClient.postSmsPreview(body)
+        const response = await eSupervisionClient.postSmsPreview(body)
         if (!responseIsError<SmsPreviewResponse>(response)) {
-          ;({ preview } = response)
+          preview = response
         }
       } catch (err: any) {
         const error = err as Error
         logger.error(`SMS preview request error: ${error.message}`)
       }
-      const previewSession: SmsPreview = { name, location, welsh, preview }
-      setDataValue(data, ['appointments', crn, uuid, 'smsPreview'], previewSession)
+      setDataValue(data, ['appointments', crn, uuid, 'smsPreview'], preview)
     }
     res.locals.smsPreview = preview
     return next()

@@ -310,19 +310,6 @@ describe('masApiClient', () => {
         '/case/X000001/probation-practitioner',
         () => masApiClient.getProbationPractitioner('X000001'),
       ],
-      [
-        'postSmsPreview',
-        '/calendar/event/sms-preview',
-        () =>
-          masApiClient.postSmsPreview({
-            name: '',
-            date: '',
-            start: '',
-            location: '',
-            welsh: false,
-          }),
-        'post',
-      ],
       ['getUserAlerts', '/alerts?size=10&page=1', () => masApiClient.getUserAlerts(1)],
       ['getUserAlertsCount', '/alerts?size=10', () => masApiClient.getUserAlerts()],
       [

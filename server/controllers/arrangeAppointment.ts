@@ -22,12 +22,8 @@ import {
   getAttendedCompliedProps,
   isRescheduleAppointment,
 } from '../middleware'
-import {
-  AppointmentSession,
-  AppointmentsPostResponse,
-  RescheduleAppointmentResponse,
-  SmsOptInOptions,
-} from '../models/Appointments'
+import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
+import { SmsOptInOptions } from '../data/model/esupervision'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
@@ -319,7 +315,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       const path = ['appointments', crn, id]
       const appointment = getDataValue<AppointmentSession>(data, path)
-      const { date, interval } = appointment
+      const { date } = appointment
       const until = date
       setDataValue(data, [...path, 'numberOfAppointments'], '1')
       setDataValue(data, [...path, 'interval'], 'DAY')
