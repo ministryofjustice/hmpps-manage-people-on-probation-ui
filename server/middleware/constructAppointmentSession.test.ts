@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
 import { constructNextAppointmentSession } from './constructAppointmentSession'
 import { Activity, PersonAppointment } from '../data/model/schedule'
@@ -147,7 +147,9 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
   },
 })
 
-const expectedSession = (values: Record<string, string | number | Record<string, string | Name | null>>) => {
+const expectedSession = (
+  values: Record<string, string | number | Record<string, string | Name | null>>,
+): AppointmentSession => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
   const { eventId, isVisor, startDateTime: date, endDateTime: end } = mockAppointment
@@ -173,9 +175,9 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     username,
     uuid: '',
     repeating: 'No',
-    repeatingDates: [] as string[],
+    repeatingDates: [],
     externalReference,
-    smsOptIn: null as null,
+    smsOptIn: null,
     ...values,
   }
 }

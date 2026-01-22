@@ -412,6 +412,7 @@ describe('/controllers/personalDetails', () => {
           ...req,
           query: {
             ...req.query,
+            origin: 'appointments',
           },
           body: {
             ...req.body,
@@ -443,7 +444,7 @@ describe('/controllers/personalDetails', () => {
               email,
             },
             needs: mockNeeds,
-            origin: '',
+            origin: 'appointments',
             tierCalculation: mockTierCalculation,
             crn,
             risksWidget: toRoshWidget(mockRisks),

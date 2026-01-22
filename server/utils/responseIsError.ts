@@ -1,6 +1,6 @@
 import { ErrorSummaryItem } from '../data/model/common'
 
-interface RestClientError {
+export interface RestClientError {
   errors: ErrorSummaryItem[]
 }
 

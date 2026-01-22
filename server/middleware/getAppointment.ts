@@ -50,8 +50,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         date,
         start,
         end,
-        repeatingDates,
-        repeating,
         notes,
         sensitivity,
         outcomeRecorded,
@@ -72,7 +70,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
       }
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
-        sentenceObj = req.session.data.sentences[crn].find(user => user.id === parseInt(eventId, 10))
+        sentenceObj = req.session.data.sentences[crn].find(_sentence => _sentence.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
           sentenceRequirement = sentenceObj?.requirements?.find(
@@ -153,8 +151,6 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         previousStart: rescheduleAppointment?.previousStart ?? null,
         end,
         previousEnd: rescheduleAppointment?.previousEnd ?? null,
-        repeating,
-        repeatingDates,
         notes: notes ?? null,
         sensitivity: sensitivity ?? null,
         outcomeRecorded: outcomeRecorded ?? null,

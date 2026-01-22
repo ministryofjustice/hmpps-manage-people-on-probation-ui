@@ -111,11 +111,8 @@ export interface AppointmentRequestBody {
   type: string
   start: Date
   end: Date
-  interval: AppointmentInterval
-  numberOfAppointments: number
   eventId?: number
   uuid: string
-  createOverlappingAppointment: true
   requirementId?: number
   licenceConditionId?: number
   nsiId?: number

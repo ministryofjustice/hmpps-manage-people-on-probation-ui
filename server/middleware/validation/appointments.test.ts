@@ -11,6 +11,7 @@ const typeUrl = `${arrangeAppointmentUrl}/type`
 const locationDateTimeUrl = `${arrangeAppointmentUrl}/location-date-time`
 const repeatingUrl = `${arrangeAppointmentUrl}/repeating`
 const supportingUrl = `${arrangeAppointmentUrl}/supporting-information`
+const textMessageConfirmationUrl = `/case/${crn}/arrange-appointment/${contactId}/text-message-confirmation`
 
 jest.mock('../appointmentDateIsInPast', () => ({
   appointmentDateIsInPast: jest.fn(),
@@ -341,5 +342,39 @@ describe('/controllers/arrangeAppointmentController', () => {
     validation.appointments(req, res, next)
 
     expect(res.render).toHaveBeenCalled()
+  })
+
+  it('validation fails for text message confirmation', () => {
+    const appointments = {
+      [crn]: {
+        [contactId]: {
+          smsOptIn: '',
+        },
+      },
+    }
+    const req = makeReq({
+      url: textMessageConfirmationUrl,
+      body: { appointments },
+    })
+    const res = makeRes()
+    validation.appointments(req, res, next)
+    expect(res.render).toHaveBeenCalled()
+  })
+  it('validation passes for text message confirmation', () => {
+    const appointments = {
+      [crn]: {
+        [contactId]: {
+          smsOptIn: 'YES',
+        },
+      },
+    }
+    const req = makeReq({
+      url: textMessageConfirmationUrl,
+      body: { appointments },
+    })
+    const res = makeRes()
+    validation.appointments(req, res, next)
+    expect(res.render).not.toHaveBeenCalled()
+    expect(next).toHaveBeenCalled()
   })
 })

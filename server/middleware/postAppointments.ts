@@ -27,8 +27,6 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       date,
       start,
       end,
-      interval,
-      numberOfAppointments,
       eventId,
       requirementId = '',
       licenceConditionId = '',
@@ -49,10 +47,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       type,
       start: dateTime(date, start),
       end: dateTime(date, end),
-      interval,
-      numberOfAppointments: parseInt(numberOfAppointments, 10),
       uuid,
-      createOverlappingAppointment: true,
       until: dateTime(untilDate, end),
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
@@ -100,7 +95,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       if (smsOptIn?.includes('YES')) {
         outlookEventRequestBody.smsEventRequest = {
           firstName: userDetails.firstName,
-          mobileNumber: res?.locals?.case?.mobileNumber || '',
+          mobileNumber: getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) || '',
           crn,
           smsOptIn: true,
         }
@@ -108,11 +103,11 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
+    if (!userDetails?.email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
 
     return response
   }
 }
 
 export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>
-  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`
+  `<a href="${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments" target="_blank" rel="external noopener noreferrer">View the appointment on Manage people on probation (opens in new tab).</a>`

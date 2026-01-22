@@ -59,11 +59,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
     const date = appointment?.startDateTime || ''
     const end = appointment?.endDateTime || ''
-    // const dt = DateTime.fromISO(date, { setZone: true })
-    // const startDate = dt.toISODate() // '2024-02-21'
-    // const startTime = dt.toFormat('HH:mm') // '10:15'
-    // const { isInPast } = dateIsInPast(startDate, startTime)
-
     const externalReference = appointment?.externalReference || ''
 
     /*

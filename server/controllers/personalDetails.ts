@@ -58,7 +58,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
           req.path.includes(route),
         )
       ) {
-        if (req.query?.origin === 'appointments') {
+        if (query?.origin === 'appointments') {
           backLink = back
         }
         if (!manageUsersAccess) {
@@ -121,8 +121,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
         manageUsersAccess,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
       }
-      if (req.query?.origin) {
-        props.origin = req.query.origin as Origin
+      if (query?.origin) {
+        props.origin = query.origin as Origin
       }
       return res.render(renderPath, props)
     }

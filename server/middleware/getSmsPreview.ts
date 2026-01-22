@@ -2,7 +2,7 @@ import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { AppointmentSession, SmsPreview, SmsPreviewRequest } from '../models/Appointments'
+import { AppointmentSession, SmsPreview, SmsPreviewRequest, SmsPreviewResponse } from '../models/Appointments'
 import { getDataValue, isWelshPostcode, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 
@@ -44,7 +44,7 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       const masClient = new MasApiClient(token)
       try {
         const response = await masClient.postSmsPreview(body)
-        if (!responseIsError(response)) {
+        if (!responseIsError<SmsPreviewResponse>(response)) {
           ;({ preview } = response)
         }
       } catch (err: any) {
