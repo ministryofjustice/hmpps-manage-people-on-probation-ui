@@ -434,7 +434,7 @@ describe('checkInsController', () => {
             [uuid]: {
               checkins: {
                 editCheckInEmail: 'test@example.com',
-                editCheckInMobile: '07700900000',
+                editCheckInMobile: '  07700900000     ',
               },
             },
           },
@@ -1875,7 +1875,7 @@ describe('checkInsController', () => {
           [crn]: {
             [uuid]: {
               manageCheckin: {
-                editCheckInMobile: '07700900055',
+                editCheckInMobile: ' 07700900055     ',
                 editCheckInEmail: 'new@example.com',
                 checkInMobile: 'oldmobile',
                 checkInEmail: 'old@example.com',
