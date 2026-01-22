@@ -105,7 +105,7 @@ const buildRequest = ({
   return httpMocks.createRequest(req)
 }
 
-xdescribe('middleware/getSmsPreview', () => {
+describe('middleware/getSmsPreview', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -154,7 +154,7 @@ xdescribe('middleware/getSmsPreview', () => {
   })
 
   describe('api request returns a 500 error', () => {
-    const req = buildRequest()
+    const req = buildRequest({ appointment: { ...mockAppointmentSession, smsPreview: undefined } })
     beforeEach(async () => {
       postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve({ errors: [{ text: '500 error' }] }))
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
@@ -166,8 +166,9 @@ xdescribe('middleware/getSmsPreview', () => {
       expect(res.locals.smsPreview).toBeNull()
     })
   })
+
   describe('api request returns a 404 error (null)', () => {
-    const req = buildRequest()
+    const req = buildRequest({ appointment: { ...mockAppointmentSession, smsPreview: undefined } })
     beforeEach(async () => {
       postSmsPreviewSpy.mockImplementationOnce(() => Promise.resolve(null))
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
@@ -182,7 +183,7 @@ xdescribe('middleware/getSmsPreview', () => {
   describe('server throws an error', () => {
     const loggerSpy = jest.spyOn(logger, 'error')
     const error = 'Server timeout'
-    const req = buildRequest()
+    const req = buildRequest({ appointment: { ...mockAppointmentSession, smsPreview: undefined } })
     beforeEach(async () => {
       postSmsPreviewSpy.mockImplementationOnce(() => Promise.reject(new Error(error)))
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
@@ -200,7 +201,7 @@ xdescribe('middleware/getSmsPreview', () => {
 
   describe('Only building name listed for matching location', () => {
     const locations: Location[] = [{ id: 1, code: locationCode, address: { buildingName } }]
-    const req = buildRequest({ locations })
+    const req = buildRequest({ locations, appointment: { ...mockAppointmentSession, smsPreview: undefined } })
     beforeEach(async () => {
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
     })
@@ -217,7 +218,7 @@ xdescribe('middleware/getSmsPreview', () => {
 
   describe('No matching location found', () => {
     const locations: Location[] = [{ id: 1, code: '5678', address: { officeName: appointmentLocation } }]
-    const req = buildRequest({ locations })
+    const req = buildRequest({ locations, appointment: { ...mockAppointmentSession, smsPreview: undefined } })
     beforeEach(async () => {
       await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
     })
