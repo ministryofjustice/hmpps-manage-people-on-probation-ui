@@ -125,6 +125,10 @@ const personalDetailsController: Controller<typeof routes, void> = {
       } = request
       let action = 'SAVE_EDIT_PERSONAL_DETAILS'
       const renderPage = req.path.split('/').pop()
+      request = {
+        ...request,
+        mobileNumber: mobileNumber?.trim(),
+      }
       if (editingMainAddress) {
         request = {
           ...request,

@@ -222,7 +222,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const editCheckInMobile = getDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
       const body: PersonalDetailsUpdateRequest = {
         emailAddress: editCheckInEmail,
-        mobileNumber: editCheckInMobile,
+        mobileNumber: editCheckInMobile?.trim(),
       }
       let cyaQuery = ''
       if (req.query?.cya === 'true') {
@@ -754,13 +754,13 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'])
       const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInMobile'])
-      if (previousMobile !== editCheckInMobile1 || previousEmail !== editCheckInEmail1) {
+      if (previousMobile?.trim() !== editCheckInMobile1?.trim() || previousEmail !== editCheckInEmail1) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
 
         const body: PersonalDetailsUpdateRequest = {
           emailAddress: editCheckInEmail1,
-          mobileNumber: editCheckInMobile1,
+          mobileNumber: editCheckInMobile1?.trim(),
         }
         const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
         // Save to show success message on contact preferences page
@@ -769,7 +769,7 @@ const checkInsController: Controller<typeof routes, void> = {
           setDataValue(
             req.session.data,
             ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'],
-            editCheckInMobile1,
+            editCheckInMobile1?.trim(),
           )
           setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], editCheckInEmail1)
         }
