@@ -7,8 +7,8 @@ import { isoFromDateTime, setDataValue } from '../utils'
 import { mockAppResponse } from '../controllers/mocks'
 import { Location } from '../data/model/caseload'
 import { AppointmentSession } from '../models/Appointments'
-import logger from '../../logger'
 import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
+import logger from '../../logger'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
@@ -20,7 +20,6 @@ jest.mock('../utils', () => {
   return {
     ...actualUtils,
     setDataValue: jest.fn(),
-    isWelshPostcode: jest.fn(() => false),
   }
 })
 
@@ -109,6 +108,7 @@ describe('middleware/getSmsPreview', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
+
   describe('SMS preview session exists for current crn', () => {
     const req = buildRequest()
     beforeEach(async () => {
@@ -124,6 +124,7 @@ describe('middleware/getSmsPreview', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
   })
+
   describe('SMS preview session does not exist for current crn', () => {
     const req = buildRequest({ appointment: { ...mockAppointmentSession, smsPreview: undefined } })
     beforeEach(async () => {
@@ -150,6 +151,25 @@ describe('middleware/getSmsPreview', () => {
     })
     it('should return next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('POP postcode is welsh', () => {
+    const req = buildRequest({
+      postcode: 'CF11 2PP',
+      appointment: { ...mockAppointmentSession, smsPreview: undefined },
+    })
+    beforeEach(async () => {
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should request the sms preview(s) from the api', () => {
+      const expectedRequest: SmsPreviewRequest = {
+        firstName: 'James',
+        appointmentLocation,
+        dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+        includeWelshPreview: true,
+      }
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
   })
 
