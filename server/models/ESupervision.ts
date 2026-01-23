@@ -17,6 +17,7 @@ export interface CheckinUserDetails {
   displayCommsOption?: string
   displayDay?: string
   contactUpdated?: boolean
+  settingsUpdated?: boolean
 }
 export interface LocalParams {
   crn: string
