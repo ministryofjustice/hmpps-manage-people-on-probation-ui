@@ -36,6 +36,20 @@ describe('Pick a date, location and time for this appointment', () => {
   const yesterday = now.minus({ days: 1 })
   const yesterdayIsInCurrentMonth = yesterday.month === now.month
 
+  const completeDateInFuture = () => {
+    locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+    const tomorrow = now.plus({ days: 1 })
+    const tomorrowIsInCurrentMonth = tomorrow.month === now.month
+    locationDateTimePage.getDatePickerToggle().click()
+    if (!tomorrowIsInCurrentMonth) {
+      cy.get('.moj-js-datepicker-next-month').click()
+    }
+    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage.getElementInput(`startTime`).type('09:00')
+    locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+    locationDateTimePage.getSubmitBtn().click()
+  }
+
   const selectPastDate = () => {
     locationDateTimePage.getDatePickerToggle().click()
     if (!yesterdayIsInCurrentMonth) {
@@ -522,17 +536,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      const tomorrow = now.plus({ days: 1 })
-      const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!tomorrowIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
-      locationDateTimePage.getSubmitBtn().click()
+      completeDateInFuture()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
         .should(
@@ -557,6 +561,19 @@ describe('Pick a date, location and time for this appointment', () => {
       completeSupportingInformationPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.checkOnPage()
+    })
+  })
+
+  describe('Text message confirmation feature flag is disabled', () => {
+    beforeEach(() => {
+      cy.task('stubDisableSmsReminders')
+      loadPage()
+      completeDateInFuture()
+      locationDateTimePage.getSubmitBtn().click()
+    })
+    it('should redirect to the supporting info page', () => {
+      notePage = new AppointmentNotePage()
+      notePage.checkOnPage()
     })
   })
 

@@ -37,11 +37,12 @@ const loadPage = ({
   notes = true,
   dateInPast = false,
   textMessageOptionIndex = 1,
+  textMessageFeatureFlag = true,
 } = {}) => {
   completeSentencePage(sentenceOptionIndex, '')
   completeTypePage(typeOptionIndex, hasVisor)
   completeLocationDateTimePage({ dateInPast })
-  if (!dateInPast) {
+  if (!dateInPast && textMessageFeatureFlag) {
     completeTextMessageConfirmationPage({ index: textMessageOptionIndex })
     if (textMessageOptionIndex === 2) {
       const page = new EditContactDetails()
@@ -49,9 +50,13 @@ const loadPage = ({
       cy.get('[data-qa=submitBtn]').click()
     }
     completeSupportingInformationPage(notes)
-  } else {
+  }
+  if (dateInPast) {
     completeAttendedCompliedPage()
     completeAddNotePage()
+  }
+  if (!dateInPast && !textMessageFeatureFlag) {
+    completeSupportingInformationPage(notes)
   }
 }
 
@@ -66,7 +71,7 @@ describe('Check your answers then confirm the appointment', () => {
       const cyaPage = new AppointmentCheckYourAnswersPage()
       checkPopHeader('Alton Berge', true)
       const showsProbationPractitioner = true
-      checkAppointmentSummary(cyaPage, showsProbationPractitioner)
+      checkAppointmentSummary({ page: cyaPage, probationPractitioner: showsProbationPractitioner })
       cy.get('[data-qa="calendarInviteInset"]').should(
         'contain.text',
         `You'll receive a calendar invite for the appointment`,
@@ -94,7 +99,19 @@ describe('Check your answers then confirm the appointment', () => {
     it(`should render the page if text message confirmation selected as 'No'`, () => {
       loadPage({ textMessageOptionIndex: 3 })
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkAppointmentSummary(cyaPage, true, false, false)
+      checkAppointmentSummary({ page: cyaPage, probationPractitioner: true, sendTextMessage: false })
+    })
+
+    it('should render the page when text message confirmation feature flag is disabled', () => {
+      cy.task('stubDisableSmsReminders')
+      loadPage({ textMessageFeatureFlag: false })
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      checkAppointmentSummary({
+        page: cyaPage,
+        probationPractitioner: true,
+        sendTextMessage: false,
+        smsFeatureFlagDisabled: true,
+      })
     })
 
     describe('Change appointment values', () => {
@@ -160,7 +177,7 @@ describe('Check your answers then confirm the appointment', () => {
     })
     it('should display the attended and complied row', () => {
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkAppointmentSummary(cyaPage, false, true)
+      checkAppointmentSummary({ page: cyaPage, probationPractitioner: false, dateInPast: true })
       it('should update the notes when value is changed', () => {
         checkUpdateNotes(cyaPage)
       })

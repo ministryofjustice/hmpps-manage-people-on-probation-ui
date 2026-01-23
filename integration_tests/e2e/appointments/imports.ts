@@ -246,13 +246,23 @@ export const completeNextAppointmentPage = (index = 1) => {
   nextAppointmentPage.getSubmitBtn().click()
 }
 
-export const checkAppointmentSummary = (
-  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage | RescheduleCheckYourAnswerPage,
+interface SummaryProps {
+  page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage | RescheduleCheckYourAnswerPage
+  probationPractitioner?: boolean
+  dateInPast?: boolean
+  sendTextMessage?: boolean
+  summaryHasDate?: boolean
+  smsFeatureFlagDisabled?: boolean
+}
+
+export const checkAppointmentSummary = ({
+  page,
   probationPractitioner = false,
   dateInPast = false,
   sendTextMessage = true,
   summaryHasDate = true,
-) => {
+  smsFeatureFlagDisabled = false,
+}: SummaryProps) => {
   const appointmentFor =
     page instanceof RescheduleCheckYourAnswerPage ? 'Default Sentence Type (12 Months)' : '12 month Community order'
   let attending = 'Deborah Fern (PS - Other) (Automated Allocation Team, London)'
@@ -311,7 +321,7 @@ export const checkAppointmentSummary = (
     page.getSummaryListRow(6).find('.govuk-summary-list__key').should('contain.text', 'Attended and complied')
     page.getSummaryListRow(6).find('.govuk-summary-list__value').should('contain.text', 'Yes')
   }
-  if (!dateInPast) {
+  if (!dateInPast && !smsFeatureFlagDisabled) {
     page
       .getSummaryListRow(6 + index)
       .find('.govuk-summary-list__key')
@@ -335,19 +345,19 @@ export const checkAppointmentSummary = (
       .should(sendTextMessage ? 'contain.text' : 'not.contain.text', '07703123456')
   }
   page
-    .getSummaryListRow((!dateInPast ? 7 : 6) + index)
+    .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 7 : 6) + index)
     .find('.govuk-summary-list__key')
     .should('contain.text', 'Supporting information')
   page
-    .getSummaryListRow((!dateInPast ? 7 : 6) + index)
+    .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 7 : 6) + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', !(page instanceof AppointmentCheckYourAnswersPage) ? 'Not entered' : 'Some notes')
   page
-    .getSummaryListRow((!dateInPast ? 8 : 7) + index)
+    .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 8 : 7) + index)
     .find('.govuk-summary-list__key')
     .should('contain.text', 'Sensitivity')
   page
-    .getSummaryListRow((!dateInPast ? 8 : 7) + index)
+    .getSummaryListRow((!dateInPast && !smsFeatureFlagDisabled ? 8 : 7) + index)
     .find('.govuk-summary-list__value')
     .should('contain.text', !(page instanceof AppointmentCheckYourAnswersPage) ? 'Not entered' : 'Yes')
 }
