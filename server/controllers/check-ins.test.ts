@@ -1579,7 +1579,7 @@ describe('checkInsController', () => {
         },
       }
 
-      const req = baseReq()
+      const req = baseReq(data)
       await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
 
       expect(res.locals.success).toEqual(true)
