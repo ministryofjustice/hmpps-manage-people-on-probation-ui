@@ -27,7 +27,7 @@ describe('Change appointment details and reschedule', () => {
     checkAppointmentSummary(checkYourAnswerPage)
     cy.get('[data-qa="calendarInviteInset"]').should(
       'contain.text',
-      `You'll receive an updated calendar invite for the appointment`,
+      `You'll receive a calendar invite for the appointment.`,
     )
     cy.get('[data-qa="previousDateTime"]').should('not.exist')
   })
@@ -78,6 +78,10 @@ describe('Change appointment details and reschedule', () => {
             )
           })
         cy.get('[data-qa="calendarInviteInset"]').should('be.visible')
+        cy.get('[data-qa="calendarInviteInset"]').should(
+          'contain.text',
+          `You'll receive an updated calendar invite for the appointment.`,
+        )
       })
     })
   })

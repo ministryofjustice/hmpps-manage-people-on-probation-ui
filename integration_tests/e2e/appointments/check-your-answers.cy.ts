@@ -58,7 +58,7 @@ describe('Check your answers then confirm the appointment', () => {
       checkAppointmentSummary(cyaPage, showsProbationPractitioner)
       cy.get('[data-qa="calendarInviteInset"]').should(
         'contain.text',
-        `You'll receive a calendar invite for the appointment`,
+        `You'll receive a calendar invite for the appointment.`,
       )
     })
 
