@@ -21,7 +21,7 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const locations = getDataValue<Location[]>(data, ['locations', username])
     const {
-      // type,
+      type: appointmentType,
       date,
       start,
       user: { locationCode },
@@ -40,10 +40,10 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       const body: SmsPreviewRequest = {
         firstName,
         dateAndTimeOfAppointment,
+        appointmentType,
         includeWelshPreview,
       }
       if (appointmentLocation) body.appointmentLocation = appointmentLocation
-      // appointmentType ?
       const token = await hmppsAuthClient.getSystemClientToken(username)
       const eSupervisionClient = new ESupervisionClient(token)
       try {

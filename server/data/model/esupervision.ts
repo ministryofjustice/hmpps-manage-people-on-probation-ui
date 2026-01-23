@@ -176,14 +176,12 @@ export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS
 
 export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
 
-export type SmsPreviewAppointmentType = 'TELEPHONE_EN' | 'HOME_VISIT_EN' | 'TELEPHONE_CY' | 'HOME_VISIT_CY'
-
 export interface SmsPreviewRequest {
   firstName: string
   dateAndTimeOfAppointment: string
   appointmentLocation?: string
   includeWelshPreview: boolean
-  appointmentType?: SmsPreviewAppointmentType
+  appointmentType?: string
 }
 
 export interface SmsPreviewResponse {

@@ -136,6 +136,7 @@ describe('middleware/getSmsPreview', () => {
         appointmentLocation,
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: false,
+        appointmentType: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
@@ -168,6 +169,7 @@ describe('middleware/getSmsPreview', () => {
         appointmentLocation,
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: true,
+        appointmentType: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
@@ -231,6 +233,7 @@ describe('middleware/getSmsPreview', () => {
         appointmentLocation: buildingName,
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: false,
+        appointmentType: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
@@ -247,6 +250,7 @@ describe('middleware/getSmsPreview', () => {
         firstName: 'James',
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: false,
+        appointmentType: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
