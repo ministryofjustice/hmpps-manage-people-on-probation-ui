@@ -30,16 +30,15 @@ describe('Reschedule Appointment', () => {
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Reschedule an appointment')
     cy.get('div[data-qa="whoNeedsToReschedule"] legend').should(
       'contain.text',
-      'Who needs to reschedule this appointment',
+      'Who needs to reschedule this appointment?',
     )
 
     cy.get('.govuk-form-group .govuk-hint')
       .eq(0)
       .should(
         'include.text',
-        'Appointment: Planned Office Visit (NS) with Terry Jones on 21 February 2024 at 10:15am to 10:30am',
+        'Appointment: Planned Office Visit (NS) with Terry Jones on Wednesday 21 February 2024 at 10:15am to 10:30am.',
       )
-
     cy.get('.govuk-form-group .govuk-hint')
       .eq(1)
       .should('contain.text', 'They should give 48 hours notice and provide evidence.')
@@ -74,14 +73,14 @@ describe('Reschedule Appointment', () => {
       rescheduleAppointmentPage.getSubmitBtn().click()
       rescheduleAppointmentPage.checkErrorSummaryBox([
         'Select who is rescheduling this appointment',
-        'Select if contact includes sensitive information',
+        'Select if appointment includes sensitive information',
       ])
       rescheduleAppointmentPage
         .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-whoNeedsToReschedule-error`)
         .should('contain.text', 'Select who is rescheduling this appointment')
       rescheduleAppointmentPage
         .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-sensitivity-error`)
-        .should('contain.text', 'Select if contact includes sensitive information')
+        .should('contain.text', 'Select if appointment includes sensitive information')
     })
   })
 
