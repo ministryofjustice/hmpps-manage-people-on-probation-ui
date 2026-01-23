@@ -640,6 +640,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const eSupClient = new ESupervisionClient(token)
       const response = await eSupClient.postUpdateOffenderDetails(id, body)
       if (response?.crn) {
+        res.locals.success = true
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'settingsUpdated'], true)
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
@@ -704,6 +705,7 @@ const checkInsController: Controller<typeof routes, void> = {
         const eSupClient = new ESupervisionClient(token)
         const response = await eSupClient.postUpdateOffenderDetails(id, body)
         if (response?.crn) {
+          res.locals.success = true
           setDataValue(data, ['esupervision', crn, id, 'checkins', 'settingsUpdated'], true)
         }
         redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`

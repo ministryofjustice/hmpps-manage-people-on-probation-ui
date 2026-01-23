@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
 import { mockAppResponse } from './mocks'
-import { isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
@@ -85,6 +85,10 @@ const updatePersonalDetailsSpy = jest
 
 const postDeactivateOffender = jest
   .spyOn(ESupervisionClient.prototype, 'postDeactivateOffender')
+  .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
+
+const postUpdateOffenderDetailsSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postUpdateOffenderDetails')
   .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
 
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
@@ -1615,6 +1619,17 @@ describe('checkInsController', () => {
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
     })
+
+    it('sets settings updated to true if response has crn', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq({})
+      postUpdateOffenderDetailsSpy.mockImplementationOnce(() => Promise.resolve({ crn } as CheckinScheduleResponse))
+      await controllers.checkIns.postManageCheckinDatePage(hmppsAuthClient)(req, res)
+
+      expect(res.locals.success).toEqual(true)
+    })
   })
 
   describe('getManageContactPage', () => {
@@ -1753,6 +1768,17 @@ describe('checkInsController', () => {
       await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
+    })
+
+    it('sets settings updated to true if response has crn', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq({})
+      postUpdateOffenderDetailsSpy.mockImplementationOnce(() => Promise.resolve({ crn } as CheckinScheduleResponse))
+      await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
+
+      expect(res.locals.success).toEqual(true)
     })
   })
 
