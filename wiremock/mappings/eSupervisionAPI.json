@@ -293,7 +293,7 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "englishSmsPreview": "Dear Stuart,\n\nYou have an appointment at Leamington Probation Office on Monday 11 August at 2pm.\n\nThis is an automated message. Do not reply.",
+          "englishSmsPreview": "Dear Stuart,\n\nYou have an appointment at Cardiff Probation Office on Monday 11 August at 2pm.\n\nThis is an automated message. Do not reply.",
           "welshSmsPreview": "Annwyl Stuart,\n\nMae gennych apwyntiad yn Cardiff Probation Office ar Dydd Llun 11 Awst am 2pm.\n\nNeges awtomataidd yw hon. Peidiwch ag ymateb."
         },
         "headers": {

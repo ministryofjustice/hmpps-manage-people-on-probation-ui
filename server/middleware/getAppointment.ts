@@ -66,6 +66,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
       let textMessageConfirmation: YesNo | null | undefined
+      if (smsOptIn === null) textMessageConfirmation = null
       if (![null, undefined].includes(smsOptIn)) {
         textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
       }

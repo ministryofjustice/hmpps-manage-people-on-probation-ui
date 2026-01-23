@@ -19,6 +19,10 @@ describe('Change appointment details and reschedule', () => {
   const startTime = '09:10'
   const endTime = '10:30'
 
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
+
   it('should render the page', () => {
     completeRescheduleAppointmentPage()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
