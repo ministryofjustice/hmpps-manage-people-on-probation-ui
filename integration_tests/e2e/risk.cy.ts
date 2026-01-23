@@ -373,8 +373,8 @@ context('Risk', () => {
     cy.get('[data-qa="noOasysRiskBanner"]')
       .find('.govuk-notification-banner__content')
       .should('contain.text', 'We do not know:')
-      .should('contain.text', 'Risk of serious harm (ROSH) in the community')
-      .should('contain.text', 'Risk of serious harm to themselves')
+      .should('contain.text', 'risk of serious harm (ROSH) in the community')
+      .should('contain.text', 'risk of serious harm to themselves')
 
     page
       .getElementData('noOasysRiskBanner')
