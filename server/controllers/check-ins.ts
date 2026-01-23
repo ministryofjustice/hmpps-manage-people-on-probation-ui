@@ -588,10 +588,10 @@ const checkInsController: Controller<typeof routes, void> = {
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
       const showChange = checkinRes?.status === 'VERIFIED'
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
-      const settingsUpdated = getDataValue(data, ['esupervision', crn, id, 'checkins', 'settingsUpdated'])
+      const settingsUpdated = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'])
       if (settingsUpdated) {
         res.locals.success = true
-        delete req.session?.data?.esupervision?.[crn]?.[id]?.checkins?.settingsUpdated
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.settingsUpdated
       }
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
     }
@@ -641,7 +641,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const response = await eSupClient.postUpdateOffenderDetails(id, body)
       if (response?.crn) {
         res.locals.success = true
-        setDataValue(data, ['esupervision', crn, id, 'checkins', 'settingsUpdated'], true)
+        setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'], true)
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
@@ -706,7 +706,7 @@ const checkInsController: Controller<typeof routes, void> = {
         const response = await eSupClient.postUpdateOffenderDetails(id, body)
         if (response?.crn) {
           res.locals.success = true
-          setDataValue(data, ['esupervision', crn, id, 'checkins', 'settingsUpdated'], true)
+          setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'], true)
         }
         redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`
         setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)

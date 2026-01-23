@@ -95,6 +95,7 @@ const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
+const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 const mockPostCheckInDetails = postCheckInDetails as jest.MockedFunction<typeof postCheckInDetails>
 
 const crn = 'X000001'
@@ -1559,6 +1560,30 @@ describe('checkInsController', () => {
         showChange: false,
       })
     })
+
+    it('note when changes have occured', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              manageCheckin: {
+                checkInMobile: '07700900011',
+                checkInEmail: 'user@example.com',
+                settingsUpdated: true,
+              },
+            },
+          },
+        },
+      }
+
+      const req = baseReq()
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(res.locals.success).toEqual(true)
+    })
   })
 
   describe('getManageCheckinDatePage', () => {
@@ -1775,6 +1800,7 @@ describe('checkInsController', () => {
       mockIsValidUUID.mockReturnValue(true)
 
       const req = baseReq({})
+      req.body = { change: 'main' }
       postUpdateOffenderDetailsSpy.mockImplementationOnce(() => Promise.resolve({ crn } as CheckinScheduleResponse))
       await controllers.checkIns.postManageContactPage(hmppsAuthClient)(req, res)
 
