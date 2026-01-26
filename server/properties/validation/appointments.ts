@@ -285,7 +285,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select if contact includes sensitive information',
+          msg: 'Select if appointment includes sensitive information',
           log: 'Sensitivity not selected',
         },
       ],

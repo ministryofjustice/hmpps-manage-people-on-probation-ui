@@ -222,7 +222,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const editCheckInMobile = getDataValue(data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
       const body: PersonalDetailsUpdateRequest = {
         emailAddress: editCheckInEmail,
-        mobileNumber: editCheckInMobile,
+        mobileNumber: editCheckInMobile?.trim(),
       }
       let cyaQuery = ''
       if (req.query?.cya === 'true') {
@@ -588,6 +588,11 @@ const checkInsController: Controller<typeof routes, void> = {
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
       const showChange = checkinRes?.status === 'VERIFIED'
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
+      const settingsUpdated = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'])
+      if (settingsUpdated) {
+        res.locals.success = true
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.settingsUpdated
+      }
       return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
     }
   },
@@ -633,8 +638,11 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupClient = new ESupervisionClient(token)
-      await eSupClient.postUpdateOffenderDetails(id, body)
-
+      const response = await eSupClient.postUpdateOffenderDetails(id, body)
+      if (response?.crn) {
+        res.locals.success = true
+        setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'], true)
+      }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
   },
@@ -674,6 +682,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const { change } = req.body
+      const { data } = req.session
       const checkInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'])
       const checkInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'])
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInMobile'], checkInMobile)
@@ -694,7 +703,11 @@ const checkInsController: Controller<typeof routes, void> = {
         }
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const eSupClient = new ESupervisionClient(token)
-        await eSupClient.postUpdateOffenderDetails(id, body)
+        const response = await eSupClient.postUpdateOffenderDetails(id, body)
+        if (response?.crn) {
+          res.locals.success = true
+          setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'], true)
+        }
         redirectUrl = `/case/${crn}/appointments/check-in/manage/${id}`
         setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
       }
@@ -754,13 +767,13 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInEmail'])
       const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'editCheckInMobile'])
-      if (previousMobile !== editCheckInMobile1 || previousEmail !== editCheckInEmail1) {
+      if (previousMobile?.trim() !== editCheckInMobile1?.trim() || previousEmail !== editCheckInEmail1) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
 
         const body: PersonalDetailsUpdateRequest = {
           emailAddress: editCheckInEmail1,
-          mobileNumber: editCheckInMobile1,
+          mobileNumber: editCheckInMobile1?.trim(),
         }
         const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
         // Save to show success message on contact preferences page
@@ -769,7 +782,7 @@ const checkInsController: Controller<typeof routes, void> = {
           setDataValue(
             req.session.data,
             ['esupervision', crn, id, 'manageCheckin', 'checkInMobile'],
-            editCheckInMobile1,
+            editCheckInMobile1?.trim(),
           )
           setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], editCheckInEmail1)
         }

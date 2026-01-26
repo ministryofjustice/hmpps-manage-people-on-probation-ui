@@ -154,7 +154,7 @@
     "http-errors": "^2.0.0",
     "jwt-decode": "^4.0.0",
     "lcov-result-merger": "^5.0.1",
-    "lodash": "^4.17.21",
+    "lodash": "^4.17.23",
     "luxon": "^3.7.2",
     "luxon-business-days": "^3.0.1",
     "multer": "^2.0.2",
@@ -180,7 +180,7 @@
   "devDependencies": {
     "@babel/core": "^7.28.4",
     "@babel/preset-env": "^7.28.3",
-    "@cypress/code-coverage": "^3.10.0",
+    "@cypress/code-coverage": "^3.14.7",
     "@faker-js/faker": "^10.0.0",
     "@istanbuljs/nyc-config-typescript": "^1.0.2",
     "@jgoz/esbuild-plugin-typecheck": "^4.0.3",

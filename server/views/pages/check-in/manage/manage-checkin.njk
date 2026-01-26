@@ -25,6 +25,14 @@
             }
         ]
     }) }}
+
+    {{ mojBanner({
+        type: 'success',
+        text: 'Check in settings saved',
+        classes: 'govuk-!-margin-bottom-2',
+        attributes: { "data-qa": "updateBanner"},
+        iconFallbackText: 'Success'
+    }) if success }}
 {% endblock %}
 
 {% block pageContent %}

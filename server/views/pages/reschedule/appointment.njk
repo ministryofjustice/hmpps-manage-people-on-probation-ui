@@ -4,7 +4,7 @@
 {% set apptDetails = personAppointment.appointment %}
 {% set officerName = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname %}
 {% set officerStaffCode = apptDetails.officer.name.forename + ' ' + apptDetails.officer.name.surname %}
-{% set appointmentWithTitle = 'Appointment: ' + apptDetails.type + ' with ' + officerName + ' on ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime if apptDetails.endDateTime else 
+{% set appointmentWithTitle = 'Appointment: ' + apptDetails.type + ' with ' + officerName + ' on ' + apptDetails.startDateTime | dayOfWeek + ' ' + apptDetails.startDateTime | dateWithYear + ' at ' + apptDetails.startDateTime | govukTime + (' to ' + apptDetails.endDateTime | govukTime + '.' if apptDetails.endDateTime else 
     ''
 ) %}
 {% set showAnchorLink = true %}
@@ -16,7 +16,7 @@
     {{ govukRadios({
         fieldset: {
             legend: {
-                text: 'Who needs to reschedule this appointment',
+                text: 'Who needs to reschedule this appointment?',
                 classes: "govuk-fieldset__legend--m",
                 isPageHeading: false
             }

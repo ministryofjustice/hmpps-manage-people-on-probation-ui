@@ -1,4 +1,5 @@
 {% set changePath = "/case/" + crn + "/arrange-appointment/"  + id %}
+{% set insertText = "You'll receive a calendar invite for the appointment." %}
 {% set sentenceHtml %}
 {% if appointment.appointmentFor.sentence %}
     <span data-qa="appointmentSentence">{{ appointment.appointmentFor.sentence }}</span>
@@ -73,6 +74,9 @@
     {% for appointmentDate in appointment.repeatingDates %}
         {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
     {% endfor %}
+    {% if appointmentDates.length > 0  %}
+        {% set insertText = rescheduleApptInsertText | default("You'll receive a calendar invite for the appointment.")%}
+    {% endif %}
     {% set appointmentDatesHtml %}
     <ul class="govuk-list">
         {% for appointmentDate in appointmentDates %}
@@ -185,7 +189,7 @@
 ] }) }}
     {% if showCalendarInsetText %}
         {{ govukInsetText({
-  text: "You'll receive a calendar invite for the appointment",
+  text: insertText,
   classes: 'govuk!-margin-top-0',
    attributes: {
         'data-qa': 'calendarInviteInset'

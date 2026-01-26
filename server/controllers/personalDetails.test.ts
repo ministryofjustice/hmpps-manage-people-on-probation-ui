@@ -275,7 +275,7 @@ describe('/controllers/personalDetails', () => {
 
     const contactDetailsBody = {
       phoneNumber: '07882 458594',
-      mobileNumber: '07882 458594',
+      mobileNumber: '07882 458594    ',
       emailAddress: 'first.last@digital.justice.gov.uk',
       _csrf: '1234',
     }
@@ -475,9 +475,10 @@ describe('/controllers/personalDetails', () => {
         checkAuditMessage(res, 'SAVE_EDIT_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
         it('should update the personal details', () => {
           const { emailAddress } = contactDetailsBody
+          const trimmedMobileNumber = '07882 458594'
           expect(updatePersonalDetailsContactSpy).toHaveBeenCalledWith(crn, {
             phoneNumber,
-            mobileNumber,
+            mobileNumber: trimmedMobileNumber,
             emailAddress,
           })
         })
