@@ -274,7 +274,6 @@ const appointments: Route<void> = (req, res, next) => {
         page: `arrange-appointment/${id}/add-note`,
         notes: req.body.appointments[crn][id].notes,
         maxCharCount: maxCharCount as number,
-        isSensitive,
       }),
     )
   }
@@ -297,6 +296,7 @@ const appointments: Route<void> = (req, res, next) => {
           notes: req.body.notes,
           fileOrNote: req.body.fileOrNote,
           maxCharCount: maxCharCount as number,
+          isSensitive,
         }),
       ),
     }

@@ -264,7 +264,8 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     sensitivity: {
-      optional: page !== `appointment/${contactId}/add-note` || isSensitive,
+      optional:
+        page !== `appointment/${contactId}/add-note` || (page === `appointment/${contactId}/add-note` && isSensitive),
       checks: [
         {
           validator: isNotEmpty,
