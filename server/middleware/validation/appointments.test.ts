@@ -379,7 +379,6 @@ describe('/controllers/arrangeAppointmentController', () => {
       id: contactId,
     }
     const res = makeRes(locals)
-    console.log(res)
 
     validation.appointments(req, res, next)
 

@@ -300,8 +300,6 @@ const appointments: Route<void> = (req, res, next) => {
         }),
       ),
     }
-
-    console.log(errorMessages)
   }
 
   const validateReschedule = () => {
