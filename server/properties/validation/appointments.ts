@@ -23,10 +23,23 @@ export interface AppointmentsValidationArgs {
   maxCharCount?: number
   enablePastAppointments?: boolean
   fileOrNote?: boolean
+  isSensitive?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, contactId, page, visor, repeatingValue, notes, maxCharCount, enablePastAppointments } = args
+  const {
+    crn,
+    id,
+    contactId,
+    page,
+    visor,
+    repeatingValue,
+    notes,
+    maxCharCount,
+    enablePastAppointments,
+    fileOrNote,
+    isSensitive,
+  } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -251,7 +264,7 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
       ],
     },
     sensitivity: {
-      optional: page !== `appointment/${contactId}/add-note`,
+      optional: page !== `appointment/${contactId}/add-note` || isSensitive,
       checks: [
         {
           validator: isNotEmpty,

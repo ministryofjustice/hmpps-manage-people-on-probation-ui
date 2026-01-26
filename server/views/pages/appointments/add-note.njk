@@ -99,6 +99,9 @@
             }) }}
         </section>
     {% endif %}
+    {% if appointment.isSensitive %}
+        <p>You already told us that this contact includes sensitive information.</p>
+    {% endif %}
     {{ govukButton({
         text: "Show CRISS headers",
         classes: "govuk-button--secondary",
