@@ -69,7 +69,7 @@
             checked: body.sensitivity == 'No'
         }
     ]
-} %}
+} if not appointment.isSensitive %}
     {% if errorMessages.sensitivity %}
         {% set errorMsgSensitivity = {
             text: errorMessages.sensitivity
@@ -179,5 +179,5 @@
         <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
     {% endif %}
     {% endif %}
-    {{ govukRadios(sensitivityConfig) }}
+    {{ govukRadios(sensitivityConfig) }} 
 {% endblock %}
