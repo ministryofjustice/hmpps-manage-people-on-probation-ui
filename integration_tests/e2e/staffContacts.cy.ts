@@ -19,7 +19,7 @@ context('Staff contacts', () => {
     page.assertPageElementAtIndexWithin('dl', 0, 'dd', 4, 'All London')
     page.assertPageElementAtIndexWithin('dl', 0, 'dt', 5, 'Team')
     page.assertPageElementAtIndexWithin('dl', 0, 'dd', 5, 'Unallocated Team (N07)')
-    page.assertPageElementAtIndexWithin('dl', 0, 'dt', 6, 'Allocated from')
+    page.assertPageElementAtIndexWithin('dl', 0, 'dt', 6, 'Date allocated')
     page.assertPageElementAtIndexWithin('dl', 0, 'dd', 6, '22 April 2025')
 
     cy.get('h4').eq(1).should('contain.text', 'Bruce Wayne')
@@ -31,7 +31,7 @@ context('Staff contacts', () => {
     page.assertPageElementAtIndexWithin('dl', 1, 'dd', 2, 'Leicestershire All')
     page.assertPageElementAtIndexWithin('dl', 1, 'dt', 3, 'Team')
     page.assertPageElementAtIndexWithin('dl', 1, 'dd', 3, 'OMU B')
-    page.assertPageElementAtIndexWithin('dl', 1, 'dt', 4, 'Allocated from')
+    page.assertPageElementAtIndexWithin('dl', 1, 'dt', 4, 'Date allocated')
     page.assertPageElementAtIndexWithin('dl', 1, 'dd', 4, '12 January 2025')
 
     cy.get('h3').eq(2).should('contain.text', 'Previous contacts')
