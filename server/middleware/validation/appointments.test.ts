@@ -1,7 +1,9 @@
 import httpMocks from 'node-mocks-http'
+import { TRUE } from 'sass'
 import validation from '.'
 import { mockAppResponse } from '../../controllers/mocks'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
+import { LocalParams } from '../../models/Appointments'
 
 const crn = 'X000001'
 const contactId = '1'
@@ -11,6 +13,8 @@ const typeUrl = `${arrangeAppointmentUrl}/type`
 const locationDateTimeUrl = `${arrangeAppointmentUrl}/location-date-time`
 const repeatingUrl = `${arrangeAppointmentUrl}/repeating`
 const supportingUrl = `${arrangeAppointmentUrl}/supporting-information`
+const appointmentUrl = `/case/${crn}/appointments/appointment/${contactId}`
+const addNoteUrl = `${appointmentUrl}/add-note`
 
 jest.mock('../appointmentDateIsInPast', () => ({
   appointmentDateIsInPast: jest.fn(),
@@ -34,14 +38,14 @@ const reqBase = {
 
 describe('/controllers/arrangeAppointmentController', () => {
   let next: jest.Mock
-  let makeRes: () => any
+  let makeRes: (locals?: LocalParams) => any
 
   beforeEach(() => {
     jest.clearAllMocks()
 
     next = jest.fn()
 
-    makeRes = () =>
+    makeRes = (locals?: LocalParams) =>
       mockAppResponse({
         filters: {
           dateFrom: '',
@@ -51,6 +55,7 @@ describe('/controllers/arrangeAppointmentController', () => {
         flags: {
           enablePastAppointments: true,
         },
+        ...locals,
       })
   })
 
@@ -341,5 +346,42 @@ describe('/controllers/arrangeAppointmentController', () => {
     validation.appointments(req, res, next)
 
     expect(res.render).toHaveBeenCalled()
+  })
+
+  it('validation fails for add-note - no fields', () => {
+    const req = makeReq({
+      url: addNoteUrl,
+      session: { data: {} },
+      body: {},
+    })
+    const res = makeRes()
+
+    validation.appointments(req, res, next)
+
+    expect(res.render).toHaveBeenCalled()
+  })
+
+  it('validation succeeds if sensitivity already set', () => {
+    const req = makeReq({
+      url: addNoteUrl,
+      session: { data: {} },
+      body: { sensitivity: undefined, notes: 'string', fileOrNote: 'string' },
+      config: { maxCharCount: 40000 },
+    })
+
+    const locals = {
+      personAppointment: {
+        appointment: {
+          isSensitive: true,
+        },
+      },
+      crn,
+      id: contactId,
+    }
+    const res = makeRes(locals)
+
+    validation.appointments(req, res, next)
+
+    expect(next).toHaveBeenCalled()
   })
 })

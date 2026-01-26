@@ -25,6 +25,8 @@ const appointments: Route<void> = (req, res, next) => {
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
 
+  const isSensitive = res.locals.personAppointment?.appointment?.isSensitive
+
   let localParams: LocalParams = {
     crn,
     id,
@@ -294,6 +296,7 @@ const appointments: Route<void> = (req, res, next) => {
           notes: req.body.notes,
           fileOrNote: req.body.fileOrNote,
           maxCharCount: maxCharCount as number,
+          isSensitive,
         }),
       ),
     }

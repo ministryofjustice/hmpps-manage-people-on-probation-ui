@@ -988,7 +988,7 @@
             "rarToolKit": "Choices and Changes",
             "appointmentNotes": [{ "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false }],
             "appointmentNote": null,
-            "isSensitive": false,
+            "isSensitive": true,
             "hasOutcome": false,
             "isInPast": true,
             "wasAbsent": true,
