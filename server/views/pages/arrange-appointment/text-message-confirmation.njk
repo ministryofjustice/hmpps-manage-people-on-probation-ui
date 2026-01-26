@@ -35,7 +35,13 @@
         <section id="smsPreview" data-qa="smsPreview" class="govuk-!-margin-bottom-6">
             <h3 class="govuk-heading-m">Text message preview</h3>
             <p class="govuk-hint">Preview the text that will be sent based on the appointment details.</p>
-            <p class="govuk-body">{{ personForename }} will receive this message in English{% if smsPreview.welshSmsPreview %} and in Welsh{% endif %}: </p>
+            <p class="govuk-body">
+                {% if not smsPreview.welshSmsPreview %}
+                    {{ personForename }} will receive this message:
+            {% else %}
+                    {{ personForename }}’s preferred language is Welsh, so they will receive this message in English and in Welsh:
+            {% endif %}
+            </p>
             {% for key, value in smsPreview %}
                 <div class="sms-message-wrapper">
                     <p class="govuk-body govuk-!-margin-bottom-0">

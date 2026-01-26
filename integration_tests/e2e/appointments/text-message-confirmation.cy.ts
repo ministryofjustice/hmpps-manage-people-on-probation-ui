@@ -70,7 +70,7 @@ describe('Text message confirmation', () => {
         .getSmsPreview()
         .find('p')
         .eq(1)
-        .should('contain.text', 'Caroline will receive this message in English:')
+        .should('contain.text', 'Caroline will receive this message:')
 
       textMessageConfirmPage
         .getSmsPreview()
@@ -125,7 +125,10 @@ describe('Text message confirmation', () => {
         .getSmsPreview()
         .find('p')
         .eq(1)
-        .should('contain.text', 'Caroline will receive this message in English and in Welsh:')
+        .should(
+          'contain.text',
+          'Caroline’s preferred language is Welsh, so they will receive this message in English and in Welsh:',
+        )
       textMessageConfirmPage
         .getSmsPreview()
         .find('.sms-message-wrapper')
