@@ -12,8 +12,4 @@ export default class TextMessageConfirmationPage extends Page {
   getSmsPreview = () => {
     return cy.get(`[data-qa="smsPreview"]`)
   }
-
-  getPreviewReveal = () => {
-    return cy.get('[data-qa="generate-reveal"]')
-  }
 }

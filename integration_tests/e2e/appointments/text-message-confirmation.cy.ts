@@ -63,19 +63,17 @@ describe('Text message confirmation', () => {
         .getSmsPreview()
         .find('.govuk-hint')
         .should('contain.text', 'Preview the text that will be sent based on the appointment details.')
-      textMessageConfirmPage.getSmsPreview().find('button').should('contain.text', 'Generate text preview')
       textMessageConfirmPage.getSubmitBtn().should('contain.text', 'Continue')
     })
     it('should display the text message preview in english when the generate button is clicked if POP postcode is not welsh', () => {
-      textMessageConfirmPage.getSmsPreview().find('button').click()
       textMessageConfirmPage
-        .getPreviewReveal()
+        .getSmsPreview()
         .find('p')
-        .eq(0)
+        .eq(1)
         .should('contain.text', 'Caroline will receive this message in English:')
 
       textMessageConfirmPage
-        .getPreviewReveal()
+        .getSmsPreview()
         .find('.sms-message-wrapper p')
         .then($el => {
           expect(normalise($el.html())).to.include(english())
@@ -123,14 +121,13 @@ describe('Text message confirmation', () => {
       loadPage()
     })
     it('should display the text message preview both in english and welsh', () => {
-      textMessageConfirmPage.getSmsPreview().find('button').click()
       textMessageConfirmPage
-        .getPreviewReveal()
+        .getSmsPreview()
         .find('p')
-        .eq(0)
+        .eq(1)
         .should('contain.text', 'Caroline will receive this message in English and in Welsh:')
       textMessageConfirmPage
-        .getPreviewReveal()
+        .getSmsPreview()
         .find('.sms-message-wrapper')
         .eq(0)
         .find('p')
@@ -138,7 +135,7 @@ describe('Text message confirmation', () => {
           expect(normalise($el.html())).to.include(english('Cardiff'))
         })
       textMessageConfirmPage
-        .getPreviewReveal()
+        .getSmsPreview()
         .find('.sms-message-wrapper')
         .eq(1)
         .find('p')

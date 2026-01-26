@@ -355,19 +355,6 @@ class ServiceAlert {
   }
 }
 
-const handleMessagePreview = () => {
-  const elm = document.getElementById('smsPreview')
-  if (elm) {
-    const revealElm = elm.querySelector('#generate-reveal')
-    elm.querySelector('button').addEventListener('click', event => {
-      event.preventDefault()
-      if (!revealElm.getAttribute('open')) {
-        revealElm.setAttribute('open', '')
-      }
-    })
-  }
-}
-
 setNoFixedAddressConditional()
 lastAppointment()
 resetConditionals()
@@ -378,4 +365,3 @@ recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
 new ServiceAlert()
-handleMessagePreview()

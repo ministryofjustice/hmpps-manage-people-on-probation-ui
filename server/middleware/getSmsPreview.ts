@@ -4,7 +4,7 @@ import { HmppsAuthClient } from '../data'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
 import { AppointmentSession } from '../models/Appointments'
-import { getDataValue, isoFromDateTime, isWelshPostcode, responseIsError, setDataValue } from '../utils'
+import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
@@ -34,8 +34,8 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       if (locationMatch) {
         appointmentLocation = locationMatch?.address?.officeName || locationMatch?.address?.buildingName || ''
       }
-      const postcode = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mainAddress', 'postcode'])
-      const includeWelshPreview = postcode ? isWelshPostcode(postcode) : false
+      const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
+      const includeWelshPreview = preferredLanguage === 'Welsh'
       const dateAndTimeOfAppointment = isoFromDateTime(date, start)
       const body: SmsPreviewRequest = {
         firstName,

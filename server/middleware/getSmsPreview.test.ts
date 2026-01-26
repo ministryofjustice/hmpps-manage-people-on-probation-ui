@@ -78,7 +78,7 @@ const mockLocations: Location[] = [{ id: 1, code: locationCode, address: { offic
 const buildRequest = ({
   appointment = mockAppointmentSession,
   locations = mockLocations,
-  postcode = 'SW1 4PP',
+  preferredLanguage = '',
 } = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
@@ -96,7 +96,7 @@ const buildRequest = ({
           },
         },
         personalDetails: {
-          [crn]: { overview: { mainAddress: { postcode } } },
+          [crn]: { overview: { preferredLanguage } },
         },
       },
     },
@@ -157,7 +157,7 @@ describe('middleware/getSmsPreview', () => {
 
   describe('POP postcode is welsh', () => {
     const req = buildRequest({
-      postcode: 'CF11 2PP',
+      preferredLanguage: 'Welsh',
       appointment: { ...mockAppointmentSession, smsPreview: undefined },
     })
     beforeEach(async () => {
