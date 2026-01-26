@@ -82,7 +82,7 @@ describe('Arrange another appointment', () => {
         supportingInformationPage.getSubmitBtn().click()
         cy.get('[data-qa="calendarInviteInset"]').should(
           'contain.text',
-          `You'll receive a calendar invite for the appointment`,
+          `You'll receive a calendar invite for the appointment.`,
         )
       })
     })
