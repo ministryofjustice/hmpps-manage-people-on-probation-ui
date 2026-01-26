@@ -63,9 +63,7 @@ context('Personal Details', () => {
     page.getRowData('identityNumber', 'pnc', 'Value').should('contain.text', '1954/0018147W')
     page.getRowData('identityNumber', 'noms', 'Value').should('contain.text', 'G9566GQ')
 
-    page
-      .getRowData('staffContacts', 'staffContactRole', 'Label')
-      .should('contain.text', 'Prison Offender Manager (POM)')
+    page.getRowData('staffContacts', 'staffContactRole', 'Label').should('contain.text', 'Probation practitioner')
     page.getRowData('staffContacts', 'staffContactRole', 'Label').should('contain.text', '(responsible officer)')
     page
       .getRowData('staffContacts', 'staffContactLastUpdated', 'Label')
@@ -73,7 +71,7 @@ context('Personal Details', () => {
     page.getRowData('staffContacts', 'staffContactName', 'Value').should('contain.text', 'Arhsimna Xolfo')
     page
       .getRowData('staffContacts', 'staffContactRole', 'Label', 1)
-      .should('contain.text', 'Community Offender Manager (COM)')
+      .should('contain.text', 'Prison offender manager (POM)')
     page
       .getRowData('staffContacts', 'staffContactLastUpdated', 'Label', 1)
       .should('contain.text', 'Last updated 30 April 2024')

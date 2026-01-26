@@ -8,7 +8,7 @@ context('Staff contacts', () => {
     cy.get('h3').eq(1).should('contain.text', 'Current contacts')
     cy.get('h4').eq(0).should('contain.text', 'Arhsimna Xolfo')
     page.assertPageElementAtIndexWithin('dl', 0, 'dt', 0, 'Role')
-    page.assertPageElementAtIndexWithin('dl', 0, 'dd', 0, 'Community Offender Manager (COM) (responsible officer)')
+    page.assertPageElementAtIndexWithin('dl', 0, 'dd', 0, 'Probation practitioner (responsible officer)')
     page.assertPageElementAtIndexWithin('dl', 0, 'dt', 1, 'Phone number')
     page.assertPageElementAtIndexWithin('dl', 0, 'dd', 1, '07321165373')
     page.assertPageElementAtIndexWithin('dl', 0, 'dt', 2, 'Email')
@@ -24,7 +24,7 @@ context('Staff contacts', () => {
 
     cy.get('h4').eq(1).should('contain.text', 'Bruce Wayne')
     page.assertPageElementAtIndexWithin('dl', 1, 'dt', 0, 'Role')
-    page.assertPageElementAtIndexWithin('dl', 1, 'dd', 0, 'Prison Offender Manager (POM)')
+    page.assertPageElementAtIndexWithin('dl', 1, 'dd', 0, 'Prison offender manager (POM)')
     page.assertPageElementAtIndexWithin('dl', 1, 'dt', 1, 'Provider')
     page.assertPageElementAtIndexWithin('dl', 1, 'dd', 1, 'Leicester')
     page.assertPageElementAtIndexWithin('dl', 1, 'dt', 2, 'Probation Delivery Unit (PDU)')
@@ -38,7 +38,7 @@ context('Staff contacts', () => {
 
     cy.get('h4').eq(2).should('contain.text', 'Yrhreender Hanandra')
     page.assertPageElementAtIndexWithin('dl', 2, 'dt', 0, 'Role')
-    page.assertPageElementAtIndexWithin('dl', 2, 'dd', 0, 'Community Offender Manager (COM)')
+    page.assertPageElementAtIndexWithin('dl', 2, 'dd', 0, 'Probation practitioner')
     page.assertPageElementAtIndexWithin('dl', 2, 'dt', 1, 'Phone number')
     page.assertPageElementAtIndexWithin('dl', 2, 'dd', 1, '07321165373')
     page.assertPageElementAtIndexWithin('dl', 2, 'dt', 2, 'Email')
@@ -52,7 +52,7 @@ context('Staff contacts', () => {
 
     cy.get('h4').eq(3).should('contain.text', 'Peter Parker')
     page.assertPageElementAtIndexWithin('dl', 3, 'dt', 0, 'Role')
-    page.assertPageElementAtIndexWithin('dl', 3, 'dd', 0, 'Community Offender Manager (COM)')
+    page.assertPageElementAtIndexWithin('dl', 3, 'dd', 0, 'Probation practitioner')
     page.assertPageElementAtIndexWithin('dl', 3, 'dt', 3, 'Provider')
     page.assertPageElementAtIndexWithin('dl', 3, 'dd', 3, 'London')
     page.assertPageElementAtIndexWithin('dl', 3, 'dt', 4, 'Probation Delivery Unit (PDU)')
@@ -64,7 +64,7 @@ context('Staff contacts', () => {
 
     cy.get('h4').eq(4).should('contain.text', 'Jon Smith')
     page.assertPageElementAtIndexWithin('dl', 4, 'dt', 0, 'Role')
-    page.assertPageElementAtIndexWithin('dl', 4, 'dd', 0, 'Prison Offender Manager (POM)')
+    page.assertPageElementAtIndexWithin('dl', 4, 'dd', 0, 'Prison offender manager (POM)')
     page.assertPageElementAtIndexWithin('dl', 4, 'dt', 1, 'Provider')
     page.assertPageElementAtIndexWithin('dl', 4, 'dd', 1, 'Public Protection Unit')
     page.assertPageElementAtIndexWithin('dl', 4, 'dt', 2, 'Probation Delivery Unit (PDU)')

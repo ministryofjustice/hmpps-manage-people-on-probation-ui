@@ -112,7 +112,7 @@
               rows: [
                 {
                   key: { text: "Role" },
-                  value: { html: contact | roleDescription }
+                  value: { html: contact | roleDescription | toSentenceCase(['(POM)']) }
                 },
                 {
                   key: { text: "Phone number" },
