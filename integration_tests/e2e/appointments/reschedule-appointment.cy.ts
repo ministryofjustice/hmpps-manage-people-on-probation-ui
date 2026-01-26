@@ -73,14 +73,18 @@ describe('Reschedule Appointment', () => {
       rescheduleAppointmentPage.getSubmitBtn().click()
       rescheduleAppointmentPage.checkErrorSummaryBox([
         'Select who is rescheduling this appointment',
-        'Select if appointment includes sensitive information',
+        'Explain why this appointment is being rescheduled',
+        'Explain if appointment includes sensitive information',
       ])
       rescheduleAppointmentPage
         .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-whoNeedsToReschedule-error`)
         .should('contain.text', 'Select who is rescheduling this appointment')
       rescheduleAppointmentPage
+        .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-reason-error`)
+        .should('contain.text', 'Explain why this appointment is being rescheduled')
+      rescheduleAppointmentPage
         .getElement(`#appointments-X000001-${uuid}-rescheduleAppointment-sensitivity-error`)
-        .should('contain.text', 'Select if appointment includes sensitive information')
+        .should('contain.text', 'Explain if appointment includes sensitive information')
     })
   })
 
@@ -92,6 +96,10 @@ describe('Reschedule Appointment', () => {
       .eq(0)
       .find('.govuk-radios__input')
       .click()
+    rescheduleAppointmentPage
+      .getReason()
+      .type('This appointment is being rescheduled because of a change in availability.')
+
     cy.get('[data-qa=sensitiveInformation]').find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     rescheduleAppointmentPage.getSubmitBtn().click()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()

@@ -280,12 +280,22 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][rescheduleAppointment][reason]`]: {
+      optional: page !== 'reschedule-appointment',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Explain why this appointment is being rescheduled',
+          log: 'Explain why this appointment is being rescheduled not provided',
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][rescheduleAppointment][sensitivity]`]: {
       optional: page !== 'reschedule-appointment',
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select if appointment includes sensitive information',
+          msg: 'Explain if appointment includes sensitive information',
           log: 'Sensitivity not selected',
         },
       ],
