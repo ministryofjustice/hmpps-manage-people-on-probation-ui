@@ -215,4 +215,11 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     getCheckIn(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
+
+  router.get('/case/:crn/appointments/:id/check-in/eligibility-check', [
+    controllers.checkIns.getEligibilityPage(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/:id/check-in/not-eligible', [
+    controllers.checkIns.getNotEligiblePage(hmppsAuthClient),
+  ])
 }
