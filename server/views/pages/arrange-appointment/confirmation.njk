@@ -53,7 +53,7 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-      {% if not isInPast or isInPast and appointmentType === 'RESCHEDULE' %}
+      {% if not isInPast %}
         <p class="govuk-body">
         You need to send
         {{case.name.forename}}

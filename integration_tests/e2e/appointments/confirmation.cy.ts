@@ -297,19 +297,9 @@ describe('Confirmation page', () => {
         cy.get('[data-qa="what-happens-next"]')
           .find('p')
           .eq(0)
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
-            )
-          })
-        cy.get('[data-qa="what-happens-next"]')
-          .find('p')
-          .eq(1)
           .should(
             'contain.text',
-            'The appointment details have been updated on the NDelius contact log and officer diary.',
+            'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.',
           )
       })
     })
