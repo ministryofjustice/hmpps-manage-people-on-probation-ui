@@ -2,10 +2,28 @@ import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget } from '../utils'
+import { compactActivityLogDate, toPredictors, toRoshWidget } from '../utils'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
+import { Activity } from '../data/model/schedule'
+
+const groupActivitiesByDate = (activities: Activity[]) => {
+  const groups: { date: string; activities: Activity[] }[] = []
+  const seenDates = new Set<string>()
+
+  for (const activity of activities) {
+    const date = compactActivityLogDate(activity.startDateTime)
+    if (date && !seenDates.has(date)) {
+      seenDates.add(date)
+      groups.push({
+        date,
+        activities: activities.filter(a => compactActivityLogDate(a.startDateTime) === date),
+      })
+    }
+  }
+
+  return groups
+}
 
 const routes = ['getOrPostActivityLog', 'getActivity'] as const
 
@@ -75,6 +93,7 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsStart,
         resultsEnd,
         errorMessages: req.session.errorMessages,
+        groupedActivities: groupActivitiesByDate(personActivity.activities),
       })
     }
   },

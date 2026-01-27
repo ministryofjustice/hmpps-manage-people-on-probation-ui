@@ -72,7 +72,6 @@ import {
   handleQuotes,
   dateToLongDate,
   merge,
-  filterActivities,
 } from '.'
 
 import { ApplicationInfo } from '../applicationInfo'
@@ -163,8 +162,6 @@ export default function nunjucksSetup(
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
-  njkEnv.addFilter('filterActivities', filterActivities)
-
   app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
     return next()
