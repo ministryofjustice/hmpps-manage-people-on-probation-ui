@@ -10,12 +10,14 @@ import {
   isValidMobileNumber,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
+import { type Origin } from '../../data/model/personalDetails'
 
 interface Props {
   phoneNumber?: string
   mobileNumber?: string
   emailAddress?: string
   editingMainAddress: boolean
+  origin?: Origin
 }
 
 export const personDetailsValidation = ({
@@ -23,6 +25,7 @@ export const personDetailsValidation = ({
   mobileNumber = '',
   emailAddress = '',
   editingMainAddress,
+  origin,
 }: Props): ValidationSpec => ({
   phoneNumber: {
     optional: editingMainAddress === false || !phoneNumber,
@@ -39,7 +42,8 @@ export const personDetailsValidation = ({
     ],
   },
   mobileNumber: {
-    optional: editingMainAddress === false || !mobileNumber,
+    optional:
+      (editingMainAddress === false && origin !== 'appointments') || (origin !== 'appointments' && !mobileNumber),
     checks: [
       {
         validator: isValidMobileNumber,

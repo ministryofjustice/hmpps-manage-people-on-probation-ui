@@ -6,12 +6,17 @@
 {% set dateWarning = 'An end date will change this to a previous address and you will need to add a new main address.' %}
 
 {% block beforeContent %}
-
     {% set bannerHtml %}
     <h2 class="govuk-heading-m govuk-!-font-weight-regular">{{ dateWarning }}</h2>
     {% endset %}
-
-    {{ govukBreadcrumbs({
+    {% if origin === 'appointments' %}
+        {% if backLink %}
+            {{ govukBackLink({
+    href: backLink
+  }) }}
+        {% endif %}
+    {% else %}
+        {{ govukBreadcrumbs({
         items: [
             {
                 text: "Cases",
@@ -28,7 +33,7 @@
             }
         ]
     }) }}
-
+    {% endif %}
     {{ mojBanner({
         type: 'information',
         html: bannerHtml,

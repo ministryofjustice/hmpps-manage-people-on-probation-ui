@@ -927,7 +927,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { backendId: 1234, user: { username: '' } },
+        appointmentSession: { backendId: 1234, user: { username: '' }, smsOptIn: 'YES' },
         dataSession: { isOutLookEventFailed: false },
       })
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
@@ -937,6 +937,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: null,
+        smsSent: true,
         attendingName: 'Caroline´s',
         url: '',
       })

@@ -9,6 +9,7 @@ import {
   ESupervisionReview,
   DeactivateOffenderRequest,
   ReactivateOffenderRequest,
+  SmsPreviewRequest,
 } from './model/esupervision'
 
 jest.mock('../utils', () => {
@@ -354,6 +355,25 @@ describe('ESupervisionClient', () => {
         .reply(200, response)
 
       const output = await client.postReactivateOffender(checkInUuid, body)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('postSmsPreview', () => {
+    it('should POST sms preview', async () => {
+      const body: SmsPreviewRequest = {
+        firstName: 'John',
+        dateAndTimeOfAppointment: '2026-01-22T17:05:53.994Z',
+        includeWelshPreview: false,
+      }
+      const response = {}
+
+      fakeESupervisionApi
+        .post(`/v2/sms-preview`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.postSmsPreview(body)
       expect(output).toEqual(response)
     })
   })

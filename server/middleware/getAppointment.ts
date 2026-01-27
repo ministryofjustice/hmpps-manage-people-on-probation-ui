@@ -2,12 +2,11 @@ import { upperFirst } from 'lodash'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { AppointmentSession, AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType, YesNo } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
 import { convertToTitleCase, getDataValue } from '../utils'
 import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
 import { Location, Provider, Team, User } from '../data/model/caseload'
-import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -17,6 +16,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     const masClient = new MasApiClient(token)
     const currentCase = await masClient.getOverview(crn)
     const { forename } = currentCase.personalDetails.name
+    const mobileNumber = currentCase?.personalDetails?.mobileNumber ?? ''
     const { data } = req.session
     // eslint-disable-next-line no-useless-escape
     const regexIgnoreValuesInParentheses = /[\(\)]/
@@ -50,12 +50,11 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
         date,
         start,
         end,
-        repeatingDates,
-        repeating,
         notes,
         sensitivity,
         outcomeRecorded,
         rescheduleAppointment,
+        smsOptIn,
       } = appointmentSession
 
       const type: AppointmentType | null = typeId
@@ -66,8 +65,13 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       let sentenceRequirement: Requirement
       let sentenceLicenceCondition: LicenceCondition
       let sentenceNsi: Nsi
+      let textMessageConfirmation: YesNo | null | undefined
+      if (smsOptIn === null) textMessageConfirmation = null
+      if (![null, undefined].includes(smsOptIn)) {
+        textMessageConfirmation = smsOptIn?.includes('YES') ? 'Yes' : 'No'
+      }
       if (parseInt(eventId, 10) !== 1 && req?.session?.data?.sentences?.[crn]) {
-        sentenceObj = req.session.data.sentences[crn].find(user => user.id === parseInt(eventId, 10))
+        sentenceObj = req.session.data.sentences[crn].find(_sentence => _sentence.id === parseInt(eventId, 10))
         sentence = parseInt(eventId, 10) !== 1 ? sentenceObj?.order?.description : forename
         if (requirementId) {
           sentenceRequirement = sentenceObj?.requirements?.find(
@@ -133,6 +137,7 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           licenceCondition: sentenceLicenceCondition?.mainDescription ?? null,
           nsi: sentenceNsi?.description ?? null,
           forename: eventId === 'PERSON_LEVEL_CONTACT' ? forename : null,
+          mobileNumber,
         },
         attending: {
           name: selectedUser,
@@ -141,13 +146,12 @@ export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           html: attendingHtml,
         },
         location,
+        textMessageConfirmation,
         date,
         start,
         previousStart: rescheduleAppointment?.previousStart ?? null,
         end,
         previousEnd: rescheduleAppointment?.previousEnd ?? null,
-        repeating,
-        repeatingDates,
         notes: notes ?? null,
         sensitivity: sensitivity ?? null,
         outcomeRecorded: outcomeRecorded ?? null,

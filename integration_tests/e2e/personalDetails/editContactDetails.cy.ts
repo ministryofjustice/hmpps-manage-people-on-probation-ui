@@ -1,26 +1,39 @@
+import AppointmentNotePage from '../../pages/appointments/note.page'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import Page from '../../pages/page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import {
+  uuid,
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+  normalise,
+} from '../appointments/imports'
 
 const submitInvalidPhoneNumber = (page: EditContactDetails, field: string) => {
   page.getElementInput(field).clear().type('1-2345X')
   page.getElement('submitBtn').click()
 }
 
-const submitInvalidCharLength = (page: EditContactDetails, field: string) => {
-  page.getElementInput(field).clear().type('1'.repeat(36))
-  page.getElement('submitBtn').click()
-}
-
 context('Edit contact details', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('Edit contact details page is rendered based on non fixed address', () => {
     cy.visit('/case/X000001/personal-details/edit-contact-details')
     const page = new EditContactDetails()
     page.checkPageTitle('Edit contact details for Caroline')
     page.getElement('phoneNumber').should('be.visible')
+    cy.get('.govuk-breadcrumbs').should('exist')
+    page.getBackLink().should('not.exist')
     page.getElement('phoneNumber').find('label').should('contain.text', 'Phone number')
     page.getElement('phoneNumber').find('.govuk-hint').should('contain.text', 'For example, 01632 960 000')
     page.getElement('phoneNumber').find('input').should('have.value', '0123456999')
     page.getElement('mobileNumber').should('be.visible')
+    cy.get('label[for=mobileNumber]').then($el => {
+      expect(normalise($el.text())).to.eq('Mobile number (optional)')
+    })
     page.getElement('mobileNumber').find('label').should('contain.text', 'Mobile number')
     page.getElement('mobileNumber').find('.govuk-hint').should('contain.text', 'For example, 07771 900 900')
     page.getElement('mobileNumber').find('input').should('have.value', '07783889300')
@@ -95,5 +108,58 @@ context('Edit contact details', () => {
     const page = Page.verifyOnPage(EditContactDetails)
     page.getElement('submitBtn').click()
     page.getElement('updateBanner').should('contain.text', 'Contact details saved')
+  })
+})
+context('Appointment journey', () => {
+  let textMessageConfirmPage: TextMessageConfirmationPage
+  let supportingInfoPage: AppointmentNotePage
+  const crn = 'X000001'
+  const loadPage = () => {
+    cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+    completeSentencePage(1, '', crn)
+    completeTypePage()
+    completeLocationDateTimePage({ crnOverride: crn })
+    completeTextMessageConfirmationPage({ _crn: crn })
+  }
+  beforeEach(() => {
+    loadPage()
+  })
+  it('should display the back link', () => {
+    const page = Page.verifyOnPage(EditContactDetails)
+    cy.get('.govuk-breadcrumbs').should('not.exist')
+    page.getBackLink().click()
+    textMessageConfirmPage = new TextMessageConfirmationPage()
+    textMessageConfirmPage.checkOnPage()
+  })
+  it('should return to the text message confirmation page when Cancel and go back is clicked', () => {
+    cy.get('[data-qa=cancelBtn]').click()
+    textMessageConfirmPage = new TextMessageConfirmationPage()
+    textMessageConfirmPage.checkOnPage()
+  })
+  it('should display only the mobile number field as mandatory', () => {
+    const page = Page.verifyOnPage(EditContactDetails)
+    cy.get('label[for=mobileNumber]').then($el => {
+      expect(normalise($el.text())).to.eq('Mobile number')
+    })
+    page.getElementInput('phoneNumber').should('not.exist')
+    page.getElementInput('emailAddress').should('not.exist')
+    page.getElementInput('mobileNumber').should('have.value', '07783889300')
+  })
+  it('should display the validation summary and message if continue clicked without entering a mobile number', () => {
+    const page = Page.verifyOnPage(EditContactDetails)
+    page.getElementInput('mobileNumber').clear()
+    cy.get('[data-qa=submitBtn]').click()
+    page.checkErrorSummaryBox(['Enter a mobile number in the correct format.'])
+    cy.get(`#mobileNumber-error`).should('contain.text', 'Enter a mobile number in the correct format.')
+    page.getElementInput('phoneNumber').should('not.exist')
+    page.getElementInput('emailAddress').should('not.exist')
+    page.getElementInput('mobileNumber').should('not.have.value')
+  })
+  it('should redirect to the supporting information page if valid mobile number submitted', () => {
+    const page = Page.verifyOnPage(EditContactDetails)
+    page.getElementInput('mobileNumber').clear().type('07700900000')
+    cy.get('[data-qa=submitBtn]').click()
+    supportingInfoPage = new AppointmentNotePage()
+    supportingInfoPage.checkOnPage()
   })
 })

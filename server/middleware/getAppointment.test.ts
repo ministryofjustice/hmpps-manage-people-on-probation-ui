@@ -2,27 +2,26 @@ import httpMocks from 'node-mocks-http'
 import { getAppointment } from './getAppointment'
 import { AppResponse } from '../models/Locals'
 import HmppsAuthClient from '../data/hmppsAuthClient'
-import { getDataValue } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import { Overview } from '../data/model/overview'
-import { AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
+import { Sentence } from '../data/model/sentenceDetails'
 
 const crn = 'X000001'
 
-const mockAppt = {
-  type: 'Phone call',
-  location: '',
+const mockAppt: AppointmentSession = {
+  type: 'COAP',
+  eventId: '12345',
+  user: {
+    locationCode: 'NE5',
+    teamCode: 'NE5TTT',
+    username: 'user-1',
+  },
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
   repeating: 'Yes',
-  interval: '',
-  numberOfAppointments: '',
-  id: 1,
-  rescheduleAppointment: {
-    previousStart: '',
-    previousEnd: '',
-  },
+  smsOptIn: 'YES',
 }
 
 const username = 'user-1'
@@ -65,6 +64,21 @@ const mockTypes: AppointmentType[] = [
   },
 ]
 
+const mockSentences = [
+  {
+    id: 12345,
+    mainOffence: {
+      code: '18502',
+      description: 'Breach of Restraining Order (Protection from Harassment Act 1997) - 00831',
+    },
+    order: {
+      description: '12 month Community order',
+      endDate: '2024-12-01',
+      startDate: '2023-12-01',
+    },
+  },
+] as unknown as Sentence[]
+
 describe('/middleware/getAppointment', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -87,6 +101,9 @@ describe('/middleware/getAppointment', () => {
             },
           },
           appointmentTypes: mockTypes,
+          sentences: {
+            [crn]: mockSentences,
+          },
           providers: {
             [username]: [],
           },
@@ -114,6 +131,41 @@ describe('/middleware/getAppointment', () => {
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
     await getAppointment(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.appointment).toStrictEqual({
+      meta: {
+        isVisor: false,
+        forename: 'Joe',
+        change: null,
+        userIsAttending: true,
+        hasLocation: true,
+      },
+      type: {
+        code: 'COAP',
+        description: 'Planned Office Visit (NS)',
+        isLocationRequired: true,
+        isPersonLevelContact: false,
+      },
+      visorReport: null,
+      appointmentFor: {
+        sentence: '12 month Community order',
+        requirement: null,
+        licenceCondition: null,
+        nsi: null,
+        forename: null,
+        mobileNumber: '',
+      },
+      attending: { name: '', team: '', region: '', html: '' },
+      location: '',
+      textMessageConfirmation: 'Yes',
+      date: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      start: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      previousStart: null,
+      end: '2044-12-22T09:15:00.382936Z[Europe/London]',
+      previousEnd: null,
+      notes: null,
+      sensitivity: null,
+      outcomeRecorded: null,
+    })
     expect(getOverviewSpy).toHaveBeenCalledWith(crn)
     expect(nextSpy).toHaveBeenCalled()
   })
