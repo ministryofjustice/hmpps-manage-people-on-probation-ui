@@ -13,11 +13,11 @@
     {{ activity.type }}
   </span>
   {% if activity.isAppointment === true %}
-    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity-tag', compact: true }) }}
+    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
     {% elif activity.isCommunication %}
-    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity-tag', compact: true }) }}
+    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
   {% else %}
-    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity-tag', compact: true }) }}
+    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
   {% endif %}
 {% endmacro %}
 

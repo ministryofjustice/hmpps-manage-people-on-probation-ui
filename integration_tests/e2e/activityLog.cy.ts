@@ -51,10 +51,8 @@ context('Contacts', () => {
     cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
     cy.get('.govuk-table__header').eq(1).should('contain.text', 'Activity')
     cy.get('.govuk-table__header').eq(2).should('contain.text', 'Actions')
-    // Verify activities are rendered
     page.getActivityTitle(0).should('contain.text', 'Planned Video Contact (NS)')
     page.getActivityTitle(1).should('contain.text', 'Phone call')
-    // Verify View links exist
     page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/case/X000001/')
   })
   it('should render the page with date of death recorded warning', () => {
@@ -82,7 +80,6 @@ context('Contacts', () => {
       cy.wrap($el).find('input').should('not.be.checked')
       cy.wrap($el).find('label').should('contain.text', filters[i])
     })
-    // Verify activities are displayed with View links
     page.getActivityViewLink(0).should('exist')
   })
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
@@ -372,9 +369,7 @@ context('Contacts', () => {
   it('Contacts page renders activities with View and Manage links', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    // Verify table structure
     cy.get('.govuk-table').should('exist')
-    // Verify activities are displayed
     page.getActivityTitle(0).should('contain.text', 'Planned Video Contact (NS)')
     page.getActivityTitle(1).should('contain.text', 'Phone call')
     page.getActivityTitle(2).should('contain.text', 'Planned appointment')
@@ -382,7 +377,6 @@ context('Contacts', () => {
     page.getActivityTitle(4).should('contain.text', 'Office appointment')
     page.getActivityTitle(5).should('contain.text', 'Phone call')
     page.getActivityTitle(6).should('contain.text', 'Office appointment')
-    // Verify View links are present
     page.getActivityViewLink(0).should('contain.text', 'View')
     page
       .getActivityViewLink(6)

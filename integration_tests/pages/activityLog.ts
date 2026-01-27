@@ -27,20 +27,13 @@ export default class ActivityLogPage extends Page {
 
   getSelectedFilterTag = (index: number) => cy.get(`.moj-filter-tags li:nth-of-type(${index}) a`)
 
-  // Get activity item by 1-based index (for backwards compatibility with tests)
   getActivity = (index: string): PageElement => cy.get('.contact-activity').eq(parseInt(index, 10) - 1)
 
-  // Get activity title text by 0-based index
   getActivityTitle = (index: number): PageElement =>
     cy.get('.contact-activity').eq(index).find('.govuk-details__summary-text span').first()
 
-  // Get View link for activity by 0-based index
   getActivityViewLink = (index: number): PageElement =>
-    cy.get('.contact-activity').eq(index).find('.contact-activity-actions a').first()
-
-  // Get Manage link for activity by 0-based index (second link in actions list)
-  getActivityManageLink = (index: number): PageElement =>
-    cy.get('.contact-activity').eq(index).find('.contact-activity-actions li:nth-of-type(2) a')
+    cy.get('.contact-activity').eq(index).find('.contact-activity__actions a').first()
 
   getComplianceFilter = (index: number): PageElement =>
     cy.get(`[data-qa="compliance"] .govuk-checkboxes__item:nth-of-type(${index}) input`)
@@ -54,5 +47,5 @@ export default class ActivityLogPage extends Page {
   getTimelineCard = (index: number): PageElement => cy.get(`[data-qa="timeline${index}Card"]`)
 
   getTimelineCardViewLink = (index: number): PageElement =>
-    cy.get(`[data-qa="timeline${index}Card"]`).find('.contact-activity-actions a').first()
+    cy.get(`[data-qa="timeline${index}Card"]`).find('.contact-activity__actions a').first()
 }

@@ -636,7 +636,7 @@ body.feature-disabled {
     gap: 8px;
   }
 
-  &-tag {
+  &__tag {
     display: inline-block !important;
     float: none;
     flex-shrink: 0;
@@ -649,7 +649,7 @@ body.feature-disabled {
     justify-content: center;
   }
 
-  &-actions {
+  &__actions {
     position: absolute;
     top: 0;
     left: 100%;
@@ -664,7 +664,7 @@ body.feature-disabled {
     }
   }
 
-  &-filter {
+  &__filter {
     .govuk-button{
       @extend .govuk-button--secondary;
     }
