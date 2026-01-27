@@ -46,7 +46,6 @@ context('Contacts', () => {
   it('should render the contacts results', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    // Verify table structure
     cy.get('.govuk-table').should('exist')
     cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
     cy.get('.govuk-table__header').eq(1).should('contain.text', 'Activity')

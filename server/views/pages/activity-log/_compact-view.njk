@@ -1,12 +1,6 @@
 {% from "govuk/components/details/macro.njk" import govukDetails %}
 
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
-{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
-{% if entry.isAppointment %}
-  {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
-  {% elif entry.esupervisionId %}
-  {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
-{% endif %}
 
 {% macro rendersummaryText(activity) %}
   <span>
@@ -30,16 +24,13 @@
   </tr>
   </thead>
   <tbody class="govuk-table__body">
-  {% for entry in entries %}
-    {% set lastDate = lastEntry.startDateTime | compactActivityLogDate %}
-    {% set thisDate = entry.startDateTime | compactActivityLogDate %}
-    {% set activities = entries | filterActivities(entry.startDateTime) %}
-    {% if lastDate != thisDate %}
+  {% for group in groupedActivities %}
+    {% set entry = group.activities[0] %}
       <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-quarter">{{ thisDate }}</td>
+        <td class="govuk-table__cell govuk-!-width-one-quarter">{{ group.date }}</td>
         <td class="govuk-table__cell govuk-!-width-one-half govuk-!-padding-bottom-0" data-qa="timeline{{ loop.index }}Card">
           <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
-            {% for activity in activities %}
+            {% for activity in group.activities %}
               <li class="contact-activity">
                 {% set notes = '' %}
                 {% set hasNote = activity.appointmentNote and activity.hasOutcome != true %}
@@ -69,8 +60,6 @@
         </td>
         <td class="govuk-table__cell govuk-!-width-one-quarter">&nbsp;</td>
       </tr>
-      {% set lastEntry = entry %}
-    {% endif %}
   {% endfor %}
   </tbody>
 </table>
