@@ -8,7 +8,6 @@ export const getOverdueOutcomes = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     res.locals.contactResponse = await masClient.getOverdueOutcomes(crn)
-
     return next()
   }
 }

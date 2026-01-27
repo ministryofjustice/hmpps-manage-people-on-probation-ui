@@ -20,4 +20,8 @@ export default class AppointmentConfirmationPage extends Page {
   getPopMobile = () => {
     return cy.get(`[data-qa="mobile"]`)
   }
+
+  getlogOutcomeLink = () => {
+    return cy.get(`[data-qa="logOutcomeLink"]`)
+  }
 }
