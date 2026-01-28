@@ -44,6 +44,10 @@ $mappa-colour: #4c2c92;
   white-space: preserve-breaks;
 }
 
+.secondary-text--with-break {
+  display: block; /* replaces <br> */
+}
+
 .dps-header {
   background-color: rgba(86, 148, 202, 0.2);
   padding: 25px 0;
