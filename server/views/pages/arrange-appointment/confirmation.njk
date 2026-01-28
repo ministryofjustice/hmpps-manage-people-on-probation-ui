@@ -1,5 +1,4 @@
 {% extends "../_form.njk" %}
-{% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
@@ -11,9 +10,6 @@
 {% if not case.mobileNumber and case.telephoneNumber %}
   {% set phoneNumber = 'telephone' %}
 {% endif %}
-{% for appointmentDate in appointment.repeatingDates %}
-  {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
-{% endfor %}
 {% set title = 'Appointment arranged' %}
 {% if isInPast %}
   {% set title = 'Past appointment arranged' %}

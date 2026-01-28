@@ -63,10 +63,7 @@
     {% if appointment.date %}
         {% set appointmentDates = (appointmentDates.push(appointment.date), appointmentDates) %}
     {% endif %}
-    {% for appointmentDate in appointment.repeatingDates %}
-        {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
-    {% endfor %}
-    {% if appointmentDates.length > 0  %}
+    {% if appointmentDates.length > 0 %}
         {% set insertText = rescheduleApptInsertText | default("You'll receive a calendar invite for the appointment.")%}
     {% endif %}
     {% set appointmentDatesHtml %}

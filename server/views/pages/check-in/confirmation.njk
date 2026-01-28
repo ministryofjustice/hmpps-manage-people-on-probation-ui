@@ -1,26 +1,20 @@
-{% set phoneeNumber = case.mobileNumber %}
-
 {% extends "../_form.njk" %}
-{% set checkInDateVal = userDetails.date | dmyToLongDate  %}
-
-
-{% set isRepeating = appointment.repeating == 'Yes' %}
+{% set phoneeNumber = case.mobileNumber %}
+{% set checkInDateVal = userDetails.date | dmyToLongDate %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
 {% set title = 'Online check ins added' %}
 {% set cases = "/case/" %}
 {% set hideButton = true %}
-{% set overViewLink = "/case/"+ crn %}
+{% set overViewLink = "/case/" + crn %}
 {% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
-{% set overViewPage = "/case/"+ crn %}
-
-
-
+{% set overViewPage = "/case/" + crn %}
 
 {% set panelHtml %}
 <div class="govuk-!-font-size-36">
-    Starting {{ userDetails.displayDay }} {{ checkInDateVal }}<br/>
+    Starting {{ userDetails.displayDay }}
+  {{ checkInDateVal }}<br/>
      then {{ userDetails.interval | lower }}
 </div>
 {% endset %}
@@ -40,19 +34,19 @@
         We have sent a confirmation to
         {{case.name.forename}} on {{ userDetails.displayCommsOption }}.
         </p>
-        <p>
-            {{case.name.forename}} will receive a message to their preferred contact method each time<br/>
+      <p>
+        {{case.name.forename}} will receive a message to their preferred contact method each time<br/>
             they need to submit an online check in. They will have 3 days to complete and<br/> submit their check in.
         </p>
-        <p>You will get an email when they have submitted a check in for you to review.</p>
+      <p>You will get an email when they have submitted a check in for you to review.</p>
 
     </div>
   </div>
-    <div class="govuk-button-group">
-        <a href="{{ overViewPage }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
-        <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
+  <div class="govuk-button-group">
+    <a href="{{ overViewPage }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
+    <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
             Go to all cases
         </a>
-    </div>
+  </div>
 
 {% endblock %}

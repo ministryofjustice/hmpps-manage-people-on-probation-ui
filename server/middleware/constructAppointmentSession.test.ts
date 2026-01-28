@@ -165,15 +165,9 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     date,
     start: date,
     end,
-    until: end,
-    interval: 'DAY',
-    numberOfAppointments: '1',
-    numberOfRepeatAppointments: '0',
     eventId: eventId.toString(),
     username,
     uuid: '',
-    repeating: 'No',
-    repeatingDates: [] as string[],
     externalReference,
     ...values,
   }
@@ -207,14 +201,9 @@ describe('/middleware/constructAppointmentSession', () => {
     })
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual({
-      interval: 'DAY',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
       eventId: '',
       username: res.locals.user.username,
       uuid: '',
-      repeating: 'No',
-      repeatingDates: [],
     })
     expect(nextSpy).toHaveBeenCalled()
   })
@@ -349,19 +338,6 @@ describe('/middleware/constructAppointmentSession', () => {
         type: 'COAP',
       }),
     )
-  })
-
-  it('should set until as an empty string if end date does not exist in person appointment', () => {
-    const mockAppt = mockPersonAppointmentResponse({
-      endDateTime: undefined,
-    })
-    const req = mockReq()
-    const res = mockAppResponse({
-      personAppointment: mockAppt,
-      appointmentTypes: mockTypes,
-    })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ until: '', end: '' }))
   })
 
   it('should add requirementId if requirement component in person appointment', () => {
