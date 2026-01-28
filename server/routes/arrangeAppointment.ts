@@ -25,64 +25,116 @@ import { dateIsInPast } from '../utils'
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
 
-  router.all(
+  // intial redirect
+  get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
+
+  // GET
+  // pre-steps for each page
+  router.get('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
+  router.get(
+    '/case/:crn/arrange-appointment/:id/type-attendance',
+    redirectWizard(['eventId']),
+    getDefaultUser(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/attendance',
+    redirectWizard(['eventId']),
+    getUserOptions(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/location-date-time',
+    redirectWizard(['eventId', 'type']),
+    getTimeOptions,
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+  )
+  router.get('/case/:crn/arrange-appointment/:id/location-not-in-list', redirectWizard(['eventId', 'type']))
+  router.get('/case/:crn/arrange-appointment/:id/attended-complied', redirectWizard(['eventId', 'type', 'date']))
+  router.get(
+    '/case/:crn/arrange-appointment/:id/supporting-information',
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/check-your-answers',
+    redirectWizard(['eventId']),
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/confirmation',
+    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
+    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+  )
+  // common pre-steps and final pre-step
+  router.get(
     '/case/:crn/arrange-appointment/:id/*path',
     getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
   )
-  router.all('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
-  get('/case/:crn/arrange-appointment/sentence', controllers.arrangeAppointments.redirectToSentence())
-  get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
+  // load pages
+  router.get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
+  router.get('/case/:crn/arrange-appointment/:id/type-attendance', controllers.arrangeAppointments.getTypeAttendance())
+  router.get('/case/:crn/arrange-appointment/:id/attendance', controllers.arrangeAppointments.getWhoWillAttend())
+  router.get(
+    '/case/:crn/arrange-appointment/:id/location-date-time',
+    controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/location-not-in-list',
+    controllers.arrangeAppointments.getLocationNotInList(),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/attended-complied',
+    controllers.arrangeAppointments.getAttendedComplied(),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/supporting-information',
+    controllers.arrangeAppointments.getSupportingInformation(),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/check-your-answers',
+    checkAnswers,
+    controllers.arrangeAppointments.getCheckYourAnswers(),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/confirmation',
+    controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
+  )
+  router.get(
+    '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
+    checkAnswers,
+    controllers.arrangeAppointments.getArrangeAnotherAppointment(),
+  )
 
+  // POST
+  // pre-steps for each page
+  router.post('/case/:crn/arrange-appointment/:id/sentence', getSentences(hmppsAuthClient))
+  router.post('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
+  // common pre-steps and final pre-steps
   router.post('/case/:crn/arrange-appointment/:id/*path', [
     autoStoreSessionData(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
+    getAppointmentTypes(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
     checkAnswers,
   ])
-
+  // complete post
   router.post(
     '/case/:crn/arrange-appointment/:id/sentence',
     validate.appointments,
     controllers.arrangeAppointments.postSentence(),
   )
-  router.get(
-    '/case/:crn/arrange-appointment/:id/type-attendance',
-    redirectWizard(['eventId']),
-    getAppointmentTypes(hmppsAuthClient),
-    getPersonalDetails(hmppsAuthClient),
-    getDefaultUser(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    controllers.arrangeAppointments.getTypeAttendance(),
-  )
-
   router.post(
     '/case/:crn/arrange-appointment/:id/type-attendance',
     routeChangeAttendee,
     validate.appointments,
     controllers.arrangeAppointments.postTypeAttendance(),
   )
-  router.get(
-    '/case/:crn/arrange-appointment/:id/attendance',
-    redirectWizard(['eventId']),
-    getUserOptions(hmppsAuthClient),
-
-    controllers.arrangeAppointments.getWhoWillAttend(),
-  )
   router.post(
     '/case/:crn/arrange-appointment/:id/attendance',
     validate.appointments,
     controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient),
-  )
-
-  router.all('/case/:crn/arrange-appointment/:id/location-date-time', getTimeOptions)
-  router.get(
-    '/case/:crn/arrange-appointment/:id/location-date-time',
-    redirectWizard(['eventId', 'type']),
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getPersonRiskFlags(hmppsAuthClient),
-    controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',
@@ -90,66 +142,26 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     checkAppointments(hmppsAuthClient),
     controllers.arrangeAppointments.postLocationDateTime(),
   )
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/location-not-in-list',
-    redirectWizard(['eventId', 'type']),
-    controllers.arrangeAppointments.getLocationNotInList(),
-  )
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/attended-complied',
-    redirectWizard(['eventId', 'type', 'date']),
-    controllers.arrangeAppointments.getAttendedComplied(),
-  )
-
   router.post(
     '/case/:crn/arrange-appointment/:id/attended-complied',
     validate.appointments,
     controllers.arrangeAppointments.postAttendedComplied(),
   )
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/supporting-information',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
-    controllers.arrangeAppointments.getSupportingInformation(),
-  )
-
   router.post(
     '/case/:crn/arrange-appointment/:id/supporting-information',
     validate.appointments,
     controllers.arrangeAppointments.postSupportingInformation(),
   )
-
-  router.get(
-    '/case/:crn/arrange-appointment/:id/check-your-answers',
-    redirectWizard(['eventId']),
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    checkAnswers,
-    controllers.arrangeAppointments.getCheckYourAnswers(),
-  )
   router.post(
     '/case/:crn/arrange-appointment/:id/check-your-answers',
     controllers.arrangeAppointments.postCheckYourAnswers(hmppsAuthClient),
   )
-  router.get(
-    '/case/:crn/arrange-appointment/:id/confirmation',
-    redirectWizard(['eventId', 'type', ['user', 'locationCode']]),
-    controllers.arrangeAppointments.getConfirmation(hmppsAuthClient),
-  )
   router.post('/case/:crn/arrange-appointment/:id/confirmation', controllers.arrangeAppointments.postConfirmation())
-  router.get(
-    '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
-    getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
-    getAppointment(hmppsAuthClient),
-    checkAnswers,
-    controllers.arrangeAppointments.getArrangeAnotherAppointment(),
-  )
   router.post(
     '/case/:crn/arrange-appointment/:id/arrange-another-appointment',
     controllers.arrangeAppointments.postArrangeAnotherAppointment(hmppsAuthClient),
   )
+
   router.post('/alert/dismiss', (req, res) => {
     req.session.alertDismissed = true
     return res.json({ success: true })
