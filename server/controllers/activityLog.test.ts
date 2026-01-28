@@ -37,6 +37,7 @@ jest.mock('../data/hmppsAuthClient', () => {
 })
 jest.mock('../data/arnsApiClient')
 jest.mock('../utils', () => ({
+  ...jest.requireActual('../utils'),
   toRoshWidget: jest.fn(),
   toPredictors: jest.fn(),
 }))
@@ -161,6 +162,13 @@ describe('/controllers/activityLogController', () => {
         url: req.url,
         resultsStart: 1,
         resultsEnd: 1,
+        errorMessages: undefined,
+        groupedActivities: [
+          {
+            date: 'Thu 22 Dec 2044',
+            activities: mockActivities.activities,
+          },
+        ],
       })
     })
   })
