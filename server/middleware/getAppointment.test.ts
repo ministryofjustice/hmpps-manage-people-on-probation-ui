@@ -15,9 +15,6 @@ const mockAppt = {
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  repeating: 'Yes',
-  interval: '',
-  numberOfAppointments: '',
   id: 1,
   rescheduleAppointment: {
     previousStart: '',

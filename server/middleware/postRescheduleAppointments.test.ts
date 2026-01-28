@@ -72,9 +72,6 @@ const mockAppointment: AppointmentSession = {
   date: tomorrow.toFormat('yyyy-M-dd'),
   start: '09:00',
   end: '09:30',
-  until: tomorrow.toFormat('yyyy-M-dd'),
-  interval: 'DAY',
-  numberOfAppointments: '1',
   eventId: '250113825',
   requirementId: '1',
   licenceConditionId: '2500686668',
@@ -191,7 +188,7 @@ describe('middleware/postRescheduleAppointments', () => {
     })
   })
   describe('reschedule an appointment in the past', () => {
-    const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10', until: '2025-03-10' })
+    const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10' })
     const {
       date,
       start: startTime,

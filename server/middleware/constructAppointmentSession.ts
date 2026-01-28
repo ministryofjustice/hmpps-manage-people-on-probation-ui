@@ -10,14 +10,9 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
   const { nextAppointment: nextAppointmentSelection } = req.body
 
   let nextAppointment: AppointmentSession = {
-    interval: 'DAY',
-    numberOfAppointments: '1',
-    numberOfRepeatAppointments: '0',
     eventId: '',
     username: res.locals.user.username,
     uuid: '',
-    repeating: 'No',
-    repeatingDates: [],
   }
 
   if (nextAppointmentSelection === 'KEEP_TYPE' || nextAppointmentSelection === 'RESCHEDULE') {
@@ -98,15 +93,9 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       date,
       start: date,
       end,
-      until: end,
-      interval: 'DAY',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
       eventId: eventId?.toString(),
       username: res.locals.user.username,
       uuid: '',
-      repeating: 'No',
-      repeatingDates: [],
       externalReference,
     }
 

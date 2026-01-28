@@ -912,7 +912,6 @@ describe('controllers/arrangeAppointment', () => {
         type: 'X',
         date: 'X',
         sensitivity: 'No',
-        repeating: 'No',
       }
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
@@ -971,7 +970,6 @@ describe('controllers/arrangeAppointment', () => {
       date: '2025/7/2',
       start: '9:00am',
       end: '9:30am',
-      repeatingDates: ['2025/7/9', '2025/7/16'],
       backendId: 5,
     }
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
@@ -1033,7 +1031,6 @@ describe('controllers/arrangeAppointment', () => {
           type: 'type',
           date: '',
           sensitivity: 'No',
-          repeating: 'No',
         },
       })
       mockedIsValidCrn.mockReturnValue(true)
