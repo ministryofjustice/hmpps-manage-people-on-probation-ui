@@ -37,7 +37,7 @@ const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementat
 const predictorsSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
   .mockImplementation(() => Promise.resolve(mockPredictors))
-const res = mockAppResponse()
+const res = mockAppResponse({ flags: { enableCompliancePage: true } })
 const renderSpy = jest.spyOn(res, 'render')
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
