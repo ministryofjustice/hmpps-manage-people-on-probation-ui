@@ -12,6 +12,9 @@ const complianceController: Controller<typeof routes, void> = {
   getCompliance: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
+      if (!res?.locals?.flags?.enableCompliancePage) {
+        return res.redirect(`/case/${crn}`)
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_COMPLIANCE',

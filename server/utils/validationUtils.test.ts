@@ -31,7 +31,6 @@ import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
   activityLogValidation,
   appointmentsValidation,
-  type AppointmentsValidationArgs,
   documentSearchValidation,
   personDetailsValidation,
   eSuperVisionValidation,
@@ -340,95 +339,6 @@ describe('validates edit main address request with spec', () => {
       expect(validateWithSpec(a, b)).toEqual(expected)
     },
   )
-})
-
-describe('validates appointment repeat request with spec when no repeating option is selected', () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-  const testRequest = {
-    appointments: {
-      [crn]: {
-        [id]: {
-          repeating: undefined,
-        },
-      },
-    },
-  } as unknown as Validateable
-  const expectedResult: Record<string, string> = {
-    [`appointments-${crn}-${id}-repeating`]: 'Select if the appointment will repeat',
-  }
-  const args: AppointmentsValidationArgs = {
-    crn,
-    id,
-    page: 'repeating',
-    repeatingValue: undefined,
-  }
-  const spec = appointmentsValidation(args)
-  it('should return the correct validation errors', () => {
-    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
-  })
-  it('should log the error', () => {
-    validateWithSpec(testRequest, spec)
-    expect(loggerSpy).toHaveBeenCalledWith('Appointment repeat not selected')
-  })
-})
-describe(`validates appointment repeat request with spec when no repeating option is 'Yes'`, () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-  const testRequest = {
-    appointments: {
-      [crn]: {
-        [id]: {
-          repeating: 'Yes',
-        },
-      },
-    },
-  } as unknown as Validateable
-  const expectedResult: Record<string, string> = {
-    [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-numberOfRepeatAppointments`]: 'Enter the number of times the appointment will repeat',
-  }
-  const args: AppointmentsValidationArgs = {
-    crn,
-    id,
-    page: 'repeating',
-    repeatingValue: 'Yes',
-  }
-  const spec = appointmentsValidation(args)
-  it('should return the correct validation errors', () => {
-    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
-  })
-})
-
-describe(`validates appointment repeat request with spec when no repeating option is 'Yes'`, () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-  const testRequest = {
-    appointments: {
-      [crn]: {
-        [id]: {
-          repeating: 'Yes',
-        },
-      },
-    },
-  } as unknown as Validateable
-  const expectedResult: Record<string, string> = {
-    [`appointments-${crn}-${id}-interval`]: 'Select the frequency the appointment will repeat',
-    [`appointments-${crn}-${id}-numberOfRepeatAppointments`]: 'Enter the number of times the appointment will repeat',
-  }
-  const args: AppointmentsValidationArgs = {
-    crn,
-    id,
-    page: 'repeating',
-    repeatingValue: 'Yes',
-  }
-  const spec = appointmentsValidation(args)
-  it('should return the correct validation errors', () => {
-    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
-  })
 })
 
 describe('validates appointment location and date time page request with spec', () => {

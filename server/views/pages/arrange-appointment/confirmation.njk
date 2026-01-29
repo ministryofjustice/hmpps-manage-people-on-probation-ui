@@ -1,5 +1,4 @@
 {% extends "../_form.njk" %}
-{% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
@@ -11,9 +10,6 @@
 {% if not case.mobileNumber and case.telephoneNumber %}
   {% set phoneNumber = 'telephone' %}
 {% endif %}
-{% for appointmentDate in appointment.repeatingDates %}
-  {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
-{% endfor %}
 {% set title = 'Appointment arranged' %}
 {% if isInPast %}
   {% set title = 'Past appointment arranged' %}
@@ -47,6 +43,7 @@
 {% block primary %}
   {{ govukPanel({
   titleHtml: '<span data-qa="pageHeading">' + title + '</span>',
+  headingLevel: 2,
   html: panelHtml
 }) }}
   <div class="govuk-grid-row">
@@ -86,6 +83,20 @@
                         arrange another appointment
                     </a>
         </li>
+        {% if contactResponse.content.length > 0 %}
+          <li>
+            {% if contactResponse.content.length == 1 %}
+              <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
+        log appointment outcome for {{ contactResponse.content[0].date | dayOfWeek + ' ' + contactResponse.content[0].date | dateWithYear }}
+              </a>
+            {% endif %}
+            {% if contactResponse.content.length > 1 %}
+              <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
+        log outcomes for {{ contactResponse.content.length }} appointments
+          </a>
+            {% endif %}
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>

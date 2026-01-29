@@ -314,12 +314,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         return renderError(404)(req, res)
       }
       const path = ['appointments', crn, id]
-      const appointment = getDataValue<AppointmentSession>(data, path)
-      const { date } = appointment
-      const until = date
-      setDataValue(data, [...path, 'numberOfAppointments'], '1')
-      setDataValue(data, [...path, 'interval'], 'DAY')
-      setDataValue(data, [...path, 'until'], until)
       if (change) {
         const originalDate = getDataValue(data, [...path, 'temp', 'date'])
         const updatedDate = getDataValue(data, [...path, 'date'])

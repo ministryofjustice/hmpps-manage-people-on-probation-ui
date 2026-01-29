@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import CompliancePage from '../pages/compliance'
+import OverviewPage from '../pages/overview'
 import { checkPopHeader } from './appointments/imports'
 
 context('Compliance', () => {
@@ -102,5 +103,10 @@ context('Compliance', () => {
   it('should display the PoP details header on the previous order page', () => {
     cy.visit('/case/X000001/sentence/previous-orders/3')
     checkPopHeader()
+  })
+  it('should redirect to overview if compliance page feature flag is disabled', () => {
+    cy.task('stubDisableCompliancePage')
+    cy.visit('/case/X778160/compliance')
+    Page.verifyOnPage(OverviewPage)
   })
 })

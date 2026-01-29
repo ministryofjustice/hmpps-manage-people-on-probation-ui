@@ -3,7 +3,6 @@ export class FeatureFlags {
   [index: string]: boolean
   enableAppointmentCreate?: boolean = undefined
   enableDeleteAppointmentFile?: boolean = undefined
-  enableManageAppointments?: boolean = undefined
   enableSentencePlan?: boolean = undefined
   enableSanIndicator?: boolean = undefined
   enableProbFEComponent?: boolean = undefined
@@ -12,4 +11,5 @@ export class FeatureFlags {
   enableRescheduleAppointment?: boolean = undefined
   enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
+  enableCompliancePage?: boolean = undefined
 }

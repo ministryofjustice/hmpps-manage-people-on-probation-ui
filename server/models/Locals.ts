@@ -49,8 +49,6 @@ export interface AppointmentLocals {
   end?: string
   previousEnd?: string
   date?: string
-  repeating?: string
-  repeatingDates?: string[]
   notes?: string
   sensitivity?: string
   outcomeRecorded?: string

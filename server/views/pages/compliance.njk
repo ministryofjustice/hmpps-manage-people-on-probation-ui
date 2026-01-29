@@ -30,7 +30,7 @@
 
   {% set showWarning = false %}
   {% for sentence in personCompliance.currentSentences %}
-    {% if sentence.compliance.currentBreaches > 0 %}
+    {% if sentence.compliance.breachesOnCurrentOrderCount > 0 %}
       {% set showWarning = true %}
     {% endif %}
   {% endfor %}

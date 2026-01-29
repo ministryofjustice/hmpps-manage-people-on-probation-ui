@@ -24,18 +24,12 @@ export interface AppointmentSession {
   date?: string
   start?: string
   end?: string
-  until?: string
-  interval?: AppointmentInterval
-  numberOfAppointments?: string
-  numberOfRepeatAppointments?: string
   eventId?: string
   username?: string
   uuid?: string
   requirementId?: string
   licenceConditionId?: string
   nsiId?: string
-  repeating?: YesNo
-  repeatingDates?: string[]
   notes?: string
   sensitivity?: YesNo
   backendId?: number
@@ -106,7 +100,6 @@ export interface AppointmentRequestBody {
   requirementId?: number
   licenceConditionId?: number
   nsiId?: number
-  until?: Date
   notes?: string
   sensitive?: boolean
   visorReport?: boolean

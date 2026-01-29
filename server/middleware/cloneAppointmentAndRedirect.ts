@@ -21,11 +21,6 @@ export const cloneAppointmentAndRedirect = (appointmentToClone: AppointmentSessi
       date: '',
       start: '',
       end: '',
-      repeatingDates: [] as string[],
-      until: '',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
-      repeating: 'No',
       notes: null,
       sensitivity: null,
     }

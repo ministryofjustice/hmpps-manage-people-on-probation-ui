@@ -20,8 +20,11 @@ const mockAppt: AppointmentSession = {
   date: '2044-12-22T09:15:00.382936Z[Europe/London]',
   start: '2044-12-22T09:15:00.382936Z[Europe/London]',
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
-  repeating: 'Yes',
   smsOptIn: 'YES',
+  rescheduleAppointment: {
+    previousStart: '',
+    previousEnd: '',
+  },
 }
 
 const username = 'user-1'
@@ -159,9 +162,9 @@ describe('/middleware/getAppointment', () => {
       textMessageConfirmation: 'Yes',
       date: '2044-12-22T09:15:00.382936Z[Europe/London]',
       start: '2044-12-22T09:15:00.382936Z[Europe/London]',
-      previousStart: null,
+      previousStart: '',
       end: '2044-12-22T09:15:00.382936Z[Europe/London]',
-      previousEnd: null,
+      previousEnd: '',
       notes: null,
       sensitivity: null,
       outcomeRecorded: null,

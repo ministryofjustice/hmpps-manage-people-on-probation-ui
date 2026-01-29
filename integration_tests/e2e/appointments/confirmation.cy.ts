@@ -100,7 +100,10 @@ describe('Confirmation page', () => {
         .should('contain', 'the NDelius contact log and officer diary, along with any supporting information')
       cy.get('[data-qa="outlook-err-msg-1"]').should('not.exist')
       cy.get('[data-qa="outlook-err-msg-2"]').should('not.exist')
-
+      confirmPage
+        .getlogOutcomeLink()
+        .should('contain.text', 'log outcomes for 2 appointments')
+        .should('have.attr', 'href', '/case/X778160/record-an-outcome/outcome')
       confirmPage.getSubmitBtn().should('contain.text', "Return to Alton's overview")
       confirmPage.getSubmitBtn().click()
       const nextAppointmentPage = new OverviewPage()
@@ -134,6 +137,21 @@ describe('Confirmation page', () => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
         })
+    })
+
+    it('should render the page with no log outcomes link', () => {
+      cy.task('stubNoOverdueOutcomes')
+      loadPage('X000001')
+      confirmPage.getlogOutcomeLink().should('not.exist')
+    })
+
+    it('should render the page with log outcome for a single appointment link', () => {
+      cy.task('stubSingleOverdueOutcome')
+      loadPage('X000001')
+      confirmPage
+        .getlogOutcomeLink()
+        .should('contain.text', 'log appointment outcome for Thursday 21 March 2024')
+        .should('have.attr', 'href', `/case/X000001/appointments/appointment/5/manage`)
     })
 
     it('should link to the appointment page when practitioner click Return to all cases', () => {
@@ -294,6 +312,7 @@ describe('Confirmation page', () => {
           .find('li')
           .eq(1)
           .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
+        confirmPage.getlogOutcomeLink().should('contain.text', 'log outcomes for 2 appointments')
       })
     })
   })
