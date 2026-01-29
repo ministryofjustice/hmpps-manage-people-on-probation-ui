@@ -35,6 +35,9 @@ export default class ActivityLogPage extends Page {
   getActivityViewLink = (index: number): PageElement =>
     cy.get('.contact-activity').eq(index).find('.contact-activity__actions a').first()
 
+  getActivityViewNoNotes = (index: number): PageElement =>
+    cy.get('.contact-activity').eq(index).find('.contact-activity--noNotes a').first()
+
   getComplianceFilter = (index: number): PageElement =>
     cy.get(`[data-qa="compliance"] .govuk-checkboxes__item:nth-of-type(${index}) input`)
 

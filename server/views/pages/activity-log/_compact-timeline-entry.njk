@@ -9,13 +9,15 @@
 {% endif %}
 
 {% set titleHtml %}
-  <ul class="govuk-list contact-activity__actions govuk-!-margin-top-0">
-    <li><a href="{{ link }}" class="govuk-link govuk-!-margin-right-2" rel="noopener noreferrer">View</a></li>
-    <li>
-      {% if entry.esupervisionId and flags.enableESuperVision %}
-        {% elif shouldPromptToRecordAnOutcome %} {% include './_log-outcome-link.njk' %}
-      {% endif %}
-    </li>
+    <ul class="govuk-list contact-activity__actions govuk-!-margin-top-0">
+    {% if entry.esupervisionId and flags.enableESuperVision  %}
+      <li><a href="{{ '/case/' + crn + '/activity/' + entry.id + '?back=' + url  }}" class="govuk-link govuk-!-margin-right-2" rel="noopener noreferrer">View</a></li>
+      <li><a href="{{ link }}">Update</a></li>
+      {% elif shouldPromptToRecordAnOutcome %}
+        {% include './_log-outcome-link.njk' %}
+      {% else %}
+      <li><a href="{{ link }}" rel="noopener noreferrer">View</a></li>
+    {% endif %}
   </ul>
 {% endset %}
 

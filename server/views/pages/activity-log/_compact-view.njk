@@ -2,10 +2,7 @@
 
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
 
-{% macro rendersummaryText(activity) %}
-  <span>
-    {{ activity.type }}
-  </span>
+{% macro renderComplianceTag(activity) %}
   {% if activity.isAppointment === true %}
     {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
     {% elif activity.isCommunication %}
@@ -15,12 +12,19 @@
   {% endif %}
 {% endmacro %}
 
+{% macro rendersummaryText(activity) %}
+  <span>
+    {{ activity.type | toSentenceCase }}
+  </span>
+  {{ renderComplianceTag(activity) }}
+{% endmacro %}
+
 <table class="govuk-table govuk-!-margin-top-4">
   <thead class="govuk-table__head">
   <tr class="govuk-table__row">
     <th class="govuk-table__header govuk-!-width-one-quarter">Date</th>
     <th class="govuk-table__header govuk-!-width-one-half">Activity</th>
-    <th class="govuk-table__header govuk-!-width-one-quarter">Actions</th>
+    <th class="govuk-table__header govuk-!-width-one-quarter contact-activity__actions-header">Actions</th>
   </tr>
   </thead>
   <tbody class="govuk-table__body">
@@ -32,7 +36,12 @@
           <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
             {% for activity in group.activities %}
               <li class="contact-activity">
-                {% set notes = '' %}
+                {% set notes = '' %}{% set link = '/case/' + crn + '/activity/' + activity.id + '?back=' + url %}
+                {% if activity.isAppointment %}
+                  {% set link = '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage?back=' + url %}
+                  {% elif entry.esupervisionId %}
+                  {% set link = '/case/' + crn + '/appointments/' + activity.esupervisionId + '/check-in/update?back=' + url %}
+                {% endif %}
                 {% set hasNote = activity.appointmentNote and activity.hasOutcome != true %}
                 {% set hasNotes = activity.appointmentNotes.length > 0 and activity.hasOutcome != true %}
                 {% if hasNotes %}
@@ -48,17 +57,23 @@
                       }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
                     {% endif %}
                   {% endfor %}
+                  {{ govukDetails({
+                    summaryText: rendersummaryText(activity),
+                    html: notes
+                  }) }}
+                {% else %}
+                  <div class="govuk-!-margin-right-2 govuk-!-margin-bottom-6 contact-activity--noNotes">
+                    <a href="{{ link }}"  rel="noopener noreferrer" class="govuk-link" >{{ activity.type | toSentenceCase }}</a>
+                    {{ renderComplianceTag(activity)  }}
+                  </div>
                 {% endif %}
-                {{ govukDetails({
-                  summaryText: rendersummaryText(activity),
-                  html: notes
-                }) }}
+                {% set entry = activity %}
                 {% include "./_compact-timeline-entry.njk" %}
               </li>
             {% endfor %}
           </ul>
         </td>
-        <td class="govuk-table__cell govuk-!-width-one-quarter">&nbsp;</td>
+        <td class="govuk-table__cell govuk-!-width-one-quarter contact-activity__actions-cell">&nbsp;</td>
       </tr>
   {% endfor %}
   </tbody>
