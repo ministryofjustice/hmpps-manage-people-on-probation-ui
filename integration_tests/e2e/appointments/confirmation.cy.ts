@@ -295,6 +295,7 @@ describe('Confirmation page', () => {
           .find('li')
           .eq(1)
           .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
+        confirmPage.getlogOutcomeLink().should('contain.text', 'log outcomes for 2 appointments')
       })
     })
   })
