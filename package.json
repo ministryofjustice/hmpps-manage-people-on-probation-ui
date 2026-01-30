@@ -252,6 +252,15 @@
     },
     "formidable": "3.5.3",
     "cross-spawn": "7.0.5",
-    "qs": "^6.14.1"
+    "qs": "^6.14.1",
+    "@cypress/code-coverage": {
+      "js-yaml": "4.1.1"
+    },
+    "@ministryofjustice/hmpps-probation-integration-e2e-tests": {
+      "js-yaml": "4.1.1"
+    },
+    "@istanbuljs/load-nyc-config": {
+      "js-yaml": "^3.14.0"
+    }
   }
 }
