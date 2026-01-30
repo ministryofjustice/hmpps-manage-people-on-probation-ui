@@ -1,7 +1,10 @@
 {% if entry.esupervisionId %}
-    <a href="/case/{{ crn }}/appointments/{{ entry.esupervisionId }}/check-in/update?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
-{% elif entry.deliusManaged %}
-    <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank" rel="external noopener noreferrer" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span></a>
+  <li><a href="/case/{{ crn }}/appointments/{{ entry.esupervisionId }}/check-in/update?back={{ url }}">Update</a></li>
+  {% elif entry.deliusManaged %}
+  <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-link govuk-!-margin-right-2" >View</a></li>
+  <li><a href="{{ deliusDeepLinkUrl('UpdateContact', crn, entry.id) }}" target="_blank"
+         rel="external noopener noreferrer" class="contact-activity__manage-link">Manage on NDelius<span
+          class="govuk-visually-hidden"> (opens in new tab)</span></a></li>
 {% else %}
-    <a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?back={{ url }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Manage</a>
+  <li><a href="/case/{{ crn }}/appointments/appointment/{{ entry.id }}/manage?back={{ url }}">Manage</a></li>
 {% endif %}

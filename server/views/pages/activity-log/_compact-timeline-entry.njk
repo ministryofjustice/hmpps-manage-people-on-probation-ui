@@ -1,44 +1,24 @@
-{% set hasOutcomeBeenConfirmed = entry.didTheyComply === true or entry.rescheduled === true %}
 {% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
 {% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
-{% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
 
 {% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
 {% if entry.isAppointment %}
-      {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
-{% elif entry.esupervisionId %}
-      {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
+  {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+  {% elif entry.esupervisionId %}
+  {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
 {% endif %}
 
 {% set titleHtml %}
-<p class="govuk-body govuk-!-margin-bottom-1" data-qa="timeline{{ loop.index }}Card">
-      <a href="{{ link }}">
-            {% if entry.isAppointment === true %}
-                  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-                  {{ entry.type | toSentenceCase }} at&nbsp;{{ entry.startDateTime | govukTime }}
-            {% elif entry.isCommunication %}
-                  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-                  {% include './_communication-title.njk' %} at {{ entry.startDateTime | govukTime }}
-            {% else %}
-                  {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2', compact: true }) }}
-                  {{ entry.type | toSentenceCase }}
-            {% endif %}
-            <span class="govuk-visually-hidden"> on {{ thisDate }}
-            </a>
-            {% if entry.esupervisionId and flags.enableESuperVision  %}
-                  <br/><a href="{{ link }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
-            {% elif shouldPromptToRecordAnOutcome %}
-                  <br/>{% include './_log-outcome-link.njk' %}
-            {% endif %}
-      </p>
-      {% endset %}
+    <ul class="govuk-list contact-activity__actions govuk-!-margin-top-0">
+    {% if entry.esupervisionId and flags.enableESuperVision  %}
+      <li><a href="{{ '/case/' + crn + '/activity/' + entry.id + '?back=' + url  }}" class="govuk-link govuk-!-margin-right-2" rel="noopener noreferrer">View</a></li>
+      <li><a href="{{ link }}">Update</a></li>
+      {% elif shouldPromptToRecordAnOutcome %}
+        {% include './_log-outcome-link.njk' %}
+      {% else %}
+      <li><a href="{{ link }}" rel="noopener noreferrer">View</a></li>
+    {% endif %}
+  </ul>
+{% endset %}
 
-      {% set html %}
-      {% include './_timeline-notes.njk' %}
-      {% endset %}
-
-      {% set actionsHtml %}
-      {{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
-      {% endset %}
-
-      {{ titleHtml | safe }}
+{{ titleHtml | safe }}
