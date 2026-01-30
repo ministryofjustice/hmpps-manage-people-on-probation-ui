@@ -187,7 +187,7 @@ context('Risk', () => {
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload and san indicator is false', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload and san indicator is false', () => {
     cy.task('stubAuthSentencePlan')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
@@ -195,8 +195,8 @@ context('Risk', () => {
     checkRiskPageView(page)
   })
 
-  it('Risk overview page is rendered when has no sentence plan, pop in users caseload and san indicator is false', () => {
-    cy.task('stubSentencePlan404')
+  it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
+    cy.task('stubSentencePlanAgreementDraft')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
@@ -205,7 +205,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload and san indicator is true', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload and san indicator is true', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
@@ -215,7 +215,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and san indicator feature flag is disabled', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and san indicator feature flag is disabled', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubNoSanIndicator')
     cy.task('stubUserCaseloadSearch')
@@ -225,8 +225,8 @@ context('Risk', () => {
     checkRiskPageView(page)
   })
 
-  it('Risk overview page is rendered when has no sentence plan, pop in users caseload and san indicator is true', () => {
-    cy.task('stubSentencePlan404')
+  it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
+    cy.task('stubSentencePlanAgreementDraft')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')
@@ -236,7 +236,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop not in users caseload and san indicator is true', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop not in users caseload and san indicator is true', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubAuthSentencePlan')
     cy.task('stubUserNoCaseload')
@@ -248,7 +248,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
@@ -260,7 +260,7 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlan)
   })
 
-  it('Risk overview page is rendered when has sentence plan, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
     cy.task('stubNoSentencePlanAndSanIndicator')
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')

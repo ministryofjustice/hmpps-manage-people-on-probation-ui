@@ -46,6 +46,8 @@ export const mockSentencePlans: SentencePlan[] = [
             externalId: 'string',
             username: 'string',
           },
+          note: 'string',
+          type: 'note',
         },
       ],
       planProgressNotes: [
@@ -62,6 +64,7 @@ export const mockSentencePlans: SentencePlan[] = [
             externalId: 'string',
             username: 'string',
           },
+          type: 'string',
         },
       ],
       goals: [
@@ -105,6 +108,8 @@ export const mockSentencePlans: SentencePlan[] = [
               note: 'string',
               type: 'PROGRESS',
               createdDate: '2025-09-29T10:54:36.782Z',
+              createdBy: { externalId: 'string', username: 'string' },
+              personName: '',
               practitionerName: 'string',
             },
           ],
@@ -121,6 +126,7 @@ export const mockSentencePlans: SentencePlan[] = [
       mostRecentUpdateByName: 'string',
       crn: 'string',
     },
+    versions: [],
     crn: 'string',
   },
 ]

@@ -63,6 +63,7 @@ export const postRescheduleAppointments = (
     if (rescheduleAppointment?.reason) {
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
     }
+    console.dir(body, { depth: null })
     const response = await masClient.putRescheduleAppointment(contactId, body)
     const userDetails = await masClient.getUserDetails(username)
     let eventResponse: EventResponse
