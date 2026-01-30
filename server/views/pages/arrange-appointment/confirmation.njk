@@ -54,7 +54,7 @@
       {% else %}
         <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
       {% endif %}
-      {% if not isInPast or isInPast and appointmentType === 'RESCHEDULE' %}
+      {% if not isInPast %}
         {% if isOutLookEventFailed %}
           <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
           <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType === 'RESCHEDULE' %} details have been updated on

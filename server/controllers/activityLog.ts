@@ -2,9 +2,8 @@ import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget } from '../utils'
+import { toPredictors, toRoshWidget, groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
 
 const routes = ['getOrPostActivityLog', 'getActivity'] as const
@@ -75,6 +74,7 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsStart,
         resultsEnd,
         errorMessages: req.session.errorMessages,
+        groupedActivities: groupActivitiesByDate(personActivity.activities),
       })
     }
   },

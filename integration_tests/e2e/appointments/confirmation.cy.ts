@@ -343,7 +343,7 @@ describe('Confirmation page', () => {
           .eq(1)
           .should(
             'contain.text',
-            'The appointment details have been updated on the NDelius contact log and officer diary.',
+            'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.',
           )
       })
     })
