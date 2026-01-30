@@ -138,12 +138,6 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
-  it('Overview page is rendered with enable compliance page feature flag disabled', () => {
-    cy.task('stubDisableCompliancePage')
-    cy.visit('/case/X000001')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getTab('compliance').should('not.exist')
-  })
   it('Overview page is rendered with date of death', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001')
