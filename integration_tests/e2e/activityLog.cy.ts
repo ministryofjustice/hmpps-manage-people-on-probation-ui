@@ -509,7 +509,6 @@ context('Contacts', () => {
   it('Contacts page renders activities in compact view', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
-    // Page now always renders in compact view (table format)
     cy.get('.govuk-table').should('exist')
     page.getActivity('1').should('contain.text', 'Planned video contact (NS)')
     page.getActivity('2').should('contain.text', 'Phone call')
