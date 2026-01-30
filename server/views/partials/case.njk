@@ -27,7 +27,14 @@
 
     {% if currentSectionName %}
         {% if not riskPage %}
-            <h2 class="govuk-heading-l{% if currentSectionNameSubText %} govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
+            <div class="flex">
+                <h2 class="govuk-heading-l govuk-!-margin-bottom-0{% if currentSectionNameSubText %} govuk-!-margin-bottom-2{% endif %}" data-qa="pageHeading">{{ currentSectionName }}</h2>
+                {% if headerActionHref %}
+                    <a href="{{ headerActionHref }}" role="button" draggable="false" class="govuk-button govuk-!-margin-bottom-0 govuk-!-margin-left-3" data-module="govuk-button" data-qa="headerActionButton">
+                        {{ headerActionText }}
+                    </a>
+                {% endif %}
+            </div>
             {% include "../partials/_date-of-death-warning.njk" %}
             {% if currentSectionNameSubText %}
                 <p class="govuk-!-margin-bottom-7" data-qa="currentSectionNameSubText">{{ currentSectionNameSubText }}</p>
