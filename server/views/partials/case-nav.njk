@@ -52,15 +52,13 @@
             {% endif %}
             href="/case/{{ crn }}/activity-log">Contacts</a>
         </li>
-        {% if flags.enableCompliancePage == true %}
-          <li class="moj-sub-navigation__item" data-qa="complianceTab">
-            <a class="moj-sub-navigation__link govuk-link--no-visited-state"
+        <li class="moj-sub-navigation__item" data-qa="complianceTab">
+          <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'compliance' %}
             aria-current="page"
             {% endif %}
             href="/case/{{ crn }}/compliance">Compliance</a>
-          </li>
-        {% endif %}
+        </li>
         <li class="moj-sub-navigation__item" data-qa="interventionsTab">
           <a class="moj-sub-navigation__link govuk-link--no-visited-state"
             {% if currentNavSection == 'interventions' %}
