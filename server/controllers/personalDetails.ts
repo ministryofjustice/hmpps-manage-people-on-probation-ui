@@ -247,9 +247,15 @@ const personalDetailsController: Controller<typeof routes, void> = {
           origin,
         })
       } else {
-        await masClient[updateFn](crn, Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')))
+        const personalDetails: PersonalDetails = await masClient[updateFn](
+          crn,
+          Object.fromEntries(Object.entries(request).filter(([key]) => key !== '_csrf')),
+        )
         if (!isValidCrn(crn)) {
           renderError(404)(req, res)
+        }
+        if (req.session.data?.personalDetails?.[crn]?.overview) {
+          req.session.data.personalDetails[crn].overview = personalDetails
         }
         let redirect = `/case/${crn}/personal-details?update=success`
         if (origin === 'appointments') {

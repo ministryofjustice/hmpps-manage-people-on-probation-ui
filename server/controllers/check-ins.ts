@@ -229,6 +229,10 @@ const checkInsController: Controller<typeof routes, void> = {
         cyaQuery = '?cya=true'
       }
       const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
+      // If personal details overview exists in session cache, update it with latest values
+      if (req.session.data?.personalDetails?.[crn]?.overview) {
+        req.session.data.personalDetails[crn].overview = personalDetails
+      }
       // Save to show the success message on the contact preferences page
       if (personalDetails?.crn) {
         setDataValue(data, ['esupervision', crn, id, 'checkins', 'contactUpdated'], true)
@@ -776,6 +780,10 @@ const checkInsController: Controller<typeof routes, void> = {
           mobileNumber: editCheckInMobile1?.trim(),
         }
         const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
+        // If personal details overview exists in session cache, update it with latest values
+        if (req.session.data?.personalDetails?.[crn]?.overview) {
+          req.session.data.personalDetails[crn].overview = personalDetails
+        }
         // Save to show success message on contact preferences page
         if (personalDetails?.crn) {
           setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'contactUpdated'], true)
