@@ -1,4 +1,7 @@
 .app-note {
+    overflow-wrap: break-word;
+    word-break: break-word;
+
     .app-note__author {
         @include govuk-responsive-margin(2, "bottom");
     }
