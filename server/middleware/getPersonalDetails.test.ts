@@ -110,6 +110,7 @@ const mock = (crn = 'X000001', lastUpdatedDate = mockSentencePlans[0].lastUpdate
   sentencePlan: {
     lastUpdatedDate,
     showLink: false,
+    showText: true,
   },
   risks: mockRisks,
   tierCalculation: mockTierCalculation,
@@ -143,7 +144,7 @@ describe('/middleware/getPersonalDetails', () => {
     const expected = {
       personalDetails: {
         X000001: mock(),
-        X000002: mock('X000002', ''),
+        X000002: mock('X000002', '2025-09-29T10:54:36.782Z'),
       },
     }
     expect(req.session.data).toEqual(expected)
@@ -184,7 +185,7 @@ describe('/middleware/getPersonalDetails', () => {
     const expected = {
       personalDetails: {
         X000001: mock(),
-        X000002: mock('X000002', ''),
+        X000002: mock('X000002', '2025-09-29T10:54:36.782Z'),
       },
     }
     expect(req.session.data).toEqual(expected)
@@ -290,7 +291,8 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
-      lastUpdatedDate: '',
+      showText: true,
+      lastUpdatedDate: '2025-09-29T10:54:36.782Z',
     })
   })
 
@@ -305,7 +307,8 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
-      lastUpdatedDate: '',
+      showText: true,
+      lastUpdatedDate: '2025-09-29T10:54:36.782Z',
     })
   })
 
@@ -326,6 +329,7 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
+      showText: false,
       lastUpdatedDate: '',
     })
   })
@@ -361,6 +365,7 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
+      showText: true,
       lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
     })
   })
@@ -383,6 +388,7 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
+      showText: false,
       lastUpdatedDate: '',
     })
   })

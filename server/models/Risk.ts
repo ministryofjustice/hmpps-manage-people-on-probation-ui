@@ -5,5 +5,6 @@ export interface SanIndicatorResponse {
 
 export interface SentencePlan {
   showLink: boolean
+  showText: boolean
   lastUpdatedDate: string
 }

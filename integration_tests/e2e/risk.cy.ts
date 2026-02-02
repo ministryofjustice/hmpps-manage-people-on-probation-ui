@@ -32,8 +32,8 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
 ).response.jsonBody.riskFlags
 
-const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = true) => {
-  const headingLevel = !sentencePlan ? '3' : '4'
+const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLink = true, sentencePlanText = false) => {
+  const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
   page.getElementData('rsr').should('exist')
   page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
 
@@ -153,7 +153,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
     })
     page.getElementData('oasysScoreHistory').should('not.exist')
   }
-  if (sentencePlan) {
+  if (sentencePlanLink && !sentencePlanText) {
     page.checkPageTitle('Risk and plan')
     page.getElementData('riskNavLink').should('contain.text', 'Risk and plan')
     cy.get('[data-qa="pageSubHeading"]').should('contain.text', 'Risk')
@@ -168,11 +168,26 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlan = 
       .should('have.attr', 'target', '_blank')
       .should('have.attr', 'href', 'https://sentence-plan-dummy-url/crn/X000001/plan')
   }
-  if (!sentencePlan) {
+  if (!sentencePlanLink && !sentencePlanText) {
     page.checkPageTitle('Risk')
     cy.get('[data-qa="pageSubHeading"]').should('not.exist')
     page.getElementData('plan').should('not.exist')
     page.getElementData('riskNavLink').should('contain.text', 'Risk')
+  }
+  if (sentencePlanText && !sentencePlanLink) {
+    page.checkPageTitle('Risk and plan')
+    page.getElementData('riskNavLink').should('contain.text', 'Risk and plan')
+    page.getElementData('plan').should('exist')
+    page.getElementData('plan').get('h3').should('contain.text', 'Plan')
+    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 29 September 2025')
+    page
+      .getElementData('plan')
+      .find('p')
+      .eq(1)
+      .should(
+        'contain.text',
+        'You cannot view this sentence plan. Only the allocated probation practitioner can access it.',
+      )
   }
 }
 
@@ -232,8 +247,8 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    const sentencePlan = false
-    checkRiskPageView(page, sanIndicator, sentencePlan)
+    const sentencePlanLink = false
+    checkRiskPageView(page, sanIndicator, sentencePlanLink)
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop not in users caseload and san indicator is true', () => {
@@ -244,8 +259,9 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    const sentencePlan = false
-    checkRiskPageView(page, sanIndicator, sentencePlan)
+    const sentencePlanLink = false
+    const sentencePlanText = true
+    checkRiskPageView(page, sanIndicator, sentencePlanLink, sentencePlanText)
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
@@ -256,8 +272,8 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    const sentencePlan = false
-    checkRiskPageView(page, sanIndicator, sentencePlan)
+    const sentencePlanLink = false
+    checkRiskPageView(page, sanIndicator, sentencePlanLink)
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
@@ -268,8 +284,8 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = false
-    const sentencePlan = false
-    checkRiskPageView(page, sanIndicator, sentencePlan)
+    const sentencePlanLink = false
+    checkRiskPageView(page, sanIndicator, sentencePlanLink)
   })
 
   it('Should persist Risk and plan nav link for all case pages', () => {

@@ -5,7 +5,7 @@
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 
 {% set currentNavSection = 'risk' %}
-{% set currentSectionName = 'Risk' if not sentencePlan.showLink else 
+{% set currentSectionName = 'Risk' if not sentencePlan.showLink and not sentencePlan.showText else 
     'Risk and plan' %}
 {% set riskPage = true %}
 {% set pageTitle = makePageTitle({pageHeading: currentSectionName}) %}
@@ -20,7 +20,7 @@
     {% set lastUpdatedDate = 'Last updated: ' + risks.assessedOn | dateWithYear %}
 {% endif %}
 
-{% if sentencePlan.showLink %}
+{% if sentencePlan.showLink or sentencePlan.showText %}
     {% set scoresHeadingLevel = '4' %}
     {% set scoresSubHeadingLevel = '5' %}
 
