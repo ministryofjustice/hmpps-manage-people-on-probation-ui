@@ -249,10 +249,10 @@ describe('middleware/postRescheduleAppointments', () => {
         }),
       )
     })
-    it('should not create outlook event if rescheduled appointment is in the past', async () => {
+    it('should delete future outlook event if rescheduled appointment is in the past', async () => {
       const [req] = buildRequest({ date: yesterday.toFormat('yyyy-M-dd'), until: yesterday.toFormat('yyyy-M-dd') })
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
-      expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalled()
     })
     it('should not create outlook event if user has no email address defined', async () => {
       const [req] = buildRequest()
