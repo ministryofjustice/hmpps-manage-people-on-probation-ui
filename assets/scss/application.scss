@@ -44,6 +44,11 @@ $mappa-colour: #4c2c92;
   white-space: preserve-breaks;
 }
 
+.text-break {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
 .secondary-text--with-break {
   display: block; /* replaces <br> */
 }
