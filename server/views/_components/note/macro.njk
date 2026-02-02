@@ -1,3 +1,4 @@
-{% macro appNote(note, href) %}
+{% macro appNote(note, href, linkText) %}
+    {% set viewFullNoteText = linkText | default('View full note') %}
     {% include './template.njk' %}
 {% endmacro %}
