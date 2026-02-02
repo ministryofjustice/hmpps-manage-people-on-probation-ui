@@ -48,7 +48,7 @@ context('Contacts', () => {
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.govuk-table').should('exist')
     cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
-    cy.get('.govuk-table__header').eq(1).should('contain.text', 'Activity')
+    cy.get('.govuk-table__header').eq(1).should('contain.text', 'Contact')
     cy.get('.govuk-table__header').eq(2).should('contain.text', 'Actions')
     page.getActivityViewNoNotes(0).should('contain.text', 'Planned video contact (NS)')
     page.getActivityTitle(1).should('contain.text', 'Phone call')
