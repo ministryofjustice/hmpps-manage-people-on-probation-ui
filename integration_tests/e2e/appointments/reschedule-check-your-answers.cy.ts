@@ -19,18 +19,28 @@ describe('Change appointment details and reschedule', () => {
   const startTime = '09:10'
   const endTime = '10:30'
 
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
+
   it('should render the page', () => {
     completeRescheduleAppointmentPage()
     checkYourAnswerPage = new RescheduleCheckYourAnswerPage()
     checkPopHeader()
     cy.get('[data-qa=pageHeading]').should('contain.text', 'Change appointment details and reschedule')
+    checkAppointmentSummary({
+      page: checkYourAnswerPage,
+      probationPractitioner: false,
+      sendTextMessage: false,
+      summaryHasDate: false,
+    })
+
     cy.get('p')
       .eq(0)
       .should(
         'contain.text',
         'Use the saved details of the previously created appointment to reschedule it. You can amend any of the details.',
       )
-    checkAppointmentSummary(checkYourAnswerPage)
     cy.get('[data-qa="calendarInviteInset"]').should(
       'contain.text',
       `You'll receive a calendar invite for the appointment.`,

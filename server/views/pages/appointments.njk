@@ -22,11 +22,11 @@
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
-    {% set checkinLink = checkinLink %}
-    {% set checkinButtonText = 'Set up online check ins' %}
+  {% set checkinLink = checkinLink %}
+  {% set checkinButtonText = 'Set up online check ins' %}
 {% else %}
-    {% set checkinLink = manageCheckinLink %}
-    {% set checkinButtonText = 'Manage online check ins' %}
+  {% set checkinLink = manageCheckinLink %}
+  {% set checkinButtonText = 'Manage online check ins' %}
 {% endif %}
 
 {% if not hasDeceased %}
@@ -171,7 +171,7 @@
           {% endif %}
         </div>
       {% endif %}
-      
+
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointmentsSection">
         <h3 class="govuk-heading-m" id="section1" data-qa="upcomingAppointments">Upcoming appointments</h3>
         {% if upcomingAppointments.length == 0 %}

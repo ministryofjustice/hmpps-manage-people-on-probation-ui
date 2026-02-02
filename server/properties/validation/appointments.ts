@@ -264,6 +264,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][smsOptIn]`]: {
+      optional: page !== 'text-message-confirmation',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if you want to send a text message confirmation',
+          log: 'Send text message confirmation not selected',
+        },
+      ],
+    },
     outcomeRecorded: {
       optional: page !== `appointment/${contactId}/attended-complied`,
       checks: [

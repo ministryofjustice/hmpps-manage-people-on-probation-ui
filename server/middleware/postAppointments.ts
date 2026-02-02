@@ -13,8 +13,6 @@ import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/Out
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
-import FlagService from '../services/flagService'
-import { FeatureFlags } from '../data/model/featureFlags'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
@@ -37,6 +35,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       sensitivity,
       visorReport,
       outcomeRecorded,
+      smsOptIn,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const body: AppointmentRequestBody = {
       user: {
@@ -48,7 +47,6 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       start: dateTime(date, start),
       end: dateTime(date, end),
       uuid,
-      createOverlappingAppointment: true,
       notes: handleQuotes(notes),
       sensitive: sensitivity === 'Yes',
       visorReport: visorReport === 'Yes',
@@ -92,14 +90,22 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
+      if (smsOptIn?.includes('YES')) {
+        outlookEventRequestBody.smsEventRequest = {
+          firstName: userDetails.firstName,
+          mobileNumber: getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) || '',
+          crn,
+          smsOptIn: true,
+        }
+      }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || !outlookEventResponse.id) data.isOutLookEventFailed = true
+    if (!userDetails?.email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
 
     return response
   }
 }
 
 export const buildCaseLink = (baseUrl: string, crn: string, appointmentId: string): string =>
-  `<a href=${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`
+  `<a href="${baseUrl}/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/appointments" target="_blank" rel="external noopener noreferrer">View the appointment on Manage people on probation (opens in new tab).</a>`

@@ -12,6 +12,7 @@ import {
   completeLocationDateTimePage,
   completeSentencePage,
   completeSupportingInformationPage,
+  completeTextMessageConfirmationPage,
   completeTypePage,
 } from './imports'
 import { toSentenceCase } from '../../../server/utils'
@@ -248,6 +249,7 @@ describe('Arrange an appointment', () => {
       cy.get('[data-qa="attendeeDetails"]').should('contain.text', changedUser)
       completeTypePage()
       completeLocationDateTimePage()
+      completeTextMessageConfirmationPage({ index: 1 })
       completeSupportingInformationPage()
       const cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.getSummaryListRow(3).find('.govuk-summary-list__value').should('contain.text', changedUser)

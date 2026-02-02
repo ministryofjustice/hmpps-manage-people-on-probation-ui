@@ -49,20 +49,12 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+      {% if smsSent %}
+        <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+      {% else %}
+        <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
+      {% endif %}
       {% if not isInPast %}
-        <p class="govuk-body">
-        You need to send
-        {{case.name.forename}}
-        the appointment details.
-      {% if phoneNumber %}
-         Their phone number is
-         <span data-qa="{{ phoneNumber }}">
-              {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
-              {% else %}{{ case.telephoneNumber + "." }}
-              {% endif %}
-            </span>
-          {% endif %}
-        </p>
         {% if isOutLookEventFailed %}
           <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
           <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType === 'RESCHEDULE' %} details have been updated on

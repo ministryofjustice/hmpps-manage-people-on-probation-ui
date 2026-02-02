@@ -1,7 +1,8 @@
 import { type AttendedCompliedAppointment } from '../middleware'
-import { Name } from '../data/model/personalDetails'
-import { Activity } from '../data/model/schedule'
-import { Errors } from './Errors'
+import { type Name } from '../data/model/personalDetails'
+import { type Activity } from '../data/model/schedule'
+import { type Errors } from './Errors'
+import { type SmsOptInOptions, type SmsPreviewResponse } from '../data/model/esupervision'
 
 export type YesNo = '' | 'Yes' | 'No'
 
@@ -36,6 +37,8 @@ export interface AppointmentSession {
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
+  smsOptIn?: SmsOptInOptions
+  smsPreview?: SmsPreviewResponse
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -94,7 +97,6 @@ export interface AppointmentRequestBody {
   end: Date
   eventId?: number
   uuid: string
-  createOverlappingAppointment: true
   requirementId?: number
   licenceConditionId?: number
   nsiId?: number

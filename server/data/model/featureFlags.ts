@@ -9,6 +9,7 @@ export class FeatureFlags {
   enableESuperVision?: boolean = undefined
   enablePastAppointments?: boolean = undefined
   enableRescheduleAppointment?: boolean = undefined
+  enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
 }

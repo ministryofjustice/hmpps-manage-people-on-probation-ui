@@ -1,6 +1,8 @@
 import { Request, NextFunction } from 'express'
+import { DateTime } from 'luxon'
 import { AppointmentSession, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
+import { dateIsInPast, isoToDateTime } from '../utils'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
@@ -50,23 +52,16 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     const staffCode = appointment?.officer?.code || ''
     let providerCode = appointment?.officer?.providerCode || ''
     const visorReport = appointment?.isVisor !== undefined ? booleanToYesNo(appointment.isVisor) : ''
-    const date = appointment?.startDateTime || ''
-    const end = appointment?.endDateTime || ''
+    let date = ''
+    let start = ''
+    let end = ''
+    if (appointment?.startDateTime) {
+      ;({ date, time: start } = isoToDateTime(appointment.startDateTime))
+    }
+    if (appointment?.endDateTime) {
+      ;({ time: end } = isoToDateTime(appointment.endDateTime))
+    }
     const externalReference = appointment?.externalReference || ''
-
-    /*
-      If event has not been selected, then the user cannot select type or location, but can select the attendee
-      If type has not been selected, then the user cannot select location, but can select the attendee
-      if attendee has not been selected, then the user cannot select the location.
-    */
-
-    /* constructed session does not include notes or sensitivity */
-
-    /*
-      If event has not been selected, then the user cannot select type or location, but can select the attendee
-      If type has not been selected, then the user cannot select location, but can select the attendee
-      if attendee has not been selected, then the user cannot select the location.
-    */
 
     if (!eventId) {
       type = ''
@@ -91,7 +86,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       },
       type,
       date,
-      start: date,
+      start,
       end,
       eventId: eventId?.toString(),
       username: res.locals.user.username,
@@ -118,6 +113,7 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     if (appointment?.officer?.name) {
       nextAppointment.user.name = appointment.officer.name
     }
+    nextAppointment.smsOptIn = null
   }
   res.locals.nextAppointmentSession = nextAppointment
   return next()

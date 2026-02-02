@@ -230,23 +230,24 @@ describe('middleware/postRescheduleAppointments', () => {
     it('should create the outlook event if user email is defined', async () => {
       const [req] = buildRequest()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
-      const expectedBody: RescheduleEventRequest = {
-        rescheduledEventRequest: {
-          recipients: [
-            {
-              emailAddress: mockUserDetails.email,
-              name: `${mockUserDetails.firstName} ${mockUserDetails.surname}`,
-            },
-          ],
-          durationInMinutes: 30,
-          message: `<a href=http://localhost:3000/case/X000001/appointments/appointment/12345/manage?back=/case/X000001/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`,
-          start: null,
-          subject: 'Planned Office Visit (NS) with ',
-          supervisionAppointmentUrn: 'ABCDE',
-        },
-        oldSupervisionAppointmentUrn: externalReference,
-      }
-      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(expectedBody)
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: {
+            recipients: [
+              {
+                emailAddress: mockUserDetails.email,
+                name: `${mockUserDetails.firstName} ${mockUserDetails.surname}`,
+              },
+            ],
+            durationInMinutes: 30,
+            message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
+            start: null,
+            subject: 'Planned Office Visit (NS) with ',
+            supervisionAppointmentUrn: 'ABCDE',
+          },
+          oldSupervisionAppointmentUrn: externalReference,
+        }),
+      )
     })
     it('should not create outlook event if rescheduled appointment is in the past', async () => {
       const [req] = buildRequest({ date: yesterday.toFormat('yyyy-M-dd'), until: yesterday.toFormat('yyyy-M-dd') })

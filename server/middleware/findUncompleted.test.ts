@@ -34,6 +34,7 @@ const mockAppointmentSession: AppointmentSession = {
   end: '2044-12-22T09:15:00.382936Z[Europe/London]',
   sensitivity: 'Yes',
   outcomeRecorded: 'Yes',
+  smsOptIn: 'YES',
 }
 
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
@@ -118,6 +119,15 @@ describe('middleware/findUncompleted', () => {
     mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
     expect(findUncompleted(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/supporting-information?change=${change}`,
+    )
+  })
+  it('should return text message confirmation if no smsOptIn', () => {
+    const req = buildRequest({
+      smsOptIn: null,
+    })
+    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
+    expect(findUncompleted(req, res)).toBe(
+      `/case/${crn}/arrange-appointment/${id}/text-message-confirmation?change=${change}`,
     )
   })
   it('should return attended-complied if no outcomeRecorded value in appointment session and appointment date is in past', () => {

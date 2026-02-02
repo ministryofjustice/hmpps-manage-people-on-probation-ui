@@ -1,6 +1,12 @@
 import { PersonSummary } from './personalDetails'
 import { Activity } from './schedule'
 
+export interface SmsEventRequest {
+  firstName: string
+  mobileNumber?: string
+  crn: string
+  smsOptIn: boolean
+}
 export interface OutlookEventRequestBody {
   recipients: Recipient[]
   message: string
@@ -8,6 +14,7 @@ export interface OutlookEventRequestBody {
   start: string
   durationInMinutes: number
   supervisionAppointmentUrn: string
+  smsEventRequest?: SmsEventRequest
 }
 
 export interface Recipient {
@@ -26,13 +33,6 @@ export interface OutlookEventResponse {
 export interface RescheduleEventRequest {
   rescheduledEventRequest: EventRequest
   oldSupervisionAppointmentUrn: string
-}
-
-export interface SmsEventRequest {
-  firstName: string
-  crn: string
-  smsOptIn: boolean
-  mobileNumber?: string
 }
 
 export interface EventRequest {

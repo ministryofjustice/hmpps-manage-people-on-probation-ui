@@ -1,10 +1,11 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
 import { constructNextAppointmentSession } from './constructAppointmentSession'
 import { Activity, PersonAppointment } from '../data/model/schedule'
 import { mockAppResponse } from '../controllers/mocks'
 import { Name } from '../data/model/personalDetails'
+import { isoToDateTime } from '../utils'
 
 const nextSpy = jest.fn()
 const mockTypes: AppointmentType[] = [
@@ -147,10 +148,14 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
   },
 })
 
-const expectedSession = (values: Record<string, string | number | Record<string, string | Name>>) => {
+const expectedSession = (
+  values: Record<string, string | number | Record<string, string | Name | null>>,
+): AppointmentSession => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
-  const { eventId, isVisor, startDateTime: date, endDateTime: end } = mockAppointment
+  const { eventId, isVisor } = mockAppointment
+  const { date, time: start } = isoToDateTime(mockAppointment.startDateTime)
+  const { time: end } = isoToDateTime(mockAppointment.endDateTime)
   return {
     user: {
       providerCode,
@@ -163,12 +168,13 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     type: 'COAP',
     visorReport: isVisor ? 'Yes' : 'No',
     date,
-    start: date,
+    start,
     end,
     eventId: eventId.toString(),
     username,
     uuid: '',
     externalReference,
+    smsOptIn: null,
     ...values,
   }
 }
