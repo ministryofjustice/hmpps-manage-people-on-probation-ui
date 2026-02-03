@@ -132,6 +132,17 @@
               "updatedAt": "2026-01-15T17:06:39.269084Z",
               "rules": [],
               "rollouts": []
+            },
+            {
+              "key": "enableContactLog",
+              "name": "enableContactLog",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-02-02T12:00:00.000000Z",
+              "updatedAt": "2026-02-02T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }

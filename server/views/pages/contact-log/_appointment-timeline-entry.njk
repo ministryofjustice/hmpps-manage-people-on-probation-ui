@@ -1,0 +1,31 @@
+{% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set appointment = entry %}
+{% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
+{% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+
+{% set titleHtml %}
+<span class="govuk-heading-s govuk-!-margin-bottom-0">
+  <a href="{{link}}">{{ entry.type | toSentenceCase }} at {{ entry.startDateTime | govukTime }}
+    <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+</span>
+{% endset %}
+
+{% set html %}
+{% include './_timeline-notes.njk' %}
+{% endset %}
+
+{% set actionsHtml %}
+{{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
+{% if shouldPromptToRecordAnOutcome %}
+  {% include './_log-outcome-link.njk' %}
+{% endif %}
+{% endset %}
+
+{{ appSummaryCard({
+  attributes: {'data-qa': 'timeline' + loop.index + 'Card'},
+  titleHtml: titleHtml,
+  classes: 'govuk-!-margin-bottom-2',
+  html: html,
+  actionsHtml: actionsHtml
+}) }}

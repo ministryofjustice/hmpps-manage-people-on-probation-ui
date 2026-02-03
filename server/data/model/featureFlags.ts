@@ -12,4 +12,5 @@ export class FeatureFlags {
   enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
+  enableContactLog?: boolean = undefined
 }

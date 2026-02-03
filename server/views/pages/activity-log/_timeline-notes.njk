@@ -1,0 +1,95 @@
+{% set documents %}
+  <ul class="govuk-list">
+    {% for document in entry.documents %}
+      <li {% if loop.last %}class="govuk-!-margin-bottom-0"{% endif %}>
+      <a href="/case/{{ crn }}/personal-details/documents/{{ doc.id }}/download" download="{{ document.name }}">{{ document.name }}</a>
+      </li>
+    {% endfor %}
+    </ul>
+{% endset %}
+
+{{ govukWarningText({
+  html: 'Absent and waiting for evidence<br /><a href="/case/' + crn +'/appointments/appointment' + entry.id + '">Change outcome</a>',
+  iconFallbackText: 'Warning'
+}) if entry.acceptableAbsence === null }}
+
+{% if
+  entry.rarCategory or
+  entry.acceptableAbsence === true or
+  entry.didTheyComply === false or
+  entry.rescheduled or
+  entry.description or
+  entry.action or
+  entry.documents.length > 0 %}
+{{ govukSummaryList({
+  classes: 'govuk-!-margin-bottom-0',
+  rows: [
+    {
+      key: {
+        html: '<span data-qa="descriptionLabel">Description</span>'
+      },
+      value: {
+        html: '<span data-qa="descriptionValue">' + entry.description + '</span>'
+      }
+    } if entry.description,
+    {
+      key: {
+        html: '<span data-qa="rarActivityLabel">RAR activity</span>'
+      },
+      value: {
+        html: '<span data-qa="rarActivityValue">' + entry.rarCategory + '</span>'
+      }
+    } if entry.rarCategory,
+    {
+      key: { html: '<span data-qa="rescheduleLabel">Reschedule</span>'},
+      value: { html: '<span data-qa="rescheduleValue">Requested by ' + personSummary.name | fullName + '</span>' if entry.rescheduledPop == true
+        else '<span data-qa="rescheduleValue">Requested by ' + entry.rescheduledBy | fullName + '</span'}
+    } if entry.rescheduledBy,
+    {
+      key: { html: '<span data-qa="outcomeLabel">Outcome</span>' },
+      value: { html: '<span data-qa="outcomeValue">' + entry.outcome + '</span>' }
+    } if entry.outcome,
+    {
+      key: { html: '<span data-qa="acceptableAbsenceLabel">Reason for absence</span>' },
+      value: { html: '<span data-qa="acceptableAbsenceValue">' + entry.acceptableAbsenceReason + '</span>' if entry.acceptableAbsence === true }
+    } if entry.acceptableAbsenceReason,
+    {
+      key: { html: '<span data-qa="enforcementLabel">Enforcement</span>' },
+      value: { html: '<span data-qa="enforcementValue">' + entry.action + '</span>'}
+    } if entry.action,
+    {
+      key: { html: '<span data-qa="documentsLabel">Documents</span>' },
+      value: { html: '<span data-qa="documentsValue">' + documents + '</span>' }
+    } if entry.documents.length > 0
+  }
+}) }}
+
+<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible govuk-!-margin-top-1">
+{% endif %}
+
+{% set showNotesDetails = entry.appointmentNotes.length > 0 %}
+{% set notes = '' %}
+  {% if showNotesDetails > 0  %}
+    {% for appointmentNote in entry.appointmentNotes %}
+      {% if appointmentNote.note %}
+        {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
+      {% endif %}
+    {% endfor  %}
+  {% endif %}
+
+{% if showNotesDetails %}
+  {{ govukDetails({
+    summaryText: "Notes (sensitive)" if entry.isSensitive else "Notes",
+    html: notes,
+    open: true,
+    classes: 'govuk-!-margin-bottom-0'
+  }) }}
+{% elif not entry.appointmentNotes.length > 0 %}
+  {% if entry.isSensitive %}
+    <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold govuk-colour--red">Sensitive (No notes)</p>
+  {% else %}
+    <p class="govuk-!-margin-bottom-0 govuk-!-font-weight-bold govuk-colour--red">No notes</p>
+  {% endif %}
+{% else %}
+  {{ notes | safe }}
+{% endif %}

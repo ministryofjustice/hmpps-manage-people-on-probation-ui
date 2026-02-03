@@ -1,0 +1,16 @@
+  <ul class="toggle-menu govuk-!-margin-bottom-6">
+  <li class="toggle-menu__list-item">
+    {% if compactView %}
+      <a href="{{filters.baseUrl}}?page={{page}}">Default view</a>
+    {% else %}
+      <span>Default view</span>
+    {% endif %}
+    </li>
+ <li class="toggle-menu__list-item">
+ {% if defaultView %}
+      <a href="{{filters.baseUrl}}?view=compact&page={{page}}">Compact view</a>
+    {% else %}
+      <span>Compact view</span>
+    {% endif %}
+ </li>
+ </ul>

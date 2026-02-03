@@ -110,9 +110,24 @@ const res = mockAppResponse({
     dateTo: '',
     keywords: '',
   },
+  flags: {
+    enableContactLog: false,
+  },
+})
+
+const resWithContactLogFlag = mockAppResponse({
+  filters: {
+    dateFrom: '',
+    dateTo: '',
+    keywords: '',
+  },
+  flags: {
+    enableContactLog: true,
+  },
 })
 
 const renderSpy = jest.spyOn(res, 'render')
+const renderSpyWithFlag = jest.spyOn(resWithContactLogFlag, 'render')
 
 describe('/controllers/activityLogController', () => {
   afterEach(() => {
@@ -147,8 +162,33 @@ describe('/controllers/activityLogController', () => {
     it('should request all predictors from the api', () => {
       expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
     })
-    it('should render the contacts page', () => {
+    it('should render the activity-log page when enableContactLog flag is false', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
+        personActivity: mockActivities,
+        baseUrl: '',
+        crn,
+        query: req.query,
+        queryParams: [],
+        page: req.query.page,
+        view: req.query.view,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+        url: req.url,
+        resultsStart: 1,
+        resultsEnd: 1,
+        errorMessages: undefined,
+        groupedActivities: [
+          {
+            date: 'Thu 22 Dec 2044',
+            activities: mockActivities.activities,
+          },
+        ],
+      })
+    })
+    it('should render the contact-log page when enableContactLog flag is true', async () => {
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, resWithContactLogFlag)
+      expect(renderSpyWithFlag).toHaveBeenCalledWith('pages/contact-log', {
         personActivity: mockActivities,
         baseUrl: '',
         crn,
