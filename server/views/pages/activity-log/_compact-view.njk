@@ -1,80 +1,44 @@
-{% from "govuk/components/details/macro.njk" import govukDetails %}
-
 {% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
-
-{% macro renderComplianceTag(activity) %}
-  {% if activity.isAppointment === true %}
-    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
-    {% elif activity.isCommunication %}
-    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
-  {% else %}
-    {{ appComplianceTag({ entry: activity, classes: 'govuk-!-margin-left-2 contact-activity__tag', compact: true }) }}
-  {% endif %}
-{% endmacro %}
-
-{% macro rendersummaryText(activity) %}
-  <span>
-    {{ activity.type | toSentenceCase }}
-  </span>
-  {{ renderComplianceTag(activity) }}
-{% endmacro %}
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+{% if entry.isAppointment %}
+      {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+{% elif entry.esupervisionId %}
+      {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
+{% endif %}
 
 <table class="govuk-table govuk-!-margin-top-4">
   <thead class="govuk-table__head">
-  <tr class="govuk-table__row">
-    <th class="govuk-table__header govuk-!-width-one-quarter">Date</th>
-    <th class="govuk-table__header govuk-!-width-one-half">Contact</th>
-    <th class="govuk-table__header govuk-!-width-one-quarter contact-activity__actions-header">Actions</th>
-  </tr>
+    <tr class="govuk-table__row">
+      <th class="govuk-table__header" style="width: 200px">Date</th>
+      <th class="govuk-table__header">Activity</th>
+    </tr>
   </thead>
   <tbody class="govuk-table__body">
-  {% for group in groupedActivities %}
-    {% set entry = group.activities[0] %}
-      <tr class="govuk-table__row">
-        <td class="govuk-table__cell govuk-!-width-one-quarter">{{ group.date }}</td>
-        <td class="govuk-table__cell govuk-!-width-one-half govuk-!-padding-bottom-0" data-qa="timeline{{ loop.index }}Card">
-          <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
-            {% for activity in group.activities %}
-              <li class="contact-activity">
-                {% set notes = '' %}{% set link = '/case/' + crn + '/activity/' + activity.id + '?back=' + url %}
-                {% if activity.isAppointment %}
-                  {% set link = '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage?back=' + url %}
-                  {% elif entry.esupervisionId %}
-                  {% set link = '/case/' + crn + '/appointments/' + activity.esupervisionId + '/check-in/update?back=' + url %}
-                {% endif %}
-                {% set hasNote = activity.appointmentNote and activity.hasOutcome != true %}
-                {% set hasNotes = activity.appointmentNotes.length > 0 and activity.hasOutcome != true %}
-                {% if hasNotes %}
-                  {% for appointmentNote in activity.appointmentNotes %}
-                    {% if appointmentNote.note %}
-                      {% set notes = notes.concat(appNote({
-                        note: appointmentNote.note,
-                        hasNoteBeenTruncated: appointmentNote.hasNoteBeenTruncated,
-                        createdBy: appointmentNote.createdBy,
-                        createdByDate: appointmentNote.createdByDate,
-                        lastUpdatedBy: activity.lastUpdatedBy,
-                        lastUpdated: activity.lastUpdated
-                      }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact')) %}
-                    {% endif %}
-                  {% endfor %}
-                  {{ govukDetails({
-                    summaryText: rendersummaryText(activity),
-                    html: notes
-                  }) }}
-                {% else %}
-                  <div class="govuk-!-margin-right-2 govuk-!-margin-bottom-6 contact-activity--noNotes">
-                    <a href="{{ link }}"  rel="noopener noreferrer" class="govuk-link" >{{ activity.type | toSentenceCase }}</a>
-                    {{ renderComplianceTag(activity)  }}
-                  </div>
-                {% endif %}
-                {% set entry = activity %}
-                {% include "./_compact-timeline-entry.njk" %}
-              </li>
-            {% endfor %}
-          </ul>
-        </td>
-        <td class="govuk-table__cell govuk-!-width-one-quarter contact-activity__actions-cell">&nbsp;</td>
-      </tr>
-  {% endfor %}
-  </tbody>
+    {% for entry in entries %}
+      {% set lastDate = lastEntry.startDateTime | compactActivityLogDate %}
+      {% set thisDate = entry.startDateTime | compactActivityLogDate %}
+      {% if lastDate != thisDate %}
+      </td>
+    </tr>
+    <tr class="govuk-table__row">
+      <td class="govuk-table__cell">{{ thisDate }}</td>
+      <td class="govuk-table__cell">
+        <ul class="govuk-list govuk-!-margin-bottom-0 app-activity-log-day-items">
+        {% endif %}
+        <li>
+          {% if entry.isSystemContact === true and entry.isAppointment === false and entry.isCommunication === false and not entry.esupervisionId %}
+            <div class="govuk-hint govuk-!-margin-bottom-1">
+              <a href="{{ link }}" class="app-!-inherit-colour">{{ entry.type | toSentenceCase }}
+                <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+            </div>
+          {% elif flags.enableESuperVision === true or not entry.esupervisionId %}
+            {% include "./_compact-timeline-entry.njk" %}
+          {% endif %}
+        </li>
+        {% set lastEntry = entry %}
+      {% endfor %}
+    </ul>
+  </td>
+</tr>
+</tbody>
 </table>

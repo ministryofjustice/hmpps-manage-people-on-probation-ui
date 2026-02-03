@@ -59,7 +59,8 @@ const activityLogController: Controller<typeof routes, void> = {
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
       const baseUrl = req.url.split('?')[0]
-      res.render('pages/activity-log', {
+      const template = res.locals.flags.enableContactLog === true ? 'pages/contact-log' : 'pages/activity-log'
+      res.render(template, {
         personActivity,
         crn,
         query: req.session.activityLogFilters,

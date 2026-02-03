@@ -1,0 +1,24 @@
+{% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+{% if entry.isAppointment %}
+  {% set link = '/case/' + crn + '/appointments/appointment/' + entry.id + '/manage?back=' + url %}
+  {% elif entry.esupervisionId %}
+  {% set link = '/case/' + crn + '/appointments/' + entry.esupervisionId + '/check-in/update?back=' + url %}
+{% endif %}
+
+{% set titleHtml %}
+    <ul class="govuk-list contact-activity__actions govuk-!-margin-top-0">
+    {% if entry.esupervisionId and flags.enableESuperVision  %}
+      <li><a href="{{ '/case/' + crn + '/activity/' + entry.id + '?back=' + url  }}" class="govuk-link govuk-!-margin-right-2" rel="noopener noreferrer">View</a></li>
+      <li><a href="{{ link }}">Update</a></li>
+      {% elif shouldPromptToRecordAnOutcome %}
+        {% include './_log-outcome-link.njk' %}
+      {% else %}
+      <li><a href="{{ link }}" rel="noopener noreferrer">View</a></li>
+    {% endif %}
+  </ul>
+{% endset %}
+
+{{ titleHtml | safe }}

@@ -1,0 +1,13 @@
+{% if entry.action %}
+   {{ entry.action }}
+{% elif entry.isEmailOrTextToPop === true %}
+    Email/Text to {{ personSummary.name | fullName }}
+{% elif entry.isEmailOrTextFromPop === true %}
+   Email or Text from {{ personSummary.name | fullName }}
+{% elif entry.isPhoneCallToPop === true %}
+   Phone call to {{  personSummary.name | fullName }}
+{% elif entry.isPhoneCallFromPop === true %}
+   Phone call from {{ personSummary.name | fullName }}
+{% else %}
+   {{ entry.type | toSentenceCase }}
+{% endif %}

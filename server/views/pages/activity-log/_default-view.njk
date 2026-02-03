@@ -1,0 +1,25 @@
+{% for entry in entries %}
+  {% set lastDate = lastEntry.startDateTime | activityLogDate %}
+  {% set thisDate = entry.startDateTime | activityLogDate %}
+  {% if lastDate != thisDate %}
+    <p class="govuk-!-font-weight-bold govuk-!-font-size-19 {% if loop.index != 1 %}govuk-!-margin-top-7{% endif %} govuk-!-margin-bottom-2">
+      {{ thisDate }}
+    </p>
+  {% endif %}
+
+
+  {% if entry.isAppointment %}
+    {% include "./_appointment-timeline-entry.njk" %}
+  {% elif entry.esupervisionId %}
+    {% if flags.enableESuperVision %}
+      {% include "./_online-checkin-entry.njk" %}
+    {% endif %}
+  {% elif entry.isCommunication %}
+    {% include "./_communication-timeline-entry.njk" %}
+  {% elif entry.isSystemContact %}
+    {% include "./_system-contact-timeline-entry.njk" %}
+  {% else %}
+    {% include "./_other-timeline-entry.njk" %}
+  {% endif %}
+  {% set lastEntry = entry %}
+{% endfor %}

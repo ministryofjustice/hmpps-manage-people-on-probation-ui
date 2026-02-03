@@ -13,29 +13,29 @@
 
 {% block beforeContent %}
   {{ govukBreadcrumbs({
-      items: [
-        {
-          text: "Cases",
-          href: "/case"
-        },
-        {
-          text: headerPersonName.forename + ' ' + headerPersonName.surname,
-          href: "/case/" + crn,
-          attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
-        },
-        {
-          text: currentSectionName
-        }
-      ]
-    }) }}
+    items: [
+      {
+        text: "Cases",
+        href: "/case"
+      },
+      {
+        text: headerPersonName.forename + ' ' + headerPersonName.surname,
+        href: "/case/" + crn,
+        attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+      },
+      {
+        text: currentSectionName
+      }
+    ]
+  }) }}
   {% if errorMessages %}
     {% set errorList = errorMessages | toErrorList %}
     {% if errorList.length > 0 %}
       {{ govukErrorSummary({
-                titleText: "There is a problem",
-                errorList: errorList,
-                attributes: { "data-qa": "errorList"}
-            }) }}
+        titleText: "There is a problem",
+        errorList: errorList,
+        attributes: { "data-qa": "errorList"}
+      }) }}
     {% endif %}
   {% endif %}
 {% endblock %}
@@ -43,24 +43,14 @@
 {% block pageContent %}
 
   <div class="govuk-grid-row govuk-!-margin-top-4">
-    {% include "./activity-log/_filters.njk" %}
+    {% include "./contact-log/_filters.njk" %}
     <div class="govuk-grid-column-two-thirds">
-      {% if not(title == 'Contacts') %}
-        <h2 class="govuk-heading-m govuk-!-margin-bottom-2">
-          {{ title }}
-        </h2>
-      {% endif %}
       {% if personActivity.activities.length %}
-        <div class="flex flex--space-between">
-          {% include "./activity-log/_switch-views.njk" %}
-          <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
-        </div>
         {% if entries.length > 0 %}
-          {% if compactView %}
-            {% include "./activity-log/_compact-view.njk" %}
-          {% else %}
-            {% include "./activity-log/_default-view.njk" %}
-          {% endif %}
+          <div>
+            <p class="govuk-!-margin-bottom-0" data-qa="results-count">Showing <span class="govuk-!-font-weight-bold" data-qa="results-count-start">{{ resultsStart }}</span> to <span class="govuk-!-font-weight-bold"  data-qa="results-count-end">{{ resultsEnd }}</span> of <span class="govuk-!-font-weight-bold" data-qa="results-count-total">{{ personActivity.totalResults }}</span> results</p>
+          </div>
+          {% include "./contact-log/_compact-view.njk" %}
         {% else %}
           <p class="govuk-!-margin-top-4">{{ emptyText }}</p>
         {% endif %}
@@ -68,10 +58,10 @@
         {% if personActivity.totalPages > 1 %}
           <div class="govuk-!-margin-top-8">
             {{ appPagination({
-  currentPage: page | int,
-  totalPages: personActivity.totalPages,
-  url: filters.baseUrl + '?view=' + view + '&' if view else filters.baseUrl + '?'
-  }) }}
+              currentPage: page | int,
+              totalPages: personActivity.totalPages,
+              url: filters.baseUrl + '?view=' + view + '&' if view else filters.baseUrl + '?'
+            }) }}
           </div>
         {% endif %}
       {% else %}
