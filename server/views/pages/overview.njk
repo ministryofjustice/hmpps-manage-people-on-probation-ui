@@ -589,8 +589,9 @@
           {%- case 0 -%}
                         No breaches on previous orders
                     {%- default -%}
-            {{ overview.previousOrders.breaches }} breaches on previous orders
-                {%- endswitch -%}
+            {% set breachCount = overview.previousOrders.breaches %}
+            {{ breachCount }} breach{% if breachCount > 1 %}es{% endif %} on previous orders
+          {%- endswitch -%}
             {% endset %}
             {{ total}} ({{ breaches }})
             {% endif %}
