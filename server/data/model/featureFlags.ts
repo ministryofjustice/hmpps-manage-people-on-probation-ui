@@ -13,4 +13,5 @@ export class FeatureFlags {
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
   enableContactLog?: boolean = undefined
+  enableCreateContact?: boolean = undefined
 }

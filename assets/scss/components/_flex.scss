@@ -21,6 +21,16 @@
   }
 }
 
+.flex--col-mobile {
+  @include govuk-media-query($until: tablet ) {
+    flex-direction: column;
+  }
+}
+
+.flex--gap-3 {
+  gap: govuk-spacing(3);
+}
+
 .flex--space-between {
   justify-content: space-between;
 }
@@ -65,4 +75,10 @@
 
 .flex__item-no-shrink {
   flex-shrink: 0;
+}
+
+.flex__item-full-width-mobile {
+  @include govuk-media-query($until: tablet ) {
+    width: 100%;
+  }
 }
