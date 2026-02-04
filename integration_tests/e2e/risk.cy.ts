@@ -211,7 +211,7 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
-    cy.task('stubSentencePlanAgreementDraft')
+    cy.task('stubSentencePlanAgreementStatus', 'DRAFT')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
@@ -221,6 +221,28 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload and san indicator is true', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubUserCaseloadSearch')
+    cy.task('stubAuthSentencePlan')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = true
+    checkRiskPageView(page, sanIndicator)
+  })
+
+  it('Risk overview page is rendered when sentence plan agreement status is COULD_NOT_ANSWER, pop in users caseload and san indicator is true', () => {
+    cy.task('stubSentencePlanAgreementStatus', 'COULD_NOT_ANSWER')
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubUserCaseloadSearch')
+    cy.task('stubAuthSentencePlan')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = true
+    checkRiskPageView(page, sanIndicator)
+  })
+
+  it('Risk overview page is rendered when sentence plan agreement status is UPDATED_AGREED, pop in users caseload and san indicator is true', () => {
+    cy.task('stubSentencePlanAgreementStatus', 'UPDATED_AGREED')
     cy.task('stubSanIndicatorTrue')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubAuthSentencePlan')
@@ -241,7 +263,7 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
-    cy.task('stubSentencePlanAgreementDraft')
+    cy.task('stubSentencePlanAgreementStatus', 'DRAFT')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')

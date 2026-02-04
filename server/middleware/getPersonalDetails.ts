@@ -42,7 +42,10 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
           const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
           sentencePlan.showLink =
             res.locals?.flags?.enableSentencePlan &&
-            sentencePlans?.[0]?.currentVersion?.agreementStatus?.includes('AGREED')
+            ['AGREED', 'COULD_NOT_ANSWER'].some(status =>
+              sentencePlans?.[0]?.currentVersion?.agreementStatus?.includes(status),
+            )
+          console.log('showLink:', sentencePlan.showLink)
           if (sentencePlan.showLink && sentencePlans?.[0]?.lastUpdatedDate) {
             sentencePlan.lastUpdatedDate = sentencePlans[0].lastUpdatedDate
           }

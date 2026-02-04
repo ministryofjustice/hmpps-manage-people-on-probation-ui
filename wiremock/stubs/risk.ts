@@ -60,7 +60,7 @@ const stubSentencePlan404 = (): SuperAgentRequest =>
     },
   })
 
-const stubSentencePlanAgreementDraft = (): SuperAgentRequest =>
+const stubSentencePlanAgreementStatus = (agreementStatus = 'AGREED'): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPattern: '/sentence-plan/plans/crn/.*',
@@ -88,7 +88,7 @@ const stubSentencePlanAgreementDraft = (): SuperAgentRequest =>
             planId: 0,
             planType: 'INITIAL',
             status: 'AWAITING_COUNTERSIGN',
-            agreementStatus: 'DRAFT',
+            agreementStatus,
             createdDate: '2025-09-29T10:54:36.782Z',
             createdBy: {
               externalId: 'string',
@@ -201,7 +201,7 @@ const stubSentencePlanAgreementDraft = (): SuperAgentRequest =>
 export default {
   stubSanIndicatorTrue,
   stubSentencePlan404,
-  stubSentencePlanAgreementDraft,
+  stubSentencePlanAgreementStatus,
   stubArnsUnavailable,
   stubArnsServerError,
 }

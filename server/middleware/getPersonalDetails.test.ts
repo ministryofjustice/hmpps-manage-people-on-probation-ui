@@ -29,6 +29,7 @@ import {
   PersonalDetails,
 } from '../data/model/personalDetails'
 import { Contact } from '../data/model/professionalContact'
+import { SentencePlan } from '../data/model/sentencePlan'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -344,6 +345,74 @@ describe('/middleware/getPersonalDetails', () => {
       lastUpdatedDate: '2025-09-29T10:54:36.782Z',
     })
   })
+  it('should set the correct sentence plan local variables if user has SENTENCE_PLAN role, pop has COULD_NOT_ANSWER sentence plan status and pop not in caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    const mockSentencePlan: SentencePlan[] = [
+      {
+        ...mockSentencePlans[0],
+        currentVersion: { ...mockSentencePlans[0].currentVersion, agreementStatus: 'COULD_NOT_ANSWER' },
+      },
+    ]
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlan))
+    req = getReq()
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: true,
+      lastUpdatedDate: '2025-09-29T10:54:36.782Z',
+    })
+  })
+  it('should set the correct sentence plan local variables if user has SENTENCE_PLAN role, pop has UPDATED_AGREED sentence plan status and pop not in caseload', async () => {
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    const mockSentencePlan: SentencePlan[] = [
+      {
+        ...mockSentencePlans[0],
+        currentVersion: { ...mockSentencePlans[0].currentVersion, agreementStatus: 'UPDATED_AGREED' },
+      },
+    ]
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlan))
+    req = getReq()
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: true,
+      lastUpdatedDate: '2025-09-29T10:54:36.782Z',
+    })
+  })
 
   it('should set the correct sentence plan local variables if user does not have sentence plan role', async () => {
     req = getReq()
@@ -367,7 +436,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
   })
 
-  it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan and pop in user caseload', async () => {
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan status and pop in user caseload', async () => {
     process.env.NODE_ENV = 'development'
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
@@ -375,6 +444,94 @@ describe('/middleware/getPersonalDetails', () => {
     jest
       .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
       .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+          },
+        },
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has COULD_NOT_ANSWER sentence plan status and pop in user caseload', async () => {
+    process.env.NODE_ENV = 'development'
+    const mockSentencePlan: SentencePlan[] = [
+      {
+        ...mockSentencePlans[0],
+        currentVersion: { ...mockSentencePlans[0].currentVersion, agreementStatus: 'COULD_NOT_ANSWER' },
+      },
+    ]
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlan))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+          },
+        },
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has UPDATED_AGREED sentence plan status and pop in user caseload', async () => {
+    process.env.NODE_ENV = 'development'
+    const mockSentencePlan: SentencePlan[] = [
+      {
+        ...mockSentencePlans[0],
+        currentVersion: { ...mockSentencePlans[0].currentVersion, agreementStatus: 'UPDATED_AGREED' },
+      },
+    ]
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlan))
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',
