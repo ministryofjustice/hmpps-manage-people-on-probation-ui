@@ -42,15 +42,13 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
           const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
           sentencePlan.showLink =
             res.locals.flags.enableSentencePlan &&
-            sentencePlans?.[0]?.currentVersion?.agreementStatus?.includes('AGREED') &&
-            popInUsersCaseload
-
-          if (!sentencePlan.showLink && !popInUsersCaseload) {
-            sentencePlan.showText = true
-          }
-
-          if ((sentencePlan.showLink || sentencePlan.showText) && sentencePlans[0]?.lastUpdatedDate) {
+            sentencePlans?.[0]?.currentVersion?.agreementStatus?.includes('AGREED')
+          if (sentencePlan.showLink && sentencePlans?.[0]?.lastUpdatedDate) {
             sentencePlan.lastUpdatedDate = sentencePlans[0].lastUpdatedDate
+          }
+          if (sentencePlan.showLink && !popInUsersCaseload) {
+            sentencePlan.showText = true
+            sentencePlan.showLink = false
           }
         } catch (error) {
           logger.error(error, 'Failed to connect to sentence plan service.')
