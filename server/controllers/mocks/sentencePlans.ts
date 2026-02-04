@@ -20,7 +20,7 @@ export const mockSentencePlans: SentencePlan[] = [
       planId: 0,
       planType: 'INITIAL',
       status: 'AWAITING_COUNTERSIGN',
-      agreementStatus: 'DRAFT',
+      agreementStatus: 'AGREED',
       createdDate: '2025-09-29T10:54:36.782Z',
       createdBy: {
         externalId: 'string',
