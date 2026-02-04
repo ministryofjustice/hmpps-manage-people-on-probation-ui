@@ -29,6 +29,9 @@ export const findUncompleted = (req: Request, res: Response): string => {
     }
     if (redirect === 'text-message-confirmation') {
       appointmentIsIncomplete = !value && !dateInPast
+      if (res.locals?.flags?.enableSmsReminders === false) {
+        appointmentIsIncomplete = false
+      }
     }
     if (appointmentIsIncomplete) {
       return `/case/${crn}/arrange-appointment/${id}/${redirect}?change=${change}`

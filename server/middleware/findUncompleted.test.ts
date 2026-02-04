@@ -70,6 +70,9 @@ const buildRequest = (session?: Record<string, string | Record<string, string | 
 }
 
 describe('middleware/findUncompleted', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   it('should return change url if all required appointment data provided', () => {
     const req = buildRequest()
     mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
@@ -129,6 +132,20 @@ describe('middleware/findUncompleted', () => {
     expect(findUncompleted(req, res)).toBe(
       `/case/${crn}/arrange-appointment/${id}/text-message-confirmation?change=${change}`,
     )
+  })
+  it('should not return text message confirmation if no smsOptIn and sms feature flag is disabled', () => {
+    const req = buildRequest({
+      smsOptIn: null,
+    })
+    mockGetDataValue.mockImplementationOnce(() => req.session.data.appointments[crn][id])
+    const mockRes = httpMocks.createResponse({
+      locals: {
+        flags: {
+          enableSmsReminders: false,
+        },
+      },
+    })
+    expect(findUncompleted(req, mockRes)).toBe(change)
   })
   it('should return attended-complied if no outcomeRecorded value in appointment session and appointment date is in past', () => {
     mockAppointmentDateIsInPast.mockImplementationOnce(() => true)
