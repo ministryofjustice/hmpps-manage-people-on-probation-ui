@@ -52,21 +52,29 @@
 {% set notesStatus = 'Not started' %}
 {% set outcomeStatus = '' %}
 {% set compliedStatus = 'Not started' %}
+{% set compliedTagColor = 'blue'  %}
 {% set outcomeTagColour = 'blue' %}
 {% set notesTagColour = 'blue' %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% if not canReschedule and flags.enableRescheduleAppointment == true %}
+    {% set compliedStatus= 'Rescheduled' %}
+    {% set compliedTagColor = 'blue' %}
+{% endif %}
 {% if appointment.hasOutcome and appointment.didTheyComply == true %}
   {% set outcomeStatus = 'Complied' %}
   {% set compliedStatus = 'Complied' %}
   {% set outcomeTagColour = 'green' %}
+  {% set compliedTagColor = 'green' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == false %}
   {% set outcomeStatus = 'Unacceptable absence' %}
   {% set outcomeTagColour = 'red' %}
+  {% set compliedTagColor = 'red' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.wasAbsent and appointment.acceptableAbsence == true %}
   {% set outcomeStatus = 'Acceptable absence' %}
   {% set outcomeTagColour = 'green' %}
+  {% set compliedTagColor = 'blue' %}
 {% endif %}
 {% if appointment.isInPast and not appointment.hasOutcome and not hasNotes %}
   {% set alert = "You must log an outcome and should add notes to this appointment." %}
@@ -105,7 +113,7 @@
     <hr class="govuk-section-break--l">
   {% endif %}
   <div class="govuk-grid-row">
-    <div class="govuk-grid-column-two-thirds">
+    <div class="govuk-grid-column-three-quarters">
       <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">{{ ('Manage ' + appointment.type) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</h2>
       {% if alert and not appointment.deliusManaged %}
         {{ mojAlert({
@@ -150,7 +158,7 @@
       status: {
         tag: {
           text: compliedStatus,
-          classes: "govuk-tag--" + outcomeTagColour
+          classes: "govuk-tag--" + compliedTagColor
         }
       }
     },
@@ -233,6 +241,7 @@
         html: '<span data-qa="locationValue">' + location + '</span>' 
       },
       actions: {
+        classes: "govuk-!-white-space-nowrap",
         items: [
           {
             href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
@@ -254,6 +263,7 @@
         text: appointment.officer.name | fullName
       },
       actions: {
+        classes: "govuk-!-white-space-nowrap",
         items: [
           {
             href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
@@ -275,6 +285,7 @@
         text: appointment.rarCategory if appointment.rarCategory else 'Not provided'
       },
       actions: {
+        classes: "govuk-!-white-space-nowrap",
         items: [
           {
             href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
@@ -296,6 +307,7 @@
         text: 'No'
       },
       actions: {
+        classes: "govuk-!-white-space-nowrap",
         items: [
           {
             href: deliusDeepLinkUrl('UpdateContact', crn, appointment.id),
@@ -332,6 +344,7 @@
         text: 'Yes' if appointment.isSensitive else 'No'
       },
       actions: {
+        classes: "govuk-!-white-space-nowrap",
         items: [
           {
             href: "/case/" + crn + "/appointments/appointment/" + appointment.id + "/add-note",
