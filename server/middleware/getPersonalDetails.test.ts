@@ -29,6 +29,7 @@ import {
   PersonalDetails,
 } from '../data/model/personalDetails'
 import { Contact } from '../data/model/professionalContact'
+import { SentencePlan } from '../data/model/sentencePlan'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -367,7 +368,7 @@ describe('/middleware/getPersonalDetails', () => {
     })
   })
 
-  it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan and pop in user caseload', async () => {
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan status and pop in user caseload', async () => {
     process.env.NODE_ENV = 'development'
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
@@ -401,6 +402,49 @@ describe('/middleware/getPersonalDetails', () => {
       showLink: true,
       showText: false,
       lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop in user caseload', async () => {
+    process.env.NODE_ENV = 'development'
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    const draftSentencePlan: SentencePlan[] = [
+      {
+        ...mockSentencePlans[0],
+        currentVersion: { ...mockSentencePlans[0].currentVersion, agreementStatus: 'DRAFT' },
+      },
+    ]
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(draftSentencePlan))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+          },
+        },
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: false,
+      lastUpdatedDate: '',
     })
   })
 

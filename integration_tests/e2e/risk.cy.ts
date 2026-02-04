@@ -211,7 +211,7 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
-    cy.task('stubSentencePlanAgreementDraft')
+    cy.task('stubSentencePlanAgreementStatus', 'DRAFT')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
@@ -241,7 +241,7 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
-    cy.task('stubSentencePlanAgreementDraft')
+    cy.task('stubSentencePlanAgreementStatus', 'DRAFT')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')
