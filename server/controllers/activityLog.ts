@@ -42,8 +42,9 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const currentPage = parseInt(page as string, 10)
-      const resultsStart = currentPage > 0 ? 10 * currentPage + 1 : 1
-      let resultsEnd = currentPage > 0 ? (currentPage + 1) * 10 : 10
+      const pageSize = res.locals?.flags?.enableContactLog === true ? 25 : 10
+      const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1
+      let resultsEnd = currentPage > 0 ? (currentPage + 1) * pageSize : pageSize
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }

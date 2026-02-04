@@ -267,7 +267,7 @@ context('Contacts', () => {
     page.getDateToInput().should('have.value', '')
     page.getActivityViewNoNotes(0).should('contain.text', 'Planned video contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
-    cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
+    cy.get('[data-qa="results-count-end"]').should('contain.text', '25')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
   })
   it('should display the 3 filter tags and filter the list if all compliance filters as clicked and submitted', () => {
@@ -361,7 +361,7 @@ context('Contacts', () => {
     page.getComplianceFilter(3).should('not.be.checked')
     page.getActivityViewNoNotes(0).should('contain.text', 'Planned video contact (NS)')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
-    cy.get('[data-qa="results-count-end"]').should('contain.text', '10')
+    cy.get('[data-qa="results-count-end"]').should('contain.text', '25')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
     cy.get('.govuk-pagination').should('exist')
   })

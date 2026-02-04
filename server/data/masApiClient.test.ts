@@ -173,6 +173,18 @@ describe('masApiClient', () => {
           masApiClient.postPersonActivityLog('X000001', { keywords: '', dateFrom: '', dateTo: '', filters: [] }, '1'),
         'post',
       ],
+      [
+        'postPersonActivityLog with custom size',
+        '/activity/X000001?size=25&page=1',
+        () =>
+          masApiClient.postPersonActivityLog(
+            'X000001',
+            { keywords: '', dateFrom: '', dateTo: '', filters: [] },
+            '1',
+            '25',
+          ),
+        'post',
+      ],
       ['getPersonRiskFlags', '/risk-flags/X000001', () => masApiClient.getPersonRiskFlags('X000001')],
       [
         'getDocuments',
