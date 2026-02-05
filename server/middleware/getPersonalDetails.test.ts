@@ -342,7 +342,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
-      lastUpdatedDate: '2025-09-29T10:54:36.782Z',
+      lastUpdatedDate: '2025-10-10T16:08:54Z',
     })
   })
 
@@ -401,7 +401,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: true,
       showText: false,
-      lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+      lastUpdatedDate: mockSentencePlans[1].lastUpdatedDate,
     })
   })
 
@@ -413,7 +413,6 @@ describe('/middleware/getPersonalDetails', () => {
     const draftSentencePlan: SentencePlan[] = [
       {
         ...mockSentencePlans[0],
-        currentVersion: { ...mockSentencePlans[0].currentVersion, agreementStatus: 'DRAFT' },
       },
     ]
     jest
@@ -485,7 +484,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
-      lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+      lastUpdatedDate: mockSentencePlans[1].lastUpdatedDate,
     })
   })
 

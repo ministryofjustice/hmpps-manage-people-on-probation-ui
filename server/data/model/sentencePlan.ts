@@ -15,13 +15,6 @@ interface User {
   username: string
 }
 
-interface Note {
-  note: string
-  type: string
-  createdDate: string
-  practitionerName: string
-}
-
 interface RelatedAreasOfNeed {
   uuid: string
   name: string
@@ -64,7 +57,7 @@ interface Version {
   createdDate: string
   createdBy?: CreatedBy
   updatedDate: string
-  updatedBy?: string
+  updatedBy?: User
   agreementDate: string
   readOnly: boolean
   checksum: string
@@ -83,8 +76,6 @@ interface Note {
   createdDate: string
   createdBy: CreatedBy
 }
-
-type NoteType = 'PROGRESS' | 'REMOVED' | 'ACHIEVED' | 'READDED'
 
 interface AgreementNote extends Note {
   optionalNote: string
