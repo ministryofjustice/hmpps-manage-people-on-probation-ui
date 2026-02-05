@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
@@ -40,14 +41,24 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {
         try {
           const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
-          sentencePlan.showLink =
-            res.locals?.flags?.enableSentencePlan && sentencePlans?.[0]?.currentVersion?.agreementStatus !== 'DRAFT'
-          if (sentencePlan.showLink && sentencePlans?.[0]?.lastUpdatedDate) {
-            sentencePlan.lastUpdatedDate = sentencePlans[0].lastUpdatedDate
-          }
-          if (sentencePlan.showLink && !popInUsersCaseload) {
-            sentencePlan.showText = true
-            sentencePlan.showLink = false
+          let hasAgreedSentencePlan = false
+          const agreedSentencePlans = sentencePlans.filter(sp => sp?.currentVersion?.agreementDate)
+          if (agreedSentencePlans.length) {
+            const latestSentencePlan =
+              agreedSentencePlans.length === 1
+                ? agreedSentencePlans[0]
+                : agreedSentencePlans.sort(
+                    (a, b) =>
+                      DateTime.fromISO(b.currentVersion.agreementDate).toMillis() -
+                      DateTime.fromISO(a.currentVersion.agreementDate).toMillis(),
+                  )[0]
+            hasAgreedSentencePlan = latestSentencePlan.currentVersion?.agreementStatus !== 'DRAFT'
+            sentencePlan.showLink = res.locals?.flags?.enableSentencePlan && hasAgreedSentencePlan
+            sentencePlan.lastUpdatedDate = sentencePlan.showLink ? latestSentencePlan?.lastUpdatedDate : ''
+            if (sentencePlan.showLink && !popInUsersCaseload) {
+              sentencePlan.showText = true
+              sentencePlan.showLink = false
+            }
           }
         } catch (error) {
           logger.error(error, 'Failed to connect to sentence plan service.')

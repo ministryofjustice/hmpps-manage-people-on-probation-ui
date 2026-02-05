@@ -159,7 +159,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLin
     cy.get('[data-qa="pageSubHeading"]').should('contain.text', 'Risk')
     page.getElementData('plan').should('exist')
     page.getElementData('plan').get('h3').should('contain.text', 'Plan')
-    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 29 September 2025')
+    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 10 October 2025')
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
 
     page
@@ -179,7 +179,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLin
     page.getElementData('riskNavLink').should('contain.text', 'Risk and plan')
     page.getElementData('plan').should('exist')
     page.getElementData('plan').get('h3').should('contain.text', 'Plan')
-    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 29 September 2025')
+    page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 10 October 2025')
     page
       .getElementData('plan')
       .find('p')
@@ -211,7 +211,7 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
-    cy.task('stubSentencePlanAgreementStatus', 'DRAFT')
+    cy.task('stubSentencePlanDraft')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
@@ -241,7 +241,7 @@ context('Risk', () => {
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
-    cy.task('stubSentencePlanAgreementStatus', 'DRAFT')
+    cy.task('stubSentencePlanDraft')
     cy.task('stubUserCaseloadSearch')
     cy.task('stubSanIndicatorTrue')
     cy.visit('/case/X000001/risk')

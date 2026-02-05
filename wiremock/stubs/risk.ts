@@ -60,7 +60,7 @@ const stubSentencePlan404 = (): SuperAgentRequest =>
     },
   })
 
-const stubSentencePlanAgreementStatus = (agreementStatus = 'AGREED'): SuperAgentRequest =>
+const stubSentencePlanDraft = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPattern: '/sentence-plan/plans/crn/.*',
@@ -71,125 +71,47 @@ const stubSentencePlanAgreementStatus = (agreementStatus = 'AGREED'): SuperAgent
       jsonBody: [
         {
           publishedState: 'UNPUBLISHED',
-          uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-          createdDate: '2025-09-29T10:54:36.782Z',
+          uuid: 'a2dc10a4-7ad2-45e5-8999-7ecbadc8b1d8',
+          createdDate: '2025-10-01T16:39:23Z',
           createdBy: {
             externalId: 'string',
             username: 'string',
           },
-          lastUpdatedDate: '2025-09-29T10:54:36.782Z',
+          lastUpdatedDate: '2025-10-01T16:39:23Z',
           lastUpdatedBy: {
-            externalId: 'string',
-            username: 'string',
+            externalId: 'SYSTEM',
+            username: 'hmpps-assess-risks-and-needs-coordinator-api-1',
           },
           currentVersion: {
-            uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
+            uuid: '6f351179-dcf2-406f-b264-5b059e6358e3',
             version: 0,
-            planId: 0,
+            planId: 5856,
             planType: 'INITIAL',
-            status: 'AWAITING_COUNTERSIGN',
-            agreementStatus,
-            createdDate: '2025-09-29T10:54:36.782Z',
+            status: 'UNSIGNED',
+            agreementStatus: 'DRAFT',
+            createdDate: '2025-10-01T16:39:23Z',
             createdBy: {
               externalId: 'string',
               username: 'string',
             },
-            updatedDate: '2025-09-29T10:54:36.782Z',
+            updatedDate: '2025-10-01T16:39:23Z',
             updatedBy: {
               externalId: 'string',
               username: 'string',
             },
-            agreementDate: '2025-09-29T10:54:36.782Z',
-            readOnly: true,
-            checksum: 'string',
-            agreementNotes: [
-              {
-                optionalNote: 'string',
-                agreementStatus: 'DRAFT',
-                agreementStatusNote: 'string',
-                practitionerName: 'string',
-                personName: 'string',
-                createdDate: '2025-09-29T10:54:36.782Z',
-                createdBy: {
-                  externalId: 'string',
-                  username: 'string',
-                },
-              },
-            ],
-            planProgressNotes: [
-              {
-                note: 'string',
-                isSupportNeeded: 'YES',
-                isSupportNeededNote: 'string',
-                isInvolved: true,
-                isInvolvedNote: 'string',
-                personName: 'string',
-                practitionerName: 'string',
-                createdDate: '2025-09-29T10:54:36.782Z',
-                createdBy: {
-                  externalId: 'string',
-                  username: 'string',
-                },
-              },
-            ],
-            goals: [
-              {
-                uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                title: 'string',
-                areaOfNeed: {
-                  uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                  name: 'string',
-                },
-                targetDate: '2025-09-29',
-                reminderDate: '2025-09-29',
-                createdDate: '2025-09-29T10:54:36.782Z',
-                createdBy: {
-                  externalId: 'string',
-                  username: 'string',
-                },
-                updatedDate: '2025-09-29T10:54:36.782Z',
-                updatedBy: {
-                  externalId: 'string',
-                  username: 'string',
-                },
-                status: 'ACTIVE',
-                statusDate: '2025-09-29T10:54:36.782Z',
-                goalOrder: 0,
-                steps: [
-                  {
-                    uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                    description: 'string',
-                    status: 'NOT_STARTED',
-                    createdDate: '2025-09-29T10:54:36.782Z',
-                    createdBy: {
-                      externalId: 'string',
-                      username: 'string',
-                    },
-                    actor: 'string',
-                  },
-                ],
-                notes: [
-                  {
-                    note: 'string',
-                    type: 'PROGRESS',
-                    createdDate: '2025-09-29T10:54:36.782Z',
-                    practitionerName: 'string',
-                  },
-                ],
-                relatedAreasOfNeed: [
-                  {
-                    uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-                    name: 'string',
-                  },
-                ],
-              },
-            ],
-            softDeleted: true,
-            mostRecentUpdateDate: '2025-09-29T10:54:36.782Z',
+            agreementDate: null,
+            readOnly: false,
+            checksum: null,
+            agreementNotes: [],
+            planProgressNotes: [],
+            goals: [],
+            softDeleted: false,
+            mostRecentUpdateDate: '2025-10-01T16:39:23Z',
             mostRecentUpdateByName: 'string',
-            crn: 'string',
+            crn: 'X960260',
           },
-          crn: 'string',
+          versions: [],
+          crn: 'X960260',
         },
       ],
       headers: {
@@ -201,7 +123,7 @@ const stubSentencePlanAgreementStatus = (agreementStatus = 'AGREED'): SuperAgent
 export default {
   stubSanIndicatorTrue,
   stubSentencePlan404,
-  stubSentencePlanAgreementStatus,
+  stubSentencePlanDraft,
   stubArnsUnavailable,
   stubArnsServerError,
 }
