@@ -728,3 +728,9 @@ body.feature-disabled {
     gap: 8px;
   }
 }
+
+.flex__item-full-width-mobile {
+  @include govuk-media-query($until: tablet ) {
+    width: 100%;
+  }
+}
