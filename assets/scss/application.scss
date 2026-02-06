@@ -728,3 +728,19 @@ body.feature-disabled {
     gap: 8px;
   }
 }
+
+.flex__item-full-width-mobile {
+  @include govuk-media-query($until: tablet ) {
+    width: 100%;
+  }
+}
+
+.flex--col-mobile {
+  @include govuk-media-query($until: tablet ) {
+    flex-direction: column;
+  }
+}
+
+.flex--gap-3 {
+  gap: govuk-spacing(3);
+}

@@ -7,6 +7,7 @@ import personalDetailRoutes from './personalDetails'
 import sentenceRoutes from './sentence'
 import scheduleRoutes from './appointments'
 import activityLogRoutes from './activityLog'
+import addContactRoutes from './addContact'
 import risksRoutes from './risks'
 import complianceRoutes from './compliance'
 import caseloadRoutes from './caseload'
@@ -28,6 +29,7 @@ export default function routes(router: Router, services: Services): Router {
   scheduleRoutes(router, services)
   risksRoutes(router, services)
   activityLogRoutes(router, services)
+  addContactRoutes(router, services)
   complianceRoutes(router, services)
   caseloadRoutes(router, services)
   accessibilityRoutes(router)

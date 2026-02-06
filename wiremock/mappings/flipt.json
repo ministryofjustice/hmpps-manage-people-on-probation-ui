@@ -143,6 +143,17 @@
               "updatedAt": "2026-02-02T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
+            },
+            {
+              "key": "enableCreateContact",
+              "name": "enableCreateContact",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-01-30T15:28:37.920581Z",
+              "updatedAt": "2026-01-30T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }
