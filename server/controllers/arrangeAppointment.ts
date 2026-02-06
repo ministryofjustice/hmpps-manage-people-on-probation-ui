@@ -535,7 +535,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const attending = getDataValue(data, ['appointments', crn, id, 'user'])
       const smsOptIn = getDataValue<SmsOptInOptions>(data, ['appointments', crn, id, 'smsOptIn'])
       const smsSent = smsOptIn?.includes('YES')
-      let attendingName = 'Your '
+      let attendingName = 'your '
       if (attending.username.toUpperCase() !== res.locals.user.username) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
