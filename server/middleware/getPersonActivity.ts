@@ -27,8 +27,9 @@ export const getPersonActivity = async (
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
     filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
   }
+  const size = res.locals.flags.enableContactLog ? '25' : '10'
   const [personActivity, tierCalculation] = await Promise.all([
-    masClient.postPersonActivityLog(crn, body, page as string),
+    masClient.postPersonActivityLog(crn, body, page as string, size),
     tierClient.getCalculationDetails(crn),
   ])
 

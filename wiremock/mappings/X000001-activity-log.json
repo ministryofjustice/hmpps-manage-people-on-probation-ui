@@ -9,7 +9,7 @@
             "matches": ".*"
           },
           "size": {
-            "equalTo": "10"
+            "equalTo": "25"
           }
         }
       },
@@ -935,11 +935,14 @@
       "request": {
         "method": "POST",
         "urlPathPattern": "/mas/activity/X000001",
-        "bodyPatterns": [
-          {
-            "equalToJson": "{\"keywords\": \"\", \"dateFrom\": \"\", \"dateTo\": \"\", \"filters\": [\"noOutcome\"]}"
+        "queryParameters": {
+          "page": {
+            "matches": ".*"
+          },
+          "size": {
+            "equalTo": "10"
           }
-        ]
+        }
       },
       "response": {
         "status": 200,
