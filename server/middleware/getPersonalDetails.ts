@@ -5,7 +5,7 @@ import { Route } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import SentencePlanApiClient from '../data/sentencePlanApiClient'
-import { toPredictors, toRoshWidget } from '../utils'
+import { tierLink, toPredictors, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
@@ -88,6 +88,9 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = overview.crn
     res.locals.headerDob = overview.dateOfBirth
+    if (res.locals?.flags?.enableTierLink) {
+      res.locals.headerTierLink = tierLink(crn)
+    }
     if (overview?.dateOfDeath) {
       res.locals.dateOfDeath = overview.dateOfDeath
     }
