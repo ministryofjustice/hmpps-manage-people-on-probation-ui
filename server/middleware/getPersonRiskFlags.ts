@@ -1,8 +1,8 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { PersonRiskFlags } from '../data/model/risk'
-import { setDataValue } from '../utils'
+import { PersonRiskFlags, RiskFlag } from '../data/model/risk'
+import { setDataValue, findReplace } from '../utils'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -12,6 +12,16 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       personRisks = await masClient.getPersonRiskFlags(crn)
+      const term = 'RoSH'
+      ;['riskFlags', 'removedRiskFlags'].forEach(path => {
+        personRisks = findReplace<PersonRiskFlags, RiskFlag>({
+          data: personRisks,
+          path: [path],
+          key: 'description',
+          find: term,
+          replace: term.toUpperCase(),
+        })
+      })
       const { data } = req.session
       setDataValue(data, ['risks', crn], personRisks)
     } else {
