@@ -75,15 +75,15 @@ describe('middleware/getPersonRiskFlags', () => {
       expect(getPersonRiskFlagsSpy).toHaveBeenCalledWith(crn)
     })
     it(`should find and replace RoSH with ROSH in the api response`, () => {
-      expect(findReplace).toHaveBeenCalledTimes(2)
-      expect(findReplace).toHaveBeenNthCalledWith(1, {
+      expect(mockFindReplace).toHaveBeenCalledTimes(2)
+      expect(mockFindReplace).toHaveBeenNthCalledWith(1, {
         data: mockRisks,
         path: ['riskFlags'],
         key: 'description',
         find: 'RoSH',
         replace: 'ROSH',
       })
-      expect(findReplace).toHaveBeenNthCalledWith(2, {
+      expect(mockFindReplace).toHaveBeenNthCalledWith(2, {
         data: expect.any(Object),
         path: ['removedRiskFlags'],
         key: 'description',
