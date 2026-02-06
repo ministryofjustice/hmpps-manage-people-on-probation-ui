@@ -57,7 +57,7 @@
         <section data-qa="currentContacts">
           <h3 class="govuk-heading-m">Current contacts</h3>
           {% for contact in currentContacts %}
-            {% set contactName = "Unallocated " + contact | roleDescription if (contact.name === "Unallocated Staff" or contact.name === "Unallocated Unallocated") else contact.name %}
+            {% set contactName = "Unallocated " + contact | roleDescription if (contact.unallocated) else contact.name %}
             <div class="govuk-!-margin-bottom-0">
               <h4 class="govuk-heading-s">{{ contactName }}</h4>
               {{ govukSummaryList({
@@ -104,7 +104,7 @@
           {% set hr = joiner('<hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">') %}
 
           {% for contact in previousContacts %}
-            {% set contactName = "Unallocated " + contact | roleDescription  if (contact.name === "Unallocated Staff" or contact.name === "Unallocated Unallocated") else contact.name %}
+            {% set contactName = "Unallocated " + contact | roleDescription  if (contact.unallocated) else contact.name %}
             <div class="govuk-!-margin-bottom-0">
               <h4 class="govuk-heading-s">{{ contactName }}</h4>
               {{ govukSummaryList({
