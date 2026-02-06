@@ -9,7 +9,7 @@ interface Props<DataT, ItemT> {
   replace?: string
 }
 
-export const findReplace = <DataT, ItemT>({ data, path, key, find, replace }: Props<DataT, ItemT>): DataT => {
+export const findReplace = <DataT, ItemT = never>({ data, path, key, find, replace }: Props<DataT, ItemT>): DataT => {
   const replaceTerm = (str: string) => {
     if (str.includes(find)) {
       return str.split(find).join(replace)
