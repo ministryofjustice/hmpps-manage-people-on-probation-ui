@@ -152,7 +152,7 @@
     visuallyHiddenText: "text message confirmation"
      } 
      ] 
-     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined, 
+     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true, 
        { key: { text: "Attended and complied" },
     value: { html: appointment.outcomeRecorded },
     actions: {
