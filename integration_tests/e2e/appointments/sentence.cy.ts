@@ -14,7 +14,7 @@ describe('What is this appointment for?', () => {
       sentencePage = new AppointmentSentencePage()
     })
     it('should render the pop header', () => {
-      checkPopHeader('Alton Berge', true)
+      checkPopHeader('Alton Berge', true, 'X778160')
     })
     it('should render the risk to staff alert', () => {
       checkRiskToStaffAlert()

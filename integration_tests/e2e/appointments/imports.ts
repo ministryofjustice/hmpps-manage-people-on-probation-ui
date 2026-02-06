@@ -210,16 +210,21 @@ export const completeCYAPage = () => {
   const cyaPage = new AppointmentCheckYourAnswersPage()
   cyaPage.getSubmitBtn().click()
 }
-export const checkPopHeader = (name = 'Caroline Wolff', appointments = false, tierLinkEnabled = true) => {
+export const checkPopHeader = (
+  name = 'Caroline Wolff',
+  appointments = false,
+  headerCrn = 'X000001',
+  tierLinkEnabled = true,
+) => {
   cy.clock(DateTime.now().toMillis())
   cy.get('h1').should('contain.text', name)
-  cy.get('[data-qa="crn"]').should('contain.text', 'X000001')
+  cy.get('[data-qa="crn"]').should('contain.text', headerCrn)
   cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')
   cy.get('[data-qa="headerDateOfBirthAge"]').should('contain.text', '46')
   if (tierLinkEnabled) {
     cy.get('[data-qa="tierLink"]')
       .should('contain.text', appointments ? 'A3' : 'B2')
-      .should('have.attr', 'href', `https://tier-dev.hmpps.service.justice.gov.uk/case/X000001`)
+      .should('have.attr', 'href', `https://tier-dev.hmpps.service.justice.gov.uk/case/${headerCrn}`)
     cy.get('[data-qa="tierValue"]').should('not.exist')
   } else {
     cy.get('[data-qa="tierValue"]').should('contain.text', appointments ? 'A3' : 'B2')

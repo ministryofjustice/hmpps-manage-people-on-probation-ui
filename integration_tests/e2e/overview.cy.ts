@@ -6,6 +6,9 @@ context('Overview', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('Overview page is rendered', () => {
     cy.visit('/case/X000001')
     const page = Page.verifyOnPage(OverviewPage)
@@ -143,7 +146,7 @@ context('Overview', () => {
   it('Should render overview page without tier link when feature flag disabled', () => {
     cy.task('stubDisableTierLink')
     cy.visit('/case/X000001')
-    checkPopHeader('Caroline Wolff', false, false)
+    checkPopHeader('Caroline Wolff', false, 'X000001', false)
   })
 
   it('Overview page is rendered with date of death', () => {
