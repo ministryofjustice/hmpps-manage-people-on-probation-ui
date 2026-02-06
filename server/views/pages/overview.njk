@@ -6,7 +6,7 @@
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set headerCRN = crn %}
-{% set headerDob = overview.personalDetails.dateOfBirth %}
+{% set headerDob = personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}

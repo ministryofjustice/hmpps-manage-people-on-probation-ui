@@ -6,6 +6,7 @@ import {
   checkPopHeader,
   completeLocationDateTimePage,
   checkRiskToStaffAlert,
+  completeTextMessageConfirmationPage,
 } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
@@ -15,23 +16,22 @@ const loadPage = () => {
   completeSentencePage()
   completeTypePage()
   completeLocationDateTimePage()
+  completeTextMessageConfirmationPage({ _crn: crn, _uuid: uuid, index: 1 })
 }
 
 describe('Add supporting information (optional)', () => {
   let appointmentNotePage: AppointmentNotePage
   beforeEach(() => {
-    cy.task('stubNoRepeats')
+    cy.task('resetMocks')
     loadPage()
     appointmentNotePage = new AppointmentNotePage()
   })
-  afterEach(() => {
-    cy.task('resetMocks')
-  })
+
   it('should be on add supporting information (optional) page', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {
-    checkPopHeader('Alton Berge', true)
+    checkPopHeader('Alton Berge', true, 'X778160')
   })
   it('should render the risk to staff alert', () => {
     checkRiskToStaffAlert()

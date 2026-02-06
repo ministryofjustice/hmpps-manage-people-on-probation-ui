@@ -17,7 +17,7 @@ describe('Arrange an appointment in another location', () => {
   it('should render the page', () => {
     loadPage()
     const locationNotInListPage = new AppointmentLocationNotInListPage()
-    checkPopHeader('Alton Berge', true)
+    checkPopHeader('Alton Berge', true, 'X778160')
     locationNotInListPage
       .getElement('p:nth-of-type(1)')
       .should(

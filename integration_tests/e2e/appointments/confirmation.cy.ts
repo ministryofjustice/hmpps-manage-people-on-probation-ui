@@ -63,7 +63,7 @@ describe('Confirmation page', () => {
     })
 
     it('should render the page', () => {
-      checkPopHeader('Alton Berge', true)
+      checkPopHeader('Alton Berge', true, 'X778160')
       confirmPage.checkPageTitle('Appointment arranged')
       confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
       confirmPage
@@ -169,7 +169,7 @@ describe('Confirmation page', () => {
         confirmPage = new AppointmentConfirmationPage()
       })
       it('should render the page with error message', () => {
-        checkPopHeader('Alton Berge', true)
+        checkPopHeader('Alton Berge', true, 'X778160')
         confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
         confirmPage
           .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
@@ -216,7 +216,7 @@ describe('Confirmation page', () => {
         confirmPage = new AppointmentConfirmationPage()
       })
       it('should render the page with error message when no user details found from MAS API', () => {
-        checkPopHeader('Alton Berge', true)
+        checkPopHeader('Alton Berge', true, 'X778160')
         confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
         confirmPage
           .getElement('[data-qa="appointment-date"]:nth-of-type(1)')

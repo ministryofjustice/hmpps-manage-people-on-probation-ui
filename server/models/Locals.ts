@@ -67,6 +67,7 @@ interface Locals {
   headerPersonName?: { forename: string; surname: string }
   headerCRN?: string
   headerDob?: string
+  headerTierLink?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary

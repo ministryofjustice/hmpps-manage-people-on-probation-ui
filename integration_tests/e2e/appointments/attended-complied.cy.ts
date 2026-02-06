@@ -37,6 +37,7 @@ describe('Log attended and complied appointment', () => {
 
   const checkContent = (manageJourney = false) => {
     const name = 'Alton Berge'
+    const headerCrn = 'X778160'
     const now = DateTime.now()
     const yesterday = now.minus({ days: 1 })
     const date = dateWithYear(yesterday.toISODate())
@@ -47,7 +48,7 @@ describe('Log attended and complied appointment', () => {
     const id = getId(manageJourney)
     cy.get(`#${id}-hint`).should('contain.text', `Appointment: ${appointmentText}.`)
     cy.get(`label[for="${id}"]`).should('contain.text', `Yes, ${name.split(' ')[0]} attended and complied`)
-    checkPopHeader(name, true)
+    checkPopHeader(name, true, headerCrn)
   }
 
   const checkValidation = (manageJourney = false) => {

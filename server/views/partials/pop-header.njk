@@ -10,8 +10,11 @@
                                 (<span data-qa='headerDateOfBirthAge'>{{ headerDob | yearsSince }} years old</span>)
                         <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
             </li>
-            <li>Tier:
-                        <span data-qa='tierValue'>{{ tierCalculation.tierScore }}</span>
+            <li>Tier:{{' '}}
+                {% if flags.enableTierLink == true %}
+                    <a href="{{ headerTierLink }}" data-qa="tierLink" class="govuk-link">{{ tierCalculation.tierScore }}</a>
+                {% else %}
+                    <span data-qa='tierValue'>{{ tierCalculation.tierScore }}</span>{% endif %}
             </li>
         </ul>
     </div>

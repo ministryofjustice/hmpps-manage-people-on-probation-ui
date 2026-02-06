@@ -1,8 +1,12 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overview'
+import { checkPopHeader } from './appointments/imports'
 
 context('Overview', () => {
   beforeEach(() => {
+    cy.task('resetMocks')
+  })
+  afterEach(() => {
     cy.task('resetMocks')
   })
   it('Overview page is rendered', () => {
@@ -19,6 +23,7 @@ context('Overview', () => {
     page.getTab('activityLog').should('contain.text', 'Contacts')
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
+    checkPopHeader()
 
     page
       .getAppointmentsLink('X000001')
@@ -138,6 +143,12 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
+  it('Should render overview page without tier link when feature flag disabled', () => {
+    cy.task('stubDisableTierLink')
+    cy.visit('/case/X000001')
+    checkPopHeader('Caroline Wolff', false, 'X000001', false)
+  })
+
   it('Overview page is rendered with date of death', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001')
