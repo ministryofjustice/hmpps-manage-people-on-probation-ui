@@ -30,8 +30,8 @@ describe('View appointment note page', () => {
   it('Back link goes to source page', () => {
     cy.visit('/case/X000001/activity-log')
     const activityLogPage = new ActivityLogPage()
-    activityLogPage.getTimelineCard(2).find('.govuk-details__summary').click()
-    activityLogPage.getTimelineCard(2).find('.app-note').find('a').click()
+    activityLogPage.getActivity(2).find('.govuk-details__summary').click()
+    activityLogPage.getActivity(2).find('.app-note').find('a').click()
     const page = new AppointmentPage()
     page.getBackLink().click()
     activityLogPage.checkOnPage()
