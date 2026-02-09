@@ -338,7 +338,7 @@ describe('Confirmation page', () => {
         cy.get('[data-qa="what-happens-next"]')
           .find('p')
           .eq(1)
-          .should('contain.text', 'The appointment has been added to the NDelius contact log and officer diary.')
+          .should('contain.text', 'The appointment has been updated on the NDelius contact log and officer diary.')
       })
     })
   })
