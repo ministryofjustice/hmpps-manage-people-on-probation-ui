@@ -74,11 +74,11 @@
         {% endif %}
         {% if isOutLookEventFailed %}
           <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
-          <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType === 'RESCHEDULE' %} details have been updated on
+          <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
             {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
         {% else %}
           {% if not isInPast %}
-            <p class="govuk-!-margin-bottom-0" data-qa="">The appointment{% if appointmentType === 'RESCHEDULE' %} details have been updated on{% else %} has been added to{% endif %}:</p>
+            <p class="govuk-!-margin-bottom-0" data-qa="">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on{% else %} has been added to{% endif %}:</p>
             <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
               <li>{{ attendingName }} calendar</li>
               <li>the NDelius contact log and officer diary, along with any supporting information</li>
@@ -88,7 +88,7 @@
           {% endif %}
         {% endif %}
       {% else %}
-        <p class="govuk-body">The appointment has been added to the NDelius contact log and officer diary.</p>
+        <p class="govuk-body">The appointment has been {% if appointmentType == 'RESCHEDULE' %}updated on{% else %}added to{% endif %} the NDelius contact log and officer diary.</p>
       {% endif %}
     </div>
     <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
