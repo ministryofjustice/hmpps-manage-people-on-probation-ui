@@ -266,10 +266,7 @@ describe('Confirmation page', () => {
       confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
       cy.get('[data-qa="what-happens-next"]')
         .find('p')
-        .should(
-          'contain.text',
-          'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.',
-        )
+        .should('contain.text', 'The appointment has been added to the NDelius contact log and officer diary.')
     })
   })
   describe('Appointment rescheduled to a date and time in the future', () => {
@@ -341,10 +338,7 @@ describe('Confirmation page', () => {
         cy.get('[data-qa="what-happens-next"]')
           .find('p')
           .eq(1)
-          .should(
-            'contain.text',
-            'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.',
-          )
+          .should('contain.text', 'The appointment has been added to the NDelius contact log and officer diary.')
       })
     })
   })
