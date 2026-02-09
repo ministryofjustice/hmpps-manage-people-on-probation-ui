@@ -1,4 +1,5 @@
 import httpMocks from 'node-mocks-http'
+import e from 'connect-flash'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -50,7 +51,6 @@ const predictorsSpy = jest
 const searchUserCaseloadSpy = jest
   .spyOn(MasApiClient.prototype, 'searchUserCaseload')
   .mockImplementation(() => Promise.resolve(mockUserCaseload))
-
 let getPersonalDetailsSpy: jest.SpyInstance
 let getPlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
@@ -148,6 +148,7 @@ describe('/middleware/getPersonalDetails', () => {
         },
         flags: {
           enableSentencePlan: false,
+          enableTierLink: true,
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -173,6 +174,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -201,6 +203,7 @@ describe('/middleware/getPersonalDetails', () => {
         },
         flags: {
           enableSentencePlan: false,
+          enableTierLink: true,
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -226,6 +229,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -244,7 +248,19 @@ describe('/middleware/getPersonalDetails', () => {
         },
       },
     })
-    res = getRes()
+    res = {
+      locals: {
+        user: {
+          username: 'user-1',
+          roles: ['SENTENCE_PLAN'],
+        },
+        flags: {
+          enableSentencePlan: false,
+          enableTierLink: true,
+        },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(getPersonalDetailsSpy).not.toHaveBeenCalled()
     expect(risksSpy).not.toHaveBeenCalled()
@@ -258,6 +274,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
     expect(res.locals.dateOfDeath).toBeUndefined()
     expect(nextSpy).toHaveBeenCalled()
   })
@@ -509,5 +526,24 @@ describe('/middleware/getPersonalDetails', () => {
       showText: false,
       lastUpdatedDate: '',
     })
+  })
+  it('should not set res.locals.headerTierLink if feature flag is disabled', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
+    req = getReq()
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: [],
+      },
+      flags: {
+        enableSentencePlan: true,
+        enableTierLink: false,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.headerTierLink).toBeUndefined()
   })
 })

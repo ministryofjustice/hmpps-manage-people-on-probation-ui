@@ -154,6 +154,17 @@
               "updatedAt": "2026-01-30T17:06:39.269084Z",
               "rules": [],
               "rollouts": []
+            },
+            {
+              "key": "enableTierLink",
+              "name": "enableTierLink",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-01-30T15:28:37.920581Z",
+              "updatedAt": "2026-01-30T17:06:39.269084Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }

@@ -14,4 +14,5 @@ export class FeatureFlags {
   enableCompliancePage?: boolean = undefined
   enableContactLog?: boolean = undefined
   enableCreateContact?: boolean = undefined
+  enableTierLink?: boolean = undefined
 }
