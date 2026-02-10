@@ -682,10 +682,7 @@ body.feature-disabled {
   }
 
     &--noNotes {
-      display: inline-flex;
-      align-items: center;
-      flex-wrap: nowrap;
-      gap: 8px;
+      display: block;
     }
   }
 
@@ -693,6 +690,22 @@ body.feature-disabled {
 
   .govuk-details {
     margin-bottom: 5px;
+  }
+
+  &__contact-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  &__contact-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .contact-activity__tag {
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
   &-row {

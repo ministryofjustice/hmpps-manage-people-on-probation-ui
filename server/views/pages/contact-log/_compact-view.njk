@@ -16,7 +16,6 @@
   <span>
     {{ activity.type | toSentenceCase }}
   </span>
-  {{ renderComplianceTag(activity) }}
 {% endmacro %}
 
 <table class="govuk-table govuk-!-margin-top-4 contact-log-compact">
@@ -46,29 +45,33 @@
           {% endif %}
           {% set hasNote = activity.appointmentNote and activity.hasOutcome != true %}
           {% set hasNotes = activity.appointmentNotes.length > 0 and activity.hasOutcome != true %}
-          {% if hasNotes %}
-            {% for appointmentNote in activity.appointmentNotes %}
-              {% if appointmentNote.note %}
-                {% set notes = notes.concat(appNote({
-                  note: appointmentNote.note,
-                  hasNoteBeenTruncated: appointmentNote.hasNoteBeenTruncated,
-                  createdBy: appointmentNote.createdBy,
-                  createdByDate: appointmentNote.createdByDate,
-                  lastUpdatedBy: activity.lastUpdatedBy,
-                  lastUpdated: activity.lastUpdated
-                }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact')) %}
+          <div class="contact-log-compact__contact-wrapper">
+            <div class="contact-log-compact__contact-content">
+              {% if hasNotes %}
+                {% for appointmentNote in activity.appointmentNotes %}
+                  {% if appointmentNote.note %}
+                    {% set notes = notes.concat(appNote({
+                      note: appointmentNote.note,
+                      hasNoteBeenTruncated: appointmentNote.hasNoteBeenTruncated,
+                      createdBy: appointmentNote.createdBy,
+                      createdByDate: appointmentNote.createdByDate,
+                      lastUpdatedBy: activity.lastUpdatedBy,
+                      lastUpdated: activity.lastUpdated
+                    }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact')) %}
+                  {% endif %}
+                {% endfor %}
+                {{ govukDetails({
+                  summaryHtml: rendersummaryText(activity),
+                  html: notes
+                }) }}
+              {% else %}
+                <div class="govuk-!-margin-bottom-6 contact-activity--noNotes">
+                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link">{{ activity.type | toSentenceCase }}</a>
+                </div>
               {% endif %}
-            {% endfor %}
-            {{ govukDetails({
-              summaryHtml: rendersummaryText(activity),
-              html: notes
-            }) }}
-          {% else %}
-            <div class="govuk-!-margin-right-2 govuk-!-margin-bottom-6 contact-activity--noNotes">
-              <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link">{{ activity.type | toSentenceCase }}</a>
-              {{ renderComplianceTag(activity) }}
             </div>
-          {% endif %}
+            {{ renderComplianceTag(activity) }}
+          </div>
         </td>
         <td class="govuk-table__cell govuk-!-width-one-quarter contact-activity__actions-cell contact-log-compact-row {% if loop.last %} contact-log-compact-row--last{% endif %}">
           {% include "./_compact-timeline-entry.njk" %}
