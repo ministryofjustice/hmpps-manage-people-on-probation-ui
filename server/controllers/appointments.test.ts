@@ -576,6 +576,7 @@ describe('controllers/appointments', () => {
             id: parseInt(mockReq.params.contactId, 10),
             notes: mockReq.body.notes,
             sensitive: true,
+            outcomeRecorded: false,
           })
         })
         it('should redirect to the manage appointment page', () => {
@@ -606,7 +607,7 @@ describe('controllers/appointments', () => {
                 appointments: {
                   [crn]: {
                     [contactId]: {
-                      outcomeRecorded: true,
+                      outcomeRecorded: 'Yes',
                     },
                   },
                 },
