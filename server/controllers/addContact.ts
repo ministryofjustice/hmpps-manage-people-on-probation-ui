@@ -6,7 +6,7 @@ const addContactController: Controller<typeof routes, void> = {
   getAddContact: () => {
     return async (req, res) => {
       const { crn } = req.params
-      return res.render('pages/add-contact', {
+      return res.render('pages/contact-log/contact/contact', {
         crn,
       })
     }

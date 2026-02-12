@@ -18,7 +18,7 @@ describe('addContactController', () => {
     })
 
     it('should render the add-contact page with the crn', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/add-contact', { crn })
+      expect(renderSpy).toHaveBeenCalledWith('pages/contact-log/contact/contact', { crn })
     })
   })
 })
