@@ -468,6 +468,39 @@ describe('checkInsController', () => {
       )
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/contact-preference`)
     })
+
+    it('updates session personalDetails overview when present', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const existingOverview = { crn: 'X10100', mobileNumber: '07856984552' }
+      const data = {
+        personalDetails: {
+          [crn]: {
+            overview: existingOverview,
+          },
+        },
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              checkins: {
+                editCheckInEmail: 'new@example.com',
+                editCheckInMobile: '07123456789',
+              },
+            },
+          },
+        },
+      }
+
+      const req = httpMocks.createRequest({
+        params: { crn, id: uuid },
+        session: { data },
+      })
+      res.locals.user = defaultUser
+      await controllers.checkIns.postEditContactPrePage(hmppsAuthClient)(req, res)
+      expect(req.session.data.personalDetails[crn].overview).toEqual({ crn })
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/contact-preference`)
+    })
   })
 
   describe('postContactPreferencePage', () => {

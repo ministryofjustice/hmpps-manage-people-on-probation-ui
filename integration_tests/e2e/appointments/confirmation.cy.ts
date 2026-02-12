@@ -18,11 +18,12 @@ import {
   completeRescheduling,
   completeRescheduleAppointmentPage,
   getUuid,
+  completeTextMessageConfirmationPage,
 } from './imports'
 import OverviewPage from '../../pages/overview'
 import YourCasesPage from '../../pages/myCases'
 
-const loadPage = (crnOverride = '', dateInPast = false) => {
+const loadPage = (crnOverride = '', dateInPast = false, completeTextMessageConfirmOptionIndex = 1) => {
   completeSentencePage(1, '', crnOverride)
   completeTypePage(1, false)
   completeLocationDateTimePage({ index: 1, crnOverride, dateInPast })
@@ -30,6 +31,7 @@ const loadPage = (crnOverride = '', dateInPast = false) => {
     completeAttendedCompliedPage()
     completeAddNotePage()
   } else {
+    completeTextMessageConfirmationPage({ index: completeTextMessageConfirmOptionIndex, _crn: crnOverride })
     completeSupportingInformationPage(true, crnOverride)
   }
   completeCYAPage()
@@ -61,7 +63,7 @@ describe('Confirmation page', () => {
     })
 
     it('should render the page', () => {
-      checkPopHeader('Alton Berge', true)
+      checkPopHeader('Alton Berge', true, 'X778160')
       confirmPage.checkPageTitle('Appointment arranged')
       confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
       confirmPage
@@ -81,7 +83,7 @@ describe('Confirmation page', () => {
         .then(text => {
           const normalizedText = text.replace(/\s+/g, ' ').trim()
           expect(normalizedText).to.include(
-            `You need to send Alton the appointment details. Their phone number is 071838893.`,
+            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
           )
         })
       confirmPage
@@ -98,7 +100,10 @@ describe('Confirmation page', () => {
         .should('contain', 'the NDelius contact log and officer diary, along with any supporting information')
       cy.get('[data-qa="outlook-err-msg-1"]').should('not.exist')
       cy.get('[data-qa="outlook-err-msg-2"]').should('not.exist')
-
+      confirmPage
+        .getlogOutcomeLink()
+        .should('contain.text', 'log outcomes for 2 appointments')
+        .should('have.attr', 'href', '/case/X778160/record-an-outcome/outcome')
       confirmPage.getSubmitBtn().should('contain.text', "Return to Alton's overview")
       confirmPage.getSubmitBtn().click()
       const nextAppointmentPage = new OverviewPage()
@@ -108,15 +113,45 @@ describe('Confirmation page', () => {
 
     it('should render the page with pop telephone number', () => {
       cy.task('stubPersonalDetailsNoMobileNumber')
-      loadPage('X000001')
+      loadPage('X000001', false, 2)
       confirmPage = new AppointmentConfirmationPage()
-      confirmPage.getPopTelephone().should('contain.text', `0123456999`)
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+        })
     })
     it('should render the page with no contact numbers', () => {
       cy.task('stubPersonalDetailsNoTelephoneNumbers')
-      loadPage('X000001')
+      loadPage('X000001', false, 2)
       confirmPage = new AppointmentConfirmationPage()
       confirmPage.getPopContactNumber().should('not.exist')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+        })
+    })
+
+    it('should render the page with no log outcomes link', () => {
+      cy.task('stubNoOverdueOutcomes')
+      loadPage('X000001')
+      confirmPage.getlogOutcomeLink().should('not.exist')
+    })
+
+    it('should render the page with log outcome for a single appointment link', () => {
+      cy.task('stubSingleOverdueOutcome')
+      loadPage('X000001')
+      confirmPage
+        .getlogOutcomeLink()
+        .should('contain.text', 'log appointment outcome for Thursday 21 March 2024')
+        .should('have.attr', 'href', `/case/X000001/appointments/appointment/5/manage`)
     })
 
     it('should link to the appointment page when practitioner click Return to all cases', () => {
@@ -134,7 +169,7 @@ describe('Confirmation page', () => {
         confirmPage = new AppointmentConfirmationPage()
       })
       it('should render the page with error message', () => {
-        checkPopHeader('Alton Berge', true)
+        checkPopHeader('Alton Berge', true, 'X778160')
         confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
         confirmPage
           .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
@@ -153,7 +188,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `You need to send Alton the appointment details. Their phone number is 071838893.`,
+              `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
             )
           })
 
@@ -181,7 +216,7 @@ describe('Confirmation page', () => {
         confirmPage = new AppointmentConfirmationPage()
       })
       it('should render the page with error message when no user details found from MAS API', () => {
-        checkPopHeader('Alton Berge', true)
+        checkPopHeader('Alton Berge', true, 'X778160')
         confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
         confirmPage
           .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
@@ -200,7 +235,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `You need to send Alton the appointment details. Their phone number is 071838893.`,
+              `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
             )
           })
 
@@ -231,10 +266,7 @@ describe('Confirmation page', () => {
       confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
       cy.get('[data-qa="what-happens-next"]')
         .find('p')
-        .should(
-          'contain.text',
-          'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.',
-        )
+        .should('contain.text', 'The appointment has been added to the NDelius contact log and officer diary.')
     })
   })
   describe('Appointment rescheduled to a date and time in the future', () => {
@@ -259,7 +291,7 @@ describe('Confirmation page', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
+              `Caroline will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
             )
           })
 
@@ -277,6 +309,7 @@ describe('Confirmation page', () => {
           .find('li')
           .eq(1)
           .should('contain.text', 'the NDelius contact log and officer diary, along with any supporting information')
+        confirmPage.getlogOutcomeLink().should('contain.text', 'log outcomes for 2 appointments')
       })
     })
   })
@@ -300,17 +333,12 @@ describe('Confirmation page', () => {
           .invoke('text')
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `You need to send Caroline the appointment details. Their phone number is 07783889300.`,
-            )
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
           })
         cy.get('[data-qa="what-happens-next"]')
           .find('p')
           .eq(1)
-          .should(
-            'contain.text',
-            'The appointment details have been updated on the NDelius contact log and officer diary.',
-          )
+          .should('contain.text', 'The appointment has been updated on the NDelius contact log and officer diary.')
       })
     })
   })

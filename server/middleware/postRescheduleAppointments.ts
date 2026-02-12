@@ -66,7 +66,7 @@ export const postRescheduleAppointments = (
     const response = await masClient.putRescheduleAppointment(contactId, body)
     const userDetails = await masClient.getUserDetails(username)
     let eventResponse: EventResponse
-    if (userDetails?.email && !isInPast) {
+    if (userDetails?.email) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)

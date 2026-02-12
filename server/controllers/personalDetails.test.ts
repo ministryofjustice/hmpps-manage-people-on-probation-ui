@@ -84,6 +84,15 @@ jest.mock('../data/hmppsAuthClient', () => {
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
+const existingOverview = { crn: 'X000001', mobileNumber: '07856984552' }
+const data = {
+  personalDetails: {
+    [crn]: {
+      overview: existingOverview,
+    },
+  },
+}
+
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -96,6 +105,7 @@ const req = httpMocks.createRequest({
     adjustmentId,
     system: 'mockSystem',
   },
+  session: { data },
   url: '/sentence',
 })
 
@@ -329,6 +339,7 @@ describe('/controllers/personalDetails', () => {
               },
             },
             needs: mockNeeds,
+            origin: '',
             tierCalculation: mockTierCalculation,
             crn,
             risksWidget: toRoshWidget(mockRisks),
@@ -411,6 +422,7 @@ describe('/controllers/personalDetails', () => {
           ...req,
           query: {
             ...req.query,
+            origin: 'appointments',
           },
           body: {
             ...req.body,
@@ -442,6 +454,7 @@ describe('/controllers/personalDetails', () => {
               email,
             },
             needs: mockNeeds,
+            origin: 'appointments',
             tierCalculation: mockTierCalculation,
             crn,
             risksWidget: toRoshWidget(mockRisks),

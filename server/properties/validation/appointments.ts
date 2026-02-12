@@ -16,7 +16,6 @@ export interface AppointmentsValidationArgs {
   crn: string
   id: string
   page: string
-  repeatingValue?: 'Yes' | 'No'
   visor?: boolean
   contactId?: string
   notes?: string
@@ -26,7 +25,7 @@ export interface AppointmentsValidationArgs {
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, contactId, page, visor, repeatingValue, notes, maxCharCount, enablePastAppointments } = args
+  const { crn, id, contactId, page, visor, notes, maxCharCount, enablePastAppointments } = args
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -151,41 +150,6 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
-    [`[appointments][${crn}][${id}][repeating]`]: {
-      optional: page !== 'repeating',
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select if the appointment will repeat',
-          log: 'Appointment repeat not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][interval]`]: {
-      optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Select the frequency the appointment will repeat',
-          log: 'Appointment repeat frequency not selected',
-        },
-      ],
-    },
-    [`[appointments][${crn}][${id}][numberOfRepeatAppointments]`]: {
-      optional: page !== 'repeating' || (page === 'repeating' && repeatingValue !== 'Yes'),
-      checks: [
-        {
-          validator: isNotEmpty,
-          msg: 'Enter the number of times the appointment will repeat',
-          log: 'Appointment repeat count not entered',
-        },
-        {
-          validator: isStringNumber,
-          msg: 'Enter a number',
-          log: 'Appointment repeat count not entered in correct format',
-        },
-      ],
-    },
     [`[appointments][${crn}][${id}][notes]`]: {
       optional:
         !['supporting-information', `arrange-appointment/${id}/add-note`].includes(page) ||
@@ -297,6 +261,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Explain if appointment includes sensitive information',
           log: 'Sensitivity not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][smsOptIn]`]: {
+      optional: page !== 'text-message-confirmation',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if you want to send a text message confirmation',
+          log: 'Send text message confirmation not selected',
         },
       ],
     },

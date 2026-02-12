@@ -1,5 +1,4 @@
 {% extends "../_form.njk" %}
-{% set isRepeating = appointment.repeating == 'Yes' %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
@@ -11,9 +10,6 @@
 {% if not case.mobileNumber and case.telephoneNumber %}
   {% set phoneNumber = 'telephone' %}
 {% endif %}
-{% for appointmentDate in appointment.repeatingDates %}
-  {% set appointmentDates = (appointmentDates.push(appointmentDate), appointmentDates) %}
-{% endfor %}
 {% set title = 'Appointment arranged' %}
 {% if isInPast %}
   {% set title = 'Past appointment arranged' %}
@@ -53,27 +49,36 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
-      {% if not isInPast or isInPast and appointmentType === 'RESCHEDULE' %}
-        <p class="govuk-body">
+      {% if flags.enableSmsReminders == true %}
+        {% if smsSent %}
+          <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+        {% else %}
+          <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
+        {% endif %}
+      {% endif %}
+      {% if not isInPast %}
+        {% if flags.enableSmsReminders == false %}
+          <p class="govuk-body">
         You need to send
         {{case.name.forename}}
         the appointment details.
       {% if phoneNumber %}
          Their phone number is
          <span data-qa="{{ phoneNumber }}">
-              {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
-              {% else %}{{ case.telephoneNumber + "." }}
-              {% endif %}
-            </span>
-          {% endif %}
-        </p>
+                {% if phoneNumber == 'mobile' %}{{ case.mobileNumber + "." }}
+                {% else %}{{ case.telephoneNumber + "." }}
+                {% endif %}
+              </span>
+            {% endif %}
+          </p>
+        {% endif %}
         {% if isOutLookEventFailed %}
           <p class="govuk-body" data-qa="outlook-err-msg-1">There is a technical problem with Outlook and we could not send a calendar invitation.</p>
-          <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType === 'RESCHEDULE' %} details have been updated on
+          <p class="govuk-body" data-qa="outlook-err-msg-2">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on
             {% else %} has been added to {% endif %}the NDelius contact log and officer diary, along with any supporting information.</p>
         {% else %}
           {% if not isInPast %}
-            <p class="govuk-!-margin-bottom-0" data-qa="">The appointment{% if appointmentType === 'RESCHEDULE' %} details have been updated on{% else %} has been added to{% endif %}:</p>
+            <p class="govuk-!-margin-bottom-0" data-qa="">The appointment{% if appointmentType == 'RESCHEDULE' %} details have been updated on{% else %} has been added to{% endif %}:</p>
             <ul class="govuk-list govuk-list--bullet govuk-!-margin-top-0 govuk-!-margin-left-1" data-qa="outlook-msg">
               <li>{{ attendingName }} calendar</li>
               <li>the NDelius contact log and officer diary, along with any supporting information</li>
@@ -83,7 +88,7 @@
           {% endif %}
         {% endif %}
       {% else %}
-        <p class="govuk-body">The appointment has been added to the NDelius contact log and officer diary, along with any supporting information and the outcome.</p>
+        <p class="govuk-body">The appointment has been {% if appointmentType == 'RESCHEDULE' %}updated on{% else %}added to{% endif %} the NDelius contact log and officer diary.</p>
       {% endif %}
     </div>
     <div class="govuk-grid-column-two-thirds" data-qa="further-actions">
@@ -95,6 +100,20 @@
                         arrange another appointment
                     </a>
         </li>
+        {% if contactResponse.content.length > 0 %}
+          <li>
+            {% if contactResponse.content.length == 1 %}
+              <a class="govuk-link" href="/case/{{ crn }}/appointments/appointment/{{ contactResponse.content[0].id }}/manage" data-qa="logOutcomeLink">
+        log appointment outcome for {{ contactResponse.content[0].date | dayOfWeek + ' ' + contactResponse.content[0].date | dateWithYear }}
+              </a>
+            {% endif %}
+            {% if contactResponse.content.length > 1 %}
+              <a class="govuk-link" href="/case/{{ crn }}/record-an-outcome/outcome" data-qa="logOutcomeLink">
+        log outcomes for {{ contactResponse.content.length }} appointments
+          </a>
+            {% endif %}
+          </li>
+        {% endif %}
       </ul>
     </div>
   </div>

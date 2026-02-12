@@ -1,4 +1,4 @@
-{% if sentencePlan.showLink %}
+{% if sentencePlan.showLink or sentencePlan.showText %}
     <section data-qa="plan">
         <h3 class="govuk-heading-m">Plan</h3>
         <div class="text-secondary govuk-body govuk-!-margin-bottom-2 govuk-hint">
@@ -6,7 +6,12 @@
                 <p class="govuk-body" data-qa="planLastUpdated">Last updated: {{ sentencePlan.lastUpdatedDate | dateWithYear }}</p>
             {% endif %}
             <p class="govuk-body">
-                <a href="{{ sentencePlanLink() }}/crn/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
+                {% if sentencePlan.showLink %}
+                    <a href="{{ sentencePlanLink() }}/crn/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
+            {% endif %}
+            {% if sentencePlan.showText %}
+You cannot view this sentence plan. Only the allocated probation practitioner can access it.
+                       {% endif %}
         </div>
     </section>
 {% endif %}

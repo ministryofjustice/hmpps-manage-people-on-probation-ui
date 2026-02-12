@@ -217,3 +217,5 @@ export interface Disability {
   lastUpdated: string
   lastUpdatedBy: Name
 }
+
+export type Origin = 'appointments' | undefined

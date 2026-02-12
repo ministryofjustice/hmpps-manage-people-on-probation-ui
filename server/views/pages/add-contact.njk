@@ -1,0 +1,31 @@
+{% extends "../partials/case.njk" %}
+{% set pageTitle = makePageTitle({pageHeading: "Choose a contact"}) %}
+{% set currentNavSection = 'timeline' %}
+{% set currentSectionName = 'Choose a contact' %}
+
+{% block beforeContent %}
+  {{ govukBreadcrumbs({
+    items: [
+      {
+        text: "Cases",
+        href: "/case"
+      },
+      {
+        text: headerPersonName.forename + ' ' + headerPersonName.surname,
+        href: "/case/" + crn,
+        attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+      },
+      {
+        text: "Contacts",
+        href: "/case/" + crn + "/activity-log"
+      },
+      {
+        text: currentSectionName
+      }
+    ]
+  }) }}
+{% endblock %}
+
+{% block pageContent %}
+  <p class="govuk-body">Select a contact type to add.</p>
+{% endblock %}

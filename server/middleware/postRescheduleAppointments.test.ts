@@ -72,9 +72,6 @@ const mockAppointment: AppointmentSession = {
   date: tomorrow.toFormat('yyyy-M-dd'),
   start: '09:00',
   end: '09:30',
-  until: tomorrow.toFormat('yyyy-M-dd'),
-  interval: 'DAY',
-  numberOfAppointments: '1',
   eventId: '250113825',
   requirementId: '1',
   licenceConditionId: '2500686668',
@@ -191,7 +188,7 @@ describe('middleware/postRescheduleAppointments', () => {
     })
   })
   describe('reschedule an appointment in the past', () => {
-    const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10', until: '2025-03-10' })
+    const [req, mockAppointmentSession] = buildRequest({ date: '2025-03-10' })
     const {
       date,
       start: startTime,
@@ -233,28 +230,29 @@ describe('middleware/postRescheduleAppointments', () => {
     it('should create the outlook event if user email is defined', async () => {
       const [req] = buildRequest()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
-      const expectedBody: RescheduleEventRequest = {
-        rescheduledEventRequest: {
-          recipients: [
-            {
-              emailAddress: mockUserDetails.email,
-              name: `${mockUserDetails.firstName} ${mockUserDetails.surname}`,
-            },
-          ],
-          durationInMinutes: 30,
-          message: `<a href=http://localhost:3000/case/X000001/appointments/appointment/12345/manage?back=/case/X000001/appointments target='_blank' rel="external noopener noreferrer"> View the appointment on Manage people on probation (opens in new tab).</a>`,
-          start: null,
-          subject: 'Planned Office Visit (NS) with ',
-          supervisionAppointmentUrn: 'ABCDE',
-        },
-        oldSupervisionAppointmentUrn: externalReference,
-      }
-      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(expectedBody)
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: {
+            recipients: [
+              {
+                emailAddress: mockUserDetails.email,
+                name: `${mockUserDetails.firstName} ${mockUserDetails.surname}`,
+              },
+            ],
+            durationInMinutes: 30,
+            message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
+            start: null,
+            subject: 'Planned Office Visit (NS) with ',
+            supervisionAppointmentUrn: 'ABCDE',
+          },
+          oldSupervisionAppointmentUrn: externalReference,
+        }),
+      )
     })
-    it('should not create outlook event if rescheduled appointment is in the past', async () => {
+    it('should delete future outlook event if rescheduled appointment is in the past', async () => {
       const [req] = buildRequest({ date: yesterday.toFormat('yyyy-M-dd'), until: yesterday.toFormat('yyyy-M-dd') })
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
-      expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalled()
     })
     it('should not create outlook event if user has no email address defined', async () => {
       const [req] = buildRequest()

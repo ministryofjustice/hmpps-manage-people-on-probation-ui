@@ -10,6 +10,7 @@ import {
   getAppointment,
   getAppointmentTypes,
   getOfficeLocationsByTeamAndProvider,
+  getOverdueOutcomes,
   getPersonalDetails,
   getPersonAppointment,
   getSentences,
@@ -59,6 +60,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
 
   router.get(
     '/case/:crn/appointments/reschedule/:contactId/:id/confirmation',
+    getOverdueOutcomes(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getPersonalDetails(hmppsAuthClient),
     getPersonAppointment(hmppsAuthClient),

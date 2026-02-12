@@ -4,9 +4,9 @@ import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import config from '../config'
 import ArnsApiClient from '../data/arnsApiClient'
-import { TimelineItem } from '../data/model/risk'
+import { PersonRiskFlag, TimelineItem } from '../data/model/risk'
 import TierApiClient from '../data/tierApiClient'
-import { toTimeline, toRoshWidget } from '../utils'
+import { toTimeline, toRoshWidget, findReplace } from '../utils'
 
 const routes = [
   'getRisk',
@@ -76,7 +76,14 @@ const riskController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const personRiskFlag = await masClient.getPersonRiskFlag(crn, id)
+      let personRiskFlag = await masClient.getPersonRiskFlag(crn, id)
+      const term = 'RoSH'
+      personRiskFlag = findReplace<PersonRiskFlag>({
+        data: personRiskFlag,
+        path: ['riskFlag', 'description'],
+        find: term,
+        replace: term.toUpperCase(),
+      })
       return res.render('pages/risk/flag', {
         personRiskFlag,
         crn,

@@ -912,7 +912,6 @@ describe('controllers/arrangeAppointment', () => {
         type: 'X',
         date: 'X',
         sensitivity: 'No',
-        repeating: 'No',
       }
       mockedIsValidCrn.mockReturnValue(true)
       mockedIsValidUUID.mockReturnValue(true)
@@ -927,7 +926,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getConfirmation', () => {
     it('should render the confirmation page', async () => {
       const mockReq = createMockRequest({
-        appointmentSession: { backendId: 1234, user: { username: '' } },
+        appointmentSession: { backendId: 1234, user: { username: '' }, smsOptIn: 'YES' },
         dataSession: { isOutLookEventFailed: false },
       })
       await controllers.arrangeAppointments.getConfirmation(hmppsAuthClient)(mockReq, res)
@@ -937,6 +936,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: null,
+        smsSent: true,
         attendingName: 'Caroline´s',
         url: '',
       })
@@ -971,7 +971,6 @@ describe('controllers/arrangeAppointment', () => {
       date: '2025/7/2',
       start: '9:00am',
       end: '9:30am',
-      repeatingDates: ['2025/7/9', '2025/7/16'],
       backendId: 5,
     }
     it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
@@ -1033,7 +1032,6 @@ describe('controllers/arrangeAppointment', () => {
           type: 'type',
           date: '',
           sensitivity: 'No',
-          repeating: 'No',
         },
       })
       mockedIsValidCrn.mockReturnValue(true)

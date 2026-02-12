@@ -1,5 +1,6 @@
 import caseloadController from './caseload'
 import activityLogController from './activityLog'
+import addContactController from './addContact'
 import personalDetailsController from './personalDetails'
 import appointmentsController from './appointments'
 import caseController from './case'
@@ -21,6 +22,7 @@ import whatsNewController from './whatsNewController'
 export default {
   caseload: caseloadController,
   activityLog: activityLogController,
+  addContact: addContactController,
   personalDetails: personalDetailsController,
   appointments: appointmentsController,
   case: caseController,

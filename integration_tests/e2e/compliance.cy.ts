@@ -1,5 +1,6 @@
 import Page from '../pages/page'
 import CompliancePage from '../pages/compliance'
+import OverviewPage from '../pages/overview'
 import { checkPopHeader } from './appointments/imports'
 
 context('Compliance', () => {
@@ -89,7 +90,8 @@ context('Compliance', () => {
   })
   it('Compliance page is rendered with multiple NSIs in progress warning message', () => {
     cy.visit('/case/X778160/compliance')
-    const page = Page.verifyOnPage(CompliancePage)
+    const page = new CompliancePage()
+    page.checkPageTitle('Compliance')
     cy.get('.govuk-warning-text').should(
       'contain.html',
       'There are multiple breach NSIs in progress.<br>Check and correct any issues in NDelius.',
@@ -102,5 +104,17 @@ context('Compliance', () => {
   it('should display the PoP details header on the previous order page', () => {
     cy.visit('/case/X000001/sentence/previous-orders/3')
     checkPopHeader()
+  })
+  it('Compliance page is rendered with feature flag disabled', () => {
+    cy.task('stubDisableCompliancePage')
+    cy.visit('/case/X778160/compliance')
+    const page = new CompliancePage()
+    page.checkPageTitle('Sorry, the Compliance page is unavailable')
+    cy.get('p')
+      .eq(0)
+      .should(
+        'contain.text',
+        'The Compliance page is temporarily unavailable while we make some improvements. You can use NDelius if you need to check compliance in the meantime.',
+      )
   })
 })

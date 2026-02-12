@@ -130,44 +130,6 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
-  const validateRepeating = (): void => {
-    if (!baseUrl.includes('/repeating')) return
-
-    const repeatingValue = req.body?.appointments?.[crn]?.[id]?.repeating
-    const appointmentDate = getDataValue(data, ['appointments', crn, id, 'date'])
-    const appointmentRepeatingDates = getDataValue(data, ['appointments', crn, id, 'repeatingDates'])
-
-    const oneYearFromDate = new Date(appointmentDate)
-    oneYearFromDate.setFullYear(oneYearFromDate.getFullYear() + 1)
-
-    let isMoreThanAYear = false
-
-    if (appointmentRepeatingDates?.length) {
-      const finalAppointmentDate = appointmentRepeatingDates.at(-1)
-      isMoreThanAYear = new Date(finalAppointmentDate) > oneYearFromDate
-    }
-
-    errorMessages = {
-      ...errorMessages,
-      ...validateWithSpec(
-        req.body,
-        appointmentsValidation({
-          crn,
-          id,
-          page: 'repeating',
-          repeatingValue,
-        }),
-      ),
-    }
-
-    if (isMoreThanAYear) {
-      errorMessages = {
-        ...errorMessages,
-        [`appointments-${crn}-${id}-interval`]: 'The appointment can only repeat up to a year',
-      }
-    }
-  }
-
   const validateRecordAnOutcome = (): void => {
     if (!baseUrl.includes(`case/${crn}/record-an-outcome`)) return
 
@@ -317,10 +279,25 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateTextMessageConfirmation = () => {
+    if (!baseUrl.includes(`/case/${crn}/arrange-appointment/${id}/text-message-confirmation`)) return
+    render = 'pages/arrange-appointment/text-message-confirmation'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req.body,
+        appointmentsValidation({
+          crn,
+          id,
+          page: 'text-message-confirmation',
+        }),
+      ),
+    }
+  }
+
   validateType()
   validateSentence()
   validateLocationDateTime()
-  validateRepeating()
   validateSupportingInformation()
   validateNextAppointment()
   validateRecordAnOutcome()
@@ -329,6 +306,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateAddNote()
   validateManageAddNote()
   validateReschedule()
+  validateTextMessageConfirmation()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

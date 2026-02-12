@@ -1,0 +1,28 @@
+{% set hasAppointmentStartTimePassed = isInThePast(entry.startDateTime) %}
+{% set shouldPromptToRecordAnOutcome = entry.hasOutcome === false and hasAppointmentStartTimePassed %}
+{% set queryParams = 'category=' + category + '&view=default&requirement=' + requirement + '&' + filters.queryStr + '&page=' + page %}
+
+{% set link = '/case/' + crn + '/activity/' + entry.id + '?back=' + url %}
+
+{% set titleHtml %}
+<a href="{{ link }}" class="govuk-!-font-weight-bold">{% include './_communication-title.njk' %} at&nbsp;{{ entry.startDateTime | govukTime }}
+  <span class="govuk-visually-hidden"> on {{ thisDate }}</span></a>
+{% endset %}
+{% set actionsHtml %}
+{{ appComplianceTag({ entry: entry, classes: 'govuk-!-margin-left-2' }) }}
+{% if shouldPromptToRecordAnOutcome %}
+  {% include './_log-outcome-link.njk' %}
+{% endif %}
+{% endset %}
+
+{% set html %}
+{% include './_timeline-notes.njk' %}
+{% endset %}
+
+{{ appSummaryCard({
+  attributes: {'data-qa': 'timeline' + loop.index + 'Card'},
+  titleHtml: titleHtml,
+  classes: 'govuk-!-margin-bottom-2 app-summary-card--white-header',
+  html: html,
+  actionsHtml: actionsHtml
+}) }}

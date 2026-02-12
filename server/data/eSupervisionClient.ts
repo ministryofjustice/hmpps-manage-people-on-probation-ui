@@ -14,7 +14,10 @@ import {
   OffenderSetup,
   OffenderSetupCompleteResponse,
   ReactivateOffenderRequest,
+  SmsPreviewRequest,
+  SmsPreviewResponse,
 } from './model/esupervision'
+import { ErrorSummary } from './model/common'
 
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {
@@ -103,6 +106,15 @@ export default class ESupervisionClient extends RestClient {
     return this.post({
       path: `/v2/offenders/${uuid}/reactivate`,
       data: reactivateOffenderRequest,
+    })
+  }
+
+  async postSmsPreview(body: SmsPreviewRequest): Promise<SmsPreviewResponse | ErrorSummary | null> {
+    return this.post({
+      data: body,
+      path: `/v2/sms-preview`,
+      handle404: true,
+      handle500: true,
     })
   }
 }

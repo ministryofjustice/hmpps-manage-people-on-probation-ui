@@ -6,14 +6,13 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import SentencePlanApiClient from '../data/sentencePlanApiClient'
 import { checkAuditMessage } from './testutils'
-import { toPredictors, toRoshWidget } from '../utils'
+import { findReplace, toPredictors, toRoshWidget } from '../utils'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import {
   mockAppResponse,
   mockTierCalculation,
   mockRisks,
-  mockPersonRiskFlags,
   mockPersonRiskFlag,
   mockPredictors,
   mockNeeds,
@@ -40,6 +39,14 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 
+jest.mock('../utils', () => {
+  const actualUtils = jest.requireActual('../utils')
+  return {
+    ...actualUtils,
+    findReplace: jest.fn(),
+  }
+})
+
 const username = 'user-1'
 
 const token = { access_token: 'token-1', expires_in: 300 }
@@ -64,6 +71,15 @@ const predictorsSpy = jest
 const sanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
+
+const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
+
+const mockFormattedRiskFlag = {
+  ...mockPersonRiskFlag,
+  riskFlag: { description: 'ROSH flag' },
+}
+
+mockFindReplace.mockImplementation(() => mockFormattedRiskFlag)
 
 const needsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 
@@ -241,9 +257,22 @@ describe('riskController', () => {
     it('should request the person risk flag from the api', () => {
       expect(getPersonRiskFlagSpy).toHaveBeenCalledWith(crn, id)
     })
+    it(`should find and replace RoSH with ROSH in the api response`, () => {
+      expect(mockFindReplace).toHaveBeenCalledTimes(1)
+      expect(mockFindReplace).toHaveBeenCalledWith({
+        data: mockPersonRiskFlag,
+        path: ['riskFlag', 'description'],
+        find: 'RoSH',
+        replace: 'ROSH',
+      })
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: mockFormattedRiskFlag,
+        crn,
+      })
+    })
     it('should render the person risk flag page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
-        personRiskFlag: mockPersonRiskFlag,
+        personRiskFlag: mockFormattedRiskFlag,
         crn,
       })
     })

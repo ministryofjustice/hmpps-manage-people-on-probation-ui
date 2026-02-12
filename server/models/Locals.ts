@@ -6,7 +6,7 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { AppointmentSession, AppointmentType, NextAppointmentResponse } from './Appointments'
+import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
@@ -16,7 +16,7 @@ import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
-import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
+import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse, SmsPreviewResponse } from '../data/model/esupervision'
 
 export interface AppointmentLocals {
   meta: {
@@ -34,6 +34,7 @@ export interface AppointmentLocals {
     licenceCondition: string
     nsi: string
     forename: string
+    mobileNumber: string
   }
   attending?: {
     name: string
@@ -42,13 +43,12 @@ export interface AppointmentLocals {
     html: string
   }
   location?: Location | string
+  textMessageConfirmation?: YesNo
   start?: string
   previousStart?: string
   end?: string
   previousEnd?: string
   date?: string
-  repeating?: string
-  repeatingDates?: string[]
   notes?: string
   sensitivity?: string
   outcomeRecorded?: string
@@ -67,6 +67,7 @@ interface Locals {
   headerPersonName?: { forename: string; surname: string }
   headerCRN?: string
   headerDob?: string
+  headerTierLink?: string
   dateOfDeath?: string
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
@@ -114,6 +115,7 @@ interface Locals {
   offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
   uploadError: string
   renderPath: string
+  smsPreview?: SmsPreviewResponse | null
   personRisks?: PersonRiskFlags
 }
 

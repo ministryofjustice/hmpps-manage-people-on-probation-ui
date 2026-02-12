@@ -1,10 +1,11 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentType } from '../models/Appointments'
+import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
 import { constructNextAppointmentSession } from './constructAppointmentSession'
 import { Activity, PersonAppointment } from '../data/model/schedule'
 import { mockAppResponse } from '../controllers/mocks'
 import { Name } from '../data/model/personalDetails'
+import { isoToDateTime } from '../utils'
 
 const nextSpy = jest.fn()
 const mockTypes: AppointmentType[] = [
@@ -147,10 +148,14 @@ const mockPersonAppointmentResponse = (values: Partial<Activity>): PersonAppoint
   },
 })
 
-const expectedSession = (values: Record<string, string | number | Record<string, string | Name>>) => {
+const expectedSession = (
+  values: Record<string, string | number | Record<string, string | Name | null>>,
+): AppointmentSession => {
   const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
   const { code: locationCode } = mockAppointment.location
-  const { eventId, isVisor, startDateTime: date, endDateTime: end } = mockAppointment
+  const { eventId, isVisor } = mockAppointment
+  const { date, time: start } = isoToDateTime(mockAppointment.startDateTime)
+  const { time: end } = isoToDateTime(mockAppointment.endDateTime)
   return {
     user: {
       providerCode,
@@ -163,18 +168,13 @@ const expectedSession = (values: Record<string, string | number | Record<string,
     type: 'COAP',
     visorReport: isVisor ? 'Yes' : 'No',
     date,
-    start: date,
+    start,
     end,
-    until: end,
-    interval: 'DAY',
-    numberOfAppointments: '1',
-    numberOfRepeatAppointments: '0',
     eventId: eventId.toString(),
     username,
     uuid: '',
-    repeating: 'No',
-    repeatingDates: [] as string[],
     externalReference,
+    smsOptIn: null,
     ...values,
   }
 }
@@ -207,14 +207,9 @@ describe('/middleware/constructAppointmentSession', () => {
     })
     constructNextAppointmentSession(req, res, nextSpy)
     expect(res.locals.nextAppointmentSession).toStrictEqual({
-      interval: 'DAY',
-      numberOfAppointments: '1',
-      numberOfRepeatAppointments: '0',
       eventId: '',
       username: res.locals.user.username,
       uuid: '',
-      repeating: 'No',
-      repeatingDates: [],
     })
     expect(nextSpy).toHaveBeenCalled()
   })
@@ -349,19 +344,6 @@ describe('/middleware/constructAppointmentSession', () => {
         type: 'COAP',
       }),
     )
-  })
-
-  it('should set until as an empty string if end date does not exist in person appointment', () => {
-    const mockAppt = mockPersonAppointmentResponse({
-      endDateTime: undefined,
-    })
-    const req = mockReq()
-    const res = mockAppResponse({
-      personAppointment: mockAppt,
-      appointmentTypes: mockTypes,
-    })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ until: '', end: '' }))
   })
 
   it('should add requirementId if requirement component in person appointment', () => {

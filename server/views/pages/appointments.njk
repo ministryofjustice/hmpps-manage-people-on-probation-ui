@@ -22,11 +22,11 @@
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
-    {% set checkinLink = checkinLink %}
-    {% set checkinButtonText = 'Set up online check ins' %}
+  {% set checkinLink = checkinLink %}
+  {% set checkinButtonText = 'Set up online check ins' %}
 {% else %}
-    {% set checkinLink = manageCheckinLink %}
-    {% set checkinButtonText = 'Manage online check ins' %}
+  {% set checkinLink = manageCheckinLink %}
+  {% set checkinButtonText = 'Manage online check ins' %}
 {% endif %}
 
 {% if not hasDeceased %}
@@ -156,7 +156,7 @@
         <div class="moj-button-group moj-button-group--inline govuk-!-margin-bottom-3">
           {% if flags.enableESuperVision === true %}
             <div class="moj-button-group__item">
-              <form method="POST" action="" style="display:inline">
+              <form method="POST" action="" class="govuk-!-display-inline-block">
                 <button type="submit" class="govuk-button govuk-!-static-margin-bottom-0" data-module="govuk-button" data-qa="arrange-appointment-btn">
                             Arrange an appointment
                         </button>
@@ -171,7 +171,7 @@
           {% endif %}
         </div>
       {% endif %}
-      
+
       <section class="govuk-!-margin-bottom-8 app-summary-card--large-title" data-qa="upcomingAppointmentsSection">
         <h3 class="govuk-heading-m" id="section1" data-qa="upcomingAppointments">Upcoming appointments</h3>
         {% if upcomingAppointments.length == 0 %}

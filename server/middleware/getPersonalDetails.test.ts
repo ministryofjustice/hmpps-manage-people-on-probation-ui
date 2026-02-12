@@ -1,4 +1,5 @@
 import httpMocks from 'node-mocks-http'
+import e from 'connect-flash'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -29,6 +30,7 @@ import {
   PersonalDetails,
 } from '../data/model/personalDetails'
 import { Contact } from '../data/model/professionalContact'
+import { SentencePlan } from '../data/model/sentencePlan'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -49,7 +51,6 @@ const predictorsSpy = jest
 const searchUserCaseloadSpy = jest
   .spyOn(MasApiClient.prototype, 'searchUserCaseload')
   .mockImplementation(() => Promise.resolve(mockUserCaseload))
-
 let getPersonalDetailsSpy: jest.SpyInstance
 let getPlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
@@ -110,6 +111,7 @@ const mock = (crn = 'X000001', lastUpdatedDate = mockSentencePlans[0].lastUpdate
   sentencePlan: {
     lastUpdatedDate,
     showLink: false,
+    showText: false,
   },
   risks: mockRisks,
   tierCalculation: mockTierCalculation,
@@ -138,7 +140,19 @@ describe('/middleware/getPersonalDetails', () => {
     process.env.NODE_ENV = 'production'
     getPersonalDetailsSpy.mockResolvedValueOnce(overview('X000002'))
     req = getReq()
-    res = getRes()
+    res = {
+      locals: {
+        user: {
+          username: 'user-1',
+          roles: ['SENTENCE_PLAN'],
+        },
+        flags: {
+          enableSentencePlan: false,
+          enableTierLink: true,
+        },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     const expected = {
       personalDetails: {
@@ -160,6 +174,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -179,7 +194,20 @@ describe('/middleware/getPersonalDetails', () => {
         },
       },
     })
-    res = getRes()
+
+    res = {
+      locals: {
+        user: {
+          username: 'user-1',
+          roles: ['SENTENCE_PLAN'],
+        },
+        flags: {
+          enableSentencePlan: false,
+          enableTierLink: true,
+        },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     const expected = {
       personalDetails: {
@@ -201,6 +229,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -219,7 +248,19 @@ describe('/middleware/getPersonalDetails', () => {
         },
       },
     })
-    res = getRes()
+    res = {
+      locals: {
+        user: {
+          username: 'user-1',
+          roles: ['SENTENCE_PLAN'],
+        },
+        flags: {
+          enableSentencePlan: false,
+          enableTierLink: true,
+        },
+      },
+      redirect: jest.fn().mockReturnThis(),
+    } as unknown as AppResponse
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(getPersonalDetailsSpy).not.toHaveBeenCalled()
     expect(risksSpy).not.toHaveBeenCalled()
@@ -233,6 +274,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
+    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
     expect(res.locals.dateOfDeath).toBeUndefined()
     expect(nextSpy).toHaveBeenCalled()
   })
@@ -290,12 +332,23 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
+      showText: false,
       lastUpdatedDate: '',
     })
   })
 
-  it('should set the correct sentence plan local variables if pop not in caseload', async () => {
+  it('should set the correct sentence plan local variables if user has SENTENCE_PLAN role, pop has AGREED sentence plan and pop not in caseload', async () => {
     const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    req = getReq()
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
     jest
       .spyOn(MasApiClient.prototype, 'searchUserCaseload')
       .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
@@ -305,7 +358,8 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
-      lastUpdatedDate: '',
+      showText: true,
+      lastUpdatedDate: '2025-10-10T16:08:54Z',
     })
   })
 
@@ -326,11 +380,96 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
+      showText: false,
       lastUpdatedDate: '',
     })
   })
 
-  it('should set the correct sentence plan local variables if user has sentence plan role, pop has sentence plan and pop in user caseload', async () => {
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan status and pop in user caseload', async () => {
+    process.env.NODE_ENV = 'development'
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+          },
+        },
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: true,
+      showText: false,
+      lastUpdatedDate: mockSentencePlans[1].lastUpdatedDate,
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has DRAFT sentence plan status and pop in user caseload', async () => {
+    process.env.NODE_ENV = 'development'
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    const draftSentencePlan: SentencePlan[] = [
+      {
+        ...mockSentencePlans[0],
+      },
+    ]
+    jest
+      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(draftSentencePlan))
+    req = httpMocks.createRequest({
+      params: {
+        crn: 'X000001',
+      },
+      session: {
+        data: {
+          personalDetails: {
+            X000001: mock(),
+          },
+        },
+      },
+    })
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: ['SENTENCE_PLAN'],
+      },
+      flags: {
+        enableSentencePlan: true,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.sentencePlan).toStrictEqual({
+      showLink: false,
+      showText: false,
+      lastUpdatedDate: '',
+    })
+  })
+
+  it('should set the correct sentence plan local variables if user has sentence plan role, pop has AGREED sentence plan and pop not in user caseload', async () => {
+    process.env.NODE_ENV = 'development'
+    const mockedUserCaseload: UserCaseload = { ...mockUserCaseload, caseload: [] }
+    jest
+      .spyOn(MasApiClient.prototype, 'searchUserCaseload')
+      .mockImplementationOnce(() => Promise.resolve(mockedUserCaseload))
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
@@ -361,7 +500,8 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
-      lastUpdatedDate: mockSentencePlans[0].lastUpdatedDate,
+      showText: true,
+      lastUpdatedDate: mockSentencePlans[1].lastUpdatedDate,
     })
   })
 
@@ -383,7 +523,27 @@ describe('/middleware/getPersonalDetails', () => {
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
+      showText: false,
       lastUpdatedDate: '',
     })
+  })
+  it('should not set res.locals.headerTierLink if feature flag is disabled', async () => {
+    jest
+      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
+      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
+    jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
+    req = getReq()
+    res = mockAppResponse({
+      user: {
+        username: 'user-1',
+        roles: [],
+      },
+      flags: {
+        enableSentencePlan: true,
+        enableTierLink: false,
+      },
+    })
+    await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
+    expect(res.locals.headerTierLink).toBeUndefined()
   })
 })

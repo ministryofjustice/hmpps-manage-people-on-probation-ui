@@ -81,6 +81,7 @@ const mockPersonalDetails: PersonalDetailsSession = {
   sentencePlan: {
     lastUpdatedDate: '',
     showLink: false,
+    showText: false,
   },
   risks: mockRisks,
   tierCalculation: mockTierCalculation,

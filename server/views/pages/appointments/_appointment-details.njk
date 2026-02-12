@@ -8,7 +8,8 @@
     {% endif %}
   {% endfor %}
 {% endif %}
-{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else ['Type', 'Notes'] %}
+{% set headings = ['Type of appointment', 'Appointment notes'] if appointment.isAppointment else 
+  ['Type', 'Notes'] %}
 {{ govukSummaryList({
   classes: 'govuk-!-margin-bottom-0' if noMargin else 'govuk-!-margin-bottom-9',
   rows: [
@@ -51,10 +52,6 @@
       key: { html:  '<span data-qa="timeLabel">Time</span>' },
       value: { html: '<span data-qa="timeValue">' + timeFromTo(appointment.startDateTime, appointment.endDateTime) + '</span>'}
     },
-    {
-      key: { html: '<span data-qa="repeatingLabel">Repeating appointment</span>' },
-      value: { html: '<span data-qa="repeatingValue">' + appointment.repeating  | toYesNo + '</span>'}
-    } if appointment.repeating,
     {
       key: { html: '<span data-qa="rarLabel">RAR toolkit</span>' },
       value: { html: '<span data-qa="rarValue">' + appointment.rarCategory + '</span>'}

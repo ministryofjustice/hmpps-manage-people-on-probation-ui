@@ -1,0 +1,147 @@
+{%- from "moj/components/filter/macro.njk" import mojFilter -%}
+{%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
+
+{% set queryString = '?' + queryParams.join('&')if queryParams.length > 0 else 
+  '' %}
+{% set clearLink = '?clear=true&view=' + view if view else 
+  '?clear=true' %}
+
+{%- set filterOptionsHtml %}
+
+{{ govukInput({
+    id: 'keywords',
+    name: 'keywords',
+    label: {
+      text: 'Keywords',
+      classes: "govuk-label--s govuk-!-font-weight-bold"
+    },
+    formGroup: {
+      classes: "govuk-!-margin-bottom-3",
+      attributes: {
+        'data-qa': 'keywords'
+      }
+    },
+    value: query.keywords
+  }) }}
+{{ mojDatePicker({
+  id: "dateFrom",
+  name: "dateFrom",
+  label: {
+      text: "Date from",
+      classes: "govuk-label--s govuk-!-font-weight-bold"
+  },
+  formGroup: {
+      classes: "govuk-!-margin-bottom-3",
+      attributes: {
+        'data-qa': 'date-from'
+      }
+    },
+    value: query.dateFrom,
+    maxDate: filters.maxDate,
+    errorMessage: {
+      text: errorMessages.dateFrom,
+      attributes: {
+        'data-qa': 'dateFromError'
+      }
+    } if errorMessages.dateFrom
+}) }}
+{{ mojDatePicker({
+  id: "dateTo",
+  name: "dateTo",
+  label: {
+      text: "Date to",
+      classes: "govuk-label--s govuk-!-font-weight-bold"
+  },
+  formGroup: {
+    classes: "govuk-!-margin-bottom-3",
+    attributes: {
+        'data-qa': 'date-to'
+      }
+  },
+  value: query.dateTo,
+  maxDate: filters.maxDate,
+  errorMessage: {
+      text: errorMessages.dateTo,
+      attributes: {
+        'data-qa': 'dateToError'
+      }
+    } if errorMessages.dateTo
+}) }}
+{{ govukCheckboxes({
+    idPrefix: 'compliance',
+    name: 'compliance',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: 'Compliance filters',
+        classes: 'govuk-fieldset__legend--s'
+      }
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'compliance'
+      }
+    },
+    items: filters.complianceOptions
+  }) }}
+
+{% endset -%}
+
+{% set filterCategories = [] %}
+{% if filters.selectedFilterItems.keywords.length %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Search term'
+    },
+    items: filters.selectedFilterItems.keywords
+  }), filterCategories) %}
+{% endif %}
+{% if filters.selectedFilterItems.dateRange.length %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Date range'
+    },
+    items: filters.selectedFilterItems.dateRange
+  }), filterCategories) %}
+{% endif %}
+{% if filters.selectedFilterItems.compliance.length %}
+  {% set filterCategories = (filterCategories.push({
+    heading: {
+      text: 'Compliance filters'
+    },
+    items: filters.selectedFilterItems.compliance
+  }), filterCategories) %}
+{% endif %}
+
+<div class="govuk-grid-column-one-third contact-activity__filter govuk-!-padding-bottom-4">
+  <form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+    {{ mojFilter({
+  heading: {
+    html: 'Filter contacts',
+    classes: 'govuk-heading-s'
+  },
+  submit: {
+    value: "submit",
+    attributes: {
+        "data-qa": "submit-button"
+    }
+  },
+  selectedFilters: {
+    heading: {
+      html: '<span class="govuk-heading-m">Selected filters</span>'
+    },
+    clearLink: {
+      text: 'Clear filters',
+      href: '/case/' + crn + '/activity-log' + clearLink
+    },
+    categories: filterCategories
+  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length,
+  optionsHtml: filterOptionsHtml
+}) }}
+    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+    <input type="hidden" name="submit" value="true">
+    <input type="hidden" name="view" value="{{view}}">
+    <input type="hidden" name="page" value="{{page}}">
+  </form>
+
+</div>

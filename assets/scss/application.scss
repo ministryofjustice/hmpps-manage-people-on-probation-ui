@@ -44,6 +44,15 @@ $mappa-colour: #4c2c92;
   white-space: preserve-breaks;
 }
 
+.text-break {
+  overflow-wrap: break-word;
+  word-break: break-word;
+}
+
+.secondary-text--with-break {
+  display: block; /* replaces <br> */
+}
+
 .dps-header {
   background-color: rgba(86, 148, 202, 0.2);
   padding: 25px 0;
@@ -614,4 +623,117 @@ body.feature-disabled {
 }
 .display-none {
   display: none;
+}
+
+.sms-message-wrapper {
+  background: #e2e1e0;
+  border: 1px solid #e2e1e0;
+  border-radius: 5px;
+  box-sizing: border-box;
+  clear: both;
+  margin: 0 0 30px;
+  max-width: 464px;
+  padding: 15px;
+  position: relative;
+  white-space: normal;
+  width: 100%;
+  word-wrap: break-word;
+}
+.sms-message-wrapper:after {
+  border-color: transparent transparent #e2e1e0 #e2e1e0;
+  border-style: solid;
+  border-width: 10px 13px;
+  bottom: -5px;
+  content: '';
+  display: block;
+  position: absolute;
+  right: -20px;
+  transform: rotate(20deg);
+}
+
+.contact-activity {
+  &__tag {
+    display: inline-block !important;
+    float: none;
+    flex-shrink: 0;
+  }
+
+  &__actions {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 10px;
+
+    li {
+      white-space: nowrap;
+    }
+  }
+
+  &__manage-link {
+    display: inline-block;
+    width: 100px;
+    white-space: normal;
+  }
+
+  &__filter {
+    .govuk-button {
+      @extend .govuk-button--secondary;
+    }
+  }
+
+    &--noNotes {
+      display: block;
+    }
+  }
+
+.contact-log-compact {
+
+  .govuk-details {
+    margin-bottom: 5px;
+  }
+
+  &__contact-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  &__contact-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .contact-activity__tag {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  &-row {
+    border: 0;
+    &--last {
+      border-bottom: 1px solid #b1b4b6;;
+    }
+  }
+  .app-compliance-tag--compact {
+    float: none;
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+  }
+}
+
+.flex__item-full-width-mobile {
+  @include govuk-media-query($until: tablet ) {
+    width: 100%;
+  }
+}
+
+.flex--col-mobile {
+  @include govuk-media-query($until: tablet ) {
+    flex-direction: column;
+  }
+}
+
+.flex--gap-3 {
+  gap: govuk-spacing(3);
 }

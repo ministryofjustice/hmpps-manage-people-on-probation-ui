@@ -1,7 +1,8 @@
 import { type AttendedCompliedAppointment } from '../middleware'
-import { Name } from '../data/model/personalDetails'
-import { Activity } from '../data/model/schedule'
-import { Errors } from './Errors'
+import { type Name } from '../data/model/personalDetails'
+import { type Activity } from '../data/model/schedule'
+import { type Errors } from './Errors'
+import { type SmsOptInOptions, type SmsPreviewResponse } from '../data/model/esupervision'
 
 export type YesNo = '' | 'Yes' | 'No'
 
@@ -23,18 +24,12 @@ export interface AppointmentSession {
   date?: string
   start?: string
   end?: string
-  until?: string
-  interval?: AppointmentInterval
-  numberOfAppointments?: string
-  numberOfRepeatAppointments?: string
   eventId?: string
   username?: string
   uuid?: string
   requirementId?: string
   licenceConditionId?: string
   nsiId?: string
-  repeating?: YesNo
-  repeatingDates?: string[]
   notes?: string
   sensitivity?: YesNo
   backendId?: number
@@ -42,6 +37,8 @@ export interface AppointmentSession {
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
+  smsOptIn?: SmsOptInOptions
+  smsPreview?: SmsPreviewResponse
   temp?: {
     providerCode?: string
     teamCode?: string
@@ -98,15 +95,11 @@ export interface AppointmentRequestBody {
   type: string
   start: Date
   end: Date
-  interval: AppointmentInterval
-  numberOfAppointments: number
   eventId?: number
   uuid: string
-  createOverlappingAppointment: true
   requirementId?: number
   licenceConditionId?: number
   nsiId?: number
-  until?: Date
   notes?: string
   sensitive?: boolean
   visorReport?: boolean

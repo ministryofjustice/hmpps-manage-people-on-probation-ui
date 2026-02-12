@@ -2,9 +2,8 @@ import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget } from '../utils'
+import { toPredictors, toRoshWidget, groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import { getPersonActivity } from '../middleware'
 
 const routes = ['getOrPostActivityLog', 'getActivity'] as const
@@ -43,8 +42,9 @@ const activityLogController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const currentPage = parseInt(page as string, 10)
-      const resultsStart = currentPage > 0 ? 10 * currentPage + 1 : 1
-      let resultsEnd = currentPage > 0 ? (currentPage + 1) * 10 : 10
+      const pageSize = res.locals?.flags?.enableContactLog === true ? 25 : 10
+      const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1
+      let resultsEnd = currentPage > 0 ? (currentPage + 1) * pageSize : pageSize
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
@@ -60,7 +60,8 @@ const activityLogController: Controller<typeof routes, void> = {
       const risksWidget = toRoshWidget(risks)
       const predictorScores = toPredictors(predictors)
       const baseUrl = req.url.split('?')[0]
-      res.render('pages/activity-log', {
+      const template = res.locals?.flags?.enableContactLog === true ? 'pages/contact-log' : 'pages/activity-log'
+      res.render(template, {
         personActivity,
         crn,
         query: req.session.activityLogFilters,
@@ -75,6 +76,7 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsStart,
         resultsEnd,
         errorMessages: req.session.errorMessages,
+        groupedActivities: groupActivitiesByDate(personActivity.activities),
       })
     }
   },

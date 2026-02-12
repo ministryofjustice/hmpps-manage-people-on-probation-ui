@@ -1,7 +1,8 @@
 {% extends "../partials/case.njk" %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% set pageTitle = makePageTitle({pageHeading: "Compliance"}) %}
-{% set currentSectionName = 'Compliance' %}
+{% set currentSectionName = 'Compliance' if flags.enableCompliancePage else 
+  'Sorry, the Compliance page is unavailable' %}
 {% set currentNavSection = 'compliance' %}
 {% set headerCRN = personCompliance.personSummary.crn %}
 {% set headerDob = personCompliance.personSummary.dateOfBirth %}
@@ -27,26 +28,30 @@
 {% endblock %}
 
 {% block pageContent %}
-
-  {% set showWarning = false %}
-  {% for sentence in personCompliance.currentSentences %}
-    {% if sentence.compliance.breachesOnCurrentOrderCount > 0 %}
-      {% set showWarning = true %}
-    {% endif %}
-  {% endfor %}
-
-  {% if showWarning === true %}
-    <div class="govuk-grid-row">
-      <div class="govuk-grid-column-two-thirds">
-        {{ govukWarningText({
+  {% if flags.enableCompliancePage %}
+    {% set showWarning = false %}
+    {% for sentence in personCompliance.currentSentences %}
+      {% if sentence.compliance.breachesOnCurrentOrderCount > 0 %}
+        {% set showWarning = true %}
+      {% endif %}
+    {% endfor %}
+    {% if showWarning === true %}
+      <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+          {{ govukWarningText({
           html: 'There are multiple breach NSIs in progress.<br>Check and correct any issues in NDelius.',
           iconFallbackText: 'Warning'
         }) }}
+        </div>
+      </div>
+    {% endif %}
+    {% include './compliance/_compliance-current-order.njk' %}
+    {% include './compliance/_compliance-previous-orders.njk' %}
+  {% else %}
+    <div class="govuk-grid-row">
+      <div class="govuk-grid-column-two-thirds">
+        <p class="govuk-body">The Compliance page is temporarily unavailable while we make some improvements. You can use NDelius if you need to check compliance in the meantime.</p>
       </div>
     </div>
   {% endif %}
-
-  {% include './compliance/_compliance-current-order.njk' %}
-  {% include './compliance/_compliance-previous-orders.njk' %}
-
 {% endblock %}

@@ -173,3 +173,18 @@ export interface ReactivateOffenderRequest {
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
 export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'
+
+export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
+
+export interface SmsPreviewRequest {
+  firstName: string
+  dateAndTimeOfAppointment: string
+  appointmentLocation?: string
+  includeWelshPreview: boolean
+  appointmentType?: string
+}
+
+export interface SmsPreviewResponse {
+  englishSmsPreview: string
+  welshSmsPreview?: string
+}

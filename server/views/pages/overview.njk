@@ -6,7 +6,7 @@
 {% set currentNavSection = 'overview' %}
 {% set currentSectionName = 'Overview' %}
 {% set headerCRN = crn %}
-{% set headerDob = overview.personalDetails.dateOfBirth %}
+{% set headerDob = personalDetails.dateOfBirth %}
 {% set headerGender = overview.personalDetails.preferredGender %}
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
@@ -589,8 +589,9 @@
           {%- case 0 -%}
                         No breaches on previous orders
                     {%- default -%}
-            {{ overview.previousOrders.breaches }} breaches on previous orders
-                {%- endswitch -%}
+            {% set breachCount = overview.previousOrders.breaches %}
+            {{ breachCount }} breach{% if breachCount > 1 %}es{% endif %} on previous orders
+          {%- endswitch -%}
             {% endset %}
             {{ total}} ({{ breaches }})
             {% endif %}
@@ -644,7 +645,7 @@
             value: { html: '<span data-qa="complianceValue">' + compliance + '</span>'}
           },
           {
-            key: { html: '<span data-qa="activityLogLabel">Contacts</span>'},
+            key: { html: '<span data-qa="activityLogLabel">Contacts across all orders</span><span class="govuk-!-font-weight-regular secondary-text secondary-text--with-break">Includes all previous orders</span>'},
             value: { html: '<span data-qa="activityLogValue">' + activity + '</span>'}
           }
         ]

@@ -17,6 +17,7 @@ import AppointmentNotePage from '../../pages/appointments/note.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 
 const loadPage = (typeOptionIndex = 1) => {
   completeSentencePage()
@@ -29,10 +30,25 @@ describe('Pick a date, location and time for this appointment', () => {
   let locationNotInListPage: AppointmentLocationNotInListPage
   let notePage: AppointmentNotePage
   let cyaPage: AppointmentCheckYourAnswersPage
+  let textMessageConfirmPage: TextMessageConfirmationPage
 
   const now = DateTime.now()
   const yesterday = now.minus({ days: 1 })
   const yesterdayIsInCurrentMonth = yesterday.month === now.month
+
+  const completeDateInFuture = () => {
+    locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+    const tomorrow = now.plus({ days: 1 })
+    const tomorrowIsInCurrentMonth = tomorrow.month === now.month
+    locationDateTimePage.getDatePickerToggle().click()
+    if (!tomorrowIsInCurrentMonth) {
+      cy.get('.moj-js-datepicker-next-month').click()
+    }
+    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage.getElementInput(`startTime`).type('09:00')
+    locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+    locationDateTimePage.getSubmitBtn().click()
+  }
 
   const selectPastDate = () => {
     locationDateTimePage.getDatePickerToggle().click()
@@ -51,7 +67,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage = new AppointmentLocationDateTimePage()
     })
     it('should render the pop header', () => {
-      checkPopHeader('Alton Berge', true)
+      checkPopHeader('Alton Berge', true, 'X778160')
     })
     it('should render the risk to staff alert', () => {
       checkRiskToStaffAlert()
@@ -520,17 +536,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-      const tomorrow = now.plus({ days: 1 })
-      const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!tomorrowIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
-      locationDateTimePage.getSubmitBtn().click()
+      completeDateInFuture()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
         .should(
@@ -546,12 +552,28 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getSubmitBtn().click()
     })
 
-    it('should redirect to the supporting information, then cya page', () => {
+    it('should redirect to the text message confirm, supporting information, then cya page', () => {
+      textMessageConfirmPage = new TextMessageConfirmationPage()
+      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
+      textMessageConfirmPage.getSubmitBtn().click()
       notePage = new AppointmentNotePage()
       notePage.checkOnPage()
       completeSupportingInformationPage()
       cyaPage = new AppointmentCheckYourAnswersPage()
       cyaPage.checkOnPage()
+    })
+  })
+
+  describe('Text message confirmation feature flag is disabled', () => {
+    beforeEach(() => {
+      cy.task('stubDisableSmsReminders')
+      loadPage()
+      completeDateInFuture()
+      locationDateTimePage.getSubmitBtn().click()
+    })
+    it('should redirect to the supporting info page', () => {
+      notePage = new AppointmentNotePage()
+      notePage.checkOnPage()
     })
   })
 

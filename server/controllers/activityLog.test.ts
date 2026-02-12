@@ -37,6 +37,7 @@ jest.mock('../data/hmppsAuthClient', () => {
 })
 jest.mock('../data/arnsApiClient')
 jest.mock('../utils', () => ({
+  ...jest.requireActual('../utils'),
   toRoshWidget: jest.fn(),
   toPredictors: jest.fn(),
 }))
@@ -109,9 +110,24 @@ const res = mockAppResponse({
     dateTo: '',
     keywords: '',
   },
+  flags: {
+    enableContactLog: false,
+  },
+})
+
+const resWithContactLogFlag = mockAppResponse({
+  filters: {
+    dateFrom: '',
+    dateTo: '',
+    keywords: '',
+  },
+  flags: {
+    enableContactLog: true,
+  },
 })
 
 const renderSpy = jest.spyOn(res, 'render')
+const renderSpyWithFlag = jest.spyOn(resWithContactLogFlag, 'render')
 
 describe('/controllers/activityLogController', () => {
   afterEach(() => {
@@ -130,14 +146,14 @@ describe('/controllers/activityLogController', () => {
       expect(res.locals.defaultView).toEqual(true)
     })
     checkAuditMessage(res, 'VIEW_MAS_ACTIVITY_LOG', uuidv4(), crn, 'CRN')
-    it('should request the person activity from the api', () => {
+    it('should request the person activity from the api with size 10 when enableContactLog is false', () => {
       const expectedBody = {
         keywords: '',
         dateFrom: '',
         dateTo: '',
         filters: [] as string[],
       }
-      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page)
+      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '10')
       expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
     })
     it('should request risks from api', async () => {
@@ -146,7 +162,7 @@ describe('/controllers/activityLogController', () => {
     it('should request all predictors from the api', () => {
       expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
     })
-    it('should render the contacts page', () => {
+    it('should render the activity-log page when enableContactLog flag is false', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
         personActivity: mockActivities,
         baseUrl: '',
@@ -161,7 +177,93 @@ describe('/controllers/activityLogController', () => {
         url: req.url,
         resultsStart: 1,
         resultsEnd: 1,
+        errorMessages: undefined,
+        groupedActivities: [
+          {
+            date: 'Thu 22 Dec 2044',
+            activities: mockActivities.activities,
+          },
+        ],
       })
+    })
+    it('should request the person activity from the api with size 25 when enableContactLog is true', async () => {
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, resWithContactLogFlag)
+      const expectedBody = {
+        keywords: '',
+        dateFrom: '',
+        dateTo: '',
+        filters: [] as string[],
+      }
+      expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25')
+    })
+    it('should render the contact-log page when enableContactLog flag is true', async () => {
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(req, resWithContactLogFlag)
+      expect(renderSpyWithFlag).toHaveBeenCalledWith('pages/contact-log', {
+        personActivity: mockActivities,
+        baseUrl: '',
+        crn,
+        query: req.query,
+        queryParams: [],
+        page: req.query.page,
+        view: req.query.view,
+        tierCalculation: mockTierCalculation,
+        risksWidget: toRoshWidget(mockRisks),
+        predictorScores: toPredictors(mockPredictors),
+        url: req.url,
+        resultsStart: 1,
+        resultsEnd: 1,
+        errorMessages: undefined,
+        groupedActivities: [
+          {
+            date: 'Thu 22 Dec 2044',
+            activities: mockActivities.activities,
+          },
+        ],
+      })
+    })
+    it('should calculate correct pagination when page is greater than 0', async () => {
+      const reqWithPage = httpMocks.createRequest({
+        params: { crn },
+        query: { page: '1', view: 'default' },
+        session: { activityLogFilters: {} },
+      })
+      const resWithPage = mockAppResponse({
+        filters: { dateFrom: '', dateTo: '', keywords: '' },
+        flags: { enableContactLog: false },
+      })
+      const renderSpyWithPage = jest.spyOn(resWithPage, 'render')
+
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithPage, resWithPage)
+
+      expect(renderSpyWithPage).toHaveBeenCalledWith(
+        'pages/activity-log',
+        expect.objectContaining({
+          resultsStart: 11,
+          resultsEnd: 20,
+        }),
+      )
+    })
+    it('should calculate correct pagination with pageSize 25 when page is greater than 0 and enableContactLog is true', async () => {
+      const reqWithPage = httpMocks.createRequest({
+        params: { crn },
+        query: { page: '1', view: 'default' },
+        session: { activityLogFilters: {} },
+      })
+      const resWithPageAndFlag = mockAppResponse({
+        filters: { dateFrom: '', dateTo: '', keywords: '' },
+        flags: { enableContactLog: true },
+      })
+      const renderSpyWithPageAndFlag = jest.spyOn(resWithPageAndFlag, 'render')
+
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithPage, resWithPageAndFlag)
+
+      expect(renderSpyWithPageAndFlag).toHaveBeenCalledWith(
+        'pages/contact-log',
+        expect.objectContaining({
+          resultsStart: 26,
+          resultsEnd: 50,
+        }),
+      )
     })
   })
   describe('getActivity', () => {

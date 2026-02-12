@@ -9,8 +9,8 @@ const arrangeAppointmentUrl = `case/${crn}/arrange-appointment/${contactId}`
 const sentenceUrl = `${arrangeAppointmentUrl}/sentence`
 const typeUrl = `${arrangeAppointmentUrl}/type`
 const locationDateTimeUrl = `${arrangeAppointmentUrl}/location-date-time`
-const repeatingUrl = `${arrangeAppointmentUrl}/repeating`
 const supportingUrl = `${arrangeAppointmentUrl}/supporting-information`
+const textMessageConfirmationUrl = `/case/${crn}/arrange-appointment/${contactId}/text-message-confirmation`
 
 jest.mock('../appointmentDateIsInPast', () => ({
   appointmentDateIsInPast: jest.fn(),
@@ -198,86 +198,6 @@ describe('/controllers/arrangeAppointmentController', () => {
     expect(res.render).toHaveBeenCalled()
   })
 
-  it('validation passes for repeating - not repeating', () => {
-    const appointments = {
-      [crn]: {
-        [contactId]: { repeating: 'No' },
-      },
-    }
-
-    const req = makeReq({
-      url: repeatingUrl,
-      session: { data: { appointments } },
-      body: { appointments },
-    })
-    const res = makeRes()
-
-    validation.appointments(req, res, next)
-
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('validation passes for repeating - repeating', () => {
-    const appointments = {
-      [crn]: {
-        [contactId]: {
-          repeating: 'Yes',
-          interval: 'Monthly',
-          numberOfRepeatAppointments: '2',
-        },
-      },
-    }
-
-    const req = makeReq({
-      url: repeatingUrl,
-      session: { data: { appointments } },
-      body: { appointments },
-    })
-    const res = makeRes()
-
-    validation.appointments(req, res, next)
-
-    expect(next).toHaveBeenCalled()
-  })
-
-  it('validation fails for repeating - more than a year', () => {
-    const appointments = {
-      [crn]: {
-        [contactId]: {
-          repeating: 'Yes',
-          interval: 'Monthly',
-          numberOfRepeatAppointments: '2',
-          date: '2030-10-02',
-          repeatingDates: ['2040-10-02'],
-        },
-      },
-    }
-
-    const req = makeReq({
-      url: repeatingUrl,
-      session: { data: { appointments } },
-      body: { appointments },
-    })
-    const res = makeRes()
-
-    validation.appointments(req, res, next)
-
-    expect(res.render).toHaveBeenCalled()
-  })
-
-  it('validation fails for repeating - no value', () => {
-    const req = makeReq({
-      url: repeatingUrl,
-      session: { data: {} },
-      body: { appointments: {} },
-    })
-    const res = makeRes()
-
-    validation.appointments(req, res, next)
-
-    expect(res.render).toHaveBeenCalled()
-  })
-
   it('validation passes for supporting information', () => {
     const appointments = {
       [crn]: {
@@ -341,5 +261,39 @@ describe('/controllers/arrangeAppointmentController', () => {
     validation.appointments(req, res, next)
 
     expect(res.render).toHaveBeenCalled()
+  })
+
+  it('validation fails for text message confirmation', () => {
+    const appointments = {
+      [crn]: {
+        [contactId]: {
+          smsOptIn: '',
+        },
+      },
+    }
+    const req = makeReq({
+      url: textMessageConfirmationUrl,
+      body: { appointments },
+    })
+    const res = makeRes()
+    validation.appointments(req, res, next)
+    expect(res.render).toHaveBeenCalled()
+  })
+  it('validation passes for text message confirmation', () => {
+    const appointments = {
+      [crn]: {
+        [contactId]: {
+          smsOptIn: 'YES',
+        },
+      },
+    }
+    const req = makeReq({
+      url: textMessageConfirmationUrl,
+      body: { appointments },
+    })
+    const res = makeRes()
+    validation.appointments(req, res, next)
+    expect(res.render).not.toHaveBeenCalled()
+    expect(next).toHaveBeenCalled()
   })
 })

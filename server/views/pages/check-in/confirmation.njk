@@ -1,26 +1,20 @@
-{% set phoneeNumber = case.mobileNumber %}
-
 {% extends "../_form.njk" %}
-{% set checkInDateVal = userDetails.date | dmyToLongDate  %}
-
-
-{% set isRepeating = appointment.repeating == 'Yes' %}
+{% set phoneeNumber = case.mobileNumber %}
+{% set checkInDateVal = userDetails.date | dmyToLongDate %}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
 {% set title = 'Online check ins added' %}
 {% set cases = "/case/" %}
 {% set hideButton = true %}
-{% set overViewLink = "/case/"+ crn %}
+{% set overViewLink = "/case/" + crn %}
 {% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
-{% set overViewPage = "/case/"+ crn %}
-
-
-
+{% set overViewPage = "/case/" + crn %}
 
 {% set panelHtml %}
 <div class="govuk-!-font-size-36">
-    Starting {{ userDetails.displayDay }} {{ checkInDateVal }}<br/>
+    Starting {{ userDetails.displayDay }}
+  {{ checkInDateVal }}<br/>
      then {{ userDetails.interval | lower }}
 </div>
 {% endset %}
@@ -37,22 +31,25 @@
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
       <p class="govuk-body">
-        We have sent a confirmation to
-        {{case.name.forename}} on {{ userDetails.displayCommsOption }}.
+        We have sent a confirmation to {{case.name.forename}}
+        {% if userDetails.preferredComs === 'EMAIL' %}
+          at {{ userDetails.displayCommsOption }}.
+        {% else %}
+          on {{ userDetails.displayCommsOption }}.
+        {% endif %}
+      </p>
+      <p class="govuk-body">
+        {{case.name.forename}} will receive a message to their preferred contact method each time they need to submit an online check in. They will have 3 days to complete and submit their check in.
         </p>
-        <p>
-            {{case.name.forename}} will receive a message to their preferred contact method each time<br/>
-            they need to submit an online check in. They will have 3 days to complete and<br/> submit their check in.
-        </p>
-        <p>You will get an email when they have submitted a check in for you to review.</p>
+      <p class="govuk-body">You will get an email when they have submitted a check in or if they miss a check in. The email will include a link to review the check in or add any actions you will take for a missed check in.</p>
 
     </div>
   </div>
-    <div class="govuk-button-group">
-        <a href="{{ overViewPage }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
-        <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
+  <div class="govuk-button-group">
+    <a href="{{ overViewPage }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
+    <a class="govuk-link" href="{{ cases }}" data-qa="returnToAllCases">
             Go to all cases
         </a>
-    </div>
+  </div>
 
 {% endblock %}

@@ -27,7 +27,16 @@ export default class ActivityLogPage extends Page {
 
   getSelectedFilterTag = (index: number) => cy.get(`.moj-filter-tags li:nth-of-type(${index}) a`)
 
-  getActivity = (index: string): PageElement => cy.get(`[data-qa=timeline${index}Card]`)
+  getActivity = (index: number): PageElement => cy.get('.govuk-table').find('tr').eq(index)
+
+  getActivityTitle = (index: number): PageElement =>
+    this.getActivity(index).find('.govuk-details__summary-text span').first()
+
+  getActivityViewLink = (index: number): PageElement =>
+    cy.get('.contact-activity__actions-cell').eq(index).find('.contact-activity__actions a').first()
+
+  getActivityViewNoNotes = (index: number): PageElement =>
+    this.getActivity(index).find('.contact-activity--noNotes a').first()
 
   getComplianceFilter = (index: number): PageElement =>
     cy.get(`[data-qa="compliance"] .govuk-checkboxes__item:nth-of-type(${index}) input`)
@@ -36,10 +45,8 @@ export default class ActivityLogPage extends Page {
 
   getPaginationItem = (index: number): PageElement => cy.get(`.govuk-pagination li:nth-of-type(${index})`)
 
-  getTimelineCard = (index: number): PageElement => cy.get(`.app-summary-card:nth-of-type(${index})`)
-
-  getTimelineCardValue = (index: number, row: string, item: string) =>
-    cy.get(`.app-summary-card:nth-of-type(${index})`).find(`[data-qa="${row}${item}"]`)
-
   getNoResults = (): PageElement => cy.get('[data-qa="no-results"]')
+
+  getTimelineCardViewLink = (index: number): PageElement =>
+    this.getActivity(index).find('.contact-activity__actions a').first()
 }

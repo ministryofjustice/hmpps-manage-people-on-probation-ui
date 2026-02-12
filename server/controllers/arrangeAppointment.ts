@@ -23,6 +23,7 @@ import {
   isRescheduleAppointment,
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
+import { SmsOptInOptions } from '../data/model/esupervision'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'
@@ -55,6 +56,8 @@ const routes = [
   'postArrangeAnotherAppointment',
   'getAddNote',
   'postAddNote',
+  'getTextMessageConfirmation',
+  'postTextMessageConfirmation',
 ] as const
 
 export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
@@ -106,7 +109,7 @@ export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, 
   return res.redirect(`${baseUrl}/confirmation`)
 }
 
-const arrangeAppointmentController: Controller<typeof routes, void> = {
+const arrangeAppointmentController: Controller<typeof routes, void | AppResponse> = {
   redirectToSentence: () => {
     return async (req, res) => {
       const uuid = uuidv4()
@@ -311,12 +314,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const path = ['appointments', crn, id]
-      const appointment = getDataValue<AppointmentSession>(data, path)
-      const { date, interval } = appointment
-      const until = date
-      setDataValue(data, [...path, 'numberOfAppointments'], '1')
-      setDataValue(data, [...path, 'interval'], 'DAY')
-      setDataValue(data, [...path, 'until'], until)
       if (change) {
         const originalDate = getDataValue(data, [...path, 'temp', 'date'])
         const updatedDate = getDataValue(data, [...path, 'date'])
@@ -336,14 +333,14 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       }
 
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])
-      let nextPage = `supporting-information`
+      let nextPage = res.locals?.flags?.enableSmsReminders ? `text-message-confirmation` : `supporting-information`
+
+      if (appointmentDateIsInPast(req)) nextPage = `attended-complied`
 
       if (selectedLocation === `LOCATION_NOT_IN_LIST`) {
         nextPage = `location-not-in-list`
       }
       let redirect = `/case/${crn}/arrange-appointment/${id}/${nextPage}`
-
-      if (appointmentDateIsInPast(req)) redirect = `/case/${crn}/arrange-appointment/${id}/attended-complied`
 
       if (change && nextPage !== 'location-not-in-list') {
         redirect = findUncompleted(req, res)
@@ -436,6 +433,31 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
       return res.redirect(change ?? `/case/${crn}/arrange-appointment/${id}/check-your-answers`)
     }
   },
+  getTextMessageConfirmation: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id })
+    }
+  },
+  postTextMessageConfirmation: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const url = encodeURIComponent(req.url)
+      const change = req?.query?.change as string
+      let redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
+        req.body.appointments[crn][id].smsOptIn,
+      )
+        ? `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}`
+        : `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
+      if (change) {
+        redirect = findUncompleted(req, res)
+      }
+      return res.redirect(redirect)
+    }
+  },
   getSupportingInformation: () => {
     return async (req, res) => {
       const { maxCharCount } = config
@@ -463,7 +485,6 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
   postSupportingInformation: () => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      const { data } = req.session
       const change = req?.query?.change as string
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -512,7 +533,9 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const attending = getDataValue(data, ['appointments', crn, id, 'user'])
-      let attendingName = 'Your '
+      const smsOptIn = getDataValue<SmsOptInOptions>(data, ['appointments', crn, id, 'smsOptIn'])
+      const smsSent = smsOptIn?.includes('YES')
+      let attendingName = 'your '
       if (attending.username.toUpperCase() !== res.locals.user.username) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
@@ -542,6 +565,7 @@ const arrangeAppointmentController: Controller<typeof routes, void> = {
         url,
         isInPast,
         appointmentType,
+        smsSent,
       })
     }
   },
