@@ -306,6 +306,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       }
 
       const { notes, sensitive } = req.body
+      const outcomeRecorded = res?.locals?.personAppointment?.appointment?.hasOutcome === true
       const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -314,6 +315,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         id: parseInt(id, 10),
         notes: handleQuotes(notes),
         sensitive: sensitive === 'Yes',
+        outcomeRecorded,
       }
 
       if (req?.session?.data?.appointments?.[crn]?.[id]?.outcomeRecorded) {
