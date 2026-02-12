@@ -120,6 +120,8 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
     expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
+      back: '',
+      change: '',
       warningMessages: {
         isWithinOneHourOfMeetingWith:
           'You already have an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
@@ -164,6 +166,8 @@ describe('/middleware/checkAppointments shows warnings the for a colleague', () 
     expect(renderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
+      back: '',
+      change: '',
       warningMessages: {
         isWithinOneHourOfMeetingWith:
           'Test User already has an appointment with Test within an hour of this date and time. Continue with these details or make changes.',
@@ -223,6 +227,8 @@ describe('past appointments feature flag is disabled', () => {
     expect(mockRenderSpy).toHaveBeenCalledWith('pages/arrange-appointment/location-date-time', {
       crn: 'X000001',
       id: '4715aa09-0f9d-4c18-948b-a42c45bc0974',
+      back: '',
+      change: '',
       warningMessages: {
         isWithinOneHourOfMeetingWith:
           'Test User already has an appointment with Test within an hour of this date and time. Continue with these details or make changes.',

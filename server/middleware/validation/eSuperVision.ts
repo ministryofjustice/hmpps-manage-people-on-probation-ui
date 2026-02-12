@@ -26,12 +26,13 @@ const eSuperVision: Route<void> = (req, res, next) => {
     'editCheckInEmail',
   ])
 
-  const { back = '' } = req.query as Record<string, string>
+  const { back = '', cya = '' } = req.query as Record<string, string>
   const localParams: LocalParams = {
     crn,
     id,
     body,
     back,
+    cya,
     checkInMinDate,
     checkInEmail,
     checkInMobile,
