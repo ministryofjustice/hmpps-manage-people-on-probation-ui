@@ -38,6 +38,8 @@ export default class ActivityLogPage extends Page {
   getActivityViewNoNotes = (index: number): PageElement =>
     this.getActivity(index).find('.contact-activity--noNotes a').first()
 
+  getActivityViewNotes = (index: number): PageElement => this.getActivity(index).find('.app-note')
+
   getComplianceFilter = (index: number): PageElement =>
     cy.get(`[data-qa="compliance"] .govuk-checkboxes__item:nth-of-type(${index}) input`)
 

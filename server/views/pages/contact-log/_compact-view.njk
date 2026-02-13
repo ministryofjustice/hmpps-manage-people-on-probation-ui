@@ -43,8 +43,7 @@
           {% elif activity.esupervisionId %}
             {% set link = '/case/' + crn + '/appointments/' + activity.esupervisionId + '/check-in/update?back=' + url %}
           {% endif %}
-          {% set hasNote = activity.appointmentNote and activity.hasOutcome != true %}
-          {% set hasNotes = activity.appointmentNotes.length > 0 and activity.hasOutcome != true %}
+          {% set hasNotes = activity.appointmentNotes.length > 0 %}
           <div class="contact-log-compact__contact-wrapper">
             <div class="contact-log-compact__contact-content">
               {% if hasNotes %}
