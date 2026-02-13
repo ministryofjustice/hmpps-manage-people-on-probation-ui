@@ -17,8 +17,25 @@ describe('addContactController', () => {
       await controllers.addContact.getAddContact()(req, res)
     })
 
-    it('should render the add-contact page with the crn', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/contact-log/contact/contact', { crn })
+    it('should render the contact page with the crn', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/contact-log/contact/contact', { crn, formValues: {} })
+    })
+  })
+
+  describe('postAddContact', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+    })
+    const res = mockAppResponse()
+    const redirectSpy = jest.spyOn(res, 'redirect')
+
+    beforeEach(async () => {
+      jest.resetAllMocks()
+      await controllers.addContact.postAddContact()(req, res)
+    })
+
+    it('should redirect to the contact log', () => {
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/contact-log`)
     })
   })
 })

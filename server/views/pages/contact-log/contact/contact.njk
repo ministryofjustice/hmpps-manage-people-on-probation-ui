@@ -15,6 +15,7 @@
             {% set allSentences = (allSentences.push({
                 text: sentence.order.description,
                 value: sentence.id,
+                checked: true if formValues.sentence and sentence.id | string == formValues.sentence | string,
                 label: {
                     classes: 'govuk-!-font-weight-bold'
                 },
@@ -52,6 +53,7 @@
         },
         id: "title",
         name: "title",
+        value: formValues.title,
         classes: "govuk-input--width-20",
         formGroup: {
             attributes: {
@@ -71,6 +73,7 @@
         },
         id: "date",
         name: "date",
+        value: formValues.date,
         errorMessage: { text: errorMessages.date } if errorMessages.date
     }) }}
 
@@ -84,6 +87,7 @@
         },
         id: "time",
         name: "time",
+        value: formValues.time,
         attributes: {
             size: 5,
             maxlength: 5
@@ -102,6 +106,7 @@
         id: "details",
         maxlength: 12000,
         rows: '10',
+        value: formValues.details,
         label: {
             text: "Add details of the contact",
             classes: "govuk-label--m"
@@ -151,11 +156,13 @@
         items: [
             {
                 value: 'Yes',
-                text: "Yes"
+                text: "Yes",
+                checked: true if formValues.visor == 'Yes'
             },
             {
                 value: 'No',
-                text: "No"
+                text: "No",
+                checked: true if formValues.visor == 'No'
             }
         ],
         errorMessage: { text: errorMessages.visor } if errorMessages.visor
@@ -182,11 +189,13 @@
         items: [
             {
                 value: 'Yes',
-                text: "Yes, it includes sensitive information"
+                text: "Yes, it includes sensitive information",
+                checked: true if formValues.sensitivity == 'Yes'
             },
             {
                 value: 'No',
-                text: "No, it is not sensitive"
+                text: "No, it is not sensitive",
+                checked: true if formValues.sensitivity == 'No'
             }
         ],
         errorMessage: { text: errorMessages.sensitivity } if errorMessages.sensitivity
