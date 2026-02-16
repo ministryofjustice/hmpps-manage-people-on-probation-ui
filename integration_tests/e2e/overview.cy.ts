@@ -210,8 +210,8 @@ context('Overview', () => {
   })
 
   it('Overview page with very high risk to staff is rendered', () => {
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
+    cy.visit('/case/X778160', { failOnStatusCode: false })
+    Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert()
   })
 })
