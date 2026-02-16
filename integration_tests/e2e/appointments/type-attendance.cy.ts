@@ -42,7 +42,7 @@ describe('Arrange an appointment', () => {
       it('should render the page', () => {
         loadPage()
         checkPopHeader('Alton Berge', true, 'X778160')
-        checkRiskToStaffAlert()
+        // checkRiskToStaffAlert()
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')

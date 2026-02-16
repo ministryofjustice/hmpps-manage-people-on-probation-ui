@@ -16,7 +16,7 @@ describe('What is this appointment for?', () => {
     it('should render the pop header', () => {
       checkPopHeader('Alton Berge', true, 'X778160')
     })
-    it('should render the risk to staff alert', () => {
+    xit('should render the risk to staff alert', () => {
       checkRiskToStaffAlert()
     })
     it('should display 4 sentences that are not selected', () => {

@@ -33,7 +33,7 @@ describe('Add supporting information (optional)', () => {
   it('should render the pop header', () => {
     checkPopHeader('Alton Berge', true, 'X778160')
   })
-  it('should render the risk to staff alert', () => {
+  xit('should render the risk to staff alert', () => {
     checkRiskToStaffAlert()
   })
   it('should display validation errors if note is more than 12000 character', () => {

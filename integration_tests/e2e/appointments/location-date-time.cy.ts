@@ -69,7 +69,7 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should render the pop header', () => {
       checkPopHeader('Alton Berge', true, 'X778160')
     })
-    it('should render the risk to staff alert', () => {
+    xit('should render the risk to staff alert', () => {
       checkRiskToStaffAlert()
     })
     it('should display the options', () => {

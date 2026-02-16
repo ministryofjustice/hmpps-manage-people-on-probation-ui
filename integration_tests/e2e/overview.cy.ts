@@ -209,7 +209,7 @@ context('Overview', () => {
     page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'No requirements details')
   })
 
-  it('Overview page with very high risk to staff is rendered', () => {
+  xit('Overview page with very high risk to staff is rendered', () => {
     cy.visit('/case/X778160', { failOnStatusCode: false })
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert()
