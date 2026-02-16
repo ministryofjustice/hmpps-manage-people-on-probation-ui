@@ -215,7 +215,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
-      const { data } = req.session
       const errors = req?.session?.data?.errors
       if (errors) {
         delete req.session.data.errors
