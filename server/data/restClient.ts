@@ -170,7 +170,7 @@ export default class RestClient {
       return raw ? (result as Response) : result.body
     } catch (error) {
       if (error.response?.status === 400) {
-        throw new Error('http 400 Sentry alert test (Express) - ignore')
+        throw new Error(`http 400 Sentry alert test (Express) - ignore - Request data: ${JSON.stringify(data)}`)
       }
       if (handle404 && error.response?.status === 404) return null
       if (handle415 && error?.response?.status === 415) {

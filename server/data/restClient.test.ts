@@ -323,3 +323,31 @@ describe('RestClient.construct', () => {
     expect(client.agent).toBeInstanceOf(HttpsAgent)
   })
 })
+
+describe('RestClient requestWithBody - 400 handling', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedIsValidHost.mockReturnValue(true)
+    mockedIsValidPath.mockReturnValue(true)
+    nock.cleanAll()
+  })
+
+  it('throws custom error message when API returns 400', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .post('/api/test')
+      .reply(400, { message: 'Bad request from API' })
+
+    const requestData = { foo: 'bar' }
+
+    await expect(
+      restClient.post({
+        path: '/test',
+        data: requestData,
+      }),
+    ).rejects.toThrow(`http 400 Sentry alert test (Express) - ignore - Request data: ${JSON.stringify(requestData)}`)
+
+    expect(nock.isDone()).toBe(true)
+  })
+})
