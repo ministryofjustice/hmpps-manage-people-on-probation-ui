@@ -3,7 +3,7 @@ import OverviewPage from '../pages/overview'
 import { checkPopHeader } from './appointments/imports'
 
 context('Overview', () => {
-  beforeEach(() => {
+  afterEach(() => {
     cy.task('resetMocks')
   })
   it('Overview page is rendered', () => {
