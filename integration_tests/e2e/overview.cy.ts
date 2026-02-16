@@ -1,9 +1,9 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overview'
-import { checkPopHeader } from './appointments/imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './appointments/imports'
 
 context('Overview', () => {
-  afterEach(() => {
+  beforeEach(() => {
     cy.task('resetMocks')
   })
   it('Overview page is rendered', () => {
@@ -212,6 +212,6 @@ context('Overview', () => {
   it('Overview page with very high risk to staff is rendered', () => {
     cy.visit('/case/X778160')
     const page = Page.verifyOnPage(OverviewPage)
-    page.getAlert().should('contain.text', 'is very high risk to staff')
+    checkRiskToStaffAlert()
   })
 })
