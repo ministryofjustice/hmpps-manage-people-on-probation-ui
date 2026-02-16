@@ -169,6 +169,9 @@ export default class RestClient {
       const result = await request
       return raw ? (result as Response) : result.body
     } catch (error) {
+      if (error.response?.status === 400) {
+        throw new Error('http 400 Sentry alert test (Express) - ignore')
+      }
       if (handle404 && error.response?.status === 404) return null
       if (handle415 && error?.response?.status === 415) {
         const warnings: ErrorSummaryItem[] = []
