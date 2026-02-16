@@ -6,9 +6,6 @@ context('Overview', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
-  afterEach(() => {
-    cy.task('resetMocks')
-  })
   it('Overview page is rendered', () => {
     cy.visit('/case/X000001')
     const page = Page.verifyOnPage(OverviewPage)
