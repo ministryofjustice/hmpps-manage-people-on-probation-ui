@@ -48,7 +48,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         {
           validator: isTodayOrLater,
           msg: 'The first online check in date must be today or in the future',
-          log: 'Checkin date must not be in the past',
+          log: 'First checkin date must be today or in the future',
         },
       ],
     },
