@@ -36,9 +36,7 @@ export const flashProvider = jest.fn()
 
 function appSetup(services: Services, production: boolean, userSupplier: () => Express.User): Express {
   const app = express()
-
   app.set('view engine', 'njk')
-
   nunjucksSetup(app, testAppInfo, services)
   app.use(cookieSession({ keys: [''] }))
   app.use((req, res, next) => {
@@ -56,7 +54,6 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   app.use(setUpAuthentication())
   app.use((_req, _res, next) => next(new NotFound()))
   app.use(errorHandler(production))
-
   return app
 }
 
