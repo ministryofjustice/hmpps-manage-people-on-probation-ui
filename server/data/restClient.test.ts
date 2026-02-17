@@ -17,19 +17,22 @@ jest.mock('../utils', () => {
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
+let restClient: RestClient
 
-const restClient = new RestClient(
-  'api-name',
-  {
-    url: 'http://localhost:8080/api',
-    timeout: {
-      response: 1000,
-      deadline: 1000,
+beforeEach(() => {
+  restClient = new RestClient(
+    'api-name',
+    {
+      url: 'http://localhost:8080/api',
+      timeout: {
+        response: 1000,
+        deadline: 1000,
+      },
+      agent: new AgentConfig(1000),
     },
-    agent: new AgentConfig(1000),
-  },
-  'token-1',
-)
+    'token-1',
+  )
+})
 
 describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method => {
   beforeEach(() => {
