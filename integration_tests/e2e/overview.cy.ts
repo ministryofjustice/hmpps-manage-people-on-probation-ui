@@ -1,12 +1,9 @@
 import Page from '../pages/page'
 import OverviewPage from '../pages/overview'
-import { checkPopHeader } from './appointments/imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './appointments/imports'
 
 context('Overview', () => {
   beforeEach(() => {
-    cy.task('resetMocks')
-  })
-  afterEach(() => {
     cy.task('resetMocks')
   })
   it('Overview page is rendered', () => {
@@ -212,9 +209,9 @@ context('Overview', () => {
     page.getRowData('sentence11', 'requirements', 'Value').should('contain.text', 'No requirements details')
   })
 
-  it('Overview page with very high risk to staff is rendered', () => {
-    cy.visit('/case/X778160')
-    const page = Page.verifyOnPage(OverviewPage)
-    page.getAlert().should('contain.text', 'is very high risk to staff')
+  it('Overview page with medium risk to staff is rendered', () => {
+    cy.visit('/case/X000001', { failOnStatusCode: false })
+    Page.verifyOnPage(OverviewPage)
+    checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
   })
 })

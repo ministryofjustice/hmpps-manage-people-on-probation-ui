@@ -2,8 +2,8 @@ import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
 import { crn, uuid, checkPopHeader, checkRiskToStaffAlert } from './imports'
 
-const loadPage = () => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
+const loadPage = (_crn = crn) => {
+  cy.visit(`/case/${_crn}/arrange-appointment/${uuid}/sentence`)
 }
 
 describe('What is this appointment for?', () => {
@@ -16,15 +16,20 @@ describe('What is this appointment for?', () => {
     it('should render the pop header', () => {
       checkPopHeader('Alton Berge', true, 'X778160')
     })
-    it('should render the risk to staff alert', () => {
-      checkRiskToStaffAlert()
-    })
     it('should display 4 sentences that are not selected', () => {
       const radios = sentencePage.getElement(`input[data-sentence="true"]`)
       radios.should('have.length', 4)
       radios.each($radio => {
         cy.wrap($radio).should('not.be.checked')
       })
+    })
+  })
+  describe('Risk to staff alert', () => {
+    beforeEach(() => {
+      loadPage('X000001')
+    })
+    it('should display the alert with medium risk to staff details', () => {
+      checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
     })
   })
   describe('Continue is clicked without selecting a sentence', () => {

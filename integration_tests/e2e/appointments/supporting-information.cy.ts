@@ -11,12 +11,12 @@ import {
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 
-const loadPage = () => {
+const loadPage = (_crn = crn) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage()
+  completeSentencePage(1, '', _crn)
   completeTypePage()
-  completeLocationDateTimePage()
-  completeTextMessageConfirmationPage({ _crn: crn, _uuid: uuid, index: 1 })
+  completeLocationDateTimePage({ crnOverride: _crn })
+  completeTextMessageConfirmationPage({ _crn, _uuid: uuid, index: 1 })
 }
 
 describe('Add supporting information (optional)', () => {
@@ -32,9 +32,6 @@ describe('Add supporting information (optional)', () => {
   })
   it('should render the pop header', () => {
     checkPopHeader('Alton Berge', true, 'X778160')
-  })
-  it('should render the risk to staff alert', () => {
-    checkRiskToStaffAlert()
   })
   it('should display validation errors if note is more than 12000 character', () => {
     loadPage()
@@ -93,5 +90,11 @@ describe('Add supporting information (optional)', () => {
       'contain.text',
       'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.',
     )
+  })
+})
+describe('Risk to staff alert', () => {
+  it('should display the alert with medium risk to staff details', () => {
+    loadPage('X000001')
+    checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
   })
 })

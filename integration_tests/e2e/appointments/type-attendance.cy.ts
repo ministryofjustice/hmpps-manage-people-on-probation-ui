@@ -25,9 +25,9 @@ const mockAppointmentTypes = getWiremockData<AppointmentType[]>(mockData, '/mas/
 const crn = 'X778160'
 const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
 
-const loadPage = () => {
-  cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
-  completeSentencePage()
+const loadPage = (_crn = crn) => {
+  cy.visit(`/case/${_crn}/arrange-appointment/${uuid}/sentence`)
+  completeSentencePage(1, '', _crn)
 }
 
 describe('Arrange an appointment', () => {
@@ -42,7 +42,6 @@ describe('Arrange an appointment', () => {
       it('should render the page', () => {
         loadPage()
         checkPopHeader('Alton Berge', true, 'X778160')
-        checkRiskToStaffAlert()
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')
@@ -66,6 +65,15 @@ describe('Arrange an appointment', () => {
         )
         cy.get('[data-qa="visorReport"]').should('not.exist')
         typePage.getSubmitBtn().should('contain.text', 'Continue')
+      })
+
+      describe('Page is rendered with risk to staff alert', () => {
+        beforeEach(() => {
+          loadPage('X000001')
+        })
+        it('should render the alert with correct details', () => {
+          checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+        })
       })
 
       describe('Continue is clicked without first selecting a type', () => {
