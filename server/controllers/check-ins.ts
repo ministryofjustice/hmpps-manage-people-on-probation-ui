@@ -833,7 +833,6 @@ export const getMinDate = (): string => {
   // setting temporary fix for minDate
   // (https://github.com/ministryofjustice/moj-frontend/issues/923)
   let checkInMinDate: string
-  today.setDate(today.getDate() + 1)
   if (today.getDate() > 9) {
     checkInMinDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
   } else {
