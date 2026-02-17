@@ -60,6 +60,13 @@ const routes = [
   'postManageEditContactPage',
   'postManageStopCheckin',
   'getStopCheckinPage',
+  'getRestartCheckinPage',
+  'postRestartDateFrequency',
+  'getRestartContactPage',
+  'postRestartContactPage',
+  'getRestartSummaryPage',
+  // 'postFinalRestart',
+  'getRestartConfirmation',
 ] as const
 
 interface OptionPair {
@@ -807,6 +814,145 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
     }
   },
+  getRestartCheckinPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      const journeyStarted = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'id'])
+
+      if (!journeyStarted) {
+        await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
+        const { offenderCheckinsByCRNResponse } = res.locals
+
+        setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'id'], id)
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'restartCheckin', 'interval'],
+          offenderCheckinsByCRNResponse.checkinInterval,
+        )
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'restartCheckin', 'preferredComs'],
+          offenderCheckinsByCRNResponse.contactPreference,
+        )
+      }
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const caseData = await masClient.getPersonalDetails(crn)
+      const checkInMinDate = getMinDate()
+
+      if (req.session.errorMessages) {
+        res.locals.errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
+
+      return res.render('pages/check-in/manage/restart-date-frequency.njk', {
+        crn,
+        id,
+        case: caseData,
+        checkInMinDate,
+      })
+    }
+  },
+
+  postRestartDateFrequency: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const isCya = req.query.cya === 'true'
+
+      if (isCya) {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-summary`)
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-contact`)
+    }
+  },
+
+  getRestartContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+
+      const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+      const checkInMobile = restartDetails?.checkInMobile || personalDetails.mobileNumber
+      const checkInEmail = restartDetails?.checkInEmail || personalDetails.email
+
+      return res.render('pages/check-in/manage/restart-contact-preference.njk', {
+        crn,
+        id,
+        case: personalDetails,
+        checkInMobile,
+        checkInEmail,
+        errorMessages: res.locals.errorMessages,
+      })
+    }
+  },
+
+  postRestartContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { change } = req.body
+      const url =
+        change === 'main'
+          ? `/case/${crn}/appointments/check-in/manage/${id}/restart-summary`
+          : `/case/${crn}/appointments/check-in/manage/${id}/edit-contact?restart=true`
+      return res.redirect(url)
+    }
+  },
+
+  getRestartSummaryPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const caseData = await masClient.getPersonalDetails(crn)
+
+      const userDetails = {
+        ...restartDetails,
+        interval: checkinIntervals.find(i => i.id === restartDetails.interval)?.label,
+        preferredComs: restartDetails.preferredComs === 'EMAIL' ? 'Email' : 'Text message',
+        checkInMobile: restartDetails.checkInMobile || caseData.mobileNumber || 'No mobile number',
+        checkInEmail: restartDetails.checkInEmail || caseData.email || 'No email address',
+      }
+
+      return res.render('pages/check-in/manage/restart-checkin-summary.njk', {
+        crn,
+        id,
+        userDetails,
+        case: caseData,
+      })
+    }
+  },
+
+  // API changes underway this will change based on
+  // postFinalRestart: hmppsAuthClient => {
+  //   return;
+  // },
+
+  getRestartConfirmation: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const caseData = await masClient.getPersonalDetails(crn)
+
+      return res.render('pages/check-in/manage/restart-confirmation.njk', {
+        crn,
+        id,
+        case: caseData,
+        userDetails: restartDetails,
+      })
+    }
+  },
+
   postManageStopCheckin: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params

@@ -161,6 +161,43 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.postManageStopCheckin(hmppsAuthClient),
   )
 
+  router.get(
+    '/case/:crn/appointments/check-in/manage/:id/restart-checkin',
+    controllers.checkIns.getRestartCheckinPage(hmppsAuthClient),
+  )
+  router.post(
+    '/case/:crn/appointments/check-in/manage/:id/restart-checkin',
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postRestartDateFrequency(hmppsAuthClient),
+  )
+
+  router.get(
+    '/case/:crn/appointments/check-in/manage/:id/restart-contact',
+    controllers.checkIns.getRestartContactPage(hmppsAuthClient),
+  )
+  router.post(
+    '/case/:crn/appointments/check-in/manage/:id/restart-contact',
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postRestartContactPage(hmppsAuthClient),
+  )
+
+  router.get(
+    '/case/:crn/appointments/check-in/manage/:id/restart-summary',
+    controllers.checkIns.getRestartSummaryPage(hmppsAuthClient),
+  )
+  // router.post(
+  //   '/case/:crn/appointments/check-in/manage/:id/restart-summary',
+  //   validate.eSuperVision,
+  //   controllers.checkIns.postFinalRestart(hmppsAuthClient),
+  // )
+
+  router.get(
+    '/case/:crn/appointments/check-in/manage/:id/restart-confirmation',
+    controllers.checkIns.getRestartConfirmation(hmppsAuthClient),
+  )
+
   router.get('/case/:crn/appointments/:id/check-in/update', [
     getCheckIn(hmppsAuthClient),
     controllers.checkIns.getUpdateCheckIn(hmppsAuthClient),

@@ -237,6 +237,77 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
 
+    // Restart Date and Frequency
+    [`[esupervision][${crn}][${id}][restartCheckin][date]`]: {
+      optional: page !== 'restart-date-frequency',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter the date you would like the person to complete their next online check in',
+          log: 'Restart checkin date not entered',
+        },
+        {
+          validator: isValidDateFormat,
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
+          log: 'Restart checkin date not entered in correct format',
+        },
+        {
+          validator: isValidDate,
+          msg: 'Enter a date in the correct format, for example 17/5/2024',
+          log: 'Restart checkin date is not valid',
+        },
+        {
+          validator: isFutureDate,
+          msg: 'The next online check in date must be in the future',
+          log: 'Restart checkin date must be in the future',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][interval]`]: {
+      optional: page !== 'restart-date-frequency',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how often you would like the person to check in',
+          log: 'Restart checkin frequency not selected',
+        },
+      ],
+    },
+
+    // Restart Contact Preferences
+    [`[esupervision][${crn}][${id}][restartCheckin][preferredComs]`]: {
+      optional: page !== 'restart-contact' || change !== 'main',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how the person wants us to send a link to the service',
+          log: 'Restart contact preference not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][checkInEmail]`]: {
+      optional: (page === 'restart-contact' && checkInEmail?.trim() !== '') || page !== 'restart-contact',
+      checks: [
+        {
+          validator: contactPrefEmailCheck,
+          msg: 'Enter an email address',
+          log: 'Email missing in restart process',
+          crossField: `[esupervision][${crn}][${id}][restartCheckin][preferredComs]`,
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][checkInMobile]`]: {
+      optional: (page === 'restart-contact' && checkInMobile?.trim() !== '') || page !== 'restart-contact',
+      checks: [
+        {
+          validator: contactPrefMobileCheck,
+          msg: 'Enter a mobile number',
+          log: 'Mobile missing in restart process',
+          crossField: `[esupervision][${crn}][${id}][restartCheckin][preferredComs]`,
+        },
+      ],
+    },
+
     photoUpload: {
       optional: page !== 'upload-a-photo',
       checks: [
