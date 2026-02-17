@@ -1,12 +1,17 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "dist",
+    "rootDir": "src",
     "declaration": true,
     "declarationMap": true,
-    "emitDeclarationOnly": false,
-    "module": "ESNext"
+    "sourceMap": true,
+    "composite": true,
+    "removeComments": true,
+    "noEmit": false,
+    "inlineSources": false,
+    "sourceRoot": "./"
   },
-  "include": ["src"]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "**/*.test.ts", "**/*.spec.ts", "dist", "coverage"]
 }

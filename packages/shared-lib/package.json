@@ -146,8 +146,8 @@
     }
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json",
-    "clean": "rimraf dist"
+    "clean": "rm -rf dist",
+    "build": "tsc --build tsconfig.build.json"
   },
   "dependencies": {
     "@flipt-io/flipt-client": "^0.14.0",
