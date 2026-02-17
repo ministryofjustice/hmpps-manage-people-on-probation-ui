@@ -1,7 +1,7 @@
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
-import { PersonRiskFlags, Risk, RiskFlag, RiskScore } from '../data/model/risk'
+import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
 import { setDataValue, findReplace, getStaffRisk } from '../utils'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
@@ -28,9 +28,12 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       personRisks = req.session.data.risks[crn]
     }
     const riskToStaff = getStaffRisk(personRisks.riskFlags)
-    const riskToStaffLevel = riskToStaff?.levelDescription ?? riskToStaff?.level
+    let riskToStaffLevel = riskToStaff?.levelDescription ?? riskToStaff?.level
+    if (riskToStaffLevel?.toUpperCase() === 'VERY HIGH') {
+      riskToStaffLevel = 'VERY_HIGH'
+    }
     const level =
-      riskToStaffLevel && ['VERY HIGH', 'VERY_HIGH', 'HIGH', 'MEDIUM'].includes(riskToStaffLevel.toUpperCase())
+      riskToStaffLevel && ['VERY_HIGH', 'HIGH', 'MEDIUM'].includes(riskToStaffLevel.toUpperCase())
         ? (riskToStaffLevel.toUpperCase() as RiskScore)
         : null
     res.locals.riskToStaff = { id: riskToStaff?.id, level }

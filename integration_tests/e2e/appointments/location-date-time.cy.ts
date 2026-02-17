@@ -19,8 +19,8 @@ import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 
-const loadPage = (typeOptionIndex = 1) => {
-  completeSentencePage()
+const loadPage = (_crn = crn, typeOptionIndex = 1) => {
+  completeSentencePage(1, '', _crn)
   completeTypePage(typeOptionIndex)
 }
 
@@ -68,9 +68,6 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should render the pop header', () => {
       checkPopHeader('Alton Berge', true, 'X778160')
-    })
-    xit('should render the risk to staff alert', () => {
-      checkRiskToStaffAlert()
     })
     it('should display the options', () => {
       locationDateTimePage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')
@@ -120,10 +117,18 @@ describe('Pick a date, location and time for this appointment', () => {
         .should('contain.text', 'Married / Civil partnership')
     })
   })
+  describe('Page is rendered with risk to staff alert', () => {
+    beforeEach(() => {
+      loadPage('X000001')
+    })
+    it('should render the alert with medium risk to staff details', () => {
+      checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+    })
+  })
   describe('Page is rendered with options for an appointment type which does not require a location', () => {
     beforeEach(() => {
       const typeOptionIndex = 2
-      loadPage(typeOptionIndex)
+      loadPage(crn, typeOptionIndex)
       locationDateTimePage = new AppointmentLocationDateTimePage()
     })
     it('should display the non-mandatory location option', () => {
@@ -143,7 +148,7 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should only display the last 2 radio options', () => {
       cy.task('stubNoUserLocationsFound')
       const typeOptionIndex = 2
-      loadPage(typeOptionIndex)
+      loadPage(crn, typeOptionIndex)
       locationDateTimePage = new AppointmentLocationDateTimePage()
       locationDateTimePage
         .getRadioLabel('locationCode', 1)

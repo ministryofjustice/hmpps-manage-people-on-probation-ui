@@ -3,8 +3,8 @@ import { getPersonRiskFlags } from './getPersonRiskFlags'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import { findReplace, setDataValue } from '../utils'
-import { PersonRiskFlags } from '../data/model/risk'
+import { findReplace, setDataValue, getStaffRisk } from '../utils'
+import { PersonRiskFlags, RiskFlag } from '../data/model/risk'
 import { mockAppResponse } from '../controllers/mocks'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -18,8 +18,13 @@ jest.mock('../utils', () => {
     ...actualUtils,
     setDataValue: jest.fn(),
     findReplace: jest.fn(),
+    getStaffRisk: jest.fn(),
   }
 })
+
+const getStaffRiskMock = getStaffRisk as jest.MockedFunction<typeof getStaffRisk>
+
+getStaffRiskMock.mockReturnValue({ id: 1, description: 'Risk to Staff', levelDescription: 'Medium' } as RiskFlag)
 
 const nextSpy = jest.fn()
 const crn = 'X000001'
@@ -42,9 +47,9 @@ const mockFindReplace = findReplace as jest.MockedFunction<typeof findReplace>
 
 const mockFormattedRisks = {
   ...mockRisks,
-  riskFlags: [{ description: 'ROSH flag' }],
-  removedRiskFlags: [{ description: 'Removed ROSH flag' }],
-}
+  riskFlags: [{ id: 1, description: 'Risk to Staff', levelDescription: 'Medium' }],
+  removedRiskFlags: [{ id: 2, description: 'Removed ROSH flag' }],
+} as Partial<PersonRiskFlags>
 
 mockFindReplace.mockImplementation(() => mockFormattedRisks)
 
@@ -127,8 +132,30 @@ describe('middleware/getPersonRiskFlags', () => {
     it('should set res.locals.personRisks to the session value', () => {
       expect(res.locals.personRisks).toEqual(mockSessionRisks)
     })
+    it('should set res.locals.riskToStaff to the expected value', () => {
+      expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'MEDIUM' })
+    })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+  })
+  describe('Risk to staff level value is formatted as VERY HIGH', () => {
+    const req = httpMocks.createRequest({
+      params: {
+        crn,
+      },
+      session: {
+        data: {},
+      },
+    })
+    beforeEach(async () => {
+      getStaffRiskMock.mockImplementationOnce(
+        () => ({ id: 1, description: 'Risk to Staff', levelDescription: 'VERY HIGH' }) as RiskFlag,
+      )
+      await getPersonRiskFlags(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should set res.locals.riskToStaff level to VERY_HIGH', () => {
+      expect(res.locals.riskToStaff).toStrictEqual({ id: 1, level: 'VERY_HIGH' })
     })
   })
 })
