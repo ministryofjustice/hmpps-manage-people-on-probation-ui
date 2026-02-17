@@ -47,4 +47,4 @@ generic-service:
       - accessibility-testing-1
 
 generic-prometheus-alerts:
-  alertSeverity: manage-people-on-probation-alerts
+  alertSeverity: manage-people-on-probation-dev
