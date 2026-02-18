@@ -11,12 +11,12 @@
 {% set titleHtml %}
     <ul class="govuk-list contact-activity__actions govuk-!-margin-bottom-0">
     {% if entry.esupervisionId and flags.enableESuperVision  %}
-      <li><a href="{{ '/case/' + crn + '/activity/' + entry.id + '?back=' + url  }}" class="govuk-link govuk-!-margin-right-2" rel="noopener noreferrer">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
-      <li><a href="{{ link }}">Update<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
+      <li><a href="{{ '/case/' + crn + '/activity/' + entry.id + '?back=' + url  }}" class="govuk-link govuk-!-margin-right-2" rel="noopener noreferrer" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
+      <li><a href="{{ link }}" data-qa="update-link">Update<span class="govuk-visually-hidden" data-qa="update-link"> {{ entry.type }}</span></a></li>
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}
       {% else %}
-      <li><a href="{{ link }}" rel="noopener noreferrer">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
+      <li><a href="{{ link }}" rel="noopener noreferrer" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
     {% endif %}
   </ul>
 {% endset %}
