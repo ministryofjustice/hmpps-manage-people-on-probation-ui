@@ -95,7 +95,7 @@ export default class RestClient {
       }
       if (handle404 && error?.response?.status === 404) {
         logger.info('Handling 404')
-        return null
+        return null as TResponse
       }
       if (handle401 && error?.response?.status === 401) {
         logger.info('Handling 401s the same as 500s')
@@ -169,8 +169,8 @@ export default class RestClient {
       }
       const result = await request
       return raw ? (result as Response) : result.body
-    } catch (error) {
-      if (handle404 && error.response?.status === 404) return null
+    } catch (error: any) {
+      if (handle404 && error.response?.status === 404) return null as Response
       if (handle415 && error?.response?.status === 415) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })
@@ -239,7 +239,7 @@ export default class RestClient {
         .timeout(this.timeoutConfig())
 
       return raw ? (result as Response) : result.body
-    } catch (error) {
+    } catch (error: any) {
       const sanitisedError = sanitiseError(error)
       logger.warn({ ...sanitisedError }, escapeForLog(`Error calling ${this.name}, path: '${path}', verb: 'DELETE'`))
       throw sanitisedError

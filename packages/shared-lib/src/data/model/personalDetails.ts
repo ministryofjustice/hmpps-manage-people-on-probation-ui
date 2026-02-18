@@ -1,6 +1,5 @@
 /* eslint-disable import/no-cycle */
 import { Note } from './note'
-import { Validateable } from '../../models/Errors'
 import { Contact } from './professionalContact'
 
 export interface Name {
@@ -94,7 +93,7 @@ export interface PersonalDetailsMainAddress {
   contacts: PersonalContact[]
   mainAddress?: PersonAddress
 }
-export interface PersonalDetailsUpdateRequest extends Validateable {
+export interface PersonalDetailsUpdateRequest {
   phoneNumber?: string
   mobileNumber?: string
   emailAddress?: string

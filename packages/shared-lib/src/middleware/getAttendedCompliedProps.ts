@@ -1,9 +1,9 @@
 import { Request } from 'express'
-import { Activity } from '../data/model/schedule'
+import { Activity, PersonAppointment } from '../data/model/schedule'
 import { AppointmentSession } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
 import { getDataValue, convertToTitleCase } from '../utils'
-import { Name } from '../data/model/personalDetails'
+import { Name, PersonalDetails } from '../data/model/personalDetails'
 
 export interface AttendedCompliedAppointment {
   type: string
@@ -20,9 +20,9 @@ export const getAttendedCompliedProps = (
   const { crn, id, contactId } = req.params
   const data = req?.session?.data
   let appointment: AttendedCompliedAppointment | Activity
-  const { forename, surname } = res.locals.case.name
+  const { forename, surname } = (res.locals.case as PersonalDetails).name
   if (contactId) {
-    ;({ appointment } = res.locals.personAppointment)
+    ;({ appointment } = res.locals.personAppointment as PersonAppointment)
   } else {
     const description = res?.locals?.appointment?.type?.description
     const name = res?.locals?.appointment?.attending?.name
@@ -35,7 +35,7 @@ export const getAttendedCompliedProps = (
     const appointmentSession = getDataValue<AppointmentSession>(data, path)
     const startDateTime = appointmentSession?.date ?? ''
     appointment = {
-      type: description,
+      type: description as string,
       officer: {
         name: { forename: convertToTitleCase(officerForename), surname: convertToTitleCase(officerSurname) },
       },

@@ -145,7 +145,6 @@ export type RiskScore = 'LOW' | 'MEDIUM' | 'HIGH' | 'VERY_HIGH'
 export type RiskResponse = 'YES' | 'NO' | 'DK'
 
 export interface Risk {
-  [index: string]: string
   risk: RiskResponse | null
   current: RiskResponse | null
   currentConcernsText: string | null
@@ -154,7 +153,6 @@ export interface Risk {
 }
 
 export interface RiskToSelf {
-  [index: string]: Risk
   suicide?: Risk | null
   selfHarm?: Risk | null
   custody?: Risk | null

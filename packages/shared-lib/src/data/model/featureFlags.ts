@@ -1,6 +1,5 @@
 /* eslint-disable lines-between-class-members */
 export class FeatureFlags {
-  [index: string]: boolean
   enableAppointmentCreate?: boolean = undefined
   enableDeleteAppointmentFile?: boolean = undefined
   enableSentencePlan?: boolean = undefined
@@ -10,4 +9,5 @@ export class FeatureFlags {
   enablePastAppointments?: boolean = undefined
   enableRescheduleAppointment?: boolean = undefined
   enableManageCheckins?: boolean = undefined
+  enableTierLink?: boolean = undefined
 }

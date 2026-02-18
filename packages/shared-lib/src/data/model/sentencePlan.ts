@@ -126,7 +126,7 @@ type Status =
   | 'SELF_SIGNED'
   | 'UNSIGNED'
 
-interface CurrentVersion {
+export interface CurrentVersion {
   uuid: string
   version: number
   planId: number

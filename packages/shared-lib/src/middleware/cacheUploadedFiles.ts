@@ -4,7 +4,7 @@ import { FileCache } from '../types/FileUpload'
 
 export const cacheUploadedFiles = (req: Request, res: AppResponse, next: NextFunction): void => {
   const raw = req.body
-  const enableDelete = res.locals.flags.enableDeleteAppointmentFile === true
+  const enableDelete = res?.locals?.flags?.enableDeleteAppointmentFile === true
   let filesAdded = []
   if (raw?.filesAdded_filename) {
     if (Array.isArray(raw.filesAdded_filename)) {

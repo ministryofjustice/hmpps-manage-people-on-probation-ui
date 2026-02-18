@@ -6,7 +6,7 @@ import { HmppsAuthClient } from '../data'
 import { Route } from '../types/Route'
 import '../types/express/index.d'
 
-export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, _res, next) => {
     const config = getConfig()
     const newSessionData: Data = req?.session?.data ?? {}
@@ -16,7 +16,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
     const deleteValues = (keys: string[]): void => {
       keys.forEach(key => {
         if ((req?.session?.data?.appointments as any)?.[crn]?.[id]?.[key]) {
-          delete newSessionData.appointments[crn][id][key as keyof AppointmentSession]
+          delete newSessionData?.appointments?.[crn][id][key as keyof AppointmentSession]
         }
       })
     }
@@ -66,6 +66,9 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
       }
     })
     req.session.data = newSessionData
-    return next()
+    if (next) {
+      return next()
+    }
+    return null
   }
 }

@@ -76,7 +76,7 @@ interface Locals {
   title?: string
   success?: boolean
   status?: number
-  stack?: boolean | number | string
+  stack?: boolean | number | string | null | undefined
   flags?: FeatureFlags
   sentences?: Sentence[]
   timeOptions?: Option[]
