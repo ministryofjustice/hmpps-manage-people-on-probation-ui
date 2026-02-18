@@ -169,7 +169,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     '/case/:crn/appointments/check-in/manage/:id/restart-checkin',
     autoStoreSessionData(hmppsAuthClient),
     validate.eSuperVision,
-    controllers.checkIns.postRestartDateFrequency(hmppsAuthClient),
+    controllers.checkIns.postRestartCheckinPage(hmppsAuthClient),
   )
 
   router.get(

@@ -61,7 +61,7 @@ const routes = [
   'postManageStopCheckin',
   'getStopCheckinPage',
   'getRestartCheckinPage',
-  'postRestartDateFrequency',
+  'postRestartCheckinPage',
   'getRestartContactPage',
   'postRestartContactPage',
   'getRestartEditContactPage',
@@ -856,7 +856,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  postRestartDateFrequency: hmppsAuthClient => {
+  postRestartCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) {
