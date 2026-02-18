@@ -64,6 +64,8 @@ const routes = [
   'postRestartDateFrequency',
   'getRestartContactPage',
   'postRestartContactPage',
+  'getRestartEditContactPage',
+  'postRestartEditContactPage',
   'getRestartSummaryPage',
   // 'postFinalRestart',
   'getRestartConfirmation',
@@ -814,44 +816,42 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/manage/stop-checkin.njk', { crn, id })
     }
   },
+
   getRestartCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { data } = req.session
-      const journeyStarted = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'id'])
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
 
-      if (!journeyStarted) {
+      const { data } = req.session
+      const cya = req.query.cya === 'true'
+      const checkInMinDate = getMinDate()
+
+      const defaultsLoaded = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'id'])
+      if (!defaultsLoaded) {
         await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
-        const { offenderCheckinsByCRNResponse } = res.locals
+        const offenderSettings = res.locals.offenderCheckinsByCRNResponse
 
         setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'id'], id)
-        setDataValue(
-          data,
-          ['esupervision', crn, id, 'restartCheckin', 'interval'],
-          offenderCheckinsByCRNResponse.checkinInterval,
-        )
+        setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'interval'], offenderSettings.checkinInterval)
         setDataValue(
           data,
           ['esupervision', crn, id, 'restartCheckin', 'preferredComs'],
-          offenderCheckinsByCRNResponse.contactPreference,
+          offenderSettings.contactPreference,
         )
       }
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const caseData = await masClient.getPersonalDetails(crn)
-      const checkInMinDate = getMinDate()
-
-      if (req.session.errorMessages) {
-        res.locals.errorMessages = req.session.errorMessages
-        delete req.session.errorMessages
-      }
+      const personalDetails = await masClient.getPersonalDetails(crn)
 
       return res.render('pages/check-in/manage/restart-date-frequency.njk', {
         crn,
         id,
-        case: caseData,
         checkInMinDate,
+        case: personalDetails,
+        cya,
       })
     }
   },
@@ -859,10 +859,12 @@ const checkInsController: Controller<typeof routes, void> = {
   postRestartDateFrequency: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const isCya = req.query.cya === 'true'
-
-      if (isCya) {
-        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-summary`)
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const cyaQuery = req.query?.cya === 'true' ? '?cya=true' : ''
+      if (req.query?.cya === 'true') {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-summary${cyaQuery}`)
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-contact`)
     }
@@ -871,23 +873,41 @@ const checkInsController: Controller<typeof routes, void> = {
   getRestartContactPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { data } = req.session
-
-      const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
-
+      if (req?.session?.errorMessages) {
+        res.locals.errorMessages = req.session.errorMessages
+        delete req?.session?.errorMessages
+      }
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const { data } = req.session
+      const { cya } = req.query
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
-      const checkInMobile = restartDetails?.checkInMobile || personalDetails.mobileNumber
-      const checkInEmail = restartDetails?.checkInEmail || personalDetails.email
+      const checkInMobile = personalDetails.mobileNumber
+      const checkInEmail = personalDetails.email
+
+      const preferredComs = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'preferredComs'])
+      // if page not submitted, required to save in session for change link /edit page to avoid API call.
+      setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInMobile'], checkInMobile)
+      setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'], checkInEmail)
+
+      // To show success message on edit contact preference page
+      const contactUpdated = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'contactUpdated'])
+      if (contactUpdated) {
+        res.locals.success = true
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.restartCheckin?.contactUpdated
+      }
 
       return res.render('pages/check-in/manage/restart-contact-preference.njk', {
         crn,
         id,
-        case: personalDetails,
         checkInMobile,
         checkInEmail,
-        errorMessages: res.locals.errorMessages,
+        preferredComs,
+        case: personalDetails,
+        cya,
       })
     }
   },
@@ -899,8 +919,90 @@ const checkInsController: Controller<typeof routes, void> = {
       const url =
         change === 'main'
           ? `/case/${crn}/appointments/check-in/manage/${id}/restart-summary`
-          : `/case/${crn}/appointments/check-in/manage/${id}/edit-contact?restart=true`
+          : `/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact?change=${change}`
       return res.redirect(url)
+    }
+  },
+
+  getRestartEditContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { change } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      // To show success message on edit contact preference page
+      const contactUpdated = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'restartCheckin',
+        'contactUpdated',
+      ])
+      if (contactUpdated) {
+        res.locals.success = true
+        delete req.session?.data?.esupervision?.[crn]?.[id]?.restartCheckin?.contactUpdated
+      }
+      const checkInMobile = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'restartCheckin',
+        'editCheckInMobile',
+      ])
+      const checkInEmail = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'restartCheckin',
+        'editCheckInEmail',
+      ])
+      return res.render('pages/check-in/manage/restart-edit-contact.njk', {
+        crn,
+        id,
+        change,
+        checkInMobile,
+        checkInEmail,
+      })
+    }
+  },
+
+  postRestartEditContactPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      const { previousMobile, previousEmail } = req.body
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'])
+      const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInMobile'])
+      if (previousMobile?.trim() !== editCheckInMobile1?.trim() || previousEmail !== editCheckInEmail1) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+
+        const body: PersonalDetailsUpdateRequest = {
+          emailAddress: editCheckInEmail1,
+          mobileNumber: editCheckInMobile1?.trim(),
+        }
+        const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
+        // If personal details overview exists in session cache, update it with latest values
+        if (req.session.data?.personalDetails?.[crn]?.overview) {
+          req.session.data.personalDetails[crn].overview = personalDetails
+        }
+        // Save to show success message on contact preferences page
+        if (personalDetails?.crn) {
+          setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'contactUpdated'], true)
+          setDataValue(
+            req.session.data,
+            ['esupervision', crn, id, 'restartCheckin', 'checkInMobile'],
+            editCheckInMobile1?.trim(),
+          )
+          setDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin', 'checkInEmail'], editCheckInEmail1)
+        }
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-contact`)
     }
   },
 
@@ -979,7 +1081,6 @@ export const getMinDate = (): string => {
   // setting temporary fix for minDate
   // (https://github.com/ministryofjustice/moj-frontend/issues/923)
   let checkInMinDate: string
-  today.setDate(today.getDate() + 1)
   if (today.getDate() > 9) {
     checkInMinDate = DateTime.fromJSDate(today).toFormat('dd/M/yyyy')
   } else {

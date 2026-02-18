@@ -5,8 +5,8 @@
 {% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInEmail]' %}
-{% set setMobileError =  'esupervision-'+  crn + '-' + id +'-checkins-checkInMobile' %}
-{% set setEmailError =  'esupervision-'+  crn + '-' + id +'-checkins-checkInEmail' %}
+{% set setMobileError =  'esupervision-'+  crn + '-' + id +'-restartCheckin-checkInMobile' %}
+{% set setEmailError =  'esupervision-'+  crn + '-' + id +'-restartCheckin-checkInEmail' %}
 {% set cyaLink =  "?cya=true" if cya else  "" %}
 {% set mobileValue = checkInMobile | default('No mobile number') %}
 {% set emailValue = checkInEmail | default('No email address') %}
@@ -41,7 +41,7 @@
                     value: { html: ('<span data-qa="mobileNumberValue" class="app-!-font-family-tabular">' + checkInMobile+ '</span>') if checkInMobile else '<span data-qa="mobileNumberValue">No mobile number</span>' },
                     actions: {
                     items: [{
-                        href:"/case/" + crn + "/appointments/" + id +"/check-in/edit-contact-preference" + cyaLink,
+                        href:"/case/" + crn + "/appointments/check-in/manage" + id +"restart-edit-contact?change=mobile" + cyaLink,
                         text: "Change",
                         visuallyHiddenText: "mobile number",
                         attributes: {
@@ -55,7 +55,7 @@
                     value: { html: '<span data-qa="emailAddressValue">' + checkInEmail+ '</span>' if checkInEmail else '<span data-qa="emailAddressValue">No email address</span>' },
                     actions: {
                     items: [{
-                        href:"/case/" + crn + "/appointments/" + id +"/check-in/edit-contact-preference" + cyaLink,
+                        href:"/case/" + crn + "/appointments/check-in/manage" + id +"restart-edit-contact?change=emailAddress" + cyaLink,
                         text: "Change",
                         visuallyHiddenText: "email address",
                         attributes: {
@@ -118,7 +118,7 @@
                             <button type="submit"
                                     name="change"
                                     data-qa="emailAddressAction"
-                                    value="emailAddress"
+                                    value="email"
                                     class="mpop-govuk-link-button">
                                 Change<span class="govuk-visually-hidden"> email address</span>
                             </button>
@@ -128,7 +128,7 @@
             </div>
         </section>
         </div>
-        <div class="govuk-!-width-one-half">
+        <div>
             {{ govukRadios({
                 fieldset: {
                     legend: {
@@ -147,11 +147,13 @@
                 items: [
                     {
                         value: "PHONE",
-                        text: "Text message"
+                        text: "Text message",
+                        checked: preferredComs === "PHONE"
                     },
                     {
                         value: "EMAIL",
-                        text: "Email"
+                        text: "Email",
+                        checked: preferredComs === "EMAIL"
                     }
                 ]
             } | decorateFormAttributes(['esupervision', crn, id, 'restartCheckin', 'preferredComs'])) }}

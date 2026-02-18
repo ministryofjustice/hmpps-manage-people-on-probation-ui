@@ -204,7 +204,7 @@ describe('checkInsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/date-frequency.njk', {
         crn,
         id: uuid,
-        checkInMinDate: '2/7/2025',
+        checkInMinDate: '1/7/2025',
         cya,
       })
     })
@@ -222,7 +222,7 @@ describe('checkInsController', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/date-frequency.njk', {
         crn,
         id: uuid,
-        checkInMinDate: '10/7/2025',
+        checkInMinDate: '9/7/2025',
         cya,
       })
     })

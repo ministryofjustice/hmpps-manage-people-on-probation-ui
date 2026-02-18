@@ -5,6 +5,7 @@ import {
   isEmail,
   isFutureDate,
   isNotEmpty,
+  isTodayOrLater,
   isValidDate,
   isValidDateFormat,
   isValidMobileNumber,
@@ -257,9 +258,9 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           log: 'Restart checkin date is not valid',
         },
         {
-          validator: isFutureDate,
-          msg: 'The next online check in date must be in the future',
-          log: 'Restart checkin date must be in the future',
+          validator: isTodayOrLater,
+          msg: 'The next online check in date must be today or in the future',
+          log: 'Restart checkin date must be today or in the future',
         },
       ],
     },
@@ -281,7 +282,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         {
           validator: isNotEmpty,
           msg: 'Select how the person wants us to send a link to the service',
-          log: 'Restart contact preference not selected',
+          log: 'Select how to send service link, not selected',
         },
       ],
     },
@@ -291,7 +292,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         {
           validator: contactPrefEmailCheck,
           msg: 'Enter an email address',
-          log: 'Email missing in restart process',
+          log: 'Email not entered in restart check in process',
           crossField: `[esupervision][${crn}][${id}][restartCheckin][preferredComs]`,
         },
       ],
@@ -302,7 +303,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         {
           validator: contactPrefMobileCheck,
           msg: 'Enter a mobile number',
-          log: 'Mobile missing in restart process',
+          log: 'Mobile number not entered in manage check in processs',
           crossField: `[esupervision][${crn}][${id}][restartCheckin][preferredComs]`,
         },
       ],

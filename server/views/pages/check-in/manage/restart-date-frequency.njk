@@ -5,7 +5,7 @@
 {% set buttonText =  "Continue" %}
 
 {% block form %}
-    <h3 class="govuk-heading-s govuk-!-margin-bottom-1" >When would you like {{case.name.forename}} to complete their next online <br/> check in?</h3>
+    <h3 class="govuk-heading-s" >When would you like {{case.name.forename}} to complete their next online check in?</h3>
     {{ mojDatePicker({
         formGroup: {
             classes: "govuk-!-margin-bottom-3",

@@ -6,11 +6,7 @@ import { LocalParams } from '../../models/ESupervision'
 import { getDataValue } from '../../utils'
 
 const eSuperVision: Route<void> = (req, res, next) => {
-  if (req.method !== 'POST') {
-    return next()
-  }
-  const { url, params } = req
-  const body = req.body || {}
+  const { url, params, body } = req
   const { crn, id } = params
   const { checkInMinDate, checkInMobile, checkInEmail } = body
   const editCheckInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
@@ -56,7 +52,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
       render = `pages/check-in/date-frequency`
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -68,16 +64,16 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateContactPreference = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/contact-preference`)) {
       render = `pages/check-in/contact-preference`
-      if (body?.change === 'main') {
+      if (req.body?.change === 'main') {
         errorMessages = validateWithSpec(
-          body,
+          req.body,
           eSuperVisionValidation({
             crn,
             id,
             checkInEmail,
             checkInMobile,
             page: 'contact-preference',
-            change: body.change,
+            change: req.body.change,
           }),
         )
       }
@@ -88,7 +84,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       const preferredComs = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'preferredComs'])
       render = `pages/check-in/edit-contact-preference`
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -107,7 +103,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/photo-options`)) {
       render = `pages/check-in/photo-options`
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -120,7 +116,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/upload-a-photo`)) {
       render = `pages/check-in/upload-a-photo`
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -134,7 +130,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       render = `pages/check-in/manage/checkin-settings`
       localParams.id = id
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -149,7 +145,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       render = `pages/check-in/manage/manage-edit-contact`
       localParams.id = id
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -169,7 +165,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
       localParams.id = id
       const stopCheckIn = getDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'stopCheckin'])
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
@@ -182,16 +178,16 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateManageContactPage = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/contact`)) {
       render = `pages/check-in/manage/manage-contact`
-      if (body?.change === 'main') {
+      if (req.body?.change === 'main') {
         errorMessages = validateWithSpec(
-          body,
+          req.body,
           eSuperVisionValidation({
             crn,
             id,
             checkInEmail,
             checkInMobile,
             page: 'manage-contact',
-            change: body.change,
+            change: req.body.change,
           }),
         )
       }
@@ -200,31 +196,55 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateRestartJourney = () => {
     if (baseUrl.includes(`/manage/${id}/restart-checkin`)) {
       render = `pages/check-in/manage/restart-date-frequency`
+      localParams.id = id // Mirroring manage flow
+      errorMessages = validateWithSpec(req.body, eSuperVisionValidation({ crn, id, page: 'restart-date-frequency' }))
+    }
+
+    if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`)) {
+      render = `pages/check-in/manage/restart-edit-contact`
+      localParams.id = id // Mirroring manage flow
+      const editMobile = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'restartCheckin',
+        'editCheckInMobile',
+      ])
+      const editEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'])
+
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
-          page: 'restart-date-frequency',
+          page: 'restart-edit-contact',
+          editCheckInEmail: editEmail,
+          editCheckInMobile: editMobile,
         }),
       )
     }
 
     if (baseUrl.includes(`/manage/${id}/restart-contact`)) {
       render = `pages/check-in/manage/restart-contact-preference`
+      localParams.id = id
+      const restartData = req.body.esupervision?.[crn]?.[id]?.restartCheckin || {}
+      const sessionData = getDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin']) || {}
+      const email = restartData.checkInEmail || sessionData.checkInEmail
+      const mobile = restartData.checkInMobile || sessionData.checkInMobile
 
-      const restartData = body.esupervision?.[crn]?.[id]?.restartCheckin || {}
       errorMessages = validateWithSpec(
-        body,
+        req.body,
         eSuperVisionValidation({
           crn,
           id,
           page: 'restart-contact',
-          change: body.change || 'main',
-          checkInEmail: restartData.checkInEmail || '',
-          checkInMobile: restartData.checkInMobile || '',
+          change: req.body.change || 'main',
+          checkInEmail: email,
+          checkInMobile: mobile,
         }),
       )
+      localParams.checkInEmail = email
+      localParams.checkInMobile = mobile
     }
   }
 
