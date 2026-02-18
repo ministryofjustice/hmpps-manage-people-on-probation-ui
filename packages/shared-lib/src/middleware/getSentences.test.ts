@@ -5,9 +5,23 @@ import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { Sentences } from '../data/model/sentenceDetails'
 import { AppResponse } from '../models/Locals'
+import { getConfig } from '../config'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')
+
+jest.mock('../applicationInfo', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    applicationName: 'manage-people-on-probation-ui',
+    version: '1.0.0',
+    buildNumber: 'build-123',
+    gitRef: 'git-ref-123',
+    gitShortHash: 'git-ref',
+    productId: 'manage-people-on-probation-ui',
+    branchName: 'branch-name-123',
+  }),
+}))
 
 jest
   .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
@@ -49,6 +63,30 @@ const number = '2'
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
+jest.mock('../config', () => ({
+  __esModule: true,
+  getConfig: jest.fn(),
+}))
+
+const mockedConfig = {
+  produiction: false,
+  buildNumber: 'build-123',
+  gitRef: 'git-ref-123',
+  productId: 'manage-people-on-probation-ui',
+  branchName: 'branch-name-123',
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 const spy = jest.spyOn(MasApiClient.prototype, 'getSentences').mockImplementation(() => Promise.resolve(sentencesMock))
 

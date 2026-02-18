@@ -1,13 +1,39 @@
-import nock from 'nock'
-
-import config from '../config'
-import HmppsAuthClient from './hmppsAuthClient'
-import TokenStore from './tokenStore/redisTokenStore'
+/* eslint-disable import/first */
 
 jest.mock('./tokenStore/redisTokenStore')
 
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
 
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
+}))
+
+const mockedConfig = {
+  apis: {
+    hmppsAuth: {
+      url: 'http://fake-hmpps-auth',
+      timeout: 5000,
+      systemClientId: 'client-id',
+      systemClientSecret: 'client-secret',
+    },
+  },
+}
+
+import nock from 'nock'
+import HmppsAuthClient from './hmppsAuthClient'
+import TokenStore from './tokenStore/redisTokenStore'
+import { getConfig } from '../config'
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const username = 'Bob'
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -16,7 +42,10 @@ describe('hmppsAuthClient', () => {
   let hmppsAuthClient: HmppsAuthClient
 
   beforeEach(() => {
-    fakeHmppsAuthApi = nock(config.apis.hmppsAuth.url)
+    // Use the mocked config URL here
+    jest.clearAllMocks()
+    fakeHmppsAuthApi = nock(mockedConfig.apis.hmppsAuth.url)
+    mockedGetConfig.mockReturnValue(mockedConfig)
     hmppsAuthClient = new HmppsAuthClient(tokenStore)
   })
 
@@ -42,12 +71,14 @@ describe('hmppsAuthClient', () => {
 
       fakeHmppsAuthApi
         .post('/oauth/token', 'grant_type=client_credentials&username=Bob')
-        .basicAuth({ user: config.apis.hmppsAuth.systemClientId, pass: config.apis.hmppsAuth.systemClientSecret })
+        .basicAuth({
+          user: mockedConfig.apis.hmppsAuth.systemClientId,
+          pass: mockedConfig.apis.hmppsAuth.systemClientSecret,
+        })
         .matchHeader('Content-Type', 'application/x-www-form-urlencoded')
         .reply(200, token)
 
       const output = await hmppsAuthClient.getSystemClientToken(username)
-
       expect(output).toEqual(token.access_token)
       expect(tokenStore.setToken).toHaveBeenCalledWith('Bob', token.access_token, 240)
     })
@@ -57,7 +88,10 @@ describe('hmppsAuthClient', () => {
 
       fakeHmppsAuthApi
         .post('/oauth/token', 'grant_type=client_credentials')
-        .basicAuth({ user: config.apis.hmppsAuth.systemClientId, pass: config.apis.hmppsAuth.systemClientSecret })
+        .basicAuth({
+          user: mockedConfig.apis.hmppsAuth.systemClientId,
+          pass: mockedConfig.apis.hmppsAuth.systemClientSecret,
+        })
         .matchHeader('Content-Type', 'application/x-www-form-urlencoded')
         .reply(200, token)
 

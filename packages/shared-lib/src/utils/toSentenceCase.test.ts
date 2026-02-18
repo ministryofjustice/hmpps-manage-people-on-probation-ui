@@ -1,4 +1,17 @@
 import { toSentenceCase } from './toSentenceCase'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockedConfig = {
+  preservedWords: ['(NS)', '(Non', 'NS)'],
+  preservedSeparators: ['-'],
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 describe('toSentenceCase()', () => {
   it('should expect one argument', () => {

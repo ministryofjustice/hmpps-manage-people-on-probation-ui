@@ -1,12 +1,25 @@
 import { createRedisClient } from './redisClient'
 
-jest.mock('../config', () => {
-  const config = jest.requireActual('../config')
-  return {
-    ...config,
-    redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
-  }
-})
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
+const mockedConfig = {
+  redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 jest.mock('./redisReconnectStrategy', () => {
   const config = jest.requireActual('./redisReconnectStrategy')
@@ -23,13 +36,16 @@ describe('createRedisClient', () => {
     jest.restoreAllMocks()
   })
   it('createRedisClient without tls', async () => {
-    jest.mock('../config', () => {
-      const config = jest.requireActual('../config')
-      return {
-        ...config,
-        redis: { tls_enabled: 'false', host: 'localhost', port: 6379 },
-      }
+    mockedGetConfig.mockReturnValueOnce({
+      redis: { tls_enabled: 'false', host: 'localhost', port: 6379 },
     })
+    // jest.mock('../config', () => {
+    //   const config = jest.requireActual('../config')
+    //   return {
+    //     ...config,
+    //     redis: { tls_enabled: 'false', host: 'localhost', port: 6379 },
+    //   }
+    // })
     const client = createRedisClient()
     try {
       await client.connect()
@@ -38,13 +54,16 @@ describe('createRedisClient', () => {
     }
   })
   it('createRedisClient with tls', async () => {
-    jest.mock('../config', () => {
-      const config = jest.requireActual('../config')
-      return {
-        ...config,
-        redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
-      }
+    mockedGetConfig.mockReturnValueOnce({
+      redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
     })
+    // jest.mock('../config', () => {
+    //   const config = jest.requireActual('../config')
+    //   return {
+    //     ...config,
+    //     redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
+    //   }
+    // })
     const client = createRedisClient()
     try {
       await client.connect()

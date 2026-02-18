@@ -1,9 +1,10 @@
 import { EvaluationRequest, EvaluationResponse, FliptEvaluationClient } from '@flipt-io/flipt-client'
-import config from '../config'
+import { getConfig } from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
 
 export default class FlagService {
   async getFlags(): Promise<FeatureFlags> {
+    const config = getConfig()
     const namespace = 'manage-people-on-probation-ui'
     const fliptEvaluationClient = await FliptEvaluationClient.init(namespace, {
       url: config.flipt.url,

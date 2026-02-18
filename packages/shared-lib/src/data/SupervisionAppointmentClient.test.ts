@@ -1,15 +1,16 @@
-// File: `server/data/masOutlookClient.test.ts`
-import nock from 'nock'
+/* eslint-disable import/first */
+// Mock the config and logger above importing the client to ensure the mocks are in place before the client is imported
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
 
-import config from '../config'
-import { isValidHost, isValidPath } from '../utils'
-import SupervisionAppointmentClient from './SupervisionAppointmentClient'
-import {
-  OutlookEventRequestBody,
-  OutlookEventResponse,
-  RescheduleEventRequest,
-  EventResponse,
-} from './model/OutlookEvent'
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -19,22 +20,49 @@ jest.mock('../utils', () => {
     isValidHost: jest.fn(),
   }
 })
-const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
-const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 
 jest.mock('./tokenStore/redisTokenStore')
 
+import nock from 'nock'
+import { getConfig } from '../config'
+import { isValidHost, isValidPath } from '../utils'
+import SupervisionAppointmentClient from './SupervisionAppointmentClient'
+import {
+  OutlookEventRequestBody,
+  OutlookEventResponse,
+  RescheduleEventRequest,
+  EventResponse,
+} from './model/OutlookEvent'
+
+// Type casts
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
+const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
+
 const token = { access_token: 'token-1', expires_in: 300 }
+
+const mockConfig: any = {
+  apis: {
+    masAppointmentsApi: {
+      url: 'http://test-api',
+      timeout: {
+        response: 10000,
+        deadline: 10000,
+      },
+      agent: {},
+    },
+  },
+}
 
 describe('MasOutlookClient', () => {
   let fakeApi: nock.Scope
   let client: SupervisionAppointmentClient
-
   beforeEach(() => {
     jest.clearAllMocks()
+    mockGetConfig.mockReturnValue(mockConfig)
     mockedIsValidHost.mockReturnValue(true)
     mockedIsValidPath.mockReturnValue(true)
-    fakeApi = nock(config.apis.masAppointmentsApi.url)
+    fakeApi = nock(mockConfig.apis.masAppointmentsApi.url)
     client = new SupervisionAppointmentClient(token.access_token)
   })
 

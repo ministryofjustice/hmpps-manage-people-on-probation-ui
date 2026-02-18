@@ -5,9 +5,9 @@ import {
   isNotLaterThan,
   isNotLaterThanToday,
   isNumeric,
-  isUkPostcode,
   isValidDate,
   isValidMobileNumber,
+  isUkPostcode,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 import { type Origin } from '../../data/model/personalDetails'

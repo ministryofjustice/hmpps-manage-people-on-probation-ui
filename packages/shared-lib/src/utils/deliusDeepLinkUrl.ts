@@ -1,6 +1,7 @@
-import config from '../config'
+import { getConfig } from '../config'
 
 export const deliusDeepLinkUrl = (component: string, crn: string, contactId?: string, componentId?: string) => {
+  const config = getConfig()
   if (!component || !crn) {
     return ''
   }

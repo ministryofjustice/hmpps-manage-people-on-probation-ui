@@ -1,8 +1,32 @@
 import UserService from './userService'
 import ManageUsersApiClient, { type User } from '../data/manageUsersApiClient'
 import createUserToken from '../testutils/createUserToken'
+import { getConfig } from '../config'
 
 jest.mock('../data/manageUsersApiClient')
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
+const mockLink = 'https://manage-users-dummy-url'
+
+const mockedConfig = {
+  apis: {
+    manageUsersApi: mockLink,
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 describe('User service', () => {
   let manageUsersApiClient: jest.Mocked<ManageUsersApiClient>

@@ -3,6 +3,14 @@ import type { Request, Response } from 'express'
 
 import { authorisationMiddleware } from './authorisationMiddleware'
 
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
 function createToken(authorities: string[]) {
   const payload = {
     user_name: 'USER1',

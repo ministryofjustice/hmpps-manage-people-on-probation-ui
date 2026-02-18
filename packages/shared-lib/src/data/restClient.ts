@@ -3,12 +3,12 @@ import superagent, { Response } from 'superagent'
 import 'multer'
 import logger from '../logger'
 import sanitiseError from '../sanitisedError'
-import type { ApiConfig } from '../config'
+import type { ApiConfig } from '../types/ApiConfig'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { type ErrorSummaryItem } from './model/common'
-import { escapeForLog } from '../utils/escapeForLog'
 import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
+import { escapeForLog } from '../utils/escapeForLog'
 
 interface Request {
   path: string

@@ -4,13 +4,14 @@ import express from 'express'
 import passport from 'passport'
 import flash from 'connect-flash'
 import * as Sentry from '@sentry/node'
-import config from '../config'
+import { getConfig } from '../config'
 import auth from '../authentication/auth'
 import { AppResponse } from '../models/Locals'
 
 const router = express.Router()
 
 export const setUpAuthentication = (): Router => {
+  const config = getConfig()
   auth.init()
 
   router.use(passport.initialize())

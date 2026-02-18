@@ -15,19 +15,22 @@ import ManageUsersApiClient from './manageUsersApiClient'
 import { createRedisClient } from './redisClient'
 import RedisTokenStore from './tokenStore/redisTokenStore'
 import InMemoryTokenStore from './tokenStore/inMemoryTokenStore'
-import config from '../config'
+import { getConfig } from '../config'
 import ProbationFrontendComponentsApiClient from './probationFrontendComponentsClient'
 
 type RestClientBuilder<T> = (token: string) => T
 
-export const dataAccess = () => ({
-  applicationInfo,
-  hmppsAuthClient: new HmppsAuthClient(
-    config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
-  ),
-  manageUsersApiClient: new ManageUsersApiClient(),
-  probationFrontendComponentsApiClient: new ProbationFrontendComponentsApiClient(),
-})
+export const dataAccess = () => {
+  const config = getConfig()
+  return {
+    applicationInfo,
+    hmppsAuthClient: new HmppsAuthClient(
+      config.redis.enabled ? new RedisTokenStore(createRedisClient()) : new InMemoryTokenStore(),
+    ),
+    manageUsersApiClient: new ManageUsersApiClient(),
+    probationFrontendComponentsApiClient: new ProbationFrontendComponentsApiClient(),
+  }
+}
 
 export type DataAccess = ReturnType<typeof dataAccess>
 

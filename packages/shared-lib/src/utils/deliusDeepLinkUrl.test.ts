@@ -1,4 +1,20 @@
 import { deliusDeepLinkUrl } from './deliusDeepLinkUrl'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockLink = 'https://ndelius-dummy-url'
+
+const mockedConfig = {
+  delius: {
+    link: mockLink,
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 describe('utils/deliusDeepLinkUrl', () => {
   it.each([
@@ -9,7 +25,7 @@ describe('utils/deliusDeepLinkUrl', () => {
       '1234',
       undefined,
       undefined,
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234',
+      `${mockLink}/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234`,
     ],
     [
       'contactId',
@@ -17,7 +33,7 @@ describe('utils/deliusDeepLinkUrl', () => {
       '1234',
       'contact-id',
       undefined,
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&contactID=contact-id',
+      `${mockLink}/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&contactID=contact-id`,
     ],
     [
       'contactId',
@@ -25,7 +41,7 @@ describe('utils/deliusDeepLinkUrl', () => {
       '1234',
       undefined,
       'component-id',
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&componentId=component-id',
+      `${mockLink}/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&componentId=component-id`,
     ],
     [
       'contactId',
@@ -33,7 +49,7 @@ describe('utils/deliusDeepLinkUrl', () => {
       '1234',
       'contact-id',
       'component-id',
-      'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&contactID=contact-id&componentId=component-id',
+      `${mockLink}/NDelius-war/delius/JSP/deeplink.xhtml?component=ContactList&CRN=1234&contactID=contact-id&componentId=component-id`,
     ],
   ])(
     '%s deliusDeepLinkUrl(%s, %s)',

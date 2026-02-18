@@ -3,10 +3,11 @@ import compression from 'compression'
 import express, { Router } from 'express'
 import noCache from 'nocache'
 
-import config from '../config'
+import { getConfig } from '../config'
 
 export const setUpStaticResources = (): Router => {
   const router = express.Router()
+  const config = getConfig()
 
   router.use(compression())
 

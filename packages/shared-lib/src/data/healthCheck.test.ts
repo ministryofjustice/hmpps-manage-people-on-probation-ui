@@ -1,6 +1,14 @@
 import nock from 'nock'
 import { serviceCheckFactory } from './healthCheck'
-import { AgentConfig } from '../config'
+import { AgentConfig } from '../types/AgentConfig'
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
 
 describe('Service healthcheck', () => {
   const healthcheck = serviceCheckFactory('externalService', 'http://test-service.com/ping', new AgentConfig(), {

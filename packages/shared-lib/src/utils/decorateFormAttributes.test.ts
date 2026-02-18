@@ -2,6 +2,18 @@ import httpMocks from 'node-mocks-http'
 
 import { decorateFormAttributes } from './decorateFormAttributes'
 import { mockAppResponse } from '../controllers/mocks'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockedConfig = {
+  dateFields: ['date'],
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 describe('utils/decorateFormAttributes', () => {
   const crn = 'X000001'

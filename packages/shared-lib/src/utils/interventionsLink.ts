@@ -1,6 +1,7 @@
-import config from '../config'
+import { getConfig } from '../config'
 
 export const interventionsLink = (referralId: string) => {
+  const config = getConfig()
   if (!referralId) {
     return ''
   }

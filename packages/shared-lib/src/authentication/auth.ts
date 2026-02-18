@@ -1,7 +1,7 @@
 import passport from 'passport'
 import { Strategy as OAuth2Strategy } from 'passport-oauth2'
 import type { RequestHandler } from 'express'
-import config from '../config'
+import { getConfig } from '../config'
 import generateOauthClientToken from './clientCredentials'
 import type { TokenVerifier } from '../data/tokenVerification'
 
@@ -28,6 +28,7 @@ const authenticationMiddleware: AuthenticationMiddleware = verifyToken => {
 }
 
 function init(): void {
+  const config = getConfig()
   const oauth2Strategy = new OAuth2Strategy(
     {
       authorizationURL: `${config.apis.hmppsAuth.externalUrl}/oauth/authorize`,

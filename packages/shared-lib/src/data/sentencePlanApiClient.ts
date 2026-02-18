@@ -1,9 +1,10 @@
-import config from '../config'
+import { getConfig } from '../config'
 import RestClient from './restClient'
 import { SentencePlan } from './model/sentencePlan'
 
 export default class SentencePlanApiClient extends RestClient {
   constructor(token: string) {
+    const config = getConfig()
     super('Sentence Plan API', config.apis.sentencePlanApi, token)
   }
 

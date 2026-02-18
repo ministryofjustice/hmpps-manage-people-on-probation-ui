@@ -12,6 +12,14 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
   return {

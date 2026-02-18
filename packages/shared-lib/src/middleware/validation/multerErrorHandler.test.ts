@@ -4,6 +4,23 @@ import { NextFunction, Response } from 'express'
 import { mockAppResponse } from '../../controllers/mocks'
 import { multerErrorHandler } from './multerErrorHandler'
 import { AppResponse } from '../../models/Locals'
+import { getConfig } from '../../config'
+
+jest.mock('../../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockedConfig = {
+  validMimeTypes: {
+    pdf: 'application/pdf',
+    doc: 'application/msword',
+    docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  },
+  maxFileSize: 5 * 1024 * 1024,
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 jest.mock('multer', () => {
   class MockMulterError extends Error {

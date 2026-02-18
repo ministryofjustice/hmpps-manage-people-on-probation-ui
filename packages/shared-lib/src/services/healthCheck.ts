@@ -1,7 +1,7 @@
 import promClient from 'prom-client'
 import { serviceCheckFactory } from '../data/healthCheck'
-import config from '../config'
-import type { AgentConfig } from '../config'
+import { getConfig } from '../config'
+import type { AgentConfig } from '../types/AgentConfig'
 import type { ApplicationInfo } from '../applicationInfo'
 
 const healthCheckGauge = new promClient.Gauge({
@@ -49,24 +49,27 @@ function gatherCheckInfo(aggregateStatus: Record<string, unknown>, currentStatus
   return { ...aggregateStatus, [currentStatus.name]: { status: currentStatus.status, details: currentStatus.message } }
 }
 
-const apiChecks = [
-  service('hmppsAuth', `${config.apis.hmppsAuth.url}/health/ping`, config.apis.hmppsAuth.agent),
-  service('manageUsersApi', `${config.apis.manageUsersApi.url}/health/ping`, config.apis.manageUsersApi.agent),
-  ...(config.apis.tokenVerification.enabled
-    ? [
-        service(
-          'tokenVerification',
-          `${config.apis.tokenVerification.url}/health/ping`,
-          config.apis.tokenVerification.agent,
-        ),
-      ]
-    : []),
-]
+const apiChecks = () => {
+  const config = getConfig()
+  return [
+    service('hmppsAuth', `${config.apis.hmppsAuth.url}/health/ping`, config.apis.hmppsAuth.agent),
+    service('manageUsersApi', `${config.apis.manageUsersApi.url}/health/ping`, config.apis.manageUsersApi.agent),
+    ...(config.apis.tokenVerification.enabled
+      ? [
+          service(
+            'tokenVerification',
+            `${config.apis.tokenVerification.url}/health/ping`,
+            config.apis.tokenVerification.agent,
+          ),
+        ]
+      : []),
+  ]
+}
 
 export default function healthCheck(
   applicationInfo: ApplicationInfo,
   callback: HealthCheckCallback,
-  checks = apiChecks,
+  checks = apiChecks(),
 ): void {
   Promise.all(checks.map(fn => fn())).then(checkResults => {
     const allOk = checkResults.every(item => item.status === 'UP') ? 'UP' : 'DOWN'

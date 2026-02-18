@@ -1,7 +1,23 @@
 import { oaSysUrl } from './oaSysUrl'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockLink = 'https://oasys-dummy-url'
+
+const mockedConfig = {
+  oaSys: {
+    link: mockLink,
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 describe('utils/oaSysUrl', () => {
-  it.each([['Get link', 'https://oasys-dummy-url']])('%s oaSysUrl()', (_: string, expected: string) => {
+  it.each([['Get link', mockLink]])('%s oaSysUrl()', (_: string, expected: string) => {
     expect(oaSysUrl()).toEqual(expected)
   })
 })

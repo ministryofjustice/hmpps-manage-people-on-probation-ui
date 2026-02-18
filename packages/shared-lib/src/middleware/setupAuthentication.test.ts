@@ -3,6 +3,23 @@ import flash from 'connect-flash'
 import passport from 'passport'
 import { setUpAuthentication } from './setUpAuthentication'
 import auth from '../authentication/auth'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockedConfig = {
+  domain: 'http://localhost:3000',
+  apis: {
+    hmppsAuth: {
+      apiClientId: 'dummy-client-id',
+    },
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 jest.mock('express', () => {
   const actualExpress = jest.requireActual('express')

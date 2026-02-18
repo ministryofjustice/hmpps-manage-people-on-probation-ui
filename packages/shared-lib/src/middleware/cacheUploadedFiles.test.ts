@@ -1,6 +1,41 @@
+/* eslint-disable import/first */
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}))
+
+jest.mock('uuid', () => ({
+  v4: jest.fn(),
+}))
+
 import httpMocks from 'node-mocks-http'
 import { cacheUploadedFiles } from '.'
 import { AppResponse } from '../models/Locals'
+import { getConfig } from '../config'
+
+const mockConfig: any = {
+  apis: {
+    masApi: {
+      url: 'https://mas-api-dummy-url',
+      timeout: {
+        response: 10000,
+        deadline: 10000,
+      },
+      agent: {},
+    },
+  },
+}
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 describe('middleware/cacheUploadedFiles', () => {
   const nextSpy = jest.fn()
@@ -34,6 +69,7 @@ describe('middleware/cacheUploadedFiles', () => {
       },
     } as unknown as AppResponse
     beforeEach(() => {
+      mockGetConfig.mockReturnValue(mockConfig)
       cacheUploadedFiles(mockReq, mockRes, nextSpy)
     })
     it('should add the uploadedFiles cache to the session', () => {
@@ -103,6 +139,7 @@ describe('middleware/cacheUploadedFiles', () => {
       },
     } as unknown as AppResponse
     beforeEach(() => {
+      mockGetConfig.mockReturnValue(mockConfig)
       cacheUploadedFiles(mockReq, mockRes, nextSpy)
     })
     it('should add the uploadedFiles cache to the session', () => {

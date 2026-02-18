@@ -1,6 +1,6 @@
 import { Response } from 'superagent'
-import config from '../config'
 import RestClient from './restClient'
+import { getConfig } from '../config'
 import { Overview } from './model/overview'
 import { PersonAppointment, Schedule } from './model/schedule'
 import {
@@ -60,6 +60,7 @@ interface GetUserScheduleProps {
 
 export default class MasApiClient extends RestClient {
   constructor(token: string) {
+    const config = getConfig()
     super('Manage a Supervision API', config.apis.masApi, token)
   }
 

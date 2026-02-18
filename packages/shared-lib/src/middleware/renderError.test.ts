@@ -1,6 +1,30 @@
 import httpMocks from 'node-mocks-http'
 import { renderError } from './renderError'
 import { StatusErrorCode, statusErrors } from '../properties'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
+const mockLink = 'https://sentence-plan-dummy-url'
+
+const mockedConfig = {
+  sentencePlan: {
+    link: mockLink,
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 const res = httpMocks.createResponse({
   locals: {},

@@ -1,17 +1,41 @@
 import nock from 'nock'
 import { Request } from 'express'
 import verifyToken from './tokenVerification'
-import config from '../config'
+import { getConfig } from '../config'
 import logger from '../logger'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
+}))
+
+const mockedConfig = {
+  apis: {
+    tokenVerification: {
+      url: 'http://localhost:8100',
+      enabled: true,
+      timeout: 1000,
+    },
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 describe('token verification api tests', () => {
   let fakeApi: nock.Scope
 
-  const loggerErrorSpy = jest.spyOn(logger, 'error')
-
   beforeEach(() => {
-    config.apis.tokenVerification.url = 'http://localhost:8100'
-    fakeApi = nock(config.apis.tokenVerification.url)
+    // config.apis.tokenVerification.url = 'http://localhost:8100'
+    fakeApi = nock(mockedConfig.apis.tokenVerification.url)
   })
 
   afterEach(() => {
@@ -21,7 +45,10 @@ describe('token verification api tests', () => {
   describe('POST requests', () => {
     describe('Token verification disabled', () => {
       beforeAll(() => {
-        config.apis.tokenVerification.enabled = false
+        mockedGetConfig.mockReturnValueOnce({
+          ...mockedConfig,
+          apis: { ...mockedConfig.apis, tokenVerification: { ...mockedConfig.apis.tokenVerification, enabled: false } },
+        })
       })
 
       it('Token always considered valid', async () => {
@@ -34,7 +61,10 @@ describe('token verification api tests', () => {
 
     describe('Token Verification enabled', () => {
       beforeEach(() => {
-        config.apis.tokenVerification.enabled = true
+        mockedGetConfig.mockReturnValueOnce({
+          ...mockedConfig,
+          apis: { ...mockedConfig.apis, tokenVerification: { ...mockedConfig.apis.tokenVerification, enabled: true } },
+        })
       })
       it('Calls verify and parses response', async () => {
         fakeApi.post('/token/verify', '').reply(200, { active: true })
@@ -65,7 +95,7 @@ describe('token verification api tests', () => {
       it('Superagent throws error', async () => {
         fakeApi.post('/token/verify', '').reply(500, { active: true })
         await verifyToken({ user: {}, verified: false } as Request)
-        expect(loggerErrorSpy).toHaveBeenCalled()
+        expect(logger.error).toHaveBeenCalled()
       })
     })
   })
