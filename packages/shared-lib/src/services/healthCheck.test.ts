@@ -1,6 +1,32 @@
 import healthCheck from './healthCheck'
 import type { ApplicationInfo } from '../applicationInfo'
 import type { HealthCheckCallback, HealthCheckService } from './healthCheck'
+import { getConfig } from '../config'
+import { AgentConfig } from '../types/AgentConfig'
+
+const mockedConfig = {
+  apis: {
+    hmppsAuth: { url: 'http://hmpps-auth.com', agent: {} as AgentConfig },
+    manageUsersApi: { url: 'http://manage-users-api.com', agent: {} as AgentConfig },
+    tokenVerification: { enabled: true, url: 'http://token-verification.com', agent: {} as AgentConfig },
+  },
+}
+
+jest.mock('../config', () => ({
+  __esModule: true,
+  getConfig: jest.fn(),
+}))
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
 
 describe('Healthcheck', () => {
   const testAppInfo: ApplicationInfo = {

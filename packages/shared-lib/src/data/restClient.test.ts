@@ -1,6 +1,7 @@
 import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
-import { AgentConfig, type ApiConfig } from '../config'
+import { AgentConfig } from '../types/AgentConfig'
+import { ApiConfig } from '../types/ApiConfig'
 import RestClient from './restClient'
 import { isValidHost, isValidPath } from '../utils'
 import logger from '../logger'
@@ -14,6 +15,16 @@ jest.mock('../utils', () => {
     isValidHost: jest.fn(),
   }
 })
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+    warn: jest.fn(),
+  },
+}))
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>

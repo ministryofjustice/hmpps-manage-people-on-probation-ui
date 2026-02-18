@@ -2,6 +2,7 @@ import httpMocks from 'node-mocks-http'
 import { autoStoreSessionData } from './autoStoreSessionData'
 import type { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
+import { getConfig } from '../config'
 
 const crn = 'X778160'
 const id = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -16,6 +17,39 @@ const res = {
 } as unknown as AppResponse
 
 jest.mock('../data/hmppsAuthClient')
+
+jest.mock('../applicationInfo', () => ({
+  __esModule: true,
+  default: jest.fn().mockReturnValue({
+    applicationName: 'manage-people-on-probation-ui',
+    version: '1.0.0',
+    buildNumber: 'build-123',
+    gitRef: 'git-ref-123',
+    gitShortHash: 'git-ref',
+    productId: 'manage-people-on-probation-ui',
+    branchName: 'branch-name-123',
+  }),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+  },
+}))
+
+jest.mock('../config', () => ({
+  __esModule: true,
+  getConfig: jest.fn(),
+}))
+
+const mockedConfig = {
+  dateFields: ['date'],
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const nextSpy = jest.fn()

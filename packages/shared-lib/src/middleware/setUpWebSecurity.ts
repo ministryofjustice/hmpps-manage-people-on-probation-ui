@@ -1,13 +1,13 @@
 import crypto from 'crypto'
 import express, { Router, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
-import config from '../config'
+import { getConfig } from '../config'
 import { AppResponse } from '../models/Locals'
 import validateHost from './validateHost'
 
 export const setUpWebSecurity = (): Router => {
   const router = express.Router()
-
+  const config = getConfig()
   // Secure code best practice - see:
   // 1. https://expressjs.com/en/advanced/best-practice-security.html,
   // 2. https://www.npmjs.com/package/helmet

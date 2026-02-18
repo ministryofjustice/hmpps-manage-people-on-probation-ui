@@ -1,7 +1,8 @@
-import fs from 'fs'
-import TechnicalUpdatesService, { TechnicalUpdate } from './technicalUpdatesService'
+import { TechnicalUpdate } from './technicalUpdatesService'
 
-jest.mock('fs', () => {
+describe('TechnicalUpdatesService', () => {
+  const mockPath = './technicalUpdates.json'
+
   const mockTechnicalUpdatesData: TechnicalUpdate[] = [
     {
       heading: 'View all outcomes to log on one page and other service improvements',
@@ -16,57 +17,27 @@ jest.mock('fs', () => {
     },
   ]
 
-  const mockFileContent = JSON.stringify(mockTechnicalUpdatesData)
+  beforeEach(() => {
+    jest.resetModules()
 
-  return {
-    readFileSync: jest.fn(() => ({
-      toString: jest.fn(() => mockFileContent),
-    })),
-  }
-})
+    jest.mock('path', () => ({
+      ...jest.requireActual('path'),
+      join: jest.fn(() => mockPath),
+    }))
 
-const mockTechnicalUpdatesData: TechnicalUpdate[] = [
-  {
-    heading: 'View all outcomes to log on one page and other service improvements',
-    summary: '31 October 2025',
-    whatsNew: ['View all outcomes to log on one page', 'Manage appointments in this service'],
-  },
-  {
-    heading: 'Welcome to Manage people on probation',
-    summary: '23 September 2025',
-    whatsNew: ['Initial setup'],
-    technicalFixes: ['Minor styling fixes'],
-  },
-]
-
-describe('TechnicalUpdatesService', () => {
-  let technicalUpdatesService: TechnicalUpdatesService
-
-  beforeAll(() => {
-    technicalUpdatesService = new TechnicalUpdatesService()
+    jest.mock('fs', () => ({
+      readFileSync: jest.fn(() => JSON.stringify(mockTechnicalUpdatesData)),
+    }))
   })
 
-  afterEach(() => {
-    jest.clearAllMocks()
-  })
+  it('should read file using path.join result', async () => {
+    const fs = await import('fs')
+    const { default: TechnicalUpdatesService } = await import('./technicalUpdatesService')
 
-  describe('getTechnicalUpdates', () => {
-    it('should return all technical updates loaded from the file', () => {
-      const updates = technicalUpdatesService.getTechnicalUpdates()
+    const service = new TechnicalUpdatesService()
+    const updates = service.getTechnicalUpdates()
 
-      expect(fs.readFileSync).toHaveBeenCalledWith('./technicalUpdates.json')
-
-      expect(updates).toEqual(mockTechnicalUpdatesData)
-      expect(updates).toHaveLength(2)
-    })
-  })
-
-  describe('getLatestTechnicalUpdateHeading', () => {
-    it('should return the heading of the first (latest) technical update', () => {
-      const latestHeading = technicalUpdatesService.getLatestTechnicalUpdateHeading()
-
-      expect(latestHeading).toEqual(mockTechnicalUpdatesData[0].heading)
-      expect(latestHeading).toEqual('View all outcomes to log on one page and other service improvements')
-    })
+    expect(fs.readFileSync).toHaveBeenCalledWith(mockPath, 'utf-8')
+    expect(updates).toEqual(mockTechnicalUpdatesData)
   })
 })

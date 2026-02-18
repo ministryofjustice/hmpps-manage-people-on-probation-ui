@@ -3,7 +3,7 @@ import { getFrontendComponents } from './probationFEComponentsMiddleware'
 
 import logger from '../logger'
 
-jest.mock('../../logger', () => ({
+jest.mock('../logger', () => ({
   __esModule: true,
   default: { info: jest.fn() },
 }))

@@ -3,10 +3,11 @@ import { dataAccess } from '../data'
 import UserService from './userService'
 import FlagService from './flagService'
 import TechnicalUpdatesService from './technicalUpdatesService'
-import config from '../config'
+import { getConfig } from '../config'
 import ProbationComponentsApiService from './ProbationComponentsService'
 
 export const services = () => {
+  const config = getConfig()
   const { applicationInfo, hmppsAuthClient, manageUsersApiClient, probationFrontendComponentsApiClient } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient)

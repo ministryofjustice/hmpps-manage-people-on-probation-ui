@@ -1,6 +1,6 @@
 import nock from 'nock'
 
-import config from '../config'
+import { getConfig } from '../config'
 import ManageUsersApiClient from './manageUsersApiClient'
 import { isValidHost, isValidPath } from '../utils'
 
@@ -12,6 +12,31 @@ jest.mock('../utils', () => {
     isValidHost: jest.fn(),
   }
 })
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    debug: jest.fn(),
+  },
+}))
+
+const mockedConfig = {
+  apis: {
+    manageUsersApi: {
+      url: 'http://localhost:8100',
+      timeout: 1000,
+    },
+  },
+}
+
+const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockedGetConfig.mockReturnValue(mockedConfig)
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
@@ -26,7 +51,7 @@ describe('manageUsersApiClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    fakeManageUsersApiClient = nock(config.apis.manageUsersApi.url)
+    fakeManageUsersApiClient = nock(mockedConfig.apis.manageUsersApi.url)
     manageUsersApiClient = new ManageUsersApiClient()
   })
 

@@ -1,14 +1,17 @@
-import { Request } from 'express'
-import controllers from '.'
-import HmppsAuthClient from '../data/hmppsAuthClient'
-import TokenStore from '../data/tokenStore/redisTokenStore'
-import { mockAppResponse } from './mocks'
-import { FileUploadResponse } from '../types/FileUpload'
-import MasApiClient from '../data/masApiClient'
+/* eslint-disable import/first */
 
-const token = { access_token: 'token-1', expires_in: 300 }
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}))
 
 jest.mock('../data/tokenStore/redisTokenStore')
 
@@ -19,6 +22,34 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+
+import { Request } from 'express'
+import controllers from '.'
+import HmppsAuthClient from '../data/hmppsAuthClient'
+import TokenStore from '../data/tokenStore/redisTokenStore'
+import { mockAppResponse } from './mocks'
+import { FileUploadResponse } from '../types/FileUpload'
+import MasApiClient from '../data/masApiClient'
+import { getConfig } from '../config'
+
+const mockConfig: any = {
+  apis: {
+    masApi: {
+      url: 'https://mas-api-dummy-url',
+      timeout: {
+        response: 10000,
+        deadline: 10000,
+      },
+      agent: {},
+    },
+  },
+}
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+
+const token = { access_token: 'token-1', expires_in: 300 }
+const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 
 const patchDocumentsSpy = jest
   .spyOn(MasApiClient.prototype, 'patchDocuments')
@@ -78,6 +109,7 @@ describe('fileUpload controller', () => {
       const jsonSpy = jest.spyOn(mockRes, 'json')
 
       beforeEach(async () => {
+        mockGetConfig.mockReturnValue(mockConfig)
         await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
 
@@ -108,6 +140,7 @@ describe('fileUpload controller', () => {
       const jsonSpy = jest.spyOn(mockRes, 'json')
 
       beforeEach(async () => {
+        mockGetConfig.mockReturnValue(mockConfig)
         await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
 
@@ -134,6 +167,7 @@ describe('fileUpload controller', () => {
       const jsonSpy = jest.spyOn(mockRes, 'json')
 
       beforeEach(async () => {
+        mockGetConfig.mockReturnValue(mockConfig)
         await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
 
@@ -162,6 +196,7 @@ describe('fileUpload controller', () => {
     const mockRes = mockAppResponse()
     const jsonSpy = jest.spyOn(mockRes, 'json')
     beforeEach(async () => {
+      mockGetConfig.mockReturnValue(mockConfig)
       await controllers.fileUpload.postDeleteFile(hmppsAuthClient)(req, mockRes)
     })
     it('should return the correct response', () => {

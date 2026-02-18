@@ -1,5 +1,5 @@
 import logger from '../logger'
-import config from '../config'
+import { getConfig } from '../config'
 import RestClient from './restClient'
 
 export interface User {
@@ -18,6 +18,7 @@ export interface UserRole {
 
 export default class ManageUsersApiClient {
   private static restClient(token: string): RestClient {
+    const config = getConfig()
     return new RestClient('Manage Users Api Client', config.apis.manageUsersApi, token)
   }
 

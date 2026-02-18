@@ -1,10 +1,11 @@
 import superagent from 'superagent'
 import type { Request } from 'express'
 import getSanitisedError from '../sanitisedError'
-import config from '../config'
+import { getConfig } from '../config'
 import logger from '../logger'
 
 function getApiClientToken(token: string) {
+  const config = getConfig()
   return superagent
     .post(`${config.apis.tokenVerification.url}/token/verify`)
     .auth(token, { type: 'bearer' })
@@ -18,6 +19,7 @@ function getApiClientToken(token: string) {
 export type TokenVerifier = (request: Request) => Promise<boolean | void>
 
 const tokenVerifier: TokenVerifier = async request => {
+  const config = getConfig()
   const { user, verified } = request
 
   if (!config.apis.tokenVerification.enabled) {

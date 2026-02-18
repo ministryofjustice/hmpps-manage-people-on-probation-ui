@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { Request } from 'express'
 import { getDataValue } from './getDataValue'
-import config from '../config'
+import { getConfig } from '../config'
 import { AppResponse } from '../models/Locals'
 
 interface Item {
@@ -14,6 +14,7 @@ interface Item {
 
 export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: any, sections?: string[]) => {
   const newObj = obj
+  const config = getConfig()
   const { data } = req.session as any
   let storedValue = getDataValue(data, sections)
   if (storedValue && config.dateFields.includes(sections[sections.length - 1]) && storedValue.includes('-')) {

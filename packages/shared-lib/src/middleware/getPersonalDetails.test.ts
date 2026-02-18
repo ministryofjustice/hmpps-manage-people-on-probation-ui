@@ -1,3 +1,23 @@
+/* eslint-disable import/first */
+jest.mock('../data/masApiClient')
+jest.mock('../data/tierApiClient')
+jest.mock('../data/arnsApiClient')
+jest.mock('../data/hmppsAuthClient')
+jest.mock('../data/tokenStore/redisTokenStore')
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}))
+
 import httpMocks from 'node-mocks-http'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
@@ -30,14 +50,13 @@ import {
 } from '../data/model/personalDetails'
 import { Contact } from '../data/model/professionalContact'
 import { SentencePlan } from '../data/model/sentencePlan'
+import { getConfig } from '../config'
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
-jest.mock('../data/masApiClient')
-jest.mock('../data/tierApiClient')
-jest.mock('../data/arnsApiClient')
-jest.mock('../data/hmppsAuthClient')
-jest.mock('../data/tokenStore/redisTokenStore')
+const tierLink = 'https://tier-dummy-url'
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 const tierCalculationSpy = jest
@@ -55,6 +74,30 @@ let getPlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
 let res: httpMocks.MockResponse<any>
 let nextSpy: jest.Mock
+
+const mockConfig: any = {
+  apis: {
+    masApi: {
+      url: 'https://mas-api-dummy-url',
+      timeout: {
+        response: 10000,
+        deadline: 10000,
+      },
+      agent: {},
+    },
+    sentencePlanApi: {
+      url: 'https://sentence-plan-api-dummy-url',
+      timeout: {
+        response: 10000,
+        deadline: 10000,
+      },
+      agent: {},
+    },
+  },
+  tier: {
+    link: tierLink,
+  },
+}
 
 const getReq = () =>
   httpMocks.createRequest({
@@ -127,6 +170,7 @@ describe('/middleware/getPersonalDetails', () => {
     getPlanByCrnSpy = jest
       .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
       .mockImplementation(() => Promise.resolve(mockSentencePlans))
+    mockGetConfig.mockReturnValue(mockConfig)
     nextSpy = jest.fn()
     process.env = { ...ORIGINAL_ENV }
   })
@@ -152,6 +196,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       redirect: jest.fn().mockReturnThis(),
     } as unknown as AppResponse
+    mockGetConfig.mockReturnValue(mockConfig)
     await getPersonalDetails(hmppsAuthClient)(req, res, nextSpy)
     const expected = {
       personalDetails: {
@@ -173,7 +218,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
-    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
+    expect(res.locals.headerTierLink).toEqual(`${tierLink}/X000002`)
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -228,7 +273,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
-    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
+    expect(res.locals.headerTierLink).toEqual(`${tierLink}/X000002`)
     expect(nextSpy).toHaveBeenCalled()
   })
 
@@ -273,7 +318,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
-    expect(res.locals.headerTierLink).toEqual('https://tier-dummy-url/X000002')
+    expect(res.locals.headerTierLink).toEqual(`${tierLink}/X000002`)
     expect(res.locals.dateOfDeath).toBeUndefined()
     expect(nextSpy).toHaveBeenCalled()
   })

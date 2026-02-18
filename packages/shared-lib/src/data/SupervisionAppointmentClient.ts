@@ -1,6 +1,5 @@
-import config from '../config'
+import { getConfig } from '../config'
 import RestClient from './restClient'
-
 import {
   EventResponse,
   OutlookEventRequestBody,
@@ -10,6 +9,7 @@ import {
 
 export default class SupervisionAppointmentClient extends RestClient {
   constructor(token: string) {
+    const config = getConfig()
     super('HMPPS Probation Supervision Appointments API', config.apis.masAppointmentsApi, token)
   }
 

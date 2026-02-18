@@ -1,6 +1,7 @@
-import config from '../config'
+import { getConfig } from '../config'
 
 export const tierLink = (crn: string) => {
+  const config = getConfig()
   if (!crn) {
     return ''
   }

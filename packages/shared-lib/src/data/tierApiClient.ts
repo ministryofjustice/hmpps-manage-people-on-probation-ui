@@ -1,8 +1,9 @@
 import RestClient from './restClient'
-import config from '../config'
+import { getConfig } from '../config'
 
 export default class TierApiClient extends RestClient {
   constructor(token: string) {
+    const config = getConfig()
     super('Tier API', config.apis.tierApi, token)
   }
 

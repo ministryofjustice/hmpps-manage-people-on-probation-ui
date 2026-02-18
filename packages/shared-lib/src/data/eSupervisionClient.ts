@@ -1,4 +1,4 @@
-import config from '../config'
+import { getConfig } from '../config'
 import RestClient from './restClient'
 
 import {
@@ -18,6 +18,8 @@ import {
   SmsPreviewResponse,
 } from './model/esupervision'
 import { ErrorSummary } from './model/common'
+
+const config = getConfig()
 
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {

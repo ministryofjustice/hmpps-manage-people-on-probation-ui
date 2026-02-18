@@ -1,5 +1,4 @@
 import { DateTime } from 'luxon-business-days'
-import { AppointmentSession } from './Appointments'
 
 export class ArrangedSession {
   params: any

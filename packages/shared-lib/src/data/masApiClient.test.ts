@@ -1,8 +1,15 @@
-import nock from 'nock'
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
 
-import config from '../config'
-import { isValidHost, isValidPath } from '../utils'
-import MasApiClient from './masApiClient'
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}))
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -12,10 +19,33 @@ jest.mock('../utils', () => {
     isValidHost: jest.fn(),
   }
 })
+
+jest.mock('./tokenStore/redisTokenStore')
+
+/* eslint-disable import/first */
+
+import nock from 'nock'
+import { getConfig } from '../config'
+import { isValidHost, isValidPath } from '../utils'
+import MasApiClient from './masApiClient'
+
+// Type casts
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 
-jest.mock('./tokenStore/redisTokenStore')
+const mockConfig: any = {
+  apis: {
+    masApi: {
+      url: 'https://mas-api-dummy-url',
+      timeout: {
+        response: 10000,
+        deadline: 10000,
+      },
+      agent: {},
+    },
+  },
+}
 
 const token = { access_token: 'token-1', expires_in: 300 }
 
@@ -25,7 +55,10 @@ describe('masApiClient', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    fakeMasApiClient = nock(config.apis.masApi.url)
+    mockGetConfig.mockReturnValue(mockConfig)
+    mockedIsValidHost.mockReturnValue(true)
+    mockedIsValidPath.mockReturnValue(true)
+    fakeMasApiClient = nock(mockConfig.apis.masApi.url)
     masApiClient = new MasApiClient(token.access_token)
   })
   afterEach(() => {
@@ -33,14 +66,6 @@ describe('masApiClient', () => {
     nock.cleanAll()
   })
   describe('getSentenceDetails', () => {
-    beforeEach(() => {
-      jest.clearAllMocks()
-      mockedIsValidHost.mockReturnValue(true)
-      mockedIsValidPath.mockReturnValue(true)
-    })
-    fakeMasApiClient = nock(config.apis.masApi.url)
-    masApiClient = new MasApiClient(token.access_token)
-
     it.each([
       ['getOverview', '/overview/X000001?sentenceNumber=1', () => masApiClient.getOverview('X000001')],
       ['getOverdueOutcomes', '/appointment/X000001/overdue-outcomes', () => masApiClient.getOverdueOutcomes('X000001')],

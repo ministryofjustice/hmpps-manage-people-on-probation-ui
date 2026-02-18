@@ -79,7 +79,7 @@ import {
 } from '.'
 
 import { type ApplicationInfo } from '../applicationInfo'
-import config from '../config'
+import { getConfig } from '../config'
 import { type AppResponse } from '../models/Locals'
 
 export default function nunjucksSetup(
@@ -87,6 +87,7 @@ export default function nunjucksSetup(
   applicationInfo: ApplicationInfo,
   services: Services,
 ): void {
+  const config = getConfig()
   const production = process.env.NODE_ENV === 'production'
   app.set('view engine', 'njk')
 

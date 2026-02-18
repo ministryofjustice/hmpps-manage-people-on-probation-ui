@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import logger from '../logger'
 import { dateTime } from './dateTime'
 import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
-import config from '../config'
+import { getConfig } from '../config'
 
 export const isEmail = (string: string) => /^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/.test(string)
 export const hasAllDigits = (string: string) => /^\d+$/.test(string)
@@ -151,6 +151,7 @@ export const timeIsNotLaterThan = (args: any[]) => {
 
 export const isValidCharCount = (args: any[]) => {
   const value = args?.[0]
+  const config = getConfig()
   const { maxCharCount } = config
   if (!value) {
     return true

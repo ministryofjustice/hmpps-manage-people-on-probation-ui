@@ -1,7 +1,38 @@
-import nock from 'nock'
+/* eslint-disable import/first */
 
-import config from '../config'
+jest.mock('../config', () => ({
+  __esModule: true,
+  getConfig: jest.fn().mockReturnValue({
+    apis: {
+      eSupervisionApi: {
+        url: 'http://localhost:9091/esupervision',
+      },
+    },
+  }),
+}))
+
+jest.mock('../logger', () => ({
+  __esModule: true,
+  default: {
+    info: jest.fn(),
+    error: jest.fn(),
+    warn: jest.fn(),
+  },
+}))
+
+jest.mock('./tokenStore/redisTokenStore')
+
+const mockedConfig = {
+  apis: {
+    eSupervisionApi: {
+      url: 'http://localhost:9091/esupervision',
+    },
+  },
+}
+
+import nock from 'nock'
 import { isValidHost, isValidPath } from '../utils'
+import { getConfig } from '../config'
 import ESupervisionClient from './eSupervisionClient'
 import {
   ESupervisionCheckIn,
@@ -23,9 +54,9 @@ jest.mock('../utils', () => {
 
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
-
-jest.mock('./tokenStore/redisTokenStore')
-
+// mockedIsValidHost.mockReturnValue(true)
+;(getConfig as jest.Mock).mockReturnValue(mockedConfig)
+// mockedIsValidPath.mockReturnValue(true)
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('ESupervisionClient', () => {
@@ -36,12 +67,12 @@ describe('ESupervisionClient', () => {
     jest.clearAllMocks()
     mockedIsValidHost.mockReturnValue(true)
     mockedIsValidPath.mockReturnValue(true)
-    fakeESupervisionApi = nock(config.apis.eSupervisionApi.url)
+    fakeESupervisionApi = nock(mockedConfig.apis.eSupervisionApi.url)
     client = new ESupervisionClient(token.access_token)
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
+    // jest.resetAllMocks()
     nock.cleanAll()
   })
 

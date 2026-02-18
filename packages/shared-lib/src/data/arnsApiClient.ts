@@ -1,10 +1,11 @@
-import config from '../config'
-
+import { getConfig } from '../config'
 import RestClient from './restClient'
 import { ErrorSummary } from './model/common'
 import { Needs, RiskScoresDto, RiskSummary } from './model/risk'
 import { SanIndicatorResponse } from '../models/Risk'
 import { apiErrors } from '../properties'
+
+const config = getConfig()
 
 export default class ArnsApiClient extends RestClient {
   constructor(token: string) {

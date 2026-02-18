@@ -1,10 +1,11 @@
-import config from '../config'
+import { getConfig } from '../config'
 
 import RestClient from './restClient'
 import { AvailableComponent, ComponentsResponse } from '../types/probationComponent'
 
 export default class ProbationFrontendComponentsApiClient {
   private static restClient(token: string): RestClient {
+    const config = getConfig()
     return new RestClient('Probation Frontend Components API', config.apis.probationFrontendComponentsApi, token)
   }
 

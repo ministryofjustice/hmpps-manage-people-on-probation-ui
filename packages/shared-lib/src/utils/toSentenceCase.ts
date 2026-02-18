@@ -1,4 +1,4 @@
-import config from '../config'
+import { getConfig } from '../config'
 
 const capsRegex = /^[A-Z]+(?:\/[A-Z]+)*$/
 
@@ -10,6 +10,7 @@ export const toSentenceCase = (
   ignoreCapWords: boolean = true,
 ): string => {
   if (!value) return ''
+  const config = getConfig()
   const preservedWords = [...preserveWords, ...config.preservedWords]
   const preservedSeparators = preserveSeparators ?? config.preservedSeparators
   const words = value.split(' ')
