@@ -1,5 +1,27 @@
 [
   {
+    "heading": "Reschedule appointments created on this service",
+    "summary": "10 February 2026",
+    "whatsNew": [
+      "Reschedule appointments",
+      [
+        "To help you keep your appointment schedule up to date, you can now reschedule appointments created on this service if they do not have outcomes.\u2028\nWhen you reschedule a future appointment, your calendar invite will automatically be updated with the new time and date. If the new date changes from the future to the past, you’ll get an email deleting the original calendar invitation."
+      ],
+      "Access to sentence plan",
+      [
+        "If a person on probation has a sentence plan using the new service, you can now access it via a link from the Risk page. This saves you from needing to sign in separately.\n\nThe Risk page has also been renamed to Risk and plan for people with sentence plans.\n\nIf they also have a new strength and needs assessment, you will not see their: \nOASys score history \ncriminogenic needs, because they’re different from the ones in OASys \u2028\n"
+      ],
+      "‘Risk to staff’ flag more visible",
+      [
+        "The ‘Risk to staff flag’ now shows during the appointment-booking process and on the appointment details page, as a more visual reminder of the person’s risk level."
+      ],
+      "Bug fixes and feedback",
+      [
+        "Thanks for continuing to share your feedback about the service. We’ve made some recent improvements based on what you told us:\n\nThe My cases page now displays a person on probation’s next contact with any part of the Probation Service. This resolves an issue where you could only see their next appointment if you were their probation practitioner.\n\nThe contacts count in the Activity and compliance section of the Overview page now states that any data is from all orders, including previous ones. Thanks for letting us know that this needed more clarity.\n\nIf you have outstanding issues to log, you can now access them from the appointment confirmation screen. This fixes a bug where the link was missing."
+      ]
+    ]
+  },
+  {
     "heading": "Compliance page temporarily unavailable",
     "summary": "29 January 2026",
     "whatsNew": [
