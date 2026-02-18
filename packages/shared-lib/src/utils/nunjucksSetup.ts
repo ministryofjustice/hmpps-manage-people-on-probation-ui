@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
 import nunjucks from 'nunjucks'
-import express, { Request, NextFunction } from 'express'
+import express, { Request, Response, NextFunction } from 'express'
 import type { Services } from '../services'
 
 import {
@@ -102,7 +102,7 @@ export default function nunjucksSetup(
     app.locals.version = applicationInfo.gitShortHash
   } else {
     // Version changes every request
-    app.use((_req, res: AppResponse, next) => {
+    app.use((_req, res: Response, next) => {
       res.locals.version = Date.now().toString()
       return next()
     })
@@ -163,7 +163,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
-  app.use((req: Request, res: AppResponse, next: NextFunction) => {
+  app.use((req: Request, res: Response, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
     return next()
   })

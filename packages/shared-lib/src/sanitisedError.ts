@@ -14,7 +14,7 @@ export type UnsanitisedError = ResponseError
 export default function sanitise(error: UnsanitisedError): SanitisedError {
   const e = new Error() as SanitisedError
   e.message = error.message
-  e.stack = error.stack
+  e.stack = error.stack as string
   if (error.response) {
     e.text = error.response.text
     e.status = error.response.status

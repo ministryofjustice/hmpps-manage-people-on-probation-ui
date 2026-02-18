@@ -1,6 +1,6 @@
 import { RiskFlag } from '../data/model/risk'
 
-export const getStaffRisk = (data: RiskFlag[]): RiskFlag => {
+export const getStaffRisk = (data: RiskFlag[]): RiskFlag | null => {
   if (!data) {
     return null
   }

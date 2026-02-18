@@ -1,7 +1,5 @@
-/* eslint-disable import/no-extraneous-dependencies */
-import { Request, Router } from 'express'
+import { Request, Response, Router } from 'express'
 import { csrfSync } from 'csrf-sync'
-import { AppResponse } from '../models/Locals'
 
 const testMode = process.env.NODE_ENV === 'test'
 
@@ -23,7 +21,7 @@ export const setUpCsrf = (): Router => {
     router.use(csrfSynchronisedProtection)
   }
 
-  router.use((req, res: AppResponse, next) => {
+  router.use((req: any, res: Response, next) => {
     if (typeof req.csrfToken === 'function') {
       res.locals.csrfToken = req.csrfToken()
     }

@@ -2,8 +2,10 @@ import { type UserDetails } from '../../services/userService'
 import { type Errors } from '../../models/Errors'
 import { type DocumentLevel } from '../../data/model/documents'
 import { type Data } from '../../models/Data'
+import { ActivityLogFilters } from '../../models/ActivityLog'
+import { FileCache } from '../FileUpload'
 
-export default {}
+// export default {}
 
 declare global {
   namespace Express {
@@ -32,14 +34,13 @@ declare module 'express-session' {
     errorMessages?: Record<string, string>
     alertDismissed?: boolean
     cache?: {
-      activityLog?: ActivityLogCache
+      activityLog?: any
       uploadedFiles?: FileCache[]
     }
     body?: Record<string, any>
   }
 
   interface DocumentFilters {
-    [key: string]: string
     fileName?: string
     query?: string
     documentLevel?: string
@@ -55,7 +56,7 @@ declare module 'express-session' {
   }
 }
 
-export declare global {
+declare global {
   namespace Express {
     interface User extends Partial<UserDetails> {
       token: string

@@ -73,7 +73,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
     },
 
     [`[esupervision][${crn}][${id}][checkins][checkInEmail]`]: {
-      optional: (page === 'contact-preference' && checkInEmail.trim() !== '') || page !== 'contact-preference',
+      optional: (page === 'contact-preference' && checkInEmail?.trim() !== '') || page !== 'contact-preference',
       checks: [
         {
           validator: contactPrefEmailCheck,
@@ -84,7 +84,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][checkins][checkInMobile]`]: {
-      optional: (page === 'contact-preference' && checkInMobile.trim() !== '') || page !== 'contact-preference',
+      optional: (page === 'contact-preference' && checkInMobile?.trim() !== '') || page !== 'contact-preference',
       checks: [
         {
           validator: contactPrefMobileCheck,
@@ -215,7 +215,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
     },
 
     [`[esupervision][${crn}][${id}][manageCheckin][checkInEmail]`]: {
-      optional: (page === 'manage-contact' && checkInEmail.trim() !== '') || page !== 'manage-contact',
+      optional: (page === 'manage-contact' && checkInEmail?.trim() !== '') || page !== 'manage-contact',
       checks: [
         {
           validator: contactPrefEmailCheck,
@@ -226,7 +226,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][manageCheckin][checkInMobile]`]: {
-      optional: (page === 'manage-contact' && checkInMobile.trim() !== '') || page !== 'manage-contact',
+      optional: (page === 'manage-contact' && checkInMobile?.trim() !== '') || page !== 'manage-contact',
       checks: [
         {
           validator: contactPrefMobileCheck,

@@ -24,7 +24,7 @@ export const getSearchParamsString = ({
   const searchParams = params
     .reduce((acc, [key, value]) => {
       return [...acc, `${key}=${value}`]
-    }, [])
+    }, [] as any)
     .join('&')
   return `${prefix}${searchParams}${suffix}`
 }

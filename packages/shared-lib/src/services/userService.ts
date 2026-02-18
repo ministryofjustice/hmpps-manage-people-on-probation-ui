@@ -13,7 +13,7 @@ export default class UserService {
 
   async getUser(token: string): Promise<UserDetails> {
     const user = await this.manageUsersApiClient.getUser(token)
-    return { ...user, roles: this.getUserRoles(token), displayName: convertToTitleCase(user.name) }
+    return { ...user, roles: this.getUserRoles(token), displayName: convertToTitleCase(user.name as string) }
   }
 
   getUserRoles(token: string): string[] {

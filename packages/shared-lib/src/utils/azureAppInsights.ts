@@ -8,7 +8,7 @@ export function defaultName(): string {
 
 export function version(): string {
   const { version: buildNumber } = applicationInfo()
-  return buildNumber
+  return buildNumber as string
 }
 
 export function initialiseAppInsights(): void {
@@ -20,7 +20,7 @@ export function initialiseAppInsights(): void {
   }
 }
 
-export function buildAppInsightsClient(applicationName = defaultName()): TelemetryClient {
+export function buildAppInsightsClient(applicationName = defaultName()): TelemetryClient | null {
   const appInsightsConnectionString = process.env.APPLICATIONINSIGHTS_CONNECTION_STRING
   if (appInsightsConnectionString) {
     defaultClient.context.tags['ai.cloud.role'] = applicationName

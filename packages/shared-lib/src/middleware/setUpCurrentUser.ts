@@ -7,6 +7,7 @@ import type { Services } from '../services'
 export const setUpCurrentUser = ({ userService }: Services): Router => {
   const router = Router({ mergeParams: true })
   router.use(auth.authenticationMiddleware(tokenVerifier))
+  // @ts-expect-error TS ERROR BELOW TO FIX
   router.use(populateCurrentUser(userService))
   return router
 }

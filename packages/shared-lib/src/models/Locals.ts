@@ -116,6 +116,12 @@ interface Locals {
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
   personRisks?: PersonRiskFlags
+  applicationInsightsConnectionString?: string
+  applicationInsightsRoleName?: string
+  home?: boolean
+  cases?: boolean
+  search?: boolean
+  makePageTitle?: string
 }
 
 export interface AppResponse extends Response {

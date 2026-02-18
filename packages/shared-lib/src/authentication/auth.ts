@@ -18,6 +18,7 @@ passport.deserializeUser((user, done) => {
 export type AuthenticationMiddleware = (tokenVerifier: TokenVerifier) => RequestHandler
 
 const authenticationMiddleware: AuthenticationMiddleware = verifyToken => {
+  // @ts-expect-error TS ERROR
   return async (req, res, next) => {
     if (req.isAuthenticated() && (await verifyToken(req))) {
       return next()

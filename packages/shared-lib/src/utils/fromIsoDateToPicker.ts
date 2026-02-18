@@ -1,7 +1,7 @@
 import { DateTime } from 'luxon'
 import { isBlank } from './isBlank'
 
-export const fromIsoDateToPicker = (datetimeString: string): string => {
+export const fromIsoDateToPicker = (datetimeString: string): string | null => {
   if (!datetimeString || isBlank(datetimeString)) return null
   if (!DateTime.fromFormat(datetimeString, 'yyyy-MM-dd').isValid) {
     return datetimeString

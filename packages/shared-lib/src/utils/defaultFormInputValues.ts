@@ -9,7 +9,7 @@ export const defaultFormInputValues = (
   if (data !== undefined) {
     obj.id = id
     obj.name = id
-    obj.value = data[id]
+    obj.value = data[id] as string
   }
   return obj
 }
