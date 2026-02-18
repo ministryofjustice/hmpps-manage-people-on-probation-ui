@@ -60,7 +60,7 @@
         {% endif %}
 
         {% if personActivity.totalPages > 1 %}
-          <div class="govuk-!-margin-top-8">
+          <div class="govuk-!-margin-top-8" data-qa="contact-pagination">
             {{ appPagination({
               currentPage: page | int,
               totalPages: personActivity.totalPages,
