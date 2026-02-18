@@ -652,36 +652,10 @@ body.feature-disabled {
 }
 
 .contact-activity {
-  position: relative;
-  margin-bottom: 10px !important;
-  padding-bottom: 1px;
-
-  @include govuk-media-query($from: tablet) {
-    padding-bottom: 0 !important;
-  }
-
-  .govuk-details {
-    @extend .govuk-\!-width-three-quarters;
-  }
-
-  .govuk-details__summary-text {
-    display: inline-flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 8px;
-  }
-
   &__tag {
     display: inline-block !important;
     float: none;
     flex-shrink: 0;
-  }
-
-  .app-compliance-tag--compact {
-    float: none;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
   }
 
   &__actions {
@@ -690,22 +664,15 @@ body.feature-disabled {
     flex-wrap: nowrap;
     gap: 10px;
 
-    @include govuk-media-query($from: desktop) {
-      position: absolute;
-      top: 0;
-      left: 100%;
-      padding-left: 20px;
-
-      .contact-activity__manage-link {
-        display: inline-block;
-        width: 100px;
-        white-space: normal;
-      }
-    }
-
     li {
       white-space: nowrap;
     }
+  }
+
+  &__manage-link {
+    display: inline-block;
+    width: 100px;
+    white-space: normal;
   }
 
   &__filter {
@@ -714,18 +681,44 @@ body.feature-disabled {
     }
   }
 
-  &__actions-header,
-  &__actions-cell {
-    @include govuk-media-query($until: desktop) {
-      display: none;
+    &--noNotes {
+      display: block;
     }
   }
 
-  &--noNotes {
-    display: inline-flex;
+.contact-log-compact {
+
+  .govuk-details {
+    margin-bottom: 5px;
+  }
+
+  &__contact-wrapper {
+    display: flex;
+    align-items: flex-start;
+    gap: 5px;
+  }
+
+  &__contact-content {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .contact-activity__tag {
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  &-row {
+    border: 0;
+    &--last {
+      border-bottom: 1px solid #b1b4b6;;
+    }
+  }
+  .app-compliance-tag--compact {
+    float: none;
+    display: inline-flex !important;
     align-items: center;
-    flex-wrap: nowrap;
-    gap: 8px;
+    justify-content: center;
   }
 }
 

@@ -11,10 +11,11 @@ export default function limitedAccess(services: Services) {
     if (!isValidCrn(req?.params?.crn)) {
       return renderError(404)(req, res)
     }
+    const { back } = req.query
     const token = await services.hmppsAuthClient.getSystemClientToken()
     const access = await new MasApiClient(token).getUserAccess(res.locals.user.username, req.params.crn)
     if (access.userExcluded || access.userRestricted) {
-      const { backLink } = req.session
+      const backLink = back || req.session.backLink
       if (access.exclusionMessage) {
         return res.render('autherror-lao', { message: access.exclusionMessage, backLink })
       }

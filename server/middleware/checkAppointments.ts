@@ -15,6 +15,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     }
     const { crn, id } = req.params
     const { data } = req.session
+    const { back = '', change = '' } = req.query as Record<string, string>
     const { date, start: startTime, end: endTime, previousValues } = getDataValue(data, ['appointments', crn, id])
     const sameValuesHaveBeenSubmitted = JSON.stringify({ date, startTime, endTime }) === JSON.stringify(previousValues)
     setDataValue(data, ['appointments', crn, id, 'previousValues'], { date, startTime, endTime })
@@ -25,6 +26,8 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     const localParams: LocalParams = {
       crn,
       id,
+      back,
+      change,
       ...(!enablePastAppointments ? { _minDate } : {}),
       _maxDate,
       isInPast: appointmentDateIsInPast(req),

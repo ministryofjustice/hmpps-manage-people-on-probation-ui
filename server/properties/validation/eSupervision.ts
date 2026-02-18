@@ -46,9 +46,9 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           log: 'Checkin date is not valid',
         },
         {
-          validator: isFutureDate,
-          msg: 'The first online check in date must be in the future',
-          log: 'First checkin date must be in the future',
+          validator: isTodayOrLater,
+          msg: 'The first online check in date must be today or in the future',
+          log: 'First checkin date must be today or in the future',
         },
       ],
     },

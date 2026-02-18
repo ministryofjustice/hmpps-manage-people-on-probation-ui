@@ -9,7 +9,7 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
-import { PersonRiskFlags, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { PersonRiskFlags, RiskScore, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
@@ -117,6 +117,7 @@ interface Locals {
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
   personRisks?: PersonRiskFlags
+  riskToStaff?: { id: number; level: RiskScore | null }
 }
 
 export interface AppResponse extends Response {
