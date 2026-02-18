@@ -28,13 +28,13 @@ export default class FlagService {
     function result(results: EvaluationResponse[], key: string) {
       const filtered = results.filter(flag => flag.booleanEvaluationResponse?.flagKey === key)
       if (filtered.length === 1) {
-        return filtered[0].booleanEvaluationResponse.enabled
+        return filtered[0].booleanEvaluationResponse?.enabled
       }
       return false
     }
 
     flagList.forEach(f => {
-      featureFlags[f] = result(flags.responses, f)
+      featureFlags[f as keyof FeatureFlags] = result(flags.responses, f)
     })
 
     return featureFlags

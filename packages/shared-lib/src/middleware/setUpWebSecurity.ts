@@ -2,8 +2,8 @@ import crypto from 'crypto'
 import express, { Router, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import { getConfig } from '../config'
-import { AppResponse } from '../models/Locals'
 import validateHost from './validateHost'
+import '../types/express/index.d'
 
 export const setUpWebSecurity = (): Router => {
   const router = express.Router()
@@ -11,8 +11,8 @@ export const setUpWebSecurity = (): Router => {
   // Secure code best practice - see:
   // 1. https://expressjs.com/en/advanced/best-practice-security.html,
   // 2. https://www.npmjs.com/package/helmet
-  router.use(validateHost())
-  router.use((_req: Request, res: AppResponse, next: NextFunction) => {
+  router.use(validateHost() as any)
+  router.use((_req: Request, res: Response, next: NextFunction) => {
     res.locals.cspNonce = crypto.randomBytes(16).toString('hex')
     next()
   })
@@ -46,7 +46,7 @@ export const setUpWebSecurity = (): Router => {
             'js.monitor.azure.com',
             '*.applicationinsights.azure.com/v2/track',
             (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`,
-          ],
+          ] as any,
           // Build connect-src dynamically so we can relax it for local development only
           // NOTE: Keep localhost allowances out of non-local environments
           connectSrc: (() => {
@@ -67,7 +67,7 @@ export const setUpWebSecurity = (): Router => {
             return sources
           })(),
           workerSrc: ["'self' blob:"],
-          styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`],
+          styleSrc: ["'self'", (_req: Request, res: Response) => `'nonce-${res.locals.cspNonce}'`] as any,
           fontSrc: ["'self'", config.probationFrontendComponents.fontSrc],
           formAction: [`'self' ${config.apis.hmppsAuth.externalUrl}`],
         },

@@ -2,7 +2,7 @@ import fs from 'fs'
 import path from 'path'
 
 export default class TechnicalUpdatesService {
-  private technicalUpdates: TechnicalUpdate[]
+  private technicalUpdates: TechnicalUpdate[] = []
 
   readTechnicalUpdates() {
     const technicalUpdatesPath = path.join(__dirname, 'technicalUpdates.json')

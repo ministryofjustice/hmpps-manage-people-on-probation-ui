@@ -1,5 +1,5 @@
 import ProbationFrontendComponentsApiClient from '../data/probationFrontendComponentsClient'
-import { AvailableComponent, Component } from '../types/probationComponent'
+import { AvailableComponent, ComponentsResponse } from '../types/probationComponent'
 import logger from '../logger'
 
 export default class ProbationComponentsService {
@@ -8,7 +8,7 @@ export default class ProbationComponentsService {
   async getProbationFEComponents<T extends AvailableComponent[]>(
     components: T,
     token: string,
-  ): Promise<Record<T[number], Component>> {
+  ): Promise<ComponentsResponse> {
     logger.info('Getting FE details  : calling Probation FE components API')
     return this.probationFEComponentsClient.getComponents(components, token)
   }

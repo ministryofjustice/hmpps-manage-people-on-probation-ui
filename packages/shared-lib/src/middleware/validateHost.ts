@@ -12,11 +12,14 @@ export const allowedHosts = [
 ]
 
 export default function validateHost(): Route<void> {
-  return (req, res, next): AppResponse | void => {
+  return (req, res, next): AppResponse | void | null => {
     const host = req.get('host')
-    if (!allowedHosts.includes(host)) {
+    if (!allowedHosts.includes(host as string)) {
       return res.status(400).send('Invalid host')
     }
-    return next()
+    if (next) {
+      return next()
+    }
+    return null
   }
 }

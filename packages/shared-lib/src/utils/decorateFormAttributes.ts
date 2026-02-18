@@ -17,7 +17,7 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
   const config = getConfig()
   const { data } = req.session as any
   let storedValue = getDataValue(data, sections)
-  if (storedValue && config.dateFields.includes(sections[sections.length - 1]) && storedValue.includes('-')) {
+  if (storedValue && config.dateFields.includes(sections?.[sections.length - 1]) && storedValue.includes('-')) {
     const [year, month, day] = storedValue
       .split('-')
       .map((value: string) => (value.startsWith('0') ? value.substring(1) : value))
@@ -26,7 +26,7 @@ export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: 
   if (newObj.items !== undefined) {
     newObj.items = newObj.items.map((item: Item) => {
       if (typeof item.value === 'undefined') {
-        item.value = item.text
+        item.value = item.text as string
       }
       if (storedValue) {
         if (

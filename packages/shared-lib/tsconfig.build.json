@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2022",
+    "target": "es2023",
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
@@ -15,14 +15,14 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "typeRoots": ["src/types", "node_modules/@types"],
     "declaration": true,
     "declarationMap": true,
-    "composite": true,
+    "composite": false,
     "removeComments": true,
     "strict": true,
     "inlineSources": false,
-    "sourceRoot": "./",
+    "sourceRoot": "./src",
     "types": ["node", "jest"]
   },
   "exclude": [

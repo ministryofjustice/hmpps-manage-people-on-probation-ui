@@ -12,7 +12,7 @@ export const highlightText = (text: string, object: Document[]): Document[] => {
 
 function highlightDoc(text: string, doc: Document): Document {
   let pos = doc.name.toUpperCase().indexOf(text.toUpperCase())
-  let filenameHighlighted: string
+  let filenameHighlighted: string = ''
   if (pos !== -1) {
     const str = doc.name.substring(pos, pos + text.length)
     filenameHighlighted = doc.name.replaceAll(str, `<span class="govuk-tag--yellow">${str}</span>`)

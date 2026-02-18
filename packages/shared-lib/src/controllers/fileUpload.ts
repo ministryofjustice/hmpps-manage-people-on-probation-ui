@@ -1,12 +1,14 @@
+import { Request, Response } from 'express'
 import { type Controller } from '../types/Controller'
 import { type FileUploadResponse } from '../types/FileUpload'
 import MasApiClient from '../data/masApiClient'
+import { AppResponse } from '../models/Locals'
 
 const routes = ['postUploadFile', 'postDeleteFile'] as const
 
 const fileUploadController: Controller<typeof routes, any> = {
   postUploadFile: hmppsAuthClient => {
-    return async (req, res) => {
+    return async (req: Request, res: AppResponse) => {
       const sleep = (ms: number) => {
         return new Promise(resolve => {
           setTimeout(resolve, ms)
