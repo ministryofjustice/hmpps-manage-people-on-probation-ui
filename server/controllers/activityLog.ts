@@ -10,7 +10,7 @@ const routes = ['getOrPostActivityLog', 'getActivity'] as const
 
 export const getQueryString = (params: Record<string, string>): string[] => {
   const queryParams: string[] = []
-  const usedParams = ['view', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page']
+  const usedParams = ['view', 'keywords', 'dateFrom', 'dateTo', 'compliance', 'page', 'category', 'hideContact']
   for (const usedParam of usedParams) {
     if (params?.[usedParam]) {
       if (!Array.isArray(params[usedParam])) {

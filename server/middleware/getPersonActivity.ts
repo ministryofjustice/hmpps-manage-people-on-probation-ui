@@ -14,7 +14,7 @@ export const getPersonActivity = async (
 ): Promise<[TierCalculation, PersonActivity]> => {
   const { filters } = res.locals
   const { params, query } = req
-  const { keywords, dateFrom, dateTo, compliance } = filters
+  const { keywords, dateFrom, dateTo, compliance, category, hideContact } = filters
   const { crn } = params
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

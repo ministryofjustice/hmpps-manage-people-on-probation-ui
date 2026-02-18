@@ -85,6 +85,24 @@
     items: filters.complianceOptions
   }) }}
 
+  {{ govukCheckboxes({
+    idPrefix: 'category',
+    name: 'category',
+    classes: "govuk-checkboxes--small",
+    fieldset: {
+      legend: {
+        text: 'Category filters',
+        classes: 'govuk-fieldset__legend--s'
+      }
+    },
+    formGroup: {
+      attributes: {
+        'data-qa': 'category'
+      }
+    },
+    items: filters.categoryOptions
+  }) }}
+
 {% endset -%}
 
 {% set filterCategories = [] %}
@@ -113,8 +131,65 @@
   }), filterCategories) %}
 {% endif %}
 
+{% if filters.selectedFilterItems.category.length %}
+    {% set filterCategories = (filterCategories.push({
+        heading: {
+            text: 'Category filters'
+        },
+        items: filters.selectedFilterItems.category
+    }), filterCategories) %}
+{% endif %}
+
+
 <div class="govuk-grid-column-one-third contact-activity__filter govuk-!-padding-bottom-4">
-  <form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+    <form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}">
+        <div class="moj-filter" data-module="moj-filter">
+            <div class="moj-filter__header">
+                <div class="moj-filter__header-title">
+                    <h2 class="govuk-heading-m">Hide contacts</h2>
+                </div>
+                <div class="moj-filter__header-action">
+                </div>
+            </div>
+            <div class="moj-filter__content">
+                <div class="moj-filter__options">
+                {{ govukCheckboxes({
+                    idPrefix: 'hideContact',
+                    name: 'hideContact',
+                    classes: "govuk-checkboxes--small",
+                    formGroup: {
+                        attributes: {
+                            'data-qa': 'hideContact'
+                        }
+                    },
+                    items: filters.hideContactOptions
+                }) }}
+                <button type="submit" class="govuk-button govuk-!-margin-bottom-2" data-module="govuk-button" data-qa="submit-apply-button">
+                    Apply
+                </button>
+                </div>
+               {# <div class="moj-filter__options">
+                    <div class="govuk-form-group">
+                        <fieldset class="govuk-fieldset ">
+                            <div class="govuk-checkboxes govuk-checkboxes--small" data-module="govuk-checkboxes">
+                                <div class="govuk-checkboxes__item govuk-!-margin-bottom-3">
+                                    <input class="govuk-checkboxes__input" id="hideNDelusContacts" name="hideNDelusContacts" value="hideNDelusContacts" type="checkbox">
+                                    <label class="govuk-label govuk-checkboxes__label" for="hideNDelus">
+                                        Hide NDelius system generated contactsÏ
+                                    </label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <button type="submit" class="govuk-button govuk-!-margin-bottom-2" data-module="govuk-button" data-qa="submit-button">
+                            Apply
+                        </button>
+                    </div>
+                </div>#}
+            </div>
+        </div>
+
+    <div class="govuk-!-margin-bottom-3"> </div>
+
     {{ mojFilter({
   heading: {
     html: 'Filter contacts',
@@ -135,7 +210,7 @@
       href: '/case/' + crn + '/activity-log' + clearLink
     },
     categories: filterCategories
-  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length,
+  } if filters.selectedFilterItems.keywords.length or filters.selectedFilterItems.dateRange.length or filters.selectedFilterItems.compliance.length or filters.selectedFilterItems.category.length,
   optionsHtml: filterOptionsHtml
 }) }}
     <input type="hidden" name="_csrf" value="{{ csrfToken }}">
