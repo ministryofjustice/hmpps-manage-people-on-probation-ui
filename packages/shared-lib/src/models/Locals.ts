@@ -62,7 +62,7 @@ interface Locals {
   defaultView?: boolean
   requirement?: string
   appointment?: AppointmentLocals
-  case?: PersonalDetails
+  case?: PersonalDetails | null
   headerPersonName?: { forename: string; surname: string }
   headerCRN?: string
   headerDob?: string
@@ -109,9 +109,9 @@ interface Locals {
   sentencePlan?: SentencePlan
   alertsCount?: string
   alertsCleared?: { error: boolean; message: string }
-  contactResponse?: ContactResponse
+  contactResponse?: ContactResponse | null
   checkIn?: ESupervisionCheckIn
-  offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse
+  offenderCheckinsByCRNResponse?: OffenderCheckinsByCRNResponse | null
   uploadError: string
   renderPath: string
   smsPreview?: SmsPreviewResponse | null
@@ -120,4 +120,8 @@ interface Locals {
 
 export interface AppResponse extends Response {
   locals: Locals
+  errorMessages: string
+  warningMessages: string
+  version: string
+  backLink: string
 }

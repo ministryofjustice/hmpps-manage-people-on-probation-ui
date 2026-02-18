@@ -1,5 +1,5 @@
-import { Controller } from '../types/Controller'
-import { FileUploadResponse } from '../types/FileUpload'
+import { type Controller } from '../types/Controller'
+import { type FileUploadResponse } from '../types/FileUpload'
 import MasApiClient from '../data/masApiClient'
 
 const routes = ['postUploadFile', 'postDeleteFile'] as const
@@ -12,6 +12,7 @@ const fileUploadController: Controller<typeof routes, any> = {
           setTimeout(resolve, ms)
         })
       }
+      if (!hmppsAuthClient) throw new Error('No hmppsAuthClient')
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       let status = 200

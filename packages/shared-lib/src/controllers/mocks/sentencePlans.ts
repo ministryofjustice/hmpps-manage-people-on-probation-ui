@@ -31,9 +31,9 @@ export const mockSentencePlans: SentencePlan[] = [
         externalId: 'string',
         username: 'string',
       },
-      agreementDate: null,
+      agreementDate: '',
       readOnly: false,
-      checksum: null,
+      checksum: '',
       agreementNotes: [],
       planProgressNotes: [],
       goals: [],
@@ -77,7 +77,7 @@ export const mockSentencePlans: SentencePlan[] = [
       },
       agreementDate: '2025-12-09T08:58:36Z',
       readOnly: false,
-      checksum: null,
+      checksum: '',
       agreementNotes: [
         {
           optionalNote: '',

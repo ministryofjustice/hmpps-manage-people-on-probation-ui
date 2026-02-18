@@ -18,10 +18,6 @@
     "typeRoots": ["./server/@types", "./node_modules/@types"],
     "inlineSources": true,
     "ignoreDeprecations": "5.0",
-
-    // Set `sourceRoot` to  "/" to strip the build path prefix
-    // from generated source code references.
-    // This improves issue grouping in Sentry.
     "sourceRoot": "/"
   },
   "exclude": [
@@ -38,7 +34,8 @@
     "coverage",
     "**/*.cy.ts",
     "test_results",
-    "codecov_reports"
+    "codecov_reports",
+    "packages"
   ],
   "include": ["**/*.js", "**/*.ts"]
 }
