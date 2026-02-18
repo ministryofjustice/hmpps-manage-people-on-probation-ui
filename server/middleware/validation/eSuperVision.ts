@@ -197,13 +197,13 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateRestartJourney = () => {
     if (baseUrl.includes(`/manage/${id}/restart-checkin`)) {
       render = `pages/check-in/manage/restart-date-frequency`
-      localParams.id = id // Mirroring manage flow
+      localParams.id = id
       errorMessages = validateWithSpec(req.body, eSuperVisionValidation({ crn, id, page: 'restart-date-frequency' }))
     }
 
     if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`)) {
       render = `pages/check-in/manage/restart-edit-contact`
-      localParams.id = id // Mirroring manage flow
+      localParams.id = id
       const editMobile = getDataValue(req.session.data, [
         'esupervision',
         crn,
