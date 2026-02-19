@@ -3,18 +3,17 @@ import { HttpsAgent } from 'agentkeepalive'
 import { AgentConfig } from '../types/AgentConfig'
 import { ApiConfig } from '../types/ApiConfig'
 import RestClient from './restClient'
-import { isValidHost, isValidPath } from '../utils'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 import logger from '../logger'
 import { ErrorSummary } from './model/common'
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    isValidPath: jest.fn(),
-    isValidHost: jest.fn(),
-  }
-})
+jest.mock('../utils/isValidHost', () => ({
+  isValidHost: jest.fn(),
+}))
+jest.mock('../utils/isValidPath', () => ({
+  isValidPath: jest.fn(),
+}))
 
 jest.mock('../logger', () => ({
   __esModule: true,

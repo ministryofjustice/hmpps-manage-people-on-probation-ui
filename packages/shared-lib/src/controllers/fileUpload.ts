@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { Request } from 'express'
 import { type Controller } from '../types/Controller'
 import { type FileUploadResponse } from '../types/FileUpload'
 import MasApiClient from '../data/masApiClient'

@@ -11,6 +11,13 @@ jest.mock('../config', () => ({
   }),
 }))
 
+jest.mock('../utils/isValidHost', () => ({
+  isValidHost: jest.fn(),
+}))
+jest.mock('../utils/isValidPath', () => ({
+  isValidPath: jest.fn(),
+}))
+
 jest.mock('../logger', () => ({
   __esModule: true,
   default: {
@@ -31,7 +38,8 @@ const mockedConfig = {
 }
 
 import nock from 'nock'
-import { isValidHost, isValidPath } from '../utils'
+import { isValidPath } from '../utils/isValidPath'
+import { isValidHost } from '../utils/isValidHost'
 import { getConfig } from '../config'
 import ESupervisionClient from './eSupervisionClient'
 import {
@@ -43,20 +51,9 @@ import {
   SmsPreviewRequest,
 } from './model/esupervision'
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    isValidPath: jest.fn(),
-    isValidHost: jest.fn(),
-  }
-})
-
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
-// mockedIsValidHost.mockReturnValue(true)
 ;(getConfig as jest.Mock).mockReturnValue(mockedConfig)
-// mockedIsValidPath.mockReturnValue(true)
 const token = { access_token: 'token-1', expires_in: 300 }
 
 describe('ESupervisionClient', () => {

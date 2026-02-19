@@ -6,6 +6,7 @@ import { HmppsAuthClient } from '../data'
 import { Sentences } from '../data/model/sentenceDetails'
 import { AppResponse } from '../models/Locals'
 import { getConfig } from '../config'
+import { RedisClient } from '../data/redisClient'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -26,7 +27,7 @@ jest.mock('../applicationInfo', () => ({
 jest
   .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
   .mockImplementation(() => Promise.resolve(token.access_token))
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const tokenStore = new TokenStore({} as RedisClient) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
 const sentencesMock = {

@@ -1,10 +1,10 @@
 {
+  "compileOnSave": true,
   "compilerOptions": {
     "target": "es2023",
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
-    "rootDir": "./src",
     "sourceMap": true,
     "skipLibCheck": true,
     "noEmit": false,
@@ -15,21 +15,17 @@
     "allowSyntheticDefaultImports": true,
     "noImplicitAny": true,
     "experimentalDecorators": true,
-    "typeRoots": ["src/types", "node_modules/@types"],
-    "declaration": true,
-    "declarationMap": true,
-    "composite": false,
-    "removeComments": true,
-    "strict": true,
-    "inlineSources": false,
-    "sourceRoot": "./src",
-    "types": ["node", "jest"]
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "inlineSources": true,
+    "ignoreDeprecations": "5.0",
+    "sourceRoot": "/"
   },
   "exclude": [
     "node_modules",
-    "dist",
+    "assets/**/*.js",
     "integration_tests",
     "e2e_tests",
+    "dist",
     "cypress.config.ts",
     "playwright.config.ts",
     "playwright-report",
@@ -39,8 +35,7 @@
     "**/*.cy.ts",
     "test_results",
     "codecov_reports",
-    "jest-resolver.js",
-    "**/*.test.ts"
+    "packages"
   ],
-  "include": ["./src/**/*.js", "./src/**/*.ts"]
+  "include": ["**/*.js", "**/*.ts"]
 }

@@ -7,7 +7,6 @@ import { isValidCrn } from '../utils'
 import { renderError } from './renderError'
 
 export const limitedAccess = (services: Services) => {
-  // @ts-expect-error FIX TS ERROR BELOW
   return asyncMiddleware(async (req: Request, res: AppResponse, next: NextFunction): Promise<void> => {
     const { crn } = req.params as Record<string, string>
     if (!isValidCrn(crn)) {

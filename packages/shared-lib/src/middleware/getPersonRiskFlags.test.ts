@@ -6,11 +6,29 @@ import MasApiClient from '../data/masApiClient'
 import { setDataValue } from '../utils'
 import { PersonRiskFlags } from '../data/model/risk'
 import { mockAppResponse } from '../controllers/mocks'
+import { RedisClient } from '../data/redisClient'
+import { getConfig } from '../config'
 
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
+const tokenStore = new TokenStore({} as RedisClient) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockConfig: any = {
+  apis: {
+    hmppsAuth: {
+      apiClientId: '1234',
+      apiClientSecret: '5678',
+    },
+  },
+}
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockGetConfig.mockReturnValue(mockConfig)
 
 jest.mock('../logger', () => ({
   __esModule: true,

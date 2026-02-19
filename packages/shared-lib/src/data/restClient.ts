@@ -6,8 +6,8 @@ import sanitiseError from '../sanitisedError'
 import type { ApiConfig } from '../types/ApiConfig'
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { type ErrorSummaryItem } from './model/common'
-import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
+import { isValidHost } from '../utils/isValidHost'
 import { escapeForLog } from '../utils/escapeForLog'
 
 interface Request {

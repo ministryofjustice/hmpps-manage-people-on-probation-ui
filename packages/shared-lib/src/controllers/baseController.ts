@@ -9,7 +9,6 @@ const baseController = () => {
     const config = getConfig()
     res.locals.applicationInsightsConnectionString = config.apis.appInsights.connectionString
     res.locals.applicationInsightsRoleName = defaultName()
-    // @ts-expect-error TS ERROR
     const url = req.url.split('/').filter(dir => dir)
     res.locals.home = url.length === 0
     res.locals.cases = url[0] === 'case'
