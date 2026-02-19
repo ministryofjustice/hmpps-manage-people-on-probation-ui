@@ -1,11 +1,9 @@
 import { RequestHandler } from 'express'
 import logger from '../logger'
 import FlagService from '../services/flagService'
-import { AppResponse } from '../models/Locals'
 
 export default function evaluateFeatureFlags(flagService: FlagService): RequestHandler {
-  // @ts-expect-error TS ERROR TO FIX
-  return async (_req, res: AppResponse, next) => {
+  return async (_req, res, next) => {
     try {
       const flags = await flagService.getFlags()
       if (flags) {

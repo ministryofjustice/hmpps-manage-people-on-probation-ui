@@ -11,14 +11,12 @@ jest.mock('../logger', () => ({
   },
 }))
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    isValidPath: jest.fn(),
-    isValidHost: jest.fn(),
-  }
-})
+jest.mock('../utils/isValidHost', () => ({
+  isValidHost: jest.fn(),
+}))
+jest.mock('../utils/isValidPath', () => ({
+  isValidPath: jest.fn(),
+}))
 
 jest.mock('./tokenStore/redisTokenStore')
 
@@ -26,7 +24,8 @@ jest.mock('./tokenStore/redisTokenStore')
 
 import nock from 'nock'
 import { getConfig } from '../config'
-import { isValidHost, isValidPath } from '../utils'
+import { isValidPath } from '../utils/isValidPath'
+import { isValidHost } from '../utils/isValidHost'
 import MasApiClient from './masApiClient'
 
 // Type casts

@@ -163,7 +163,7 @@ export default function nunjucksSetup(
   njkEnv.addFilter('isArray', (str: string | string[]) => {
     return Array.isArray(str)
   })
-  app.use((req: Request, res: Response, next: NextFunction) => {
+  app.use((req: Request, res: AppResponse, next: NextFunction) => {
     njkEnv.addFilter('decorateFormAttributes', decorateFormAttributes(req, res))
     return next()
   })

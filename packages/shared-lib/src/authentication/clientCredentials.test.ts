@@ -1,4 +1,21 @@
 import generateOauthClientToken from './clientCredentials'
+import { getConfig } from '../config'
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
+}))
+
+const mockConfig: any = {
+  apis: {
+    hmppsAuth: {
+      apiClientId: '1234',
+      apiClientSecret: '5678',
+    },
+  },
+}
+
+const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
+mockGetConfig.mockReturnValue(mockConfig)
 
 describe('generateOauthClientToken', () => {
   it('Token can be generated', () => {

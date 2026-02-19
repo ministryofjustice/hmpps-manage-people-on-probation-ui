@@ -31,6 +31,7 @@ import { mockAppResponse } from './mocks'
 import { FileUploadResponse } from '../types/FileUpload'
 import MasApiClient from '../data/masApiClient'
 import { getConfig } from '../config'
+import { RedisClient } from '../data/redisClient'
 
 const mockConfig: any = {
   apis: {
@@ -48,8 +49,8 @@ const mockConfig: any = {
 const mockGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 
 const token = { access_token: 'token-1', expires_in: 300 }
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
-const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
+const tokenStore = new TokenStore({} as RedisClient) as jest.Mocked<TokenStore>
+const hmppsAuthClient = new HmppsAuthClient(tokenStore) as jest.Mocked<HmppsAuthClient>
 
 const patchDocumentsSpy = jest
   .spyOn(MasApiClient.prototype, 'patchDocuments')
