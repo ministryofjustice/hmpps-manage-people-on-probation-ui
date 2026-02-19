@@ -38,15 +38,15 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   get('/case/:crn/arrange-appointment/:id/sentence', controllers.arrangeAppointments.getSentence())
 
   router.post('/case/:crn/arrange-appointment/:id/*path', [
-    autoStoreSessionData(hmppsAuthClient),
     getOfficeLocationsByTeamAndProvider(hmppsAuthClient),
     getAppointment(hmppsAuthClient),
-    checkAnswers,
   ])
 
   router.post(
     '/case/:crn/arrange-appointment/:id/sentence',
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.postSentence(),
   )
   router.get(
@@ -63,18 +63,21 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     '/case/:crn/arrange-appointment/:id/type-attendance',
     routeChangeAttendee,
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.postTypeAttendance(),
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/attendance',
     redirectWizard(['eventId']),
     getUserOptions(hmppsAuthClient),
-
     controllers.arrangeAppointments.getWhoWillAttend(),
   )
   router.post(
     '/case/:crn/arrange-appointment/:id/attendance',
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.postWhoWillAttend(hmppsAuthClient),
   )
 
@@ -89,6 +92,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     checkAppointments(hmppsAuthClient),
     controllers.arrangeAppointments.postLocationDateTime(),
   )
@@ -108,6 +113,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/attended-complied',
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.postAttendedComplied(),
   )
 
@@ -120,6 +127,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/supporting-information',
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.postSupportingInformation(),
   )
 
@@ -166,6 +175,8 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
   router.post(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
+    checkAnswers,
     controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient),
   )
   router.post('/alert/dismiss', (req, res) => {

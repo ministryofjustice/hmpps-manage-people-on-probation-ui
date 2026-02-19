@@ -93,7 +93,6 @@ const appointments: Route<void> = (req, res, next) => {
 
   const validateSentence = (): void => {
     if (!baseUrl.includes('/sentence')) return
-
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
@@ -311,7 +310,6 @@ const appointments: Route<void> = (req, res, next) => {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })
   }
-
   return next()
 }
 
