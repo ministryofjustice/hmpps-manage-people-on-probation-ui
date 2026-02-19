@@ -1,4 +1,6 @@
+export { initSharedConfig, getConfig } from './config'
 export * as controllers from './controllers'
 export * as services from './services'
 export * as data from './data'
 export * as utils from './utils'
+export * as types from './types'

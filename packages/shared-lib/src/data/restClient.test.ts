@@ -1,7 +1,6 @@
 import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
-import { AgentConfig } from '../types/AgentConfig'
-import { ApiConfig } from '../types/ApiConfig'
+import { AgentConfig, ApiConfig } from '../types/Config'
 import RestClient from './restClient'
 import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'

@@ -1,7 +1,7 @@
 import promClient from 'prom-client'
 import { serviceCheckFactory } from '../data/healthCheck'
 import { getConfig } from '../config'
-import type { AgentConfig } from '../types/AgentConfig'
+import type { AgentConfig } from '../types/Config'
 import type { ApplicationInfo } from '../applicationInfo'
 
 const healthCheckGauge = new promClient.Gauge({

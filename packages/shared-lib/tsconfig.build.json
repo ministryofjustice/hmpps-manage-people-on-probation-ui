@@ -5,6 +5,7 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "outDir": "./dist",
+    "rootDir": "./src",
     "sourceMap": true,
     "skipLibCheck": true,
     "noEmit": false,
@@ -18,7 +19,8 @@
     "typeRoots": ["./src/types", "./node_modules/@types"],
     "inlineSources": true,
     "ignoreDeprecations": "5.0",
-    "sourceRoot": "/"
+    "sourceRoot": "/",
+    "declaration": true
   },
   "exclude": [
     "node_modules",

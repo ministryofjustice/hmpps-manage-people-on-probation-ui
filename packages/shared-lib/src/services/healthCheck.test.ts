@@ -2,7 +2,7 @@ import healthCheck from './healthCheck'
 import type { ApplicationInfo } from '../applicationInfo'
 import type { HealthCheckCallback, HealthCheckService } from './healthCheck'
 import { getConfig } from '../config'
-import { AgentConfig } from '../types/AgentConfig'
+import { AgentConfig } from '../types/Config'
 
 const mockedConfig = {
   apis: {
