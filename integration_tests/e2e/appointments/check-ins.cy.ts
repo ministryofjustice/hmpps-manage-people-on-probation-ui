@@ -372,6 +372,13 @@ context('Appointment check-ins', () => {
     contactPreferencePage.getChangeLink().click()
     const editContactPreferencePage = new EditContactPreferencePage()
     editContactPreferencePage.checkOnPage()
+    editContactPreferencePage
+      .getAlert()
+      .should('be.visible')
+      .and(
+        'contain',
+        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+      )
     editContactPreferencePage.getSubmitBtn().click()
     contactPreferencePage.checkOnPage()
     contactPreferencePage.getSubmitBtn().click()
