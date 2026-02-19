@@ -8,7 +8,6 @@ const buildAssets = require('./assets.config')
 const buildApp = require('./app.config')
 
 const nwDir = path.dirname(process.execPath)
-
 const cwd = process.cwd()
 
 /**
@@ -24,8 +23,8 @@ const buildConfig = {
       process.env.NODE_ENV === 'production'
         ? path.join(cwd, 'server.ts')
         : glob
-            .sync([path.join(cwd, '*.ts'), path.join(cwd, 'server/**/*.ts')])
-            .filter(file => !file.endsWith('.test.ts')),
+            .sync([path.join(cwd, '*.ts'), path.join(cwd, 'server/**/*.ts'), path.join(cwd, 'app/**/*.ts')])
+            .filter(file => !file.endsWith('.test.ts') && !file.includes(`${path.sep}packages${path.sep}`)),
     copy: [
       {
         from: path.join(cwd, 'server/views/**/*'),
@@ -66,42 +65,49 @@ function main() {
     Promise.all([buildApp(buildConfig), buildAssets(buildConfig)]).catch(() => process.exit(1))
   }
 
-  if (args.includes('--feature-dev-server')) {
+  const spawnServer = cmdArgs => {
     let serverProcess = null
-    chokidar.watch(['dist']).on('all', () => {
+    chokidar.watch(['dist'], chokidarOptions).on('all', () => {
       if (serverProcess) serverProcess.kill()
-      serverProcess = spawn(
-        `${nwDir}/node`,
-        ['--inspect=0.0.0.0', '--enable-source-maps', 'dist/server.js', ' | bunyan -o short'],
-        {
-          stdio: 'inherit',
-        },
-      )
+      serverProcess = spawn(`${nwDir}/node`, cmdArgs, { stdio: 'inherit' })
     })
   }
+
+  if (args.includes('--feature-dev-server')) {
+    spawnServer(['--inspect=0.0.0.0', '--enable-source-maps', 'dist/server.js', '|', 'bunyan', '-o', 'short'])
+  }
+
   if (args.includes('--dev-server')) {
-    let serverProcess = null
-    chokidar.watch(['dist']).on('all', () => {
-      if (serverProcess) serverProcess.kill()
-      serverProcess = spawn(
-        `${nwDir}/node`,
-        ['--inspect=0.0.0.0', '--enable-source-maps', '-r', 'dotenv/config', 'dist/server.js', ' | bunyan -o short'],
-        {
-          stdio: 'inherit',
-        },
-      )
-    })
+    spawnServer([
+      '--inspect=0.0.0.0',
+      '--enable-source-maps',
+      '-r',
+      'dotenv/config',
+      'dist/server.js',
+      '|',
+      'bunyan',
+      '-o',
+      'short',
+    ])
   }
 
   if (args.includes('--watch')) {
     console.log('\u{1b}[1m\u{1F52D} Watching for changes...\u{1b}[0m')
-    // Assets
+
+    // Watch assets
     chokidar.watch(['assets/**/*'], chokidarOptions).on('all', () => buildAssets(buildConfig).catch(console.error))
 
-    // App
+    // Watch app and server, ignoring test files and packages
     chokidar
-      .watch(['server/**/*', 'app/**/*'], { ...chokidarOptions, ignored: ['**/*.test.ts'] })
+      .watch(['server/**/*', 'app/**/*'], {
+        ...chokidarOptions,
+        ignored: [
+          '**/*.test.ts',
+          '**/packages/**', // ignore all files under packages
+        ],
+      })
       .on('all', () => buildApp(buildConfig).catch(console.error))
   }
 }
+
 main()
