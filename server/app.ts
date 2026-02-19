@@ -3,6 +3,8 @@ import express, { Router } from 'express'
 import createError from 'http-errors'
 
 import * as Sentry from '@sentry/node'
+import { initSharedConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+
 // @ts-expect-error Import untyped middleware for cypress coverage
 import cypressCoverage from '@cypress/code-coverage/middleware/express'
 import nunjucksSetup from './utils/nunjucksSetup'
@@ -22,6 +24,7 @@ import routes from './routes'
 import type { Services } from './services'
 import limitedAccess from './middleware/limitedAccessMiddleware'
 import config from './config'
+
 import './sentry'
 import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
@@ -33,7 +36,7 @@ import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
-
+  // initSharedConfig(config)
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
   }
