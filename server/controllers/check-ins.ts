@@ -10,6 +10,7 @@ import {
   DeactivateOffenderRequest,
   ESupervisionNote,
   ESupervisionReview,
+  ReactivateOffenderRequest,
 } from '../data/model/esupervision'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinUserDetails } from '../models/ESupervision'
@@ -67,7 +68,7 @@ const routes = [
   'getRestartEditContactPage',
   'postRestartEditContactPage',
   'getRestartSummaryPage',
-  // 'postFinalRestart',
+  'postRestartSummaryPage',
   'getRestartConfirmation',
 ] as const
 
@@ -1032,25 +1033,77 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  // API changes underway this will change based on
-  // postFinalRestart: hmppsAuthClient => {
-  //   return;
-  // },
+  postRestartSummaryPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+
+      const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
+      if (!restartDetails) return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-checkin`)
+
+      try {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupervisionClient = new ESupervisionClient(token)
+
+        const parsedDate = DateTime.fromFormat(restartDetails.date ?? '', 'd/M/yyyy')
+        const formattedDate = parsedDate.isValid ? parsedDate.toISODate() : restartDetails.date
+
+        const body: ReactivateOffenderRequest = {
+          requestedBy: res.locals.user.username,
+          reason: restartDetails.reason || 'Reactivated via MPOP UI',
+          checkinSchedule: {
+            requestedBy: res.locals.user.username,
+            firstCheckin: formattedDate,
+            checkinInterval: restartDetails.interval,
+          },
+          contactPreference: {
+            requestedBy: res.locals.user.username,
+            contactPreference: restartDetails.preferredComs,
+          },
+        }
+
+        await eSupervisionClient.postReactivateOffender(id, body)
+
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-confirmation`)
+      } catch (e) {
+        logger.error(`Reactivate failed: ${e.message}`)
+        return renderError(500)(req, res)
+      }
+    }
+  },
 
   getRestartConfirmation: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { data } = req.session
-      const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
+
+      const savedDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
+
+      if (!savedDetails) {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+      }
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const caseData = await masClient.getPersonalDetails(crn)
+
+      const userDetails = {
+        ...savedDetails,
+        interval: checkinIntervals.find(option => option.id === savedDetails.interval)?.label,
+        displayCommsOption:
+          savedDetails.preferredComs === 'EMAIL' ? savedDetails.checkInEmail : savedDetails.checkInMobile,
+        displayDay: dayOfWeek(DateTime.fromFormat(savedDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
+      }
+      setDataValue(data, ['esupervision', crn, id, 'restartCheckin'], undefined)
 
       return res.render('pages/check-in/manage/restart-confirmation.njk', {
         crn,
         id,
         case: caseData,
-        userDetails: restartDetails,
+        userDetails,
       })
     }
   },
