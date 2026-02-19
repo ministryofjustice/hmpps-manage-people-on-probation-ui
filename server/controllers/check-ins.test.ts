@@ -87,6 +87,10 @@ const postDeactivateOffender = jest
   .spyOn(ESupervisionClient.prototype, 'postDeactivateOffender')
   .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
 
+const postReactivateOffenderSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'postReactivateOffender')
+  .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
+
 const postUpdateOffenderDetailsSpy = jest
   .spyOn(ESupervisionClient.prototype, 'postUpdateOffenderDetails')
   .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
@@ -2117,6 +2121,225 @@ describe('checkInsController', () => {
 
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+  })
+  describe('getRestartCheckinPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+      await controllers.checkIns.getRestartCheckinPage(hmppsAuthClient)(req, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
+
+    it('sets session values and renders restart date page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      ;(res.locals as any).offenderCheckinsByCRNResponse = {
+        crn,
+        uuid,
+        status: 'INACTIVE',
+        firstCheckin: '01/01/2026',
+        checkinInterval: 'WEEKLY',
+        contactPreference: 'EMAIL',
+      }
+      const req = baseReq({})
+
+      await controllers.checkIns.getRestartCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'restartCheckin', 'id'],
+        uuid,
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'restartCheckin', 'interval'],
+        'WEEKLY',
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'restartCheckin', 'preferredComs'],
+        'EMAIL',
+      )
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/restart-date-frequency.njk',
+        expect.objectContaining({
+          crn,
+          id: uuid,
+          cya,
+        }),
+      )
+    })
+  })
+
+  describe('postRestartCheckinPage', () => {
+    it('returns 404 when CRN or id invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      const req = baseReq()
+      await controllers.checkIns.postRestartCheckinPage(hmppsAuthClient)(req, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+    })
+
+    it('redirects to restart contact page', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const req = baseReq()
+      await controllers.checkIns.postRestartCheckinPage(hmppsAuthClient)(req, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-contact`)
+    })
+  })
+
+  describe('getRestartContactPage', () => {
+    it('renders restart contact page and stores edit values in session', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      ;(mockPersonalDetails as PersonalDetails).mobileNumber = '07700900000'
+      ;(mockPersonalDetails as PersonalDetails).email = 'test@example.com'
+
+      const req = baseReq({
+        esupervision: { [crn]: { [uuid]: { restartCheckin: { preferredComs: 'EMAIL' } } } },
+      })
+
+      await controllers.checkIns.getRestartContactPage(hmppsAuthClient)(req, res)
+
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'restartCheckin', 'editCheckInMobile'],
+        '07700900000',
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'restartCheckin', 'editCheckInEmail'],
+        'test@example.com',
+      )
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/restart-contact-preference.njk',
+        expect.objectContaining({
+          crn,
+          id: uuid,
+          checkInMobile: '07700900000',
+          checkInEmail: 'test@example.com',
+          preferredComs: 'EMAIL',
+        }),
+      )
+    })
+  })
+
+  describe('postRestartContactPage', () => {
+    it('redirects to summary when change is main', async () => {
+      const req = baseReq()
+      req.body = { change: 'main' }
+      await controllers.checkIns.postRestartContactPage(hmppsAuthClient)(req, res)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-summary`)
+    })
+  })
+
+  describe('getRestartSummaryPage', () => {
+    it('renders restart summary with transformed userDetails', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              restartCheckin: {
+                interval: 'WEEKLY',
+                preferredComs: 'EMAIL',
+                checkInEmail: 'test@example.com',
+                date: '19/2/2026',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      await controllers.checkIns.getRestartSummaryPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/restart-checkin-summary.njk',
+        expect.objectContaining({
+          crn,
+          userDetails: expect.objectContaining({
+            interval: 'Every week',
+            preferredComs: 'Email',
+          }),
+        }),
+      )
+    })
+  })
+
+  describe('postRestartSummaryPage', () => {
+    it('calls reactivate API with ISO date and redirects to confirmation', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              restartCheckin: {
+                date: '19/2/2026',
+                interval: 'WEEKLY',
+                preferredComs: 'EMAIL',
+                reason: 'Back on supervision',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      await controllers.checkIns.postRestartSummaryPage(hmppsAuthClient)(req, res)
+
+      expect(postReactivateOffenderSpy).toHaveBeenCalledWith(
+        uuid,
+        expect.objectContaining({
+          requestedBy: 'testuser',
+          checkinSchedule: expect.objectContaining({
+            firstCheckin: '2026-02-19',
+          }),
+        }),
+      )
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-confirmation`)
+    })
+  })
+
+  describe('getRestartConfirmation', () => {
+    it('renders restart confirmation and clears session data', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              restartCheckin: {
+                date: '19/2/2026',
+                interval: 'WEEKLY',
+                preferredComs: 'EMAIL',
+                checkInEmail: 'test@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+
+      await controllers.checkIns.getRestartConfirmation(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/restart-confirmation.njk',
+        expect.objectContaining({
+          userDetails: expect.objectContaining({
+            displayDay: 'Thursday',
+          }),
+        }),
+      )
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'restartCheckin'],
+        undefined,
+      )
     })
   })
 })
