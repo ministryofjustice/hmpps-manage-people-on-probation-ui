@@ -117,7 +117,7 @@ const documentController: Controller<typeof routes, void> = {
         },
       }
 
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const baseUrl = `/case/${crn}/documents`
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       let sortBy = req.query.sortBy ? (req.query.sortBy as string) : 'createdAt.desc'

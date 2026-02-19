@@ -113,7 +113,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   redirectToSentence: () => {
     return async (req, res) => {
       const uuid = uuidv4()
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(uuid)) {
         return renderError(404)(req, res)
@@ -170,7 +170,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getTypeAttendance: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change, validation } = req.query
       const { data } = req.session
       const url = encodeURIComponent(req.url)
@@ -352,7 +352,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { alertDismissed = false } = req.session
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
       const isReschedule = isRescheduleAppointment(req)
@@ -424,7 +424,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   postAddNote: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change } = req.query as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)

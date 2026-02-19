@@ -10,7 +10,7 @@ import { Location, Provider, Team, User } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { username: loggedInUsername = '' } = res.locals.user
     const token = await hmppsAuthClient.getSystemClientToken(loggedInUsername)
     const masClient = new MasApiClient(token)

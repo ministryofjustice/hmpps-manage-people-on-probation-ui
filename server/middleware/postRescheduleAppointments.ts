@@ -21,7 +21,7 @@ export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<RescheduleAppointmentResponse | PersonAppointment>> => {
   return async (req, res) => {
-    const { crn, id: uuid, contactId } = req.params
+    const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)

@@ -7,7 +7,7 @@ import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
     const { username } = res.locals.user
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { providerCode: providerCodeQuery, teamCode: teamCodeQuery, back } = req.query as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(username)
     const masClient = new MasApiClient(token)

@@ -77,7 +77,7 @@ const checkinIntervals: OptionPair[] = [
 const checkInsController: Controller<typeof routes, void> = {
   getStartSetup: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { back } = req.query
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -89,7 +89,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getIntroPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -107,7 +107,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postIntroPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -119,7 +119,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -131,7 +131,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -141,7 +141,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (req?.session?.errorMessages) {
         res.locals.errorMessages = req.session.errorMessages
         delete req?.session?.errorMessages
@@ -172,7 +172,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -189,7 +189,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getPhotoOptionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -199,7 +199,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -211,7 +211,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -242,7 +242,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postPhotoOptionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -255,7 +255,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getTakePhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -266,7 +266,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getUploadPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -277,7 +277,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postUploadaPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -287,7 +287,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getPhotoRulesPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -298,7 +298,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getUpdateCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -328,7 +328,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getViewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -348,7 +348,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postViewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -379,7 +379,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getViewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -395,7 +395,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getReviewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -413,7 +413,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getReviewIdentityCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -430,7 +430,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postReviewIdentityCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -441,7 +441,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getReviewNotesCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { checkIn } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -462,7 +462,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postReviewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -491,7 +491,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postPhotoRulesPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -500,7 +500,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getCheckinSummaryPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -533,7 +533,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getConfirmationPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -553,7 +553,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getCheckinVideoPage: HmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { checkIn } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -564,7 +564,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postTakeAPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { userPhotoUpload } = req.body
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -575,7 +575,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -602,7 +602,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageCheckinDatePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -623,7 +623,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageCheckinDatePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -652,7 +652,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -681,7 +681,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -720,7 +720,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -762,7 +762,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       const { previousMobile, previousEmail } = req.body
 
@@ -800,7 +800,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getStopCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -809,7 +809,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageStopCheckin: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }

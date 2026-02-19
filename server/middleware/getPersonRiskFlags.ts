@@ -6,7 +6,7 @@ import { setDataValue, findReplace, getStaffRisk } from '../utils'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
-    const { crn } = req.params
+    const { crn } = req.params as Record<string, string>
     let personRisks: PersonRiskFlags
     if (!req.session?.data?.risks?.[crn]) {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

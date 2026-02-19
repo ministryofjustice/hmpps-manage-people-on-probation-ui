@@ -106,7 +106,7 @@ const alertsController: Controller<typeof routes, void> = {
 
   getAlertNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { contactId, noteId } = req.params
+      const { contactId, noteId } = req.params as Record<string, string>
       const { back } = req.query
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const url = encodeURIComponent(req.url)

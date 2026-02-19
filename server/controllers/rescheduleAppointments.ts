@@ -15,7 +15,7 @@ const routes = [
 const rescheduleAppointmentController: Controller<typeof routes, void> = {
   redirectToRescheduleAppointment: () => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn, contactId } = req.params as Record<string, string>
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
@@ -74,7 +74,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
   },
   postRescheduleAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -84,7 +84,7 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
   },
   getRescheduleCheckYourAnswer: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, contactId } = req.params
+      const { crn, id, contactId } = req.params as Record<string, string>
       const isInPast = appointmentDateIsInPast(req)
       const { url } = req
       res.render('pages/reschedule/check-your-answers', {

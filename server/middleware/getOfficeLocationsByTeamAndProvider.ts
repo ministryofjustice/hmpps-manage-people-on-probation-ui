@@ -5,7 +5,7 @@ import { getDataValue } from '../utils'
 
 export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { data } = req.session
     const { username } = res.locals.user
     const providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode'])

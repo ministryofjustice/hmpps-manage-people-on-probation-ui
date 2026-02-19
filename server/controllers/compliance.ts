@@ -11,7 +11,7 @@ const routes = ['getCompliance'] as const
 const complianceController: Controller<typeof routes, void> = {
   getCompliance: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_COMPLIANCE',
