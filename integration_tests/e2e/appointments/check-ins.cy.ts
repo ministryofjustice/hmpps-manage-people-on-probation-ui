@@ -20,6 +20,11 @@ import ManageContactPage from '../../pages/check-ins/manage-contact'
 import ManageEditContactPage from '../../pages/check-ins/manage-edit-contact'
 import ChangeSettingsPage from '../../pages/check-ins/change-settings'
 import StopCheckins from '../../pages/check-ins/stop-checkins'
+import RestartConfirmationPage from '../../pages/check-ins/restart/restart-confirmation.page'
+import RestartContactPreferencePage from '../../pages/check-ins/restart/restart-contact-preference.page'
+import RestartDateFrequencyPage from '../../pages/check-ins/restart/restart-date-frequency.page'
+import RestartCheckYourAnswersPage from '../../pages/check-ins/restart/restart-check-your-answers.page'
+import RestartEditContactPreferencePage from '../../pages/check-ins/restart/restart-edit-contact-preference.page'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -741,5 +746,38 @@ context('check-ins overview and manage pages', () => {
     stopCheckIn.getElementData('stop-checkin-reason').type('No longer available')
     stopCheckIn.getSubmitBtn().click()
     manageCheckins.checkOnPage()
+  })
+
+  it('should able to stop and restart online check ins', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESuperVision')
+    cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
+
+    const restartDatePage = new RestartDateFrequencyPage()
+    restartDatePage.checkOnPage()
+    restartDatePage.getDatePickerToggle().click()
+    restartDatePage.getNextDayButton().click()
+    restartDatePage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
+    restartDatePage.getSubmitBtn().click()
+
+    const restartContactPage = new RestartContactPreferencePage()
+    restartContactPage.checkOnPage()
+    restartContactPage.getCheckInPreferredComs().find('input[value="PHONE"]').should('be.checked')
+    restartContactPage.getMobileNumberChangeLink().click()
+    const restartEditPage = new RestartEditContactPreferencePage()
+    restartEditPage.checkOnPage()
+    restartEditPage.getAlert().should('be.visible').and('contain.text', 'update the record in NDelius')
+    restartEditPage.getMobileInput().clear().type('07700900123')
+    restartEditPage.getSubmitBtn().click()
+    restartContactPage.checkOnPage()
+    restartContactPage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
+    restartContactPage.getSubmitBtn().click()
+    const restartSummaryPage = new RestartCheckYourAnswersPage()
+    restartSummaryPage.checkOnPage()
+    restartSummaryPage.getSummaryValue(2).should('contain.text', 'Every week')
+    // restartSummaryPage.getSubmitBtn().click()
+    // const restartConfirmPage = new RestartConfirmationPage()
+    // restartConfirmPage.checkOnPage()
+    // restartConfirmPage.getPanel().should('contain.text', 'Online check ins restarted')
   })
 })
