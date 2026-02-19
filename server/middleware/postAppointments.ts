@@ -16,7 +16,7 @@ import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
-    const { crn, id: uuid } = req.params
+    const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)

@@ -1,14 +1,13 @@
 import { Request, NextFunction } from 'express'
-import { DateTime } from 'luxon'
 import { AppointmentSession, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { dateIsInPast, isoToDateTime } from '../utils'
+import { isoToDateTime } from '../utils'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
-  const { crn, id } = req.params
+  const { crn, id } = req.params as Record<string, string>
   const { nextAppointment: nextAppointmentSelection } = req.body
 
   let nextAppointment: AppointmentSession = {

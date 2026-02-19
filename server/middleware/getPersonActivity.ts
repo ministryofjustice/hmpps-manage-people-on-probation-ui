@@ -15,7 +15,7 @@ export const getPersonActivity = async (
   const { filters } = res.locals
   const { params, query } = req
   const { keywords, dateFrom, dateTo, compliance } = filters
-  const { crn } = params
+  const { crn } = params as Record<string, string> as Record<string, string>
   const { page = '0' } = query
   const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
   const masClient = new MasApiClient(token)

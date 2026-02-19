@@ -4,7 +4,7 @@ import { FileCache } from '../@types'
 
 export const cacheUploadedFiles = (req: Request, res: AppResponse, next: NextFunction): void => {
   const raw = req.body
-  const enableDelete = res.locals.flags.enableDeleteAppointmentFile === true
+  const enableDelete = res?.locals?.flags?.enableDeleteAppointmentFile === true
   let filesAdded = []
   if (raw?.filesAdded_filename) {
     if (Array.isArray(raw.filesAdded_filename)) {
@@ -19,7 +19,7 @@ export const cacheUploadedFiles = (req: Request, res: AppResponse, next: NextFun
       ]
     }
   }
-  const { contactId: id } = req.params
+  const { contactId: id } = req.params as Record<string, string>
   const uploadedFiles: FileCache[] = []
 
   for (const file of filesAdded) {

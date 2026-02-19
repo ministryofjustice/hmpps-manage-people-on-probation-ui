@@ -14,7 +14,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   }
   const { clearFilterKey, clearFilterValue } = req.query
   const view = req?.query?.view ?? req?.body?.view
-  const { crn } = req.params
+  const { crn } = req.params as Record<string, string>
   const { keywords, dateFrom, dateTo, compliance } = setSession()
   const errorMessages = req?.session?.errorMessages
 

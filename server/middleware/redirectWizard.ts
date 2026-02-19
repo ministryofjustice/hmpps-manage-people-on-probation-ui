@@ -17,9 +17,9 @@ interface RedirectInfo {
 export const redirectWizard = (
   requiredValues: (string | string[])[],
   route: RouteKey = 'appointments',
-): Route<Promise<void>> => {
-  return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { crn, id } = req.params
+): Route<Promise<void | null>> => {
+  return async (req: Request, res: Response, next: NextFunction | undefined) => {
+    const { crn, id } = req.params as Record<string, string>
     const mapping: Mapping = {
       appointments: {
         dataPath: ['appointments', crn, id],
@@ -46,6 +46,9 @@ export const redirectWizard = (
         }
       }
     }
-    return next()
+    if (next) {
+      return next()
+    }
+    return null
   }
 }

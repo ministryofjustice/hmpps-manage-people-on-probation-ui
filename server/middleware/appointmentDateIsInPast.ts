@@ -4,7 +4,7 @@ import { dateIsInPast, getDataValue } from '../utils'
 import '../@types/express/index.d'
 
 export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean => {
-  const { crn, id } = req.params
+  const { crn, id } = req.params as Record<string, string>
   let date: string
   let start: string
   let isInPast = false

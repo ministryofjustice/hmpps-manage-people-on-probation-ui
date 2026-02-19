@@ -15,7 +15,7 @@ import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
-  const { crn, id, contactId, actionType } = params
+  const { crn, id, contactId, actionType } = params as Record<string, string>
   const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config

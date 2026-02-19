@@ -5,7 +5,7 @@ import { checkInReviewValidation } from '../../properties/validation/checkInRevi
 
 const checkInReview: Route<void> = (req, res, next) => {
   const { url, params } = req
-  const { crn, id } = params
+  const { crn, id } = params as Record<string, string>
   const { checkIn } = res.locals
   const { back = '' } = req.query as Record<string, string>
 
