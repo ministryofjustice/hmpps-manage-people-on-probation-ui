@@ -1,12 +1,14 @@
+import { Config } from './types/Config'
+
 export interface SharedLibConfig {
   apiUrl: string
   debug?: boolean
 }
 
-let config: SharedLibConfig | null = null
+let config: Config | null = null
 
-export function initSharedConfig(userConfig: SharedLibConfig) {
-  config = userConfig
+export function initSharedConfig(serviceConfig: Config) {
+  config = serviceConfig
 }
 
 export function getConfig(): any {

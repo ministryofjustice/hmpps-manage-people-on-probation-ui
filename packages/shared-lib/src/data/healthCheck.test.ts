@@ -1,6 +1,6 @@
 import nock from 'nock'
 import { serviceCheckFactory } from './healthCheck'
-import { AgentConfig } from '../types/AgentConfig'
+import { AgentConfig } from '../types/Config'
 
 jest.mock('../logger', () => ({
   __esModule: true,
