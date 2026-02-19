@@ -1,16 +1,46 @@
 {% extends "../_form.njk" %}
-{% set title = "Edit contact details for " +  case.name.forename%}
-{% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/contact-preference' %}
-{% set buttonText = "Save changes" %}
-{% set showAnchorLink = true %}
-{% set formAnchorLink = backLink %}
-{% set formAnchorText = "Cancel and go back" %}
-{% set showError = false %}
+{% from "moj/components/alert/macro.njk" import mojAlert %}
 
+{% set title = "Edit contact details for " + case.name.forename %}
+{% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/contact-preference' %}
+{% set notStandardForm = true %}
 
-{% block form %}
-<div class="govuk-grid-row">
-    <div class="govuk-grid-column-three-quarters">
+{% block primary %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      {{ mojAlert({
+            variant: "warning",
+            title: "",
+            showTitleAsHeading: false,
+            dismissible: false,
+            html: 'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.'
+      }) }}
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                classes: 'govuk-!-margin-bottom-6',
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
+        
+        <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+            {{ title }}
+        </h2>
+
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+            <input type="hidden" name="change" value="{{ change }}">
+
             {{ govukInput({
                 label: {
                     text: "Mobile number (optional)",
@@ -20,9 +50,7 @@
                     text: "For example, 07771 900 900"
                 },
                 formGroup: {
-                    attributes: {
-                        'data-qa': 'mobileNumber'
-                    }
+                    attributes: { 'data-qa': 'mobileNumber' }
                 },
                 classes: "govuk-input"
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'editCheckInMobile'])) }}
@@ -37,13 +65,22 @@
                     text: "For example, name@example.com"
                 },
                 formGroup: {
-                    attributes: {
-                        'data-qa': 'editEmail'
-                    }
+                    attributes: { 'data-qa': 'editEmail' }
                 },
                 classes: "govuk-input"
             } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'editCheckInEmail'])) }}
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                    text: "Save changes",
+                    type: "submit",
+                    attributes: { "data-qa": "submit-btn" }
+                }) }}
+                <a class="govuk-link" href="{{ backLink }}" data-qa="formAnchorLink">
+                    Cancel and go back
+                </a>
+            </div>
+        </form>
     </div>
 </div>
-    <input type="hidden" name="change" value="{{ change }}">
 {% endblock %}
