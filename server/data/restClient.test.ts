@@ -17,19 +17,22 @@ jest.mock('../utils', () => {
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
+let restClient: RestClient
 
-const restClient = new RestClient(
-  'api-name',
-  {
-    url: 'http://localhost:8080/api',
-    timeout: {
-      response: 1000,
-      deadline: 1000,
+beforeEach(() => {
+  restClient = new RestClient(
+    'api-name',
+    {
+      url: 'http://localhost:8080/api',
+      timeout: {
+        response: 1000,
+        deadline: 1000,
+      },
+      agent: new AgentConfig(1000),
     },
-    agent: new AgentConfig(1000),
-  },
-  'token-1',
-)
+    'token-1',
+  )
+})
 
 describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method => {
   beforeEach(() => {
@@ -321,5 +324,33 @@ describe('RestClient.construct', () => {
     }
     const client = new RestClient('test', config, 'token')
     expect(client.agent).toBeInstanceOf(HttpsAgent)
+  })
+})
+
+describe('RestClient requestWithBody - 400 handling', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedIsValidHost.mockReturnValue(true)
+    mockedIsValidPath.mockReturnValue(true)
+    nock.cleanAll()
+  })
+
+  it('throws custom error message when API returns 400', async () => {
+    nock('http://localhost:8080', {
+      reqheaders: { authorization: 'Bearer token-1' },
+    })
+      .post('/api/test')
+      .reply(400, { message: 'Bad request from API' })
+
+    const requestData = { foo: 'bar' }
+
+    await expect(
+      restClient.post({
+        path: '/test',
+        data: requestData,
+      }),
+    ).rejects.toThrow(`http 400 Sentry alert test (Express) - ignore - Request data: ${JSON.stringify(requestData)}`)
+
+    expect(nock.isDone()).toBe(true)
   })
 })
