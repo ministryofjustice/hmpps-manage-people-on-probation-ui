@@ -2,17 +2,21 @@ import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
 import { logger, AgentConfig, type ApiConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import RestClient from './restClient'
-import { isValidHost, isValidPath } from '../utils'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 import { ErrorSummary } from './model/common'
 
 jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
+jest.mock('../utils/isValidHost', () => {
   return {
-    ...actualUtils,
-    isValidPath: jest.fn(),
     isValidHost: jest.fn(),
+  }
+})
+
+jest.mock('../utils/isValidPath', () => {
+  return {
+    isValidPath: jest.fn(),
   }
 })
 

@@ -1,4 +1,5 @@
 import { logger, type ApiConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import 'multer'
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
 import sanitiseError from '../sanitisedError'
@@ -8,7 +9,6 @@ import { ErrorSummaryItem } from './model/common'
 import { escapeForLog } from '../utils/escapeForLog'
 import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
-import 'multer'
 
 interface Request {
   path: string
