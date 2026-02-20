@@ -167,6 +167,10 @@ describe('Text message confirmation', () => {
         .find('label')
         .should('contain.text', 'Yes, add a mobile number')
       textMessageConfirmPage.getSmsOptIn().find('.govuk-radios__item').eq(1).find('label').should('contain.text', 'No')
+      textMessageConfirmPage
+        .getSmsOptIn()
+        .find(`#appointments-${crn}-${uuid}-smsOptIn-hint`)
+        .should('contain.text', 'They do not have a mobile number saved, so you´ll need to check if they have one.')
     })
     it(`should redirect to the update contact details page if 'Yes, add a mobile number' is selected`, () => {
       textMessageConfirmPage.getSmsOptIn().find(`#appointments-${crn}-${uuid}-smsOptIn`).click()
