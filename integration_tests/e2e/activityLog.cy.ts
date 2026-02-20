@@ -558,4 +558,21 @@ context('Contacts', () => {
     page.getBackLink().click()
     filtersAreFilled(page)
   })
+
+  it('should render contacts when hide contact NDelius system generated contacts is checked', () => {
+    cy.visit('/case/X000001/activity-log')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Filter contacts'))
+    page.getApplyFiltersButton().should('contain.text', 'Apply filters')
+    page.getSelectedFiltersBox().should('not.exist')
+    page.getElementByDataQA('submit-apply-button').should('contain.text', 'Apply')
+    cy.get('[data-qa="filter-form"]').within(() => cy.get('h2').should('contain.text', 'Hide contacts'))
+    page.getElementByDataQA('hideContact').find('input[type="checkbox"]').should('not.be.checked')
+    page.getElementByDataQA('hideContact').find('input[type="checkbox"]').click()
+    page.getElementByDataQA('submit-apply-button').click()
+
+    cy.get('.govuk-table').should('exist')
+    page.getActivity(1).should('contain.text', 'AP PA - attitudes, thinking & behaviours')
+    page.getActivity(2).should('contain.text', 'Pre-intervention session 1')
+  })
 })
