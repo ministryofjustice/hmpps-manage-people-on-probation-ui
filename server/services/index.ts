@@ -1,5 +1,5 @@
 import CaseSearchService from '@ministryofjustice/probation-search-frontend/service/caseSearchService'
-import { dataAccess } from '../data'
+import { dataAccess, appInsightsClient } from '../data'
 import UserService from './userService'
 import FlagService from './flagService'
 import TechnicalUpdatesService from './technicalUpdatesService'
@@ -8,7 +8,7 @@ import ProbationComponentsApiService from './ProbationComponentsService'
 
 export const services = () => {
   const { applicationInfo, hmppsAuthClient, manageUsersApiClient, probationFrontendComponentsApiClient } = dataAccess()
-
+  appInsightsClient()
   const userService = new UserService(manageUsersApiClient)
 
   const searchService = new CaseSearchService({

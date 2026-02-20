@@ -5,10 +5,9 @@ import { Needs, RiskScoresDto, RiskSummary } from './model/risk'
 import { SanIndicatorResponse } from '../models/Risk'
 import { apiErrors } from '../properties'
 
-const config = getConfig()
-
 export default class ArnsApiClient extends RestClient {
   constructor(token: string) {
+    const config = getConfig()
     super('Assess Risks and Needs API', config.apis.arnsApi, token)
   }
 
