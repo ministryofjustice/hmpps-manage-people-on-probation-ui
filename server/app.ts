@@ -3,7 +3,6 @@ import express, { Router } from 'express'
 import createError from 'http-errors'
 
 import * as Sentry from '@sentry/node'
-import { initSharedConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 
 // @ts-expect-error Import untyped middleware for cypress coverage
 import cypressCoverage from '@cypress/code-coverage/middleware/express'
@@ -36,7 +35,6 @@ import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
-  initSharedConfig(config)
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
   }

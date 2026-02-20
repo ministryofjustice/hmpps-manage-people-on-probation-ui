@@ -6,9 +6,11 @@
 import { initialiseAppInsights, buildAppInsightsClient } from '../utils/azureAppInsights'
 import applicationInfoSupplier from '../applicationInfo'
 
-const applicationInfo = applicationInfoSupplier()
-initialiseAppInsights()
-buildAppInsightsClient(applicationInfo.applicationName)
+export const appInsightsClient = () => {
+  const applicationInfo = applicationInfoSupplier()
+  initialiseAppInsights()
+  buildAppInsightsClient(applicationInfo.applicationName)
+}
 
 import HmppsAuthClient from './hmppsAuthClient'
 import ManageUsersApiClient from './manageUsersApiClient'
@@ -21,6 +23,7 @@ import ProbationFrontendComponentsApiClient from './probationFrontendComponentsC
 type RestClientBuilder<T> = (token: string) => T
 
 export const dataAccess = () => {
+  const applicationInfo = applicationInfoSupplier()
   const config = getConfig()
   return {
     applicationInfo,
