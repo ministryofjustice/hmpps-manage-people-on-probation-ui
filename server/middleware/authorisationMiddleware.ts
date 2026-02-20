@@ -1,7 +1,7 @@
 import { jwtDecode } from 'jwt-decode'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import type { RequestHandler, Request, NextFunction } from 'express'
 
-import logger from '../../logger'
 import asyncMiddleware from './asyncMiddleware'
 import { AppResponse } from '../models/Locals'
 

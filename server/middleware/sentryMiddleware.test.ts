@@ -3,6 +3,8 @@ import { AppResponse } from '../models/Locals'
 import sentryMiddleware from './sentryMiddleware'
 import config from '../config'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 const res = {
   locals: {
     user: {

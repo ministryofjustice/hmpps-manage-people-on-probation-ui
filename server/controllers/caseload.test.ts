@@ -2,7 +2,7 @@ import httpMocks from 'node-mocks-http'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { v4 as uuidv4 } from 'uuid'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -14,6 +14,18 @@ import caseloadController from './caseload'
 import { RecentlyViewedCase, UserAccess } from '../data/model/caseAccess'
 import * as utils from '../utils'
 import { checkAuditMessage } from './testutils'
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: {
+    apis: {
+      masApi: {
+        pageSize: 10,
+      },
+    },
+  },
+}))
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')

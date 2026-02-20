@@ -9,7 +9,7 @@ import '../types/express/index.d'
 export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, _res, next) => {
     const config = getConfig()
-    const newSessionData: Data = req?.session?.data ?? {}
+    const newSessionData: Data = req?.session?.data ?? ({} as Data)
     const { crn, id } = req.params as Record<string, string>
     const inputs: Record<string, any> = req.body ?? {}
 
@@ -65,7 +65,7 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
         }
       }
     })
-    req.session.data = newSessionData
+    req.session.data = newSessionData as any
     if (next) {
       return next()
     }

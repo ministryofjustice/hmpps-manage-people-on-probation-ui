@@ -1,4 +1,8 @@
+/* eslint-disable import/first */
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 import httpMocks from 'node-mocks-http'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { getSmsPreview } from './getSmsPreview'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -8,7 +12,6 @@ import { mockAppResponse } from '../controllers/mocks'
 import { Location } from '../data/model/caseload'
 import { AppointmentSession } from '../models/Appointments'
 import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
-import logger from '../../logger'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')

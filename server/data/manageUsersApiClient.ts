@@ -1,6 +1,6 @@
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import config from '../config'
-// eslint-disable-next-line import/no-cycle
+
 import RestClient from './restClient'
 
 export interface User {

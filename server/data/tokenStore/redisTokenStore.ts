@@ -1,6 +1,6 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import type { RedisClient } from '../redisClient'
 
-import logger from '../../../logger'
 import TokenStore from './tokenStore'
 
 export default class RedisTokenStore implements TokenStore {

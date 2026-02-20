@@ -1,4 +1,4 @@
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import ESupervisionClient from '../data/eSupervisionClient'

@@ -1,23 +1,18 @@
 import { URLSearchParams } from 'url'
-
 import superagent from 'superagent'
-
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import type TokenStore from './tokenStore/tokenStore'
-import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
-// eslint-disable-next-line import/no-cycle
 import RestClient from './restClient'
-
-const timeoutSpec = config.apis.hmppsAuth.timeout
-const hmppsAuthUrl = config.apis.hmppsAuth.url
 
 function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagent.Response> {
   const clientToken = generateOauthClientToken(
     config.apis.hmppsAuth.systemClientId,
     config.apis.hmppsAuth.systemClientSecret,
   )
-
+  const timeoutSpec = config.apis.hmppsAuth.timeout
+  const hmppsAuthUrl = config.apis.hmppsAuth.url
   const grantRequest = new URLSearchParams({
     grant_type: 'client_credentials',
     ...(username && { username }),

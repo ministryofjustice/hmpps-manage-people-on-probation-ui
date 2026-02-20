@@ -12,24 +12,13 @@ jest.mock('../applicationInfo', () => ({
   }),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-  },
-}))
-
 jest.mock('../config', () => ({
   __esModule: true,
   getConfig: jest.fn(),
 }))
 
 import httpMocks from 'node-mocks-http'
-import logger from '../logger'
 import populateCurrentUser from './populateCurrentUser'
-
 import { UserService } from '../services'
 import ManageUsersApiClient from '../data/manageUsersApiClient'
 import { UserDetails } from '../services/userService'
@@ -82,6 +71,13 @@ const mockedConfig = {
   branchName: 'branch-name-123',
 }
 
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+} as any
+
 const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 mockedGetConfig.mockReturnValue(mockedConfig)
 
@@ -105,7 +101,7 @@ describe('/middleware/populateCurrentUser()', () => {
       expect(res.locals.user).toEqual(expected)
     })
     it('should log that no user has been found', () => {
-      expect(logger.info).toHaveBeenCalledWith('No user available')
+      expect(mockedLogger.info).toHaveBeenCalledWith('No user available')
     })
   })
 
@@ -131,13 +127,15 @@ describe('/middleware/populateCurrentUser()', () => {
 
   describe('If error returned', () => {
     const mockError = new Error('Error fetching user')
-    const loggerErrorSpy = jest.spyOn(logger, 'error')
     beforeEach(async () => {
       jest.spyOn(userService, 'getUser').mockImplementationOnce(() => Promise.reject(mockError))
       await populateCurrentUser(userService)(req, res, nextSpy)
     })
     it('should log the error', () => {
-      expect(loggerErrorSpy).toHaveBeenCalledWith(mockError, `Failed to retrieve user for: ${res.locals.user.username}`)
+      expect(mockedLogger.error).toHaveBeenCalledWith(
+        mockError,
+        `Failed to retrieve user for: ${res.locals.user.username}`,
+      )
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledWith(mockError)

@@ -1,16 +1,6 @@
 /* eslint-disable import/first */
-// Mock the config and logger above importing the client to ensure the mocks are in place before the client is imported
-jest.mock('../config', () => ({
-  getConfig: jest.fn(),
-}))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-  },
-}))
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -58,7 +48,7 @@ describe('MasOutlookClient', () => {
   let fakeApi: nock.Scope
   let client: SupervisionAppointmentClient
   beforeEach(() => {
-    jest.clearAllMocks()
+    // jest.clearAllMocks()
     mockGetConfig.mockReturnValue(mockConfig)
     mockedIsValidHost.mockReturnValue(true)
     mockedIsValidPath.mockReturnValue(true)

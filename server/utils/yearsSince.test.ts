@@ -1,5 +1,7 @@
 import { yearsSince } from '.'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('utils/yearsSince', () => {
   it.each([
     [null, null, null],

@@ -1,8 +1,8 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { postCheckinInComplete } from './postCheckinComplete'
 import ESupervisionClient from '../data/eSupervisionClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import logger from '../../logger'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -10,6 +10,7 @@ jest.mock('../data/eSupervisionClient')
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 describe('postCheckinInComplete middleware', () => {
   const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'

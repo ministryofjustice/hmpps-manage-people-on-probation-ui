@@ -1,9 +1,6 @@
 import { RedisClient } from '../redisClient'
 import TokenStore from './redisTokenStore'
 
-jest.mock('../../logger', () => ({
-  error: jest.fn(),
-}))
 const redisClient = {
   get: jest.fn(),
   set: jest.fn(),

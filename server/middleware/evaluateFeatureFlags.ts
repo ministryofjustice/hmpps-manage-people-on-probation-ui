@@ -1,5 +1,5 @@
 import { RequestHandler } from 'express'
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import FlagService from '../services/flagService'
 import { AppResponse } from '../models/Locals'
 

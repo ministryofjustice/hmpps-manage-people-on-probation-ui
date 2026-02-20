@@ -1,6 +1,25 @@
+import { AgentConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import nock from 'nock'
 import { serviceCheckFactory } from './healthCheck'
-import { AgentConfig } from '../config'
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: {
+    preservedWords: [] as string[],
+    preservedSeparators: [] as string[],
+    validMimeTypes: {} as Record<string, string>,
+    apis: {
+      masApi: {
+        pageSize: 12,
+      },
+    },
+    delius: {
+      link: 'https://ndelius-dummy-url',
+    },
+  },
+}))
 
 describe('Service healthcheck', () => {
   const healthcheck = serviceCheckFactory('externalService', 'http://test-service.com/ping', new AgentConfig(), {

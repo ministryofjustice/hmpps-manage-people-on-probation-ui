@@ -24,6 +24,8 @@
   },
   "exclude": [
     "node_modules",
+    "jest-resolver.js",
+    "jest.config.js",
     "assets/**/*.js",
     "integration_tests",
     "e2e_tests",

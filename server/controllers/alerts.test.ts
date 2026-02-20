@@ -1,6 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import getPaginationLinks from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import controllers from '.'
 import MasApiClient from '../data/masApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -10,7 +11,6 @@ import { mockAppResponse } from './mocks'
 import { mockClearAlertsSuccess, defaultUser } from './mocks/alerts'
 import { apiErrors } from '../properties'
 import { UserAlerts } from '../models/Alerts'
-import logger from '../../logger'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/arnsApiClient')

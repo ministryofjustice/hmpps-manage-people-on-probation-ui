@@ -3,6 +3,8 @@ import httpMocks from 'node-mocks-http'
 import { decorateFormAttributes } from './decorateFormAttributes'
 import { mockAppResponse } from '../controllers/mocks'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('utils/decorateFormAttributes', () => {
   const crn = 'X000001'
   const id = '19a88188-6013-43a7-bb4d-6e338516818f'

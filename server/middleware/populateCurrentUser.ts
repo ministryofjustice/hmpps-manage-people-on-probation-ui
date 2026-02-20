@@ -1,4 +1,4 @@
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import UserService from '../services/userService'
 import { Route } from '../@types'
 

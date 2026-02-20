@@ -36,7 +36,7 @@ import { getUserAlertsCount } from './middleware/getUserAlertsCount'
 
 export default function createApp(services: Services): express.Application {
   const app = express()
-  // initSharedConfig(config)
+  initSharedConfig(config)
   if (process.env.NODE_ENV === 'development') {
     cypressCoverage(app)
   }

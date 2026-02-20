@@ -1,5 +1,7 @@
 import { deliusDeepLinkUrl } from './deliusDeepLinkUrl'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('utils/deliusDeepLinkUrl', () => {
   it.each([
     ['null', null, null, undefined, undefined, ''],

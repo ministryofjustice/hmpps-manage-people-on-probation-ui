@@ -6,15 +6,6 @@ jest.mock('../config', () => ({
   getConfig: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-  },
-}))
-
 const mockedConfig = {
   apis: {
     hmppsAuth: {
@@ -32,7 +23,6 @@ import TokenStore from './tokenStore/redisTokenStore'
 import { getConfig } from '../config'
 
 const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
-
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const username = 'Bob'
 const token = { access_token: 'token-1', expires_in: 300 }

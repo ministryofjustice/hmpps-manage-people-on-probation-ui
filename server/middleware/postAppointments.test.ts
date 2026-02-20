@@ -24,6 +24,8 @@ const crn = 'X000001'
 const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
 const username = 'user-1'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 jest.mock('../data/masApiClient')
 jest.mock('../data/SupervisionAppointmentClient')
 jest.mock('../data/hmppsAuthClient')
@@ -256,9 +258,12 @@ let getUserDetailsSpy: jest.SpyInstance
 let postOutlookCalendarEventSpy: jest.SpyInstance
 
 describe('/middleware/postAppointments', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
+  // afterEach(() => {
+  //   jest.clearAllMocks()
+  // })
 
   describe('It should post the correct request body', () => {
     beforeEach(() => {

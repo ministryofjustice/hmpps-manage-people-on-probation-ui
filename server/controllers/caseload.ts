@@ -1,6 +1,7 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
+import { logger, initSharedConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { v4 } from 'uuid'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
@@ -8,8 +9,9 @@ import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
 import { checkRecentlyViewedAccess, getSearchParamsString } from '../utils'
 import { Controller } from '../@types'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
-import logger from '../../logger'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
+
+initSharedConfig(config)
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 

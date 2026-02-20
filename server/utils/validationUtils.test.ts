@@ -1,5 +1,6 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { DateTime } from 'luxon'
-import logger from '../../logger'
+
 import {
   charsOrLess,
   getNestedValue,
@@ -38,7 +39,10 @@ import {
 } from '../properties'
 import { Validateable, ValidationSpec } from '../models/Errors'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 const loggerSpy = jest.spyOn(logger, 'info')
+
 const crn = 'X000001'
 const id = 'bfb940b1-77ab-45a6-8f3c-aa481c403555'
 

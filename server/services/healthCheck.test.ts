@@ -2,6 +2,8 @@ import healthCheck from './healthCheck'
 import type { ApplicationInfo } from '../applicationInfo'
 import type { HealthCheckCallback, HealthCheckService } from './healthCheck'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('Healthcheck', () => {
   const testAppInfo: ApplicationInfo = {
     applicationName: 'test',

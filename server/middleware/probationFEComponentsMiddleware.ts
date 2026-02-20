@@ -1,6 +1,6 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import type { RequestHandler } from 'express'
 import ProbationComponentsService from '../services/ProbationComponentsService'
-import logger from '../../logger'
 
 export default function getFrontendComponents(probationComponentsService: ProbationComponentsService): RequestHandler {
   return async (req, res, next) => {

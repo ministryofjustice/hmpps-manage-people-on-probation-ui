@@ -1,7 +1,9 @@
 import nunjucksSetup from './nunjucksSetup'
 import { appWithAllRoutes } from '../routes/testutils/appSetup'
 import { ApplicationInfo } from '../applicationInfo'
-import type { Services } from '../services' // Import Services type
+import type { Services } from '../services'
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 const mockTechnicalUpdatesService = {
   getLatestTechnicalUpdateHeading: jest.fn(() => 'Mock Technical Update Heading'),
@@ -17,7 +19,6 @@ const mockServices: Services = {
   technicalUpdatesService: mockTechnicalUpdatesService,
   searchService: mockSearchService,
 } as unknown as Services
-
 jest.mock('../config', () => ({
   ...jest.requireActual('../config'),
   __esModule: true,
@@ -40,7 +41,6 @@ jest.mock('../config', () => ({
     },
   },
 }))
-
 const app = appWithAllRoutes({ services: mockServices })
 
 const mockAppInfo: ApplicationInfo = {

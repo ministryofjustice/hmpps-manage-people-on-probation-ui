@@ -1,10 +1,11 @@
 /* eslint-disable import/no-cycle */
 import { Response } from 'express'
+import { type SentryConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
-import { SentryConfig } from '../config'
+
 import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
 import { Option } from './Option'

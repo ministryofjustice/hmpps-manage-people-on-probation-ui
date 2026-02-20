@@ -1,5 +1,7 @@
 import { toSentenceCase } from './toSentenceCase'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('toSentenceCase()', () => {
   it('should expect one argument', () => {
     expect(toSentenceCase.length).toEqual(1)

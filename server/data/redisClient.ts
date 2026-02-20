@@ -1,5 +1,5 @@
 import { createClient } from 'redis'
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import config from '../config'
 import { reconnectStrategy } from './redisReconnectStrategy'
 

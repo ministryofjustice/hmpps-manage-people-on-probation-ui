@@ -6,14 +6,6 @@ jest.mock('../config', () => ({
   getConfig: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-  },
-}))
-
 const mockedConfig = {
   redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
 }
@@ -39,13 +31,7 @@ describe('createRedisClient', () => {
     mockedGetConfig.mockReturnValueOnce({
       redis: { tls_enabled: 'false', host: 'localhost', port: 6379 },
     })
-    // jest.mock('../config', () => {
-    //   const config = jest.requireActual('../config')
-    //   return {
-    //     ...config,
-    //     redis: { tls_enabled: 'false', host: 'localhost', port: 6379 },
-    //   }
-    // })
+
     const client = createRedisClient()
     try {
       await client.connect()
@@ -57,13 +43,7 @@ describe('createRedisClient', () => {
     mockedGetConfig.mockReturnValueOnce({
       redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
     })
-    // jest.mock('../config', () => {
-    //   const config = jest.requireActual('../config')
-    //   return {
-    //     ...config,
-    //     redis: { tls_enabled: 'true', host: 'localhost', port: 6379 },
-    //   }
-    // })
+
     const client = createRedisClient()
     try {
       await client.connect()

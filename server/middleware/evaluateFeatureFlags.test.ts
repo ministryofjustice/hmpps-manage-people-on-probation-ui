@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import evaluateFeatureFlags from './evaluateFeatureFlags'
 import FlagService from '../services/flagService'
-import logger from '../../logger'
 import { AppResponse } from '../models/Locals'
 
 const mockFlags = {

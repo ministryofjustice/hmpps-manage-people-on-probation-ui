@@ -13,6 +13,7 @@ import { RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { ErrorSummary } from '../data/model/common'
 import { UserCaseload } from '../data/model/caseload'
 import { CurrentVersion } from '../data/model/sentencePlan'
+import { PersonalDetailsSession } from '../models/Data'
 
 export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, res, next) => {
@@ -68,7 +69,7 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       req.session.data = {
         ...(req?.session?.data ?? {}),
         personalDetails: {
-          ...(req?.session?.data?.personalDetails ?? {}),
+          ...(req?.session?.data?.personalDetails ?? ({} as any)),
           [crn]: {
             overview: overview as PersonalDetails,
             sentencePlan,

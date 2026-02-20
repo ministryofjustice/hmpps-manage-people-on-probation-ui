@@ -1,17 +1,8 @@
 import httpMocks from 'node-mocks-http'
 import evaluateFeatureFlags from './evaluateFeatureFlags'
 import FlagService from '../services/flagService'
-import logger from '../logger'
 import { AppResponse } from '../models/Locals'
 import { getConfig } from '../config'
-
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-  },
-}))
 
 jest.mock('../config', () => ({
   getConfig: jest.fn(),
@@ -22,6 +13,12 @@ const mockedConfig = {
     token: 'dummy-token',
   },
 }
+
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+} as any
 
 const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 mockedGetConfig.mockReturnValue(mockedConfig)
@@ -80,7 +77,7 @@ describe('/middleware/evaluateFeatureFlags', () => {
       await evaluateFeatureFlags(flagService)(req, res, nextSpy)
     })
     it('should log info', () => {
-      expect(logger.info).toHaveBeenCalledWith('No flags available')
+      expect(mockedLogger.info).toHaveBeenCalledWith('No flags available')
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalled()
@@ -95,7 +92,7 @@ describe('/middleware/evaluateFeatureFlags', () => {
       await evaluateFeatureFlags(flagService)(req, res, nextSpy)
     })
     it('should log the error', () => {
-      expect(logger.error).toHaveBeenCalledWith(mockError, `Failed to retrieve flipt feature flags`)
+      expect(mockedLogger.error).toHaveBeenCalledWith(mockError, `Failed to retrieve flipt feature flags`)
     })
     it('should call next()', () => {
       expect(nextSpy).toHaveBeenCalledWith(mockError)

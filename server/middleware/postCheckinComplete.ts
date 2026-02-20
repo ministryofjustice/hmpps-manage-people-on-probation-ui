@@ -1,8 +1,8 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 
 import ESupervisionClient from '../data/eSupervisionClient'
-import logger from '../../logger'
 
 export const postCheckinInComplete = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res) => {

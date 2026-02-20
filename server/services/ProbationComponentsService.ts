@@ -1,7 +1,6 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import ProbationFrontendComponentsApiClient from '../data/probationFrontendComponentsClient'
-
 import { AvailableComponent, Component } from '../@types/probationComponent'
-import logger from '../../logger'
 
 export default class ProbationComponentsService {
   constructor(private readonly probationFEComponentsClient: ProbationFrontendComponentsApiClient) {}

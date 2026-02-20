@@ -1,8 +1,8 @@
 import nock from 'nock'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Request } from 'express'
 import verifyToken from './tokenVerification'
 import config from '../config'
-import logger from '../../logger'
 
 describe('token verification api tests', () => {
   let fakeApi: nock.Scope

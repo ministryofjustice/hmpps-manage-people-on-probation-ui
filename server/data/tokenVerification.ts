@@ -1,8 +1,8 @@
 import superagent from 'superagent'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import type { Request } from 'express'
 import getSanitisedError from '../sanitisedError'
 import config from '../config'
-import logger from '../../logger'
 
 function getApiClientToken(token: string) {
   return superagent
