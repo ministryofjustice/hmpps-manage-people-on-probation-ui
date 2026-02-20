@@ -46,6 +46,8 @@ const loadPage = ({
     completeTextMessageConfirmationPage({ index: textMessageOptionIndex })
     if (textMessageOptionIndex === 2) {
       const page = new EditContactDetails()
+      cy.get('[name=phoneNumber]').should('not.exist')
+      cy.get('[name=emailAddress]').should('not.exist')
       page.getElementInput('mobileNumber').clear().type('07783889300')
       cy.get('[data-qa=submitBtn]').click()
     }
@@ -140,6 +142,14 @@ describe('Check your answers then confirm the appointment', () => {
       })
       it('should update the sensitivity when value is changed', () => {
         checkUpdateSensitivity(cyaPage)
+      })
+      it('should update the text message confirmation when mobile number is changed', () => {
+        const updateMobileNumber = true
+        checkUpdateTextMessageConfirmation(cyaPage, updateMobileNumber)
+      })
+      it('should update the text message confirmation when mobile number is not changed', () => {
+        const updateMobileNumber = false
+        checkUpdateTextMessageConfirmation(cyaPage, updateMobileNumber)
       })
     })
     describe('Confirm this appointment', () => {

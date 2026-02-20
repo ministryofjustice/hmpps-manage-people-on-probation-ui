@@ -17,6 +17,7 @@ import AttendedCompliedPage from '../../pages/appointments/attended-complied.pag
 import AddNotePage from '../../pages/appointments/add-note.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import EditContactDetails from '../../pages/personalDetails/editContactDetails'
 
 export const crn = 'X778160'
 export const uuid = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -476,20 +477,39 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
 
 export const checkUpdateTextMessageConfirmation = (
   page: AppointmentCheckYourAnswersPage | ArrangeAnotherAppointmentPage,
+  updateMobileNumber = false,
 ) => {
   getCrn().then(pageCrn => {
     getUuid().then(pageUuid => {
+      const optionIndex = updateMobileNumber ? 2 : 3
+      const number = '07703123456'
       page.getSummaryListRow(6).find('.govuk-link').click()
       const textMessageConfirmPage = new TextMessageConfirmationPage()
       textMessageConfirmPage.getSmsOptIn().find(`#appointments-${pageCrn}-${pageUuid}-smsOptIn`).should('be.checked')
-      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${pageCrn}-${pageUuid}-smsOptIn-3`).click()
+      textMessageConfirmPage.getSmsOptIn().find(`#appointments-${pageCrn}-${pageUuid}-smsOptIn-${optionIndex}`).click()
       textMessageConfirmPage.getSubmitBtn().click()
+      if (updateMobileNumber) {
+        const editContactDetailsPage = new EditContactDetails()
+        editContactDetailsPage.checkOnPage()
+        cy.get('[name=phoneNumber]').should('not.exist')
+        cy.get('[name=emailAddress]').should('not.exist')
+        page.getElementInput('mobileNumber').clear().type('07703123456')
+        cy.get('[data-qa=submitBtn]').click()
+      }
       page.checkOnPage()
-      page
-        .getSummaryListRow(6)
-        .find('.govuk-summary-list__value')
-        .should('contain.text', 'No')
-        .should('not.contain.text', '07783889300')
+      if (updateMobileNumber) {
+        page
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'Yes')
+          .should('contain.text', number)
+      } else {
+        page
+          .getSummaryListRow(6)
+          .find('.govuk-summary-list__value')
+          .should('contain.text', 'No')
+          .should('not.contain.text', number)
+      }
     })
   })
 }
