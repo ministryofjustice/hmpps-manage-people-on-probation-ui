@@ -92,6 +92,18 @@
     'colour': colour }), tags) %}
 {% endif %}
 
+{% if entry.isSystemContact === true %}
+  {% set text = 'System generated' %}
+  {% set shorthand = '⛭' %}
+  {% set iconClass = 'strike' %}
+  {% set colour = 'grey' %}
+  {% set tags = (tags.push({
+    'text': text,
+    'shorthand': shorthand,
+    'iconClass': iconClass,
+    'colour': colour }), tags) %}
+{% endif %}
+
 {% for tag in tags %}
   {% set tagClasses = 'app-compliance-tag govuk-tag--' + tag.colour + ' ' + params.classes + (' app-compliance-tag--compact' if isCompact) %}
   {% if tag.text %}
