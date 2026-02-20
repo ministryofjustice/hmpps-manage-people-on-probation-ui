@@ -27,7 +27,7 @@
       }
     },
     hint: {
-        text: ("Their mobile number is " + case.mobileNumber + ".") if case.mobileNumber else "They do not have a mobile number saved, you´ll need to check if they have one."
+        text: ("Their mobile number is " + case.mobileNumber + ".") if case.mobileNumber else "They do not have a mobile number saved, so you´ll need to check if they have one."
       },
     items: smsItems
    } | decorateFormAttributes(['appointments', crn, id, 'smsOptIn'])) }}
