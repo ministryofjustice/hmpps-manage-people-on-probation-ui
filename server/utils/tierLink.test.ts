@@ -1,5 +1,7 @@
 import { tierLink } from './tierLink'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('utils/tierLink', () => {
   it.each([
     ['Returns empty', null, ''],

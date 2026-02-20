@@ -1,10 +1,10 @@
 import { DateTime } from 'luxon'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { LocationInfo, OffenderInfo, OffenderSetup } from '../data/model/esupervision'
-import logger from '../../logger'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const postCheckInDetails = (

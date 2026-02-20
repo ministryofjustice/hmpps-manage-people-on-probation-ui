@@ -1,12 +1,13 @@
-/* eslint-disable import/no-cycle */
+import { logger, type ApiConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { HttpAgent as Agent, HttpsAgent } from 'agentkeepalive'
 import superagent, { Response } from 'superagent'
-import logger from '../../logger'
 import sanitiseError from '../sanitisedError'
-import type { ApiConfig } from '../config'
+
 import { restClientMetricsMiddleware } from './restClientMetricsMiddleware'
 import { ErrorSummaryItem } from './model/common'
-import { escapeForLog, isValidHost, isValidPath } from '../utils'
+import { escapeForLog } from '../utils/escapeForLog'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 import 'multer'
 
 interface Request {

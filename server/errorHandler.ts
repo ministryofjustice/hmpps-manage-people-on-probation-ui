@@ -1,6 +1,6 @@
 import type { Request, NextFunction } from 'express'
 import type { HTTPError } from 'superagent'
-import logger from '../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { statusErrors, type StatusErrorCode } from './properties'
 import { AppResponse } from './models/Locals'
 

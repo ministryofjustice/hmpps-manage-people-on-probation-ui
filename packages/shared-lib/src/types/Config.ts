@@ -1,7 +1,9 @@
 type Env = 'local' | 'dev' | 'preprod' | 'prod'
 
-interface LinkConfig {
-  link: string
+interface ServiceConfig {
+  link?: string
+  url?: string
+  token?: string
 }
 
 export class AgentConfig {
@@ -13,9 +15,9 @@ export class AgentConfig {
 }
 
 export interface ApiConfig {
-  url: string
+  url?: string
   externalUrl?: string
-  timeout: {
+  timeout?: {
     response: number
     deadline: number
   }
@@ -25,6 +27,8 @@ export interface ApiConfig {
   systemClientId?: string
   systemClientSecret?: string
   pageSize?: number
+  enabled?: boolean
+  connectionString?: string
 }
 
 export interface SentryConfig {
@@ -59,18 +63,18 @@ export interface Config {
     expiryMinutes: number
   }
   sentry: SentryConfig
-  delius: LinkConfig
-  oaSys: LinkConfig
-  tier: LinkConfig
-  sentencePlan: LinkConfig
-  interventions: LinkConfig
-  recall: LinkConfig
-  cas1: LinkConfig
-  cas3: LinkConfig
-  caval: LinkConfig
-  guidance: LinkConfig
-  epf2: LinkConfig
-  flipt: LinkConfig
+  delius: ServiceConfig
+  oaSys: ServiceConfig
+  tier: ServiceConfig
+  sentencePlan: ServiceConfig
+  interventions: ServiceConfig
+  recall: ServiceConfig
+  cas1: ServiceConfig
+  cas3: ServiceConfig
+  caval: ServiceConfig
+  guidance: ServiceConfig
+  epf2: ServiceConfig
+  flipt: ServiceConfig
   probationFrontendComponents: {
     connectSrc: string
     fontSrc: string
@@ -96,7 +100,7 @@ export interface Config {
   validMimeTypes: Record<string, string>
   maxFileSize: number
   fileUploadLimit: number
-  maxCharCount: number
+  maxCharCount: string | number
   preservedWords: string[]
   preservedSeparators: string[]
 }

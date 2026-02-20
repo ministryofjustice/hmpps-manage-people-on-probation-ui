@@ -1,5 +1,5 @@
 import httpMocks from 'node-mocks-http'
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import populateCurrentUser from './populateCurrentUser'
 
 import { UserService } from '../services'

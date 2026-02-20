@@ -1,19 +1,20 @@
 import type { Request, Response } from 'express'
 import { getFrontendComponents } from './probationFEComponentsMiddleware'
 
-import logger from '../logger'
-
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: { info: jest.fn() },
-}))
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+} as any
 
 describe('ProbationFEComponentsMiddleware', () => {
   let next: jest.Mock
 
   beforeEach(() => {
-    jest.resetAllMocks()
     next = jest.fn()
+  })
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   function createReqRes(options?: { session?: any; token?: string }): { req: Request; res: Response } {
@@ -107,7 +108,7 @@ describe('ProbationFEComponentsMiddleware', () => {
     await mw(req, res, next)
 
     // Should log and still call next without throwing
-    expect(logger.info).toHaveBeenCalled()
+    expect(mockedLogger.info).toHaveBeenCalled()
     expect(next).toHaveBeenCalled()
   })
 })

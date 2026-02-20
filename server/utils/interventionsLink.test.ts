@@ -1,6 +1,25 @@
 import { interventionsLink } from './interventionsLink'
 import config from '../config'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
+jest.mock('../config', () => ({
+  __esModule: true,
+  default: {
+    preservedWords: [] as string[],
+    preservedSeparators: [] as string[],
+    validMimeTypes: {} as Record<string, string>,
+    apis: {
+      masApi: {
+        pageSize: 10,
+      },
+    },
+    interventions: {
+      link: '',
+    },
+  },
+}))
+
 describe('utils/interventionsLink', () => {
   const referralId = '1234'
   it.each([

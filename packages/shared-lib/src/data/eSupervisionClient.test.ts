@@ -18,15 +18,6 @@ jest.mock('../utils/isValidPath', () => ({
   isValidPath: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-  },
-}))
-
 jest.mock('./tokenStore/redisTokenStore')
 
 const mockedConfig = {
@@ -69,7 +60,6 @@ describe('ESupervisionClient', () => {
   })
 
   afterEach(() => {
-    // jest.resetAllMocks()
     nock.cleanAll()
   })
 

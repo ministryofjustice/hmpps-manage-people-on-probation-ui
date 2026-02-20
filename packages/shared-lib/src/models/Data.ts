@@ -28,9 +28,7 @@ export interface Data {
     [crn: string]: Sentence[]
   }
   appointmentTypes?: AppointmentType[]
-  personalDetails?: {
-    [crn: string]: PersonalDetailsSession
-  }
+  personalDetails?: Record<string, PersonalDetailsSession>
   errors?: Errors
   locations?: {
     [userId: string]: Location[]

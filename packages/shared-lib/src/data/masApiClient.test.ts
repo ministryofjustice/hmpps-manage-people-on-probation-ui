@@ -2,15 +2,6 @@ jest.mock('../config', () => ({
   getConfig: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-  },
-}))
-
 jest.mock('../utils/isValidHost', () => ({
   isValidHost: jest.fn(),
 }))
@@ -45,6 +36,12 @@ const mockConfig: any = {
     },
   },
 }
+
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+} as any
 
 const token = { access_token: 'token-1', expires_in: 300 }
 

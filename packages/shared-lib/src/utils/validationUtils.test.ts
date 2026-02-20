@@ -1,14 +1,10 @@
 /* eslint-disable import/first */
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-  },
+
+jest.mock('../config', () => ({
+  getConfig: jest.fn(),
 }))
 
 import { DateTime } from 'luxon'
-import logger from '../logger'
 import {
   charsOrLess,
   getNestedValue,
@@ -47,10 +43,7 @@ import {
 } from '../properties'
 import { Validateable, ValidationSpec } from '../models/Errors'
 import { getConfig } from '../config'
-
-jest.mock('../config', () => ({
-  getConfig: jest.fn(),
-}))
+import logger from '../logger'
 
 const mockedConfig = {
   maxCharCount: 12000,
@@ -59,6 +52,8 @@ const mockedConfig = {
 
 const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 mockedGetConfig.mockReturnValue(mockedConfig)
+
+const loggerSpy = jest.spyOn(logger, 'info')
 
 const crn = 'X000001'
 const id = 'bfb940b1-77ab-45a6-8f3c-aa481c403555'
@@ -390,7 +385,7 @@ describe('validates appointment location and date time page request with spec', 
     expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
   })
   it('should log the error', () => {
-    expect(logger.info).toHaveBeenCalledWith('Appointment date not entered in correct format')
+    expect(loggerSpy).toHaveBeenCalledWith('Appointment date not entered in correct format')
   })
 })
 
@@ -661,7 +656,7 @@ describe('validates checkin contact type preference', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Select how to send service link, not selected')
+    expect(loggerSpy).toHaveBeenCalledWith('Select how to send service link, not selected')
   })
 })
 
@@ -696,7 +691,7 @@ describe('validates checkin date preference', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Checkin frequency not selected')
+    expect(loggerSpy).toHaveBeenCalledWith('Checkin frequency not selected')
   })
 })
 
@@ -730,7 +725,7 @@ describe('validates edit contact', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
+    expect(loggerSpy).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
   })
 })
 
@@ -761,7 +756,7 @@ describe('validates photo options page', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Photo option, not selected')
+    expect(loggerSpy).toHaveBeenCalledWith('Photo option, not selected')
   })
 })
 
@@ -792,7 +787,7 @@ describe('validates upload a photo page', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Photo not selected.')
+    expect(loggerSpy).toHaveBeenCalledWith('Photo not selected.')
   })
 })
 
@@ -826,7 +821,7 @@ describe('validates manage checkin settings', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Next checkin date not entered')
+    expect(loggerSpy).toHaveBeenCalledWith('Next checkin date not entered')
   })
 })
 
@@ -858,7 +853,7 @@ describe('validates stop checkin', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Stop checkin, not selected')
+    expect(loggerSpy).toHaveBeenCalledWith('Stop checkin, not selected')
   })
 })
 
@@ -890,7 +885,7 @@ describe('validates stop checkin reason', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Stop checkin, reason not provided')
+    expect(loggerSpy).toHaveBeenCalledWith('Stop checkin, reason not provided')
   })
 })
 
@@ -924,7 +919,7 @@ describe('validates manage edit contact', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
+    expect(loggerSpy).toHaveBeenCalledWith('Mobile number not in correct format in check in process')
   })
 })
 
@@ -959,6 +954,6 @@ describe('validates manage checkin contact type preference', () => {
   })
   it('should log the error', () => {
     validateWithSpec(testRequest, spec)
-    expect(logger.info).toHaveBeenCalledWith('Email not entered in manage check in process')
+    expect(loggerSpy).toHaveBeenCalledWith('Email not entered in manage check in process')
   })
 })

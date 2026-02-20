@@ -1,7 +1,8 @@
 //  setup, defaultClient, TelemetryClient, DistributedTracingModes
 import * as applicationInsights from 'applicationinsights'
 import { defaultName, version, initialiseAppInsights, buildAppInsightsClient } from './azureAppInsights'
-import applicationInfo from '../applicationInfo'
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 const applicationName = 'mock application name'
 const mockVersion = '1_0_0'

@@ -10,6 +10,7 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/eSupervisionClient')
 jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 describe('postCheckInDetails', () => {
   const crn = 'X000001'

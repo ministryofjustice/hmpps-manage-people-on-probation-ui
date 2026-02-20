@@ -3,6 +3,7 @@ import RoleService from './roleService'
 import { DeliusRoleEnum, DeliusRoles } from '../data/model/deliusRoles'
 
 jest.mock('../data/masApiClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 describe('Delius Role service', () => {
   let masApiClient: jest.Mocked<MasApiClient>

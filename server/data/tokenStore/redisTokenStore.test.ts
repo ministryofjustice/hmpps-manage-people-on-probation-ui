@@ -1,6 +1,8 @@
 import { RedisClient } from '../redisClient'
 import TokenStore from './redisTokenStore'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 const redisClient = {
   get: jest.fn(),
   set: jest.fn(),

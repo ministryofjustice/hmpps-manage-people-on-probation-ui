@@ -2,19 +2,9 @@ import nock from 'nock'
 import { Request } from 'express'
 import verifyToken from './tokenVerification'
 import { getConfig } from '../config'
-import logger from '../logger'
 
 jest.mock('../config', () => ({
   getConfig: jest.fn(),
-}))
-
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-  },
 }))
 
 const mockedConfig = {
@@ -26,6 +16,13 @@ const mockedConfig = {
     },
   },
 }
+
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  debug: jest.fn(),
+} as any
 
 const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 mockedGetConfig.mockReturnValue(mockedConfig)
@@ -95,7 +92,7 @@ describe('token verification api tests', () => {
       it('Superagent throws error', async () => {
         fakeApi.post('/token/verify', '').reply(500, { active: true })
         await verifyToken({ user: {}, verified: false } as Request)
-        expect(logger.error).toHaveBeenCalled()
+        expect(mockedLogger.error).toHaveBeenCalled()
       })
     })
   })

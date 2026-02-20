@@ -19,10 +19,9 @@ import {
 } from './model/esupervision'
 import { ErrorSummary } from './model/common'
 
-const config = getConfig()
-
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {
+    const config = getConfig()
     super('HMPPS E-Supervision API', config.apis.eSupervisionApi, token)
   }
 

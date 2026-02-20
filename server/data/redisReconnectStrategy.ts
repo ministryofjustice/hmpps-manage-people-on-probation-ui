@@ -1,4 +1,4 @@
-import logger from '../../logger'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 
 export const reconnectStrategy = (attempts?: number): number | false => {
   // Exponential back off: 20ms, 40ms, 80ms..., capped to retry every 30 seconds

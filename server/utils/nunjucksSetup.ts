@@ -18,7 +18,6 @@ import {
   dateWithYearShortMonth,
   dateWithYearShortMonthAndTime,
   deliusDateFormat,
-  deliusDeepLinkUrl,
   fromIsoDateToPicker,
   fullName,
   getCurrentRisksToThemselves,
@@ -73,6 +72,8 @@ import {
   dateToLongDate,
   merge,
 } from '.'
+
+import { deliusDeepLinkUrl } from './deliusDeepLinkUrl'
 
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'

@@ -4,7 +4,6 @@ import { AgentConfig, ApiConfig } from '../types/Config'
 import RestClient from './restClient'
 import { isValidHost } from '../utils/isValidHost'
 import { isValidPath } from '../utils/isValidPath'
-import logger from '../logger'
 import { ErrorSummary } from './model/common'
 
 jest.mock('../utils/isValidHost', () => ({
@@ -14,15 +13,11 @@ jest.mock('../utils/isValidPath', () => ({
   isValidPath: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-    warn: jest.fn(),
-  },
-}))
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+} as any
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
@@ -304,9 +299,8 @@ describe('RestClient.get', () => {
     mockedIsValidHost.mockReturnValue(false)
     mockedIsValidPath.mockReturnValue(true)
     Object.defineProperty(restClient as any, 'apiUrl', { value: () => 'http://invalid-url' })
-    const warnSpy = jest.spyOn(logger, 'warn')
     await expect(restClient.get({ path: '/test' } as any)).rejects.toThrow('Invalid API URL or path')
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
+    expect(mockedLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
   })
 })
 
@@ -314,9 +308,8 @@ describe('RestClient.delete', () => {
   it('throws if apiUrl or path is invalid', async () => {
     mockedIsValidHost.mockReturnValue(false)
     mockedIsValidPath.mockReturnValue(true)
-    const warnSpy = jest.spyOn(logger, 'warn')
     await expect(restClient.delete({ path: '/test' } as any)).rejects.toThrow('Invalid API URL or path')
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
+    expect(mockedLogger.warn).toHaveBeenCalledWith(expect.stringContaining('Invalid API URL or path'))
   })
 })
 

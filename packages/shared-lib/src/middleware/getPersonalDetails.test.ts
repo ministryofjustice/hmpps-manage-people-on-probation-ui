@@ -9,15 +9,6 @@ jest.mock('../config', () => ({
   getConfig: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    warn: jest.fn(),
-  },
-}))
-
 import httpMocks from 'node-mocks-http'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
@@ -98,6 +89,12 @@ const mockConfig: any = {
     link: tierLink,
   },
 }
+
+const mockedLogger = {
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+} as any
 
 const getReq = () =>
   httpMocks.createRequest({

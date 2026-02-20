@@ -17,15 +17,6 @@ jest.mock('../config', () => ({
   getConfig: jest.fn(),
 }))
 
-jest.mock('../logger', () => ({
-  __esModule: true,
-  default: {
-    info: jest.fn(),
-    error: jest.fn(),
-    debug: jest.fn(),
-  },
-}))
-
 const mockedConfig = {
   apis: {
     manageUsersApi: {
@@ -37,7 +28,6 @@ const mockedConfig = {
 
 const mockedGetConfig = getConfig as jest.MockedFunction<typeof getConfig>
 mockedGetConfig.mockReturnValue(mockedConfig)
-
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>
 
