@@ -58,8 +58,8 @@ export interface SmsPreviewRequest {
   firstName: string
   dateAndTimeOfAppointment: string
   appointmentLocation?: string
+  appointmentTypeCode?: string
   includeWelshPreview: boolean
-  appointmentType?: string
 }
 
 export interface SmsPreviewResponse {
