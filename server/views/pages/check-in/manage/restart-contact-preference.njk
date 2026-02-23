@@ -8,8 +8,8 @@
 {% set setMobileError =  'esupervision-'+  crn + '-' + id +'-restartCheckin-checkInMobile' %}
 {% set setEmailError =  'esupervision-'+  crn + '-' + id +'-restartCheckin-checkInEmail' %}
 {% set cyaLink =  "?cya=true" if cya else  "" %}
-{% set mobileValue = checkInMobile | default('No mobile number') %}
-{% set emailValue = checkInEmail | default('No email address') %}
+{% set mobileValue = checkInMobile if checkInMobile.length > 0 else "No mobile number" %}
+{% set emailValue = checkInEmail if checkInEmail.length > 0 else "No email address" %}
 
 {% block beforeContent %}
     {{ govukBreadcrumbs({
@@ -41,7 +41,7 @@
                     value: { html: ('<span data-qa="mobileNumberValue" class="app-!-font-family-tabular">' + checkInMobile+ '</span>') if checkInMobile else '<span data-qa="mobileNumberValue">No mobile number</span>' },
                     actions: {
                     items: [{
-                        href:"/case/" + crn + "/appointments/check-in/manage" + id +"restart-edit-contact?change=mobile" + cyaLink,
+                        href:"/case/" + crn + "/appointments/check-in/manage/" + id +"restart-edit-contact?change=mobile" + cyaLink,
                         text: "Change",
                         visuallyHiddenText: "mobile number",
                         attributes: {
@@ -55,7 +55,7 @@
                     value: { html: '<span data-qa="emailAddressValue">' + checkInEmail+ '</span>' if checkInEmail else '<span data-qa="emailAddressValue">No email address</span>' },
                     actions: {
                     items: [{
-                        href:"/case/" + crn + "/appointments/check-in/manage" + id +"restart-edit-contact?change=emailAddress" + cyaLink,
+                        href:"/case/" + crn + "/appointments/check-in/manage/" + id +"restart-edit-contact?change=emailAddress" + cyaLink,
                         text: "Change",
                         visuallyHiddenText: "email address",
                         attributes: {

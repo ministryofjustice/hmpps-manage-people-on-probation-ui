@@ -977,15 +977,15 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const editCheckInEmail1 = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'])
-      const editCheckInMobile1 = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInMobile'])
-      if (previousMobile?.trim() !== editCheckInMobile1?.trim() || previousEmail !== editCheckInEmail1) {
+      const editCheckInEmail = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'])
+      const editCheckInMobile = getDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInMobile'])
+      if (previousMobile?.trim() !== editCheckInMobile?.trim() || previousEmail !== editCheckInEmail) {
         const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
         const masClient = new MasApiClient(token)
 
         const body: PersonalDetailsUpdateRequest = {
-          emailAddress: editCheckInEmail1,
-          mobileNumber: editCheckInMobile1?.trim(),
+          emailAddress: editCheckInEmail,
+          mobileNumber: editCheckInMobile?.trim(),
         }
         const personalDetails: PersonalDetails = await masClient.updatePersonalDetailsContact(crn, body)
         // If personal details overview exists in session cache, update it with latest values
@@ -997,10 +997,14 @@ const checkInsController: Controller<typeof routes, void> = {
           setDataValue(data, ['esupervision', crn, id, 'restartCheckin', 'contactUpdated'], true)
           setDataValue(
             req.session.data,
-            ['esupervision', crn, id, 'restartCheckin', 'checkInMobile'],
-            editCheckInMobile1?.trim(),
+            ['esupervision', crn, id, 'restartCheckin', 'editCheckInMobile'],
+            editCheckInMobile?.trim(),
           )
-          setDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin', 'checkInEmail'], editCheckInEmail1)
+          setDataValue(
+            req.session.data,
+            ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'],
+            editCheckInEmail,
+          )
         }
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/restart-contact`)

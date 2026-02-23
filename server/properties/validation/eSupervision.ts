@@ -287,7 +287,8 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][restartCheckin][checkInEmail]`]: {
-      optional: (page === 'restart-contact' && checkInEmail?.trim() !== '') || page !== 'restart-contact',
+      optional:
+        (page === 'restart-contact' && checkInEmail?.trim() !== '') || page !== 'restart-contact' || change !== 'main',
       checks: [
         {
           validator: contactPrefEmailCheck,
@@ -298,7 +299,8 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][restartCheckin][checkInMobile]`]: {
-      optional: (page === 'restart-contact' && checkInMobile?.trim() !== '') || page !== 'restart-contact',
+      optional:
+        (page === 'restart-contact' && checkInMobile?.trim() !== '') || page !== 'restart-contact' || change !== 'main',
       checks: [
         {
           validator: contactPrefMobileCheck,
@@ -309,7 +311,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][restartCheckin][editCheckInMobile]`]: {
-      optional: page !== 'restart-edit-contact',
+      optional: (page === 'restart-edit-contact' && !editCheckInMobile) || page !== 'restart-edit-contact',
       checks: [
         {
           validator: isValidMobileNumber,
@@ -325,7 +327,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
       ],
     },
     [`[esupervision][${crn}][${id}][restartCheckin][editCheckInEmail]`]: {
-      optional: page !== 'restart-edit-contact',
+      optional: (page === 'restart-edit-contact' && !editCheckInEmail) || page !== 'restart-edit-contact',
       checks: [
         {
           validator: isEmail,
