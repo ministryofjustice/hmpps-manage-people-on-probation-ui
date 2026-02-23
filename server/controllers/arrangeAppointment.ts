@@ -435,7 +435,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getTextMessageConfirmation: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id })
+      const { change } = req.query
+      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id, change })
     }
   },
   postTextMessageConfirmation: _hmppsAuthClient => {
