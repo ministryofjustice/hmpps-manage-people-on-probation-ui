@@ -308,6 +308,32 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][restartCheckin][editCheckInMobile]`]: {
+      optional: page !== 'restart-edit-contact',
+      checks: [
+        {
+          validator: isValidMobileNumber,
+          msg: 'Enter a mobile number in the correct format.',
+          log: 'Mobile number not in correct format in restart process',
+        },
+        {
+          validator: charsOrLess,
+          length: 35,
+          msg: `Mobile number must be 35 characters or less.`,
+          log: 'Mobile number must be less than 35 chars, in check in process',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][restartCheckin][editCheckInEmail]`]: {
+      optional: page !== 'restart-edit-contact',
+      checks: [
+        {
+          validator: isEmail,
+          msg: 'Enter an email address in the correct format.',
+          log: 'Email address not in correct format in restart process',
+        },
+      ],
+    },
 
     photoUpload: {
       optional: page !== 'upload-a-photo',
