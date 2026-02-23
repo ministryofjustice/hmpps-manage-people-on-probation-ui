@@ -10,7 +10,7 @@ import type { Controller } from '../@types'
 import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
-import { renderError } from '../middleware'
+import { findUncompleted, renderError } from '../middleware'
 import { type Needs, type RoshRiskWidgetDto, type TimelineItem } from '../data/model/risk'
 
 const routes = [
@@ -260,8 +260,12 @@ const personalDetailsController: Controller<typeof routes, void> = {
         let redirect = `/case/${crn}/personal-details?update=success`
         if (origin === 'appointments') {
           const { data } = req.session
+          const change = req?.query?.change as string
           setDataValue(data, ['appointments', crn, id, 'smsOptIn'], 'YES')
           redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information`
+          if (change) {
+            redirect = findUncompleted(req, res)
+          }
         }
         res.redirect(redirect)
       }
