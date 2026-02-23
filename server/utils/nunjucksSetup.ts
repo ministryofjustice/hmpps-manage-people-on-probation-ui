@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
+import { type Services, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express, { Request, NextFunction } from 'express'
-import type { Services } from '../services'
 
 import {
   initialiseName,
@@ -77,7 +77,6 @@ import { deliusDeepLinkUrl } from './deliusDeepLinkUrl'
 
 import { ApplicationInfo } from '../applicationInfo'
 import config from '../config'
-import { AppResponse } from '../models/Locals'
 import { splitString } from './splitString'
 import getUserFriendlyString from './eSupervisionFriendlyString'
 import { to12HourTimeWithMinutes } from './to12HourTimeWithMinutes'

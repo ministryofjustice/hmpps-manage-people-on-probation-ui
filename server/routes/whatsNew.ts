@@ -1,7 +1,6 @@
 import { type Router } from 'express'
+import { type Services, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import type { Route } from '../@types'
-import type { Services } from '../services'
 import controllers from '../controllers'
 
 export default function whatsNewRoute(router: Router, { hmppsAuthClient }: Services) {

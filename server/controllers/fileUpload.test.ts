@@ -1,6 +1,6 @@
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Request } from 'express'
 import controllers from '.'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
 import { FileUploadResponse } from '../@types'
@@ -12,12 +12,17 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 
 jest.mock('../data/tokenStore/redisTokenStore')
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 
 const patchDocumentsSpy = jest

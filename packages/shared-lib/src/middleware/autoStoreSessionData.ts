@@ -4,7 +4,6 @@ import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../types/Route'
-import '../types/express/index.d'
 
 export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, _res, next) => {

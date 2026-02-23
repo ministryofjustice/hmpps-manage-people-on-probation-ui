@@ -1,6 +1,5 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
-import { Route } from '../@types'
 import { getDataValue } from '../utils'
 
 export const getOfficeLocationsByTeamAndProvider = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {

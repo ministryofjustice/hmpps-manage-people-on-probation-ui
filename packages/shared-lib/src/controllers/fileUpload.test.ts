@@ -24,7 +24,7 @@ jest.mock('../data/hmppsAuthClient', () => {
 })
 
 import { Request } from 'express'
-import controllers from '.'
+import { fileUpload } from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse } from './mocks'
@@ -111,7 +111,7 @@ describe('fileUpload controller', () => {
 
       beforeEach(async () => {
         mockGetConfig.mockReturnValue(mockConfig)
-        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
+        await fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
 
       it('should return the correct response', () => {
@@ -142,7 +142,7 @@ describe('fileUpload controller', () => {
 
       beforeEach(async () => {
         mockGetConfig.mockReturnValue(mockConfig)
-        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
+        await fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
 
       it('should return the correct response', () => {
@@ -169,7 +169,7 @@ describe('fileUpload controller', () => {
 
       beforeEach(async () => {
         mockGetConfig.mockReturnValue(mockConfig)
-        await controllers.fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
+        await fileUpload.postUploadFile(hmppsAuthClient)(testReq, mockRes)
       })
 
       it('should upload the document', () => {
@@ -198,7 +198,7 @@ describe('fileUpload controller', () => {
     const jsonSpy = jest.spyOn(mockRes, 'json')
     beforeEach(async () => {
       mockGetConfig.mockReturnValue(mockConfig)
-      await controllers.fileUpload.postDeleteFile(hmppsAuthClient)(req, mockRes)
+      await fileUpload.postDeleteFile(hmppsAuthClient)(req, mockRes)
     })
     it('should return the correct response', () => {
       expect(jsonSpy).toHaveBeenCalledWith({ success: true })

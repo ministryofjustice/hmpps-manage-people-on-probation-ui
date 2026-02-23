@@ -1,6 +1,5 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
-import { Route } from '../@types'
 import { Sentence, Sentences } from '../data/model/sentenceDetails'
 
 export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {

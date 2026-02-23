@@ -1,7 +1,7 @@
 import multer from 'multer'
+import { type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { type Router } from 'express'
 import controllers from '../controllers'
-import { Services } from '../services'
 import {
   getPersonalDetails,
   getPersonAppointment,

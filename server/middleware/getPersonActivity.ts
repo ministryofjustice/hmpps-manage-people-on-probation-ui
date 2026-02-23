@@ -1,11 +1,10 @@
+import { type AppResponse, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Request } from 'express'
-import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { PersonActivity } from '../data/model/activityLog'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
-import { AppResponse } from '../models/Locals'
-import { ActivityLogRequestBody, SelectedFilterItem } from '../models/ActivityLog'
+import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { categoryFilterOptions } from '../properties'
 
 export const getPersonActivity = async (

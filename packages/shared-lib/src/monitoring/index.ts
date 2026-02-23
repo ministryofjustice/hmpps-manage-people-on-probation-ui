@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies */
 import express from 'express'
 import promBundle from 'express-prom-bundle'
 

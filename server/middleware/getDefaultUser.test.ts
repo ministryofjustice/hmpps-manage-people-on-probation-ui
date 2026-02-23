@@ -1,5 +1,5 @@
 import httpMocks, { RequestMethod } from 'node-mocks-http'
-import HmppsAuthClient from '../data/hmppsAuthClient'
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import {
@@ -19,7 +19,18 @@ const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 const nextSpy = jest.fn()
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 
 jest.mock('../utils', () => {

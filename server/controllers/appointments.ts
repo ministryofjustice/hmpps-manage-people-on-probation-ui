@@ -2,10 +2,11 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { Controller, FileCache } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
+import { FileCache } from '../@types'
 import {
   toRoshWidget,
   toPredictors,

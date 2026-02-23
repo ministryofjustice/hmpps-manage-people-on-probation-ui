@@ -1,6 +1,6 @@
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { NextFunction, Request } from 'express'
 import { getDataValue, getPersonLevelTypes, setDataValue } from '../utils'
-import { AppResponse } from '../models/Locals'
 import { AppointmentSession } from '../models/Appointments'
 
 export const checkAnswers = (req: Request, res: AppResponse, next?: NextFunction) => {

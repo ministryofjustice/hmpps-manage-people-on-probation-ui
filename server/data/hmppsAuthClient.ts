@@ -31,9 +31,9 @@ function getSystemClientTokenFromHmppsAuth(username?: string): Promise<superagen
 export default class HmppsAuthClient {
   constructor(private readonly tokenStore: TokenStore) {}
 
-  private static restClient(token: string): RestClient {
-    return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
-  }
+  // private static restClient(token: string): RestClient {
+  //   return new RestClient('HMPPS Auth Client', config.apis.hmppsAuth, token)
+  // }
 
   async getSystemClientToken(username?: string): Promise<string> {
     const key = username || '%ANONYMOUS%'

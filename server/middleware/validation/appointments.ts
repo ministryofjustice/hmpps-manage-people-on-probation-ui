@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
+import { type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { DateTime } from 'luxon'
-import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'

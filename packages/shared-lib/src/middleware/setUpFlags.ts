@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import type { Services } from '../services'
+import type { Services } from '../types'
 import evaluateFeatureFlags from './evaluateFeatureFlags'
 
 export const setUpFlags = ({ flagService }: Services): Router => {

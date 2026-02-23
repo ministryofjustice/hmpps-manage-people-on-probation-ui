@@ -1,6 +1,6 @@
 import type { NextFunction, Request } from 'express'
 import MasApiClient from '../data/masApiClient'
-import { type Services } from '../services'
+import { type Services } from '../types'
 import { asyncMiddleware } from './asyncMiddleware'
 import { type AppResponse } from '../models/Locals'
 import { isValidCrn } from '../utils'

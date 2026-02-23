@@ -1,7 +1,6 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, setDataValue, dateTime } from '../utils'
-import { Route } from '../@types'
 import { CheckAppointment, LocalParams } from '../models/Appointments'
 import { isEmptyObject } from '../utils/isEmptyObject'
 import { getMinMaxDates } from '../utils/getMinMaxDates'

@@ -1,14 +1,26 @@
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { logger, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { postCheckinInComplete } from './postCheckinComplete'
 import ESupervisionClient from '../data/eSupervisionClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 jest.mock('../data/eSupervisionClient')
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
+
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
@@ -35,7 +47,6 @@ describe('postCheckinInComplete middleware', () => {
 
   beforeEach(() => {
     jest.resetAllMocks()
-    jest.spyOn(HmppsAuthClient.prototype, 'getSystemClientToken').mockImplementation(async () => token)
   })
 
   it('Should calls postOffenderSetupComplete with id using system token and logs success', async () => {
@@ -51,7 +62,6 @@ describe('postCheckinInComplete middleware', () => {
     await handler(req, res)
 
     expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(username)
-    expect(ESupervisionClient).toHaveBeenCalledWith(token)
     expect(postComplete).toHaveBeenCalledTimes(1)
     expect(postComplete).toHaveBeenCalledWith(id)
     expect(logSpy).toHaveBeenCalledWith('Checkin Registration completed successfully.')

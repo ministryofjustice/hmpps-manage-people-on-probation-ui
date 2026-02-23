@@ -1,5 +1,5 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
-import { AppResponse } from '../models/Locals'
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 
 jest.mock('@ministryofjustice/hmpps-audit-client')
 

@@ -1,4 +1,5 @@
-import { Controller, FileCache, FileUploadResponse } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { FileUploadResponse } from '../@types'
 import MasApiClient from '../data/masApiClient'
 
 const routes = ['postUploadFile', 'postDeleteFile'] as const

@@ -1,7 +1,7 @@
+import { type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import nunjucksSetup from './nunjucksSetup'
 import { appWithAllRoutes } from '../routes/testutils/appSetup'
 import { ApplicationInfo } from '../applicationInfo'
-import type { Services } from '../services'
 
 jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
@@ -41,6 +41,19 @@ jest.mock('../config', () => ({
     },
   },
 }))
+
+// jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+//   return {
+//     HmppsAuthClient: jest.fn().mockImplementation(() => ({
+//       getSystemClientToken: jest.fn(),
+//     })),
+//     AgentConfig: jest.fn(),
+//     logger: {
+//       info: jest.fn(),
+//       error: jest.fn(),
+//     },
+//   }
+// })
 const app = appWithAllRoutes({ services: mockServices })
 
 const mockAppInfo: ApplicationInfo = {

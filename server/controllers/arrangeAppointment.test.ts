@@ -1,10 +1,11 @@
 import { DateTime } from 'luxon'
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { dateIsInPast, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
-import HmppsAuthClient from '../data/hmppsAuthClient'
+
 import {
   postAppointments,
   renderError,
@@ -17,8 +18,6 @@ import {
 } from '../middleware'
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { AppResponse } from '../models/Locals'
-import { ArrangedSession } from '../models/ArrangedSession'
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const uuid2 = 'f1654ea3-0abb-46eb-860b-654a96edbe21'
@@ -59,12 +58,17 @@ jest.mock('../middleware', () => ({
 jest.mock('uuid', () => ({
   v4: jest.fn(),
 }))
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('uuid', () => ({

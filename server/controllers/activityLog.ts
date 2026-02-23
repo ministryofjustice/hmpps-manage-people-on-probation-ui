@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
-import type { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toPredictors, toRoshWidget, groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'

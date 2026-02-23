@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { getPersonAppointment } from './getPersonAppointment'
 import MasApiClient from '../data/masApiClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { mockAppResponse, mockPersonAppointment } from '../controllers/mocks'
 
@@ -9,7 +9,18 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const contactId = '12345'
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 const getPersonAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointment')

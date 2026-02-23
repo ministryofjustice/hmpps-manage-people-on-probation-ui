@@ -1,10 +1,9 @@
 import httpMocks from 'node-mocks-http'
 import getPaginationLinks from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { logger, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import controllers from '.'
 import MasApiClient from '../data/masApiClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import ArnsApiClient from '../data/arnsApiClient'
 import { mockAppResponse } from './mocks'
@@ -25,12 +24,17 @@ jest.mock('../utils', () => ({
 
 toRoshWidgetSpy = jest.fn()
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-alerts')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 jest.mock('../data/tokenStore/redisTokenStore')
 

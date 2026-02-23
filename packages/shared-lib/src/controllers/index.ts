@@ -1,5 +1,2 @@
-import fileUploadController from './fileUpload'
-
-export default {
-  fileUpload: fileUploadController,
-}
+export { default as fileUpload } from './fileUpload'
+export { default as baseContoller } from './baseController'

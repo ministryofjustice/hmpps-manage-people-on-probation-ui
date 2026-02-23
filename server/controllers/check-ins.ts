@@ -1,7 +1,6 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
-import { Controller } from '../@types'
+import { logger, type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
@@ -551,7 +550,7 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  getCheckinVideoPage: HmppsAuthClient => {
+  getCheckinVideoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { checkIn } = res.locals
@@ -562,7 +561,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/video.njk', { crn, id, checkIn, back })
     }
   },
-  postTakeAPhotoPage: hmppsAuthClient => {
+  postTakeAPhotoPage: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { userPhotoUpload } = req.body

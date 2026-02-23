@@ -1,6 +1,6 @@
 import type { Request, NextFunction } from 'express'
 import type { HTTPError } from 'superagent'
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import logger from '../logger'
 import { statusErrors, type StatusErrorCode } from './properties'
 import { AppResponse } from './models/Locals'
 
@@ -18,7 +18,7 @@ export default function createErrorHandler(production: boolean) {
     res.locals.title = title
     res.locals.message = production ? message : `${message}<pre>${error.stack}</pre>`
     res.locals.status = status
-    res.locals.stack = production ? null : error.stack
+    res.locals.stack = production ? '' : error.stack
 
     res.status(error?.status ?? 500)
 

@@ -1,8 +1,6 @@
 import { type Router } from 'express'
-import asyncMiddleware from '../middleware/asyncMiddleware'
-import { type Services } from '../services'
+import { type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { filterActivityLog } from '../middleware'
-import type { Route } from '../@types'
 import controllers from '../controllers'
 import validate from '../middleware/validation/index'
 

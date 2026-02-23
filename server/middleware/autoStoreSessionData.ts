@@ -1,9 +1,8 @@
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { HmppsAuthClient } from '../data'
-import { Route } from '../@types/Route.type'
 import '../@types/express/index.d'
 
 export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {

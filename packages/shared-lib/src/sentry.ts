@@ -2,7 +2,7 @@
 import * as Sentry from '@sentry/node'
 import { getConfig } from './config'
 
-const initSentry = () => {
+export const initSentry = () => {
   const config = getConfig()
   if (config.sentry.dsn) {
     Sentry.init({
@@ -13,4 +13,4 @@ const initSentry = () => {
   }
 }
 
-initSentry()
+// initSentry()

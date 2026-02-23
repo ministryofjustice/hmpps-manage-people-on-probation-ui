@@ -1,11 +1,10 @@
+import { monitoring, services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import promClient from 'prom-client'
-import { createMetricsApp } from './monitoring/metricsApp'
 import createApp from './app'
-import { services } from './services'
 
 promClient.collectDefaultMetrics()
 
-const app = createApp(services())
-const metricsApp = createMetricsApp()
+const app = createApp(services.initServices())
+const metricsApp = monitoring.createMetricsApp()
 
 export { app, metricsApp }

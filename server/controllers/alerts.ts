@@ -1,7 +1,6 @@
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { logger, type Controller, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import ArnsApiClient from '../data/arnsApiClient'
@@ -9,7 +8,6 @@ import { toRoshWidget } from '../utils'
 import { RiskInfo, RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
 import { ErrorSummaryItem } from '../data/model/common'
 import { apiErrors } from '../properties'
-import { AppResponse } from '../models/Locals'
 
 const routes = ['getAlerts', 'getAlertNote', 'clearSelectedAlerts'] as const
 

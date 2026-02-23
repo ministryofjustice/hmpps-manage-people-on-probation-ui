@@ -1,17 +1,15 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { logger, initSharedConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { v4 } from 'uuid'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import type { UserActivity, UserSchedule } from '../data/model/userSchedule'
-import { checkRecentlyViewedAccess, getSearchParamsString } from '../utils'
-import { Controller } from '../@types'
+import { checkRecentlyViewedAccess } from '../utils'
 import { CaseSearchFilter, ErrorMessages } from '../data/model/caseload'
 import { RecentlyViewedCase } from '../data/model/caseAccess'
-
-initSharedConfig(config)
 
 const colNames = ['name', 'dob', 'sentence', 'appointment', 'date']
 
@@ -43,6 +41,7 @@ interface Args {
 const caseloadController: Controller<typeof routes, void, Args> = {
   showCaseload: hmppsAuthClient => {
     return async (req, res, _next, args) => {
+      // initSharedLib(config)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
 

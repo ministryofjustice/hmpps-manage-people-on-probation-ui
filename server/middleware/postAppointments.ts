@@ -1,7 +1,6 @@
+import { type Route, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
-import { HmppsAuthClient } from '../data'
-import { Route } from '../@types'
 import {
   AppointmentRequestBody,
   AppointmentSession,

@@ -1,6 +1,5 @@
 import { upperFirst } from 'lodash'
-import { Route } from '../@types'
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType, YesNo } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'

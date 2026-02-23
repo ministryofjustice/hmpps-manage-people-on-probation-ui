@@ -1,6 +1,6 @@
 import { Request, NextFunction } from 'express'
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { AppointmentSession, YesNo } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
 import { isoToDateTime } from '../utils'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')

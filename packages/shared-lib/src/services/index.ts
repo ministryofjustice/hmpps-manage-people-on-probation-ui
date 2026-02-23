@@ -6,7 +6,7 @@ import TechnicalUpdatesService from './technicalUpdatesService'
 import { getConfig } from '../config'
 import ProbationComponentsApiService from './ProbationComponentsService'
 
-export const services = () => {
+export const initServices = () => {
   const config = getConfig()
   const { applicationInfo, hmppsAuthClient, manageUsersApiClient, probationFrontendComponentsApiClient } = dataAccess()
 
@@ -35,6 +35,4 @@ export const services = () => {
   }
 }
 
-export type Services = ReturnType<typeof services>
-
-export { UserService, FlagService }
+export { UserService, FlagService, ProbationComponentsApiService }

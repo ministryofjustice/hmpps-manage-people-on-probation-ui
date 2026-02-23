@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
-import { Controller, FileCache } from '../@types'
-import { getDataValue, isValidCrn, isValidUUID } from '../utils'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { FileCache } from '../@types'
+import { isValidCrn, isValidUUID } from '../utils'
 
 import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } from '../middleware'
 import config from '../config'

@@ -1,7 +1,7 @@
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Request } from 'express'
 import { Activity } from '../data/model/schedule'
 import { AppointmentSession } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
 import { getDataValue, convertToTitleCase } from '../utils'
 import { Name } from '../data/model/personalDetails'
 

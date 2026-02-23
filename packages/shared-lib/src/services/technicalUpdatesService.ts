@@ -5,7 +5,7 @@ export default class TechnicalUpdatesService {
   private technicalUpdates: TechnicalUpdate[] = []
 
   readTechnicalUpdates() {
-    const technicalUpdatesPath = path.join(__dirname, 'technicalUpdates.json')
+    const technicalUpdatesPath = path.resolve(__dirname, '..', 'technicalUpdates.json')
     this.technicalUpdates = JSON.parse(fs.readFileSync(technicalUpdatesPath, 'utf-8')) as TechnicalUpdate[]
   }
 

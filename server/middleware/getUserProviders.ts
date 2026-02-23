@@ -1,4 +1,4 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 

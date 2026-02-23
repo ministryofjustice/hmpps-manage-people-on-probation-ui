@@ -1,6 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
-import { Controller, FileCache } from '../@types'
+import {
+  type Controller,
+  type AppResponse,
+  HmppsAuthClient,
+} from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { FileCache } from '../@types'
 import {
   convertToTitleCase,
   dateIsInPast,
@@ -24,8 +29,6 @@ import {
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { SmsOptInOptions } from '../data/model/OutlookEvent'
-import { AppResponse } from '../models/Locals'
-import { HmppsAuthClient } from '../data'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'

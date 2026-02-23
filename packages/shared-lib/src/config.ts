@@ -7,7 +7,7 @@ export interface SharedLibConfig {
 
 let config: Config | null = null
 
-export function initSharedConfig(serviceConfig: Config) {
+export function initSharedLib(serviceConfig: Config) {
   config = serviceConfig
 }
 

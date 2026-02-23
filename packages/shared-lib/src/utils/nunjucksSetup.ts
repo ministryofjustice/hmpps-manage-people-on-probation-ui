@@ -2,7 +2,7 @@
 import path from 'path'
 import nunjucks from 'nunjucks'
 import express, { Request, Response, NextFunction } from 'express'
-import type { Services } from '../services'
+import type { Services } from '../types'
 
 import {
   initialiseName,

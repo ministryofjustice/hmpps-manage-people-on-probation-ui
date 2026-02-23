@@ -1,7 +1,6 @@
 import { Request } from 'express'
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { getPersonActivity } from './getPersonActivity'
-import { AppResponse } from '../models/Locals'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
@@ -10,7 +9,18 @@ import { Document } from '../data/model/personalDetails'
 import { APPOINTMENTS_CODES } from '../properties'
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 
 const crn = 'X756510'
@@ -104,7 +114,18 @@ const mockTierCalculationResponse = {
     calculationVersion: '',
   },
 }
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/masApiClient')
 jest.mock('../data/tierApiClient')
 

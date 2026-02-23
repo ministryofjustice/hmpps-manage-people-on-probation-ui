@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { AppointmentSession } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
 import { setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
 

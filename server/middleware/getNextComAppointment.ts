@@ -1,6 +1,5 @@
 import { NextFunction, Request } from 'express'
-import { AppResponse } from '../models/Locals'
-import { HmppsAuthClient } from '../data'
+import { type AppResponse, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 
 export const getNextComAppointment = (hmppsAuthClient: HmppsAuthClient) => {

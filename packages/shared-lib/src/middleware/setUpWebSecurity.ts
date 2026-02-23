@@ -3,7 +3,6 @@ import express, { Router, Request, Response, NextFunction } from 'express'
 import helmet from 'helmet'
 import { getConfig } from '../config'
 import validateHost from './validateHost'
-import '../types/express/index.d'
 
 export const setUpWebSecurity = (): Router => {
   const router = express.Router()

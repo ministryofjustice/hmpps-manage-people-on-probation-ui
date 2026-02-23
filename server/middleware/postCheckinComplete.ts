@@ -1,6 +1,4 @@
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
-import { HmppsAuthClient } from '../data'
-import { Route } from '../@types'
+import { logger, type Route, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 
 import ESupervisionClient from '../data/eSupervisionClient'
 

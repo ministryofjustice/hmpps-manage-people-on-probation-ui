@@ -1,6 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { v4 } from 'uuid'
-import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'

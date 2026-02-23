@@ -1,4 +1,4 @@
-import { Route } from '../../@types'
+import { type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { validateWithSpec } from '../../utils/validationUtils'
 
 import { eSuperVisionValidation } from '../../properties/validation/eSupervision'

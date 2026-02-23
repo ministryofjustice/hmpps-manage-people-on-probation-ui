@@ -1,6 +1,4 @@
-import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
-import { Route } from '../@types'
-import { HmppsAuthClient } from '../data'
+import { logger, HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { AppointmentSession } from '../models/Appointments'
 import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'

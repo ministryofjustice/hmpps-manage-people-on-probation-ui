@@ -1,7 +1,6 @@
 import httpMocks from 'node-mocks-http'
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { getAppointment } from './getAppointment'
-import { AppResponse } from '../models/Locals'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import { Overview } from '../data/model/overview'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
@@ -29,7 +28,15 @@ const mockAppt: AppointmentSession = {
 
 const username = 'user-1'
 
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+  }
+})
+
 jest.mock('../data/masApiClient')
 
 jest.mock('../utils', () => {

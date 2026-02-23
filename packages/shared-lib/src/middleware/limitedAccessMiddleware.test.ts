@@ -58,7 +58,7 @@ import httpMocks from 'node-mocks-http'
 import { limitedAccess } from './limitedAccessMiddleware'
 import MasApiClient from '../data/masApiClient'
 import { AppResponse } from '../models/Locals'
-import { services } from '../services'
+import { initServices } from '../services'
 import { CaseAccess } from '../data/model/caseAccess'
 import { isValidCrn } from '../utils'
 import { renderError } from './renderError'
@@ -124,7 +124,7 @@ const renderSpy = jest.spyOn(res, 'render')
 const nextSpy = jest.fn()
 
 describe('/middleware/limitedAccess', () => {
-  let mockServices: ReturnType<typeof services>
+  let mockServices: ReturnType<typeof initServices>
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -133,7 +133,7 @@ describe('/middleware/limitedAccess', () => {
     beforeEach(async () => {
       mockIsValidCrn.mockReturnValue(false)
       mockedGetConfig.mockReturnValue(mockedConfig)
-      mockServices = services()
+      mockServices = initServices()
       mockServices.hmppsAuthClient.getSystemClientToken = jest.fn()
       jest
         .spyOn(mockServices.hmppsAuthClient, 'getSystemClientToken')
@@ -152,7 +152,7 @@ describe('/middleware/limitedAccess', () => {
     beforeEach(async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockedGetConfig.mockReturnValue(mockedConfig)
-      mockServices = services()
+      mockServices = initServices()
       mockServices.hmppsAuthClient.getSystemClientToken = jest.fn()
       jest.spyOn(mockServices.hmppsAuthClient, 'getSystemClientToken').mockResolvedValue('token-1')
       spy = jest.spyOn(MasApiClient.prototype, 'getUserAccess').mockImplementationOnce(() => Promise.resolve(mock))
@@ -175,7 +175,7 @@ describe('/middleware/limitedAccess', () => {
     beforeEach(async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockedGetConfig.mockReturnValue(mockedConfig)
-      mockServices = services()
+      mockServices = initServices()
       mockServices.hmppsAuthClient.getSystemClientToken = jest.fn()
       jest
         .spyOn(mockServices.hmppsAuthClient, 'getSystemClientToken')
@@ -199,7 +199,7 @@ describe('/middleware/limitedAccess', () => {
     beforeEach(async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockedGetConfig.mockReturnValue(mockedConfig)
-      mockServices = services()
+      mockServices = initServices()
       jest
         .spyOn(mockServices.hmppsAuthClient, 'getSystemClientToken')
         .mockImplementation(() => Promise.resolve('token-1'))
@@ -225,7 +225,7 @@ describe('/middleware/limitedAccess', () => {
     beforeEach(async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockedGetConfig.mockReturnValue(mockedConfig)
-      mockServices = services()
+      mockServices = initServices()
       jest
         .spyOn(mockServices.hmppsAuthClient, 'getSystemClientToken')
         .mockImplementation(() => Promise.resolve('token-1'))

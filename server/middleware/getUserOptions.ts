@@ -1,6 +1,5 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
-import { Route } from '../@types'
 import { Provider, Team, User } from '../data/model/caseload'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 

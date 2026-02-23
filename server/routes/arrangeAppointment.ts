@@ -1,4 +1,5 @@
 import { type Router } from 'express'
+import { type Services, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import {
   autoStoreSessionData,
@@ -15,10 +16,8 @@ import {
   getPersonRiskFlags,
   getOverdueOutcomes,
 } from '../middleware'
-import type { Services } from '../services'
 import validate from '../middleware/validation/index'
 import { getTimeOptions } from '../middleware/getTimeOptions'
-import type { Route } from '../@types'
 import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'

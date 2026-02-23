@@ -1,8 +1,6 @@
 import httpMocks from 'node-mocks-http'
-import { getAppointmentTypes } from './getAppointmentTypes'
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import { AppResponse } from '../models/Locals'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { ESupervisionCheckIn } from '../data/model/esupervision'
 import { getCheckIn } from './getCheckIn'
@@ -10,11 +8,17 @@ import { getCheckIn } from './getCheckIn'
 const token = { access_token: 'token-1', expires_in: 300 }
 const username = 'user-1'
 jest.mock('../data/tokenStore/redisTokenStore')
-const tokenSpy = jest
-  .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
-  .mockImplementation(() => Promise.resolve(token.access_token))
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+  }
+})
 
 const checkInResponseMock = {
   uuid: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
