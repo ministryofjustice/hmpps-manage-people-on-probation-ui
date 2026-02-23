@@ -45,7 +45,6 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
         appointmentType,
         includeWelshPreview,
       }
-      console.log(body)
       if (appointmentLocation) body.appointmentLocation = appointmentLocation
       const token = await hmppsAuthClient.getSystemClientToken(username)
       const masOutlookClient = new SupervisionAppointmentClient(token)
