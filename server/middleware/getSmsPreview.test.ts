@@ -235,6 +235,26 @@ describe('middleware/getSmsPreview', () => {
     })
   })
 
+  describe('Only description listed for matching location', () => {
+    const locations: Location[] = [
+      { id: 1, code: locationCode, description: buildingName, address: { buildingName: '', officeName: '' } },
+    ]
+    const req = buildRequest({ locations, appointment: { ...mockAppointmentSession, smsPreview: undefined } })
+    beforeEach(async () => {
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should request the sms preview(s) from the api', () => {
+      const expectedRequest: SmsPreviewRequest = {
+        firstName: 'James',
+        appointmentLocation: buildingName,
+        dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+        includeWelshPreview: false,
+        appointmentType: mockAppointmentSession.type,
+      }
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
+    })
+  })
+
   describe('No matching location found', () => {
     const locations: Location[] = [{ id: 1, code: '5678', address: { officeName: appointmentLocation } }]
     const req = buildRequest({ locations, appointment: { ...mockAppointmentSession, smsPreview: undefined } })
