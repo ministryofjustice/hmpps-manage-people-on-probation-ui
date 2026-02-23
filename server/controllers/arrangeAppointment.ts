@@ -435,7 +435,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getTextMessageConfirmation: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
-      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id })
+      const { change } = req.query
+      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id, change })
     }
   },
   postTextMessageConfirmation: _hmppsAuthClient => {
@@ -448,7 +449,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       let redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
       const change = req?.query?.change as string
       if (['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(req.body.appointments[crn][id].smsOptIn)) {
-        redirect = `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}`
+        redirect = `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}&change=${change}`
       } else if (change) {
         redirect = findUncompleted(req, res)
       }
