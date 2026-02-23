@@ -2,13 +2,13 @@ import httpMocks from 'node-mocks-http'
 import { getSmsPreview } from './getSmsPreview'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import ESupervisionClient from '../data/eSupervisionClient'
 import { isoFromDateTime, setDataValue } from '../utils'
 import { mockAppResponse } from '../controllers/mocks'
 import { Location } from '../data/model/caseload'
 import { AppointmentSession } from '../models/Appointments'
-import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
+import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import logger from '../../logger'
+import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
@@ -54,7 +54,7 @@ const mockAppointmentSession: AppointmentSession = {
 }
 
 const postSmsPreviewSpy = jest
-  .spyOn(ESupervisionClient.prototype, 'postSmsPreview')
+  .spyOn(SupervisionAppointmentClient.prototype, 'postSmsPreview')
   .mockImplementation(() => Promise.resolve(mockSmsPreview))
 
 const res = mockAppResponse({
@@ -132,7 +132,7 @@ describe('middleware/getSmsPreview', () => {
         appointmentLocation,
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: false,
-        appointmentType: mockAppointmentSession.type,
+        appointmentTypeCode: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
@@ -165,7 +165,7 @@ describe('middleware/getSmsPreview', () => {
         appointmentLocation,
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: true,
-        appointmentType: mockAppointmentSession.type,
+        appointmentTypeCode: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
@@ -229,7 +229,27 @@ describe('middleware/getSmsPreview', () => {
         appointmentLocation: buildingName,
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: false,
-        appointmentType: mockAppointmentSession.type,
+        appointmentTypeCode: mockAppointmentSession.type,
+      }
+      expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
+    })
+  })
+
+  describe('Only description listed for matching location', () => {
+    const locations: Location[] = [
+      { id: 1, code: locationCode, description: buildingName, address: { buildingName: '', officeName: '' } },
+    ]
+    const req = buildRequest({ locations, appointment: { ...mockAppointmentSession, smsPreview: undefined } })
+    beforeEach(async () => {
+      await getSmsPreview(hmppsAuthClient)(req, res, nextSpy)
+    })
+    it('should request the sms preview(s) from the api', () => {
+      const expectedRequest: SmsPreviewRequest = {
+        firstName: 'James',
+        appointmentLocation: buildingName,
+        dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+        includeWelshPreview: false,
+        appointmentTypeCode: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
@@ -246,7 +266,7 @@ describe('middleware/getSmsPreview', () => {
         firstName: 'James',
         dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
         includeWelshPreview: false,
-        appointmentType: mockAppointmentSession.type,
+        appointmentTypeCode: mockAppointmentSession.type,
       }
       expect(postSmsPreviewSpy).toHaveBeenCalledWith(expectedRequest)
     })
