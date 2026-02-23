@@ -47,4 +47,15 @@ describe('View appointment note page', () => {
     appointmentPage.getBackLink().click()
     activityLogPage.checkOnPage()
   })
+  it('Only one note details should be displayed prefixed with Latest update label', () => {
+    cy.visit('/case/X000001/activity-log')
+    const activityLogPage = new ActivityLogPage()
+    activityLogPage.getTimelineCardViewLink(2)
+    activityLogPage
+      .getActivity(2)
+      .find('.app-note')
+      .should('contain.text', 'Latest update: ')
+    activityLogPage.getActivity(2).find('.app-note').should('have.length',1)
+
+  })
 })

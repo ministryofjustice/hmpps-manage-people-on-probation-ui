@@ -47,19 +47,16 @@
           <div class="contact-log-compact__contact-wrapper">
             <div class="contact-log-compact__contact-content">
               {% if hasNotes %}
-                {% for appointmentNote in activity.appointmentNotes %}
-                  {% if appointmentNote.note %}
-                    {% set notes = notes.concat(appNote({
-                      note: appointmentNote.note,
-                      hasNoteBeenTruncated: appointmentNote.hasNoteBeenTruncated,
-                      createdBy: appointmentNote.createdBy,
-                      createdByDate: appointmentNote.createdByDate,
-                      lastUpdatedBy: activity.lastUpdatedBy,
-                      lastUpdated: activity.lastUpdated
-                    }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact')) %}
-                  {% endif %}
-                {% endfor %}
-                {{ govukDetails({
+                {% set appointmentNote = activity.appointmentNotes[0] %}
+                  {% set notes = appNote({
+                    note: appointmentNote.note,
+                    hasNoteBeenTruncated: appointmentNote.hasNoteBeenTruncated,
+                    createdBy: appointmentNote.createdBy,
+                    createdByDate: appointmentNote.createdByDate,
+                    lastUpdatedBy: activity.lastUpdatedBy,
+                    lastUpdated: activity.lastUpdated
+                  }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact', 'Latest update: ') %}
+              {{ govukDetails({
                   summaryHtml: rendersummaryText(activity),
                   html: notes,
                   attributes: {'data-qa': 'summary-text' + groupIndex }
