@@ -2189,6 +2189,17 @@ describe('checkInsController', () => {
       await controllers.checkIns.postRestartCheckinPage(hmppsAuthClient)(req, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-contact`)
     })
+
+    it('redirects to summary when CYA is true', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const req = baseReq()
+      req.query = { cya: 'true' }
+      await controllers.checkIns.postRestartCheckinPage(hmppsAuthClient)(req, res)
+      expect(redirectSpy).toHaveBeenCalledWith(
+        `/case/${crn}/appointments/check-in/manage/${uuid}/restart-summary?cya=true`,
+      )
+    })
   })
 
   describe('getRestartContactPage', () => {
@@ -2234,6 +2245,104 @@ describe('checkInsController', () => {
       req.body = { change: 'main' }
       await controllers.checkIns.postRestartContactPage(hmppsAuthClient)(req, res)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-summary`)
+    })
+  })
+
+  describe('getRestartEditContactPage', () => {
+    it('renders restart edit contact page with session values', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              restartCheckin: {
+                editCheckInMobile: '07123456789',
+                editCheckInEmail: 'test@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.query = { change: 'email' }
+
+      await controllers.checkIns.getRestartEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/restart-edit-contact.njk', {
+        crn,
+        id: uuid,
+        change: 'email',
+        checkInMobile: '07123456789',
+        checkInEmail: 'test@example.com',
+      })
+    })
+
+    it('sets success flag when contactUpdated is true in session', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const data = {
+        esupervision: { [crn]: { [uuid]: { restartCheckin: { contactUpdated: true } } } },
+      }
+      const req = baseReq(data)
+      await controllers.checkIns.getRestartEditContactPage(hmppsAuthClient)(req, res)
+      expect(res.locals.success).toBe(true)
+    })
+  })
+
+  describe('postRestartEditContactPage', () => {
+    it('updates MAS when values have changed', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              restartCheckin: {
+                editCheckInMobile: '07123456789',
+                editCheckInEmail: 'test@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.body = { previousMobile: '07000000000', previousEmail: 'old@example.com' }
+
+      await controllers.checkIns.postRestartEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(updatePersonalDetailsSpy).toHaveBeenCalledWith(crn, {
+        emailAddress: 'test@example.com',
+        mobileNumber: '07123456789',
+      })
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-contact`)
+    })
+
+    it('skips contact details update when values are identical to previous', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              restartCheckin: {
+                editCheckInMobile: '07700900111',
+                editCheckInEmail: 'same@example.com',
+              },
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+      req.body = { previousMobile: '07700900111', previousEmail: 'same@example.com' }
+
+      await controllers.checkIns.postRestartEditContactPage(hmppsAuthClient)(req, res)
+
+      expect(updatePersonalDetailsSpy).not.toHaveBeenCalled()
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-contact`)
     })
   })
 
@@ -2303,6 +2412,30 @@ describe('checkInsController', () => {
       )
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-confirmation`)
     })
+    it('redirects to restart start page if session data is missing', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq({})
+      await controllers.checkIns.postRestartSummaryPage(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}/restart-checkin`)
+    })
+
+    it('renders 500 error page if reactivate API call fails', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const data = { esupervision: { [crn]: { [uuid]: { restartCheckin: { date: '19/2/2026' } } } } }
+      const req = baseReq(data)
+
+      postReactivateOffenderSpy.mockRejectedValueOnce(new Error('API failure'))
+
+      await controllers.checkIns.postRestartSummaryPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(500)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+    })
   })
 
   describe('getRestartConfirmation', () => {
@@ -2340,6 +2473,15 @@ describe('checkInsController', () => {
         ['esupervision', crn, uuid, 'restartCheckin'],
         undefined,
       )
+    })
+    it('redirects to manage page if saved restart details are missing', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq({})
+      await controllers.checkIns.getRestartConfirmation(hmppsAuthClient)(req, res)
+
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
     })
   })
 })
