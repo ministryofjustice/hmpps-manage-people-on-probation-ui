@@ -23,7 +23,7 @@ import {
   isRescheduleAppointment,
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
-import { SmsOptInOptions } from '../data/model/esupervision'
+import { SmsOptInOptions } from '../data/model/OutlookEvent'
 import { AppResponse } from '../models/Locals'
 import { HmppsAuthClient } from '../data'
 import config from '../config'

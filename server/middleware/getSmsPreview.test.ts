@@ -2,13 +2,13 @@ import httpMocks from 'node-mocks-http'
 import { getSmsPreview } from './getSmsPreview'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import ESupervisionClient from '../data/eSupervisionClient'
 import { isoFromDateTime, setDataValue } from '../utils'
 import { mockAppResponse } from '../controllers/mocks'
 import { Location } from '../data/model/caseload'
 import { AppointmentSession } from '../models/Appointments'
-import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
+import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import logger from '../../logger'
+import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
@@ -54,7 +54,7 @@ const mockAppointmentSession: AppointmentSession = {
 }
 
 const postSmsPreviewSpy = jest
-  .spyOn(ESupervisionClient.prototype, 'postSmsPreview')
+  .spyOn(SupervisionAppointmentClient.prototype, 'postSmsPreview')
   .mockImplementation(() => Promise.resolve(mockSmsPreview))
 
 const res = mockAppResponse({

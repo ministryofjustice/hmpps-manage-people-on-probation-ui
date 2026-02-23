@@ -43,13 +43,14 @@
             {% endif %}
             </p>
             {% for key, value in smsPreview %}
-                <div class="sms-message-wrapper">
-                    <p class="govuk-body govuk-!-margin-bottom-0">
-                        {{ value | nl2br | safe }}
-                    </p>
-                </div>
+                {% if value != null %}
+                    <div class="sms-message-wrapper">
+                        <p class="govuk-body govuk-!-margin-bottom-0">
+                            {{ value | nl2br | safe }}
+                        </p>
+                    </div>
+                {% endif %}
             {% endfor %}
-
         </section>
     {% endif %}
 {% endblock %}
