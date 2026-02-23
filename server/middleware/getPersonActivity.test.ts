@@ -177,6 +177,7 @@ describe('/middleware/getPersonActivity', () => {
       dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
+      includeSystemGenerated: false,
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
@@ -217,6 +218,7 @@ describe('/middleware/getPersonActivity', () => {
       dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
+      includeSystemGenerated: false,
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
