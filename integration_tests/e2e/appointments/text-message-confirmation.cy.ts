@@ -158,7 +158,7 @@ describe('Text message confirmation', () => {
       textMessageConfirmPage
         .getSmsOptIn()
         .find('.govuk-hint')
-        .should('contain.text', 'They do not have a mobile number saved, you´ll need to check if they have one.')
+        .should('contain.text', 'They do not have a mobile number saved, so you´ll need to check if they have one.')
       textMessageConfirmPage.getSmsOptIn().find('.govuk-radios__item').should('have.length', 2)
       textMessageConfirmPage
         .getSmsOptIn()
