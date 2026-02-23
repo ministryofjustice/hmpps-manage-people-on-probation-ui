@@ -32,7 +32,7 @@
     {% set groupIndex = loop.index %}
     {% for activity in group.activities %}
       {% set entry = activity %}
-      <tr class="govuk-table__row">
+      <tr class="govuk-table__row" data-qa="record-{{ groupIndex }}">
         {% if loop.first %}
           <td class="govuk-table__cell govuk-!-width-one-quarter"{% if group.activities.length > 1 %} rowspan="{{ group.activities.length }}"{% endif %}>{{ group.date }}</td>
         {% endif %}
@@ -61,11 +61,12 @@
                 {% endfor %}
                 {{ govukDetails({
                   summaryHtml: rendersummaryText(activity),
-                  html: notes
+                  html: notes,
+                  attributes: {'data-qa': 'summary-text' + groupIndex }
                 }) }}
               {% else %}
                 <div class="govuk-!-margin-bottom-6 contact-activity--noNotes">
-                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link">{{ activity.type | toSentenceCase }}</a>
+                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ activity.type | toSentenceCase }}</a>
                 </div>
               {% endif %}
             </div>

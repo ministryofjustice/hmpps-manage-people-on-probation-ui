@@ -16,7 +16,7 @@ interface Item {
 export const decorateFormAttributes = (req: Request, res: AppResponse) => (obj: any, sections?: string[]) => {
   const newObj = obj
   const { data } = req.session as any
-  let storedValue = getDataValue(data, sections)
+  let storedValue = getDataValue(data, sections) ?? getDataValue(req.body, sections)
   if (storedValue && config.dateFields.includes(sections[sections.length - 1]) && storedValue.includes('-')) {
     const [year, month, day] = storedValue
       .split('-')

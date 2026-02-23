@@ -215,7 +215,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
-      const { data } = req.session
       const errors = req?.session?.data?.errors
       if (errors) {
         delete req.session.data.errors
@@ -446,14 +445,16 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         return renderError(404)(req, res)
       }
       const url = encodeURIComponent(req.url)
+      let redirect = `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
       const change = req?.query?.change as string
-      let redirect = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
+      const isEditingMobileNumber = ['YES_ADD_MOBILE_NUMBER', 'YES_UPDATE_MOBILE_NUMBER'].includes(
         req.body.appointments[crn][id].smsOptIn,
       )
-        ? `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}`
-        : `/case/${crn}/arrange-appointment/${id}/supporting-information?back=${url}`
       if (change) {
         redirect = findUncompleted(req, res)
+      }
+      if (isEditingMobileNumber) {
+        redirect = `/case/${crn}/personal-details/${id}/edit-contact-details?origin=appointments&back=${url}${change ? `&change=${change}` : ''}`
       }
       return res.redirect(redirect)
     }

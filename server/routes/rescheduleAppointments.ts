@@ -1,4 +1,4 @@
-import { type RequestHandler, type Router } from 'express'
+import { type Router } from 'express'
 import asyncMiddleware from '../middleware/asyncMiddleware'
 import type { Services } from '../services'
 import type { Route } from '../@types'
@@ -42,9 +42,9 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient }: 
   router.post(
     '/case/:crn/appointments/reschedule/:contactId/:id',
     getPersonAppointment(hmppsAuthClient),
-    autoStoreSessionData(hmppsAuthClient),
     cacheUploadedFiles,
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
     constructNextAppointmentSession,

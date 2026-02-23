@@ -68,6 +68,7 @@
       ".*jest.config.js",
       "server/app.ts",
       "server/index.ts",
+      "server/sentry.ts",
       ".*.cy.ts"
     ],
     "coverageDirectory": "test_results/jest/",

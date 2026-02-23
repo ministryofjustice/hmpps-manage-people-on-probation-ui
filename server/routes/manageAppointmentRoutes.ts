@@ -6,8 +6,6 @@ import {
   getPersonalDetails,
   getPersonAppointment,
   redirectWizard,
-  cacheUploadedFiles,
-  parseMultipartBody,
   getAppointment,
   autoStoreSessionData,
 } from '../middleware'
@@ -61,8 +59,8 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.post(
     '/case/:crn/arrange-appointment/:id/add-note',
-    autoStoreSessionData(hmppsAuthClient),
     validate.appointments,
+    autoStoreSessionData(hmppsAuthClient),
     controllers.arrangeAppointments.postAddNote(),
   )
   return router
