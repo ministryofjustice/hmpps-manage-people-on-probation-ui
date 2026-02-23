@@ -1,8 +1,11 @@
 import httpMocks from 'node-mocks-http'
+import express from 'express'
+import request from 'supertest'
 import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
+import homeRoutes from '../routes/home'
 import config from '../config'
 import { mockUserAppointments, mockAppResponse } from './mocks'
 
@@ -111,6 +114,31 @@ describe('homeController', () => {
           caval_link: config.caval.link,
           epf2_link: config.epf2.link,
         })
+      })
+    })
+
+    describe('GET /sentry-test-error', () => {
+      it('should throw an error and return 500', async () => {
+        const app = express()
+        const router = express.Router()
+
+        // minimal services mock
+        const services = {
+          hmppsAuthClient: {},
+        } as any
+
+        homeRoutes(router, services)
+        app.use(router)
+
+        // basic error handler so Express returns 500 instead of crashing
+        app.use((err: any, _req: any, response: any, _next: any) => {
+          response.status(500).json({ message: err.message })
+        })
+
+        const response = await request(app).get('/sentry-test-error')
+
+        expect(response.status).toBe(500)
+        expect(response.body.message).toBe('Sentry alert test (Express) - ignore')
       })
     })
   })

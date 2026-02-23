@@ -2,7 +2,7 @@ import { type AttendedCompliedAppointment } from '../middleware'
 import { type Name } from '../data/model/personalDetails'
 import { type Activity } from '../data/model/schedule'
 import { type Errors } from './Errors'
-import { type SmsOptInOptions, type SmsPreviewResponse } from '../data/model/esupervision'
+import { type SmsOptInOptions, type SmsPreviewResponse } from '../data/model/OutlookEvent'
 
 export type YesNo = '' | 'Yes' | 'No'
 

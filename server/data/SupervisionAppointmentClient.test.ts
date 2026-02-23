@@ -9,6 +9,7 @@ import {
   OutlookEventResponse,
   RescheduleEventRequest,
   EventResponse,
+  SmsPreviewRequest,
 } from './model/OutlookEvent'
 
 jest.mock('../utils', () => {
@@ -163,5 +164,19 @@ describe('MasOutlookClient', () => {
     expect(result.status).toBe(500)
     expect(result.errors?.[0]?.text).toBe('Rescheduling appointment not successful')
     expect(result.text).toContain('Internal Server Error')
+  })
+
+  describe('postSmsPreview', () => {
+    it('should POST sms preview', async () => {
+      const body: SmsPreviewRequest = {
+        firstName: 'John',
+        dateAndTimeOfAppointment: '2026-01-22T17:05:53.994Z',
+        includeWelshPreview: false,
+      }
+      const response = {}
+      fakeApi.post(`/sms/preview`).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+      const output = await client.postSmsPreview(body)
+      expect(output).toEqual(response)
+    })
   })
 })

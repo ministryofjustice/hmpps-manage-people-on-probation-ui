@@ -1,11 +1,11 @@
 import logger from '../../logger'
 import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
-import ESupervisionClient from '../data/eSupervisionClient'
-import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/esupervision'
+import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { AppointmentSession } from '../models/Appointments'
 import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
+import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
@@ -21,18 +21,20 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const locations = getDataValue<Location[]>(data, ['locations', username])
     const {
-      type: appointmentType,
+      type: appointmentTypeCode,
       date,
       start,
       user: { locationCode },
       smsPreview,
     } = appointment
+
     if (smsPreview) {
       preview = smsPreview
     } else {
       const locationMatch = locations.find(loc => loc.code === locationCode)
       if (locationMatch) {
-        appointmentLocation = locationMatch?.address?.officeName || locationMatch?.address?.buildingName || ''
+        appointmentLocation =
+          locationMatch?.address?.officeName || locationMatch?.address?.buildingName || locationMatch.description || ''
       }
       const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
       const includeWelshPreview = preferredLanguage === 'Welsh'
@@ -40,14 +42,14 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       const body: SmsPreviewRequest = {
         firstName,
         dateAndTimeOfAppointment,
-        appointmentType,
+        appointmentTypeCode,
         includeWelshPreview,
       }
       if (appointmentLocation) body.appointmentLocation = appointmentLocation
       const token = await hmppsAuthClient.getSystemClientToken(username)
-      const eSupervisionClient = new ESupervisionClient(token)
+      const masOutlookClient = new SupervisionAppointmentClient(token)
       try {
-        const response = await eSupervisionClient.postSmsPreview(body)
+        const response = await masOutlookClient.postSmsPreview(body)
         if (!responseIsError<SmsPreviewResponse>(response)) {
           preview = response
         }

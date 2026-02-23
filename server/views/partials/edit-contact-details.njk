@@ -58,6 +58,20 @@
     {% include "../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
     <h2 class="govuk-!-margin-top-0 govuk-heading-l govuk-!-margin-bottom-7" data-qa="pageHeading">{{title}}</h2>
+    {% if showContactAlert %}
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-full govuk-!-margin-bottom-6">
+                {{ mojAlert({
+                    variant: "warning",
+                    title: "",
+                    showTitleAsHeading: false,
+                    dismissible: false,
+                    attributes: { "data-qa": "updateBanner" },
+                    html: 'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.'
+                }) }}
+            </div>
+        </div>
+    {% endif %}
     <div class="govuk-!-width-one-half">
         <form method="post" autocomplete="off" action="{{ paths.current }}">
 

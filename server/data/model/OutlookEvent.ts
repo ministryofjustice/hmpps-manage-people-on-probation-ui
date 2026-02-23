@@ -51,3 +51,18 @@ export interface EventResponse {
   startDate: string
   endDate: string
 }
+
+export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
+
+export interface SmsPreviewRequest {
+  firstName: string
+  dateAndTimeOfAppointment: string
+  appointmentLocation?: string
+  appointmentTypeCode?: string
+  includeWelshPreview: boolean
+}
+
+export interface SmsPreviewResponse {
+  englishSmsPreview: string
+  welshSmsPreview?: string
+}

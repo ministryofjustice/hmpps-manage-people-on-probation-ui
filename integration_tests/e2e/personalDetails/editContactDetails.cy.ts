@@ -41,6 +41,13 @@ context('Edit contact details', () => {
     page.getElement('emailAddress').find('label').should('contain.text', 'Email address')
     page.getElement('emailAddress').find('.govuk-hint').should('contain.text', 'For example, name@example.com')
     page.getElement('emailAddress').find('input').should('have.value', 'address1@gmail.com')
+    page
+      .getAlert()
+      .should('be.visible')
+      .and(
+        'contain',
+        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+      )
     page.getElement('submitBtn').should('contain.text', 'Save changes')
     page
       .getElement('cancelBtn')
