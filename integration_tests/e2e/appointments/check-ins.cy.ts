@@ -693,6 +693,13 @@ context('check-ins overview and manage pages', () => {
 
     manageContact.getElement('button[name="change"][value="emailAddress"]').click()
     manageEditContactPage.checkOnPage()
+    manageEditContactPage
+      .getAlert()
+      .should('be.visible')
+      .and(
+        'contain',
+        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+      )
     manageEditContactPage.getBackLink().click()
     manageContact.checkOnPage()
   })
