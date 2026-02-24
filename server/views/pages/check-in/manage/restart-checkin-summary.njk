@@ -2,8 +2,8 @@
 {% from "../../../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% set title = "Check your answers before restarting online check ins"  %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-contact' %}
-{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
-{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
+{% set setMobile =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInMobile]' %}
+{% set setEmail =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInEmail]' %}
 {% set checkInDateLabel = "When would you like " + case.name.forename + " to complete their next online check in?"  %}
 {% set checkInDateVal = userDetails.date | dmyToLongDate  %}
 {% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check in?"  %}

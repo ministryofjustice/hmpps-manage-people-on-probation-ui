@@ -1,8 +1,8 @@
 {% extends "../../../partials/contacts.njk" %}
-{% set title = "Contact preferences" %}
+{% set title = "Contact details" %}
 {% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-checkin' %}
 {% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
-{% set radioHint=  "We'll use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
+{% set radioHint=  "We will use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInEmail]' %}
 {% set setMobileError =  'esupervision-'+  crn + '-' + id +'-restartCheckin-checkInMobile' %}
