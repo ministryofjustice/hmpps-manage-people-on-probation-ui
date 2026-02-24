@@ -2,7 +2,7 @@
 {% from "moj/components/alert/macro.njk" import mojAlert %}
 
 {% set title = "Edit contact details for " + case.name.forename %}
-{% set backLink = '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-contact' %}
+{% set backLink = '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-contact' if not cya else '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-summary' %}
 {% set buttonText = "Save changes" %}
 {% set formAnchorLink = backLink %}
 {% set formAnchorText = "Cancel and go back" %}

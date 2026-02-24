@@ -1,6 +1,6 @@
 {% extends "../../../partials/contacts.njk" %}
 {% set title = "Contact details" %}
-{% set backLink =  '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-checkin' %}
+{% set backLink = '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-checkin' if not cya else '/case/' + crn + '/appointments/check-in/manage/' + id + '/restart-summary' %}
 {% set radioLabel =  "How does "+ case.name.forename + " want us to send a link to the service?" %}
 {% set radioHint=  "We will use these details to send a link to "+ case.name.forename + "  each time they need to use the check in service." %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][restartCheckin][checkInMobile]' %}
