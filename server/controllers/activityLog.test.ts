@@ -153,6 +153,7 @@ describe('/controllers/activityLogController', () => {
         dateTo: '',
         filters: [] as string[],
         includeSystemGenerated: false,
+        typeCodes: [] as string[],
       }
       expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '10')
       expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
@@ -195,6 +196,7 @@ describe('/controllers/activityLogController', () => {
         dateTo: '',
         filters: [] as string[],
         includeSystemGenerated: false,
+        typeCodes: [] as string[],
       }
       expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '25')
     })

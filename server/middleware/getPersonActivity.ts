@@ -5,7 +5,8 @@ import { PersonActivity } from '../data/model/activityLog'
 import TierApiClient, { TierCalculation } from '../data/tierApiClient'
 import { toIsoDateFromPicker, toCamelCase } from '../utils'
 import { AppResponse } from '../models/Locals'
-import { ActivityLogRequestBody } from '../models/ActivityLog'
+import { ActivityLogRequestBody, SelectedFilterItem } from '../models/ActivityLog'
+import { categoryFilterOptions } from '../properties'
 
 export const getPersonActivity = async (
   req: Request,
@@ -21,12 +22,20 @@ export const getPersonActivity = async (
   const masClient = new MasApiClient(token)
   const tierClient = new TierApiClient(token)
 
+  const combinedCategoryCodes: string[] = []
+  if (Array.isArray(category)) {
+    for (const val of category) {
+      combinedCategoryCodes.push(...(categoryFilterOptions.find(option => option.value === val)?.codes || []))
+    }
+  }
+
   const body: ActivityLogRequestBody = {
     keywords,
     dateFrom: dateFrom ? toIsoDateFromPicker(dateFrom) : '',
     dateTo: dateTo ? toIsoDateFromPicker(dateTo) : '',
     filters: compliance ? compliance.map(option => toCamelCase(option)) : [],
     includeSystemGenerated: hideContact?.length === 0,
+    typeCodes: combinedCategoryCodes,
   }
   const size = res.locals.flags.enableContactLog ? '25' : '10'
   const [personActivity, tierCalculation] = await Promise.all([

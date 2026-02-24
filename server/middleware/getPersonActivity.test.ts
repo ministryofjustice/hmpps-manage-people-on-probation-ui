@@ -7,6 +7,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { Document } from '../data/model/personalDetails'
+import { APPOINTMENTS_CODES } from '../properties'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -178,6 +179,7 @@ describe('/middleware/getPersonActivity', () => {
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
       includeSystemGenerated: false,
+      typeCodes: APPOINTMENTS_CODES,
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
@@ -219,6 +221,7 @@ describe('/middleware/getPersonActivity', () => {
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
       includeSystemGenerated: false,
+      typeCodes: APPOINTMENTS_CODES,
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)

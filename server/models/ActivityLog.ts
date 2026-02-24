@@ -17,6 +17,7 @@ export interface ActivityLogRequestBody {
   dateTo: string
   filters: string[]
   includeSystemGenerated?: boolean
+  typeCodes: string[]
 }
 
 export interface SelectedFilterItem {
