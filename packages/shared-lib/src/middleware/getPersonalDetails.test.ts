@@ -35,10 +35,10 @@ import {
   Name,
   PersonalContact,
   Provisions,
-  Document,
   AddressType,
   PersonalDetails,
 } from '../data/model/personalDetails'
+import { Document } from '../data/model/documents'
 import { Contact } from '../data/model/professionalContact'
 import { SentencePlan } from '../data/model/sentencePlan'
 import { getConfig } from '../config'

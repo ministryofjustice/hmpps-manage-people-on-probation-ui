@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
-import { Document } from '../data/model/personalDetails'
+import { Document } from '../data/model'
 import { APPOINTMENTS_CODES } from '../properties'
 
 jest.mock('../data/masApiClient')

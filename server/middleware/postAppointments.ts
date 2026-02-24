@@ -8,7 +8,7 @@ import {
   AppointmentType,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
+import { EventRequest, OutlookEventResponse } from '../data/model/OutlookEvent'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
@@ -76,7 +76,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
       const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
-      const outlookEventRequestBody: OutlookEventRequestBody = {
+      const outlookEventRequestBody: EventRequest = {
         recipients: [
           {
             emailAddress: userDetails.email,

@@ -8,66 +8,48 @@
     "dist"
   ],
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "require": "./dist/index.js",
-      "import": "./dist/index.js"
-    },
-    "./types": {
-      "types": "./dist/types/index.d.ts",
-      "require": "./dist/types/index.js",
-      "import": "./dist/types/index.js"
-    },
-    "./controllers": {
-      "types": "./dist/controllers/index.d.ts",
-      "require": "./dist/controllers/index.js",
-      "import": "./dist/controllers/index.js"
-    },
-    "./services": {
-      "types": "./dist/services/index.d.ts",
-      "require": "./dist/services/index.js",
-      "import": "./dist/services/index.js"
-    },
-    "./data": {
-      "types": "./dist/data/index.d.ts",
-      "require": "./dist/data/index.js",
-      "import": "./dist/data/index.js"
-    },
-    "./utils": {
-      "types": "./dist/utils/index.d.ts",
-      "require": "./dist/utils/index.js",
-      "import": "./dist/utils/index.js"
-    },
-    "./errorHandler": {
-      "types": "./dist/errorHandler.d.ts",
-      "require": "./dist/errorHandler.js",
-      "import": "./dist/errorHandler.js"
-    },
-    "./applicationInfo": {
-      "types": "./dist/applicationInfo.d.ts",
-      "require": "./dist/applicationInfo.js",
-      "import": "./dist/applicationInfo.js"
-    },
-    "./logger": {
-      "types": "./dist/logger.d.ts",
-      "require": "./dist/logger.js",
-      "import": "./dist/logger.js"
-    },
-    "./sanitisedError": {
-      "types": "./dist/sanitisedError.d.ts",
-      "require": "./dist/sanitisedError.js",
-      "import": "./dist/sanitisedError.js"
-    },
-    "./sentry": {
-      "types": "./dist/sentry.d.ts",
-      "require": "./dist/sentry.js",
-      "import": "./dist/sentry.js"
+    ".": "./dist/index.js",
+    "./middleware": "./dist/middleware/index.js",
+    "./controllers": "./dist/controllers/index.js",
+    "./mocks": "./dist/contollers/mocks/index.js",
+    "./services": "./dist/services/index.js",
+    "./data": "./dist/data/index.js",
+    "./utils": "./dist/utils/index.js",
+    "./properties": "./dist/properties/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "middleware": [
+        "dist/middleware/index.d.ts"
+      ],
+      "controllers": [
+        "dist/controllers/index.d.ts"
+      ],
+      "mocks": [
+        "dist/controllers/mocks/index.d.ts"
+      ],
+      "services": [
+        "dist/services/index.d.ts"
+      ],
+      "data": [
+        "dist/data/index.d.ts"
+      ],
+      "utils": [
+        "dist/utils/index.d.ts"
+      ],
+      "properties": [
+        "dist/properties/index.d.ts"
+      ],
+      "types": [
+        "dist/types/index.d.ts"
+      ]
     }
   },
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc --build tsconfig.build.json && npm run copy-assets",
-    "copy-assets": "copyfiles -u 1 src/technicalUpdates.json dist"
+    "copy-assets": "copyfiles -u 1 src/technicalUpdates.json dist",
+    "pack:install": "npm run build && TARBALL=$(npm pack) && cp \"$TARBALL\" ~/code/hmpps-appointments-service-ui/"
   },
   "dependencies": {
     "@flipt-io/flipt-client": "^0.14.0",
@@ -122,6 +104,7 @@
     "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/jwt-decode": "^2.2.1",
+    "@types/lodash": "^4.17.24",
     "@types/luxon-business-days": "^3.0.0",
     "@types/multer": "^2.0.0",
     "@types/node": "^25.2.3",

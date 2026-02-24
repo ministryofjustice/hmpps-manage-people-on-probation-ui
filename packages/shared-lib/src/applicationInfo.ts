@@ -1,16 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { getConfig } from './config'
-
-export type ApplicationInfo = {
-  applicationName: string
-  version?: string
-  buildNumber: string
-  gitRef: string
-  gitShortHash: string
-  productId?: string
-  branchName: string
-}
+import { type ApplicationInfo } from './types'
 
 export default (): ApplicationInfo => {
   const config = getConfig()

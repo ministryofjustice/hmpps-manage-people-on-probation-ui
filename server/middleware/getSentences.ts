@@ -23,7 +23,7 @@ export const getSentences = (hmppsAuthClient: HmppsAuthClient): Route<Promise<vo
     } else {
       sentences = req.session.data.sentences[crn]
     }
-    res.locals.sentences = sentences
+    res.locals.sentences = sentences as any
     if (next) {
       return next()
     }

@@ -4,7 +4,8 @@ import MasApiClient from '../data/masApiClient'
 import { AppointmentSession, AppointmentType, YesNo } from '../models/Appointments'
 import { AppointmentLocals } from '../models/Locals'
 import { convertToTitleCase, getDataValue } from '../utils'
-import { LicenceCondition, Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
+import { Nsi, Requirement, Sentence } from '../data/model/sentenceDetails'
+import { LicenceCondition } from '../data/model'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 
 export const getAppointment = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {

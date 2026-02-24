@@ -1,4 +1,6 @@
 import { PersonSummary } from './personalDetails'
+import { Offence } from './offences'
+import { LicenceCondition } from './licenceConditionNoteDetails'
 
 export interface SentenceDetails {
   personSummary: PersonSummary
@@ -28,6 +30,8 @@ export interface Sentence {
   conviction?: Conviction
   courtDocuments?: CourtDocument[]
   unpaidWorkProgress?: string
+  rarDescription?: string
+  additionalOffences?: Offence[]
 }
 
 export interface OffenceDetails {
@@ -43,11 +47,6 @@ export interface Conviction {
   responsibleCourt: string
   convictionDate: string
   additionalSentences: string
-}
-
-export interface Offence {
-  code: string
-  description: string
 }
 
 export interface Order {
@@ -77,11 +76,6 @@ export interface CourtDocument {
   id: string
   lastSaved: string
   documentName: string
-}
-
-export interface LicenceCondition {
-  id: number
-  mainDescription: string
 }
 
 export interface ProbationHistory {

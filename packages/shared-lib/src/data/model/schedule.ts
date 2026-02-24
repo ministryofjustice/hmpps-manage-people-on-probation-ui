@@ -1,4 +1,5 @@
-import { Name, PersonSummary, Document, Address } from './personalDetails'
+import { Document } from './documents'
+import { Name, PersonSummary, Address } from './personalDetails'
 import { Note } from './note'
 
 export interface Schedule {

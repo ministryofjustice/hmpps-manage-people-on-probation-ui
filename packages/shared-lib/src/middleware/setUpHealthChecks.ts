@@ -1,7 +1,7 @@
 import express, { Router } from 'express'
 
 import healthcheck from '../services/healthCheck'
-import type { ApplicationInfo } from '../applicationInfo'
+import type { ApplicationInfo } from '../types'
 
 export const setUpHealthChecks = (applicationInfo: ApplicationInfo): Router => {
   const router = express.Router()

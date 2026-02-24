@@ -1,8 +1,8 @@
 export interface ContactResponse {
-  content: Contact[]
+  content: ContactContent[]
 }
 
-export interface Contact {
+export interface ContactContent {
   id: number
   externalReference?: string
   type: ContactType

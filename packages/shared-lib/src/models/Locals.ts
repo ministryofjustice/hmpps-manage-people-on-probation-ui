@@ -9,11 +9,11 @@ import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } f
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
-import { TierCalculation } from '../data/tierApiClient'
+import { TierCalculation } from '../types/Tier'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../types/FileUpload'
-import { SentencePlan } from './Risk'
+import { SentencePlan } from '../data/model/sentencePlan'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse, SmsPreviewResponse } from '../data/model/esupervision'
 

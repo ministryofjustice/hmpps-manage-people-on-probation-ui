@@ -3,11 +3,11 @@ import { ErrorSummary } from '../data/model/common'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { PersonRiskFlags, RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { Sentence } from '../data/model/sentenceDetails'
-import { TierCalculation } from '../data/tierApiClient'
+import { TierCalculation } from '../types/Tier'
 import { AppointmentSession, AppointmentType } from './Appointments'
 import { Errors } from './Errors'
 import { ESupervisionSession } from './ESupervision'
-import { SentencePlan } from './Risk'
+import { SentencePlan } from '../data/model/sentencePlan'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails

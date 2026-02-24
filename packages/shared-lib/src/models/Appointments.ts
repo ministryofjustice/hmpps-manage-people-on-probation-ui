@@ -197,6 +197,12 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
+  checkInMinDate?: string
+  checkInMobile?: string
+  checkInEmail?: string
+  contactSaved?: string
+  editCheckInMobile?: string
+  editCheckInEmail?: string
 }
 
 export interface MasUserDetails {

@@ -1,4 +1,4 @@
-import { TierCalculation } from '../../data/tierApiClient'
+import { TierCalculation } from '../../types'
 
 export const mockTierCalculation = {
   tierScore: 'B2',

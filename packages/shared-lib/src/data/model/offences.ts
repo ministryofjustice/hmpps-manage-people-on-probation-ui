@@ -9,7 +9,7 @@ export interface Offences {
 
 export interface Offence {
   description: string
-  category: string
   code: string
-  dateOfOffence: string
+  category?: string
+  dateOfOffence?: string
 }

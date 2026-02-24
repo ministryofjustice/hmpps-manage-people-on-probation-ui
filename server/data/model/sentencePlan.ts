@@ -1,13 +1,15 @@
 export interface SentencePlan {
-  publishedState: string
-  uuid: string
-  createdDate: string
+  publishedState?: string
+  uuid?: string
+  createdDate?: string
   createdBy?: User
   lastUpdatedDate: string
   lastUpdatedBy?: User
   currentVersion?: CurrentVersion
-  versions: Version[]
+  versions?: Version[]
   crn?: string
+  showLink?: boolean
+  showText?: boolean
 }
 
 interface User {

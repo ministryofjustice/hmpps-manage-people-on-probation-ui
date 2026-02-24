@@ -19,17 +19,3 @@ export interface CheckinUserDetails {
   contactUpdated?: boolean
   settingsUpdated?: boolean
 }
-export interface LocalParams {
-  crn: string
-  id: string
-  errors?: Errors
-  body?: Record<string, string | string[]>
-  checkInMinDate?: string
-  back?: string
-  change?: string
-  checkInMobile?: string
-  checkInEmail?: string
-  contactSaved?: string
-  editCheckInMobile?: string
-  editCheckInEmail?: string
-}

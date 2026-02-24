@@ -1,6 +1,8 @@
 /* eslint-disable import/no-cycle */
+import { Practitioner } from './esupervision'
 import { Note } from './note'
 import { Contact } from './professionalContact'
+import { Document } from './documents'
 
 export interface Name {
   forename: string
@@ -52,6 +54,7 @@ export interface PersonSummary {
   dateOfBirth: string
   preferredLanguage?: string
 }
+
 export interface PersonalDetails {
   crn: string
   name: Name
@@ -85,6 +88,8 @@ export interface PersonalDetails {
   lastUpdatedBy?: Name
   addressTypes: AddressType[]
   staffContacts: Contact[]
+  mobile?: string
+  practitioner?: Practitioner
 }
 
 export interface PersonalDetailsMainAddress {
@@ -159,13 +164,6 @@ export interface Provisions {
   lastUpdated?: string
 }
 
-export interface Document {
-  id: string
-  name: string
-  lastUpdated?: string
-  createdAt?: string
-}
-
 export interface ProvisionOverview {
   personSummary: PersonSummary
   provisions: Provision[]
@@ -175,8 +173,8 @@ export interface Provision {
   description: string
   provisionNotes?: Note[]
   provisionNote?: Note
-  lastUpdated: string
-  lastUpdatedBy: Name
+  lastUpdated?: string
+  lastUpdatedBy?: Name
 }
 
 export interface CircumstanceOverview {
@@ -209,12 +207,12 @@ export interface DisabilityOverview {
 }
 
 export interface Disability {
-  disabilityId: number
+  disabilityId?: number
   description: string
   disabilityNotes?: Note[]
   disabilityNote?: Note
-  lastUpdated: string
-  lastUpdatedBy: Name
+  lastUpdated?: string
+  lastUpdatedBy?: Name
 }
 
 export type Origin = 'appointments' | undefined

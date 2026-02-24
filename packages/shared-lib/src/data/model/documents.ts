@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import { PersonSummary } from './personalDetails'
 
 export interface PersonDocuments {
@@ -33,13 +34,15 @@ export interface TextSearchDocumentsRequest {
 }
 
 export interface Document {
-  alfrescoId: string
+  alfrescoId?: string
+  id?: string
   name: string
   filenameHighlighted?: string
-  docLevel: string
-  tableName: string
-  createdAt: string
-  lastUpdatedAt: string
-  author: string
-  description: string
+  docLevel?: string
+  tableName?: string
+  createdAt?: string
+  lastUpdated?: string
+  lastUpdatedAt?: string
+  author?: string
+  description?: string
 }

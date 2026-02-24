@@ -310,7 +310,7 @@ describe('validates edit personal contact details request with spec', () => {
   ])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
-      expect(validateWithSpec(a, b)).toEqual(expected)
+      expect(validateWithSpec(a as any, b)).toEqual(expected)
     },
   )
 })
@@ -340,7 +340,7 @@ describe('validates edit main address request with spec', () => {
   ])(
     '%s validateWithSpec(%s, %s)',
     (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
-      expect(validateWithSpec(a, b)).toEqual(expected)
+      expect(validateWithSpec(a as any, b)).toEqual(expected)
     },
   )
 })

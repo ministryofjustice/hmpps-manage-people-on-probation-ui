@@ -1,11 +1,11 @@
 // Require app insights before anything else to allow for instrumentation of bunyan and express
+import { utils as sharedUtils } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import 'applicationinsights'
-import { initialiseAppInsights, buildAppInsightsClient } from './server/utils/azureAppInsights'
 import { app, metricsApp } from './server/index'
 import logger from './logger'
 
-initialiseAppInsights()
-buildAppInsightsClient()
+sharedUtils.initialiseAppInsights()
+sharedUtils.buildAppInsightsClient()
 
 const validatePort = (port: number) => {
   if (port >= 0 && port <= 65535) {
