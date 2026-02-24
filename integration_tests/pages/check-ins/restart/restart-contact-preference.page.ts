@@ -2,7 +2,7 @@ import Page, { PageElement } from '../../page'
 
 export default class RestartContactPreferencePage extends Page {
   constructor() {
-    super('Contact preferences')
+    super('Contact details')
   }
 
   getSubmitBtn = (): PageElement => cy.get('[data-qa="submitBtn"]')
