@@ -92,7 +92,7 @@
     'colour': colour }), tags) %}
 {% endif %}
 
-{% if entry.isSystemContact === true %}
+{% if entry.isSystemContact === true and entry.type !=='Online probation check in' %}
   {% set text = 'System generated' %}
   {% set shorthand = '⛭' %}
   {% set iconClass = 'strike' %}
