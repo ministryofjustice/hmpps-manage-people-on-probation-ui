@@ -2,14 +2,7 @@
 {% set title = 'Text message confirmation' %}
 {% set backLink = change if change else '/case/' + crn + '/arrange-appointment/' + id + '/location-date-time?back=text-message-confirmation' %}
 {% set personForename = headerPersonName.forename %}
-{% set smsItems = [] %}
-{% if case.mobileNumber %}
-    {% set smsItems = (smsItems.push({text: 'Yes', value: 'YES'}), smsItems) %}
-    {% set smsItems = (smsItems.push({text: 'Yes, update their mobile number', value: 'YES_UPDATE_MOBILE_NUMBER'}), smsItems) %}
-{% else %}
-    {% set smsItems = (smsItems.push({text: 'Yes, add a mobile number', value: 'YES_ADD_MOBILE_NUMBER'}), smsItems) %}
-{% endif %}
-{% set smsItems = (smsItems.push({text: 'No', value: 'NO'}), smsItems) %}
+
 {% block alertBanner %}
     {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
@@ -29,7 +22,7 @@
     hint: {
         text: ("Their mobile number is " + case.mobileNumber + ".") if case.mobileNumber else "They do not have a mobile number saved, so you´ll need to check if they have one."
       },
-    items: smsItems
+    items: smsConfirmationOptions
    } | decorateFormAttributes(['appointments', crn, id, 'smsOptIn'])) }}
     {% if smsPreview !== null %}
         <section id="smsPreview" data-qa="smsPreview" class="govuk-!-margin-bottom-6">

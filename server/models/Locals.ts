@@ -119,6 +119,7 @@ interface Locals {
   smsPreview?: SmsPreviewResponse | null
   personRisks?: PersonRiskFlags
   riskToStaff?: { id: number; level: RiskScore | null }
+  smsConfirmationOptions?: Option[]
 }
 
 export interface AppResponse extends Response {
