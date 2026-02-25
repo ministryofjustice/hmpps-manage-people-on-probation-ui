@@ -26,6 +26,7 @@
   },
   "exclude": [
     "node_modules",
+    "packages",
     "assets/**/*.js",
     "integration_tests",
     "e2e_tests",

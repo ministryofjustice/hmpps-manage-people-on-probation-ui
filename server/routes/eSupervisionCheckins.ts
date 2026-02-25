@@ -1,5 +1,5 @@
 import { type Router } from 'express'
-import type { Services } from '../services'
+import { type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import controllers from '../controllers'
 import validate from '../middleware/validation'
 import { autoStoreSessionData, redirectWizard } from '../middleware'

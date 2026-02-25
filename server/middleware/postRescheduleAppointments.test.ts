@@ -1,8 +1,8 @@
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { DateTime } from 'luxon'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { postRescheduleAppointments } from './postRescheduleAppointments'
 import { mockAppResponse } from '../controllers/mocks'
@@ -13,7 +13,7 @@ import {
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import { PersonAppointment } from '../data/model/schedule'
-import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
+import { EventResponse } from '../data/model/OutlookEvent'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -21,8 +21,20 @@ const externalReference = 'urn:uk:gov:hmpps:manage-supervision-service:appointme
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/SupervisionAppointmentClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 const crn = 'X000001'
 const uuid = '4715aa09-0f9d-4c18-948b-a42c45bc0974'

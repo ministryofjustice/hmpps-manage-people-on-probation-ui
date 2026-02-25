@@ -1,7 +1,6 @@
+import { type Route, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
-import { HmppsAuthClient } from '../data'
-import { Route } from '../@types'
 import {
   AppointmentRequestBody,
   AppointmentSession,
@@ -9,14 +8,14 @@ import {
   AppointmentType,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
+import { EventRequest, OutlookEventResponse } from '../data/model/OutlookEvent'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
 
 export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promise<AppointmentsPostResponse>> => {
   return async (req, res) => {
-    const { crn, id: uuid } = req.params
+    const { crn, id: uuid } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
@@ -77,7 +76,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
       const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
-      const outlookEventRequestBody: OutlookEventRequestBody = {
+      const outlookEventRequestBody: EventRequest = {
         recipients: [
           {
             emailAddress: userDetails.email,

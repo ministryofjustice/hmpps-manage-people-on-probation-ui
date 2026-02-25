@@ -1,6 +1,11 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Request as ExpressRequest } from 'express'
-import { Controller, FileCache } from '../@types'
+import {
+  type Controller,
+  type AppResponse,
+  HmppsAuthClient,
+} from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { FileCache } from '../@types'
 import {
   convertToTitleCase,
   dateIsInPast,
@@ -24,8 +29,6 @@ import {
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
 import { SmsOptInOptions } from '../data/model/OutlookEvent'
-import { AppResponse } from '../models/Locals'
-import { HmppsAuthClient } from '../data'
 import config from '../config'
 import MasApiClient from '../data/masApiClient'
 import { postRescheduleAppointments } from '../middleware/postRescheduleAppointments'
@@ -113,7 +116,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   redirectToSentence: () => {
     return async (req, res) => {
       const uuid = uuidv4()
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(uuid)) {
         return renderError(404)(req, res)
@@ -170,7 +173,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   getTypeAttendance: () => {
     return async (req, res) => {
       const errors = req?.session?.data?.errors
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change, validation } = req.query
       const { data } = req.session
       const url = encodeURIComponent(req.url)
@@ -352,7 +355,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { alertDismissed = false } = req.session
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
       const isReschedule = isRescheduleAppointment(req)
@@ -424,7 +427,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
   },
   postAddNote: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change } = req.query as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)

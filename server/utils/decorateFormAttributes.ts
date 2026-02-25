@@ -1,9 +1,8 @@
 /* eslint-disable no-param-reassign */
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Request } from 'express'
 import { getDataValue } from './getDataValue'
 import config from '../config'
-// eslint-disable-next-line import/no-cycle
-import { AppResponse } from '../models/Locals'
 
 interface Item {
   checked?: string

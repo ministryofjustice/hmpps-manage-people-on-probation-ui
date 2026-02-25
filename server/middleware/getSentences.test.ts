@@ -1,17 +1,22 @@
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { getSentences } from './getSentences'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import { HmppsAuthClient } from '../data'
 import { Sentences } from '../data/model/sentenceDetails'
-import { AppResponse } from '../models/Locals'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 jest.mock('../data/tokenStore/redisTokenStore')
 
-jest
-  .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
-  .mockImplementation(() => Promise.resolve(token.access_token))
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+  }
+})
+
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
@@ -47,7 +52,6 @@ const crn = 'X000001'
 const number = '2'
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 
 const spy = jest.spyOn(MasApiClient.prototype, 'getSentences').mockImplementation(() => Promise.resolve(sentencesMock))

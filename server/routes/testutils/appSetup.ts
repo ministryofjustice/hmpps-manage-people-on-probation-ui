@@ -1,17 +1,16 @@
 import express, { Express, Router } from 'express'
 import cookieSession from 'cookie-session'
 import { NotFound } from 'http-errors'
-
+import { type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import CaseSearchService, {
   CaseSearchOptions,
 } from '@ministryofjustice/probation-search-frontend/service/caseSearchService'
 import routes from '../index'
 import nunjucksSetup from '../../utils/nunjucksSetup'
-import errorHandler from '../../errorHandler'
 import * as auth from '../../authentication/auth'
-import type { Services } from '../../services'
 import type { ApplicationInfo } from '../../applicationInfo'
 import setUpAuthentication from '../../middleware/setUpAuthentication'
+import errorHandler from '../../errorHandler'
 
 const testAppInfo: ApplicationInfo = {
   applicationName: 'test',
@@ -36,9 +35,7 @@ export const flashProvider = jest.fn()
 
 function appSetup(services: Services, production: boolean, userSupplier: () => Express.User): Express {
   const app = express()
-
   app.set('view engine', 'njk')
-
   nunjucksSetup(app, testAppInfo, services)
   app.use(cookieSession({ keys: [''] }))
   app.use((req, res, next) => {
@@ -56,7 +53,6 @@ function appSetup(services: Services, production: boolean, userSupplier: () => E
   app.use(setUpAuthentication())
   app.use((_req, _res, next) => next(new NotFound()))
   app.use(errorHandler(production))
-
   return app
 }
 

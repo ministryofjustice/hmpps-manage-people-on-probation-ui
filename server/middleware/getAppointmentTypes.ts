@@ -1,7 +1,6 @@
+import { type Route, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { AppointmentType, AppointmentTypeResponse } from '../models/Appointments'
-import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
-import { Route } from '../@types'
 
 export const getAppointmentTypes = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {

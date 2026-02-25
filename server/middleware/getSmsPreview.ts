@@ -1,6 +1,4 @@
-import logger from '../../logger'
-import { Route } from '../@types'
-import { HmppsAuthClient } from '../data'
+import { logger, HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { AppointmentSession } from '../models/Appointments'
 import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'
@@ -9,7 +7,7 @@ import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
-    const { crn, id: uuid } = req.params
+    const { crn, id: uuid } = req.params as Record<string, string>
     const { username } = res.locals.user
     const {
       name: { forename: firstName },

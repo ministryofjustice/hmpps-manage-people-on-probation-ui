@@ -1,6 +1,6 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { postcodeValidator } from 'postcode-validator'
 import { DateTime } from 'luxon'
-import logger from '../../logger'
 import { dateTime } from './dateTime'
 import { ErrorCheck, Validateable, ValidationSpec } from '../models/Errors'
 import config from '../config'

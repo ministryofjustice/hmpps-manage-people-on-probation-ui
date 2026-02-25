@@ -1,21 +1,20 @@
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import config from '../config'
 import { toIsoDateFromPicker, getDataValue, setDataValue } from '../utils'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Data } from '../models/Data'
-import { HmppsAuthClient } from '../data'
-import { Route } from '../@types'
 import '../@types/express/index.d'
 
-export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, _res, next) => {
     const newSessionData: Data = req?.session?.data ?? {}
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const inputs: Record<string, any> = req.body ?? {}
 
     const deleteValues = (keys: string[]): void => {
       keys.forEach(key => {
         if ((req?.session?.data?.appointments as any)?.[crn]?.[id]?.[key]) {
-          delete newSessionData.appointments[crn][id][key as keyof AppointmentSession]
+          delete newSessionData?.appointments?.[crn][id][key as keyof AppointmentSession]
         }
       })
     }
@@ -65,6 +64,9 @@ export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<P
       }
     })
     req.session.data = newSessionData
-    return next()
+    if (next) {
+      return next()
+    }
+    return null
   }
 }

@@ -1,6 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -11,7 +11,7 @@ const routes = ['getCompliance'] as const
 const complianceController: Controller<typeof routes, void> = {
   getCompliance: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_COMPLIANCE',

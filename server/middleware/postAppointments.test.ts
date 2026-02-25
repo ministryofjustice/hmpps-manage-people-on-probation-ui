@@ -1,9 +1,9 @@
 import httpMocks from 'node-mocks-http'
-import { postAppointments, buildCaseLink } from './postAppointments'
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { postAppointments } from './postAppointments'
 import { dateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { Sentence } from '../data/model/sentenceDetails'
 import { UserLocation } from '../data/model/caseload'
@@ -24,9 +24,22 @@ const crn = 'X000001'
 const id = '4715aa09-0f9d-4c18-948b-a42c45bc0974'
 const username = 'user-1'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 jest.mock('../data/masApiClient')
 jest.mock('../data/SupervisionAppointmentClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('../services/flagService')
 
@@ -256,9 +269,12 @@ let getUserDetailsSpy: jest.SpyInstance
 let postOutlookCalendarEventSpy: jest.SpyInstance
 
 describe('/middleware/postAppointments', () => {
-  afterEach(() => {
+  beforeEach(() => {
     jest.clearAllMocks()
   })
+  // afterEach(() => {
+  //   jest.clearAllMocks()
+  // })
 
   describe('It should post the correct request body', () => {
     beforeEach(() => {

@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
-import { AppointmentSession, AppointmentType } from '../models/Appointments'
-import { AppointmentLocals, AppResponse } from '../models/Locals'
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+import { AppointmentType } from '../models/Appointments'
 import { getDataValue } from '../utils'
 import { checkAnswers } from './checkAnswers'
 import { Location } from '../data/model/caseload'
@@ -145,7 +145,7 @@ describe('/middleware/checkAnswers', () => {
   it('no changes are made to a valid appointment session', () => {
     const { req, res } = setup(mockAppointmentSessions[0], mockAppointments[0])
     const { data } = req.session
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
     const session = getDataValue(data, ['appointments', crn, id])
     expect(session.type).toEqual('COAP')
@@ -154,7 +154,7 @@ describe('/middleware/checkAnswers', () => {
   it('remove type and location if not a valid type', () => {
     const { req, res } = setup(mockAppointmentSessions[1], mockAppointments[1])
     const { data } = req.session
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
     const session = getDataValue(data, ['appointments', crn, id])
     expect(session.type).toEqual(null)
@@ -163,7 +163,7 @@ describe('/middleware/checkAnswers', () => {
   it('remove location if not valid', () => {
     const { req, res } = setup(mockAppointmentSessions[2], mockAppointments[2])
     const { data } = req.session
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     checkAnswers(req, res, nextSpy)
     const session = getDataValue(data, ['appointments', crn, id])
     expect(session.type).toEqual('COAP')

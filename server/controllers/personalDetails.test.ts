@@ -1,7 +1,7 @@
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { Response } from 'superagent'
 import { v4 as uuidv4 } from 'uuid'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import RoleService from '../services/roleService'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
@@ -73,12 +73,17 @@ jest.mock('../utils/validationUtils', () => ({
   validateWithSpec: jest.fn(),
 }))
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>

@@ -1,4 +1,4 @@
-import { AppResponse } from '../../models/Locals'
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 
 export const mockAppResponse = (locals?: Record<string, any>) =>
   ({

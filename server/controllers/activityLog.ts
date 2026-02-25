@@ -1,6 +1,6 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
-import type { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toPredictors, toRoshWidget, groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
@@ -27,7 +27,7 @@ const activityLogController: Controller<typeof routes, void> = {
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { query, body, params } = req
-      const { crn } = params
+      const { crn } = params as Record<string, string>
       const { page = '0', view = '' } = query
       let currentView = view ?? req?.body?.view
       if (req?.query?.view === 'compact' || req?.body?.view === 'compact') {
@@ -82,7 +82,7 @@ const activityLogController: Controller<typeof routes, void> = {
   },
   getActivity: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       let { url } = req
       url = encodeURIComponent(url)

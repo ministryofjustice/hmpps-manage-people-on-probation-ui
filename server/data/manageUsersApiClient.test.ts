@@ -1,8 +1,5 @@
-import nock from 'nock'
-
-import config from '../config'
-import ManageUsersApiClient from './manageUsersApiClient'
-import { isValidHost, isValidPath } from '../utils'
+/* eslint-disable import/first */
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -12,6 +9,11 @@ jest.mock('../utils', () => {
     isValidHost: jest.fn(),
   }
 })
+
+import nock from 'nock'
+import config from '../config'
+import ManageUsersApiClient from './manageUsersApiClient'
+import { isValidHost, isValidPath } from '../utils'
 
 const mockedIsValidPath = isValidPath as jest.MockedFunction<typeof isValidPath>
 const mockedIsValidHost = isValidHost as jest.MockedFunction<typeof isValidHost>

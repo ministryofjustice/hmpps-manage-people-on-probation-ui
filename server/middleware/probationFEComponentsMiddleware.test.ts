@@ -1,12 +1,6 @@
+import { logger } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import type { Request, Response } from 'express'
 import getFrontendComponents from './probationFEComponentsMiddleware'
-
-import logger from '../../logger'
-
-jest.mock('../../logger', () => ({
-  __esModule: true,
-  default: { info: jest.fn() },
-}))
 
 describe('ProbationFEComponentsMiddleware', () => {
   let next: jest.Mock
@@ -97,6 +91,7 @@ describe('ProbationFEComponentsMiddleware', () => {
 
   it('logs and continues when service throws an error', async () => {
     const token = 'user-token'
+    const loggerSpy = jest.spyOn(logger, 'info')
     const { req, res } = createReqRes({ token })
 
     const fakeService = {
@@ -107,7 +102,7 @@ describe('ProbationFEComponentsMiddleware', () => {
     await mw(req, res, next)
 
     // Should log and still call next without throwing
-    expect(logger.info).toHaveBeenCalled()
+    expect(loggerSpy).toHaveBeenCalled()
     expect(next).toHaveBeenCalled()
   })
 })

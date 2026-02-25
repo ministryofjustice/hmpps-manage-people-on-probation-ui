@@ -1,3 +1,5 @@
+import { type Config, AgentConfig } from '@ministryofjustice/manage-people-on-probation-shared-lib'
+
 const production = process.env.NODE_ENV === 'production'
 
 function get<T>(name: string, fallback: T, options = { requireInProduction: false }): T | string {
@@ -12,37 +14,7 @@ function get<T>(name: string, fallback: T, options = { requireInProduction: fals
 
 const requiredInProduction = { requireInProduction: true }
 
-export class AgentConfig {
-  // Sets the working socket to timeout after timeout milliseconds of inactivity on the working socket.
-  timeout: number
-
-  constructor(timeout = 8000) {
-    this.timeout = timeout
-  }
-}
-
-export interface ApiConfig {
-  url: string
-  timeout: {
-    // sets maximum time to wait for the first byte to arrive from the server, but it does not limit how long the
-    // entire download can take.
-    response: number
-    // sets a deadline for the entire request (including all uploads, redirects, server processing time) to complete.
-    // If the response isn't fully downloaded within that time, the request will be aborted.
-    deadline: number
-  }
-  agent: AgentConfig
-}
-
-export interface SentryConfig {
-  dsn: string
-  loaderScriptId: string
-  tracesSampleRate: number
-  replaySampleRate: number
-  replayOnErrorSampleRate: number
-}
-
-export default {
+const config: Config = {
   buildNumber: get('BUILD_NUMBER', '1_0_0', requiredInProduction),
   productId: get('PRODUCT_ID', 'UNASSIGNED', requiredInProduction),
   gitRef: get('GIT_REF', 'xxxxxxxxxxxxxxxxxxx', requiredInProduction),
@@ -245,3 +217,4 @@ export default {
   preservedWords: ['(NS)', '(Non', 'NS)'],
   preservedSeparators: ['-'],
 }
+export default config

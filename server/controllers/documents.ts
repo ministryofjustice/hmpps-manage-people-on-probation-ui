@@ -3,14 +3,14 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { DateTime } from 'luxon'
-import { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient from '../data/tierApiClient'
 import { toIsoDateTimeFromPicker, toPredictors, toRoshWidget } from '../utils'
 import { validateWithSpec } from '../utils/validationUtils'
 import { documentSearchValidation } from '../properties'
-import { SearchDocumentsRequest, TextSearchDocumentsRequest } from '../data/model/documents'
+import { TextSearchDocumentsRequest } from '../data/model/documents'
 import { highlightText } from '../utils/highlightText'
 
 const routes = ['getDocuments'] as const
@@ -117,7 +117,7 @@ const documentController: Controller<typeof routes, void> = {
         },
       }
 
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const baseUrl = `/case/${crn}/documents`
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       let sortBy = req.query.sortBy ? (req.query.sortBy as string) : 'createdAt.desc'

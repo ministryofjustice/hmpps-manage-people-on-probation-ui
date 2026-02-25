@@ -7,9 +7,10 @@ export interface LicenceConditionNoteDetails {
 }
 
 export interface LicenceCondition {
-  mainDescription: string
-  subTypeDescription: string
-  imposedReleasedDate: string
-  actualStartDate: string
-  licenceNote: Note
+  id?: number
+  mainDescription?: string
+  subTypeDescription?: string
+  imposedReleasedDate?: string
+  actualStartDate?: string
+  licenceNote?: Note
 }

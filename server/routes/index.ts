@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import type { Services } from '../services'
+import { type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import home from './home'
 import searchRoutes from './search'
 import caseRoutes from './case'

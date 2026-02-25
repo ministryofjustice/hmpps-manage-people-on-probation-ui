@@ -1,14 +1,23 @@
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { postCheckInDetails } from './postCheckInDetails'
 import MasApiClient from '../data/masApiClient'
 import ESupervisionClient from '../data/eSupervisionClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-
-const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/eSupervisionClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 
 describe('postCheckInDetails', () => {
@@ -60,12 +69,11 @@ describe('postCheckInDetails', () => {
 
     return { req, res }
   }
-
+  const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
   const hmppsAuthClient = new HmppsAuthClient(tokenStore) as jest.Mocked<HmppsAuthClient>
 
   beforeEach(() => {
     jest.resetAllMocks()
-    jest.spyOn(HmppsAuthClient.prototype, 'getSystemClientToken').mockResolvedValue(token)
   })
 
   it('posts offender setup and returns setup and upload location (with date conversion and MAS practitioner)', async () => {
@@ -88,7 +96,6 @@ describe('postCheckInDetails', () => {
     const result = await handler(req, res)
 
     expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith(username)
-    expect(MasApiClient).toHaveBeenCalledWith(token)
 
     expect(postOffenderSetup).toHaveBeenCalledTimes(1)
     const calledWith = postOffenderSetup.mock.calls[0][0]

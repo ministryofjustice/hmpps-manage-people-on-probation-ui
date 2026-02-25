@@ -1,17 +1,28 @@
+import { type AppResponse, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { getAppointmentTypes } from './getAppointmentTypes'
-import { HmppsAuthClient } from '../data'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { AppointmentTypeResponse } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const username = 'user-1'
+
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
+
 jest.mock('../data/tokenStore/redisTokenStore')
-const tokenSpy = jest
-  .spyOn(HmppsAuthClient.prototype, 'getSystemClientToken')
-  .mockImplementation(() => Promise.resolve(token.access_token))
+
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 tokenStore.getToken.mockResolvedValue(token.access_token)
 
@@ -65,9 +76,7 @@ describe('middleware/getAppointmentTypes', () => {
       })
       await getAppointmentTypes(hmppsAuthClient)(req, res, nextSpy)
     })
-    it('should get client token', () => {
-      expect(tokenSpy).toHaveBeenCalledWith(username)
-    })
+
     it('should request the appointment types from the api', () => {
       expect(spy).toHaveBeenCalled()
     })

@@ -1,6 +1,6 @@
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { getPersonRiskFlags } from './getPersonRiskFlags'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { findReplace, setDataValue, getStaffRisk } from '../utils'
@@ -9,7 +9,18 @@ import { mockAppResponse } from '../controllers/mocks'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 
 jest.mock('../utils', () => {

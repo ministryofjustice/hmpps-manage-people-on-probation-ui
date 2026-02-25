@@ -1,4 +1,4 @@
-import { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import TechnicalUpdatesService from '../services/technicalUpdatesService'
 import config from '../config'
 

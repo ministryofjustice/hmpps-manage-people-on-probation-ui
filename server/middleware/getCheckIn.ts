@@ -1,13 +1,11 @@
+import { type AppResponse, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { NextFunction, Request } from 'express'
 import { DateTime } from 'luxon'
-import { AppResponse } from '../models/Locals'
-import { HmppsAuthClient } from '../data'
 import ESupervisionClient from '../data/eSupervisionClient'
-import { ESupervisionLog } from '../data/model/esupervision'
 
 export const getCheckIn = (hmppsAuthClient: HmppsAuthClient) => {
   return async (req: Request, res: AppResponse, next: NextFunction): Promise<void> => {
-    const { id } = req.params
+    const { id } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
     const checkInResponse = await eSupervisionClient.getOffenderCheckIn(id)

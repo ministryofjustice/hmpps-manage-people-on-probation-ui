@@ -1,6 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
-import { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { toRoshWidget, toPredictors } from '../utils'
@@ -11,7 +11,7 @@ const routes = ['getCase'] as const
 const caseController: Controller<typeof routes, void> = {
   getCase: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)

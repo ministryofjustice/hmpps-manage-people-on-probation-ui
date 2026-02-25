@@ -1,7 +1,6 @@
 import { type RequestHandler, Router } from 'express'
+import { type Services, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import type { Services } from '../services'
-import type { Route } from '../@types'
 import controllers from '../controllers'
 import {
   constructNextAppointmentSession,

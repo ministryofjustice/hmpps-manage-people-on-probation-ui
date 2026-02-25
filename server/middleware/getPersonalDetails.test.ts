@@ -1,12 +1,10 @@
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
-import e from 'connect-flash'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import { AppResponse } from '../models/Locals'
 import { toPredictors, toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
@@ -25,10 +23,10 @@ import {
   Name,
   PersonalContact,
   Provisions,
-  Document,
   AddressType,
   PersonalDetails,
 } from '../data/model/personalDetails'
+import { Document } from '../data/model'
 import { Contact } from '../data/model/professionalContact'
 import { SentencePlan } from '../data/model/sentencePlan'
 
@@ -37,7 +35,18 @@ const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
 jest.mock('../data/tierApiClient')
 jest.mock('../data/arnsApiClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)

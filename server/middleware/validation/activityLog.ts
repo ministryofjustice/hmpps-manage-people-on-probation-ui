@@ -1,8 +1,8 @@
+import { type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { ActivityLogFilters } from '../../models/ActivityLog'
 import { activityLogValidation } from '../../properties'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { renderError } from '../renderError'
-import { Route } from '../../@types'
 
 const activityLog: Route<void> = (req, res, next): void => {
   let errorMessages: Record<string, string> = {}

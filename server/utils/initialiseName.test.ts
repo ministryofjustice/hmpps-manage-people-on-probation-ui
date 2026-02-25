@@ -1,5 +1,7 @@
 import { initialiseName } from '.'
 
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 describe('utils/initialiseName', () => {
   it.each([
     [null, null, null],

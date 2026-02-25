@@ -1,7 +1,7 @@
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { Request } from 'express'
 import { Activity } from '../data/model/schedule'
 import { AppointmentSession } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
 import { getDataValue, convertToTitleCase } from '../utils'
 import { Name } from '../data/model/personalDetails'
 
@@ -17,7 +17,7 @@ export const getAttendedCompliedProps = (
   req: Request,
   res: AppResponse,
 ): { forename: string; surname: string; appointment: AttendedCompliedAppointment | Activity } => {
-  const { crn, id, contactId } = req.params
+  const { crn, id, contactId } = req.params as Record<string, string>
   const data = req?.session?.data
   let appointment: AttendedCompliedAppointment | Activity
   const { forename, surname } = res.locals.case.name

@@ -6,7 +6,7 @@ export interface ESupervisionCheckIn {
   uuid: string
   status: 'SUBMITTED' | 'REVIEWED' | 'EXPIRED'
   dueDate: string
-  personalDetails: PersonalDetails
+  personalDetails: ESupervisionPersonalDetails
   submittedAt?: string
   surveyResponse: any
   createdBy: string
@@ -95,7 +95,7 @@ export interface OffenderSetupCompleteResponse {
   createdAt: string
   createdBy: string
   updatedAt: string
-  personalDetails?: PersonalDetails
+  personalDetails?: ESupervisionPersonalDetails
 }
 
 export interface Practitioner {
@@ -118,7 +118,7 @@ export interface Practitioner {
   }
 }
 
-export interface PersonalDetails {
+export interface ESupervisionPersonalDetails {
   crn: string
   name: Name
   mobile: string

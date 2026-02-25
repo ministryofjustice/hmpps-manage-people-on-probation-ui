@@ -1,18 +1,31 @@
+/* eslint-disable import/first */
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib')
+
 import httpMocks from 'node-mocks-http'
+import { logger, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { getSmsPreview } from './getSmsPreview'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { isoFromDateTime, setDataValue } from '../utils'
 import { mockAppResponse } from '../controllers/mocks'
 import { Location } from '../data/model/caseload'
 import { AppointmentSession } from '../models/Appointments'
 import { SmsPreviewRequest, SmsPreviewResponse } from '../data/model/OutlookEvent'
-import logger from '../../logger'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 jest.mock('../data/masApiClient')
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
+})
 jest.mock('../data/tokenStore/redisTokenStore')
 
 jest.mock('../utils', () => {

@@ -1,4 +1,4 @@
-import { Controller } from '../@types'
+import { type Controller } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import config from '../config'
 
@@ -11,9 +11,6 @@ const homeController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const { appointments, outcomes, totalAppointments, totalOutcomes } = await masClient.getUserAppointments(
         res.locals.user.username,
-      )
-      const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
-        req.host.includes(host),
       )
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage/homepage', {

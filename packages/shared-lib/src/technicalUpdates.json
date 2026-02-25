@@ -1,0 +1,73 @@
+[
+  {
+    "heading": "Compliance page temporarily unavailable",
+    "summary": "29 January 2026",
+    "whatsNew": [
+      [
+        "The Compliance page is temporarily unavailable while we make some improvements. We’ll let you know as soon as it’s available again."
+      ]
+    ]
+  },
+  {
+    "heading": "Learn about online check ins for people on probation",
+    "summary": "15 January 2026",
+    "whatsNew": [
+      "About online check ins",
+      [
+        "Online check ins allow people on probation to submit a short video to check their identity, and answer 3 questions to tell practitioners how they are. This can be used to replace some face-to-face appointments where appropriate, or used alongside face-to-face appointments to help manage risk."
+      ],
+      "Help with using online check ins",
+      ["You can get familiar with online check ins using our guidance (opens in new tab)."],
+      "Bug fixes for Manage people on probation",
+      [
+        "To help you arrange appointments faster, we’ve improved page loading speed. Thanks to the users who reported this was slowing them down.\n\nTo make it easier for you to upload files, we’ve made some technical changes so that you can add one file at a time to an appointment outcome.\n\nYou can now arrange planned telephone contacts (NS) without needing to select a location. This fixes a bug that was causing errors."
+      ]
+    ]
+  },
+  {
+    "heading": "View alerts and get calendar invitations for appointments",
+    "summary": "18 December 2025",
+    "whatsNew": [
+      "Get calendar invitations for appointments with people on probation",
+      [
+        "To make managing your appointment schedule easier, you now get an automatic meeting invitation in your inbox when you arrange an appointment with a person on probation.\u2028\u2028The invitation appears as private in your calendar, so only you will see the appointment details which include: \nthe title \nthe time and date\na direct link to the appointment within the service \u2028\nIf you arrange an appointment for someone else, they will get the private meeting invitation instead."
+      ],
+      "Type your appointment start and end times",
+      [
+        "To make it easier for you to add accurate appointment start and end times, you can now type the times you need, using the format hh:mm. \n\nThanks to the users who said this would be quicker than selecting from a list. "
+      ],
+      "Arrange past appointments",
+      [
+        "You can now arrange appointments in the past if they have an attended and complied outcome.\u2028\nUse NDelius if you need to arrange past appointments with other outcomes."
+      ]
+    ]
+  },
+  {
+    "heading": "View all outcomes to log on one page and other service improvements",
+    "summary": "11 December 2025",
+    "whatsNew": [
+      "View all outcomes to log on one page",
+      [
+        "The ‘You need to record an outcome for xx appointments’ link now goes to a page that lists every appointment without an outcome, so you can view them quicker."
+      ],
+      "Manage appointments in this service",
+      [
+        "You can use Manage people on probation (MPOP) to manage appointments arranged in this service, with a bug fix stopping those links from going to NDelius.",
+        "Thanks to our users at Harrow and Barnet PDU for this feedback. If you have any ideas or comments, we’d love to hear via mpop-digital-team@justice.gov.uk."
+      ],
+      "NDelius Risk flags",
+      [
+        "The risk flags now display the same data as on NDelius, correcting a bug where risk showed as ‘high’ instead of ‘medium’ for ‘risk to staff’."
+      ],
+      "Adding and viewing notes",
+      [
+        "To save you a click, you can now add notes right after selecting that a person on probation attended and complied. This change means you do not return to the appointment details before adding notes.",
+        "You can now read a long note in a dedicated page, thanks to a bug fix."
+      ],
+      "Clearer signposting between NDelius and MPOP",
+      [
+        "We’ve made it easier for you to see which service an appointment was created on. NDelius-created appointments now display ‘Manage on NDelius’ links on the ‘Appointments’ page, and on the ‘Activity log’ page for appointments without outcomes."
+      ]
+    ]
+  }
+]

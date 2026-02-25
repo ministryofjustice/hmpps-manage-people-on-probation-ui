@@ -1,13 +1,12 @@
+import { logger, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import controllers from '.'
 import { mockAppResponse } from './mocks'
 import { getDataValue, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { defaultUser } from './mocks/alerts'
-import logger from '../../logger'
 import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
@@ -53,12 +52,17 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 
 const postReviewSpy = jest

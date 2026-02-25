@@ -1,8 +1,8 @@
 import httpMocks from 'node-mocks-http'
 import express from 'express'
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import request from 'supertest'
 import controllers from '.'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import homeRoutes from '../routes/home'
@@ -15,12 +15,17 @@ jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 
 const token = { access_token: 'token-1', expires_in: 300 }

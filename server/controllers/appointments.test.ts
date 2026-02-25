@@ -1,11 +1,10 @@
 import httpMocks from 'node-mocks-http'
+import { logger, HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { v4 as uuidv4 } from 'uuid'
 import { Request } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ParsedQs } from 'qs'
 import controllers from '.'
-import logger from '../../logger'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
@@ -50,12 +49,17 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 jest.mock('../data/arnsApiClient')
 
@@ -573,7 +577,7 @@ describe('controllers/appointments', () => {
         })
         it('should send the patch request to the api', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId, 10),
+            id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
             sensitive: true,
             outcomeRecorded: false,

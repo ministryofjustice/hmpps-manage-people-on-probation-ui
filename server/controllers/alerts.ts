@@ -1,15 +1,13 @@
+import { logger, type Controller, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
-import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget } from '../utils'
 import { RiskInfo, RiskSummary, RoshRiskWidgetDto } from '../data/model/risk'
 import { ErrorSummaryItem } from '../data/model/common'
-import logger from '../../logger'
 import { apiErrors } from '../properties'
-import { AppResponse } from '../models/Locals'
 
 const routes = ['getAlerts', 'getAlertNote', 'clearSelectedAlerts'] as const
 
@@ -106,7 +104,7 @@ const alertsController: Controller<typeof routes, void> = {
 
   getAlertNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { contactId, noteId } = req.params
+      const { contactId, noteId } = req.params as Record<string, string>
       const { back } = req.query
       const sortedBy = req.query.sortBy ? (req.query.sortBy as string) : 'date_and_time.desc'
       const url = encodeURIComponent(req.url)

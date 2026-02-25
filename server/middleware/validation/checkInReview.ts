@@ -1,11 +1,11 @@
-import { Route } from '../../@types'
+import { type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/ESupervision'
 import { checkInReviewValidation } from '../../properties/validation/checkInReviewValidation'
 
 const checkInReview: Route<void> = (req, res, next) => {
   const { url, params } = req
-  const { crn, id } = params
+  const { crn, id } = params as Record<string, string>
   const { checkIn } = res.locals
   const { back = '' } = req.query as Record<string, string>
 

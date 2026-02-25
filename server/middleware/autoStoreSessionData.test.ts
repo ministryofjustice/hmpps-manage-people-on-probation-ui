@@ -1,7 +1,6 @@
+import { HmppsAuthClient, type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { autoStoreSessionData } from './autoStoreSessionData'
-import type { AppResponse } from '../models/Locals'
-import { HmppsAuthClient } from '../data'
 
 const crn = 'X778160'
 const id = '19a88188-6013-43a7-bb4d-6e338516818f'
@@ -15,7 +14,14 @@ const res = {
   redirect: jest.fn().mockReturnThis(),
 } as unknown as AppResponse
 
-jest.mock('../data/hmppsAuthClient')
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+  }
+})
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const nextSpy = jest.fn()

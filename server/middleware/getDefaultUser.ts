@@ -1,12 +1,11 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
-import { Route } from '../@types'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import { Team, User } from '../data/model/caseload'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, res, next) => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { username } = res.locals.user
     const { data } = req.session
     // eslint-disable-next-line no-useless-escape

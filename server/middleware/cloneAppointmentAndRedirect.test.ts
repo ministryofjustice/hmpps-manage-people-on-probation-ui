@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
+import { type AppResponse } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import { AppointmentSession } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
 import { setDataValue } from '../utils'
 import { cloneAppointmentAndRedirect } from './cloneAppointmentAndRedirect'
 
@@ -67,7 +67,7 @@ describe('/middleware/cloneAppointmentAndRedirect', () => {
     jest.clearAllMocks()
   })
   const { req, res } = setup()
-  const { crn } = req.params
+  const { crn } = req.params as Record<string, string>
   const redirectSpy = jest.spyOn(res, 'redirect')
 
   const expectedClone = {

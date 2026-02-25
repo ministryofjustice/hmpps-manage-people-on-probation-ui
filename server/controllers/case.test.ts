@@ -1,7 +1,7 @@
+import { HmppsAuthClient } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
@@ -18,8 +18,8 @@ import {
   PersonalContact,
   PersonalDetails,
   Provisions,
-  Document,
 } from '../data/model/personalDetails'
+import { Document } from '../data/model/documents'
 import { PersonalDetailsSession } from '../models/Data'
 import { Contact } from '../data/model/professionalContact'
 import { ProbationPractitioner } from '../models/CaseDetail'
@@ -31,12 +31,17 @@ jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
 }))
 
-jest.mock('../data/hmppsAuthClient', () => {
-  return jest.fn().mockImplementation(() => {
-    return {
-      getSystemClientToken: jest.fn().mockImplementation(() => Promise.resolve('token-1')),
-    }
-  })
+jest.mock('@ministryofjustice/manage-people-on-probation-shared-lib', () => {
+  return {
+    HmppsAuthClient: jest.fn().mockImplementation(() => ({
+      getSystemClientToken: jest.fn(),
+    })),
+    AgentConfig: jest.fn(),
+    logger: {
+      info: jest.fn(),
+      error: jest.fn(),
+    },
+  }
 })
 
 const token = { access_token: 'token-1', expires_in: 300 }

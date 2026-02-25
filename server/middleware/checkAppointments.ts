@@ -1,7 +1,6 @@
-import { HmppsAuthClient } from '../data'
+import { HmppsAuthClient, type Route } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import MasApiClient from '../data/masApiClient'
 import { getDataValue, setDataValue, dateTime } from '../utils'
-import { Route } from '../@types'
 import { CheckAppointment, LocalParams } from '../models/Appointments'
 import { isEmptyObject } from '../utils/isEmptyObject'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
@@ -13,7 +12,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     function getUnderscoredFormValue(name: string) {
       return req.body[`_${name}`]
     }
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { data } = req.session
     const { back = '', change = '' } = req.query as Record<string, string>
     const { date, start: startTime, end: endTime, previousValues } = getDataValue(data, ['appointments', crn, id])

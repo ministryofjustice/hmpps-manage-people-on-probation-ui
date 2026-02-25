@@ -1,7 +1,6 @@
 import { type Router } from 'express'
+import { type Route, type Services } from '@ministryofjustice/manage-people-on-probation-shared-lib'
 import asyncMiddleware from '../middleware/asyncMiddleware'
-import type { Services } from '../services'
-import type { Route } from '../@types'
 import controllers from '../controllers'
 import {
   autoStoreSessionData,
