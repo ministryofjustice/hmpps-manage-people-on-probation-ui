@@ -78,18 +78,18 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const filterHref = (key: string, value: string): string => {
     if (key === 'compliance') {
       return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}`
+        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
+        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
     }
     if (key === 'category') {
       return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}`
+        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
+        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
     }
     if (key === 'hideContact') {
       return view
-        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}&view=${view}`
-        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURI(value)}`
+        ? `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}&view=${view}`
+        : `${baseUrl}?clearFilterKey=${key}&clearFilterValue=${encodeURIComponent(value)}`
     }
     return view ? `${baseUrl}?clearFilterKey=${key}&view=${view}` : `${baseUrl}?clearFilterKey=${key}`
   }

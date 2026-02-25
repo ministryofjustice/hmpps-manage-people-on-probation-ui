@@ -225,7 +225,7 @@ describe('/middleware/filterActivityLog()', () => {
           hideContact: [
             ...(query.hideContact as string[]).map((item, i) => ({
               text: hideContactsFilterOptions[i].text,
-              href: `${url}?clearFilterKey=hideContact&clearFilterValue=${item.replaceAll(' ', '%20')}`,
+              href: `${url}?clearFilterKey=hideContact&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           dateRange: [

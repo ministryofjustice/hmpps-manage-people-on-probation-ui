@@ -155,7 +155,6 @@ describe('/middleware/getPersonActivity', () => {
       ...filterVals,
       complianceOptions: [],
       categoryOptions: [],
-
       hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',

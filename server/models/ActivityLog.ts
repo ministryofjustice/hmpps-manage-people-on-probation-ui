@@ -5,7 +5,7 @@ export interface ActivityLogFilters {
   dateFrom: string
   dateTo: string
   compliance: Array<string>
-  category: Array<string>
+  category: string[]
   clearFilterKey?: string
   clearFilterValue?: string
   hideContact?: Array<string>
