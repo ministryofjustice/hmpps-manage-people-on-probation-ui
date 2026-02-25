@@ -23,6 +23,7 @@ import controllers from '../controllers'
 import { checkAppointments } from '../middleware/checkAppointments'
 import { checkAnswers } from '../middleware/checkAnswers'
 import { dateIsInPast } from '../utils'
+import { getSmsConfirmationOptions } from '../middleware/getSmsConfirmationOptions'
 
 const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Services) => {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -167,6 +168,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient }: Ser
     redirectWizard(['eventId', 'type', 'date', 'start', ['user', 'locationCode']]),
     getPersonalDetails(hmppsAuthClient),
     getSmsPreview(hmppsAuthClient),
+    getSmsConfirmationOptions,
   )
   router.get(
     '/case/:crn/arrange-appointment/:id/text-message-confirmation',
