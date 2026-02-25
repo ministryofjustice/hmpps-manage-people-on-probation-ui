@@ -170,7 +170,11 @@ describe('masApiClient', () => {
         'postPersonActivityLog',
         '/activity/X000001?size=10&page=1',
         () =>
-          masApiClient.postPersonActivityLog('X000001', { keywords: '', dateFrom: '', dateTo: '', filters: [] }, '1'),
+          masApiClient.postPersonActivityLog(
+            'X000001',
+            { keywords: '', dateFrom: '', dateTo: '', filters: [], typeCodes: [] },
+            '1',
+          ),
         'post',
       ],
       [
@@ -179,7 +183,7 @@ describe('masApiClient', () => {
         () =>
           masApiClient.postPersonActivityLog(
             'X000001',
-            { keywords: '', dateFrom: '', dateTo: '', filters: [] },
+            { keywords: '', dateFrom: '', dateTo: '', filters: [], typeCodes: [] },
             '1',
             '25',
           ),

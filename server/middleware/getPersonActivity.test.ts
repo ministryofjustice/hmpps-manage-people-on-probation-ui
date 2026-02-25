@@ -7,6 +7,7 @@ import TierApiClient from '../data/tierApiClient'
 import { toIsoDateFromPicker } from '../utils'
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import { Document } from '../data/model/personalDetails'
+import { APPOINTMENTS_CODES } from '../properties'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/hmppsAuthClient')
@@ -134,6 +135,7 @@ describe('/middleware/getPersonActivity', () => {
     dateFrom: '14/1/2025',
     dateTo: '21/1/2025',
     compliance: ['complied', 'not complied'],
+    category: ['Appointments', 'appointments'],
   }
   let masSpy: jest.SpyInstance
   let tierSpy: jest.SpyInstance
@@ -152,6 +154,8 @@ describe('/middleware/getPersonActivity', () => {
     res.locals.filters = {
       ...filterVals,
       complianceOptions: [],
+      categoryOptions: [],
+      hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
@@ -163,6 +167,7 @@ describe('/middleware/getPersonActivity', () => {
       dateFrom: filterVals.dateFrom,
       dateTo: filterVals.dateTo,
       compliance: ['complied', 'not complied'],
+      category: ['Appointments', 'appointments'],
     }
 
     const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
@@ -172,6 +177,8 @@ describe('/middleware/getPersonActivity', () => {
       dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
+      includeSystemGenerated: false,
+      typeCodes: APPOINTMENTS_CODES,
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
@@ -187,6 +194,8 @@ describe('/middleware/getPersonActivity', () => {
     res.locals.filters = {
       ...filterVals,
       complianceOptions: [],
+      categoryOptions: [],
+      hideContactOptions: [],
       selectedFilterItems: {},
       baseUrl: '',
       query: { ...filterVals },
@@ -210,6 +219,8 @@ describe('/middleware/getPersonActivity', () => {
       dateFrom: toIsoDateFromPicker(filterVals.dateFrom),
       dateTo: toIsoDateFromPicker(filterVals.dateTo),
       filters: ['complied', 'notComplied'],
+      includeSystemGenerated: false,
+      typeCodes: APPOINTMENTS_CODES,
     }
 
     const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
