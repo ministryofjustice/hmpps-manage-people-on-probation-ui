@@ -1,0 +1,39 @@
+{% from "../predictor-timeline-item/macro.njk" import predictorTimelineItem %}
+
+<div class="govuk-flex" data-qa="popHeader">
+    <div>
+        <ul class="govuk-list govuk-caption-m inline-list-from-tablet">
+            <li>CRN:
+                        <span data-qa='crn'>{{ params.crn }}</span>
+                <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
+            </li>
+            <li>Date of birth:
+                        <span data-qa='headerDateOfBirthValue'>{{ params.dob | dateWithYear }}</span>
+                                (<span data-qa='headerDateOfBirthAge'>{{ params.dob | yearsSince }} years old</span>)
+                        <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
+            </li>
+            <li>Tier:{{' '}}
+                {% if params.flags.enableTierLink == true %}
+                    <a href="{{ params.tier.link }}" data-qa="tierLink" class="govuk-link">{{ params.tier.score }}</a>
+                {% else %}
+                    <span data-qa='tierValue'>{{ params.tier.score }}</span>{% endif %}
+            </li>
+        </ul>
+    </div>
+    {% if params.overallRisk and params.overallRisk !== 'NOT_FOUND' %}
+        <div class="govuk-!-margin-left-4">{{ predictorTimelineItem({ type: "ROSH", level: params.overallRisk }) }}</div>
+    {% endif %}
+    {% if params.rsr.level %}
+        <div class="govuk-!-margin-left-4">{{ predictorTimelineItem(params.rsr.score) }}</div>
+    {% endif %}
+</div>
+<div class="moj-page-header-actions govuk-!-static-margin-bottom-4">
+    <div class="moj-page-header-actions__title">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-0">
+            <span data-qa='name'>{{ params.forename }}{{' '}}{{ params.surname }}</span>
+        </h1>
+    </div>
+    <div class="moj-page-header-actions__actions">
+        {{ params.actions | safe }}
+    </div>
+</div>

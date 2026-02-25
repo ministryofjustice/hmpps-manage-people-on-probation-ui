@@ -48,7 +48,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "build": "npm run clean && tsc --build tsconfig.build.json && npm run copy-assets",
-    "copy-assets": "copyfiles -u 1 src/technicalUpdates.json dist",
+    "copy-assets": "copyfiles -u 1 src/technicalUpdates.json dist && copyfiles -u 1 \"src/components/**/*\" dist",
     "pack:install": "npm run build && TARBALL=$(npm pack) && cp \"$TARBALL\" ~/code/hmpps-appointments-service-ui/"
   },
   "dependencies": {

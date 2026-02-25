@@ -1,0 +1,27 @@
+{% set timelineItemClass = '' %}
+
+{% set level = params.level %}
+
+{% switch params.level %}
+{% case 'VERY_HIGH' %}
+    {% set timelineItemClass = 'predictor-timeline-item--very-high'%}
+    {% set level = 'VERY HIGH'%}
+    {% case 'HIGH' %}
+        {% set timelineItemClass = 'predictor-timeline-item--high'%}
+        {% case 'MEDIUM' %}
+            {% set timelineItemClass = 'predictor-timeline-item--medium' %}
+            {% case 'LOW' %}
+                {% set timelineItemClass = 'predictor-timeline-item--low' %}
+                     {% default %}
+                {% set timelineItemClass = 'predictor-timeline-item--unknown' %}
+                {% set default_level = 'UNKNOWN' %}
+                {% endswitch %}
+
+                <div data-qa="" class="predictor-timeline-item {{ timelineItemClass }}">
+                    <span class="predictor-timeline-item__level">
+                        <strong>{{ params.type }}</strong>
+                        {{ default_level if default_level else level }}</span>
+                    {% if params.score %}
+                        <span class="predictor-timeline-item__score">{{ params.score }}</span>
+                    {% endif %}
+                </div>
