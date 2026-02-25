@@ -213,13 +213,13 @@ describe('/middleware/filterActivityLog()', () => {
           compliance: [
             ...(query.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
-              href: `${url}?clearFilterKey=compliance&clearFilterValue=${item.replaceAll(' ', '%20')}`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           category: [
             ...(query.category as string[]).map((item, i) => ({
               text: categoryFilterOptions[i].text,
-              href: `${url}?clearFilterKey=category&clearFilterValue=${item.replaceAll(' ', '%20')}`,
+              href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           hideContact: [
@@ -301,19 +301,19 @@ describe('/middleware/filterActivityLog()', () => {
           compliance: [
             ...(query.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
-              href: `${url}?clearFilterKey=compliance&clearFilterValue=${item.replaceAll(' ', '%20')}`,
+              href: `${url}?clearFilterKey=compliance&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           category: [
             ...(query.category as string[]).map((item, i) => ({
               text: categoryFilterOptions[i].text,
-              href: `${url}?clearFilterKey=category&clearFilterValue=${item.replaceAll(' ', '%20')}`,
+              href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           hideContact: [
             ...(query.hideContact as string[]).map((item, i) => ({
               text: hideContactsFilterOptions[i].text,
-              href: `${url}?clearFilterKey=hideContact&clearFilterValue=${item.replaceAll(' ', '%20')}`,
+              href: `${url}?clearFilterKey=hideContact&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
         },
