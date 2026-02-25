@@ -66,3 +66,8 @@ export interface SmsPreviewResponse {
   englishSmsPreview: string
   welshSmsPreview?: string
 }
+
+export interface SmsPreviewSession {
+  request: SmsPreviewRequest
+  preview: SmsPreviewResponse
+}

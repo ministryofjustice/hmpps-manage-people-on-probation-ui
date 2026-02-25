@@ -2,7 +2,7 @@ import { type AttendedCompliedAppointment } from '../middleware'
 import { type Name } from '../data/model/personalDetails'
 import { type Activity } from '../data/model/schedule'
 import { type Errors } from './Errors'
-import { type SmsOptInOptions, type SmsPreviewResponse } from '../data/model/OutlookEvent'
+import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
 
 export type YesNo = '' | 'Yes' | 'No'
 
@@ -38,7 +38,7 @@ export interface AppointmentSession {
   rescheduleAppointment?: RescheduleAppointment
   externalReference?: string
   smsOptIn?: SmsOptInOptions
-  smsPreview?: SmsPreviewResponse
+  smsPreview?: SmsPreviewSession
   temp?: {
     providerCode?: string
     teamCode?: string
