@@ -4,6 +4,7 @@ export const isValidHost = (host: string): boolean => {
     process.env.MANAGE_USERS_API_URL,
     process.env.TOKEN_VERIFICATION_API_URL,
     process.env.MAS_API_URL,
+    process.env.DELIUS_API_URL,
     process.env.ARNS_API_URL,
     process.env.TIER_API_URL,
     process.env.FLIPT_URL,

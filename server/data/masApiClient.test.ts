@@ -268,7 +268,6 @@ describe('masApiClient', () => {
         'post',
       ],
 
-      ['getUserAppointments', '/user/USER/appointments', () => masApiClient.getUserAppointments('USER')],
       ['getUserTeams', '/caseload/user/USER/teams', () => masApiClient.getUserTeams('USER')],
       [
         'getOfficeLocationsByTeamAndProvider',

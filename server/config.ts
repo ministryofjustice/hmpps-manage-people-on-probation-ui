@@ -170,6 +170,15 @@ export default {
       },
       agent: new AgentConfig(Number(get('MAS_API_TIMEOUT_RESPONSE', 10000))),
     },
+    deliusApi: {
+      url: get('DELIUS_API_URL', 'http://localhost:8100', requiredInProduction),
+      pageSize: 10,
+      timeout: {
+        response: Number(get('DELIUS_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('DELIUS_API_TIMEOUT_DEADLINE', 10000)),
+      },
+      agent: new AgentConfig(Number(get('DELIUS_API_TIMEOUT_RESPONSE', 10000))),
+    },
     arnsApi: {
       url: get('ARNS_API_URL', 'http://localhost:8100', requiredInProduction),
       timeout: {

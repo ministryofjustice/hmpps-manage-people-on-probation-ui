@@ -4,16 +4,16 @@ import RestClient from './restClient'
 import { Overview } from './model/overview'
 import { PersonAppointment, Schedule } from './model/schedule'
 import {
+  AddressOverview,
+  AddressOverviewSummary,
   CircumstanceOverview,
   DisabilityOverview,
   PersonalContact,
   PersonalDetails,
   PersonalDetailsMainAddress,
   PersonalDetailsUpdateRequest,
-  ProvisionOverview,
-  AddressOverview,
-  AddressOverviewSummary,
   PersonSummary,
+  ProvisionOverview,
 } from './model/personalDetails'
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
@@ -21,7 +21,7 @@ import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
 import { PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
-import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
+import { TeamCaseload, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
 import { ProfessionalContact } from './model/professionalContact'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
@@ -33,15 +33,15 @@ import { PersonDocuments, SearchDocumentsRequest, TextSearchDocumentsRequest } f
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import {
   AppointmentChecks,
-  AppointmentRequestBody,
-  CheckAppointment,
-  AppointmentTypeResponse,
   AppointmentPatch,
-  NextAppointmentResponse,
+  AppointmentRequestBody,
   AppointmentsPostResponse,
+  AppointmentTypeResponse,
+  CheckAppointment,
   MasUserDetails,
-  RescheduleAppointmentResponse,
+  NextAppointmentResponse,
   RescheduleAppointmentRequestBody,
+  RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
@@ -357,10 +357,6 @@ export default class MasApiClient extends RestClient {
     if (sortBy) searchParams.sortBy = sortBy
     const pageQuery = `?${new URLSearchParams(searchParams).toString()}`
     return this.post({ data: body, path: `/caseload/user/${username}/search${pageQuery}`, handle404: true })
-  }
-
-  async getUserAppointments(username: string): Promise<UserAppontment> {
-    return this.get({ path: `/user/${username}/appointments` })
   }
 
   async getUserTeams(username: string): Promise<UserTeam> {

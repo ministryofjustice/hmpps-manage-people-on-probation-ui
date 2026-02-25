@@ -2,18 +2,16 @@
   "mappings": [
     {
       "request": {
-        "urlPathPattern": "/mas/user/USER1/appointments",
+        "urlPathPattern": "/delius/user/USER1/homepage",
         "method": "GET"
       },
       "response": {
         "status": 200,
         "jsonBody": {
-          "totalAppointments": 5,
-          "totalOutcomes": 21,
-          "appointments": [
+          "upcomingAppointments": [
             {
               "id": 0,
-              "caseName": {
+              "name": {
                 "surname": "Morrison",
                 "forename": "Stuart"
               },
@@ -25,7 +23,7 @@
             },
             {
               "id": 1,
-              "caseName": {
+              "name": {
                 "surname": "Emard",
                 "forename": "Garrett"
               },
@@ -35,7 +33,7 @@
             },
             {
               "id": 2,
-              "caseName": {
+              "name": {
                 "surname": "Weissnat",
                 "forename": "Briana"
               },
@@ -47,7 +45,7 @@
             },
             {
               "id": 3,
-              "caseName": {
+              "name": {
                 "surname": "Huels",
                 "forename": "Sheridan"
               },
@@ -57,7 +55,7 @@
             },
             {
               "id": 4,
-              "caseName": {
+              "name": {
                 "surname": "Bradtke",
                 "forename": "Ethan"
               },
@@ -68,10 +66,11 @@
               "endDateTime": "2025-03-17T13:30:00Z"
             }
           ],
-          "outcomes": [
+          "appointmentsRequiringOutcomeCount": 21,
+          "appointmentsRequiringOutcome": [
             {
               "id": 0,
-              "caseName": { "surname": "Morrison", "forename": "Stuart" },
+              "name": { "surname": "Morrison", "forename": "Stuart" },
               "crn": "X000001",
               "type": "Home visit",
               "startDateTime": "2025-03-04T11:30:00Z",
@@ -79,14 +78,14 @@
             },
             {
               "id": 1,
-              "caseName": { "surname": "Emard", "forename": "Garrett" },
+              "name": { "surname": "Emard", "forename": "Garrett" },
               "crn": "X000001",
               "type": "Planned office visit",
               "startDateTime": "2025-03-03T11:30:00Z"
             },
             {
               "id": 2,
-              "caseName": { "surname": "Weissnat", "forename": "Briana" },
+              "name": { "surname": "Weissnat", "forename": "Briana" },
               "crn": "X000001",
               "type": "Planned office visit",
               "startDateTime": "2025-03-02T11:30:00Z",
@@ -94,14 +93,14 @@
             },
             {
               "id": 3,
-              "caseName": { "surname": "Huels", "forename": "Sheridan" },
+              "name": { "surname": "Huels", "forename": "Sheridan" },
               "crn": "X000001",
               "type": "Planned office visit",
               "startDateTime": "2025-03-01T11:30:00Z"
             },
             {
               "id": 4,
-              "caseName": { "surname": "Bradtke", "forename": "Ethan" },
+              "name": { "surname": "Bradtke", "forename": "Ethan" },
               "crn": "X000001",
               "type": "Sentence Plan Review",
               "startDateTime": "2025-02-28T11:30:00Z",

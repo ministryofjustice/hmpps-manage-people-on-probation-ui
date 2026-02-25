@@ -1,6 +1,6 @@
 import { Controller } from '../@types'
-import MasApiClient from '../data/masApiClient'
 import config from '../config'
+import DeliusClient from '../data/deliusClient'
 
 const routes = ['getHome'] as const
 
@@ -8,19 +8,14 @@ const homeController: Controller<typeof routes, void> = {
   getHome: hmppsAuthClient => {
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const { appointments, outcomes, totalAppointments, totalOutcomes } = await masClient.getUserAppointments(
-        res.locals.user.username,
-      )
-      const isDev = ['manage-people-on-probation-dev.hmpps.service.justice.gov.uk', 'localhost'].some(host =>
-        req.host.includes(host),
-      )
+      const deliusClient = new DeliusClient(token)
+      const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } =
+        await deliusClient.getHomepage(res.locals.user.username)
       const url = encodeURIComponent(req.url)
       return res.render('pages/homepage/homepage', {
-        totalAppointments,
-        totalOutcomes,
-        appointments,
-        outcomes,
+        upcomingAppointments,
+        appointmentsRequiringOutcome,
+        appointmentsRequiringOutcomeCount,
         url,
         delius_link: config.delius.link,
         oasys_link: config.oaSys.link,
