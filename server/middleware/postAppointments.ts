@@ -91,9 +91,13 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
       if (smsOptIn?.includes('YES')) {
+        const {
+          name: { forename: firstName },
+          mobileNumber,
+        } = res.locals.case
         outlookEventRequestBody.smsEventRequest = {
-          firstName: userDetails.firstName,
-          mobileNumber: getDataValue<string>(data, ['personalDetails', crn, 'overview', 'mobileNumber']) || '',
+          firstName,
+          mobileNumber,
           crn,
           smsOptIn: true,
         }
