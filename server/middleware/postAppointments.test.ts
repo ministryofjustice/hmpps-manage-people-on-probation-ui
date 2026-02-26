@@ -215,8 +215,8 @@ const mockAppointmentsPostResponse: AppointmentsPostResponse = {
 const checkOutlookEventRequest = (smsRequest = false) => {
   const { date, start } = mockAppointment
   const smsEventRequest: SmsEventRequest = {
-    firstName: mockUserDetailsResponse.firstName,
-    mobileNumber: mockPersonalDetails.mobileNumber,
+    firstName: res.locals.case.name.forename,
+    mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
   }
@@ -246,7 +246,12 @@ const checkOutlookEventRequest = (smsRequest = false) => {
   }
 }
 
-const res = mockAppResponse()
+const mockCase: Partial<PersonalDetails> = {
+  name: { forename: 'James', surname: 'Morrison' },
+  mobileNumber: '07700900000',
+}
+
+const res = mockAppResponse({ case: mockCase })
 
 const postAppointmentsSpy = jest
   .spyOn(MasApiClient.prototype, 'postAppointments')
