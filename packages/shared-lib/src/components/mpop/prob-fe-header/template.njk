@@ -1,0 +1,23 @@
+{% from "govuk/components/tag/macro.njk" import govukTag %}
+{% from "mpop/technical-updates-banner/macro.njk" import technicalUpdatesBanner %}
+{% from "mpop/user-navigation/macro.njk" import userNavigation %}
+{% from "mpop/header/macro.njk" import header %}
+{% if params.flags.enableProbFEComponent !== true %}
+    {{ header({
+        user: params.user,
+        environment: params.environment,
+        applicationName: params.applicationName
+    })}}
+{% elif params.feComponents.header and params.flags.enableProbFEComponent === true %}
+    {{ params.feComponents.header | safe }}
+{% else %}
+    {% include "./_fallback_prob_fe_header.njk" %}
+{% endif %}
+{{ technicalUpdatesBanner({ lastTechnicalUpdate: params.lastTechnicalUpdate }) }}
+<div id="whatsNewBannerStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
+{{ userNavigation({ 
+    user: params.user,
+    provider: params.provider,
+    alertsCount: params.alertsCount,
+    currentPage: params.currentPage
+}) }}

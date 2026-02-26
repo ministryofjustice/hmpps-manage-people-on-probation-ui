@@ -1,0 +1,7 @@
+{% if params.flags.enableProbFEComponent !== true %}
+    {% include "./_footer.njk" %}
+{% elif params.feComponents.footer and params.flags.enableProbFEComponent === true %}
+    {{ params.feComponents.footer | safe }}
+{% else %}
+    {% include "./_fallback_prob_fe_footer.njk" %}
+{% endif %}
