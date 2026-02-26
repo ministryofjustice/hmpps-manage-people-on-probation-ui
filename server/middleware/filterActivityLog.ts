@@ -24,7 +24,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
 
   function setSession() {
     if (crn !== req.session.activityLogFilters?.crn) {
-      req.session.activityLogFilters = undefined
+      delete req.session.activityLogFilters
     }
     if (req.body?.submit && !req?.query?.error) {
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []

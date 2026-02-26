@@ -138,7 +138,7 @@ describe('/middleware/filterActivityLog()', () => {
         keywords: 'test message',
       }
       filterActivityLog(req, res, nextSpy)
-      expect(req.session.activityLogFilters).toEqual(undefined)
+      expect(req.session.activityLogFilters).toBeUndefined()
     })
   })
   describe('Only one compliance filter is submitted', () => {
