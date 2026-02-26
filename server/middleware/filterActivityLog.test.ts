@@ -123,7 +123,22 @@ describe('/middleware/filterActivityLog()', () => {
         errors: false,
         keywords: 'test',
         submit: true,
+        crn: 'X000001',
       })
+    })
+    it('should set the crn in the session', () => {
+      expect(req.session.activityLogFilters.crn).toEqual(crn)
+    })
+  })
+  describe('session is cleared when crn in session does not match crn in params', () => {
+    it('should clear the session activityLogFilters', () => {
+      const req = getRequest({ submit: false })
+      req.session.activityLogFilters = {
+        crn: 'X00001',
+        keywords: 'test message',
+      }
+      filterActivityLog(req, res, nextSpy)
+      expect(req.session.activityLogFilters).toEqual(undefined)
     })
   })
   describe('Only one compliance filter is submitted', () => {
@@ -181,6 +196,7 @@ describe('/middleware/filterActivityLog()', () => {
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })
@@ -195,6 +211,7 @@ describe('/middleware/filterActivityLog()', () => {
       dateFrom: '20/03/2025',
       dateTo: '23/03/2025',
       keywords: 'testing',
+      crn: 'X000001',
     }
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
@@ -246,6 +263,7 @@ describe('/middleware/filterActivityLog()', () => {
         dateFrom: req.query.dateFrom as string,
         dateTo: req.query.dateTo as string,
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })
@@ -328,6 +346,7 @@ describe('/middleware/filterActivityLog()', () => {
         dateFrom: '',
         dateTo: '',
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })
@@ -343,6 +362,7 @@ describe('/middleware/filterActivityLog()', () => {
       dateFrom: '20/03/2025',
       dateTo: '23/03/2025',
       keywords: 'testing',
+      crn: 'X000001',
     }
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
@@ -401,6 +421,7 @@ describe('/middleware/filterActivityLog()', () => {
         dateFrom: '20/03/2025',
         dateTo: '23/03/2025',
         maxDate,
+        crn,
       }
       expect(res.locals.filters).toEqual(expectedResponse)
     })

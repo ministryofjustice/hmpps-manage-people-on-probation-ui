@@ -160,6 +160,7 @@ describe('/middleware/getPersonActivity', () => {
       baseUrl: '',
       query: { ...filterVals },
       maxDate: '21/1/2025',
+      crn,
     }
 
     req.session.activityLogFilters = {
@@ -200,6 +201,7 @@ describe('/middleware/getPersonActivity', () => {
       baseUrl: '',
       query: { ...filterVals },
       maxDate: '21/1/2025',
+      crn,
     }
     res.locals.flags = {
       enableContactLog: true,

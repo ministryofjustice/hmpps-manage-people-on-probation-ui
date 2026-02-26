@@ -23,6 +23,9 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const errorMessages = req?.session?.errorMessages
 
   function setSession() {
+    if (crn !== req.session.activityLogFilters?.crn) {
+      req.session.activityLogFilters = undefined
+    }
     if (req.body?.submit && !req?.query?.error) {
       const complianceFilters: Array<string> = req.body.compliance ? [req.body.compliance].flat() : []
       const categoryFilters: Array<string> = req.body.category ? [req.body.category].flat() : []
@@ -31,6 +34,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters.compliance = complianceFilters
       req.session.activityLogFilters.category = categoryFilters
       req.session.activityLogFilters.hideContact = hideContactFilters
+      req.session.activityLogFilters.crn = crn
     }
     if (req.session.activityLogFilters) {
       checkClearFilterKeys()
@@ -165,6 +169,7 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
     dateTo: filters.dateTo,
     hideContact: filters.hideContact,
     maxDate,
+    crn,
   }
   return next()
 }
