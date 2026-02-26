@@ -60,6 +60,32 @@ export interface Location {
   address?: Address
 }
 
+export interface UserAppontment {
+  totalAppointments: number
+  totalOutcomes: number
+  appointments: {
+    caseName: {
+      surname: string
+      forename: string
+    }
+    crn: string
+    description: string
+    location: string
+    date: string
+    startTime: string
+    endTime: string
+  }[]
+  outcomes: {
+    caseName: {
+      surname: string
+      forename: string
+    }
+    crn: string
+    description: string
+    date: string
+  }[]
+}
+
 export interface UserLocation {
   id: number
   description: string

@@ -13,6 +13,7 @@ generic-service:
     HMPPS_AUTH_URL: 'https://sign-in-dev.hmpps.service.justice.gov.uk/auth'
     MANAGE_USERS_API_URL: 'https://manage-users-api-dev.hmpps.service.justice.gov.uk'
     TOKEN_VERIFICATION_API_URL: 'https://token-verification-api-dev.prison.service.justice.gov.uk'
+    MAS_API_URL: 'https://manage-supervision-and-delius-dev.hmpps.service.justice.gov.uk'
     DELIUS_API_URL: 'https://manage-people-on-probation-and-delius-dev.hmpps.service.justice.gov.uk'
     ARNS_API_URL: 'https://assess-risks-and-needs-dev.hmpps.service.justice.gov.uk'
     TIER_API_URL: 'https://hmpps-tier-dev.hmpps.service.justice.gov.uk'

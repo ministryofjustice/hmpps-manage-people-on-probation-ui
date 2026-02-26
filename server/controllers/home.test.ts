@@ -27,7 +27,7 @@ const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const crn = 'X000001'
 const url = 'manage-people-on-probation-dev.hmpps.service.justice.gov.uk'
-const res = mockAppResponse()
+const res = mockAppResponse({ flags: { enableDeliusClient: true } })
 const renderSpy = jest.spyOn(res, 'render')
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 tokenStore.getToken.mockResolvedValue(token.access_token)
@@ -108,6 +108,21 @@ describe('homeController', () => {
           caval_link: config.caval.link,
           epf2_link: config.epf2.link,
         })
+      })
+    })
+
+    describe('feature flag disabled', () => {
+      it('should use the legacy homepage controller when enableDeliusClient is false', async () => {
+        const resWithLegacyFlag = mockAppResponse({ flags: { enableDeliusClient: false } })
+        const legacyHandler = jest.fn().mockResolvedValue(undefined)
+        const getHomeOldSpy = jest
+          .spyOn(controllers.home, 'getHomeOld')
+          .mockReturnValue(legacyHandler as ReturnType<typeof controllers.home.getHomeOld>)
+
+        await controllers.home.getHome(hmppsAuthClient)(req, resWithLegacyFlag)
+
+        expect(getHomeOldSpy).toHaveBeenCalledWith(hmppsAuthClient)
+        expect(legacyHandler).toHaveBeenCalledWith(req, resWithLegacyFlag)
       })
     })
 
