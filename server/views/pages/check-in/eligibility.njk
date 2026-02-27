@@ -1,0 +1,86 @@
+{% extends "../_form.njk" %}
+{% set title = "Check if " + case.name.forename + " is eligible to use online check ins" %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/"+  crn  +"/appointments" %}
+{% set formAnchorText = "Cancel and go back" %}
+{% set back = back if back else '' %}
+{% set backLink =  '/case/' + crn + '/'  + back %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <p>Not everyone will be eligible or suitable to use online check ins, and some might only be eligible to use the service in addition to face-to-face appointments.</p>
+
+            <h2 class="govuk-heading-s">About online check ins</h2>
+            <p>Online check ins allow people on probation to update you about their needs and how they are feeling. They'll do this by answering some questions about how they are and if they need any support, and recording a 5-second video we will use to verify their identity.</p>
+            <p>You can learn more about online check ins in our guidance pages.</p>
+
+            <p>
+            <a href="{{guidanceUrl}}/guidance">Practitioner guidance about online check ins</a>, including adding people to online check ins and reviewing completed check ins.
+            </p>
+
+            <p>
+            <a href="{{guidanceUrl}}/practitioner-guidance">People on probation guidance about "Check in with your probation officer"</a>, including how online check ins work and what questions we ask.
+            </p>
+
+            {{ govukCheckboxes ({
+                name: "eligibility criteria",
+                fieldset: {
+                    legend: {
+                        html: '<span data-qa="checkboxes">Do any of these apply to ' + case.name.forename + '?</span>',
+                        classes: 'govuk-fieldset__legend--l'
+                    }
+                },
+                hint: {
+                    text: "Select all that apply"
+                },
+                items: [
+                    {
+                    value: "suspended",
+                    text: "On suspended supervision (for example, through IMPACT and Reset)"
+                    },
+                    {
+                    value: "risk",
+                    text: "At very high risk of serious harm (ROSH)"
+                    },
+                    {
+                    value: "MAPPA eligible",
+                    text: "A MAPPA (multi-agency public protection arrangements) eligible case level 2 and 3"
+                    },
+                    {
+                    value: "NSD",
+                    text: "A National Security Division case"
+                    },
+                    {
+                    value: "Youth",
+                    text: "On a youth sentence"
+                    },
+                    {
+                    value: "CPO",
+                    text: "Subject to an active child protection order"
+                    },
+                    {
+                    value: "Domestic Abuse",
+                    text: "Under a current domestic abuse conviction"
+                    },
+                    {
+                    value: "Sexual",
+                    text: "Under a current sexual conviction/motivaton"
+                    },
+                    {
+                    value: "ICP",
+                    text: "An Intensive Court Pilot case"
+                    },
+                    {
+                    divider: "or"
+                    },
+                    {
+                    value: "none",
+                    text: "None of these apply",
+                    behaviour: "exclusive"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibility'])) }}
+        </div>
+    </div>
+{% endblock %}
