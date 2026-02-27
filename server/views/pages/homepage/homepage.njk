@@ -61,7 +61,7 @@
         heading: {
             html: 'Outcomes to log' + (' (' + appointmentsRequiringOutcomeCount + ')' if appointmentsRequiringOutcome.length else '')
         },
-         afterHeading: {
+        afterHeading: {
           html: '<span class="govuk-accordion__section-heading visibility-hidden" aria-hidden="true">Outcomes to log' + (' (' + appointmentsRequiringOutcomeCount + ')' if appointmentsRequiringOutcome.length else '') + ' </span>' +  ('<a class="govuk-body govuk-link govuk-link--no-visited-state govuk-!-margin-bottom-0 govuk-!-margin-left-9" href="/caseload/appointments/no-outcome">Log more outcomes</a>' if appointmentsRequiringOutcome.length else '')
         },
         content: {

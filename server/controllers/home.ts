@@ -8,7 +8,7 @@ const routes = ['getHome', 'getHomeOld'] as const
 const homeController: Controller<typeof routes, void> = {
   getHome: hmppsAuthClient => {
     return async (req, res) => {
-      if (res.locals.flags?.enableDeliusClient !== true) return homeController.getHomeOld(hmppsAuthClient)(req, res)
+      if (!res.locals.flags?.enableDeliusClient) return homeController.getHomeOld(hmppsAuthClient)(req, res)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const deliusClient = new DeliusClient(token)
       const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } =
@@ -45,7 +45,7 @@ const homeController: Controller<typeof routes, void> = {
         req.host.includes(host),
       )
       const url = encodeURIComponent(req.url)
-      return res.render('pages/homepage/homepage', {
+      return res.render('pages/homepage-old/homepage', {
         totalAppointments,
         totalOutcomes,
         appointments,
