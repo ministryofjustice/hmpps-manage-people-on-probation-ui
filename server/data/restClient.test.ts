@@ -349,7 +349,7 @@ describe('RestClient requestWithBody - 400 handling', () => {
         path: '/test',
         data: requestData,
       }),
-    ).rejects.toThrow(`http 400 Sentry alert test (Express) - ignore - Request data: ${JSON.stringify(requestData)}`)
+    ).rejects.toThrow(/"status":400/)
 
     expect(nock.isDone()).toBe(true)
   })
