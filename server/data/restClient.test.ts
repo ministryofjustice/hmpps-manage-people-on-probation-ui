@@ -349,7 +349,7 @@ describe('RestClient requestWithBody - 400 handling', () => {
         path: '/test',
         data: requestData,
       }),
-    ).rejects.toThrow(/"status":400/)
+    ).rejects.toThrow('http 400: Bad request from API')
 
     expect(nock.isDone()).toBe(true)
   })

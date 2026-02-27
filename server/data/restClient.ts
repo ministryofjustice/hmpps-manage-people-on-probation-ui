@@ -170,7 +170,7 @@ export default class RestClient {
       return raw ? (result as Response) : result.body
     } catch (error) {
       if (error.response?.status === 400) {
-        throw new Error(`http 400: ${JSON.stringify(error.response)}`)
+        throw new Error(`http 400: ${error.response.body?.message ?? error.message}`)
       }
       if (handle404 && error.response?.status === 404) return null
       if (handle415 && error?.response?.status === 415) {
