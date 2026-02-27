@@ -15,7 +15,7 @@
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}
       {% else %}
-      <li><a href="{{ link }}" rel="noopener noreferrer" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
+      <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
     {% endif %}
   </ul>
 {% endset %}
