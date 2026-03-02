@@ -1,0 +1,203 @@
+{% extends "../../_form.njk" %}
+{%- from "moj/components/date-picker/macro.njk" import mojDatePicker -%}
+
+{% set multipartForm = true %}
+{% set backLink = '/case/' + crn + '/contact-log' %}
+
+{% block form %}
+    {% set allSentences = [] %}
+    {% for sentence in sentences %}
+        {% if sentence.order.description %}
+            {% set hintText = '' %}
+            {% if sentence.order.startDate %}
+                {% set hintText = 'Sentence start date: ' + (sentence.order.startDate | dateWithYear) + '.' %}
+            {% endif %}
+            {% set allSentences = (allSentences.push({
+                text: sentence.order.description,
+                value: sentence.id,
+                checked: true if formValues.sentence and sentence.id | string == formValues.sentence | string,
+                label: {
+                    classes: 'govuk-!-font-weight-bold'
+                },
+                hint: {
+                    text: hintText
+                }
+            }), allSentences) %}
+        {% endif %}
+    {% endfor %}
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: 'What is the contact related to?',
+                isPageHeading: false,
+                classes: "govuk-fieldset__legend--m"
+            },
+            attributes: {
+                'data-qa': 'sentences'
+            }
+        },
+        name: 'sentence',
+        id: 'sentence',
+        items: allSentences,
+        errorMessage: { text: errorMessages.sentence } if errorMessages.sentence
+    }) }}
+
+    {{ govukInput({
+        label: {
+            text: "Give the contact a different title (optional)",
+            classes: "govuk-label--m"
+        },
+        hint: {
+            text: "This will become the title of the contact on the Contacts page."
+        },
+        id: "title",
+        name: "title",
+        value: formValues.title,
+        classes: "govuk-input--width-20",
+        formGroup: {
+            attributes: {
+                'data-qa': 'contactTitle'
+            }
+        }
+    }) }}
+
+    <h3 class="govuk-heading-m">Enter the date and time of the contact</h3>
+
+    {{ mojDatePicker({
+        label: {
+            text: "Date"
+        },
+        hint: {
+            text: "For example, 17/5/2024."
+        },
+        id: "date",
+        name: "date",
+        value: formValues.date,
+        errorMessage: { text: errorMessages.date } if errorMessages.date
+    }) }}
+
+    {{ govukInput({
+        label: {
+            text: "Time",
+            classes: "govuk-label--s govuk-!-font-weight-regular"
+        },
+        hint: {
+            text: "Use the 24-hour format, for example 09:30 or 16:30."
+        },
+        id: "time",
+        name: "time",
+        value: formValues.time,
+        attributes: {
+            size: 5,
+            maxlength: 5
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'time'
+            }
+        },
+        classes: "govuk-input--width-5",
+        errorMessage: { text: errorMessages.time } if errorMessages.time
+    }) }}
+
+    {{ govukCharacterCount({
+        name: "details",
+        id: "details",
+        maxlength: 12000,
+        rows: '10',
+        value: formValues.details,
+        label: {
+            text: "Add details of the contact",
+            classes: "govuk-label--m"
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'details'
+            }
+        }
+    }) }}
+
+    <div class="govuk-form-group">
+        <label class="govuk-label govuk-label--m" for="fileUpload">
+            Upload a file (optional)
+        </label>
+        <div class="govuk-drop-zone" data-module="govuk-file-upload">
+            {{ govukFileUpload({
+                id: "fileUpload",
+                name: "fileUpload",
+                classes: "govuk-file-upload",
+                attributes: {
+                    accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                }
+            }) }}
+        </div>
+    </div>
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: 'Include contact in ViSOR report?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'visorReport'
+            }
+        },
+        hint: {
+            text: 'This will add the contact to their record on the ViSOR secure national database.'
+        },
+        name: 'visor',
+        id: 'visor',
+        classes: "govuk-radios--inline",
+        items: [
+            {
+                value: 'Yes',
+                text: "Yes",
+                checked: true if formValues.visor == 'Yes'
+            },
+            {
+                value: 'No',
+                text: "No",
+                checked: true if formValues.visor == 'No'
+            }
+        ],
+        errorMessage: { text: errorMessages.visor } if errorMessages.visor
+    }) }}
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: 'Does this contact include sensitive information?',
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'sensitiveInformation'
+            }
+        },
+        hint: {
+            text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+        },
+        name: 'sensitivity',
+        id: 'sensitivity',
+        items: [
+            {
+                value: 'Yes',
+                text: "Yes, it includes sensitive information",
+                checked: true if formValues.sensitivity == 'Yes'
+            },
+            {
+                value: 'No',
+                text: "No, it is not sensitive",
+                checked: true if formValues.sensitivity == 'No'
+            }
+        ],
+        errorMessage: { text: errorMessages.sensitivity } if errorMessages.sensitivity
+    }) }}
+{% endblock %}
