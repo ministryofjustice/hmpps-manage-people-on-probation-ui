@@ -20,6 +20,7 @@ import user from './user'
 import eSupervisionAPI from './eSupervisionAPI'
 import document from './document'
 import overdueOutcomes from './overdueOutcomes'
+import contacts from './contacts'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -44,4 +45,5 @@ export default {
   ...eSupervisionAPI,
   ...document,
   ...overdueOutcomes,
+  ...contacts,
 }
