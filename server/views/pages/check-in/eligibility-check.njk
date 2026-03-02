@@ -1,0 +1,88 @@
+{% extends "../_form.njk" %}
+{% from "govuk/components/checkboxes/macro.njk" import govukCheckboxes %}
+
+{% set title = "Check if " + case.name.forename + " is eligible to use online check ins"  %}
+{% set checkboxTitle = "Do any of these apply to " + case.name.forename + "?" %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/"+  crn %}
+{% set formAnchorText = "Cancel and go back" %}
+{% set back = back if back else '' %}
+{% set backLink =  '/case/' + crn + '/'  + back %}
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            <h2 class="govuk-heading-m">About online check ins</h2>
+            <p class="govuk-body">Online check ins allow people on probation to update you about their needs and how they are feeling. They'll do this by answering some questions about how they are and if they need any support, and recording a 5-second video we will use to verify their identity.</p>
+            <p class="govuk-body">You can learn more about online check ins in our guidance pages.</p>
+            <p class="govuk-body"><a class="govuk-link" href="{{guidanceUrl}}/practitioner-guidance">Practitioner guidance about online check ins</a>, including setting people up and reviewing completed check ins.</p>
+            <p class="govuk-body"><a class="govuk-link" href="{{guidanceUrl}}/guidance">Guidance for people on probation about online check ins</a>, including how they work and what questions we ask.</p>
+
+            <h2 class="govuk-heading-m">Eligibility and suitability</h2>
+            <p class="govuk-body">Not everyone will be eligible or suitable to use online check ins, and some might only be eligible to use the service as well as face-to-face appointments.</p>
+
+            {{ govukCheckboxes({
+                name: "esupervision[" + crn + "][" + id + "][checkins][eligibility]",
+                fieldset: {
+                    legend: {
+                        text: checkboxTitle,
+                        isPageHeading: false,
+                        classes: "govuk-fieldset__legend--m"
+                    }
+                },
+                errorMessage: {
+                  text: errorMessages["esupervision-" + crn + "-" + id + "-checkins-eligibility"]
+                } if errorMessages["esupervision-" + crn + "-" + id + "-checkins-eligibility"],
+                hint: {
+                    text: "Select all that apply"
+                },
+                items: [
+                {
+                value: "eligibility-1",
+                text: "On suspended supervision (for example, through IMPACT and Reset)"
+                },
+                {
+                value: "eligibility-2",
+                text: "At a very high risk of serious harm (ROSH)"
+                },
+                {
+                value: "eligibility-3",
+                text: "A MAPPA (multi-agency public protection arrangements) eligible case level 2 and 3"
+                },
+                {
+                value: "eligibility-4",
+                text: "A National Security Division case"
+                },
+                {
+                value: "eligibility-5",
+                text: "On a youth sentence"
+                },
+                {
+                value: "eligibility-6",
+                text: "Subject to an active child protection order"
+                },
+                {
+                value: "eligibility-7",
+                text: "Under a current domestic abuse conviction"
+                },
+                {
+                value: "eligibility-8",
+                text: "Under a current sexual conviction or motivation"
+                },
+                {
+                value: "eligibility-9",
+                text: "An Intensive Supervision Court pilot case"
+                },
+              {
+                divider: "or"
+              },
+              {
+                value: "eligibility-10",
+                text: "None of these apply",
+                behaviour: "exclusive"
+              }
+            ]
+            }) | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibility']) }}
+
+
+{% endblock %}

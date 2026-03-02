@@ -19,6 +19,7 @@ export interface CheckinUserDetails {
   displayDay?: string
   contactUpdated?: boolean
   settingsUpdated?: boolean
+  eligibility?: string[]
 }
 export interface LocalParams {
   crn: string

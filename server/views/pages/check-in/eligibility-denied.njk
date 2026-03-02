@@ -1,0 +1,15 @@
+{% extends "../_form.njk" %}
+{% set title = case.name.forename + " is not eligible to use online check ins"  %}
+{% set back = back if back else '' %}
+{% set backLink =  '/case/' + crn + '/'  + back %}
+{% set buttonText = "Go to " + case.name.forename + "'s overview" %}
+
+
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            <p class="govuk-body">This is because</p>
+        </div>
+    </div>
+{% endblock %}

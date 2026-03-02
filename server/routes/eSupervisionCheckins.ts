@@ -7,6 +7,42 @@ import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
+  router.get('/case/:crn/appointments/:id/check-in/eligibility-check', [
+    controllers.checkIns.getEligibilityPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/eligibility-check',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postEligibilityPage(hmppsAuthClient),
+  )
+  router.get('/case/:crn/appointments/:id/check-in/denied-eligibility', [
+    controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/denied-eligibility',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postEligibilityDeniedPage(hmppsAuthClient),
+  )
+  router.get('/case/:crn/appointments/:id/check-in/full-eligibility', [
+    controllers.checkIns.getFullEligibilityPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/full-eligibility',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postFullEligibilityPage(hmppsAuthClient),
+  )
+  router.get('/case/:crn/appointments/:id/check-in/supplementary-eligibility', [
+    controllers.checkIns.getSupplementaryEligibilityPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/supplementary-eligibility',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient),
+  )
   router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getStartSetup(hmppsAuthClient)])
   router.get('/case/:crn/appointments/:id/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
   router.post(
