@@ -15,4 +15,5 @@ export class FeatureFlags {
   enableContactLog?: boolean = undefined
   enableCreateContact?: boolean = undefined
   enableTierLink?: boolean = undefined
+  enableDeliusClient?: boolean = undefined
 }

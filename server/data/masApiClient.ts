@@ -4,16 +4,16 @@ import RestClient from './restClient'
 import { Overview } from './model/overview'
 import { PersonAppointment, Schedule } from './model/schedule'
 import {
+  AddressOverview,
+  AddressOverviewSummary,
   CircumstanceOverview,
   DisabilityOverview,
   PersonalContact,
   PersonalDetails,
   PersonalDetailsMainAddress,
   PersonalDetailsUpdateRequest,
-  ProvisionOverview,
-  AddressOverview,
-  AddressOverviewSummary,
   PersonSummary,
+  ProvisionOverview,
 } from './model/personalDetails'
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
@@ -33,15 +33,15 @@ import { PersonDocuments, SearchDocumentsRequest, TextSearchDocumentsRequest } f
 import { ActivityLogRequestBody } from '../models/ActivityLog'
 import {
   AppointmentChecks,
-  AppointmentRequestBody,
-  CheckAppointment,
-  AppointmentTypeResponse,
   AppointmentPatch,
-  NextAppointmentResponse,
+  AppointmentRequestBody,
   AppointmentsPostResponse,
+  AppointmentTypeResponse,
+  CheckAppointment,
   MasUserDetails,
-  RescheduleAppointmentResponse,
+  NextAppointmentResponse,
   RescheduleAppointmentRequestBody,
+  RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import { UserAlerts, UserAlertsContent } from '../models/Alerts'
 import { ContactResponse } from './model/overdueOutcomes'
@@ -61,6 +61,13 @@ interface GetUserScheduleProps {
 export default class MasApiClient extends RestClient {
   constructor(token: string) {
     super('Manage a Supervision API', config.apis.masApi, token)
+  }
+
+  /**
+   * @deprecated use DeliusClient.getHomepage
+   */
+  async getUserAppointments(username: string): Promise<UserAppontment> {
+    return this.get({ path: `/user/${username}/appointments` })
   }
 
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
@@ -357,10 +364,6 @@ export default class MasApiClient extends RestClient {
     if (sortBy) searchParams.sortBy = sortBy
     const pageQuery = `?${new URLSearchParams(searchParams).toString()}`
     return this.post({ data: body, path: `/caseload/user/${username}/search${pageQuery}`, handle404: true })
-  }
-
-  async getUserAppointments(username: string): Promise<UserAppontment> {
-    return this.get({ path: `/user/${username}/appointments` })
   }
 
   async getUserTeams(username: string): Promise<UserTeam> {

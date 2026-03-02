@@ -83,4 +83,38 @@ describe('/middleware/evaluateFeatureFlags', () => {
       expect(nextSpy).toHaveBeenCalledWith(mockError)
     })
   })
+
+  describe('enableDeliusClient query parameter', () => {
+    it('should override enableDeliusClient to true when query parameter is "true"', async () => {
+      const reqWithQuery = httpMocks.createRequest({
+        query: { enableDeliusClient: 'true' },
+      })
+      const flagsWithDeliusDisabled = { ...mockFlags, enableDeliusClient: false }
+      jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(flagsWithDeliusDisabled))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(reqWithQuery, res, nextSpy)
+
+      expect(res.locals.flags.enableDeliusClient).toBe(true)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+
+    it('should override enableDeliusClient to false when query parameter is "false"', async () => {
+      const reqWithQuery = httpMocks.createRequest({
+        query: { enableDeliusClient: 'false' },
+      })
+      const flagsWithDeliusEnabled = { ...mockFlags, enableDeliusClient: true }
+      jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(flagsWithDeliusEnabled))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(reqWithQuery, res, nextSpy)
+
+      expect(res.locals.flags.enableDeliusClient).toBe(false)
+      expect(nextSpy).toHaveBeenCalled()
+    })
+  })
 })

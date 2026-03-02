@@ -165,6 +165,17 @@
               "updatedAt": "2026-01-30T17:06:39.269084Z",
               "rules": [],
               "rollouts": []
+            },
+            {
+              "key": "enableDeliusClient",
+              "name": "enableDeliusClient",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-02-26T12:00:00.000000Z",
+              "updatedAt": "2026-02-26T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
             }
           ]
         }
