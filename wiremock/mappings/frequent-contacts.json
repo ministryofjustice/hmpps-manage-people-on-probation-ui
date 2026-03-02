@@ -1,0 +1,70 @@
+{
+  "mappings": [
+    {
+      "request": {
+        "urlPattern": "/mas/contact/types",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "contactTypes": [
+            {
+              "code": "C204",
+              "description": "Police Liaison",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "C326",
+              "description": "Internal Communications",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CM3A",
+              "description": "eMail/Text from Other",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CM3B",
+              "description": "eMail/Text to Other",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CTOB",
+              "description": "Phone Contact to PoP",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CMOB",
+              "description": "eMail/Text to PoP",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CT3A",
+              "description": "Phone Contact from Other",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CT3B",
+              "description": "Phone Contact to Other",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CTOA",
+              "description": "Phone Contact from PoP",
+              "isPersonLevelContact": true
+            },
+            {
+              "code": "CMOA",
+              "description": "eMail/Text from PoP",
+              "isPersonLevelContact": true
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    }
+  ]
+}

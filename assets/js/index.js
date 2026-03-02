@@ -9,6 +9,7 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
+import setupFrequentlyUsedContact from './frequently-used-contact'
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
 if ($backendSortableTable) {
@@ -330,4 +331,5 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
+setupFrequentlyUsedContact()
 new ServiceAlert()

@@ -1,0 +1,80 @@
+    {% extends "../../partials/layout.njk" %}
+    {% from "govuk/components/button/macro.njk" import govukButton %}
+    {% from "govuk/components/radios/macro.njk" import govukRadios %}
+    {% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+    {% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+    {% set backLink = '/case/' + crn +'/activity-log/' %}
+
+    {% block pageTitle %}
+        Add a frequently used contact - {{ pop.name.forename }} {{ pop.name.surname }}
+    {% endblock %}
+
+    {% block beforeContent %}
+        {{ govukBackLink({
+            text: "Back",
+            href: backLink
+        }) }}
+    {% endblock %}
+
+    {% block content %}
+        {% include "../../partials/pop-header.njk" %}
+
+        {% if errorMessages %}
+            {% set errorList = [] %}
+            {% for field, message in errorMessages %}
+                {% set errorList = (errorList.push({
+                    text: message,
+                    href: "#" + field
+                }), errorList) %}
+            {% endfor %}
+
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                errorList: errorList
+            }) }}
+        {% endif %}
+
+        <div class="govuk-grid-row">
+            <div class="govuk-grid-column-two-thirds">
+
+                <h1 class="govuk-heading-l">
+                    {{ pop.name.forename }} {{ pop.name.surname }}
+                </h1>
+
+                <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+                <h2 class="govuk-heading-m">Add a frequently used contact</h2>
+
+                <p class="govuk-body">
+                    You can currently add the most frequently used contacts using this service. For any other contacts,
+                    <a href="{{ deliusDeepLinkUrl('ContactList', crn) }}" target="_blank" class="govuk-link">use NDelius
+                        (opens in new tab).</a>
+                </p>
+
+                <form method="post" action="/case/{{ crn }}/add-frequently-used-contact" id="choose-contact-form"
+                      data-ndelius-url="{{ ndeliusDeepLinkUrl }}"
+                      data-back-url="{{ contactLogUrl }}">
+                    <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+
+                    {{ govukRadios({
+                        name: "contactType",
+                        idPrefix: "contactType",
+                        fieldset: {
+                            legend: {
+                                text: "Select a contact",
+                                classes: "govuk-fieldset__legend--s"
+                            }
+                        },
+                        items: radioItems,
+                        errorMessage: { text: errorMessages.contactType } if errorMessages.contactType
+                    }) }}
+
+                    {{ govukButton({
+                        text: "Continue",
+                        attributes: { "data-qa": "continue-button" }
+                    }) }}
+                </form>
+            </div>
+        </div>
+    {% endblock %}

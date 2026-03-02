@@ -1,0 +1,85 @@
+{% extends "../../partials/layout.njk" %}
+{% from "govuk/components/button/macro.njk" import govukButton %}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block pageTitle %}
+    Do you want to alert the responsible officer? - {{ pop.name.forename }} {{ pop.name.surname }}
+{% endblock %}
+
+{% block beforeContent %}
+    {{ govukBackLink({
+        text: "Back",
+        href: backUrl
+    }) }}
+{% endblock %}
+
+{% block content %}
+    {% include "../../partials/pop-header.njk" %}
+
+    {# Error Summary #}
+    {% if errors %}
+        {% set errorList = [] %}
+        {% for field, message in errors %}
+            {% set errorList = (errorList.push({
+                text: message,
+                href: "#" + field
+            }), errorList) %}
+        {% endfor %}
+
+        {{ govukErrorSummary({
+            titleText: "There is a problem",
+            errorList: errorList
+        }) }}
+
+
+    {% endif %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-6">
+                {{ pop.name.forename }} {{ pop.name.surname }}
+            </h1>
+
+            <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+
+            <form method="post" novalidate>
+                <input type="hidden" name="_csrf" value="{{ csrfToken }}">
+
+                {{ govukRadios({
+                    name: "alertResponsibleOfficer",
+                    fieldset: {
+                        legend: {
+                            text: "Do you want to alert " + responsibleOfficerName + " (the responsible officer) about this contact?",
+                            classes: "govuk-fieldset__legend--l",
+                            isPageHeading: false
+                        }
+                    },
+                    items: [
+                        {
+                            value: "yes",
+                            text: "Yes",
+                            checked: formValues.alertResponsibleOfficer === "yes"
+                        },
+                        {
+                            value: "no",
+                            text: "No",
+                            checked: formValues.alertResponsibleOfficer === "no"
+                        }
+                    ],
+                    errorMessage: { text: errors.alertResponsibleOfficer } if errors.alertResponsibleOfficer
+                }) }}
+
+                {{ govukButton({
+                    text: "Create contact",
+                    attributes: { "data-qa": "create-contact-button" }
+                }) }}
+            </form>
+        </div>
+
+
+    </div>
+
+{% endblock %}
