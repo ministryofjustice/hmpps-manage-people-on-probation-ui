@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuzzy Search Autocomplete POC</title>
+
+  <!-- GOV.UK Frontend & Autocomplete Styles -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/govuk-frontend/5.1.0/govuk-frontend.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/accessible-autocomplete@2.0.4/dist/accessible-autocomplete.min.css">
+
+  <style>
+      body { padding: 30px; }
+      .govuk-width-container { max-width: 600px; margin: 0 auto; }
+      .status-box { background: #f3f2f1; padding: 15px; margin-top: 20px; border-left: 5px solid #1d70b8; }
+      .autocomplete__wrapper { margin-top: 10px; }
+      /* Highlight the link nature of the selection */
+      .autocomplete__option--focused { background-color: #1d70b8 !important; }
+  </style>
+</head>
+<body class="govuk-template__body">
+
+<div class="govuk-width-container">
+  <span class="govuk-caption-l">Spike: Search and add a contact</span>
+  <h1 class="govuk-heading-l">Contact type search</h1>
+
+  <div class="govuk-form-group">
+    <label class="govuk-label" for="contact-type-autocomplete">
+      Search for a contact type
+    </label>
+    <div id="autocomplete-container"></div>
+  </div>
+
+  <!-- JS Disabled Fallback -->
+  <noscript>
+    <div class="govuk-form-group">
+      <label class="govuk-label" for="contact-type-select">Select a contact type</label>
+      <select class="govuk-select" id="contact-type-select" name="contactType">
+        <option value="">Select a contact...</option>
+        <option value="C001">Accommodation evidence</option>
+        <option value="C002">Phone Contact to PoP</option>
+        <option value="C003">E-mail communication</option>
+      </select>
+      <button class="govuk-button govuk-!-margin-top-4" data-module="govuk-button">Continue</button>
+    </div>
+  </noscript>
+
+  <div class="status-box">
+    <h2 class="govuk-heading-s">Try these searches:</h2>
+    <ul class="govuk-list govuk-list--bullet">
+      <li><strong>"acomodation"</strong> (Typo)</li>
+      <li><strong>"Call"</strong> (Synonym for Phone)</li>
+      <li><strong>"mail"</strong> (Partial match)</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Load Libraries -->
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@7.0.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/accessible-autocomplete@2.0.4/dist/accessible-autocomplete.min.js"></script>
+
+<script>
+  // 1. Data Source (Truncated for POC)
+  const CONTACT_TYPES = [
+    { code: 'C001', description: 'Accommodation evidence', synonyms: ['housing', 'living'] },
+    { code: 'C002', description: 'Phone Contact to PoP', synonyms: ['Call', 'Mobile', 'Telephone'] },
+    { code: 'C003', description: 'E-mail communication', synonyms: ['Mail', 'Messaging'] },
+    { code: 'C004', description: 'Home Visit', synonyms: ['HV', 'Address visit'] },
+    { code: 'C005', description: 'Office Visit', synonyms: ['Reporting', 'Appointment'] },
+    { code: 'C006', description: 'Employment Evidence', synonyms: ['Job', 'Work'] }
+  ];
+
+  // 2. Initialize Fuse.js (The "Brain")
+  const fuse = new Fuse(CONTACT_TYPES, {
+    keys: ['description', 'synonyms'],
+    threshold: 0.35,
+    includeScore: true
+  });
+
+  // 3. Custom Search Function
+  // This connects the Autocomplete UI to the Fuse.js engine
+  function fuzzySearch(query, populateResults) {
+    if (!query) return populateResults([]);
+    const results = fuse.search(query);
+    // Return just the descriptions for the UI to display
+    populateResults(results.map(r => r.item.description));
+  }
+
+  // 4. Initialize Accessible Autocomplete (The "UI Shell")
+  accessibleAutocomplete({
+    element: document.querySelector('#autocomplete-container'),
+    id: 'contact-type-autocomplete',
+    source: fuzzySearch, // Here is where we inject our fuzzy logic
+    onConfirm: (val) => {
+      if (val) {
+        const selected = CONTACT_TYPES.find(c => c.description === val);
+        // Requirement: Act as a link to the next page
+        // In a real app, this would be: window.location.href = `/next-page?code=${selected.code}`
+        console.log("Selected:", selected);
+        alert("Redirecting to next page for: " + val + " (Code: " + selected.code + ")");
+      }
+    },
+    placeholder: 'e.g. Call, Email, or Accommodation',
+    showNoOptionsFound: true
+  });
+</script>
+</body>
+</html>
