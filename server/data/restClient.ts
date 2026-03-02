@@ -89,7 +89,6 @@ export default class RestClient {
         warnings.push({ text: errorMessage })
         error.response.errors = warnings
         logger.info('Handling 500')
-        JSON.stringify(error.response)
         return error.response
       }
       if (handle404 && error?.response?.status === 404) {
@@ -169,27 +168,28 @@ export default class RestClient {
       const result = await request
       return raw ? (result as Response) : result.body
     } catch (error) {
-      if (error.response?.status === 400) {
-        throw new Error(`http 400: ${JSON.stringify(error.response)}`)
+      const sanitisedError = sanitiseError(error)
+      const sanitisedErrorMessage = sanitisedError.message
+
+      if (sanitisedError.status === 400) {
+        throw new Error(`http 400: ${sanitisedErrorMessage}`)
       }
-      if (handle404 && error.response?.status === 404) return null
-      if (handle415 && error?.response?.status === 415) {
+      if (handle404 && sanitisedError.status === 404) return null
+      if (handle415 && sanitisedError.status === 415) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })
         error.response.errors = warnings
-        JSON.stringify(error.response)
-        logger.info('Handling 415 : ', error.response)
+        logger.info('Handling 415 : ', sanitisedErrorMessage)
         return error.response
       }
       if (handle500 && error?.response?.status === 500) {
         const warnings: ErrorSummaryItem[] = []
         warnings.push({ text: errorMessage })
         error.response.errors = warnings
-        JSON.stringify(error.response)
-        logger.info('Handling 500 : ', error.response)
+        logger.info('Handling 500 : ', sanitisedErrorMessage)
         return error.response
       }
-      const sanitisedError = sanitiseError(error)
+
       logger.warn(
         { ...sanitisedError },
         escapeForLog(`Error calling ${this.name}, path: '${path}', verb: '${method.toUpperCase()}'`),
