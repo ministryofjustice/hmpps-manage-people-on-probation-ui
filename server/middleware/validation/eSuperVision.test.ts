@@ -18,7 +18,9 @@ const manageSettingsUrl = `${manageBase}/settings`
 const manageEditContactUrl = `${manageBase}/edit-contact`
 const manageStopCheckinsUrl = `${manageBase}/stop-checkin`
 const manageContactUrl = `${manageBase}/contact`
-
+const restartCheckinUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-checkin`
+const restartContactUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-contact`
+const restartEditContactUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`
 const reqBase = {
   method: 'POST',
   params: { crn, id },
@@ -387,6 +389,142 @@ describe('Test eSuperVision validation', () => {
       const res = makeRes()
       validation.eSuperVision(req, res, next)
       expect(res.render).toHaveBeenCalled()
+    })
+  })
+  describe('Test Restart Journey', () => {
+    describe('restart-date-frequency', () => {
+      it('passes with valid today or future date and interval', () => {
+        const esupervision = {
+          [crn]: {
+            [id]: {
+              restartCheckin: {
+                date: '1/12/2099',
+                interval: 'WEEKLY',
+              },
+            },
+          },
+        }
+        const req = makeReq({
+          url: restartCheckinUrl,
+          body: { esupervision },
+          session: { data: { esupervision } },
+        })
+        const res = makeRes()
+        validation.eSuperVision(req, res, next)
+        expect(next).toHaveBeenCalled()
+      })
+
+      it('fails when restart date is in the past', () => {
+        const esupervision = {
+          [crn]: {
+            [id]: {
+              restartCheckin: {
+                date: '01/01/1990',
+                interval: 'WEEKLY',
+              },
+            },
+          },
+        }
+        const req = makeReq({
+          url: restartCheckinUrl,
+          body: { esupervision },
+          session: { data: { esupervision } },
+        })
+        const res = makeRes()
+        validation.eSuperVision(req, res, next)
+        expect(res.render).toHaveBeenCalledWith('pages/check-in/manage/restart-date-frequency', expect.any(Object))
+        expect(next).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('restart-contact (main)', () => {
+      it('passes when preferredComs and corresponding contact provided', () => {
+        const esupervision = {
+          [crn]: {
+            [id]: {
+              restartCheckin: {
+                preferredComs: 'EMAIL',
+                checkInEmail: 'test@example.com',
+                checkInMobile: '',
+              },
+            },
+          },
+        }
+        const req = makeReq({
+          url: restartContactUrl,
+          body: { esupervision, change: 'main' },
+          session: { data: { esupervision } },
+        })
+        const res = makeRes()
+        validation.eSuperVision(req, res, next)
+        expect(next).toHaveBeenCalled()
+      })
+
+      it('fails when preferredComs is missing on restart', () => {
+        const esupervision = {
+          [crn]: {
+            [id]: {
+              restartCheckin: {
+                preferredComs: '',
+                checkInEmail: '',
+                checkInMobile: '',
+              },
+            },
+          },
+        }
+        const req = makeReq({
+          url: restartContactUrl,
+          body: { esupervision, change: 'main' },
+          session: { data: { esupervision } },
+        })
+        const res = makeRes()
+        validation.eSuperVision(req, res, next)
+        expect(res.render).toHaveBeenCalledWith('pages/check-in/manage/restart-contact-preference', expect.any(Object))
+        expect(next).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('restart-edit-contact', () => {
+      it('passes with valid edited email and mobile', () => {
+        const esupervision = {
+          [crn]: {
+            [id]: {
+              restartCheckin: {
+                editCheckInEmail: 'test@example.com',
+                editCheckInMobile: '07123456789',
+              },
+            },
+          },
+        }
+        const req = makeReq({
+          url: restartEditContactUrl,
+          body: { esupervision },
+          session: { data: { esupervision } },
+        })
+        const res = makeRes()
+        validation.eSuperVision(req, res, next)
+        expect(next).toHaveBeenCalled()
+      })
+      it('fails with invalid edited email and mobile', () => {
+        const esupervision = {
+          [crn]: {
+            [id]: {
+              restartCheckin: {
+                editCheckInEmail: '1',
+                editCheckInMobile: '1',
+              },
+            },
+          },
+        }
+        const req = makeReq({
+          url: restartEditContactUrl,
+          body: { esupervision },
+          session: { data: { esupervision } },
+        })
+        const res = makeRes()
+        validation.eSuperVision(req, res, next)
+        expect(next).not.toHaveBeenCalled()
+      })
     })
   })
 })

@@ -65,7 +65,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateContactPreference = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/contact-preference`)) {
       render = `pages/check-in/contact-preference`
-      if (req.body.change === 'main') {
+      if (req.body?.change === 'main') {
         errorMessages = validateWithSpec(
           req.body,
           eSuperVisionValidation({
@@ -179,7 +179,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   const validateManageContactPage = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/contact`)) {
       render = `pages/check-in/manage/manage-contact`
-      if (req.body.change === 'main') {
+      if (req.body?.change === 'main') {
         errorMessages = validateWithSpec(
           req.body,
           eSuperVisionValidation({
@@ -194,6 +194,61 @@ const eSuperVision: Route<void> = (req, res, next) => {
       }
     }
   }
+  const validateRestartJourney = () => {
+    if (baseUrl.includes(`/manage/${id}/restart-checkin`)) {
+      render = `pages/check-in/manage/restart-date-frequency`
+      localParams.id = id
+      errorMessages = validateWithSpec(req.body, eSuperVisionValidation({ crn, id, page: 'restart-date-frequency' }))
+    }
+
+    if (baseUrl.includes(`/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`)) {
+      render = `pages/check-in/manage/restart-edit-contact`
+      localParams.id = id
+      const editMobile = getDataValue(req.session.data, [
+        'esupervision',
+        crn,
+        id,
+        'restartCheckin',
+        'editCheckInMobile',
+      ])
+      const editEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin', 'editCheckInEmail'])
+
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'restart-edit-contact',
+          editCheckInEmail: editEmail,
+          editCheckInMobile: editMobile,
+        }),
+      )
+    }
+
+    if (baseUrl.includes(`/manage/${id}/restart-contact`)) {
+      render = `pages/check-in/manage/restart-contact-preference`
+      localParams.id = id
+      const restartData = req.body.esupervision?.[crn]?.[id]?.restartCheckin || {}
+      const sessionData = getDataValue(req.session.data, ['esupervision', crn, id, 'restartCheckin']) || {}
+      const email = restartData.checkInEmail || sessionData.checkInEmail
+      const mobile = restartData.checkInMobile || sessionData.checkInMobile
+
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'restart-contact',
+          change: req.body.change || 'main',
+          checkInEmail: email,
+          checkInMobile: mobile,
+        }),
+      )
+      localParams.checkInEmail = email
+      localParams.checkInMobile = mobile
+    }
+  }
+
   let errorMessages: Record<string, string> = {}
   validateDateFrequency()
   validateContactPreference()
@@ -204,6 +259,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   validateManageEditContactPreference()
   validateStopCheckins()
   validateManageContactPage()
+  validateRestartJourney()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
     return res.render(render, { errorMessages, ...localParams })

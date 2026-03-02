@@ -168,7 +168,16 @@ export interface DeactivateOffenderRequest {
 }
 export interface ReactivateOffenderRequest {
   requestedBy: string
-  reason: string
+  reason?: string
+  checkinSchedule?: {
+    requestedBy?: string
+    firstCheckin?: string
+    checkinInterval?: CheckInterval
+  }
+  contactPreference?: {
+    requestedBy?: string
+    contactPreference?: 'PHONE' | 'EMAIL'
+  }
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

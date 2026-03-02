@@ -941,3 +941,70 @@ describe('validates manage checkin contact type preference', () => {
     expect(loggerSpy).toHaveBeenCalledWith('Email not entered in manage check in process')
   })
 })
+
+describe('validates restart check in settings (start date and frequency of check ins) ', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it('should return errors when date and interval are missing', () => {
+    const testRequest = {
+      esupervision: { [crn]: { [id]: { restartCheckin: { date: undefined, interval: undefined } } } },
+    } as unknown as Validateable
+
+    const expectedResult: Record<string, string> = {
+      [`esupervision-${crn}-${id}-restartCheckin-date`]:
+        'Enter the date you would like the person to complete their next online check in',
+      [`esupervision-${crn}-${id}-restartCheckin-interval`]: 'Select how often you would like the person to check in',
+    }
+
+    const args: ESupervisionValidationArgs = { crn, id, page: 'restart-date-frequency' }
+    const spec = eSuperVisionValidation(args)
+
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+    expect(loggerSpy).toHaveBeenCalledWith('Restart checkin date not entered')
+  })
+
+  it('should return error when restart date is in the past', () => {
+    const pastDate = DateTime.now().minus({ days: 1 }).toFormat('d/M/yyyy')
+    const testRequest = {
+      esupervision: { [crn]: { [id]: { restartCheckin: { date: pastDate, interval: 'WEEKLY' } } } },
+    } as unknown as Validateable
+
+    const expectedResult: Record<string, string> = {
+      [`esupervision-${crn}-${id}-restartCheckin-date`]: 'The next online check in date must be today or in the future',
+    }
+
+    const args: ESupervisionValidationArgs = { crn, id, page: 'restart-date-frequency' }
+    const spec = eSuperVisionValidation(args)
+
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
+
+describe('validates restart contact preferences', () => {
+  it('should return errors when preferredComs is missing', () => {
+    const testRequest = {
+      esupervision: { [crn]: { [id]: { restartCheckin: { preferredComs: undefined } } } },
+    } as unknown as Validateable
+
+    const expectedResult: Record<string, string> = {
+      [`esupervision-${crn}-${id}-restartCheckin-preferredComs`]:
+        'Select how the person wants us to send a link to the service',
+      [`esupervision-${crn}-${id}-restartCheckin-checkInEmail`]: 'Enter an email address',
+      [`esupervision-${crn}-${id}-restartCheckin-checkInMobile`]: 'Enter a mobile number',
+    }
+
+    const args: ESupervisionValidationArgs = {
+      crn,
+      id,
+      page: 'restart-contact',
+      change: 'main',
+      checkInEmail: '',
+      checkInMobile: '',
+    }
+    const spec = eSuperVisionValidation(args)
+
+    expect(validateWithSpec(testRequest, spec)).toEqual(expectedResult)
+  })
+})
