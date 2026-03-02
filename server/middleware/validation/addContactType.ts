@@ -1,0 +1,17 @@
+import { Route } from '../../@types'
+import { validateWithSpec } from '../../utils/validationUtils'
+import { addContactValidation } from '../../properties/validation/addContactType'
+
+const addContactType: Route<void> = (req, res, next) => {
+  const { crn } = req.params
+
+  const errorMessages = validateWithSpec(req.body, addContactValidation())
+
+  if (Object.keys(errorMessages).length) {
+    res.locals.errorMessages = errorMessages
+    return res.render('pages/contacts/add-contact-type', { errorMessages, crn, formValues: req.body })
+  }
+  return next()
+}
+
+export default addContactType

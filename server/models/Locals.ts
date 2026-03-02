@@ -18,6 +18,7 @@ import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
+import { ContactType } from '../data/model/contacts'
 
 export interface AppointmentLocals {
   meta: {
@@ -120,6 +121,8 @@ interface Locals {
   personRisks?: PersonRiskFlags
   riskToStaff?: { id: number; level: RiskScore | null }
   smsConfirmationOptions?: Option[]
+  contactTypes: ContactType[]
+  radioItems: Option[]
 }
 
 export interface AppResponse extends Response {

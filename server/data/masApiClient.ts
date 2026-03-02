@@ -48,6 +48,7 @@ import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 import { ErrorSummary } from './model/common'
+import { ContactType, CreateContactRequest } from './model/contacts'
 
 interface GetUserScheduleProps {
   username: string
@@ -470,5 +471,29 @@ export default class MasApiClient extends RestClient {
 
   async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
     return this.get({ path: `/case/${crn}/probation-practitioner` })
+  }
+
+  // New methods for Contact Journey
+
+  async getFrequentContactTypes(): Promise<ContactType[]> {
+    return this.get({ path: `/contact/types` })
+  }
+
+  async getContactType(code: string): Promise<ContactType> {
+    return this.get({ path: `/contact/types/${code}` })
+  }
+
+  async isResponsibleOfficer(username: string, crn: string): Promise<boolean> {
+    const result = await this.get<{ isResponsibleOfficer: boolean }>({
+      path: `/case/${crn}/officer-status/${username}`,
+    })
+    return result.isResponsibleOfficer
+  }
+
+  async createContact(crn: string, payload: CreateContactRequest): Promise<void> {
+    return this.post({
+      path: `/case/${crn}/contact`,
+      data: payload,
+    })
   }
 }
