@@ -377,7 +377,7 @@ context('Appointment check-ins', () => {
       .should('be.visible')
       .and(
         'contain',
-        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+        'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.',
       )
     editContactPreferencePage.getSubmitBtn().click()
     contactPreferencePage.checkOnPage()
@@ -698,7 +698,7 @@ context('check-ins overview and manage pages', () => {
       .should('be.visible')
       .and(
         'contain',
-        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+        'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.',
       )
     manageEditContactPage.getBackLink().click()
     manageContact.checkOnPage()
