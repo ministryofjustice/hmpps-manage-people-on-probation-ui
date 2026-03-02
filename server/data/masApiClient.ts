@@ -63,13 +63,6 @@ export default class MasApiClient extends RestClient {
     super('Manage a Supervision API', config.apis.masApi, token)
   }
 
-  /**
-   * @deprecated use DeliusClient.getHomepage
-   */
-  async getUserAppointments(username: string): Promise<UserAppontment> {
-    return this.get({ path: `/user/${username}/appointments` })
-  }
-
   async getOverview(crn: string, sentenceNumber = '1'): Promise<Overview | null> {
     const queryParam = `?sentenceNumber=${sentenceNumber}`
     return this.get({ path: `/overview/${crn}${queryParam}`, handle404: false })

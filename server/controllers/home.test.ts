@@ -111,21 +111,6 @@ describe('homeController', () => {
       })
     })
 
-    describe('feature flag disabled', () => {
-      it('should use the legacy homepage controller when enableDeliusClient is false', async () => {
-        const resWithLegacyFlag = mockAppResponse({ flags: { enableDeliusClient: false } })
-        const legacyHandler = jest.fn().mockResolvedValue(undefined)
-        const getHomeOldSpy = jest
-          .spyOn(controllers.home, 'getHomeOld')
-          .mockReturnValue(legacyHandler as ReturnType<typeof controllers.home.getHomeOld>)
-
-        await controllers.home.getHome(hmppsAuthClient)(req, resWithLegacyFlag)
-
-        expect(getHomeOldSpy).toHaveBeenCalledWith(hmppsAuthClient)
-        expect(legacyHandler).toHaveBeenCalledWith(req, resWithLegacyFlag)
-      })
-    })
-
     describe('GET /sentry-test-error', () => {
       it('should throw an error and return 500', async () => {
         const app = express()
