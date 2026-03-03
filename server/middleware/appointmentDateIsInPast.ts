@@ -15,7 +15,8 @@ export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean 
     format = 'd/M/yyyy'
   }
   if (!date) {
-    ;({ date, start } = getDataValue(data, ['appointments', crn, id]))
+    date = getDataValue(data, ['appointments', crn, id, 'date'])
+    start = getDataValue(data, ['appointments', crn, id, 'start'])
     format = 'yyyy-M-d'
   }
   if (date) {
