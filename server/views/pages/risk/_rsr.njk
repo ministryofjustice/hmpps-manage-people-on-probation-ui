@@ -1,5 +1,9 @@
 {% if predictorScores.scores.RSR.score %}
     <section data-qa="rsr">
+        {{ predictorScale({
+    data: risksData,
+    predictor: "RSR"
+  }) }}
         <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
         RSR (risk of serious recidivism)
     </h {{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
