@@ -18,6 +18,7 @@ $mappa-colour: #4c2c92;
 
 @import '../../node_modules/govuk-frontend/dist/govuk/all';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
+@import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/arns/components/predictor-badge/_predictor-badge';
 
 @import './components/header-bar';
 @import './components/summary-card';
@@ -681,13 +682,12 @@ body.feature-disabled {
     }
   }
 
-    &--noNotes {
-      display: block;
-    }
+  &--noNotes {
+    display: block;
   }
+}
 
 .contact-log-compact {
-
   .govuk-details {
     margin-bottom: 5px;
   }
@@ -711,7 +711,7 @@ body.feature-disabled {
   &-row {
     border: 0;
     &--last {
-      border-bottom: 1px solid #b1b4b6;;
+      border-bottom: 1px solid #b1b4b6;
     }
   }
   .app-compliance-tag--compact {
@@ -723,17 +723,24 @@ body.feature-disabled {
 }
 
 .flex__item-full-width-mobile {
-  @include govuk-media-query($until: tablet ) {
+  @include govuk-media-query($until: tablet) {
     width: 100%;
   }
 }
 
 .flex--col-mobile {
-  @include govuk-media-query($until: tablet ) {
+  @include govuk-media-query($until: tablet) {
     flex-direction: column;
   }
 }
 
 .flex--gap-3 {
   gap: govuk-spacing(3);
+}
+
+[data-predictor-badge] {
+  margin: 0 10px 10px 0;
+  &:last-child {
+    margin: 0;
+  }
 }

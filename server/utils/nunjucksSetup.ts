@@ -116,6 +116,7 @@ export default function nunjucksSetup(
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
       'node_modules/@ministryofjustice/probation-search-frontend/components',
+      'node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/',
     ],
     {
       autoescape: true,
