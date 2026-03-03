@@ -9,7 +9,7 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
-import { ArnsComponentData, PersonRiskFlags, RiskScore, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { PersonRiskFlags, RiskScore, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
@@ -73,7 +73,6 @@ interface Locals {
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   predictorScores?: TimelineItem
-  risksData?: ArnsComponentData
   message?: string
   title?: string
   success?: boolean

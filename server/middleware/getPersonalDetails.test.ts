@@ -1,5 +1,4 @@
 import httpMocks from 'node-mocks-http'
-import e from 'connect-flash'
 import { getPersonalDetails } from './getPersonalDetails'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
@@ -31,19 +30,19 @@ import {
 } from '../data/model/personalDetails'
 import { Contact } from '../data/model/professionalContact'
 import { SentencePlan } from '../data/model/sentencePlan'
-import { ArnsComponentData, TimelineItem } from '../data/model/risk'
+import { TimelineItem } from '../data/model/risk'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
 const mockTimeline: TimelineItem = {
   date: '8 Oct 2025 at 4:25pm',
   scores: {
-    RSR: { type: 'RSR', level: 'HIGH', score: 99.86 },
-    OGP: { type: 'OGP', level: 'MEDIUM', oneYear: 43, twoYears: 58 },
-    OSPC: { type: 'OSP/C', level: 'VERY_HIGH', score: 75.3 },
-    OSPI: { type: 'OSP/I', level: 'HIGH', score: 10.31 },
-    OGRS: { type: 'OGRS', level: 'LOW', oneYear: 21, twoYears: 35 },
-    OVP: { type: 'OVP', level: 'HIGH', oneYear: 54, twoYears: 69 },
+    RSR: { type: 'RSR', level: 'HIGH', score: 99.86, staticOrDynamic: 'Dynamic' },
+    OGP: { type: 'OGP', level: 'MEDIUM', oneYear: 43, twoYears: 58, staticOrDynamic: 'Dynamic' },
+    OSPC: { type: 'OSP/C', level: 'VERY_HIGH', score: 75.3, staticOrDynamic: 'Dynamic' },
+    OSPI: { type: 'OSP/I', level: 'HIGH', score: 10.31, staticOrDynamic: 'Dynamic' },
+    OGRS: { type: 'OGRS', level: 'LOW', oneYear: 21, twoYears: 35, staticOrDynamic: 'Static' },
+    OVP: { type: 'OVP', level: 'HIGH', oneYear: 54, twoYears: 69, staticOrDynamic: 'Dynamic' },
   },
 }
 jest.mock('../data/masApiClient')
@@ -178,55 +177,6 @@ describe('/middleware/getPersonalDetails', () => {
       },
     }
 
-    const expectedRiskData: ArnsComponentData = {
-      assessments: [
-        {
-          ROSH: {
-            name: 'ROSH',
-            band: 'UNAVAILABLE',
-          },
-          RSR: {
-            name: 'Combined Serious Reoffending Predictor',
-            band: 'HIGH',
-            score: 99.86,
-            staticOrDynamic: 'Dynamic',
-          },
-          OGP: {
-            name: 'OASys General Predictor Score',
-            band: 'MEDIUM',
-            oneYear: 43,
-            twoYears: 58,
-            staticOrDynamic: 'Dynamic',
-          },
-          OSPC: {
-            name: 'Direct Contact - Sexual Reoffending Predictor',
-            band: 'VERY_HIGH',
-            score: 75.3,
-            staticOrDynamic: 'Static',
-          },
-          OSPI: {
-            name: 'Images and Indirect Contact - Sexual Reoffending Predictor',
-            band: 'HIGH',
-            score: 10.31,
-            staticOrDynamic: 'Static',
-          },
-          OGRS: {
-            name: 'All Reoffending Predictor',
-            band: 'LOW',
-            oneYear: 21,
-            twoYears: 35,
-            staticOrDynamic: 'Static',
-          },
-          OVP: {
-            name: 'Violent Reoffending Predictor',
-            band: 'HIGH',
-            oneYear: 54,
-            twoYears: 69,
-            staticOrDynamic: 'Dynamic',
-          },
-        },
-      ],
-    }
     expect(req.session.data).toEqual(expected)
     expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
@@ -238,7 +188,6 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
     expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
-    expect(res.locals.risksData).toEqual(expectedRiskData)
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
