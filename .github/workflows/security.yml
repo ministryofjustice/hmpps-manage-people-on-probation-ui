@@ -9,7 +9,7 @@ jobs:
   trivy:
     uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@5f60e142446a00a58b0b594bd22192c574c4f9ef # v1
     with:
-      channel_id: manage-people-on-probation-alerts
+      channel_id: manage-people-on-probation-alerts-security
     secrets:
       HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
 
@@ -68,7 +68,7 @@ jobs:
           method: chat.postMessage
           payload: |
             {
-              "channel": "manage-people-on-probation-alerts",
+              "channel": "manage-people-on-probation-alerts-security",
               "blocks": [
                 {
                   "type": "section",
@@ -118,7 +118,7 @@ jobs:
           method: chat.postMessage
           payload: |
             {
-              "channel": "manage-people-on-probation-alerts",
+              "channel": "manage-people-on-probation-alerts-security",
               "blocks": [
                 {
                   "type": "section",
