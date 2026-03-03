@@ -3,6 +3,9 @@ import { Controller } from '../@types'
 import { getSentences, getFrequentContactTypes } from '../middleware'
 import { deliusDeepLinkUrl } from '../utils'
 import { slugify } from '../utils/slugify'
+import { isResponsibleOfficer } from '../middleware/isResponsibleOfficer'
+import ContactService from '../services/contactService'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'getFrequentlyUsedContact',
@@ -75,11 +78,15 @@ const addContactController: Controller<typeof routes, void> = {
     }
   },
 
-  postAddContactType: () => {
+     postAddContactType: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
       // TODO: Call API endpoint when available
       // ?success=true&message=Contact added successfully.
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const contactService = new ContactService(masClient)
+      const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
       return res.redirect(`/case/${crn}/contacts/alert-responsible-officer`)
     }
   },

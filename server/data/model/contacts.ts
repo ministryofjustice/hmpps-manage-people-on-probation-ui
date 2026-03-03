@@ -26,13 +26,18 @@ export interface ContactType {
  * This matches the JSON body expected by the API.
  */
 export interface CreateContactRequest {
-  code: string
-  date: string
-  startTime?: string
-  endTime?: string
+  staffCode: string
+  teamCode: string
+  type: string
+  eventId?: number
+  requirementId?: number
   description?: string
   notes?: string
+  alert: boolean
   sensitive: boolean
-  includeInVisor?: boolean
-  relatedTo?: 'person' | 'event'
+  visorReport: boolean
+}
+
+export interface CreateContactResponse {
+  id: number
 }

@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { ContactType, PersonOnProbation, CreateContactRequest } from '../data/model/contacts'
+import { ContactType, PersonOnProbation, CreateContactRequest, CreateContactResponse } from '../data/model/contacts'
 import config from '../config'
 
 export default class ContactService {
@@ -23,7 +23,7 @@ export default class ContactService {
     return this.masApiClient.isResponsibleOfficer(username, crn)
   }
 
-  async createContact(crn: string, payload: CreateContactRequest): Promise<void> {
+  async createContact(crn: string, payload: CreateContactRequest): Promise<CreateContactResponse> {
     return this.masApiClient.createContact(crn, payload)
   }
 

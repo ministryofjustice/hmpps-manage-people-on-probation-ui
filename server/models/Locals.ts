@@ -123,6 +123,7 @@ interface Locals {
   smsConfirmationOptions?: Option[]
   contactTypes: ContactType[]
   radioItems: Option[]
+  isResponsibleOfficer?: boolean
 }
 
 export interface AppResponse extends Response {

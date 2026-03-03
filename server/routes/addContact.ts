@@ -37,7 +37,7 @@ export default function addContactRoutes(router: Router, { hmppsAuthClient }: Se
     '/case/:crn/contacts/add-:contactType',
     multerErrorHandler('fileUpload'),
     validate.addContactType,
-    controllers.addContact.postAddContactType(),
+    controllers.addContact.postAddContactType(hmppsAuthClient),
   )
 
   router.get(

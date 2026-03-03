@@ -48,7 +48,7 @@ import { ContactResponse } from './model/overdueOutcomes'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import { AppointmentStaff, AppointmentTeams } from './model/appointment'
 import { ErrorSummary } from './model/common'
-import { ContactType, CreateContactRequest } from './model/contacts'
+import { ContactType, CreateContactRequest, CreateContactResponse } from './model/contacts'
 
 interface GetUserScheduleProps {
   username: string
@@ -490,9 +490,9 @@ export default class MasApiClient extends RestClient {
     return result.isResponsibleOfficer
   }
 
-  async createContact(crn: string, payload: CreateContactRequest): Promise<void> {
+  async createContact(crn: string, payload: CreateContactRequest): Promise<CreateContactResponse> {
     return this.post({
-      path: `/case/${crn}/contact`,
+      path: `/case/${crn}`,
       data: payload,
     })
   }
