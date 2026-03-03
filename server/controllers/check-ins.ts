@@ -31,9 +31,7 @@ const routes = [
   'postFullEligibilityPage',
   'getSupplementaryEligibilityPage',
   'postSupplementaryEligibilityPage',
-  'getIntroPage',
   'getDateFrequencyPage',
-  'postIntroPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
   'postContactPreferencePage',
@@ -205,36 +203,6 @@ const checkInsController: Controller<typeof routes, void> = {
   },
 
   postSupplementaryEligibilityPage: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params
-      const { data } = req.session
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
-    }
-  },
-
-  getIntroPage: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params
-      const { back } = req.query
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const practitioner = await masClient.getProbationPractitioner(crn)
-      if (practitioner.unallocated) {
-        return res.redirect(`/case/${crn}/appointments`)
-      }
-      const guidanceUrl = config.guidance.link
-      return res.render('pages/check-in/instructions.njk', { crn, back, guidanceUrl })
-    }
-  },
-
-  postIntroPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { data } = req.session
