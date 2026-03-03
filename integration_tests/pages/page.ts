@@ -187,13 +187,21 @@ export default abstract class Page {
   }
 
   assertRiskTags() {
-    cy.get(`[class=predictor-timeline-item__level]`)
+    cy.get(`[data-predictor-badge]`)
       .eq(0)
-      .within(() => cy.get('strong').should('contain.text', 'ROSH'))
+      .get('[data-test-id=nameAndBand')
+      .should('contain.text', 'COMBINED SERIOUS REOFFENDING PREDICTOR')
+      .should('contain.text', 'MEDIUM')
+      .get('[data-test-id=score')
+      .should('contain.text', '12.1%')
+      .get('[data-test-id=staticOrDynamic')
+      .should('contain.text', 'Dynamic')
 
-    cy.get(`[class=predictor-timeline-item__level]`)
+    cy.get(`[data-predictor-badge]`)
       .eq(1)
-      .within(() => cy.get('strong').should('contain.text', 'RSR'))
+      .get('[data-test-id=nameAndBand')
+      .should('contain.text', 'ROSH')
+      .should('contain.text', 'VERY HIGH')
   }
 
   getElementByDataQA = (name: string): PageElement => cy.get(`[data-qa="${name}"]`)
