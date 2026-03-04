@@ -20,7 +20,6 @@ export interface Score {
   type: string
   level: string
   score: number
-  staticOrDynamic: ScoreType
 }
 
 export interface ScoreTwoYears {
@@ -28,7 +27,6 @@ export interface ScoreTwoYears {
   level: string
   oneYear: number
   twoYears: number
-  staticOrDynamic: ScoreType
 }
 
 export interface RoshRiskWidgetDto {
@@ -198,3 +196,16 @@ export interface Need {
 }
 
 export type ScoreType = 'Static' | 'Dynamic'
+
+export interface Predictor {
+  name: string
+  band: string
+  score?: number
+  oneYear?: number
+  twoYears?: number
+  staticOrDynamic?: ScoreType
+}
+
+export interface ArnsComponentData {
+  assessments: { [key: string]: Predictor }[]
+}

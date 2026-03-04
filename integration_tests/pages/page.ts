@@ -189,7 +189,7 @@ export default abstract class Page {
   assertRiskTags() {
     cy.get(`[data-predictor-badge]`)
       .eq(0)
-      .get('[data-test-id=typeAndLevel')
+      .get('[data-test-id=nameAndBand')
       .should('contain.text', 'COMBINED SERIOUS REOFFENDING PREDICTOR')
       .should('contain.text', 'MEDIUM')
       .get('[data-test-id=score')
@@ -199,7 +199,7 @@ export default abstract class Page {
 
     cy.get(`[data-predictor-badge]`)
       .eq(1)
-      .get('[data-test-id=typeAndLevel')
+      .get('[data-test-id=nameAndBand')
       .should('contain.text', 'ROSH')
       .should('contain.text', 'VERY HIGH')
   }
