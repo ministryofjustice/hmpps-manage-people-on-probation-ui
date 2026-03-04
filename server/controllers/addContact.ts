@@ -97,8 +97,9 @@ const addContactController: Controller<typeof routes, void> = {
 
       // TODO: Call API endpoint when available
       // ?success=true&message=Contact added successfully.
-
-      return res.redirect(`/case/${crn}/activity-log`)
+      // TODO: Add below on success of API success
+      const successQueryParam = `?showSuccessBanner=true`
+      return res.redirect(`/case/${crn}/activity-log${successQueryParam}`)
     }
   },
 }

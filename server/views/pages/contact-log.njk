@@ -1,4 +1,5 @@
 {% extends "../partials/case.njk" %}
+{% from "moj/components/banner/macro.njk" import mojBanner %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% set pageTitle = makePageTitle({pageHeading: "Contacts"}) %}
@@ -42,8 +43,14 @@
       }) }}
     {% endif %}
   {% endif %}
+  {{ mojBanner({
+    type: 'success',
+    text: 'Contact created',
+    classes: 'govuk-!-margin-bottom-2',
+    attributes: { "data-qa": "contactCreated"},
+    iconFallbackText: 'Success'
+  })  if showSuccessBanner }}
 {% endblock %}
-
 {% block pageContent %}
 
   <div class="govuk-grid-row govuk-!-margin-top-4">
