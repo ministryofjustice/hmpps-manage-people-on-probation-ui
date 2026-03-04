@@ -30,9 +30,9 @@ const categeoryList = [
   'communications with person on probation',
   'communications with police',
   'unpaid work',
-  'enforcement',
   'Internal communications',
   'Multi-agency working',
+  'enforcement',
   'Referrals and assessments',
   'safeguarding',
 ]

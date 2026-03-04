@@ -571,13 +571,13 @@ export const categoryFilterOptions = [
   },
   { text: 'Communication with police', value: 'communications with police', codes: COMM_WITH_POLICE_CODES },
   { text: 'Community payback/Unpaid work', value: 'unpaid work', codes: COMM_PAYBACK_UNPAID_WORK_CODES },
-  { text: 'Enforcement', value: 'enforcement', codes: ENFORCEMENT_CODES },
   { text: 'Internal communications', value: 'Internal communications', codes: INT_COMMS_CODES },
   {
     text: 'Multi-agency working (including IOM, MAPPA and MARAC)',
     value: 'Multi-agency working',
     codes: MULTI_AGENCY_WORKING_CODES,
   },
+  { text: 'Non-compliance and enforcement', value: 'enforcement', codes: ENFORCEMENT_CODES },
   { text: 'Referrals and assessments', value: 'Referrals and assessments', codes: REFERRALS_AND_ASSE_CODES },
   { text: 'Safeguarding', value: 'safeguarding', codes: SAFEGUARDING_CODES },
 ]
