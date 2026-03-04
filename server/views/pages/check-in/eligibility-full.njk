@@ -4,10 +4,9 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn %}
 {% set formAnchorText = "Cancel and go back to " + case.name.forename + "'s overview" %}
-{% set back = back if back else '' %}
-{% set backLink =  '/case/' + crn + '/'  + back %}
+{% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/eligibility-check' %}
 {% set buttonText = "Sign up for online check ins" %}
-{% set radioText = "How will you use online check ins with" + case.name.forename + "?" %}
+{% set radioText = "How will you use online check ins with " + case.name.forename + "?" %}
 
 {% block form %}
     <div class="govuk-grid-row">

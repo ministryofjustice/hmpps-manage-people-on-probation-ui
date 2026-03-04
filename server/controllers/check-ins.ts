@@ -135,7 +135,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/denied-eligibility`)
       }
 
-      if (selections.includes('eligibility-10')) {
+      if (selections.includes('eligibility-none')) {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)
       }
 
@@ -217,12 +217,31 @@ const checkInsController: Controller<typeof routes, void> = {
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const cya = req.query.cya === 'true'
+      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      let backLink: string
+      if (cya) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityArray.includes('eligibility-none')) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+      } else {
+        backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+      }
+
       const checkInMinDate = getMinDate()
-      return res.render(`pages/check-in/date-frequency.njk`, { crn, id, checkInMinDate, cya })
+
+      return res.render(`pages/check-in/date-frequency.njk`, {
+        crn,
+        id,
+        checkInMinDate,
+        cya,
+        backLink,
+      })
     }
   },
 

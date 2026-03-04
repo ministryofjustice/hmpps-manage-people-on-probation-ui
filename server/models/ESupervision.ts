@@ -20,6 +20,7 @@ export interface CheckinUserDetails {
   contactUpdated?: boolean
   settingsUpdated?: boolean
   eligibility?: string[]
+  eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
 }
 export interface LocalParams {
   crn: string

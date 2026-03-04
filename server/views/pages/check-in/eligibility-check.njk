@@ -8,9 +8,36 @@
 {% set formAnchorText = "Cancel and go back" %}
 {% set back = back if back else '' %}
 {% set backLink =  '/case/' + crn + '/'  + back %}
-{% block form %}
-    <div class="govuk-grid-row">
-        <div class="govuk-grid-column-full">
+{% set notStandardForm = true %}
+{% set buttonText = "Continue" %}
+
+
+{% block primary %}
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+          {{ title }}
+      </h2>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+
+        {% if errorMessages %}
+          {% set errorList = errorMessages | toErrorList %}
+          {% if errorList.length > 0 %}
+            {{ govukErrorSummary({
+                titleText: "There is a problem",
+                classes: 'govuk-!-margin-bottom-6',
+                errorList: errorList,
+                attributes: { "data-qa": "errorList"}
+            }) }}
+          {% endif %}
+        {% endif %}
+        
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
 
             <h2 class="govuk-heading-m">About online check ins</h2>
             <p class="govuk-body">Online check ins allow people on probation to update you about their needs and how they are feeling. They'll do this by answering some questions about how they are and if they need any support, and recording a 5-second video we will use to verify their identity.</p>
@@ -34,7 +61,7 @@
                   text: errorMessages["esupervision-" + crn + "-" + id + "-checkins-eligibility"]
                 } if errorMessages["esupervision-" + crn + "-" + id + "-checkins-eligibility"],
                 hint: {
-                    text: "Select all that apply"
+                    text: "Select all that apply."
                 },
                 items: [
                 {
@@ -77,12 +104,24 @@
                 divider: "or"
               },
               {
-                value: "eligibility-10",
+                value: "eligibility-none",
                 text: "None of these apply",
                 behaviour: "exclusive"
               }
             ]
             }) | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibility']) }}
-
+              <div class="govuk-button-group">
+                {{ govukButton({
+                    text: buttonText,
+                    type: "submit",
+                    attributes: { "data-qa": "submit-btn" }
+                }) }}
+                <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="formAnchorLink">
+                    {{ formAnchorText }}
+                </a>
+            </div>
+        </form>
+    </div>
+  </div>
 
 {% endblock %}

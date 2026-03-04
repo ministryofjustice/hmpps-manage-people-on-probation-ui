@@ -11,7 +11,7 @@ export default class EligibilityCheckPage extends Page {
 
   getOptionNine = (): PageElement => cy.get('input[value="eligibility-9"]')
 
-  getNoneOption = (): PageElement => cy.get('input[value="eligibility-10"]')
+  getNoneOption = (): PageElement => cy.get('input[value="eligibility-none"]')
 
   getSubmitBtn = (): PageElement => cy.get('[data-qa="submit-btn"]')
 }

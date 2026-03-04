@@ -119,7 +119,7 @@ describe('Test eSuperVision validation', () => {
       const res = makeRes()
       validation.eSuperVision(req, res, next)
 
-      expect(res.render).toHaveBeenCalledWith('pages/check-in/full-eligibility', expect.any(Object))
+      expect(res.render).toHaveBeenCalledWith('pages/check-in/eligibility-full', expect.any(Object))
       expect(next).not.toHaveBeenCalled()
     })
   })

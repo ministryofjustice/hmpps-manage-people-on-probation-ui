@@ -64,7 +64,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   }
   const validateEligibilityChoice = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)) {
-      render = `pages/check-in/full-eligibility`
+      render = `pages/check-in/eligibility-full`
       errorMessages = validateWithSpec(
         req.body,
         eSuperVisionValidation({

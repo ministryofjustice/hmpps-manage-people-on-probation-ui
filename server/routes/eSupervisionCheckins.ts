@@ -7,6 +7,9 @@ import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
+  router.get('/case/:crn/appointments/check-in/eligibility-check', [
+    controllers.checkIns.getStartSetup(hmppsAuthClient),
+  ])
   router.get('/case/:crn/appointments/:id/check-in/eligibility-check', [
     controllers.checkIns.getEligibilityPage(hmppsAuthClient),
   ])

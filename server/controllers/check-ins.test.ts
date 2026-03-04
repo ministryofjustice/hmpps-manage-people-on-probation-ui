@@ -207,14 +207,14 @@ describe('checkInsController', () => {
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/denied-eligibility`)
       })
 
-      it('redirects to full eligibility page when eligibility-10 is selected', async () => {
+      it('redirects to full eligibility page when eligibility-none is selected', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
         const { id } = req.params
         req.body = {
-          esupervision: { [crn]: { [id]: { checkins: { eligibility: 'eligibility-10' } } } },
+          esupervision: { [crn]: { [id]: { checkins: { eligibility: 'eligibility-none' } } } },
         }
 
         await controllers.checkIns.postEligibilityPage(hmppsAuthClient)(req, res)
@@ -294,6 +294,7 @@ describe('checkInsController', () => {
         id: uuid,
         checkInMinDate: '1/7/2025',
         cya,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
       })
     })
 
@@ -312,6 +313,7 @@ describe('checkInsController', () => {
         id: uuid,
         checkInMinDate: '9/7/2025',
         cya,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
       })
     })
 
