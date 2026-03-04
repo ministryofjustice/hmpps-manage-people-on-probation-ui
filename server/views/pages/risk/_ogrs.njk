@@ -1,25 +1,16 @@
 {% if predictorScores.scores.OGRS.level %}
     <section data-qa="ogrs">
-        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-{{ scoresHeadingClass | default('m') }} score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OGRS score">
-        OGRS (offender group reconviction scale)
-    </h{{ scoresHeadingLevel | default('3') }}>
-        <div class="govuk-grid-row  govuk-!-margin-bottom-4">
-            <div class="govuk-grid-column-full">
-                <div class="flex-mobile">
-                    <div class='flex__item-one-third-mobile'>
-                        <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h{{ scoresSubHeadingLevel | default('3') }}>
-                        <div class='govuk-body' data-qa='ogrs-1yr'>{{ predictorScores.scores.OGRS.oneYear }}%</div>
-                    </div>
-                    <div class='flex__item-one-third-mobile'>
-                        <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h{{ scoresSubHeadingLevel | default('3') }}>
-                        <div class='govuk-body' data-qa='ogrs-2yr'>{{ predictorScores.scores.OGRS.twoYears }}%</div>
-                    </div>
-                    <div class='flex__item-one-third-mobile'>
-                        <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h{{ scoresSubHeadingLevel | default('3') }}>
-                        <div class='govuk-body' data-qa='ogrs-level'>{{ riskLevelLabel(predictorScores.scores.OGRS.level) }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {{ predictorScale(
+            {
+            level: predictorScores.scores.OGRS.level,
+            score: predictorScores.scores.OGRS.oneYear,
+            type: predictorScores.scores.OGRS.type,
+            staticOrDynamic: predictorScores.scores.OGRS.staticOrDynamic | upper,
+            lastUpdated: predictorScores.date
+        },
+        true,
+        true,
+        true
+    )}}
     </section>
 {% endif %}

@@ -1,0 +1,16 @@
+{% if predictorScores.scores.OSPI.score %}
+    <section data-qa="ospi">
+        {{ predictorScale(
+            {
+            level: predictorScores.scores.OSPI.level,
+            score: predictorScores.scores.OSPI.score,
+            type: predictorScores.scores.OSPI.type,
+            staticOrDynamic: predictorScores.scores.OSPI.staticOrDynamic | upper,
+            lastUpdated: predictorScores.date
+        },
+        true,
+        true,
+        true
+    )}}
+    </section>
+{% endif %}
