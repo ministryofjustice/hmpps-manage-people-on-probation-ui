@@ -9,7 +9,14 @@ const addContactType: Route<void> = (req, res, next) => {
 
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    return res.render('pages/contacts/add-contact-type', { errorMessages, crn, formValues: req.body })
+    const { responsibleOfficer, isVisor } = req.body
+    return res.render('pages/contacts/add-contact-type', {
+      errorMessages,
+      crn,
+      formValues: req.body,
+      isVisor,
+      responsibleOfficer,
+    })
   }
   return next()
 }

@@ -12,7 +12,6 @@ const routes = [
   'getAddContactType',
   'postFrequentlyUsedContact',
   'postAddContactType',
-  'getAlertResponsibleOfficer',
 ] as const
 
 const addContactController: Controller<typeof routes, void> = {
@@ -65,7 +64,11 @@ const addContactController: Controller<typeof routes, void> = {
 
       const response = await getFrequentContactTypes(req, res, hmppsAuthClient)
       const contactTypes = Array.isArray(response) ? response : (response as any).contactTypes || []
+      const isVisor = req.session.data?.risks[crn]?.riskFlags
+        .map(risk => risk.description.toLowerCase())
+        .includes('visor')
 
+      const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
       const selectedType = contactTypes.find((c: any) => slugify(c.description) === contactType)
 
       return res.render('pages/contacts/add-contact-type', {
@@ -74,34 +77,25 @@ const addContactController: Controller<typeof routes, void> = {
         back,
         csrfToken: res.locals.csrfToken,
         formValues: {},
+        isVisor,
+        responsibleOfficer,
       })
     }
   },
 
-     postAddContactType: hmppsAuthClient => {
+  postAddContactType: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
-      // TODO: Call API endpoint when available
-      // ?success=true&message=Contact added successfully.
+
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const contactService = new ContactService(masClient)
-      const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
-      return res.redirect(`/case/${crn}/contacts/alert-responsible-officer`)
-    }
-  },
+      //  const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
 
-  getAlertResponsibleOfficer: hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, contactType } = req.params
-      const { back } = req.query
+      // TODO: Call API endpoint when available
+      // ?success=true&message=Contact added successfully.
 
-      return res.render('pages/contacts/alert-responsible-officer', {
-        crn,
-        back,
-        csrfToken: res.locals.csrfToken,
-        formValues: {},
-      })
+      return res.redirect(`/case/${crn}/activity-log`)
     }
   },
 }

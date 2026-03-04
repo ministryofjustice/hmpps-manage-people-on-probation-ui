@@ -39,9 +39,4 @@ export default function addContactRoutes(router: Router, { hmppsAuthClient }: Se
     validate.addContactType,
     controllers.addContact.postAddContactType(hmppsAuthClient),
   )
-
-  router.get(
-    '/case/:crn/contacts/alert-responsible-officer',
-    controllers.addContact.getAlertResponsibleOfficer(hmppsAuthClient),
-  )
 }

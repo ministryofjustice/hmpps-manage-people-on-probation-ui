@@ -3,7 +3,6 @@ import { Route } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
-
 export const isResponsibleOfficer = (hmppsAuthClient: HmppsAuthClient): Route<Promise<boolean>> => {
   return async (req, res) => {
     const { crn } = req.params

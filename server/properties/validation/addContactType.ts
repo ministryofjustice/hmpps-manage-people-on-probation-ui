@@ -69,5 +69,15 @@ export const addContactValidation = (): ValidationSpec => {
         },
       ],
     },
+    alertResponsibleOfficer: {
+      optional: false,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if you want to alert the responsible officer',
+          log: 'Select if you want to alert the responsible officer',
+        },
+      ],
+    },
   }
 }

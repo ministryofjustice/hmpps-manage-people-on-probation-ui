@@ -3,6 +3,7 @@
 {% set multipartForm = true %}
 {% set backLink = '/case/' + crn + '/add-frequently-used-contact' %}
 {% set addContactType =  'Add ' + contactTypeName %}
+{% set buttonText =  'Create contact' %}
 
 {% block pageTitle %}
     {{ addContactType }} - {{ pop.name.forename }} {{ pop.name.surname }}
@@ -174,7 +175,7 @@
             }
         ],
         errorMessage: { text: errorMessages.visor } if errorMessages.visor
-    }) }}
+    }) if isVisor  }}
 
     {{ govukRadios({
         fieldset: {
@@ -208,4 +209,38 @@
         ],
         errorMessage: { text: errorMessages.sensitivity } if errorMessages.sensitivity
     }) }}
+
+    {{ govukRadios({
+        fieldset: {
+            legend: {
+                text: "Do you want to alert " + case.name.forename + ' ' + case.name.surname +  " (the responsible officer) about this contact?",
+                classes: "govuk-fieldset__legend--m",
+                isPageHeading: false
+            }
+        },
+        formGroup: {
+            attributes: {
+                'data-qa': 'alertResponsibleOfficer'
+            }
+        },
+        name: 'alertResponsibleOfficer',
+        id: 'alertResponsibleOfficer',
+        classes: "govuk-radios--inline",
+        items: [
+            {
+                value: 'Yes',
+                text: "Yes",
+                checked: true if formValues.alertResponsibleOfficer == 'Yes'
+            },
+            {
+                value: 'No',
+                text: "No",
+                checked: true if formValues.alertResponsibleOfficer == 'No'
+            }
+        ],
+        errorMessage: { text: errorMessages.alertResponsibleOfficer } if errorMessages.alertResponsibleOfficer
+    }) if responsibleOfficer  }}
+
+    <input type="hidden" name="responsibleOfficer" value="{{ responsibleOfficer }}">
+    <input type="hidden" name="isVisor" value="{{ isVisor }}">
 {% endblock %}
