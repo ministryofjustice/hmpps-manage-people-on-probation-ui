@@ -70,7 +70,7 @@ const addContactController: Controller<typeof routes, void> = {
       const showVisor: string = isVisor ? 'SHOW_VISOR' : ''
 
       const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
-      const showResponsibleOfficer: string = responsibleOfficer ? 'SHOW_OFFICER' : ''
+      const showResponsibleOfficer: string = !responsibleOfficer ? 'SHOW_OFFICER' : ''
 
       const selectedType = contactTypes.find((c: any) => slugify(c.description) === contactType)
 

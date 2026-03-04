@@ -7,6 +7,8 @@ const addContactType: Route<void> = (req, res, next) => {
 
   const responsibleOfficer: string = req.body?.responsibleOfficer
   const isVisor: string = req.body?.isVisor
+  const responsibleOfficerSurname: string = req.body?.responsibleOfficerSurname
+  const responsibleOfficerForename: string = req.body?.responsibleOfficerForename
   const errorMessages = validateWithSpec(req.body, addContactValidation({ responsibleOfficer, isVisor }))
 
   if (Object.keys(errorMessages).length) {
@@ -17,6 +19,8 @@ const addContactType: Route<void> = (req, res, next) => {
       formValues: req.body,
       isVisor,
       responsibleOfficer,
+      responsibleOfficerForename,
+      responsibleOfficerSurname,
     })
   }
   return next()

@@ -10,6 +10,8 @@ export const isResponsibleOfficer = (hmppsAuthClient: HmppsAuthClient): Route<Pr
     const masClient = new MasApiClient(token)
     const pp: ProbationPractitioner = await masClient.getProbationPractitioner(crn)
     res.locals.isResponsibleOfficer = pp?.username === res.locals.user.username
+    res.locals.responsibleOfficerForename = pp.name.forename
+    res.locals.responsibleOfficerSurname = pp.name.surname
     return pp?.username === res.locals.user.username
   }
 }

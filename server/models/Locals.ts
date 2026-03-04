@@ -124,6 +124,8 @@ interface Locals {
   contactTypes: ContactType[]
   radioItems: Option[]
   isResponsibleOfficer?: boolean
+  responsibleOfficerForename?: string
+  responsibleOfficerSurname?: string
 }
 
 export interface AppResponse extends Response {

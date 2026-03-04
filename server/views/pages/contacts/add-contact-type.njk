@@ -213,7 +213,7 @@
         {{ govukRadios({
             fieldset: {
                 legend: {
-                    text: "Do you want to alert " + case.name.forename + ' ' + case.name.surname +  " (the responsible officer) about this contact?",
+                    text: "Do you want to alert " + responsibleOfficerForename + ' ' + responsibleOfficerSurname +  " (the responsible officer) about this contact?",
                     classes: "govuk-fieldset__legend--m",
                     isPageHeading: false
                 }
@@ -244,4 +244,6 @@
 
     <input type="hidden" name="responsibleOfficer" value="{{ responsibleOfficer }}">
     <input type="hidden" name="isVisor" value="{{ isVisor }}">
+    <input type="hidden" name="responsibleOfficerForename" value="{{ responsibleOfficerForename }}">
+    <input type="hidden" name="responsibleOfficerSurname" value="{{ responsibleOfficerSurname }}">
 {% endblock %}
