@@ -1,7 +1,13 @@
 import { isNotEmpty, isValidDate, isValidDateFormat, timeIsValid24HourFormat } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
 
-export const addContactValidation = (): ValidationSpec => {
+export interface AddContactValidationArgs {
+  responsibleOfficer: string
+  isVisor: string
+}
+
+export const addContactValidation = (args: AddContactValidationArgs): ValidationSpec => {
+  const { responsibleOfficer, isVisor } = args
   return {
     sentence: {
       optional: false,
@@ -50,7 +56,7 @@ export const addContactValidation = (): ValidationSpec => {
       ],
     },
     visor: {
-      optional: false,
+      optional: isVisor !== 'SHOW_VISOR',
       checks: [
         {
           validator: isNotEmpty,
@@ -70,7 +76,7 @@ export const addContactValidation = (): ValidationSpec => {
       ],
     },
     alertResponsibleOfficer: {
-      optional: false,
+      optional: responsibleOfficer !== 'SHOW_OFFICER',
       checks: [
         {
           validator: isNotEmpty,

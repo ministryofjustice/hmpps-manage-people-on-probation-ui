@@ -142,41 +142,41 @@
             }) }}
         </div>
     </div>
-
-    {{ govukRadios({
-        fieldset: {
-            legend: {
-                text: 'Include contact in ViSOR report?',
-                classes: "govuk-fieldset__legend--m",
-                isPageHeading: false
-            }
-        },
-        formGroup: {
-            attributes: {
-                'data-qa': 'visorReport'
-            }
-        },
-        hint: {
-            text: 'This will add the contact to their record on the ViSOR secure national database.'
-        },
-        name: 'visor',
-        id: 'visor',
-        classes: "govuk-radios--inline",
-        items: [
-            {
-                value: 'Yes',
-                text: "Yes",
-                checked: true if formValues.visor == 'Yes'
+    {% if isVisor == "SHOW_VISOR" %}
+        {{ govukRadios({
+            fieldset: {
+                legend: {
+                    text: 'Include contact in ViSOR report?',
+                    classes: "govuk-fieldset__legend--m",
+                    isPageHeading: false
+                }
             },
-            {
-                value: 'No',
-                text: "No",
-                checked: true if formValues.visor == 'No'
-            }
-        ],
-        errorMessage: { text: errorMessages.visor } if errorMessages.visor
-    }) if isVisor  }}
-
+            formGroup: {
+                attributes: {
+                    'data-qa': 'visorReport'
+                }
+            },
+            hint: {
+                text: 'This will add the contact to their record on the ViSOR secure national database.'
+            },
+            name: 'visor',
+            id: 'visor',
+            classes: "govuk-radios--inline",
+            items: [
+                {
+                    value: 'Yes',
+                    text: "Yes",
+                    checked: true if formValues.visor == 'Yes'
+                },
+                {
+                    value: 'No',
+                    text: "No",
+                    checked: true if formValues.visor == 'No'
+                }
+            ],
+            errorMessage: { text: errorMessages.visor } if errorMessages.visor
+        }) }}
+   {% endif %}
     {{ govukRadios({
         fieldset: {
             legend: {
@@ -209,37 +209,38 @@
         ],
         errorMessage: { text: errorMessages.sensitivity } if errorMessages.sensitivity
     }) }}
-
-    {{ govukRadios({
-        fieldset: {
-            legend: {
-                text: "Do you want to alert " + case.name.forename + ' ' + case.name.surname +  " (the responsible officer) about this contact?",
-                classes: "govuk-fieldset__legend--m",
-                isPageHeading: false
-            }
-        },
-        formGroup: {
-            attributes: {
-                'data-qa': 'alertResponsibleOfficer'
-            }
-        },
-        name: 'alertResponsibleOfficer',
-        id: 'alertResponsibleOfficer',
-        classes: "govuk-radios--inline",
-        items: [
-            {
-                value: 'Yes',
-                text: "Yes",
-                checked: true if formValues.alertResponsibleOfficer == 'Yes'
+    {% if responsibleOfficer == "SHOW_OFFICER" %}
+        {{ govukRadios({
+            fieldset: {
+                legend: {
+                    text: "Do you want to alert " + case.name.forename + ' ' + case.name.surname +  " (the responsible officer) about this contact?",
+                    classes: "govuk-fieldset__legend--m",
+                    isPageHeading: false
+                }
             },
-            {
-                value: 'No',
-                text: "No",
-                checked: true if formValues.alertResponsibleOfficer == 'No'
-            }
-        ],
-        errorMessage: { text: errorMessages.alertResponsibleOfficer } if errorMessages.alertResponsibleOfficer
-    }) if responsibleOfficer  }}
+            formGroup: {
+                attributes: {
+                    'data-qa': 'alertResponsibleOfficer'
+                }
+            },
+            name: 'alertResponsibleOfficer',
+            id: 'alertResponsibleOfficer',
+            classes: "govuk-radios--inline",
+            items: [
+                {
+                    value: 'Yes',
+                    text: "Yes",
+                    checked: true if formValues.alertResponsibleOfficer == 'Yes'
+                },
+                {
+                    value: 'No',
+                    text: "No",
+                    checked: true if formValues.alertResponsibleOfficer == 'No'
+                }
+            ],
+            errorMessage: { text: errorMessages.alertResponsibleOfficer } if errorMessages.alertResponsibleOfficer
+        }) }}
+  {% endif %}
 
     <input type="hidden" name="responsibleOfficer" value="{{ responsibleOfficer }}">
     <input type="hidden" name="isVisor" value="{{ isVisor }}">

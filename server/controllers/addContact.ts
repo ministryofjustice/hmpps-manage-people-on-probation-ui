@@ -64,11 +64,14 @@ const addContactController: Controller<typeof routes, void> = {
 
       const response = await getFrequentContactTypes(req, res, hmppsAuthClient)
       const contactTypes = Array.isArray(response) ? response : (response as any).contactTypes || []
-      const isVisor = req.session.data?.risks[crn]?.riskFlags
+      const isVisor: boolean = req.session.data?.risks[crn]?.riskFlags
         .map(risk => risk.description.toLowerCase())
         .includes('visor')
+      const showVisor: string = isVisor ? 'SHOW_VISOR' : ''
 
       const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
+      const showResponsibleOfficer: string = responsibleOfficer ? 'SHOW_OFFICER' : ''
+
       const selectedType = contactTypes.find((c: any) => slugify(c.description) === contactType)
 
       return res.render('pages/contacts/add-contact-type', {
@@ -77,8 +80,8 @@ const addContactController: Controller<typeof routes, void> = {
         back,
         csrfToken: res.locals.csrfToken,
         formValues: {},
-        isVisor,
-        responsibleOfficer,
+        isVisor: showVisor,
+        responsibleOfficer: showResponsibleOfficer,
       })
     }
   },
