@@ -1,11 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../@types'
 import { getSentences, getFrequentContactTypes } from '../middleware'
-import { deliusDeepLinkUrl } from '../utils'
+import { deliusDeepLinkUrl, handleQuotes } from '../utils'
 import { slugify } from '../utils/slugify'
 import { isResponsibleOfficer } from '../middleware/isResponsibleOfficer'
 import ContactService from '../services/contactService'
 import MasApiClient from '../data/masApiClient'
+import { AppointmentPatch } from '../models/Appointments'
+import { isSuccessfulUpload } from './appointments'
 
 const routes = [
   'getFrequentlyUsedContact',
@@ -89,14 +91,26 @@ const addContactController: Controller<typeof routes, void> = {
   postAddContactType: hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params
-
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const contactService = new ContactService(masClient)
-      //  const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
+      const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
 
       // TODO: Call API endpoint when available
       // ?success=true&message=Contact added successfully.
+
+      const file = req.file as Express.Multer.File
+      if (file) {
+        // Hardcoded id for now, will be replaced with actual value from the create Contact API call
+        const patchResponse = await masClient.patchDocuments(crn, '2510283229', file)
+        if (!isSuccessfulUpload(patchResponse)) {
+          return res.render('pages/contacts/error-uploading-file', {
+            uploadError: 'File not uploaded. Please try again.',
+            patchResponse,
+          })
+        }
+      }
+
       // TODO: Add below on success of API success
       const successQueryParam = `?showSuccessBanner=true`
       return res.redirect(`/case/${crn}/activity-log${successQueryParam}`)
