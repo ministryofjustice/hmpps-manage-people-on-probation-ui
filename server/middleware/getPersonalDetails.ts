@@ -9,7 +9,15 @@ import { tierLink, toPredictors, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
-import { RiskScoresDto, RiskSummary } from '../data/model/risk'
+import {
+  RiskScoresDto,
+  RiskSummary,
+  RoshRiskWidgetDto,
+  Scores,
+  ArnsComponentData,
+  Predictor,
+  ScoreType,
+} from '../data/model/risk'
 import { ErrorSummary } from '../data/model/common'
 import { UserCaseload } from '../data/model/caseload'
 
@@ -85,8 +93,7 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     res.locals.risksWidget = toRoshWidget(risks)
     res.locals.tierCalculation = tierCalculation
     res.locals.predictorScores = toPredictors(predictors)
-    // console.dir(res.locals.predictorScores, { depth: null })
-    // console.dir(res.locals.risksWidget, { depth: null })
+    res.locals.risksData = arnsComponentsData(res.locals.predictorScores.scores, res.locals.risksWidget)
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth
@@ -98,4 +105,34 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     }
     return next()
   }
+}
+
+const mapping: { [key: string]: { title: string; staticOrDynamic: ScoreType } } = {
+  RSR: { title: 'Combined Serious Reoffending Predictor', staticOrDynamic: 'Dynamic' },
+  OGP: { title: 'OASys General Predictor Score', staticOrDynamic: 'Dynamic' },
+  OSPC: { title: 'Direct Contact - Sexual Reoffending Predictor', staticOrDynamic: 'Static' },
+  OSPI: { title: 'Images and Indirect Contact - Sexual Reoffending Predictor', staticOrDynamic: 'Static' },
+  OGRS: { title: 'All Reoffending Predictor', staticOrDynamic: 'Static' },
+  OVP: { title: 'Violent Reoffending Predictor', staticOrDynamic: 'Dynamic' },
+}
+
+const arnsComponentsData = (scores: Scores, risksWidget: RoshRiskWidgetDto): ArnsComponentData => {
+  const rosh = { ROSH: { name: 'ROSH', band: risksWidget.overallRisk } }
+  const predictors = Object.entries(scores).reduce((acc, [key, entry]) => {
+    const predictor: Predictor = {
+      name: mapping[key].title,
+      band: entry.level,
+      staticOrDynamic: mapping[key].staticOrDynamic,
+    }
+    if (entry.score) predictor.score = entry.score
+    if (entry.oneYear) predictor.oneYear = entry.oneYear
+    if (entry.twoYears) predictor.twoYears = entry.twoYears
+    // eslint-disable-next-line no-param-reassign
+    acc = {
+      ...acc,
+      [key]: predictor,
+    }
+    return acc
+  }, rosh)
+  return { assessments: [predictors] }
 }

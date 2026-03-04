@@ -1,55 +1,49 @@
 import { toTimeline } from './toTimeline'
 import { riskScores } from './mocks'
-import { RiskScoresDto, ScoreType, TimelineItem } from '../data/model/risk'
+import { RiskScoresDto, TimelineItem } from '../data/model/risk'
 
 const getExpectedScores = (riskScore: RiskScoresDto) => {
   return {
     RSR: {
-      type: 'Combined Serious Reoffending Predictor',
+      type: 'RSR',
       level: riskScore.riskOfSeriousRecidivismScore?.scoreLevel,
       score: riskScore.riskOfSeriousRecidivismScore?.percentageScore,
-      staticOrDynamic: 'Dynamic' as ScoreType,
     },
     OGP: {
-      type: 'OASys General Predictor Score',
+      type: 'OGP',
       level: riskScore.generalPredictorScore?.ogpRisk,
       oneYear: riskScore.generalPredictorScore?.ogp1Year,
       twoYears: riskScore.generalPredictorScore?.ogp2Year,
-      staticOrDynamic: 'Dynamic' as ScoreType,
     },
     OSPC: {
-      type: 'Direct Contact - Sexual Reoffending Predictor',
+      type: 'OSP/C',
       level:
         riskScore.sexualPredictorScore?.ospContactScoreLevel ||
         riskScore.sexualPredictorScore?.ospDirectContactScoreLevel,
       score:
         riskScore.sexualPredictorScore?.ospContactPercentageScore ||
         riskScore.sexualPredictorScore?.ospDirectContactPercentageScore,
-      staticOrDynamic: 'Static' as ScoreType,
     },
     OSPI: {
-      type: 'Images and Indirect Contact - Sexual Reoffending Predictor',
+      type: 'OSP/I',
       level:
         riskScore.sexualPredictorScore?.ospIndecentScoreLevel ||
         riskScore.sexualPredictorScore?.ospIndirectImageScoreLevel,
       score:
         riskScore.sexualPredictorScore?.ospIndecentPercentageScore ||
         riskScore.sexualPredictorScore?.ospIndirectImagePercentageScore,
-      staticOrDynamic: 'Static' as ScoreType,
     },
     OGRS: {
-      type: 'All Reoffending Predictor',
+      type: 'OGRS',
       level: riskScore.groupReconvictionScore?.scoreLevel,
       oneYear: riskScore.groupReconvictionScore?.oneYear,
       twoYears: riskScore.groupReconvictionScore?.twoYears,
-      staticOrDynamic: 'Static' as ScoreType,
     },
     OVP: {
-      type: 'Violent Reoffending Predictor',
+      type: 'OVP',
       level: riskScore.violencePredictorScore?.ovpRisk,
       oneYear: riskScore.violencePredictorScore?.oneYear,
       twoYears: riskScore.violencePredictorScore?.twoYears,
-      staticOrDynamic: 'Dynamic' as ScoreType,
     },
   }
 }
