@@ -158,7 +158,7 @@
     "lodash": "^4.17.23",
     "luxon": "^3.7.2",
     "luxon-business-days": "^3.0.1",
-    "multer": "^2.0.2",
+    "multer": "^2.1.1",
     "nocache": "^4.0.0",
     "node-mocks-http": "^1.17.2",
     "nunjucks": "^3.2.4",
