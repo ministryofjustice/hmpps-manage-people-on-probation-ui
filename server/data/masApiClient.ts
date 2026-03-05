@@ -492,7 +492,7 @@ export default class MasApiClient extends RestClient {
 
   async createContact(crn: string, payload: CreateContactRequest): Promise<CreateContactResponse> {
     return this.post({
-      path: `/case/${crn}`,
+      path: `/contact/${crn}`,
       data: payload,
     })
   }

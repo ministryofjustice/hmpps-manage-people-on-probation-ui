@@ -26,6 +26,8 @@ export interface ContactType {
  * This matches the JSON body expected by the API.
  */
 export interface CreateContactRequest {
+  date: string
+  time: string
   staffCode: string
   teamCode: string
   type: string

@@ -3,11 +3,12 @@ import { Controller } from '../@types'
 import { getSentences, getFrequentContactTypes } from '../middleware'
 import { deliusDeepLinkUrl, handleQuotes } from '../utils'
 import { slugify } from '../utils/slugify'
+import { formattedDate } from '../utils/formattedDate'
 import { isResponsibleOfficer } from '../middleware/isResponsibleOfficer'
 import ContactService from '../services/contactService'
 import MasApiClient from '../data/masApiClient'
-import { AppointmentPatch } from '../models/Appointments'
 import { isSuccessfulUpload } from './appointments'
+import { CreateContactRequest, CreateContactResponse } from '../data/model/contacts'
 
 const routes = [
   'getFrequentlyUsedContact',
@@ -90,19 +91,40 @@ const addContactController: Controller<typeof routes, void> = {
 
   postAddContactType: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn, contactType: slug } = req.params
+      const { sentence, title, details, sensitivity, visor, alertResponsibleOfficer, date, time } = req.body
+
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const contactService = new ContactService(masClient)
       const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
 
-      // TODO: Call API endpoint when available
-      // ?success=true&message=Contact added successfully.
+      const contactTypes = await getFrequentContactTypes(req, res, hmppsAuthClient)
+      const selectedType = contactTypes.find(c => slugify(c.description) === slug)
+
+      // 2. Map form data to the CreateContactRequest interface including date and time
+      const payload: CreateContactRequest = {
+        date: formattedDate(date),
+        time,
+        staffCode: 'N03AB01',
+        teamCode: 'N03AAT',
+        type: selectedType?.code || slug,
+        eventId: null, // sentence ? Number(sentence) : 0,
+        requirementId: null, // sentence ? Number(sentence) : 0,
+        description: title || undefined,
+        notes: details || '',
+        alert: alertResponsibleOfficer === 'Yes',
+        sensitive: sensitivity === 'Yes',
+        visorReport: visor === 'Yes',
+      }
+      console.log('payload:', payload)
+      const response: CreateContactResponse = await contactService.createContact(crn, payload)
+      console.log(response.id)
 
       const file = req.file as Express.Multer.File
       if (file) {
         // Hardcoded id for now, will be replaced with actual value from the create Contact API call
-        const patchResponse = await masClient.patchDocuments(crn, '2510283229', file)
+        const patchResponse = await masClient.patchDocuments(crn, response.id.toString(), file)
         if (!isSuccessfulUpload(patchResponse)) {
           return res.render('pages/contacts/error-uploading-file', {
             uploadError: 'File not uploaded. Please try again.',
