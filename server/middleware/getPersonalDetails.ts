@@ -1,4 +1,7 @@
+/* eslint-disable import/no-extraneous-dependencies */
 import { DateTime } from 'luxon'
+import { asUser } from '@ministryofjustice/hmpps-rest-client'
+import { ArnsComponents, RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
@@ -9,19 +12,14 @@ import { tierLink, toPredictors, toRoshWidget } from '../utils'
 import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
-import {
-  RiskScoresDto,
-  RiskSummary,
-  RoshRiskWidgetDto,
-  Scores,
-  ArnsComponentData,
-  Predictor,
-  ScoreType,
-} from '../data/model/risk'
+import { RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { ErrorSummary } from '../data/model/common'
 import { UserCaseload } from '../data/model/caseload'
 
-export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
+export const getPersonalDetails = (
+  hmppsAuthClient: HmppsAuthClient,
+  arnsComponents: ArnsComponents,
+): Route<Promise<void>> => {
   return async (req, res, next) => {
     const { crn } = req.params
     let sentencePlan: SentencePlan
@@ -30,6 +28,7 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     let tierCalculation: TierCalculation
     let predictors: ErrorSummary | RiskScoresDto[]
     let userCaseload: UserCaseload
+    let riskData: RiskData
     if (!req?.session?.data?.personalDetails?.[crn] || process.env.NODE_ENV === 'development') {
       const { username } = res.locals.user
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -37,11 +36,13 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       const arnsClient = new ArnsApiClient(token)
       const tierClient = new TierApiClient(token)
       const sentencePlanClient = new SentencePlanApiClient(token)
-      ;[overview, risks, tierCalculation, predictors, userCaseload] = await Promise.all([
+      const authOptions = asUser(res.locals.user.token)
+      ;[overview, risks, tierCalculation, predictors, riskData, userCaseload] = await Promise.all([
         masClient.getPersonalDetails(crn),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
         arnsClient.getPredictorsAll(crn),
+        arnsComponents.getRiskData(authOptions, 'crn', crn),
         masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
       ])
       const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
@@ -90,10 +91,14 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
-    res.locals.risksWidget = toRoshWidget(risks)
+    const roshWidget = toRoshWidget(risks)
     res.locals.tierCalculation = tierCalculation
     res.locals.predictorScores = toPredictors(predictors)
-    res.locals.risksData = arnsComponentsData(res.locals.predictorScores.scores, res.locals.risksWidget)
+    res.locals.risksWidget = roshWidget
+    res.locals.riskData = riskData
+    // console.dir(res.locals.predictorScores, { depth: null })
+    // console.dir(riskData, { depth: null })
+    // console.dir(roshWidget, { depth: null })
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth
@@ -105,34 +110,4 @@ export const getPersonalDetails = (hmppsAuthClient: HmppsAuthClient): Route<Prom
     }
     return next()
   }
-}
-
-const mapping: { [key: string]: { title: string; staticOrDynamic: ScoreType } } = {
-  RSR: { title: 'Combined Serious Reoffending Predictor', staticOrDynamic: 'Dynamic' },
-  OGP: { title: 'OASys General Predictor Score', staticOrDynamic: 'Dynamic' },
-  OSPC: { title: 'Direct Contact - Sexual Reoffending Predictor', staticOrDynamic: 'Static' },
-  OSPI: { title: 'Images and Indirect Contact - Sexual Reoffending Predictor', staticOrDynamic: 'Static' },
-  OGRS: { title: 'All Reoffending Predictor', staticOrDynamic: 'Static' },
-  OVP: { title: 'Violent Reoffending Predictor', staticOrDynamic: 'Dynamic' },
-}
-
-const arnsComponentsData = (scores: Scores, risksWidget: RoshRiskWidgetDto): ArnsComponentData => {
-  const rosh = { ROSH: { name: 'ROSH', band: risksWidget.overallRisk } }
-  const predictors = Object.entries(scores).reduce((acc, [key, entry]) => {
-    const predictor: Predictor = {
-      name: mapping[key].title,
-      band: entry.level,
-      staticOrDynamic: mapping[key].staticOrDynamic,
-    }
-    if (entry.score) predictor.score = entry.score
-    if (entry.oneYear) predictor.oneYear = entry.oneYear
-    if (entry.twoYears) predictor.twoYears = entry.twoYears
-    // eslint-disable-next-line no-param-reassign
-    acc = {
-      ...acc,
-      [key]: predictor,
-    }
-    return acc
-  }, rosh)
-  return { assessments: [predictors] }
 }

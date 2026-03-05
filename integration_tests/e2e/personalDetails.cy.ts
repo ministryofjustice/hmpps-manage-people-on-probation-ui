@@ -293,7 +293,7 @@ context('Personal Details', () => {
   })
   it('should display the pop header on the staff contacts page', () => {
     cy.visit('/case/X000001/personal-details/staff-contacts')
-    checkPopHeader('Caroline Wolff')
+    checkPopHeader({ name: 'Caroline Wolff' })
   })
   it('should display the pop header on the adjustments page', () => {
     cy.visit('/case/X000001/personal-details/adjustments')

@@ -1,3 +1,14 @@
+{% set riskDataRosh = {
+    assessments: [
+        {
+            rosh: {
+                name: 'ROSH',
+                band: risksWidget.overallRisk
+            }
+        }
+    ]
+} %}
+
 <div class="govuk-flex">
     <div>
         <ul class="govuk-list govuk-caption-m inline-list-from-tablet">
@@ -24,17 +35,30 @@
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
             <span data-qa='name'>{{ headerPersonName.forename }}{{' '}}{{ headerPersonName.surname }}</span>
         </h1>
-        {% if predictorScores.scores.RSR.level %}
+        {% if riskData
+            .assessments[0]
+            .allReoffendingPredictor
+            .band %}
             {{ predictorBadge({
-        data: risksData,
-        predictor: 'RSR',
+        data: riskData,
+        predictor: 'allReoffendingPredictor',
+        showScore: true
+    })}}
+        {% endif %}
+        {% if riskData
+            .assessments[0]
+            .rsr
+            .band %}
+            {{ predictorBadge({
+        data: riskData,
+        predictor: 'rsr',
         showScore: true
     })}}
         {% endif %}
         {% if risksWidget.overallRisk and risksWidget.overallRisk !== 'NOT_FOUND' %}
             {{ predictorBadge({
-        data: risksData,
-        predictor: 'ROSH',
+        data: riskDataRosh,
+        predictor: 'rosh',
         showScore: false
     })}}
         {% endif %}
