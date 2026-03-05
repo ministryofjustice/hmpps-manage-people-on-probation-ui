@@ -38,99 +38,87 @@
         "status": 200,
         "jsonBody": [
           {
+            "completedDate": "2024-11-09T12:07:42",
+            "status": "COMPLETE",
+            "assessmentType": "LAYER3",
             "outputVersion": "1",
-            "completedDate": "9 November 2024",
-            "completedDateTime": "9 November 2024 at 12:07",
-            "assessmentType": "layer 3",
-            "ogrs3": {
-              "name": "OGRS",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 12,
-              "completedDate": "9 November 2024"
-            },
-            "ovp": {
-              "name": "OVP",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 5,
-              "completedDate": "9 November 2024"
-            },
-            "ogp": {
-              "name": "OGP",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 7,
-              "completedDate": "9 November 2024"
-            },
-            "rsr": {
-              "name": "RSR",
-              "band": "LOW",
-              "staticOrDynamic": "Dynamic",
-              "score": 0.05,
-              "completedDate": "9 November 2024"
-            },
-            "ospdc": {
-              "name": "OSP-DC",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 0.05,
-              "completedDate": "9 November 2024"
-            },
-            "ospiic": {
-              "name": "OSP-IIC",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 0.05,
-              "completedDate": "9 November 2024"
+            "output": {
+              "groupReconvictionScore": {
+                "oneYear": 6,
+                "twoYears": 12,
+                "scoreLevel": "LOW"
+              },
+              "violencePredictorScore": {
+                "ovpStaticWeightedScore": 10,
+                "ovpDynamicWeightedScore": 4,
+                "ovpTotalWeightedScore": 14,
+                "oneYear": 3,
+                "twoYears": 5,
+                "ovpRisk": "LOW"
+              },
+              "generalPredictorScore": {
+                "ogpStaticWeightedScore": 7,
+                "ogpDynamicWeightedScore": 0,
+                "ogpTotalWeightedScore": 7,
+                "ogp1Year": 4,
+                "ogp2Year": 7,
+                "ogpRisk": "LOW"
+              },
+              "riskOfSeriousRecidivismScore": {
+                "percentageScore": 0.05,
+                "staticOrDynamic": "DYNAMIC",
+                "source": "OASYS",
+                "algorithmVersion": "5",
+                "scoreLevel": "LOW"
+              },
+              "sexualPredictorScore": {
+                "ospIndirectImagePercentageScore": 0,
+                "ospDirectContactPercentageScore": 0,
+                "ospIndirectImageScoreLevel": "NOT_APPLICABLE",
+                "ospDirectContactScoreLevel": "NOT_APPLICABLE"
+              }
             }
           },
           {
+            "completedDate": "2024-11-01T09:00:00",
+            "status": "COMPLETE",
+            "assessmentType": "LAYER3",
             "outputVersion": "1",
-            "completedDate": "1 November 2024",
-            "completedDateTime": "1 November 2024 at 12:07",
-            "assessmentType": "layer 3",
-            "ogrs3": {
-              "name": "OGRS",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 12,
-              "completedDate": "1 November 2024"
-            },
-            "ovp": {
-              "name": "OVP",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 5,
-              "completedDate": "1 November 2024"
-            },
-            "ogp": {
-              "name": "OGP",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 7,
-              "completedDate": "1 November 2024"
-            },
-            "rsr": {
-              "name": "RSR",
-              "band": "LOW",
-              "staticOrDynamic": "Dynamic",
-              "score": 0.05,
-              "completedDate": "1 November 2024"
-            },
-            "ospdc": {
-              "name": "OSP-DC",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 0.05,
-              "completedDate": "1 November 2024"
-            },
-            "ospiic": {
-              "name": "OSP-IIC",
-              "band": "LOW",
-              "staticOrDynamic": null,
-              "score": 0.05,
-              "completedDate": "1 November 2024"
+            "output": {
+              "groupReconvictionScore": {
+                "oneYear": 7,
+                "twoYears": 14,
+                "scoreLevel": "LOW"
+              },
+              "violencePredictorScore": {
+                "ovpStaticWeightedScore": 10,
+                "ovpDynamicWeightedScore": 4,
+                "ovpTotalWeightedScore": 14,
+                "oneYear": 3,
+                "twoYears": 5,
+                "ovpRisk": "LOW"
+              },
+              "generalPredictorScore": {
+                "ogpStaticWeightedScore": 8,
+                "ogpDynamicWeightedScore": 0,
+                "ogpTotalWeightedScore": 8,
+                "ogp1Year": 4,
+                "ogp2Year": 7,
+                "ogpRisk": "LOW"
+              },
+              "riskOfSeriousRecidivismScore": {
+                "percentageScore": 0.05,
+                "staticOrDynamic": "DYNAMIC",
+                "source": "OASYS",
+                "algorithmVersion": "5",
+                "scoreLevel": "LOW"
+              },
+              "sexualPredictorScore": {
+                "ospIndirectImagePercentageScore": 0,
+                "ospDirectContactPercentageScore": 0,
+                "ospIndirectImageScoreLevel": "NOT_APPLICABLE",
+                "ospDirectContactScoreLevel": "NOT_APPLICABLE"
+              }
             }
           }
         ],
