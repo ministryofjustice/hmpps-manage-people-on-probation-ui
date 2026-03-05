@@ -46,7 +46,7 @@ context('Edit contact details', () => {
       .should('be.visible')
       .and(
         'contain',
-        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+        'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.',
       )
     page.getElement('submitBtn').should('contain.text', 'Save changes')
     page
