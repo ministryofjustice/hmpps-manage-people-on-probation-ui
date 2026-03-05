@@ -1,17 +1,28 @@
-{% if predictorScores.scores.RSR.score %}
+{% if riskData
+    .assessments[0]
+    .combinedSeriousReoffendingPredictor
+    .band or riskData
+    .assessments[0]
+    .rsr
+    .band %}
     <section data-qa="rsr">
-        {{ predictorScale(
-            {
-            level: predictorScores.scores.RSR.level,
-            score: predictorScores.scores.RSR.score,
-            type: predictorScores.scores.RSR.type,
-            bandPercentages: ['0%','0.99%','2.99%','6.89%','25+%'],
-            staticOrDynamic: predictorScores.scores.RSR.staticOrDynamic | upper,
-            lastUpdated: predictorScores.date
-        },
-        true,
-        true,
-        true
-    )}}
+        {% if riskData
+            .assessments[0]
+            .combinedSeriousReoffendingPredictor
+            .band != "NOT APPLICABLE" %}
+            {{ predictorScale({
+    data: riskData,
+    predictor: "combinedSeriousReoffendingPredictor"
+      }) }}
+        {% endif %}
+        {% if riskData
+            .assessments[0]
+            .rsr
+            .band %}
+            {{ predictorScale({
+    data: riskData,
+    predictor: "rsr"
+      }) }}
+        {% endif %}
     </section>
 {% endif %}

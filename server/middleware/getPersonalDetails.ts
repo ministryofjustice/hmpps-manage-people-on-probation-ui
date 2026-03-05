@@ -95,6 +95,7 @@ export const getPersonalDetails = (
     res.locals.tierCalculation = tierCalculation
     res.locals.predictorScores = toPredictors(predictors)
     res.locals.risksWidget = roshWidget
+    // console.dir(riskData, { depth: null })
     res.locals.riskData = riskData
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn

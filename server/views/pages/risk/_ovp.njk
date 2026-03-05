@@ -1,16 +1,28 @@
-{% if predictorScores.scores.OVP.level %}
+{% if riskData
+    .assessments[0]
+    .violentReoffendingPredictor
+    .band != "NOT APPLICABLE" or riskData
+    .assessments[0]
+    .ovp
+    .band %}
     <section data-qa="ovp">
-        {{ predictorScale(
-            {
-            level: predictorScores.scores.OVP.level,
-            score: predictorScores.scores.OVP.oneYear,
-            type: predictorScores.scores.OVP.type,
-            staticOrDynamic: predictorScores.scores.OVP.staticOrDynamic | upper,
-            lastUpdated: predictorScores.date
-        },
-        true,
-        true,
-        true
-    )}}
+        {% if riskData
+            .assessments[0]
+            .violentReoffendingPredictor
+            .band != "NOT APPLICABLE" %}
+            {{ predictorScale({
+    data: riskData,
+    predictor: "violentReoffendingPredictor"
+      }) }}
+        {% endif %}
+        {% if riskData
+            .assessments[0]
+            .ovp
+            .band %}
+            {{ predictorScale({
+    data: riskData,
+    predictor: "ovp"
+      }) }}
+        {% endif %}
     </section>
 {% endif %}
