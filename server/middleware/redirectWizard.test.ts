@@ -154,7 +154,7 @@ describe('/middleware/redirectWizard - setupcheckins', () => {
       redirectWizard(requiredValues, 'setupcheckins')(req, res, nextSpy)
     })
     it('should redirect to the first page of the setup wizard', () => {
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/instructions`)
+      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/eligibility-check`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()
@@ -190,7 +190,7 @@ describe('/middleware/redirectWizard - setupcheckins', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
     it('should not redirect to the first page of the setup wizard', () => {
-      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/instructions`)
+      expect(redirectSpy).not.toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/eligibility-check`)
     })
     it('should not call next()', () => {
       expect(nextSpy).not.toHaveBeenCalled()

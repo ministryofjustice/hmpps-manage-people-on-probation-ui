@@ -21,6 +21,8 @@ const manageContactUrl = `${manageBase}/contact`
 const restartCheckinUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-checkin`
 const restartContactUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-contact`
 const restartEditContactUrl = `/case/${crn}/appointments/check-in/manage/${id}/restart-edit-contact`
+const eligibilityCheckUrl = `${checkInUrl}/eligibility-check`
+const fullEligibilityUrl = `${checkInUrl}/full-eligibility`
 const reqBase = {
   method: 'POST',
   params: { crn, id },
@@ -61,6 +63,65 @@ describe('Test eSuperVision validation', () => {
     const res = makeRes()
     validation.eSuperVision(req, res, next)
     expect(next).toHaveBeenCalled()
+  })
+
+  describe('Test eligibility-check', () => {
+    it('passes when at least one eligibility checkbox is selected', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            checkins: {
+              eligibility: ['eligibility-1'],
+            },
+          },
+        },
+      }
+      const req = makeReq({ url: eligibilityCheckUrl, body: { esupervision } })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails when no eligibility options are selected', () => {
+      const req = makeReq({
+        url: eligibilityCheckUrl,
+      })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/check-in/eligibility-check', expect.any(Object))
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('Test full-eligibility (radio choice)', () => {
+    it('passes when a radio option is selected', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            checkins: {
+              eligibilityChoice: 'replacement-contact',
+            },
+          },
+        },
+      }
+      const req = makeReq({ url: fullEligibilityUrl, body: { esupervision } })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails when no radio option is selected', () => {
+      const req = makeReq({
+        url: fullEligibilityUrl,
+        body: { esupervision: { [crn]: { [id]: { checkins: {} } } } },
+      })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/check-in/eligibility-full', expect.any(Object))
+      expect(next).not.toHaveBeenCalled()
+    })
   })
 
   describe('Test date-frequency', () => {

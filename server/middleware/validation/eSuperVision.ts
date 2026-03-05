@@ -49,6 +49,33 @@ const eSuperVision: Route<void> = (req, res, next) => {
       .join('/'),
   ]}`
 
+  const validateEligibilityCheck = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/eligibility-check`)) {
+      render = `pages/check-in/eligibility-check`
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'eligibility-check',
+        }),
+      )
+    }
+  }
+  const validateEligibilityChoice = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)) {
+      render = `pages/check-in/eligibility-full`
+      errorMessages = validateWithSpec(
+        req.body,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'full-eligibility',
+        }),
+      )
+    }
+  }
+
   const validateDateFrequency = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
       render = `pages/check-in/date-frequency`
@@ -250,6 +277,8 @@ const eSuperVision: Route<void> = (req, res, next) => {
   }
 
   let errorMessages: Record<string, string> = {}
+  validateEligibilityCheck()
+  validateEligibilityChoice()
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()

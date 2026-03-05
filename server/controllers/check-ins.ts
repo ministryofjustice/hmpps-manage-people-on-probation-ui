@@ -23,9 +23,15 @@ import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetai
 
 const routes = [
   'getStartSetup',
-  'getIntroPage',
+  'getEligibilityPage',
+  'postEligibilityPage',
+  'getEligibilityDeniedPage',
+  'postEligibilityDeniedPage',
+  'getFullEligibilityPage',
+  'postFullEligibilityPage',
+  'getSupplementaryEligibilityPage',
+  'postSupplementaryEligibilityPage',
   'getDateFrequencyPage',
-  'postIntroPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
   'postContactPreferencePage',
@@ -93,11 +99,11 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const id = uuidv4()
-      return res.redirect(`/case/${crn}/appointments/${id}/check-in/instructions`)
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/eligibility-check`)
     }
   },
 
-  getIntroPage: hmppsAuthClient => {
+  getEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
@@ -111,11 +117,92 @@ const checkInsController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}/appointments`)
       }
       const guidanceUrl = config.guidance.link
-      return res.render('pages/check-in/instructions.njk', { crn, back, guidanceUrl })
+      return res.render('pages/check-in/eligibility-check.njk', { crn, back, id, guidanceUrl })
     }
   },
 
-  postIntroPage: hmppsAuthClient => {
+  postEligibilityPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const eligibility = req.body?.esupervision?.[crn]?.[id]?.checkins?.eligibility
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const selections = Array.isArray(eligibility) ? eligibility : [eligibility]
+
+      if (selections.includes('eligibility-9')) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/denied-eligibility`)
+      }
+
+      if (selections.includes('eligibility-none')) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)
+      }
+
+      if (eligibility && eligibility.length > 0) {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`)
+      }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/eligibility-check`)
+    }
+  },
+
+  getEligibilityDeniedPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/eligibility-denied.njk', { crn, id, back })
+    }
+  },
+
+  postEligibilityDeniedPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}`)
+    }
+  },
+
+  getFullEligibilityPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/eligibility-full.njk', { crn, id, back })
+    }
+  },
+
+  postFullEligibilityPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+    }
+  },
+
+  getSupplementaryEligibilityPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.render('pages/check-in/eligibility-supplementary.njk', { crn, id, back })
+    }
+  },
+
+  postSupplementaryEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { data } = req.session
@@ -130,12 +217,31 @@ const checkInsController: Controller<typeof routes, void> = {
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
       const cya = req.query.cya === 'true'
+      const eligibility = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibility || []
+      const eligibilityArray = Array.isArray(eligibility) ? eligibility : [eligibility]
+      let backLink: string
+      if (cya) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
+      } else if (eligibilityArray.includes('eligibility-none')) {
+        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+      } else {
+        backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
+      }
+
       const checkInMinDate = getMinDate()
-      return res.render(`pages/check-in/date-frequency.njk`, { crn, id, checkInMinDate, cya })
+
+      return res.render(`pages/check-in/date-frequency.njk`, {
+        crn,
+        id,
+        checkInMinDate,
+        cya,
+        backLink,
+      })
     }
   },
 

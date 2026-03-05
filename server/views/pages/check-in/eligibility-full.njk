@@ -1,0 +1,84 @@
+{% extends "../_form.njk" %}
+
+{% set title = case.name.forename + " is eligible to use online check ins"  %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/"+  crn %}
+{% set formAnchorText = "Cancel and go back to " + case.name.forename + "'s overview" %}
+{% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/eligibility-check' %}
+{% set buttonText = "Sign up for online check ins" %}
+{% set radioText = "How will you use online check ins with " + case.name.forename + "?" %}
+
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+            <h2 class="govuk-heading-m">
+                How they can use online check ins
+            </h2>
+            <p class="govuk-body">They are eligible to use online check ins:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>to replace some face-to-face contact where appropriate</li>
+                <li>as well as existing face-to-face contact to give you an update between appointments</li>
+            </ul>
+            <p class="govuk-body">You should use your judgement to decide if they are suitable.
+            </p>
+            <h2 class="govuk-heading-s">Option 1: To replace some face-to-face contact</h2>
+            <p class="govuk-body">If you're meeting them in person every month but they're doing well, you could use online check ins every other month in place of a face-to-face appointment. While using online check ins this way, you can deviate from national standards about monthly face-to-face meetings.</p>
+
+            <p class="govuk-body">They may be suitable to use online check ins to replace some face-to-face contact if they have:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>stable lifetstyle factors (for example, employment, accommodation, relationships)</li>
+                <li>spent time on probation and understand their responsibilities</li>
+                <li>an established relationship with their probation practitioner</li>
+                <li>sufficient digital literacy to complete online forms</li>
+                <li>access to a mobile phone or technology they can use the internet on</li>
+                <li>no restrictions on device or internet use as part of their conditions</li>
+                <li>no dependencies in their sentence plan that could be affected by using online check ins</li>
+            </ul>
+            <h2 class="govuk-heading-s">Option 2: As well as existing face-to-face contact</h2>
+            <p class="govuk-body">If you're meeting a person on probation every two weeks and would like an extra contact due to concern about them, using online check ins could give you an update about how they are without needing an additional face-to-face appointment.</p>
+            <p class="govuk-body">This person may be suitable to use online check ins as well as face-to-face contact if:</p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>you would like additional information about them for risk management</li>
+                <li>they agree to use online check ins</li>
+                <li>sufficient digital literacy to complete online forms</li>
+                <li>access to a mobile phone or technology they can use the internet on</li>
+                <li>they have no restrictions on device or internet use as part of their conditions</li>
+                <li>no dependencies in their sentence plan that could be impacted by using online check ins</li>
+            </ul>
+
+            <h2 class="govuk-heading-m">Before you start</h2>
+            <p class="govuk-body">You'll need to be with the person to sign them up to use online check ins. You'll need to take a photo of them so their identity can be verified each time they check in.</p>
+
+
+            {{ govukRadios({
+                name: "esupervision[" + crn + "][" + id + "][checkins][eligibilityChoice]",
+                fieldset: {
+                    legend: {
+                        text: radioText,
+                        classes: "govuk-fieldset__legend--m",
+                        isPageHeading: false
+                    }
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'eligibility-options'
+                    }
+                },
+                errorMessage: {
+                  text: errorMessages["esupervision-" + crn + "-" + id + "checkins-eligibilityChoice"]
+                } if errorMessages["esupervision-" + crn + "-" + id + "checkins-eligibilityChoice"],
+                items: [
+                    {
+                        value: 'replacement-contact',
+                        text: "To replace some face-to-face contact"
+                    },
+                    {
+                        value: 'supplementary-contact',
+                        text: "As well as existing face-to-face contact"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibilityChoice'])) }}
+        </div>
+    </div>
+{% endblock %}
