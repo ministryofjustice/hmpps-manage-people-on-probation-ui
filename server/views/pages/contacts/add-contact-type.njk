@@ -142,7 +142,7 @@
             }) }}
         </div>
     </div>
-    {% if isVisor == "SHOW_VISOR" %}
+    {% if isVisor  %}
         {{ govukRadios({
             fieldset: {
                 legend: {
@@ -209,7 +209,7 @@
         ],
         errorMessage: { text: errorMessages.sensitivity } if errorMessages.sensitivity
     }) }}
-    {% if responsibleOfficer == "SHOW_OFFICER" %}
+    {% if responsibleOfficer  %}
         {{ govukRadios({
             fieldset: {
                 legend: {

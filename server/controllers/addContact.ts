@@ -69,10 +69,10 @@ const addContactController: Controller<typeof routes, void> = {
       const isVisor: boolean = req.session.data?.risks[crn]?.riskFlags
         .map(risk => risk.description.toLowerCase())
         .includes('visor')
-      const showVisor: string = isVisor ? 'SHOW_VISOR' : ''
+      const showVisor: string | undefined = isVisor ? 'SHOW_VISOR' : undefined
 
       const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
-      const showResponsibleOfficer: string = !responsibleOfficer ? 'SHOW_OFFICER' : ''
+      const showResponsibleOfficer: string | undefined = !responsibleOfficer ? 'SHOW_OFFICER' : undefined
 
       const selectedType = contactTypes.find((c: any) => slugify(c.description) === contactType)
 
