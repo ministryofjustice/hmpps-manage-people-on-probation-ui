@@ -37,11 +37,11 @@
         </h1>
         {% if riskData
             .assessments[0]
-            .allReoffendingPredictor
-            .band %}
+            .combinedSeriousReoffendingPredictor
+            .band != "NOT APPLICABLE" %}
             {{ predictorBadge({
         data: riskData,
-        predictor: 'allReoffendingPredictor',
+        predictor: 'combinedSeriousReoffendingPredictor',
         showScore: true
     })}}
         {% endif %}
