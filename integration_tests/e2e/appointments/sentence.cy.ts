@@ -14,7 +14,7 @@ describe('What is this appointment for?', () => {
       sentencePage = new AppointmentSentencePage()
     })
     it('should render the pop header', () => {
-      checkPopHeader('Alton Berge', true, 'X778160')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
     })
     it('should display 4 sentences that are not selected', () => {
       const radios = sentencePage.getElement(`input[data-sentence="true"]`)

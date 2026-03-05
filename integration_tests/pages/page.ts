@@ -186,16 +186,28 @@ export default abstract class Page {
     return cy.get(`.govuk-summary-list__row:nth-child(${index})`)
   }
 
-  assertRiskTags() {
-    cy.get(`[data-predictor-badge]`)
-      .eq(0)
-      .get('[data-test-id=nameAndBand')
-      .should('contain.text', 'COMBINED SERIOUS REOFFENDING PREDICTOR')
-      .should('contain.text', 'MEDIUM')
-      .get('[data-test-id=score')
-      .should('contain.text', '12.1%')
-      .get('[data-test-id=staticOrDynamic')
-      .should('contain.text', 'Dynamic')
+  assertRiskTags(ogrs4 = false) {
+    if (ogrs4) {
+      cy.get(`[data-predictor-badge]`)
+        .eq(0)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'RSR')
+        .should('contain.text', 'MEDIUM')
+        .get('[data-test-id=score')
+        .should('contain.text', '12.1%')
+        .get('[data-test-id=staticOrDynamic')
+        .should('contain.text', 'Static')
+    } else {
+      cy.get(`[data-predictor-badge]`)
+        .eq(0)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'RSR')
+        .should('contain.text', 'MEDIUM')
+        .get('[data-test-id=score')
+        .should('contain.text', '12.1%')
+        .get('[data-test-id=staticOrDynamic')
+        .should('contain.text', 'Static')
+    }
 
     cy.get(`[data-predictor-badge]`)
       .eq(1)

@@ -36,7 +36,7 @@ describe('Create next appointment', () => {
   })
 
   it('should render the pop header', () => {
-    checkPopHeader('Caroline Wolff', false)
+    checkPopHeader({ name: 'Caroline Wolff', appointments: false })
   })
   it('should display the options', () => {
     nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another planned office visit (NS)')

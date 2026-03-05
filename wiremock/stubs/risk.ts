@@ -120,10 +120,64 @@ const stubSentencePlanDraft = (): SuperAgentRequest =>
     },
   })
 
+const stubPredictorScoresOGRS4 = (crn = 'X000001'): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: `/arns/risks/predictors/all/crn/${crn}`,
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: [
+        {
+          completedDate: '2024-12-09T08:13:33',
+          status: 'COMPLETE',
+          assessmentType: 'LAYER3',
+          outputVersion: '2',
+          output: {
+            allReoffendingPredictor: {
+              staticOrDynamic: 'DYNAMIC',
+              score: 4.41,
+              band: 'LOW',
+            },
+            violentReoffendingPredictor: {
+              staticOrDynamic: 'DYNAMIC',
+              score: 1.91,
+              band: 'LOW',
+            },
+            seriousViolentReoffendingPredictor: {
+              staticOrDynamic: 'DYNAMIC',
+              score: 0.03,
+              band: 'LOW',
+            },
+            directContactSexualReoffendingPredictor: {
+              score: 0.02,
+              band: 'LOW',
+            },
+            indirectImageContactSexualReoffendingPredictor: {
+              score: 0.12,
+              band: 'LOW',
+            },
+            combinedSeriousReoffendingPredictor: {
+              algorithmVersion: '6',
+              staticOrDynamic: 'DYNAMIC',
+              score: 0.17,
+              band: 'LOW',
+            },
+          },
+        },
+      ],
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubSanIndicatorTrue,
   stubSentencePlan404,
   stubSentencePlanDraft,
   stubArnsUnavailable,
   stubArnsServerError,
+  stubPredictorScoresOGRS4,
 }

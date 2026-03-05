@@ -12,7 +12,6 @@ context('Overview', () => {
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Caroline Wolff')
     page.pageHeading().should('contain.text', 'Overview')
-    page.assertRiskTags()
     page.getTab('overview').should('contain.text', 'Overview')
     page.getTab('personalDetails').should('contain.text', 'Personal details')
     page.getTab('risk').should('contain.text', 'Risk')
@@ -21,7 +20,6 @@ context('Overview', () => {
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
     checkPopHeader()
-
     page
       .getAppointmentsLink('X000001')
       .should('exist')
@@ -140,10 +138,15 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
+  it('Overview page is rendered with OGRS4 risk predictor scores', () => {
+    cy.task('stubPredictorScoresOGRS4')
+    cy.visit('/case/X000001')
+    checkPopHeader({ ogrs4: true })
+  })
   it('Should render overview page without tier link when feature flag disabled', () => {
     cy.task('stubDisableTierLink')
     cy.visit('/case/X000001')
-    checkPopHeader('Caroline Wolff', false, 'X000001', false)
+    checkPopHeader({ name: 'Caroline Wolff', appointments: false, headerCrn: 'X000001', tierLinkEnabled: false })
   })
 
   it('Overview page is rendered with date of death', () => {

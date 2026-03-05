@@ -211,35 +211,47 @@ export const completeCYAPage = () => {
   const cyaPage = new AppointmentCheckYourAnswersPage()
   cyaPage.getSubmitBtn().click()
 }
-export const checkPopHeader = (
+export const checkPopHeader = ({
   name = 'Caroline Wolff',
   appointments = false,
   headerCrn = 'X000001',
   tierLinkEnabled = true,
-) => {
-  cy.clock(DateTime.now().toMillis())
-  cy.get('h1').should('contain.text', name)
-  cy.get('[data-qa="crn"]').should('contain.text', headerCrn)
-  cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')
-  cy.get('[data-qa="headerDateOfBirthAge"]').should('contain.text', '46')
-  if (tierLinkEnabled) {
-    cy.get('[data-qa="tierLink"]')
-      .should('contain.text', appointments ? 'A3' : 'B2')
-      .should('have.attr', 'href', `https://tier-dev.hmpps.service.justice.gov.uk/case/${headerCrn}`)
-    cy.get('[data-qa="tierValue"]').should('not.exist')
+  ogrs4 = false,
+} = {}) => {
+  if (!ogrs4) {
+    cy.clock(DateTime.now().toMillis())
+    cy.get('h1').should('contain.text', name)
+    cy.get('[data-qa="crn"]').should('contain.text', headerCrn)
+    cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')
+    cy.get('[data-qa="headerDateOfBirthAge"]').should('contain.text', '46')
+    if (tierLinkEnabled) {
+      cy.get('[data-qa="tierLink"]')
+        .should('contain.text', appointments ? 'A3' : 'B2')
+        .should('have.attr', 'href', `https://tier-dev.hmpps.service.justice.gov.uk/case/${headerCrn}`)
+      cy.get('[data-qa="tierValue"]').should('not.exist')
+    } else {
+      cy.get('[data-qa="tierValue"]').should('contain.text', appointments ? 'A3' : 'B2')
+      cy.get('[data-qa="tierLink"]').should('not.exist')
+    }
+    cy.get(`[data-predictor-badge]`)
+      .eq(0)
+      .get('[data-test-id=nameAndBand')
+      .should('contain.text', 'RSR')
+      .should('contain.text', 'MEDIUM')
+      .get('[data-test-id=score')
+      .should('contain.text', '12.1%')
+      .get('[data-test-id=staticOrDynamic')
+      .should('contain.text', 'Static')
   } else {
-    cy.get('[data-qa="tierValue"]').should('contain.text', appointments ? 'A3' : 'B2')
-    cy.get('[data-qa="tierLink"]').should('not.exist')
-  }
-  cy.get('.predictor-timeline-item').eq(0).find('.predictor-timeline-item__level').should('contain.text', 'ROSH')
-  cy.get('.predictor-timeline-item')
-    .eq(0)
-    .find('.predictor-timeline-item__level')
-    .should('contain.text', appointments ? 'HIGH' : 'VERY HIGH')
-  if (!appointments) {
-    cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__level').should('contain.text', 'RSR')
-    cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__level').should('contain.text', 'MEDIUM')
-    cy.get('.predictor-timeline-item').eq(1).find('.predictor-timeline-item__score').should('contain.text', '12.1')
+    cy.get(`[data-predictor-badge]`)
+      .eq(0)
+      .get('[data-test-id=nameAndBand')
+      .should('contain.text', 'ALL REOFFENDING PREDICTOR')
+      .should('contain.text', 'LOW')
+      .get('[data-test-id=score')
+      .should('contain.text', '4.41%')
+      .get('[data-test-id=staticOrDynamic')
+      .should('contain.text', 'Dynamic')
   }
 }
 

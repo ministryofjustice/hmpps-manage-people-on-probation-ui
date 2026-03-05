@@ -71,7 +71,7 @@ describe('Check your answers then confirm the appointment', () => {
     it('should render the page', () => {
       loadPage()
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkPopHeader('Alton Berge', true, 'X778160')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
       const showsProbationPractitioner = true
       checkAppointmentSummary({ page: cyaPage, probationPractitioner: showsProbationPractitioner })
       cy.get('[data-qa="calendarInviteInset"]').should(
