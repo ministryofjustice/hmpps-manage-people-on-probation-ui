@@ -1,27 +1,27 @@
 {% if riskData
     .assessments[0]
-    .allReoffendingPredictor
+    .indirectImageContactSexualReoffendingPredictor
     .band != "NOT APPLICABLE" or riskData
     .assessments[0]
-    .ogrs3
+    .ospiic
     .band %}
-    <section data-qa="rsr">
+    <section data-qa="ospiic">
         {% if riskData
             .assessments[0]
-            .allReoffendingPredictor
+            .indirectImageContactSexualReoffendingPredictor
             .band != "NOT APPLICABLE" %}
             {{ predictorScale({
     data: riskData,
-    predictor: "allReoffendingPredictor"
+    predictor: 'indirectImageContactSexualReoffendingPredictor'
       }) }}
         {% endif %}
-        {% if riskData
+        {% if iskData
             .assessments[0]
-            .ogrs3
+            .ospiic
             .band %}
             {{ predictorScale({
     data: riskData,
-    predictor: "ogrs3"
+    predictor: 'ospiic'
       }) }}
         {% endif %}
     </section>
