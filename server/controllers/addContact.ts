@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from 'uuid'
 import { Controller } from '../@types'
-import { getSentences, getFrequentContactTypes } from '../middleware'
-import { deliusDeepLinkUrl, handleQuotes } from '../utils'
+import { getSentences, getFrequentContactTypes, renderError } from '../middleware'
+import { deliusDeepLinkUrl } from '../utils'
 import { slugify } from '../utils/slugify'
 import { formattedDate } from '../utils/formattedDate'
 import { isResponsibleOfficer } from '../middleware/isResponsibleOfficer'
@@ -24,7 +24,10 @@ const addContactController: Controller<typeof routes, void> = {
       const { back } = req.query
       let { url } = req
       url = encodeURIComponent(url)
-
+      // Show error page if no contacts types returned
+      if (res.locals.radioItems.length === 3) {
+        return renderError(500)(req, res)
+      }
       return res.render('pages/contacts/add-frequently-used-contact', {
         crn,
         radioItems: res.locals.radioItems,
@@ -107,7 +110,7 @@ const addContactController: Controller<typeof routes, void> = {
         staffCode: 'N03AB01',
         teamCode: 'N03AAT',
         type: selectedType?.code || slug,
-        eventId: null, // sentence ? Number(sentence) : 0,
+        eventId: sentence,
         requirementId: null, // It is not required for this journey, It is optional field
         description: title || undefined,
         notes: details || '',
@@ -122,7 +125,7 @@ const addContactController: Controller<typeof routes, void> = {
       const file = req.file as Express.Multer.File
       if (file) {
         const patchResponse = await masClient.patchDocuments(crn, response.id.toString(), file)
-        if (!isSuccessfulUpload(patchResponse)) {
+        if (isSuccessfulUpload(patchResponse)) {
           return res.render('pages/contacts/error-uploading-file', {
             uploadError: 'File not uploaded. Please try again.',
             patchResponse,
