@@ -1,10 +1,7 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import { Controller } from '../@types'
-import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
 
 const routes = [
   'getSentence',
@@ -47,22 +44,10 @@ const sentenceController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const masClient = new MasApiClient(token)
-      const arnsClient = new ArnsApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [sentenceDetails, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getSentenceDetails(crn, queryParam),
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const sentenceDetails = await masClient.getSentenceDetails(crn, queryParam)
       return res.render('pages/sentence', {
         sentenceDetails,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
       })
     }
   },
@@ -78,23 +63,11 @@ const sentenceController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [sentenceDetails, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getProbationHistory(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const sentenceDetails = await masClient.getProbationHistory(crn)
       return res.render('pages/probation-history', {
         sentenceDetails,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
       })
     }
   },
@@ -170,23 +143,11 @@ const sentenceController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [licenceNoteDetails, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getSentenceLicenceConditionNote(crn, licenceConditionId, noteId),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const predictorScores = toPredictors(predictors)
-      const risksWidget = toRoshWidget(risks)
+      const licenceNoteDetails = await masClient.getSentenceLicenceConditionNote(crn, licenceConditionId, noteId)
       return res.render('pages/licence-condition-note', {
         licenceNoteDetails,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
       })
     }
   },
@@ -202,23 +163,11 @@ const sentenceController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [requirementNoteDetails, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getSentenceRequirementNote(crn, requirementId, noteId),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const predictorScores = toPredictors(predictors)
-      const risksWidget = toRoshWidget(risks)
+      const requirementNoteDetails = await masClient.getSentenceRequirementNote(crn, requirementId, noteId)
       return res.render('pages/requirement-note', {
         requirementNoteDetails,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
       })
     }
   },

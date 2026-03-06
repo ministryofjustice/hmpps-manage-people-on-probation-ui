@@ -5,12 +5,11 @@ import { addParameters } from '@ministryofjustice/probation-search-frontend/util
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
 import TierApiClient from '../data/tierApiClient'
-import { toIsoDateTimeFromPicker, toPredictors, toRoshWidget } from '../utils'
+import { toIsoDateTimeFromPicker } from '../utils'
 import { validateWithSpec } from '../utils/validationUtils'
 import { documentSearchValidation } from '../properties'
-import { SearchDocumentsRequest, TextSearchDocumentsRequest } from '../data/model/documents'
+import { TextSearchDocumentsRequest } from '../data/model/documents'
 import { highlightText } from '../utils/highlightText'
 
 const routes = ['getDocuments'] as const
@@ -130,7 +129,6 @@ const documentController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
       const tierClient = new TierApiClient(token)
 
@@ -142,19 +140,12 @@ const documentController: Controller<typeof routes, void> = {
       }
       sortBy = textSearchRequest.query && !req.query.sortBy ? null : sortBy
 
-      const [documents, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.textSearchDocuments(crn, (pageNum - 1).toString(), textSearchRequest, sortBy),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
+      const documents = await masClient.textSearchDocuments(crn, (pageNum - 1).toString(), textSearchRequest, sortBy)
 
       const docsHighlightedFilename = {
         ...documents,
         documents: highlightText(textSearchRequest.query, documents.documents),
       }
-      const predictorScores = toPredictors(predictors)
-      const risksWidget = toRoshWidget(risks)
       const pagination: Pagination = getPaginationLinks(
         req.query.page ? pageNum : 1,
         documents?.totalPages || 0,
@@ -169,9 +160,6 @@ const documentController: Controller<typeof routes, void> = {
         documents: docsHighlightedFilename,
         pagination,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         baseUrl,
         filter,
       })

@@ -5,11 +5,9 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
-import { mockAppResponse, mockTierCalculation, mockPredictors, mockRisks } from './mocks'
+import { mockAppResponse, mockTierCalculation } from './mocks'
 import { checkAuditMessage } from './testutils'
 import { PersonCompliance } from '../data/model/compliance'
-import { toPredictors, toRoshWidget } from '../utils'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -33,10 +31,6 @@ const crn = 'X000001'
 const tierCalculationSpy = jest
   .spyOn(TierApiClient.prototype, 'getCalculationDetails')
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 const res = mockAppResponse({ flags: { enableCompliancePage: true } })
 const renderSpy = jest.spyOn(res, 'render')
 
@@ -69,16 +63,12 @@ describe('complianceController', () => {
     it('should request the page data from the api', () => {
       expect(getPersonComplianceSpy).toHaveBeenCalledWith(crn)
       expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the compliance page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/compliance', {
         personCompliance: mockPersonCompliance,
         tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
       })
     })
   })

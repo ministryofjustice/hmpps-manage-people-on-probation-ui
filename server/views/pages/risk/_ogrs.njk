@@ -1,28 +1,28 @@
 {% if riskData
-    .assessments[0]
-    .allReoffendingPredictor
-    .band != "NOT APPLICABLE" or riskData
-    .assessments[0]
-    .ogrs3
-    .band %}
-    <section data-qa="rsr">
-        {% if riskData
-            .assessments[0]
-            .allReoffendingPredictor
-            .band != "NOT APPLICABLE" %}
-            {{ predictorScale({
+  .assessments[0]
+  .allReoffendingPredictor
+  .band != "NOT APPLICABLE" or riskData
+  .assessments[0]
+  .ogrs3
+  .band %}
+  <section data-qa="ogrs">
+    {% if riskData
+      .assessments[0]
+      .allReoffendingPredictor
+      .band != "NOT APPLICABLE" %}
+      {{ predictorScale({
     data: riskData,
     predictor: "allReoffendingPredictor"
       }) }}
-        {% endif %}
-        {% if riskData
-            .assessments[0]
-            .ogrs3
-            .band %}
-            {{ predictorScale({
+    {% endif %}
+    {% if riskData
+      .assessments[0]
+      .ogrs3
+      .band %}
+      {{ predictorScale({
     data: riskData,
     predictor: "ogrs3"
       }) }}
-        {% endif %}
-    </section>
+    {% endif %}
+  </section>
 {% endif %}

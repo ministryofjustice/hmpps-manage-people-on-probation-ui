@@ -4,27 +4,12 @@ import { Request } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ParsedQs } from 'qs'
 import controllers from '.'
-import logger from '../../logger'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import {
-  toRoshWidget,
-  toPredictors,
-  isValidCrn,
-  isNumericString,
-  setDataValue,
-  canRescheduleAppointment,
-} from '../utils'
-import {
-  mockTierCalculation,
-  mockRisks,
-  mockPredictors,
-  mockAppResponse,
-  mockPersonSchedule,
-  mockPersonAppointment,
-} from './mocks'
+import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
+import { mockTierCalculation, mockRisks, mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
 import {
   cloneAppointmentAndRedirect,
@@ -160,7 +145,6 @@ const getPersonAppointmentSpy = jest
 const getPersonAppointmentNoteSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
-const loggerSpy = jest.spyOn(logger, 'info')
 
 const nextApptResponse = (appointment = {} as Activity | null): NextAppointmentResponse => ({
   appointment,
@@ -186,9 +170,6 @@ const getCalculationDetailsSpy = jest
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
 
 const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const getPredictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
@@ -210,26 +191,12 @@ describe('controllers/appointments', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
-    it('should request risks from the api', () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request tier calculation details from the api', () => {
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request predictors from the api', () => {
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request the probation practitioner from the api', () => {
-      expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-    })
+
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
         hasDeceased: false,
         hasPractitioner: true,
@@ -242,15 +209,12 @@ describe('controllers/appointments', () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
     })
+
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
-        personRisks: undefined,
         hasDeceased: false,
         hasPractitioner: false,
         url: '',
@@ -265,23 +229,11 @@ describe('controllers/appointments', () => {
     it('should request previous and upcoming appointments from the api', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', '&sortBy=date&ascending=true')
     })
-    it('should request risks from the api', () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request tier calculation details from the api', () => {
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request predictors from the api', () => {
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
         upcomingAppointments: mockPersonSchedule,
         crn,
         url: '',
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         sortedBy: 'date.asc',
         pagination: {
           from: '1',

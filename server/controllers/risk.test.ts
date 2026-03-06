@@ -106,20 +106,13 @@ describe('riskController', () => {
       })
       checkAuditMessage(mockRes, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
       it('should request the page data from the api', () => {
-        expect(getRisksSpy).toHaveBeenCalledWith(crn)
-        expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-        expect(predictorsSpy).toHaveBeenCalledWith(crn)
         expect(needsSpy).toHaveBeenCalledWith(crn)
         expect(sanIndicatorSpy).toHaveBeenCalledWith(crn)
       })
 
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -142,11 +135,7 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -164,11 +153,7 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -186,11 +171,7 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -214,11 +195,7 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(spy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,
@@ -236,11 +213,7 @@ describe('riskController', () => {
       })
       it('should render the risk page', () => {
         expect(renderSpy).toHaveBeenCalledWith('pages/risk', {
-          risks: mockRisks,
           crn,
-          tierCalculation: mockTierCalculation,
-          risksWidget: toRoshWidget(mockRisks),
-          predictorScores: toPredictors(mockPredictors),
           timeline: [],
           needs: mockNeeds,
           oasysLink: config.oaSys.link,

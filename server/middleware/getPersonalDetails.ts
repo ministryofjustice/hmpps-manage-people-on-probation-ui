@@ -13,8 +13,8 @@ import { SentencePlan } from '../models/Risk'
 import logger from '../../logger'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { RiskScoresDto, RiskSummary } from '../data/model/risk'
-import { ErrorSummary } from '../data/model/common'
 import { UserCaseload } from '../data/model/caseload'
+import { ErrorSummary } from '../data/model/common'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -26,9 +26,9 @@ export const getPersonalDetails = (
     let overview: PersonalDetails
     let risks: RiskSummary
     let tierCalculation: TierCalculation
-    let predictors: ErrorSummary | RiskScoresDto[]
     let userCaseload: UserCaseload
     let riskData: RiskData
+    let predictors: RiskScoresDto[] | ErrorSummary
     if (!req?.session?.data?.personalDetails?.[crn] || process.env.NODE_ENV === 'development') {
       const { username } = res.locals.user
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -37,13 +37,13 @@ export const getPersonalDetails = (
       const tierClient = new TierApiClient(token)
       const sentencePlanClient = new SentencePlanApiClient(token)
       const authOptions = asUser(res.locals.user.token)
-      ;[overview, risks, tierCalculation, predictors, riskData, userCaseload] = await Promise.all([
+      ;[overview, risks, tierCalculation, riskData, userCaseload, predictors] = await Promise.all([
         masClient.getPersonalDetails(crn),
         arnsClient.getRisks(crn),
         tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
         arnsComponents.getRiskData(authOptions, 'crn', crn),
         masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
+        arnsClient.getPredictorsAll(crn), // <-- only used for OPD, will this be a scale?
       ])
       const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
       sentencePlan = { showLink: false, showText: false, lastUpdatedDate: '' }
@@ -82,21 +82,24 @@ export const getPersonalDetails = (
             sentencePlan,
             risks,
             tierCalculation,
+            riskData,
             predictors,
           },
         },
       }
     } else {
-      ;({ overview, sentencePlan, risks, tierCalculation, predictors } = req.session.data.personalDetails[crn])
+      ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
     const roshWidget = toRoshWidget(risks)
+    const predictorScores = toPredictors(predictors)
     res.locals.tierCalculation = tierCalculation
-    res.locals.predictorScores = toPredictors(predictors)
     res.locals.risksWidget = roshWidget
-    // console.dir(riskData, { depth: null })
+    res.locals.risks = risks
+    res.locals.predictorScores = predictorScores // <-- only used for OPD, will this be a scale?
     res.locals.riskData = riskData
+    console.dir(riskData, { depth: null })
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth
