@@ -1,5 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { Response } from 'express'
+
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
@@ -10,7 +11,7 @@ import { ActivityLogFiltersResponse } from './ActivityLog'
 import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
-import { PersonRiskFlags, RiskScore, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
+import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
@@ -75,6 +76,7 @@ interface Locals {
   tierCalculation?: TierCalculation | ErrorSummary
   predictorScores?: TimelineItem
   riskData?: RiskData
+  risks?: RiskSummary
   message?: string
   title?: string
   success?: boolean

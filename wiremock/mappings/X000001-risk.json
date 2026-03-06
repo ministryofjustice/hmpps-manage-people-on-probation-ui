@@ -72,10 +72,10 @@
                 "scoreLevel": "LOW"
               },
               "sexualPredictorScore": {
-                "ospIndirectImagePercentageScore": 0,
-                "ospDirectContactPercentageScore": 0,
-                "ospIndirectImageScoreLevel": "NOT_APPLICABLE",
-                "ospDirectContactScoreLevel": "NOT_APPLICABLE"
+                "ospIndirectImagePercentageScore": 8,
+                "ospDirectContactPercentageScore": 8,
+                "ospIndirectImageScoreLevel": "MEDIUM",
+                "ospDirectContactScoreLevel": "MEDIUM"
               }
             }
           },
@@ -114,10 +114,10 @@
                 "scoreLevel": "LOW"
               },
               "sexualPredictorScore": {
-                "ospIndirectImagePercentageScore": 0,
-                "ospDirectContactPercentageScore": 0,
-                "ospIndirectImageScoreLevel": "NOT_APPLICABLE",
-                "ospDirectContactScoreLevel": "NOT_APPLICABLE"
+                "ospIndirectImagePercentageScore": 8,
+                "ospDirectContactPercentageScore": 8,
+                "ospIndirectImageScoreLevel": "MEDIUM",
+                "ospDirectContactScoreLevel": "MEDIUM"
               }
             }
           }

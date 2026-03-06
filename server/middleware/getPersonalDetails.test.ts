@@ -160,6 +160,7 @@ const mock = (crn = 'X000001', lastUpdatedDate = mockSentencePlans[0].lastUpdate
   },
   risks: mockRisks,
   tierCalculation: mockTierCalculation,
+  riskData: mockRiskData,
   predictors: mockPredictors,
 })
 
@@ -205,56 +206,6 @@ describe('/middleware/getPersonalDetails', () => {
         X000002: mock('X000002', ''),
       },
     }
-
-    // const expectedRiskData: ArnsComponentData = {
-    //   assessments: [
-    //     {
-    //       ROSH: {
-    //         name: 'ROSH',
-    //         band: 'UNAVAILABLE',
-    //       },
-    //       RSR: {
-    //         name: 'Combined Serious Reoffending Predictor',
-    //         band: 'HIGH',
-    //         score: 99.86,
-    //         staticOrDynamic: 'Dynamic',
-    //       },
-    //       OGP: {
-    //         name: 'OASys General Predictor Score',
-    //         band: 'MEDIUM',
-    //         oneYear: 43,
-    //         twoYears: 58,
-    //         staticOrDynamic: 'Dynamic',
-    //       },
-    //       OSPC: {
-    //         name: 'Direct Contact - Sexual Reoffending Predictor',
-    //         band: 'VERY_HIGH',
-    //         score: 75.3,
-    //         staticOrDynamic: 'Static',
-    //       },
-    //       OSPI: {
-    //         name: 'Images and Indirect Contact - Sexual Reoffending Predictor',
-    //         band: 'HIGH',
-    //         score: 10.31,
-    //         staticOrDynamic: 'Static',
-    //       },
-    //       OGRS: {
-    //         name: 'All Reoffending Predictor',
-    //         band: 'LOW',
-    //         oneYear: 21,
-    //         twoYears: 35,
-    //         staticOrDynamic: 'Static',
-    //       },
-    //       OVP: {
-    //         name: 'Violent Reoffending Predictor',
-    //         band: 'HIGH',
-    //         oneYear: 54,
-    //         twoYears: 69,
-    //         staticOrDynamic: 'Dynamic',
-    //       },
-    //     },
-    //   ],
-    // }
     expect(req.session.data).toEqual(expected)
     expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
