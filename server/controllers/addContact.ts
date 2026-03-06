@@ -97,12 +97,10 @@ const addContactController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const contactService = new ContactService(masClient)
-      const responsibleOfficer: boolean = await isResponsibleOfficer(hmppsAuthClient)(req, res)
 
       const contactTypes = await getFrequentContactTypes(req, res, hmppsAuthClient)
       const selectedType = contactTypes.find(c => slugify(c.description) === slug)
 
-      // 2. Map form data to the CreateContactRequest interface including date and time
       const payload: CreateContactRequest = {
         date: formattedDate(date),
         time,
@@ -110,7 +108,7 @@ const addContactController: Controller<typeof routes, void> = {
         teamCode: 'N03AAT',
         type: selectedType?.code || slug,
         eventId: null, // sentence ? Number(sentence) : 0,
-        requirementId: null, // sentence ? Number(sentence) : 0,
+        requirementId: null, // It is not required for this journey, It is optional field
         description: title || undefined,
         notes: details || '',
         alert: alertResponsibleOfficer === 'Yes',
@@ -123,7 +121,6 @@ const addContactController: Controller<typeof routes, void> = {
 
       const file = req.file as Express.Multer.File
       if (file) {
-        // Hardcoded id for now, will be replaced with actual value from the create Contact API call
         const patchResponse = await masClient.patchDocuments(crn, response.id.toString(), file)
         if (!isSuccessfulUpload(patchResponse)) {
           return res.render('pages/contacts/error-uploading-file', {

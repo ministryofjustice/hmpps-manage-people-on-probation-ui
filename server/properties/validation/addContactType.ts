@@ -24,7 +24,7 @@ export const addContactValidation = (args: AddContactValidationArgs): Validation
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Enter a date',
+          msg: 'Enter or select a date',
           log: 'Contact date not entered',
         },
         {
