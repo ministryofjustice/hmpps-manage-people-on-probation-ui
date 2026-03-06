@@ -1,5 +1,6 @@
 /* eslint-disable import/no-cycle */
 import { Response } from 'express'
+import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
@@ -73,6 +74,7 @@ interface Locals {
   risksWidget?: RoshRiskWidgetDto
   tierCalculation?: TierCalculation | ErrorSummary
   predictorScores?: TimelineItem
+  riskData?: RiskData
   message?: string
   title?: string
   success?: boolean

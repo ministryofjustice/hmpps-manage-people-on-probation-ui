@@ -31,7 +31,7 @@ describe('Add supporting information (optional)', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {
-    checkPopHeader('Alton Berge', true, 'X778160')
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
   })
   it('should display validation errors if note is more than 12000 character', () => {
     loadPage()

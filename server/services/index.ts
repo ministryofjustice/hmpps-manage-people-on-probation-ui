@@ -7,7 +7,13 @@ import config from '../config'
 import ProbationComponentsApiService from './ProbationComponentsService'
 
 export const services = () => {
-  const { applicationInfo, hmppsAuthClient, manageUsersApiClient, probationFrontendComponentsApiClient } = dataAccess()
+  const {
+    applicationInfo,
+    hmppsAuthClient,
+    manageUsersApiClient,
+    probationFrontendComponentsApiClient,
+    arnsComponents,
+  } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient)
 
@@ -30,6 +36,7 @@ export const services = () => {
     flagService,
     probationComponentsApiService,
     technicalUpdatesService,
+    arnsComponents,
   }
 }
 

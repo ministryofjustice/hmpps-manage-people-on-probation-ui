@@ -128,6 +128,7 @@
     "@microsoft/applicationinsights-clickanalytics-js": "^3.3.9",
     "@microsoft/applicationinsights-web": "^3.3.9",
     "@ministryofjustice/frontend": "^6.0.0",
+    "@ministryofjustice/hmpps-arns-frontend-components-lib": "^0.0.16",
     "@ministryofjustice/hmpps-audit-client": "^1.1.1",
     "@ministryofjustice/hmpps-probation-integration-e2e-tests": "^1.120.0",
     "@ministryofjustice/probation-search-frontend": "^2.4.0",
