@@ -77,6 +77,7 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsEnd,
         errorMessages: req.session.errorMessages,
         groupedActivities: groupActivitiesByDate(personActivity.activities),
+        showSuccessBanner: req.query?.showSuccessBanner,
       })
     }
   },
