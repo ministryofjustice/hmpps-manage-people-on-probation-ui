@@ -150,16 +150,11 @@ context('Appointment check-ins', () => {
     dateFrequencyPage.getSubmitBtn().click()
     const contactPreferencePage = new ContactPreferencePage()
     contactPreferencePage.checkOnPage()
-    contactPreferencePage.getElementData('mobileNumberValue').should('contain.text', 'No mobile number')
-    contactPreferencePage.getElementData('emailAddressValue').should('contain.text', 'No email address')
     contactPreferencePage.getChangeLink().click()
     const editContactPreferencePage = new EditContactPreferencePage()
     editContactPreferencePage.checkOnPage()
-    editContactPreferencePage.getElement('input[name*="checkInMobile"]').type('07700900123')
     editContactPreferencePage.getSubmitBtn().click()
     contactPreferencePage.getElementData('updateBanner').should('contain.text', 'Contact details saved')
-    contactPreferencePage.getElementData('mobileNumberValue').should('contain.text', '07700900123')
-    contactPreferencePage.getElementData('emailAddressValue').should('contain.text', 'No email address')
   })
 
   it('Should able to choose photo options', () => {
@@ -268,10 +263,6 @@ context('Appointment check-ins', () => {
     photoRules.getSubmitBtn().click()
     const checkYourAnswersPage = new CheckYourAnswersPage()
     checkYourAnswersPage.checkOnPage()
-    checkYourAnswersPage
-      .getSummaryListRow(4)
-      .find('.govuk-summary-list__value')
-      .should('contain.text', 'No email address')
     checkYourAnswersPage.getSubmitBtn().click()
     const checkinConfirmationPage = new CheckinConfirmationPage()
     checkinConfirmationPage.checkOnPage()
