@@ -49,3 +49,6 @@ generic-service:
 
 generic-prometheus-alerts:
   alertSeverity: manage-people-on-probation-dev
+
+  scheduledDowntime:
+    enabled: true
