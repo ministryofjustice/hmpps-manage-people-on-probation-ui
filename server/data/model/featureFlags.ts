@@ -16,4 +16,5 @@ export class FeatureFlags {
   enableCreateContact?: boolean = undefined
   enableTierLink?: boolean = undefined
   enableDeliusClient?: boolean = undefined
+  enableOGRS4?: boolean = undefined
 }
