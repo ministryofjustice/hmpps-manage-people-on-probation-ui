@@ -7,7 +7,7 @@ on:
 
 jobs:
   trivy:
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@8d5dfd12d8d2e45d21bdfc66b7b3668974cf87bd # v2.9.1
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@9e4e07ae026452bb642c220941a7d4c26f4ccf31 # v2.9.2
     with:
       channel_id: manage-people-on-probation-alerts-security
     secrets:
