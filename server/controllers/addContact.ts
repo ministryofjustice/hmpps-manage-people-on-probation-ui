@@ -104,11 +104,16 @@ const addContactController: Controller<typeof routes, void> = {
       const contactTypes = await getFrequentContactTypes(req, res, hmppsAuthClient)
       const selectedType = contactTypes.find(c => slugify(c.description) === slug)
 
+      const userProviders = await masClient.getUserProviders(res.locals.user.username)
+      const staffCode = userProviders.defaultUserDetails?.staffCode || 'UNKNOWN'
+      const teamName = userProviders.defaultUserDetails?.team
+      const teamCode = userProviders.teams?.find(t => t.description === teamName)?.code || 'UNKNOWN'
+
       const payload: CreateContactRequest = {
         date: formattedDate(date),
         time,
-        staffCode: 'N03AB01',
-        teamCode: 'N03AAT',
+        staffCode, // : 'N03AB01',
+        teamCode, // : 'N03AAT',
         type: selectedType?.code || slug,
         eventId: sentence,
         requirementId: null, // It is not required for this journey, It is optional field
