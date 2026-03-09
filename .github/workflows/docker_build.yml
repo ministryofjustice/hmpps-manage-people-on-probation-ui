@@ -52,7 +52,7 @@ jobs:
       - id: app_version
         name: Application version creators
         uses: ./.github/actions/create_app_version # WORKFLOW_VERSION
-      - uses: docker/login-action@v3
+      - uses: docker/login-action@v4
         with:
           registry: ${{ inputs.docker_registry }}
           username: ${{ github.actor }}
