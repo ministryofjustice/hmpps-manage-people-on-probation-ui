@@ -125,6 +125,7 @@ const getRes = () =>
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     },
     redirect: jest.fn().mockReturnThis(),
@@ -161,7 +162,6 @@ const mock = (crn = 'X000001', lastUpdatedDate = mockSentencePlans[0].lastUpdate
   risks: mockRisks,
   tierCalculation: mockTierCalculation,
   riskData: mockRiskData,
-  predictors: mockPredictors,
 })
 
 describe('/middleware/getPersonalDetails', () => {
@@ -195,6 +195,7 @@ describe('/middleware/getPersonalDetails', () => {
         flags: {
           enableSentencePlan: false,
           enableTierLink: true,
+          enableOGRS4: true,
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -210,14 +211,12 @@ describe('/middleware/getPersonalDetails', () => {
     expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
     expect(risksSpy).toHaveBeenCalledWith(req.params.crn)
-    expect(predictorsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
     expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', { nameOrCrn: req.params.crn })
     expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')
     expect(res.locals.case).toEqual(overview('X000002'))
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
-    expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
     expect(res.locals.riskData).toEqual(mockRiskData)
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
@@ -252,6 +251,7 @@ describe('/middleware/getPersonalDetails', () => {
         flags: {
           enableSentencePlan: false,
           enableTierLink: true,
+          enableOGRS4: true,
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -267,13 +267,11 @@ describe('/middleware/getPersonalDetails', () => {
     expect(getPersonalDetailsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(tierCalculationSpy).toHaveBeenCalledWith(req.params.crn)
     expect(risksSpy).toHaveBeenCalledWith(req.params.crn)
-    expect(predictorsSpy).toHaveBeenCalledWith(req.params.crn)
     expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', { nameOrCrn: req.params.crn })
     expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')
     expect(res.locals.case).toEqual(overview('X000002'))
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
-    expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
     expect(res.locals.headerPersonName).toEqual({ forename: `Caroline`, surname: `Wolff` })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
@@ -305,6 +303,7 @@ describe('/middleware/getPersonalDetails', () => {
         flags: {
           enableSentencePlan: false,
           enableTierLink: true,
+          enableOGRS4: true,
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -318,7 +317,6 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.case).toEqual(overview('X000002'))
     expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
     expect(res.locals.tierCalculation).toEqual(mockTierCalculation)
-    expect(res.locals.predictorScores).toEqual(toPredictors(mockPredictors))
     expect(res.locals.headerPersonName).toEqual({ forename: 'Caroline', surname: 'Wolff' })
     expect(res.locals.headerCRN).toEqual(req.params.crn)
     expect(res.locals.headerDob).toEqual('1979-08-18')
@@ -351,6 +349,7 @@ describe('/middleware/getPersonalDetails', () => {
         },
         flags: {
           enableSentencePlan: true,
+          enableOGRS4: true,
         },
       },
       redirect: jest.fn().mockReturnThis(),
@@ -371,6 +370,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: false,
+        enableOGRS4: true,
       },
     })
 
@@ -395,6 +395,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     })
     jest
@@ -420,6 +421,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     })
     jest
@@ -460,6 +462,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
@@ -502,6 +505,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
@@ -543,6 +547,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
@@ -566,6 +571,7 @@ describe('/middleware/getPersonalDetails', () => {
       },
       flags: {
         enableSentencePlan: true,
+        enableOGRS4: true,
       },
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
@@ -589,6 +595,7 @@ describe('/middleware/getPersonalDetails', () => {
       flags: {
         enableSentencePlan: true,
         enableTierLink: false,
+        enableOGRS4: true,
       },
     })
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)

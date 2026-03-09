@@ -15,8 +15,8 @@ export interface PersonalDetailsSession {
   sentencePlan: SentencePlan
   risks: RiskSummary
   tierCalculation: TierCalculation
-  riskData: RiskData
-  predictors: RiskScoresDto[] | ErrorSummary
+  riskData?: RiskData
+  predictors?: RiskScoresDto[] | ErrorSummary
 }
 
 export interface Data {
