@@ -1,28 +1,11 @@
-{% if riskData
-    .assessments[0]
-    .combinedSeriousReoffendingPredictor
-    .band or riskData
-    .assessments[0]
-    .rsr
-    .band %}
-    <section data-qa="rsr">
-        {% if riskData
-            .assessments[0]
-            .combinedSeriousReoffendingPredictor
-            .band != "NOT APPLICABLE" %}
-            {{ predictorScale({
-    data: riskData,
-    predictor: "combinedSeriousReoffendingPredictor"
-      }) }}
-        {% endif %}
-        {% if riskData
-            .assessments[0]
-            .rsr
-            .band %}
-            {{ predictorScale({
-    data: riskData,
-    predictor: "rsr"
-      }) }}
-        {% endif %}
-    </section>
+{% if predictorScores.scores.RSR.score %}
+  <section data-qa="rsr">
+    <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-{{ scoresHeadingClass if scoresHeadingClass else 'm'  }} score-header govuk-!-margin-bottom-0" data-analytics-event-scroll="RSR score">
+        RSR (risk of serious recidivism)
+    </h {{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>
+    <div aria-hidden="true">
+      {{ predictorScore(predictorScores.scores.RSR) }}
+    </div>
+    <div class='govuk-visually-hidden'>Score: {{ predictorScores.scores.RSR.score }}%</div>
+  </section>
 {% endif %}

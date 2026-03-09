@@ -1,14 +1,3 @@
-{% set riskDataRosh = {
-    assessments: [
-        {
-            rosh: {
-                name: 'ROSH',
-                band: risksWidget.overallRisk
-            }
-        }
-    ]
-} %}
-
 <div class="govuk-flex">
     <div>
         <ul class="govuk-list govuk-caption-m inline-list-from-tablet">
@@ -29,38 +18,58 @@
             </li>
         </ul>
     </div>
+    {% if flags.enableOGRS4 == false %}
+        {% if risksWidget.overallRisk and risksWidget.overallRisk !== 'NOT_FOUND' %}
+            <div class="govuk-!-margin-left-4">{{ predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }) }}</div>
+        {% endif %}
+        {% if predictorScores.scores.RSR.level %}
+            <div class="govuk-!-margin-left-4">{{ predictorTimelineItem(predictorScores.scores.RSR) }}</div>
+        {% endif %}
+    {% endif %}
 </div>
 <div class="moj-page-header-actions govuk-!-static-margin-bottom-4">
     <div class="moj-page-header-actions__title">
-        <h1 class="govuk-heading-xl govuk-!-margin-bottom-4">
+        <h1 class="govuk-heading-xl govuk-!-margin-bottom-{% if flags.enableOGRS4 %}4{% else %}0{% endif %}">
             <span data-qa='name'>{{ headerPersonName.forename }}{{' '}}{{ headerPersonName.surname }}</span>
         </h1>
-        {% if riskData
-            .assessments[0]
-            .allReoffendingPredictor
-            .band %}
-            {{ predictorBadge({
+        {% if flags.enableOGRS4 == true %}
+            {% set riskDataRosh = {
+                assessments: [
+                    {
+                        rosh: {
+                            name: 'ROSH',
+                            band: risksWidget.overallRisk
+                        }
+                    }
+                ]
+            } %}
+            {% if riskData
+                .assessments[0]
+                .combinedSeriousReoffendingPredictor
+                .band != "NOT APPLICABLE" %}
+                {{ predictorBadge({
         data: riskData,
         predictor: 'combinedSeriousReoffendingPredictor',
         showScore: true
     })}}
-        {% endif %}
-        {% if riskData
-            .assessments[0]
-            .rsr
-            .band %}
-            {{ predictorBadge({
+            {% endif %}
+            {% if riskData
+                .assessments[0]
+                .rsr
+                .band %}
+                {{ predictorBadge({
         data: riskData,
         predictor: 'rsr',
         showScore: true
     })}}
-        {% endif %}
-        {% if risksWidget.overallRisk and risksWidget.overallRisk !== 'NOT_FOUND' %}
-            {{ predictorBadge({
+            {% endif %}
+            {% if risksWidget.overallRisk and risksWidget.overallRisk !== 'NOT_FOUND' %}
+                {{ predictorBadge({
         data: riskDataRosh,
         predictor: 'rosh',
         showScore: false
     })}}
+            {% endif %}
         {% endif %}
     </div>
     <div class="moj-page-header-actions__actions">

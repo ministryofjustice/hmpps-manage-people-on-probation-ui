@@ -37,14 +37,24 @@ export const getPersonalDetails = (
       const tierClient = new TierApiClient(token)
       const sentencePlanClient = new SentencePlanApiClient(token)
       const authOptions = asUser(res.locals.user.token)
-      ;[overview, risks, tierCalculation, riskData, userCaseload, predictors] = await Promise.all([
-        masClient.getPersonalDetails(crn),
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsComponents.getRiskData(authOptions, 'crn', crn),
-        masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
-        arnsClient.getPredictorsAll(crn), // <-- only used for OPD, will this be a scale?
-      ])
+      if (res.locals.flags.enableOGRS4) {
+        ;[overview, risks, tierCalculation, userCaseload, riskData] = await Promise.all([
+          masClient.getPersonalDetails(crn),
+          arnsClient.getRisks(crn),
+          tierClient.getCalculationDetails(crn),
+          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
+          arnsComponents.getRiskData(authOptions, 'crn', crn),
+        ])
+      } else {
+        ;[overview, risks, tierCalculation, userCaseload, predictors] = await Promise.all([
+          masClient.getPersonalDetails(crn),
+          arnsClient.getRisks(crn),
+          tierClient.getCalculationDetails(crn),
+          masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
+          arnsClient.getPredictorsAll(crn),
+        ])
+      }
+
       const popInUsersCaseload = userCaseload?.caseload?.[0]?.crn === crn
       sentencePlan = { showLink: false, showText: false, lastUpdatedDate: '' }
       if (res.locals?.user?.roles?.includes('SENTENCE_PLAN')) {
@@ -73,33 +83,53 @@ export const getPersonalDetails = (
           logger.error(error, 'Failed to connect to sentence plan service.')
         }
       }
-      req.session.data = {
-        ...(req?.session?.data ?? {}),
-        personalDetails: {
-          ...(req?.session?.data?.personalDetails ?? {}),
-          [crn]: {
-            overview,
-            sentencePlan,
-            risks,
-            tierCalculation,
-            riskData,
-            predictors,
+      if (res.locals.flags.enableOGRS4) {
+        req.session.data = {
+          ...(req?.session?.data ?? {}),
+          personalDetails: {
+            ...(req?.session?.data?.personalDetails ?? {}),
+            [crn]: {
+              overview,
+              sentencePlan,
+              risks,
+              tierCalculation,
+              riskData,
+            },
           },
-        },
+        }
+      } else {
+        req.session.data = {
+          ...(req?.session?.data ?? {}),
+          personalDetails: {
+            ...(req?.session?.data?.personalDetails ?? {}),
+            [crn]: {
+              overview,
+              sentencePlan,
+              risks,
+              tierCalculation,
+              predictors,
+            },
+          },
+        }
       }
     } else {
-      ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
+      // eslint-disable-next-line no-lonely-if
+      if (res.locals.flags.enableOGRS4) {
+        ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
+      } else {
+        ;({ overview, sentencePlan, risks, tierCalculation, predictors } = req.session.data.personalDetails[crn])
+      }
     }
     res.locals.sentencePlan = sentencePlan
     res.locals.case = overview
-    const roshWidget = toRoshWidget(risks)
-    const predictorScores = toPredictors(predictors)
     res.locals.tierCalculation = tierCalculation
-    res.locals.risksWidget = roshWidget
+    res.locals.risksWidget = toRoshWidget(risks)
     res.locals.risks = risks
-    res.locals.predictorScores = predictorScores // <-- only used for OPD, will this be a scale?
-    res.locals.riskData = riskData
-    console.dir(riskData, { depth: null })
+    if (res.locals.flags.enableOGRS4) {
+      res.locals.riskData = riskData
+    } else {
+      res.locals.predictorScores = toPredictors(predictors)
+    }
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth
