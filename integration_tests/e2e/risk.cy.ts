@@ -33,16 +33,22 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
 ).response.jsonBody.riskFlags
 
 const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLink = true, sentencePlanText = false) => {
-  const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4' // <-- need to be fixed in component
-  // const headingLevel = '2' <!-- need to fix this when can pass heading level as param into macro
+  const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
   page.getElementData('rsr').should('exist')
-  page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
+  page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
 
   page.getElementData('ogrs').should('exist')
-  page.getElementData('ogrs').get(`h2`).should('contain.text', 'OGRS')
+  page.getElementData('ogrs').get(`h${headingLevel}`).should('contain.text', 'OGRS (offender group reconviction scale)')
+  page.getElementData('ogrs-1yr').should('have.text', '3%')
+  page.getElementData('ogrs-2yr').should('have.text', '6%')
+  page.getElementData('ogrs-level').should('have.text', 'Low')
 
   page.getElementData('ovp').should('exist')
-  page.getElementData('ovp').get(`h2`).should('contain.text', 'OVP')
+  page.getElementData('ovp').get(`h${headingLevel}`).should('contain.text', 'OVP (OASys violent predictor score)')
+  page.getElementData('ovp-1yr').should('have.text', '4%')
+  page.getElementData('ovp-2yr').should('have.text', '10.2%')
+  page.getElementData('ovp-level').should('have.text', 'Medium')
+
   page.getElementData('ogp').should('exist')
   page.getElementData('ogp').get(`h${headingLevel}`).should('contain.text', 'OGP (OASys general predictor score)')
   page.getElementData('ogp-1yr').should('have.text', '5%')
@@ -127,7 +133,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLin
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
     page.getInsetText().should('contain.text', 'Last updated: 24 January 2024')
-    // page.getElementData('osp').should('exist')
+    page.getElementData('osp').should('exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
       page.getElementData('opd').then($opd => {
         expect(Cypress.$($riskFlagsCard).index()).to.be.lessThan(Cypress.$($opd).index())

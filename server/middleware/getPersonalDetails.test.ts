@@ -160,6 +160,7 @@ const mock = (crn = 'X000001', lastUpdatedDate = mockSentencePlans[0].lastUpdate
     showText: false,
   },
   risks: mockRisks,
+  predictors: mockPredictors,
   tierCalculation: mockTierCalculation,
   riskData: mockRiskData,
 })
