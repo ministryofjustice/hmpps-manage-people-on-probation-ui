@@ -98,6 +98,19 @@ const mockAppointment: AppointmentSession = {
   sensitivity: 'Yes',
   smsOptIn: 'NO',
   outcomeRecorded: 'Yes',
+  smsPreview: {
+    request: {
+      firstName: 'James',
+      includeWelshPreview: false,
+      appointmentLocation: 'Mock Location',
+      appointmentTypeCode: 'COAP',
+      dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+    },
+    preview: {
+      englishSmsPreview: '',
+      welshSmsPreview: '',
+    },
+  },
 }
 
 const mockPersonalDetails: Partial<PersonalDetails> = {
@@ -219,6 +232,9 @@ const checkOutlookEventRequest = (smsRequest = false) => {
     mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
+    includeWelshTranslation: false,
+    appointmentLocation: 'Mock Location',
+    appointmentTypeCode: 'COAP',
   }
   const outlookEventRequestBody: OutlookEventRequestBody = {
     recipients: [
@@ -353,7 +369,20 @@ describe('/middleware/postAppointments', () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)
-        const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          smsOptIn: 'YES',
+          smsPreview: {
+            request: {
+              firstName: 'James',
+              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+              includeWelshPreview: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+            },
+            preview: { englishSmsPreview: '', welshSmsPreview: '' },
+          },
+        })
         await postAppointments(hmppsAuthClient)(mockReq, res)
         const smsRequest = true
         checkOutlookEventRequest(smsRequest)
@@ -362,7 +391,23 @@ describe('/middleware/postAppointments', () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce({ ...mockOutlookEventResponse, id: undefined })
-        const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          smsOptIn: 'YES',
+          smsPreview: {
+            request: {
+              firstName: 'James',
+              includeWelshPreview: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+            },
+            preview: {
+              englishSmsPreview: '',
+              welshSmsPreview: '',
+            },
+          },
+        })
         await postAppointments(hmppsAuthClient)(mockReq, res)
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
