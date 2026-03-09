@@ -112,8 +112,8 @@ const addContactController: Controller<typeof routes, void> = {
       const payload: CreateContactRequest = {
         date: formattedDate(date),
         time,
-        staffCode, // : 'N03AB01',
-        teamCode, // : 'N03AAT',
+        staffCode,
+        teamCode,
         type: selectedType?.code || slug,
         eventId: sentence,
         requirementId: null, // It is not required for this journey, It is optional field
