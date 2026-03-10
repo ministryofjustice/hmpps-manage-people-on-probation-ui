@@ -845,6 +845,30 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
+    it('should set the SMS opt in appointment session value to NO and delete the sms preview if updated appointment date is in the past', async () => {
+      const mockReq = createMockRequest({
+        query: { change },
+        appointmentSession: {
+          date: '2029-07-07',
+          smsOptIn: 'YES',
+          temp: {
+            date: tomorrow,
+            isInPast: false,
+          },
+        },
+      })
+      const mockRes = createMockResponse()
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      mockedAppointmentDateIsInPast.mockReturnValueOnce(true)
+      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'smsOptIn'],
+        'NO',
+      )
+      expect(mockReq.session.data.appointments[crn][uuid].smsPreview).toBeUndefined()
+    })
   })
 
   describe('getSupportingInformation', () => {
