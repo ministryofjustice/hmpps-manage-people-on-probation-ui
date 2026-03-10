@@ -109,13 +109,15 @@ const addContactController: Controller<typeof routes, void> = {
       const teamName = userProviders.defaultUserDetails?.team
       const teamCode = userProviders.teams?.find(t => t.description === teamName)?.code || 'UNKNOWN'
 
+      const eventId = sentence === 'PERSON_LEVEL_CONTACT' ? null : Number(sentence)
+
       const payload: CreateContactRequest = {
         date: formattedDate(date),
         time,
         staffCode,
         teamCode,
         type: selectedType?.code || slug,
-        eventId: sentence,
+        eventId,
         requirementId: null, // It is not required for this journey, It is optional field
         description: title || undefined,
         notes: details || '',
@@ -123,9 +125,7 @@ const addContactController: Controller<typeof routes, void> = {
         sensitive: sensitivity === 'Yes',
         visorReport: visor === 'Yes',
       }
-      console.log('payload:', payload)
       const response: CreateContactResponse = await contactService.createContact(crn, payload)
-      console.log(response.id)
 
       const file = req.file as Express.Multer.File
       if (file) {
@@ -138,7 +138,6 @@ const addContactController: Controller<typeof routes, void> = {
         }
       }
 
-      // TODO: Add below on success of API success
       const successQueryParam = `?showSuccessBanner=true`
       return res.redirect(`/case/${crn}/activity-log${successQueryParam}`)
     }

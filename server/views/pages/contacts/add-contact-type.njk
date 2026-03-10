@@ -15,6 +15,25 @@
     </h1>
 
     {% set allSentences = [] %}
+    {% set allSentences = (allSentences.push({
+        text: headerPersonName.forename,
+        value: 'PERSON_LEVEL_CONTACT',
+        label: {
+            classes: 'govuk-!-font-weight-bold',
+            attributes: {
+                'data-qa': 'personLevelContactLabel'
+            }
+        },
+        hint: {
+            text: 'Relates to the person.'
+        },
+        attributes: {
+            'data-qa': 'personLevelContact',
+            'data-sentence': 'true',
+            'data-reset-conditional-radios': ''
+        }
+    }), allSentences) %}
+
     {% for sentence in sentences %}
         {% if sentence.order.description %}
             {% set hintText = '' %}
