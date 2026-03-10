@@ -43,13 +43,13 @@
       }) }}
     {% endif %}
   {% endif %}
-  {{ mojBanner({
-    type: 'success',
-    text: 'Contact created',
-    classes: 'govuk-!-margin-bottom-2',
-    attributes: { "data-qa": "contactCreated"},
-    iconFallbackText: 'Success'
-  })  if showSuccessBanner }}
+ {{ mojBanner({
+     type: 'success',
+     html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact created</h2><p class="govuk-body">You may need to refresh the page to see it in the contacts list.</p>',
+     classes: 'govuk-!-margin-bottom-2',
+     attributes: { "data-qa": "contactCreated"},
+     iconFallbackText: 'Success'
+ }) if showSuccessBanner }}
 {% endblock %}
 {% block pageContent %}
 
