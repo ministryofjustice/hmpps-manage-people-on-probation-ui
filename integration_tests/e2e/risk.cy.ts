@@ -243,7 +243,7 @@ const checkRiskPageView = (
 }
 
 context('Risk', () => {
-  beforeEach(() => {
+  afterEach(() => {
     cy.task('resetMocks')
   })
 
