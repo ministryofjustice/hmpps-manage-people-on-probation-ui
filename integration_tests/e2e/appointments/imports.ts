@@ -211,6 +211,7 @@ export const completeCYAPage = () => {
   const cyaPage = new AppointmentCheckYourAnswersPage()
   cyaPage.getSubmitBtn().click()
 }
+
 export const checkPopHeader = ({
   name = 'Caroline Wolff',
   appointments = false,
