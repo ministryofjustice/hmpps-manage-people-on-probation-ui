@@ -146,7 +146,7 @@ context('Overview', () => {
   it('Should render overview page without tier link when feature flag disabled', () => {
     cy.task('stubDisableTierLink')
     cy.visit('/case/X000001')
-    checkPopHeader({ name: 'Caroline Wolff', appointments: false, headerCrn: 'X000001', tierLinkEnabled: false })
+    checkPopHeader({ tierLinkEnabled: false })
   })
 
   it('Overview page is rendered with date of death', () => {

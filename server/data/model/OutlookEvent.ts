@@ -6,6 +6,9 @@ export interface SmsEventRequest {
   mobileNumber?: string
   crn: string
   smsOptIn: boolean
+  includeWelshTranslation: boolean
+  appointmentLocation?: string
+  appointmentTypeCode?: string
 }
 export interface OutlookEventRequestBody {
   recipients: Recipient[]

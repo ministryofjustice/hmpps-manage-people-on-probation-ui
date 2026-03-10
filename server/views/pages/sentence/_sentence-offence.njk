@@ -15,23 +15,23 @@
     {{ govukSummaryList({
         rows: [
             {
-                key: { text: "Main offence" },
-                value: { html: sentence.offenceDetails.offence.description + ' (' + sentence.offenceDetails.offence.count + ' count)'  }
+                key: { html: '<span data-qa="mainOffenceLabel">Main offence</span>' },
+                value: { html: '<span data-qa="mainOffenceValue">' + sentence.offenceDetails.offence.description + ' (' + sentence.offenceDetails.offence.count + ' count)' + '</span>' }
             },
             {
-                key: { text: "Offence date" },
-                value: { html:  sentence.offenceDetails.dateOfOffence | dateWithYear  }
+                key: { html: '<span data-qa="dateOfOffenceLabel">Offence date</span>' },
+                value: { html: '<span data-qa="dateOfOffenceValue">' + sentence.offenceDetails.dateOfOffence | dateWithYear + '</span>' }
             },
             {
-                key: { text: "Notes" },
-                value: { html:  sentence.offenceDetails.notes | nl2br if sentence.offenceDetails.notes else 'No notes' }
+                key: { html: '<span data-qa="offenceNotesLabel">Notes</span>' },
+                value: { html: '<span data-qa="offenceNotesValue">' + (sentence.offenceDetails.notes | nl2br if sentence.offenceDetails.notes else 'No notes') + '</span>' }
             },
             {
-                key: { text: "Additional offences" },
-                value: { html:  additionalOffences if hasAdditionalOffences else 'No additional offences'  }
+                key: { html: '<span data-qa="additionalOffencesLabel">Additional offences</span>' },
+                value: { html: '<span data-qa="additionalOffencesValue">' + (additionalOffences if hasAdditionalOffences else 'No additional offences') + '</span>' }
             }
         ]
-    }) }}
+}) }}
 {% endset %}
 
 {{ appSummaryCard({

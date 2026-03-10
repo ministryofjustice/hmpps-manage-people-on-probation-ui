@@ -7,9 +7,9 @@ on:
 
 jobs:
   trivy:
-    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@5f60e142446a00a58b0b594bd22192c574c4f9ef # v1
+    uses: ministryofjustice/hmpps-github-actions/.github/workflows/security_trivy.yml@9e4e07ae026452bb642c220941a7d4c26f4ccf31 # v2.9.2
     with:
-      channel_id: manage-people-on-probation-alerts
+      channel_id: manage-people-on-probation-alerts-security
     secrets:
       HMPPS_SRE_SLACK_BOT_TOKEN: ${{ secrets.HMPPS_SRE_SLACK_BOT_TOKEN }}
 
@@ -44,7 +44,7 @@ jobs:
         shell: bash
 
       - name: Upload report
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: zap-report
           path: ${{ env.REPORT_DIR }}
@@ -68,7 +68,7 @@ jobs:
           method: chat.postMessage
           payload: |
             {
-              "channel": "manage-people-on-probation-alerts",
+              "channel": "manage-people-on-probation-alerts-security",
               "blocks": [
                 {
                   "type": "section",
@@ -118,7 +118,7 @@ jobs:
           method: chat.postMessage
           payload: |
             {
-              "channel": "manage-people-on-probation-alerts",
+              "channel": "manage-people-on-probation-alerts-security",
               "blocks": [
                 {
                   "type": "section",

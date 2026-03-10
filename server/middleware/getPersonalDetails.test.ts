@@ -10,7 +10,7 @@ import ArnsApiClient from '../data/arnsApiClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import { AppResponse } from '../models/Locals'
-import { toPredictors, toRoshWidget } from '../utils'
+import { toRoshWidget } from '../utils'
 import {
   mockTierCalculation,
   mockPredictors,
