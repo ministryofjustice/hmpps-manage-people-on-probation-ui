@@ -173,8 +173,8 @@ export const completeTextMessageConfirmationPage = ({ _crn = null, _uuid = uuid,
   textMessageConfirmPage.getSubmitBtn().click()
 }
 
-export const completeAttendedCompliedPage = (manageJourney = false) => {
-  const idPrefix = manageJourney ? '' : `appointments-${crn}-${uuid}-`
+export const completeAttendedCompliedPage = (manageJourney = false, _crn = crn, _uuid = uuid) => {
+  const idPrefix = manageJourney ? '' : `appointments-${_crn}-${_uuid}-`
   const logOutcomePage = new AttendedCompliedPage()
   cy.get(`#${idPrefix}outcomeRecorded`).click()
   logOutcomePage.getSubmitBtn().click()

@@ -316,6 +316,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (change) {
         const originalDate = getDataValue(data, [...path, 'temp', 'date'])
         const updatedDate = getDataValue(data, [...path, 'date'])
+        const smsOptIn = getDataValue<SmsOptInOptions>(data, [...path, 'smsOptIn'])
         const originalDateWasInPast = getDataValue(data, [...path, 'temp', 'isInPast'])
         const updatedDateIsInPast = appointmentDateIsInPast(req)
         delete req.session.data.appointments[crn][id].temp.isInPast
@@ -323,6 +324,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
         if (!retainOutcomeRecorded) {
           setDataValue(data, [...path, 'outcomeRecorded'], null)
+        }
+        if (updatedDateIsInPast && smsOptIn?.includes('YES')) {
+          setDataValue(data, [...path, 'smsOptIn'], 'NO')
+          delete req.session.data.appointments[crn][id].smsPreview
         }
         const retainNotesAndSensitivity = (!originalDateWasInPast && !updatedDateIsInPast) || retainOutcomeRecorded
         if (!retainNotesAndSensitivity) {
