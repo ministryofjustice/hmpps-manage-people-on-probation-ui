@@ -31,6 +31,104 @@
     },
     {
       "request": {
+        "urlPattern": "/arns/risks/predictors/all/crn/X778160",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": [
+          {
+            "completedDate": "2024-12-09T12:07:42",
+            "status": "COMPLETE",
+            "assessmentType": "LAYER3",
+            "outputVersion": "1",
+            "output": {
+              "groupReconvictionScore": {
+                "oneYear": 6,
+                "twoYears": 12,
+                "scoreLevel": "LOW"
+              },
+              "violencePredictorScore": {
+                "ovpStaticWeightedScore": 10,
+                "ovpDynamicWeightedScore": 4,
+                "ovpTotalWeightedScore": 14,
+                "oneYear": 3,
+                "twoYears": 5,
+                "ovpRisk": "LOW"
+              },
+              "generalPredictorScore": {
+                "ogpStaticWeightedScore": 7,
+                "ogpDynamicWeightedScore": 0,
+                "ogpTotalWeightedScore": 7,
+                "ogp1Year": 4,
+                "ogp2Year": 7,
+                "ogpRisk": "LOW"
+              },
+              "riskOfSeriousRecidivismScore": {
+                "percentageScore": 0.05,
+                "staticOrDynamic": "DYNAMIC",
+                "source": "OASYS",
+                "algorithmVersion": "5",
+                "scoreLevel": "LOW"
+              },
+              "sexualPredictorScore": {
+                "ospIndirectImagePercentageScore": 0,
+                "ospDirectContactPercentageScore": 0,
+                "ospIndirectImageScoreLevel": "NOT_APPLICABLE",
+                "ospDirectContactScoreLevel": "NOT_APPLICABLE"
+              }
+            }
+          },
+          {
+            "completedDate": "2024-11-01T09:00:00",
+            "status": "COMPLETE",
+            "assessmentType": "LAYER3",
+            "outputVersion": "1",
+            "output": {
+              "groupReconvictionScore": {
+                "oneYear": 7,
+                "twoYears": 14,
+                "scoreLevel": "LOW"
+              },
+              "violencePredictorScore": {
+                "ovpStaticWeightedScore": 10,
+                "ovpDynamicWeightedScore": 4,
+                "ovpTotalWeightedScore": 14,
+                "oneYear": 3,
+                "twoYears": 5,
+                "ovpRisk": "LOW"
+              },
+              "generalPredictorScore": {
+                "ogpStaticWeightedScore": 8,
+                "ogpDynamicWeightedScore": 0,
+                "ogpTotalWeightedScore": 8,
+                "ogp1Year": 4,
+                "ogp2Year": 7,
+                "ogpRisk": "LOW"
+              },
+              "riskOfSeriousRecidivismScore": {
+                "percentageScore": 0.05,
+                "staticOrDynamic": "DYNAMIC",
+                "source": "OASYS",
+                "algorithmVersion": "5",
+                "scoreLevel": "LOW"
+              },
+              "sexualPredictorScore": {
+                "ospIndirectImagePercentageScore": 0,
+                "ospDirectContactPercentageScore": 0,
+                "ospIndirectImageScoreLevel": "NOT_APPLICABLE",
+                "ospDirectContactScoreLevel": "NOT_APPLICABLE"
+              }
+            }
+          }
+        ],
+        "headers": {
+          "Content-Type": "application/json"
+        }
+      }
+    },
+    {
+      "request": {
         "urlPattern": "/arns/risks/crn/X778160/predictors/all",
         "method": "GET"
       },
@@ -39,7 +137,8 @@
         "jsonBody": [
           {
             "completedDate": "2024-12-09T08:13:33",
-            "assessmentStatus": "string",
+            "status": "COMPLETE",
+            "assessmentType": "LAYER3",
             "groupReconvictionScore": {
               "oneYear": 3,
               "twoYears": 6,
@@ -81,7 +180,8 @@
           },
           {
             "completedDate": "2024-11-01T18:56:33",
-            "assessmentStatus": "string",
+            "status": "COMPLETE",
+            "assessmentType": "LAYER3",
             "groupReconvictionScore": {
               "oneYear": 5,
               "twoYears": 6,

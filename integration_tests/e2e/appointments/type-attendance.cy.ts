@@ -41,7 +41,7 @@ describe('Arrange an appointment', () => {
     describe('No VISOR registration', () => {
       it('should render the page', () => {
         loadPage()
-        checkPopHeader('Alton Berge', true, 'X778160')
+        checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
         typePage = Page.verifyOnPage(AppointmentTypePage)
         typePage.getBackLink().should($backLink => {
           expect($backLink.text()).to.eq('Back')

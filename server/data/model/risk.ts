@@ -194,3 +194,18 @@ export interface Need {
   riskOfReoffending: boolean
   severity: string
 }
+
+export type ScoreType = 'Static' | 'Dynamic'
+
+export interface Predictor {
+  name: string
+  band: string
+  score?: number
+  oneYear?: number
+  twoYears?: number
+  staticOrDynamic?: ScoreType
+}
+
+export interface ArnsComponentData {
+  assessments: { [key: string]: Predictor }[]
+}

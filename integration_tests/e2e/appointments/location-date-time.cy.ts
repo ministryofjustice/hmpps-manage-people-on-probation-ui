@@ -67,7 +67,7 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage = new AppointmentLocationDateTimePage()
     })
     it('should render the pop header', () => {
-      checkPopHeader('Alton Berge', true, 'X778160')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
     })
     it('should display the options', () => {
       locationDateTimePage.getRadioLabel('locationCode', 1).should('contain.text', 'Hmp Wakefield')

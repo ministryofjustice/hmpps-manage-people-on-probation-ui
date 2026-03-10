@@ -8,10 +8,8 @@ import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
 import { toRoshWidget, toPredictors } from '../utils'
 import {
-  mockActivity,
   mockTierCalculation,
   mockActivities,
-  mockActivityNote,
   mockAppResponse,
   mockRisks,
   mockPredictors,
@@ -158,12 +156,7 @@ describe('/controllers/activityLogController', () => {
       expect(getPersonActivitySpy).toHaveBeenCalledWith(crn, expectedBody, req.query.page, '10')
       expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
     })
-    it('should request risks from api', async () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request all predictors from the api', () => {
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
+
     it('should render the activity-log page when enableContactLog flag is false', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/activity-log', {
         personActivity: mockActivities,

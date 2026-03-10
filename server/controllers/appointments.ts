@@ -3,12 +3,9 @@ import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { Controller, FileCache } from '../@types'
-import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import {
   toRoshWidget,
-  toPredictors,
   isNumericString,
   isValidCrn,
   isMatchingAddress,
@@ -44,9 +41,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn } = req.params as Record<string, string>
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENTS',
         who: res.locals.user.username,
@@ -56,18 +51,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, practitioner] =
-        await Promise.all([
-          masClient.getPersonSchedule(crn, 'upcoming', '0'),
-          masClient.getPersonSchedule(crn, 'previous', '0'),
-          arnsClient.getRisks(crn),
-          tierClient.getCalculationDetails(crn),
-          arnsClient.getPredictorsAll(crn),
-          masClient.getProbationPractitioner(crn),
-        ])
+      const [upcomingAppointments, pastAppointments, practitioner] = await Promise.all([
+        masClient.getPersonSchedule(crn, 'upcoming', '0'),
+        masClient.getPersonSchedule(crn, 'previous', '0'),
+        masClient.getProbationPractitioner(crn),
+      ])
 
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
@@ -76,9 +65,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         pastAppointments,
         crn,
         url,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         hasDeceased,
         hasPractitioner,
       })
@@ -95,9 +81,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         sortName === 'time' ? `&sortBy=date&ascending=${isAscending}` : `&sortBy=${sortName}&ascending=${isAscending}`
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS',
@@ -108,14 +92,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortQuery),
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const upcomingAppointments = await masClient.getPersonSchedule(
+        crn,
+        'upcoming',
+        (pageNum - 1).toString(),
+        sortQuery,
+      )
 
       const pagination: Pagination = getPaginationLinks(
         req.query.page ? pageNum : 1,
@@ -128,9 +110,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/upcoming-appointments', {
         upcomingAppointments,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         sortedBy,
         url,
         pagination,
