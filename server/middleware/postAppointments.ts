@@ -9,7 +9,7 @@ import {
   AppointmentType,
 } from '../models/Appointments'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
-import { OutlookEventRequestBody, OutlookEventResponse } from '../data/model/OutlookEvent'
+import { OutlookEventRequestBody, OutlookEventResponse, SmsPreviewRequest } from '../data/model/OutlookEvent'
 import config from '../config'
 import { Name } from '../data/model/personalDetails'
 import { getDurationInMinutes } from '../utils/getDurationInMinutes'
@@ -90,17 +90,27 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
-      if (smsOptIn?.includes('YES')) {
+      const {
+        name: { forename: firstName },
+        mobileNumber,
+      } = res.locals.case
+
+      if (smsOptIn?.includes('YES') && mobileNumber) {
         const {
-          name: { forename: firstName },
-          mobileNumber,
-        } = res.locals.case
+          includeWelshPreview: includeWelshTranslation,
+          appointmentLocation = null,
+          appointmentTypeCode = null,
+        } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
+
         outlookEventRequestBody.smsEventRequest = {
           firstName,
           mobileNumber,
           crn,
           smsOptIn: true,
+          includeWelshTranslation,
         }
+        if (appointmentLocation) outlookEventRequestBody.smsEventRequest.appointmentLocation = appointmentLocation
+        if (appointmentTypeCode) outlookEventRequestBody.smsEventRequest.appointmentTypeCode = appointmentTypeCode
       }
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
