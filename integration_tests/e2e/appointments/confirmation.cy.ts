@@ -58,44 +58,6 @@ describe('Confirmation page', () => {
     cy.task('resetMocks')
   })
 
-  describe('Appointment changed to date in the past', () => {
-    const crn = 'X000001'
-    it('should update the cya page', () => {
-      completeSentencePage(1, '', crn)
-      completeTypePage(1, false)
-      completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
-      completeTextMessageConfirmationPage({ index: 1, _crn: crn })
-      completeSupportingInformationPage(true, crn)
-      const cyaPage = new CheckYourAnswersPage()
-      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
-      getUuid().then(uuid => {
-        completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: true })
-        completeAttendedCompliedPage(false, crn, uuid)
-        completeAddNotePage(crn, uuid)
-        completeCYAPage()
-        confirmPage = new AppointmentConfirmationPage()
-        confirmPage
-          .getWhatHappensNext()
-          .find('p:nth-of-type(1)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
-          })
-        confirmPage
-          .getWhatHappensNext()
-          .find('p:nth-of-type(2)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `The appointment has been added to the NDelius contact log and officer diary.`,
-            )
-          })
-      })
-    })
-  })
-
   describe('Appointment arranged in the future', () => {
     beforeEach(() => {
       loadPage()
@@ -307,6 +269,44 @@ describe('Confirmation page', () => {
       cy.get('[data-qa="what-happens-next"]')
         .find('p')
         .should('contain.text', 'The appointment has been added to the NDelius contact log and officer diary.')
+    })
+  })
+
+  describe('Appointment changed to date in the past', () => {
+    const crn = 'X000001'
+    it('should update the cya page', () => {
+      completeSentencePage(1, '', crn)
+      completeTypePage(1, false)
+      completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
+      completeTextMessageConfirmationPage({ index: 1, _crn: crn })
+      completeSupportingInformationPage(true, crn)
+      const cyaPage = new CheckYourAnswersPage()
+      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
+      getUuid().then(uuid => {
+        completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: true })
+        completeAttendedCompliedPage(false, crn, uuid)
+        completeAddNotePage(crn, uuid)
+        completeCYAPage()
+        confirmPage = new AppointmentConfirmationPage()
+        confirmPage
+          .getWhatHappensNext()
+          .find('p:nth-of-type(1)')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+          })
+        confirmPage
+          .getWhatHappensNext()
+          .find('p:nth-of-type(2)')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(
+              `The appointment has been added to the NDelius contact log and officer diary.`,
+            )
+          })
+      })
     })
   })
 
