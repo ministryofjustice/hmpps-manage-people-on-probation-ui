@@ -117,7 +117,7 @@ const checkInsController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}/appointments`)
       }
       const guidanceUrl = config.guidance.link
-      return res.render('pages/check-in/eligibility-check.njk', { crn, back, id, guidanceUrl })
+      return res.render('pages/check-in/eligibility-check.njk', { crn, back, id, guidanceUrl, data: req.session.data })
     }
   },
 

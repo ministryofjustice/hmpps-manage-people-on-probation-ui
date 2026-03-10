@@ -10,6 +10,7 @@
 {% set backLink =  '/case/' + crn + '/'  + back %}
 {% set notStandardForm = true %}
 {% set buttonText = "Continue" %}
+{% set currentEligibility = data.esupervision[crn][id].checkins.eligibility or [] %}
 
 
 {% block primary %}
@@ -50,6 +51,7 @@
 
             {{ govukCheckboxes({
                 name: "esupervision[" + crn + "][" + id + "][checkins][eligibility]",
+                idPrefix: "esupervision-" + crn + "-" + id + "-checkins-eligibility",
                 fieldset: {
                     legend: {
                         text: checkboxTitle,
@@ -66,39 +68,48 @@
                 items: [
                 {
                 value: "eligibility-1",
-                text: "On suspended supervision (for example, through IMPACT and Reset)"
+                text: "On suspended supervision (for example, through IMPACT and Reset)",
+                checked: "eligibility-1" in currentEligibility
                 },
                 {
                 value: "eligibility-2",
-                text: "At a very high risk of serious harm (ROSH)"
+                text: "At a very high risk of serious harm (ROSH)",
+                checked: "eligibility-2" in currentEligibility
                 },
                 {
                 value: "eligibility-3",
-                text: "A MAPPA (multi-agency public protection arrangements) eligible case level 2 and 3"
+                text: "A MAPPA (multi-agency public protection arrangements) eligible case level 2 and 3",
+                checked: "eligibility-3" in currentEligibility
                 },
                 {
                 value: "eligibility-4",
-                text: "A National Security Division case"
+                text: "A National Security Division case",
+                checked: "eligibility-4" in currentEligibility
                 },
                 {
                 value: "eligibility-5",
-                text: "On a youth sentence"
+                text: "On a youth sentence",
+                checked: "eligibility-5" in currentEligibility
                 },
                 {
                 value: "eligibility-6",
-                text: "Subject to an active child protection order"
+                text: "Subject to an active child protection order",
+                checked: "eligibility-6" in currentEligibility
                 },
                 {
                 value: "eligibility-7",
-                text: "Under a current domestic abuse conviction"
+                text: "Under a current domestic abuse conviction",
+                checked: "eligibility-7" in currentEligibility
                 },
                 {
                 value: "eligibility-8",
-                text: "Under a current sexual conviction or motivation"
+                text: "Under a current sexual conviction or motivation",
+                checked: "eligibility-8" in currentEligibility
                 },
                 {
                 value: "eligibility-9",
-                text: "An Intensive Supervision Court pilot case"
+                text: "An Intensive Supervision Court pilot case",
+                checked: "eligibility-9" in currentEligibility
                 },
               {
                 divider: "or"
@@ -106,7 +117,8 @@
               {
                 value: "eligibility-none",
                 text: "None of these apply",
-                behaviour: "exclusive"
+                behaviour: "exclusive",
+                checked: "eligibility-none" in currentEligibility
               }
             ]
             }) | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'eligibility']) }}
