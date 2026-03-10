@@ -1,30 +1,31 @@
 {% if flags.enableOGRS4 %}
-    {% if riskData
+    {% set band_ogrs4 = riskData
         .assessments[0]
         .combinedSeriousReoffendingPredictor
-        .band or riskData
+        .band %}
+    {% set band_ogrs3 = riskData
         .assessments[0]
         .rsr
         .band %}
-        <section data-qa="rsr">
-            {% if riskData
-                .assessments[0]
-                .combinedSeriousReoffendingPredictor
-                .band != "NOT APPLICABLE" %}
-                {{ predictorScale({
+    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" else 
+        false %}
+    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+        false %}
+
+    {% if showOGRS4 %}
+        <section data-qa="combinedSeriousReoffendingPredictor">
+            {{ predictorScale({
     data: riskData,
     predictor: "combinedSeriousReoffendingPredictor"
       }) }}
-            {% endif %}
-            {% if riskData
-                .assessments[0]
-                .rsr
-                .band %}
-                {{ predictorScale({
+        </section>
+    {% endif %}
+    {% if showOGRS3 %}
+        <section data-qa="rsr">
+            {{ predictorScale({
     data: riskData,
     predictor: "rsr"
       }) }}
-            {% endif %}
         </section>
     {% endif %}
 {% else %}

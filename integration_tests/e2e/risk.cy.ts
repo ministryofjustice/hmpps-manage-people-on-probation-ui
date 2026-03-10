@@ -32,22 +32,79 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
 ).response.jsonBody.riskFlags
 
-const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLink = true, sentencePlanText = false) => {
-  const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4' // <-- need to be fixed in component
-  // const headingLevel = '2' <!-- need to fix this when can pass heading level as param into macro
-  page.getElementData('rsr').should('exist')
-  page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
-
-  page.getElementData('ogrs').should('exist')
-  page.getElementData('ogrs').get(`h2`).should('contain.text', 'OGRS')
-
-  page.getElementData('ovp').should('exist')
-  page.getElementData('ovp').get(`h2`).should('contain.text', 'OVP')
-  page.getElementData('ogp').should('exist')
-  page.getElementData('ogp').get(`h${headingLevel}`).should('contain.text', 'OGP (OASys general predictor score)')
-  page.getElementData('ogp-1yr').should('have.text', '5%')
-  page.getElementData('ogp-2yr').should('have.text', '28.8%')
-  page.getElementData('ogp-level').should('have.text', 'High')
+const checkRiskPageView = (
+  page: RiskPage,
+  sanIndicator = false,
+  sentencePlanLink = true,
+  sentencePlanText = false,
+  ogrs4 = false,
+  ogrs4Enabled = true,
+) => {
+  const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
+  const subHeadingLevel = !sentencePlanLink && !sentencePlanText ? '4' : '5'
+  if (ogrs4Enabled) {
+    if (ogrs4) {
+      page
+        .getElementData('combinedSeriousReoffendingPredictor')
+        .get(`h2`)
+        .should('contain.text', 'Combined Serious Reoffending Predictor')
+      page.getElementData('allReoffendingPredictor').get(`h2`).should('contain.text', 'All Reoffending Predictor')
+      page
+        .getElementData('allReoffendingPredictor')
+        .get('[data-test-id=staticOrDynamic]')
+        .should('contain.text', 'Dynamic')
+      page
+        .getElementData('directContactSexualReoffendingPredictor')
+        .get('h2')
+        .should('contain.text', 'Direct Contact - Sexual Reoffending Predictor')
+      page
+        .getElementData('indirectImageContactSexualReoffendingPredictor')
+        .get('h2')
+        .should('contain.text', 'Direct Contact - Sexual Reoffending Predictor')
+      page
+        .getElementData('violentReoffendingPredictor')
+        .get(`h2`)
+        .should('contain.text', 'Violent Reoffending Predictor')
+      page
+        .getElementData('seriousViolentReoffendingPredictor')
+        .get(`h2`)
+        .should('contain.text', 'Serious Violent Reoffending Predictor')
+    } else {
+      page.getElementData('ovp').should('exist')
+      page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
+      page.getElementData('ogrs').get(`h2`).should('contain.text', 'OGRS')
+      page.getElementData('ogp').get(`h2`).should('contain.text', 'OGP')
+      page.getElementData('ovp').get(`h2`).should('contain.text', 'OVP')
+    }
+  } else {
+    page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
+    page
+      .getElementData('ogrs')
+      .get(`h${headingLevel}`)
+      .should('contain.text', 'OGRS (offender group reconviction scale)')
+    page.getElementData('ogrs-1yr').should('have.text', '3%')
+    page.getElementData('ogrs-2yr').should('have.text', '6%')
+    page.getElementData('ogrs-level').should('have.text', 'Low')
+    page.getElementData('ogp').get(`h${headingLevel}`).should('contain.text', 'OGP (OASys general predictor score)')
+    page.getElementData('ogp-1yr').should('have.text', '5%')
+    page.getElementData('ogp-2yr').should('have.text', '28.8%')
+    page.getElementData('ogp-level').should('have.text', 'High')
+    page.getElementData('osp').get(`h${headingLevel}`).should('contain.text', 'OSP (OASys sexual predictor scores)')
+    page
+      .getElementData('osp')
+      .get(`h${subHeadingLevel}`)
+      .eq(0)
+      .should('contain.text', 'OSP/I (internet-related offences) or OSP/IIC (internet-involved child offences)')
+    page
+      .getElementData('osp')
+      .get(`h${subHeadingLevel}`)
+      .eq(1)
+      .should('contain.text', 'OSP/C (contact-related sexual reoffending) or OSP/DC (direct contact)')
+    page.getElementData('ovp').get(`h${headingLevel}`).should('contain.text', 'OVP (OASys violent predictor score)')
+    page.getElementData('ovp-1yr').should('have.text', '4%')
+    page.getElementData('ovp-2yr').should('have.text', '10.2%')
+    page.getElementData('ovp-level').should('have.text', 'Medium')
+  }
 
   page.getElementData('riskFlagsCard').should('exist')
   for (let i = 0; i < mockRiskFlags.length; i += 1) {
@@ -280,6 +337,19 @@ context('Risk', () => {
     const sanIndicator = false
     const sentencePlanLink = false
     checkRiskPageView(page, sanIndicator, sentencePlanLink)
+  })
+
+  it('Risk overview page is rendered with OGRS4 predictors', () => {
+    cy.task('stubPredictorScoresOGRS4')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView(page, false, false, false, true)
+  })
+  it('Risk overview page is rendered with OGRS4 feature flag disabled', () => {
+    cy.task('stubDisableOGRS4')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView(page, false, false, false, false, false)
   })
 
   it('Should persist Risk and plan nav link for all case pages', () => {

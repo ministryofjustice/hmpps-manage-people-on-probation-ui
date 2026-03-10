@@ -1,30 +1,36 @@
 {% if flags.enableOGRS4 %}
-    {% if riskData
+    {% set band_ogrs4 = riskData
         .assessments[0]
-        .generalPredictorScore
-        .band != "NOT APPLICABLE" or riskData
+        .allReoffendingPredictor
+        .band %}
+    {% set isDynamic = true if riskData
+        .assessments[0]
+        .allReoffendingPredictor
+        .staticOrDynamic == "Dynamic" else 
+            false %}
+    {% set band_ogrs3 = riskData
         .assessments[0]
         .ogp
         .band %}
-        <section data-qa="ogp">
-            {% if riskData
-                .assessments[0]
-                .generalPredictorScore
-                .band != "NOT APPLICABLE" %}
-                {{ predictorScale({
+    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" and isDynamic == true else 
+        false %}
+    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+        false %}
+
+    {% if showOGRS4 %}
+        <section data-qa="allReoffendingPredictor">
+            {{ predictorScale({
     data: riskData,
-    predictor: "generalPredictorScore"
+    predictor: "allReoffendingPredictor"
       }) }}
-            {% endif %}
-            {% if riskData
-                .assessments[0]
-                .ogp
-                .band %}
-                {{ predictorScale({
+        </section>
+    {% endif %}
+    {% if showOGRS3 %}
+        <section data-qa="ogp">
+            {{ predictorScale({
     data: riskData,
     predictor: "ogp"
       }) }}
-            {% endif %}
         </section>
     {% endif %}
 {% else %}

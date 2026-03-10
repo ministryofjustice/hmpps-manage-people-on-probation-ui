@@ -151,17 +151,22 @@ const stubPredictorScoresOGRS4 = (crn = 'X000001'): SuperAgentRequest =>
               band: 'LOW',
             },
             directContactSexualReoffendingPredictor: {
-              score: 0,
-              band: 'NOT_APPLICABLE',
+              score: 1,
+              band: 'LOW',
             },
             indirectImageContactSexualReoffendingPredictor: {
-              score: 0,
-              band: 'NOT_APPLICABLE',
+              score: 1,
+              band: 'LOW',
             },
             combinedSeriousReoffendingPredictor: {
               algorithmVersion: '6',
               staticOrDynamic: 'DYNAMIC',
               score: 0.28,
+              band: 'LOW',
+            },
+            generalPredictorScore: {
+              staticOrDynamic: 'DYNAMIC',
+              score: 1,
               band: 'LOW',
             },
           },
