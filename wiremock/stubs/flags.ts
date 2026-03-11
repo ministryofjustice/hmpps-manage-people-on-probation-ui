@@ -1,6 +1,6 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
+const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true) => ({
   request: {
     urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
     method: 'GET',
@@ -28,6 +28,17 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true) => ({
           name: 'enableSanIndicator',
           description: '',
           enabled: sanIndicator,
+          type: 'BOOLEAN_FLAG_TYPE',
+          createdAt: '2025-01-13T15:28:37.920581Z',
+          updatedAt: '2025-01-13T17:06:39.269084Z',
+          rules: [],
+          rollouts: [],
+        },
+        {
+          key: 'enableOGRS4',
+          name: 'enableOGRS4',
+          description: '',
+          enabled: ogrs4,
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',

@@ -1,25 +1,61 @@
-{% if predictorScores.scores.OGRS.level %}
-    <section data-qa="ogrs">
-        <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-{{ scoresHeadingClass | default('m') }} score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OGRS score">
+{% if flags.enableOGRS4 %}
+    {% set band_ogrs4 = riskData
+        .assessments[0]
+        .allReoffendingPredictor
+        .band %}
+    {% set isStatic = true if riskData
+        .assessments[0]
+        .allReoffendingPredictor
+        .staticOrDynamic == "Static" else 
+            false %}
+    {% set band_ogrs3 = riskData
+        .assessments[0]
+        .ogrs3
+        .band %}
+    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" and isStatic == true else 
+        false %}
+    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+        false %}
+    {% if showOGRS4 %}
+        <section data-qa="allReoffendingPredictor">
+            {{ predictorScale({
+    data: riskData,
+    predictor: "allReoffendingPredictor"
+      }) }}
+        </section>
+    {% endif %}
+    {% if showOGRS3 %}
+        <section data-qa="ogrs">
+            {{ predictorScale({
+    data: riskData,
+    predictor: "ogrs3"
+      }) }}
+        </section>
+    {% endif %}
+{% else %}
+    {% if predictorScores.scores.OGRS.level %}
+        <section data-qa="ogrs">
+            <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-{{ scoresHeadingClass | default('m') }} score-header govuk-!-margin-bottom-1" data-analytics-event-scroll="OGRS score">
         OGRS (offender group reconviction scale)
     </h{{ scoresHeadingLevel | default('3') }}>
-        <div class="govuk-grid-row  govuk-!-margin-bottom-4">
-            <div class="govuk-grid-column-full">
-                <div class="flex-mobile">
-                    <div class='flex__item-one-third-mobile'>
-                        <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h{{ scoresSubHeadingLevel | default('3') }}>
-                        <div class='govuk-body' data-qa='ogrs-1yr'>{{ predictorScores.scores.OGRS.oneYear }}%</div>
-                    </div>
-                    <div class='flex__item-one-third-mobile'>
-                        <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h{{ scoresSubHeadingLevel | default('3') }}>
-                        <div class='govuk-body' data-qa='ogrs-2yr'>{{ predictorScores.scores.OGRS.twoYears }}%</div>
-                    </div>
-                    <div class='flex__item-one-third-mobile'>
-                        <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h{{ scoresSubHeadingLevel | default('3') }}>
-                        <div class='govuk-body' data-qa='ogrs-level'>{{ riskLevelLabel(predictorScores.scores.OGRS.level) }}</div>
+            <div class="govuk-grid-row  govuk-!-margin-bottom-4">
+                <div class="govuk-grid-column-full">
+                    <div class="flex-mobile">
+                        <div class='flex__item-one-third-mobile'>
+                            <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>1 year</h{{ scoresSubHeadingLevel | default('3') }}>
+                            <div class='govuk-body' data-qa='ogrs-1yr'>{{ predictorScores.scores.OGRS.oneYear }}%</div>
+                        </div>
+                        <div class='flex__item-one-third-mobile'>
+                            <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>2 year</h{{ scoresSubHeadingLevel | default('3') }}>
+                            <div class='govuk-body' data-qa='ogrs-2yr'>{{ predictorScores.scores.OGRS.twoYears }}%</div>
+                        </div>
+                        <div class='flex__item-one-third-mobile'>
+                            <h{{ scoresSubHeadingLevel | default('3') }} class='govuk-heading-s govuk-!-margin-bottom-1'>Level</h{{ scoresSubHeadingLevel | default('3') }}>
+                            <div class='govuk-body' data-qa='ogrs-level'>{{ riskLevelLabel(predictorScores.scores.OGRS.level) }}</div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </section>
+        </section>
+    {% endif %}
 {% endif %}

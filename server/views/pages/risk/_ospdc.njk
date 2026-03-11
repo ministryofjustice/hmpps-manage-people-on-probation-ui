@@ -1,0 +1,29 @@
+{% set band_ogrs4 = riskData
+  .assessments[0]
+  .directContactSexualReoffendingPredictor
+  .band %}
+{% set band_ogrs3 = riskData
+  .assessments[0]
+  .ospdc
+  .band %}
+{% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" else 
+  false %}
+{% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+  false %}
+
+{% if showOGRS4 %}
+  <section data-qa="directContactSexualReoffendingPredictor">
+    {{ predictorScale({
+    data: riskData,
+    predictor: "directContactSexualReoffendingPredictor"
+      }) }}
+  </section>
+{% endif %}
+{% if showOGRS3 %}
+  <section data-qa="ospdc">
+    {{ predictorScale({
+    data: riskData,
+    predictor: "ospdc"
+      }) }}
+  </section>
+{% endif %}

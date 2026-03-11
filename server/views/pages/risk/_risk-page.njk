@@ -32,9 +32,15 @@
         <div class='govuk-!-margin-bottom-4'>
             {% include "./_rsr.njk" %}
             {% include "./_ogrs.njk" %}
-            {% include "./_osp.njk" %}
-            {% include "./_ovp.njk" %}
             {% include "./_ogp.njk" %}
+            {% if flags.enableOGRS4 %}
+                {% include "./_ospdc.njk" %}
+                {% include "./_ospiic.njk" %}
+            {% else %}
+                {% include "./_osp.njk" %}
+            {% endif %}
+            {% include "./_ovp.njk" %}
+            {% include "./_snsv.njk" %}
         </div>
     {% else %}
         {% set html %}
@@ -52,11 +58,11 @@
     {% include './_mappa.njk' %}
     <div class="govuk-body predictor-timeline__heading" data-qa="oasysScoreHistory">
         <h{{ scoresHeadingLevel | default('3') }} class="govuk-heading-m govuk-!-margin-bottom-2">OASys score history</h{{ scoresHeadingLevel | default('3') }}>
-        {% if predictorScores.error and caseSummary.roshHistory.error %}
+        {% if riskData.httpStatus !== 200 and caseSummary.roshHistory.error %}
             <p class='govuk-body' data-qa='timeline-missing'>ROSH levels and predictor scores cannot be retrieved from NDelius or OASys. Double-check NDelius and OASys.</p>
-        {% elif predictorScores.error %}
+        {% elif riskData.httpStatus !== 200 %}
             <p class='govuk-body' data-qa='score-history-missing'>Predictor scores cannot be retrieved from OASys. Double-check OASys.</p>
-        {% elif roshHistory.error %}
+        {% elif caseSummary.roshHistory.error %}
             <p class='govuk-body' data-qa='rosh-history-missing'>Historical ROSH levels cannot be retrieved from NDelius. Double-check NDelius and OASys.</p>
         {% endif %}
         {% if timeline.length %}
