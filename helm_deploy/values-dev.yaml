@@ -47,8 +47,9 @@ generic-service:
       - moj_cloud_platform
       - accessibility-testing-1
 
+  scheduledDowntime:
+    enabled: true
+
 generic-prometheus-alerts:
   alertSeverity: manage-people-on-probation-dev
 
-  scheduledDowntime:
-    enabled: true
