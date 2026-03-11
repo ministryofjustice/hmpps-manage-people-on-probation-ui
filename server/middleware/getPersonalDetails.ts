@@ -37,7 +37,7 @@ export const getPersonalDetails = (
       const tierClient = new TierApiClient(token)
       const sentencePlanClient = new SentencePlanApiClient(token)
       const authOptions = asUser(res.locals.user.token)
-      if (res.locals.flags.enableOGRS4) {
+      if (res?.locals?.flags?.enableOGRS4) {
         ;[overview, risks, tierCalculation, userCaseload, riskData] = await Promise.all([
           masClient.getPersonalDetails(crn),
           arnsClient.getRisks(crn),
@@ -83,7 +83,7 @@ export const getPersonalDetails = (
           logger.error(error, 'Failed to connect to sentence plan service.')
         }
       }
-      if (res.locals.flags.enableOGRS4) {
+      if (res?.locals?.flags?.enableOGRS4) {
         req.session.data = {
           ...(req?.session?.data ?? {}),
           personalDetails: {
@@ -114,7 +114,7 @@ export const getPersonalDetails = (
       }
     } else {
       // eslint-disable-next-line no-lonely-if
-      if (res.locals.flags.enableOGRS4) {
+      if (res?.locals?.flags?.enableOGRS4) {
         ;({ overview, sentencePlan, risks, tierCalculation, riskData } = req.session.data.personalDetails[crn])
       } else {
         ;({ overview, sentencePlan, risks, tierCalculation, predictors } = req.session.data.personalDetails[crn])
@@ -125,7 +125,7 @@ export const getPersonalDetails = (
     res.locals.tierCalculation = tierCalculation
     res.locals.risksWidget = toRoshWidget(risks)
     res.locals.risks = risks
-    if (res.locals.flags.enableOGRS4) {
+    if (res?.locals?.flags?.enableOGRS4) {
       res.locals.riskData = riskData
     } else {
       res.locals.predictorScores = toPredictors(predictors)

@@ -11,14 +11,14 @@
                         <span class='govuk-!-padding-left-3 govuk-!-padding-right-3 hide-mobile'>|</span>
             </li>
             <li>Tier:{{' '}}
-                {% if flags.enableTierLink == true %}
+                {% if flags.enableTierLink %}
                     <a href="{{ headerTierLink }}" data-qa="tierLink" class="govuk-link">{{ tierCalculation.tierScore }}</a>
                 {% else %}
                     <span data-qa='tierValue'>{{ tierCalculation.tierScore }}</span>{% endif %}
             </li>
         </ul>
     </div>
-    {% if flags.enableOGRS4 == false %}
+    {% if not flags.enableOGRS4 %}
         {% if risksWidget.overallRisk and risksWidget.overallRisk !== 'NOT_FOUND' %}
             <div class="govuk-!-margin-left-4">{{ predictorTimelineItem({ type: "ROSH", level: risksWidget.overallRisk }) }}</div>
         {% endif %}
@@ -32,7 +32,7 @@
         <h1 class="govuk-heading-xl govuk-!-margin-bottom-{% if flags.enableOGRS4 %}4{% else %}0{% endif %}">
             <span data-qa='name'>{{ headerPersonName.forename }}{{' '}}{{ headerPersonName.surname }}</span>
         </h1>
-        {% if flags.enableOGRS4 == true %}
+        {% if flags.enableOGRS4 %}
             {% set riskDataRosh = {
                 assessments: [
                     {
