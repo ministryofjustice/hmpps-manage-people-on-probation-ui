@@ -61,22 +61,24 @@ export const getPersonalDetails = (
         try {
           const sentencePlans = await sentencePlanClient.getPlanByCrn(crn)
           let hasAgreedSentencePlan = false
-          const agreedSentencePlans = sentencePlans.filter(sp => sp?.currentVersion?.agreementDate)
-          if (agreedSentencePlans.length) {
-            const latestSentencePlan =
-              agreedSentencePlans.length === 1
-                ? agreedSentencePlans[0]
-                : agreedSentencePlans.sort(
-                    (a, b) =>
-                      DateTime.fromISO(b.currentVersion.agreementDate).toMillis() -
-                      DateTime.fromISO(a.currentVersion.agreementDate).toMillis(),
-                  )[0]
-            hasAgreedSentencePlan = latestSentencePlan.currentVersion?.agreementStatus !== 'DRAFT'
-            sentencePlan.showLink = res.locals?.flags?.enableSentencePlan && hasAgreedSentencePlan
-            sentencePlan.lastUpdatedDate = sentencePlan.showLink ? latestSentencePlan?.lastUpdatedDate : ''
-            if (sentencePlan.showLink && !popInUsersCaseload) {
-              sentencePlan.showText = true
-              sentencePlan.showLink = false
+          if (sentencePlans?.length) {
+            const agreedSentencePlans = sentencePlans.filter(sp => sp?.currentVersion?.agreementDate)
+            if (agreedSentencePlans?.length) {
+              const latestSentencePlan =
+                agreedSentencePlans.length === 1
+                  ? agreedSentencePlans[0]
+                  : agreedSentencePlans.sort(
+                      (a, b) =>
+                        DateTime.fromISO(b.currentVersion.agreementDate).toMillis() -
+                        DateTime.fromISO(a.currentVersion.agreementDate).toMillis(),
+                    )[0]
+              hasAgreedSentencePlan = latestSentencePlan.currentVersion?.agreementStatus !== 'DRAFT'
+              sentencePlan.showLink = res.locals?.flags?.enableSentencePlan && hasAgreedSentencePlan
+              sentencePlan.lastUpdatedDate = sentencePlan.showLink ? latestSentencePlan?.lastUpdatedDate : ''
+              if (sentencePlan.showLink && !popInUsersCaseload) {
+                sentencePlan.showText = true
+                sentencePlan.showLink = false
+              }
             }
           }
         } catch (error) {

@@ -264,7 +264,9 @@
       "js-yaml": "^3.14.0"
     },
     "@ministryofjustice/hmpps-audit-client": {
-      "fast-xml-parser": "^5.3.8"
-    }
+      "fast-xml-parser": "^5.3.8",
+      "ajv": "^8.18.0"
+    },
+    "serialize-javascript": "^7.0.3"
   }
 }

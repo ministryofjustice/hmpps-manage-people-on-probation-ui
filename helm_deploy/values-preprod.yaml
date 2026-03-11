@@ -39,8 +39,8 @@ generic-service:
     ENVIRONMENT_NAME: PRE-PRODUCTION
     ENVIRONMENT: preprod
 
-generic-prometheus-alerts:
-  alertSeverity: manage-people-on-probation-preprod
-
   scheduledDowntime:
     enabled: true
+    
+generic-prometheus-alerts:
+  alertSeverity: manage-people-on-probation-preprod
