@@ -5,8 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import config from '../config'
 import ArnsApiClient from '../data/arnsApiClient'
 import { PersonRiskFlag, TimelineItem } from '../data/model/risk'
-import TierApiClient from '../data/tierApiClient'
-import { toTimeline, toRoshWidget, findReplace } from '../utils'
+import { toTimeline, findReplace } from '../utils'
 
 const routes = [
   'getRisk',
@@ -31,10 +30,9 @@ const riskController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const arnsClient = new ArnsApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
+
+      // remove predictors below with migration to ARNS predictor timeline component
+      const [predictors, needs, sanIndicatorResponse] = await Promise.all([
         arnsClient.getPredictorsAll(crn),
         arnsClient.getNeeds(crn),
         arnsClient.getSanIndicator(crn),
@@ -48,14 +46,9 @@ const riskController: Controller<typeof routes, void> = {
       if (timeline.length > 0) {
         ;[predictorScores] = timeline
       }
-      const risksWidget = toRoshWidget(risks)
       const oasysLink = config.oaSys.link
       return res.render('pages/risk', {
-        risks,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         timeline,
         needs,
         oasysLink,

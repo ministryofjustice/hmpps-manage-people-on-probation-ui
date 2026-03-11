@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
+import CheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 
 import {
   completeCYAPage,
@@ -56,6 +57,7 @@ describe('Confirmation page', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Appointment arranged in the future', () => {
     beforeEach(() => {
       loadPage()
@@ -63,7 +65,7 @@ describe('Confirmation page', () => {
     })
 
     it('should render the page', () => {
-      checkPopHeader('Alton Berge', true, 'X778160')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
       confirmPage.checkPageTitle('Appointment arranged')
       confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
       confirmPage
@@ -169,7 +171,7 @@ describe('Confirmation page', () => {
         confirmPage = new AppointmentConfirmationPage()
       })
       it('should render the page with error message', () => {
-        checkPopHeader('Alton Berge', true, 'X778160')
+        checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
         confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
         confirmPage
           .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
@@ -216,7 +218,7 @@ describe('Confirmation page', () => {
         confirmPage = new AppointmentConfirmationPage()
       })
       it('should render the page with error message when no user details found from MAS API', () => {
-        checkPopHeader('Alton Berge', true, 'X778160')
+        checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
         confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
         confirmPage
           .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
@@ -269,6 +271,45 @@ describe('Confirmation page', () => {
         .should('contain.text', 'The appointment has been added to the NDelius contact log and officer diary.')
     })
   })
+
+  describe('Appointment changed to date in the past', () => {
+    const crn = 'X000001'
+    it('should update the cya page', () => {
+      completeSentencePage(1, '', crn)
+      completeTypePage(1, false)
+      completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: false })
+      completeTextMessageConfirmationPage({ index: 1, _crn: crn })
+      completeSupportingInformationPage(true, crn)
+      const cyaPage = new CheckYourAnswersPage()
+      cyaPage.getSummaryListRow(5).find('.govuk-link').click()
+      getUuid().then(uuid => {
+        completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: true })
+        completeAttendedCompliedPage(false, crn, uuid)
+        completeAddNotePage(crn, uuid)
+        completeCYAPage()
+        confirmPage = new AppointmentConfirmationPage()
+        confirmPage
+          .getWhatHappensNext()
+          .find('p:nth-of-type(1)')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(`You need to give Caroline the appointment details.`)
+          })
+        confirmPage
+          .getWhatHappensNext()
+          .find('p:nth-of-type(2)')
+          .invoke('text')
+          .then(text => {
+            const normalizedText = text.replace(/\s+/g, ' ').trim()
+            expect(normalizedText).to.include(
+              `The appointment has been added to the NDelius contact log and officer diary.`,
+            )
+          })
+      })
+    })
+  })
+
   describe('Appointment rescheduled to a date and time in the future', () => {
     let checkYourAnswerPage: RescheduleCheckYourAnswerPage
     beforeEach(() => {

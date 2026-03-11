@@ -6,17 +6,7 @@ import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import InterventionsApiClient from '../data/interventionsApiClient'
 import { checkAuditMessage } from './testutils'
-import { toPredictors, toRoshWidget } from '../utils'
-import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
-import {
-  mockAppResponse,
-  mockTierCalculation,
-  mockRisks,
-  mockPredictors,
-  mockPersonSummary,
-  mockInterventions,
-} from './mocks'
+import { mockAppResponse, mockPersonSummary, mockInterventions } from './mocks'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/interventionsApiClient')
@@ -47,13 +37,6 @@ const getPersonSummarySpy = jest
 const getInterventionsSpy = jest
   .spyOn(InterventionsApiClient.prototype, 'getInterventions')
   .mockImplementation(() => Promise.resolve(mockInterventions))
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -72,18 +55,12 @@ describe('interventionsController', () => {
     it('should request the page data from the api', () => {
       expect(getPersonSummarySpy).toHaveBeenCalledWith(crn)
       expect(getInterventionsSpy).toHaveBeenCalledWith(crn)
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the interventions page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/interventions', {
         personSummary: mockPersonSummary,
         interventions: mockInterventions,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
       })
     })
   })

@@ -1,6 +1,8 @@
 /* eslint-disable no-param-reassign */
 import path from 'path'
 import nunjucks from 'nunjucks'
+
+import { arnsNunjucksSetup } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import express, { Request, NextFunction } from 'express'
 import type { Services } from '../services'
 
@@ -116,6 +118,7 @@ export default function nunjucksSetup(
       'node_modules/@ministryofjustice/frontend/',
       'node_modules/@ministryofjustice/frontend/moj/components/',
       'node_modules/@ministryofjustice/probation-search-frontend/components',
+      'node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/',
     ],
     {
       autoescape: true,
@@ -202,4 +205,6 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('lastTechnicalUpdate', services.technicalUpdatesService.getLatestTechnicalUpdateHeading())
   njkEnv.addFilter('to12HourTimeWithMinutes', to12HourTimeWithMinutes)
   njkEnv.addFilter('to12HourTimeCompact', to12HourTimeCompact)
+
+  arnsNunjucksSetup(njkEnv)
 }

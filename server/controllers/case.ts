@@ -3,7 +3,6 @@ import { v4 } from 'uuid'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
-import { toRoshWidget, toPredictors } from '../utils'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 const routes = ['getCase'] as const
@@ -25,7 +24,6 @@ const caseController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const { risks, tierCalculation, predictors } = req.session.data.personalDetails[crn]
       const [overview, needs, sanIndicatorResponse, contactResponse, practitioner] = await Promise.all([
         masClient.getOverview(crn, sentenceNumber),
         arnsClient.getNeeds(crn),
@@ -33,19 +31,13 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/overview', {
         overview,
         needs,
-        risks,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
         personalDetails: req.session.data.personalDetails[crn].overview,
         appointmentsWithoutAnOutcomeCount: contactResponse?.content?.length ?? 0,

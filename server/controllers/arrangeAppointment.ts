@@ -60,6 +60,30 @@ const routes = [
   'postTextMessageConfirmation',
 ] as const
 
+const resetSessionValues = (req: ExpressRequest) => {
+  const { crn, id } = req.params as Record<string, string>
+  const { data } = req.session
+  const path = ['appointments', crn, id]
+  const originalDate = getDataValue(data, [...path, 'temp', 'date'])
+  const updatedDate = getDataValue(data, [...path, 'date'])
+  const smsOptIn = getDataValue<SmsOptInOptions>(data, [...path, 'smsOptIn'])
+  const originalDateWasInPast = getDataValue(data, [...path, 'temp', 'isInPast'])
+  const updatedDateIsInPast = appointmentDateIsInPast(req)
+  const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
+  if (!retainOutcomeRecorded) {
+    setDataValue(data, [...path, 'outcomeRecorded'], null)
+  }
+  if (updatedDateIsInPast && smsOptIn?.includes('YES')) {
+    setDataValue(data, [...path, 'smsOptIn'], 'NO')
+    delete req.session.data.appointments[crn][id].smsPreview
+  }
+  const retainNotesAndSensitivity = (!originalDateWasInPast && !updatedDateIsInPast) || retainOutcomeRecorded
+  if (!retainNotesAndSensitivity) {
+    setDataValue(data, [...path, 'notes'], null)
+    setDataValue(data, [...path, 'sensitivity'], null)
+  }
+}
+
 export const appointmentSummary = async (req: ExpressRequest, res: AppResponse, client: HmppsAuthClient) => {
   const { data } = req.session
   const { crn, id, contactId } = req.params as Record<string, string>
@@ -314,21 +338,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       const path = ['appointments', crn, id]
       if (change) {
-        const originalDate = getDataValue(data, [...path, 'temp', 'date'])
-        const updatedDate = getDataValue(data, [...path, 'date'])
-        const originalDateWasInPast = getDataValue(data, [...path, 'temp', 'isInPast'])
-        const updatedDateIsInPast = appointmentDateIsInPast(req)
-        delete req.session.data.appointments[crn][id].temp.isInPast
-        delete req.session.data.appointments[crn][id].temp.date
-        const retainOutcomeRecorded = originalDateWasInPast && originalDate === updatedDate
-        if (!retainOutcomeRecorded) {
-          setDataValue(data, [...path, 'outcomeRecorded'], null)
-        }
-        const retainNotesAndSensitivity = (!originalDateWasInPast && !updatedDateIsInPast) || retainOutcomeRecorded
-        if (!retainNotesAndSensitivity) {
-          setDataValue(data, [...path, 'notes'], null)
-          setDataValue(data, [...path, 'sensitivity'], null)
-        }
+        resetSessionValues(req)
       }
 
       const selectedLocation = getDataValue(data, ['appointments', crn, id, 'user', 'locationCode'])

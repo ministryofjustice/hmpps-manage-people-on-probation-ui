@@ -4,6 +4,8 @@
 {% set backLink =  '/case/' + crn + '/appointments/' + id + '/check-in/photo-rules' %}
 {% set setMobile =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInMobile]' %}
 {% set setEmail =  '[esupervision]['+  crn + '][' + id +'][checkins][checkInEmail]' %}
+{% set mobileValue = userDetails.checkInMobile if userDetails.checkInMobile else "No mobile number" %}
+{% set emailValue = userDetails.checkInEmail if userDetails.checkInEmail else "No email address" %}
 {% set checkInDateLabel = "When would you like " + case.name.forename + " to complete their first online check in?"  %}
 {% set checkInDateVal = userDetails.date | dmyToLongDate  %}
 {% set dateFrequencyLabel = "How often would you like " + case.name.forename + " to check in?"  %}
@@ -122,7 +124,7 @@
             } },
             { key:
                 { html:  "Mobile number"  },
-                value: { html: userDetails.checkInMobile},
+                value: { html: mobileValue},
                 actions: {
                 items: [ {
                     href: contactPreUrl,
@@ -136,7 +138,7 @@
             } },
             { key:
                 { html:  "Email address"  },
-                value: { html: userDetails.checkInEmail},
+                value: { html: emailValue},
                 actions: {
                 items: [ {
                     href: contactPreUrl,

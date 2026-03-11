@@ -7,10 +7,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import { checkAuditMessage } from './testutils'
-import { toPredictors, toRoshWidget } from '../utils'
-import TierApiClient from '../data/tierApiClient'
-import ArnsApiClient from '../data/arnsApiClient'
-import { mockAppResponse, mockTierCalculation, mockRisks, mockPredictors, mockDocuments } from './mocks'
+import { mockAppResponse, mockDocuments } from './mocks'
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/interventionsApiClient')
@@ -44,20 +41,10 @@ const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient
 tokenStore.getToken.mockResolvedValue(token.access_token)
 const today = new Date()
 const maxDate = DateTime.fromJSDate(today).toFormat('dd/MM/yyyy')
-const searchDocumentsSpy = jest
-  .spyOn(MasApiClient.prototype, 'searchDocuments')
-  .mockImplementation(() => Promise.resolve(mockDocuments))
 const textSearchDocumentsSpy = jest
   .spyOn(MasApiClient.prototype, 'textSearchDocuments')
   .mockImplementation(() => Promise.resolve(mockDocuments))
 
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 const req = httpMocks.createRequest({
   params: {
     crn,
@@ -91,10 +78,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -121,9 +105,6 @@ describe('documentsController with text search', () => {
         { dateFrom: null, dateTo: null, levelCode: 'ALL', query: null },
         'createdAt.desc',
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with filter', () => {
       const expectedFilter = {
@@ -139,10 +120,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -181,9 +159,6 @@ describe('documentsController with text search', () => {
         },
         null,
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with filter', () => {
       const expectedFilter = {
@@ -217,10 +192,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -258,9 +230,6 @@ describe('documentsController with text search', () => {
         { dateFrom: null, dateTo: null, levelCode: 'ALL', query: null },
         'createdAt.desc',
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with clear all filter', () => {
       const expectedFilter = {
@@ -276,10 +245,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -317,9 +283,6 @@ describe('documentsController with text search', () => {
         { dateFrom: '2025-04-01T00:00:00.000Z', dateTo: '2025-04-02T00:00:00.000Z', levelCode: 'ALL', query: null },
         'createdAt.desc',
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with filter', () => {
       const expectedFilter = {
@@ -340,10 +303,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -381,9 +341,6 @@ describe('documentsController with text search', () => {
         { dateFrom: null, dateTo: null, levelCode: 'ALL', query: null },
         'createdAt.desc',
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with filter', () => {
       const expectedFilter = {
@@ -404,10 +361,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -443,9 +397,6 @@ describe('documentsController with text search', () => {
         { dateFrom: null, dateTo: null, levelCode: 'ALL', query: null },
         'createdAt.desc',
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with filter', () => {
       const expectedFilter = {
@@ -466,10 +417,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
@@ -505,9 +453,6 @@ describe('documentsController with text search', () => {
         { dateFrom: null, dateTo: null, levelCode: 'ALL', query: null },
         'createdAt.desc',
       )
-      expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-      expect(risksSpy).toHaveBeenCalledWith(crn)
-      expect(predictorsSpy).toHaveBeenCalledWith(crn)
     })
     it('should render the documents page with pagination data', () => {
       const expectedFilter = {
@@ -523,10 +468,7 @@ describe('documentsController with text search', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/documents', {
         documents: mockDocuments,
         pagination: mockPagination,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         baseUrl,
         filter: expectedFilter,
       })
