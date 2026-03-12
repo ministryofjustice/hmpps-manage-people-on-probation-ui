@@ -22,9 +22,6 @@ const res = {
       username,
     },
     case: { name: { forename: 'Test', surname: 'User' } },
-    flags: {
-      enablePastAppointments: true,
-    },
   },
   render: jest.fn().mockReturnThis(),
   redirect: jest.fn().mockReturnThis(),
@@ -190,9 +187,6 @@ describe('past appointments feature flag is disabled', () => {
         username,
       },
       case: { name: { forename: 'Test', surname: 'User' } },
-      flags: {
-        enablePastAppointments: false,
-      },
     },
     render: jest.fn().mockReturnThis(),
     redirect: jest.fn().mockReturnThis(),
@@ -237,7 +231,6 @@ describe('past appointments feature flag is disabled', () => {
       },
       isInPast: true,
       _maxDate: '31/12/2199',
-      _minDate: '1/7/2025',
     })
   })
 })
