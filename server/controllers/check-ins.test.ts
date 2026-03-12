@@ -129,68 +129,152 @@ describe('checkInsController', () => {
     jest.useRealTimers()
   })
 
-  describe('getIntroPage', () => {
-    it('renders instructions when CRN is valid', async () => {
-      mockIsValidCrn.mockReturnValue(true)
-      mockIsValidUUID.mockReturnValue(true)
+  describe('Eligibility Journey', () => {
+    describe('getEligibilityPage', () => {
+      it('renders eligibility check when CRN is valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
 
-      const req = baseReq()
-      await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.getEligibilityPage(hmppsAuthClient)(req, res)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/instructions.njk', {
-        crn,
-        back: req.query.back,
-        guidanceUrl: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-check.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          guidanceUrl: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
       })
-      expect(mockRenderError).not.toHaveBeenCalled()
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+      it('redirect if no practitioner', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+        getProbationPractitionerSpy.mockImplementationOnce(() =>
+          Promise.resolve({ unallocated: true } as ProbationPractitioner),
+        )
+
+        const req = baseReq()
+
+        await controllers.checkIns.getEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments`)
+      })
+
+      it('renders eligibility check page when practitioner is allocated', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+        getProbationPractitionerSpy.mockImplementationOnce(() =>
+          Promise.resolve({ unallocated: false } as ProbationPractitioner),
+        )
+
+        const req = baseReq()
+        const { id } = req.params
+
+        await controllers.checkIns.getEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-check.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          guidanceUrl: expect.any(String),
+        })
+      })
     })
 
-    it('returns 404 when CRN is invalid', async () => {
-      mockIsValidCrn.mockReturnValue(false)
-      mockIsValidUUID.mockReturnValue(true)
+    describe('postEligibilityPage', () => {
+      it('redirects to denied page when eligibility-9 is selected', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
 
-      const req = baseReq()
-      await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
+        const req = baseReq()
+        const { id } = req.params
+        req.body = {
+          esupervision: { [crn]: { [id]: { checkins: { eligibility: 'eligibility-9' } } } },
+        }
 
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+        await controllers.checkIns.postEligibilityPage(hmppsAuthClient)(req, res)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/denied-eligibility`)
+      })
+
+      it('redirects to full eligibility page when eligibility-none is selected', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        req.body = {
+          esupervision: { [crn]: { [id]: { checkins: { eligibility: 'eligibility-none' } } } },
+        }
+
+        await controllers.checkIns.postEligibilityPage(hmppsAuthClient)(req, res)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/full-eligibility`)
+      })
+
+      it('redirects to supplementary eligibility page when an eligible option is selected', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        req.body = {
+          esupervision: { [crn]: { [id]: { checkins: { eligibility: ['eligibility-1'] } } } },
+        }
+
+        await controllers.checkIns.postEligibilityPage(hmppsAuthClient)(req, res)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`)
+      })
     })
 
-    it('redirect if no practitioner', async () => {
-      mockIsValidCrn.mockReturnValue(true)
-      mockIsValidUUID.mockReturnValue(true)
+    describe('Full and Supplementary Results', () => {
+      it('postFullEligibilityPage saves data and redirects to date-frequency', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
 
-      getProbationPractitionerSpy.mockImplementationOnce(() =>
-        Promise.resolve({ unallocated: true } as ProbationPractitioner),
-      )
+        const req = baseReq()
+        const { id } = req.params
 
-      const req = baseReq()
-      await controllers.checkIns.getIntroPage(hmppsAuthClient)(req, res)
+        await controllers.checkIns.postFullEligibilityPage(hmppsAuthClient)(req, res)
 
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments`)
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['esupervision', crn, id, 'checkins', 'id'], id)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+      })
+
+      it('postSupplementaryEligibilityPage saves data and redirects to date-frequency', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+
+        await controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(mockSetDataValue).toHaveBeenCalledWith(req.session.data, ['esupervision', crn, id, 'checkins', 'id'], id)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+      })
     })
-  })
 
-  describe('postIntroPage', () => {
-    it('redirects to date-frequency with generated id when CRN is valid', async () => {
-      mockIsValidCrn.mockReturnValue(true)
-      mockIsValidUUID.mockReturnValue(true)
+    describe('Eligibility Denied', () => {
+      it('postEligibilityDeniedPage redirects to case overview', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
 
-      const req = baseReq()
-      await controllers.checkIns.postIntroPage(hmppsAuthClient)(req, res)
+        const req = baseReq()
 
-      expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
-    })
+        await controllers.checkIns.postEligibilityDeniedPage(hmppsAuthClient)(req, res)
 
-    it('returns 404 when CRN is invalid', async () => {
-      mockIsValidCrn.mockReturnValue(false)
-      mockIsValidUUID.mockReturnValue(true)
-
-      const req = baseReq()
-      await controllers.checkIns.postIntroPage(hmppsAuthClient)(req, res)
-
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
+      })
     })
   })
 
@@ -210,6 +294,7 @@ describe('checkInsController', () => {
         id: uuid,
         checkInMinDate: '1/7/2025',
         cya,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
       })
     })
 
@@ -228,6 +313,7 @@ describe('checkInsController', () => {
         id: uuid,
         checkInMinDate: '9/7/2025',
         cya,
+        backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
       })
     })
 

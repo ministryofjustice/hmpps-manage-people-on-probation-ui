@@ -19,6 +19,8 @@ export interface CheckinUserDetails {
   displayDay?: string
   contactUpdated?: boolean
   settingsUpdated?: boolean
+  eligibility?: string[]
+  eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
 }
 export interface LocalParams {
   crn: string

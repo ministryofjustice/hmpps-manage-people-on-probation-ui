@@ -27,6 +27,26 @@ export interface ESupervisionValidationArgs {
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
   const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change, stopCheckIn } = args
   return {
+    [`[esupervision][${crn}][${id}][checkins][eligibility]`]: {
+      optional: page !== 'eligibility-check',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if any of these apply to the person',
+          log: 'Eligibility criteria not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][eligibilityChoice]`]: {
+      optional: page !== 'full-eligibility',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how you will use online check ins',
+          log: 'Check in option not selected',
+        },
+      ],
+    },
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
       checks: [

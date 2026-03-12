@@ -28,7 +28,7 @@ export const redirectWizard = (
       },
       setupcheckins: {
         dataPath: ['esupervision', crn, id, 'checkins'],
-        redirectPath: `/case/${crn}/appointments/${id}/check-in/instructions`,
+        redirectPath: `/case/${crn}/appointments/${id}/check-in/eligibility-check`,
         queryParam: 'cya',
       },
     }

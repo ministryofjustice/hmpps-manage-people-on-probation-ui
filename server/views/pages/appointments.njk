@@ -18,7 +18,7 @@
 {% set pastAppointmentRows = [] %}
 {% set setActionButtons = "false" %}
 {% set nextCheckin = offenderCheckinsByCRNResponse %}
-{% set checkinLink = '/case/' + crn + '/appointments/check-in/instructions?back=appointments' %}
+{% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check?back=appointments' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 
 {% if not nextCheckin or nextCheckin.status === 'INITIAL'%}
