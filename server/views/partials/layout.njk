@@ -36,9 +36,6 @@
 
 {% block head %}
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
-  {% if flags.enableDeleteAppointmentFile %}
-    <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
-  {% endif %}
   {% if flags.enableProbFEComponent === true %}
     {% if feComponents.cssIncludes %}
       {% for css in feComponents.cssIncludes %}
@@ -104,7 +101,6 @@
     })
   </script>
   <script nonce="{{ cspNonce }}">
-    {% if flags.enableDeleteAppointmentFile !== undefined %}window.enableDeleteAppointmentFile = {{ flags.enableDeleteAppointmentFile }}{% endif %}
     {% if validMimeTypes %}window.validMimeTypes = '{{ validMimeTypes }}'{% endif %}
     {% if maxFileSize %}window.maxFileSize = {{ maxFileSize }}{% endif %}
     {% if fileUploadLimit %}window.fileUploadLimit = {{ fileUploadLimit }}{% endif %}

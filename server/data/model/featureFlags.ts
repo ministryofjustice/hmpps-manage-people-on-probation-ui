@@ -1,7 +1,6 @@
 /* eslint-disable lines-between-class-members */
 export class FeatureFlags {
   [index: string]: boolean
-  enableDeleteAppointmentFile?: boolean = undefined
   enableSentencePlan?: boolean = undefined
   enableSanIndicator?: boolean = undefined
   enableProbFEComponent?: boolean = undefined
