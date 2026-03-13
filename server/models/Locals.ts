@@ -123,6 +123,7 @@ interface Locals {
   smsPreview?: SmsPreviewResponse | null
   personRisks?: PersonRiskFlags
   riskToStaff?: { id: number; level: RiskScore | null }
+  riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
 }
 
