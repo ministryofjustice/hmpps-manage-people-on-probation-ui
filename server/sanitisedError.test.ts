@@ -19,9 +19,9 @@ describe('sanitised error', () => {
         status: 404,
         statusText: 'Not found',
         text: { details: 'details' },
-        body: { content: 'hello' },
+        body: { message: 'Not Found' },
       },
-      message: 'Not Found',
+      message: 'File not found',
       stack: 'stack description',
     } as unknown as UnsanitisedError
 
@@ -30,7 +30,7 @@ describe('sanitised error', () => {
     e.text = 'details'
     e.status = 404
     e.headers = { date: 'Tue, 19 May 2020 15:16:20 GMT' }
-    e.data = { content: 'hello' }
+    e.data = { message: 'Not Found' }
     e.stack = 'stack description'
 
     expect(sanitisedError(error)).toEqual(e)
@@ -43,6 +43,46 @@ describe('sanitised error', () => {
 
     expect(sanitisedError(error)).toBeInstanceOf(Error)
     expect(sanitisedError(error)).toHaveProperty('message', 'error description')
+  })
+
+  it('it should return the body message', () => {
+    const error = {
+      message: 'message',
+      response: {
+        body: {
+          message: 'body message',
+        },
+      },
+    } as unknown as UnsanitisedError
+
+    expect(sanitisedError(error)).toHaveProperty('message', 'body message')
+  })
+
+  it('it should return the body developerMessage', () => {
+    const error = {
+      message: 'message',
+      response: {
+        body: {
+          developerMessage: 'developer error message',
+        },
+      },
+    } as unknown as UnsanitisedError
+
+    expect(sanitisedError(error)).toHaveProperty('message', 'developer error message')
+  })
+
+  it('it should return the body message over developerMessage', () => {
+    const error = {
+      message: 'message',
+      response: {
+        body: {
+          message: 'body message',
+          developerMessage: 'dev error message',
+        },
+      },
+    } as unknown as UnsanitisedError
+
+    expect(sanitisedError(error)).toHaveProperty('message', 'body message')
   })
 
   it('it should return an empty Error instance for an unknown error structure', () => {
