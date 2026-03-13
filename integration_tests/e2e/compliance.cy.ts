@@ -111,7 +111,7 @@ context('Compliance', () => {
     const page = new CompliancePage()
     page.checkPageTitle('Sorry, the Compliance page is unavailable')
     cy.get('p')
-      .eq(0)
+      .eq(1)
       .should(
         'contain.text',
         'The Compliance page is temporarily unavailable while we make some improvements. You can use NDelius if you need to check compliance in the meantime.',

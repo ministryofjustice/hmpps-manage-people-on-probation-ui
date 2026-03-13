@@ -3,7 +3,7 @@ context('Contact', () => {
     cy.visit('/case/X000001/personal-details/adjustments')
 
     cy.get('p')
-      .eq(0)
+      .eq(1)
       .within(() =>
         cy
           .get('a')
@@ -14,7 +14,7 @@ context('Contact', () => {
           ),
       )
     cy.get('p')
-      .eq(0)
+      .eq(1)
       .within(() => cy.get('a').should('contain.text', 'Change adjustments on NDelius (opens in new tab)'))
   })
 })
