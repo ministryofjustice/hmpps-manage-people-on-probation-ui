@@ -32,12 +32,6 @@ describe('Manage an appointment', () => {
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
   })
-  it('should render the page with no reschedule link if feature flag is disabled', () => {
-    cy.task('stubDisableRescheduleAppointment')
-    loadPage()
-    manageAppointmentPage = new ManageAppointmentPage()
-    manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
-  })
 
   describe('Alert banner', () => {
     describe('Appointment is in the future', () => {
@@ -875,17 +869,6 @@ describe('Manage an appointment', () => {
           const rescheduleAppointmentPage = new RescheduleAppointmentPage()
           rescheduleAppointmentPage.checkOnPage()
         })
-      })
-    })
-    describe('Appointment has no outcome recorded, feature flag is disabled', () => {
-      beforeEach(() => {
-        cy.task('stubDisableRescheduleAppointment')
-        cy.task('stubAppointmentNonCompliedWithPastDate')
-        loadPage()
-        manageAppointmentPage = new ManageAppointmentPage()
-      })
-      it('should not display the reschedule link', () => {
-        manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
       })
     })
   })
