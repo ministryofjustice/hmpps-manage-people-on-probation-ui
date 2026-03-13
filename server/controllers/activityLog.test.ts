@@ -179,6 +179,7 @@ describe('/controllers/activityLogController', () => {
             activities: mockActivities.activities,
           },
         ],
+        showSuccessBanner: undefined,
       })
     })
     it('should request the person activity from the api with size 25 when enableContactLog is true', async () => {
@@ -216,7 +217,27 @@ describe('/controllers/activityLogController', () => {
             activities: mockActivities.activities,
           },
         ],
+        showSuccessBanner: undefined,
       })
+    })
+    it('should pass showSuccessBanner to the template when present in the query', async () => {
+      const reqWithBanner = httpMocks.createRequest({
+        params: { crn, id, noteId },
+        query: { page: '', view: 'default', requirement: '', showSuccessBanner: 'true' },
+        session: { activityLogFilters: { page: '', view: 'default', requirement: '' } },
+      })
+      const resWithBanner = mockAppResponse({
+        filters: { dateFrom: '', dateTo: '', keywords: '' },
+        flags: { enableContactLog: true },
+      })
+      const renderSpyWithBanner = jest.spyOn(resWithBanner, 'render')
+
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithBanner, resWithBanner)
+
+      expect(renderSpyWithBanner).toHaveBeenCalledWith(
+        'pages/contact-log',
+        expect.objectContaining({ showSuccessBanner: 'true' }),
+      )
     })
     it('should calculate correct pagination when page is greater than 0', async () => {
       const reqWithPage = httpMocks.createRequest({
