@@ -168,9 +168,6 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
       dateTo: '',
       keywords: '',
     },
-    flags: {
-      enablePastAppointments: true,
-    },
     user: {
       username,
     },
@@ -527,9 +524,6 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ query: {} })
       const mockRes = createMockResponse({
         appointment: { type: { isLocationRequired: false } },
-        flags: {
-          enablePastAppointments: false,
-        },
       })
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
@@ -537,7 +531,6 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         _maxDate: '31/12/2199',
-        _minDate: '1/7/2025',
         change: undefined,
         showValidation: false,
         personRisks: undefined,

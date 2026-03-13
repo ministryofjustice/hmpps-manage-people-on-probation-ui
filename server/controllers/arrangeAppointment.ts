@@ -284,7 +284,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change, validation } = req.query as Record<string, string>
       const showValidation = validation === 'true'
       const isInPast = appointmentDateIsInPast(req)
-      const { enablePastAppointments } = res.locals.flags
       if (showValidation) {
         const errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
@@ -324,7 +323,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         alertDismissed,
         isReschedule,
-        ...(!enablePastAppointments ? { _minDate } : {}),
       })
     }
   },

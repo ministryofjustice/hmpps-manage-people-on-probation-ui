@@ -41,14 +41,12 @@ const appointments: Route<void> = (req, res, next) => {
   if (
     [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
   ) {
-    const { enablePastAppointments } = res.locals.flags
     const { _minDate, _maxDate } = getMinMaxDates()
 
     localParams = {
       ...localParams,
       isReschedule: isRescheduleAppointment(req),
       isInPast: appointmentDateIsInPast(req),
-      ...(enablePastAppointments ? {} : { _minDate }),
       _maxDate,
     }
   }
@@ -122,7 +120,6 @@ const appointments: Route<void> = (req, res, next) => {
           crn,
           id,
           page: 'location-date-time',
-          enablePastAppointments: res.locals.flags.enablePastAppointments,
         }),
         { now },
       ),
