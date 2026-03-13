@@ -36,7 +36,7 @@ describe('Change appointment details and reschedule', () => {
     })
 
     cy.get('p')
-      .eq(0)
+      .eq(1)
       .should(
         'contain.text',
         'Use the saved details of the previously created appointment to reschedule it. You can amend any of the details.',

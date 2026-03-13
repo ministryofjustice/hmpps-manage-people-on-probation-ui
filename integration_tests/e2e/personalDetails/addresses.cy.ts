@@ -9,8 +9,8 @@ context('Addresses', () => {
     const url =
       'https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=AddressandAccommodation&CRN=X000001'
 
-    page.assertAnchorElementAtIndex('p', 1, url)
-    page.assertTextElementAtIndex('p', 1, 'Edit all other addresses on NDelius (opens in new tab)')
+    page.assertAnchorElementAtIndex('p', 2, url)
+    page.assertTextElementAtIndex('p', 2, 'Edit all other addresses on NDelius (opens in new tab)')
 
     page.getTableHeader('mainAddress').should('contain.text', 'Main address – Since 14 Mar 2023')
     cy.get('[data-qa="changeMainAddressLink"]')
