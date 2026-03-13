@@ -56,7 +56,7 @@
 {% set outcomeTagColour = 'blue' %}
 {% set notesTagColour = 'blue' %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
-{% if not canReschedule and flags.enableRescheduleAppointment == true %}
+{% if not canReschedule %}
     {% set compliedStatus= 'Rescheduled' %}
     {% set compliedTagColor = 'blue' %}
 {% endif %}
@@ -231,7 +231,7 @@
                 visuallyHiddenText: ""
             }
         ]
-    } if canReschedule and flags.enableRescheduleAppointment
+    } if canReschedule
     },
     {
       key: {

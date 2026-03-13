@@ -5,7 +5,6 @@ export class FeatureFlags {
   enableSanIndicator?: boolean = undefined
   enableProbFEComponent?: boolean = undefined
   enableESuperVision?: boolean = undefined
-  enableRescheduleAppointment?: boolean = undefined
   enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
