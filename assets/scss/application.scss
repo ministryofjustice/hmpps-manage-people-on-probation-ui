@@ -617,6 +617,21 @@ body.feature-disabled {
   padding: 10px 0 10px 0;
 }
 
+.feedback-prompt {
+  background-color: #f3f2f1;
+  color: #0b0c0c;
+  border-top: 1px solid #b1b4b6;
+  outline: 0;
+  margin-top: 60px;
+}
+
+.feedback-prompt-text {
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 0 15px;
+  padding: 20px 0;
+}
+
 .feedback-container {
   display: flex;
   align-items: center;
