@@ -88,13 +88,31 @@ context('Alerts Dashboard', () => {
       )
   })
 
-  it('View full note', () => {
+  it('First alert checkbox aria-label contains the person name and date', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('[data-qa="moreInfo-8"]').click()
-    cy.get('[data-qa="moreInfo-8"]')
-      .find('[data-qa="alertNotes-8"]')
-      .find('a')
-      .should('have.attr', 'href', `/alerts/8/note/0?back=${encodeURIComponent('/alerts')}`)
+    cy.get('[data-qa="alertsTable"] tbody tr')
+      .first()
+      .within(() => {
+        cy.get('[data-qa="alertPerson"]')
+          .invoke('text')
+          .then(person => {
+            const fullNameList = person.trim().split('\n')[0].split(',')
+            cy.get('[data-qa="alertDate"]')
+              .invoke('text')
+              .then(date => {
+                const convertedDate = new Date(date)
+                const formattedDate = new Intl.DateTimeFormat('GB', {
+                  month: 'long',
+                }).format(convertedDate)
+
+                cy.get('.alert-checkbox')
+                  .invoke('attr', 'aria-label')
+                  .should('contain', fullNameList[0])
+                  .and('contain', fullNameList[1])
+                  .and('contain', formattedDate)
+              })
+          })
+      })
   })
 })
