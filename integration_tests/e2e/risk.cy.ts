@@ -69,12 +69,36 @@ const checkRiskPageView = (
         .getElementData('seriousViolentReoffendingPredictor')
         .get(`h2`)
         .should('contain.text', 'Serious Violent Reoffending Predictor')
+      page.getElementData('oasysScoreHistory').find('.govuk-heading-m').should('contain.text', 'Scores history')
+      page.getElementData('oasysScoreHistory').find('.predictor-timeline-link-btn').eq(0).click()
+      page
+        .getElementData('oasysScoreHistory')
+        .find('.predictor-timeline-link-btn')
+        .eq(0)
+        .should('contain.text', 'Close')
+      page.getElementData('oasysScoreHistory').find('.predictor-timeline-section').eq(0).should('be.visible')
+      page
+        .getElementData('oasysScoreHistory')
+        .find('.predictor-timeline-section')
+        .eq(0)
+        .find('.predictor-timeline-item--low')
+        .eq(0)
+        .should('contain.text', 'All Reoffending Predictor')
     } else {
       page.getElementData('ovp').should('exist')
       page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
       page.getElementData('ogrs').get(`h2`).should('contain.text', 'OGRS')
       page.getElementData('ogp').get(`h2`).should('contain.text', 'OGP')
       page.getElementData('ovp').get(`h2`).should('contain.text', 'OVP')
+      if (!sanIndicator) {
+        page
+          .getElementData('oasysScoreHistory')
+          .find('.predictor-timeline-section')
+          .eq(0)
+          .find('.legacy-predictor-timeline-item--low')
+          .eq(0)
+          .should('contain.text', 'OGRS')
+      }
     }
   } else {
     page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
@@ -104,6 +128,7 @@ const checkRiskPageView = (
     page.getElementData('ovp-1yr').should('have.text', '4%')
     page.getElementData('ovp-2yr').should('have.text', '10.2%')
     page.getElementData('ovp-level').should('have.text', 'Medium')
+    page.getElementData('oasysScoreHistory').find('h3').should('contain.text', 'OASys score history')
   }
 
   page.getElementData('riskFlagsCard').should('exist')
@@ -257,6 +282,7 @@ context('Risk', () => {
     cy.task('stubAuthSentencePlan')
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
+
     const page = new RiskPage()
     checkRiskPageView(page)
   })
@@ -339,12 +365,13 @@ context('Risk', () => {
     checkRiskPageView(page, sanIndicator, sentencePlanLink)
   })
 
-  it('Risk overview page is rendered with OGRS4 predictors', () => {
+  it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data', () => {
     cy.task('stubPredictorScoresOGRS4')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     checkRiskPageView(page, false, false, false, true)
   })
+
   it('Risk overview page is rendered with OGRS4 feature flag disabled', () => {
     cy.task('stubDisableOGRS4')
     cy.visit('/case/X000001/risk')
