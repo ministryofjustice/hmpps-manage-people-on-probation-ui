@@ -88,6 +88,16 @@ context('Alerts Dashboard', () => {
       )
   })
 
+  it('View full note', () => {
+    cy.visit('/alerts')
+    const page = Page.verifyOnPage(AlertsPage)
+    cy.get('[data-qa="moreInfo-8"]').click()
+    cy.get('[data-qa="moreInfo-8"]')
+      .find('[data-qa="alertNotes-8"]')
+      .find('a')
+      .should('have.attr', 'href', `/alerts/8/note/0?back=${encodeURIComponent('/alerts')}`)
+  })
+
   it('First alert checkbox aria-label contains the person name and date', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
