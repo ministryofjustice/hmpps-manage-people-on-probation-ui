@@ -36,7 +36,7 @@
                             name="selectedAlerts"
                             type="checkbox"
                             value="{{ alert.id }}"
-                            aria-label="Select alert for {{ alert.officer.name.forename }} {{ alert.officer.name.surname }} on {{ alert.date | dateWithYear }}">
+                            aria-label="Select alert for {{ alert.name.forename }} {{ alert.name.surname }} on {{ alert.date | dateWithYear }}">
                     <label class="govuk-label govuk-checkboxes__label" for="alert-{{ alert.id }}">
                         <span class="govuk-visually-hidden">Select alert</span>
                     </label>
