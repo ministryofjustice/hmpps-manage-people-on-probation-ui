@@ -612,7 +612,30 @@ body.feature-disabled {
   padding: 10px 0 10px 0;
 }
 
-.govuk-grid-row {
+.technical-updates-banner {
+  background-color: #f9e1ec;
+  padding: 10px 0 10px 0;
+}
+
+.feedback-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feedback-container .govuk-button {
+  margin-bottom: 0;
+  border: 1px #0b0c0c solid;
+  min-width: 100px;
+  box-shadow: 0px 3px 0px 0px #0b0c0c;
+}
+
+.feedback-container .govuk-label {
+  text-decoration: none !important;
+}
+
+
+.govuk-grid-row { 
   margin-right: -15px;
   margin-left: -15px;
 }
