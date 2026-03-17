@@ -14,6 +14,7 @@ import {
   getSmsPreview,
   getPersonRiskFlags,
   getOverdueOutcomes,
+  checkReschedule,
 } from '../middleware'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
@@ -93,6 +94,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
   router.post(
     '/case/:crn/arrange-appointment/:id/location-date-time',
     validate.appointments,
+    checkReschedule(hmppsAuthClient),
     autoStoreSessionData(hmppsAuthClient),
     checkAnswers,
     checkAppointments(hmppsAuthClient),
