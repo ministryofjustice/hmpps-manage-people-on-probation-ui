@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { dateIsInPast, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import {
@@ -870,6 +870,94 @@ describe('controllers/arrangeAppointment', () => {
         'NO',
       )
       expect(mockReq.session.data.appointments[crn][uuid].smsPreview).toBeUndefined()
+    })
+  })
+
+  describe('getTextMessageConfirmation', () => {
+    const mockReq = createMockRequest({ query: { change } })
+    it('should render the text message confirmation page if feature flag enabled', async () => {
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith('pages/arrange-appointment/text-message-confirmation', {
+        crn,
+        id: uuid,
+        change,
+      })
+    })
+    it('should redirect to the location date time page if feature flag is disabled', async () => {
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: false } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.getTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-date-time`)
+    })
+  })
+
+  describe('postTextMessageConfirmtion', () => {
+    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
+      mockedIsValidCrn.mockReturnValue(false)
+      mockedIsValidUUID.mockReturnValue(false)
+      const mockReq = createMockRequest({ query: { change } })
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
+      expect(redirectSpy).not.toHaveBeenCalled()
+    })
+    it('should redirect to correct url if change query in url', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        query: { change },
+      })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(redirectUrl)
+    })
+    it('should redirect to correct url if editing mobile number', async () => {
+      const url = '/text-message-confirmation'
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        query: { change },
+        request: { url },
+        appointmentBody: { smsOptIn: 'YES_UPDATE_MOBILE_NUMBER' },
+      })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/personal-details/${uuid}/edit-contact-details?origin=appointments&back=${encodeURIComponent(url)}&change=${change}`,
+      )
+    })
+    it('should redirect to correct url if adding mobile number', async () => {
+      const url = '/text-message-confirmation'
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        query: { change },
+        request: { url },
+        appointmentBody: { smsOptIn: 'YES_ADD_MOBILE_NUMBER' },
+      })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/personal-details/${uuid}/edit-contact-details?origin=appointments&back=${encodeURIComponent(url)}&change=${change}`,
+      )
+    })
+    it('should redirect to the supporting information page', async () => {
+      const url = '/text-message-confirmation'
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({ request: { url } })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/arrange-appointment/${uuid}/supporting-information?back=${encodeURIComponent(url)}`,
+      )
+      //
     })
   })
 

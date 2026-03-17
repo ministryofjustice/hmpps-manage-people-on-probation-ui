@@ -453,7 +453,10 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRM_TEXT_MSG', crn, SubjectType.CRN)
-      return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id, change })
+      if (res.locals.flags.enableSmsReminders) {
+        return res.render('pages/arrange-appointment/text-message-confirmation', { crn, id, change })
+      }
+      return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-date-time`)
     }
   },
   postTextMessageConfirmation: _hmppsAuthClient => {
