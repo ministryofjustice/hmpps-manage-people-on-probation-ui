@@ -1,6 +1,7 @@
 /* eslint-disable no-new */
 /* eslint-disable no-restricted-globals */
 
+import * as arnsFrontend from '@ministryofjustice/hmpps-arns-frontend-components-lib/dist/js/all'
 import { DateTime } from 'luxon'
 import './appInsights'
 import './predictors'
@@ -9,6 +10,8 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
+
+arnsFrontend.initAll()
 
 const $backendSortableTable = document.querySelector('table[data-module="moj-backend-sortable-table"]')
 if ($backendSortableTable) {
