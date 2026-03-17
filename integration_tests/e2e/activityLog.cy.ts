@@ -365,6 +365,25 @@ context('Contacts', () => {
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
     cy.get('.govuk-pagination').should('exist')
   })
+  it('should display the outcome field above the note in the contact log compact view details panel', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Outcome:')
+    cy.get('.govuk-table')
+      .find('tr')
+      .eq(5)
+      .find('.govuk-details__text')
+      .should('contain.text', 'User-generated free text content')
+    cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Turned up')
+  })
+
+  it('should not display the outcome field when the activity has no outcome', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').find('tr').eq(6).find('.govuk-details__text').should('not.contain.text', 'Outcome:')
+    cy.get('.govuk-table').find('tr').eq(6).find('.govuk-details__text').should('contain.text', 'Some notes')
+  })
+
   it('Contacts page renders activities with View and Manage links', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
