@@ -2,7 +2,7 @@ import { HmppsAuthClient } from '../data'
 import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { PersonRiskFlags, RiskFlag, RiskScore } from '../data/model/risk'
-import { setDataValue, findReplace, getStaffRisk } from '../utils'
+import { setDataValue, findReplace, getStaffRisk, getProbationRisk } from '../utils'
 
 export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next) => {
@@ -28,6 +28,7 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       personRisks = req.session.data.risks[crn]
     }
     const riskToStaff = getStaffRisk(personRisks.riskFlags)
+    const riskToProbationStaff = getProbationRisk(personRisks.riskFlags)
     let riskToStaffLevel = riskToStaff?.levelDescription ?? riskToStaff?.level
     if (riskToStaffLevel?.toUpperCase() === 'VERY HIGH') {
       riskToStaffLevel = 'VERY_HIGH'
@@ -36,7 +37,8 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       riskToStaffLevel && ['VERY_HIGH', 'HIGH', 'MEDIUM'].includes(riskToStaffLevel.toUpperCase())
         ? (riskToStaffLevel.toUpperCase() as RiskScore)
         : null
-    res.locals.riskToStaff = { id: riskToStaff?.id, level }
+    res.locals.riskToProbationStaff = riskToProbationStaff ? { id: riskToProbationStaff?.id } : undefined
+    res.locals.riskToStaff = riskToStaff ? { id: riskToStaff?.id, level } : undefined
     res.locals.personRisks = personRisks
     return next()
   }

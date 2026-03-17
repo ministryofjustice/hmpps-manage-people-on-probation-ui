@@ -1,6 +1,6 @@
 import { RiskFlag } from '../data/model/risk'
 
-export const getStaffRisk = (data: RiskFlag[]): RiskFlag => {
+export const getStaffRisk = (data: RiskFlag[]): RiskFlag | null => {
   if (!data) {
     return null
   }
@@ -9,6 +9,19 @@ export const getStaffRisk = (data: RiskFlag[]): RiskFlag => {
       item?.description === 'Risk to Staff' &&
       (!item.levelDescription || ['medium', 'high', 'very high'].includes(item.levelDescription.toLowerCase())),
   )
+
+  if (staffFlag.length === 0) {
+    return null
+  }
+
+  return staffFlag[0]
+}
+
+export const getProbationRisk = (data: RiskFlag[]): RiskFlag | null => {
+  if (!data) {
+    return null
+  }
+  const staffFlag = data.filter(item => item?.description === 'Risk to Probation Staff')
 
   if (staffFlag.length === 0) {
     return null
