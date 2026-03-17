@@ -3,8 +3,8 @@ import { v4 } from 'uuid'
 import { AppResponse } from '../models/Locals'
 
 export enum SubjectType {
-  CRN,
-  USER,
+  CRN = 'CRN',
+  USER = 'USER',
 }
 
 export default async function sendAuditMessage(
