@@ -100,7 +100,7 @@ context('Alerts Dashboard', () => {
 
   it('First alert checkbox aria-label contains the person name and date', () => {
     cy.visit('/alerts')
-    const page = Page.verifyOnPage(AlertsPage)
+    Page.verifyOnPage(AlertsPage)
     cy.get('[data-qa="alertsTable"] tbody tr')
       .first()
       .within(() => {
@@ -111,16 +111,15 @@ context('Alerts Dashboard', () => {
             cy.get('[data-qa="alertDate"]')
               .invoke('text')
               .then(date => {
-                const convertedDate = new Date(date)
-                const formattedDate = new Intl.DateTimeFormat('GB', {
-                  month: 'long',
-                }).format(convertedDate)
+                const dateList = date.split(' ')
 
                 cy.get('.alert-checkbox')
                   .invoke('attr', 'aria-label')
                   .should('contain', fullNameList[0])
                   .and('contain', fullNameList[1])
-                  .and('contain', formattedDate)
+                  .and('contain', dateList[0])
+                  .and('contain', dateList[1])
+                  .and('contain', dateList[2])
               })
           })
       })
