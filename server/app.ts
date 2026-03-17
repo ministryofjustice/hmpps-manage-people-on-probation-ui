@@ -44,6 +44,12 @@ export default function createApp(services: Services): express.Application {
 
   app.use(sentryMiddleware())
   app.use(metricsMiddleware)
+
+  app.use((req, res, next) => {
+    res.locals.pageUrl = encodeURI(`https://manage-people-on-probation.hmpps.service.justice.gov.uk${req.url}`) // ignores ENV
+    next()
+  })
+
   app.use(setUpHealthChecks(services.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
