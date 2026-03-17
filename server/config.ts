@@ -85,6 +85,13 @@ export default {
   interventions: {
     link: get('INTERVENTIONS_LINK', 'https://interventions-dummy-url', requiredInProduction),
   },
+  supervisionContacts: {
+    link: get(
+      'SUPERVISION_CONTACTS_LINK',
+      'https://probation-supervision-contacts-ui-dev.hmpps.service.justice.gov.uk',
+      requiredInProduction,
+    ),
+  },
   recall: {
     link: get('RECALL_LINK', 'https://consider-a-recall-dev.hmpps.service.justice.gov.uk/', requiredInProduction),
   },

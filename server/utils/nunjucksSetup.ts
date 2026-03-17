@@ -43,6 +43,7 @@ import {
   getDistinctRequirements,
   getRisksWithScore,
   interventionsLink,
+  supervisionContactsAddLink,
   isInThePast,
   isToday,
   oaSysUrl,
@@ -194,6 +195,7 @@ export default function nunjucksSetup(
   njkEnv.addGlobal('tierLink', tierLink)
   njkEnv.addGlobal('sentencePlanLink', sentencePlanLink)
   njkEnv.addGlobal('interventionsLink', interventionsLink)
+  njkEnv.addGlobal('supervisionContactsAddLink', supervisionContactsAddLink)
   njkEnv.addGlobal('setSortOrder', setSortOrder)
   njkEnv.addGlobal('sortAppointmentsDescending', sortAppointmentsDescending)
   njkEnv.addGlobal('isNotNull', isNotNull)
