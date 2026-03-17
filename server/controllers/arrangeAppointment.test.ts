@@ -79,6 +79,12 @@ jest.mock('../data/masApiClient', () => {
     return {
       getPersonRiskFlags: jest.fn(),
       getUserDetails: jest.fn().mockImplementation(() => Promise.resolve({ firstName: 'first' })),
+      getProbationPractitioner: jest.fn().mockImplementation(() =>
+        Promise.resolve({
+          name: { forename: 'first', surname: 'last' },
+          unallocated: false,
+        }),
+      ),
     }
   })
 })
@@ -1057,7 +1063,7 @@ describe('controllers/arrangeAppointment', () => {
         isOutLookEventFailed: false,
         appointmentType: null,
         smsSent: true,
-        attendingName: 'Caroline´s',
+        probationPractitionerName: 'first',
         url: '',
       })
     })
@@ -1074,7 +1080,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
-        attendingName: 'Caroline´s',
+        probationPractitionerName: 'first',
         url: encodeURIComponent('/reschedule/url'),
       })
     })
