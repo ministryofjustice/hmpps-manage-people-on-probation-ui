@@ -252,7 +252,7 @@ describe('controllers/arrangeAppointment', () => {
     })
     it('should render the sentence page', async () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
-      checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR_PAGE', crn, SubjectType.CRN)
+      checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,

@@ -159,7 +159,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change, validation } = req.query
       const { data } = req.session
       let { back } = req.query
-      await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR_PAGE', crn, SubjectType.CRN)
+      await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       if (back) {
         setDataValue(data, ['backLink', 'sentence'], back)
       } else {
