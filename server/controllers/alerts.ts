@@ -10,6 +10,7 @@ import { ErrorSummaryItem } from '../data/model/common'
 import logger from '../../logger'
 import { apiErrors } from '../properties'
 import { AppResponse } from '../models/Locals'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = ['getAlerts', 'getAlertNote', 'clearSelectedAlerts'] as const
 
@@ -75,6 +76,8 @@ const alertsController: Controller<typeof routes, void> = {
       const [sortName, sortDirection] = sortedBy.split('.')
       const token = await hmppsAuthClient.getSystemClientToken(user.username)
       const masClient = new MasApiClient(token)
+      await sendAuditMessage(res, 'VIEW_MAS_ALERT', user.username, SubjectType.USER)
+
       const alertsData: UserAlerts = await masClient.getUserAlerts(
         pageNum - 1,
         sortName.toUpperCase(),
@@ -114,7 +117,7 @@ const alertsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-
+      await sendAuditMessage(res, 'VIEW_MAS_ALERT_NOTE', res.locals.user.username, SubjectType.USER)
       const alertNote: UserAlertsContent = await masClient.getUserAlertNote(contactId, noteId)
       const alertsData = { content: [alertNote] }
 
@@ -138,7 +141,7 @@ const alertsController: Controller<typeof routes, void> = {
     return async (req, res, next) => {
       const { user } = res.locals
       const { selectedAlerts } = req.body
-      const { url } = req
+      await sendAuditMessage(res, 'EDIT_MAS_CLEAR_ALERT', res.locals.user.username, SubjectType.USER)
 
       if (!selectedAlerts || selectedAlerts.length === 0) {
         res.locals.alertsCleared = { error: true, message: `Select an alert to clear it.` }
