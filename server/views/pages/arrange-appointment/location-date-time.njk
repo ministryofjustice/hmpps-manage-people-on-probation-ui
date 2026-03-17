@@ -137,7 +137,6 @@
           attributes: { "data-qa": "isWithinOneHourOfMeetingWithWarning"},
           html: warningMessages.isWithinOneHourOfMeetingWith
       }) if warningMessages.isWithinOneHourOfMeetingWith }}
-
         {{ mojAlert({
           variant: "warning",
           title: warningMessages.nonWorkingDayName,
@@ -145,7 +144,6 @@
           attributes: { "data-qa": "nonWorkingDayNameWarning"},
           html: warningMessages.nonWorkingDayName
       }) if warningMessages.nonWorkingDayName }}
-
         {{ mojAlert({
           variant: "warning",
           title: warningMessages.overlapsWithMeetingWith,
@@ -153,15 +151,6 @@
           attributes: { "data-qa": "overlapsWithMeetingWith"},
           html: warningMessages.overlapsWithMeetingWith
       }) if warningMessages.overlapsWithMeetingWith }}
-
-        {{ mojAlert({
-          variant: "warning",
-          title: warningMessages.isSameRescheduledDate,
-          dismissible: true,
-          attributes: { "data-qa": "isSameRescheduledDate"},
-          html: warningMessages.isSameRescheduledDate
-      }) if warningMessages.isSameRescheduledDate }}
-
     {% endif %}
     {% if showCircumstances %}
         {{ govukDetails({
