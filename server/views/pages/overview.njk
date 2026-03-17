@@ -95,7 +95,7 @@
     {% if infoOnlyRiskLevel.length %}
       <dt class="govuk-!-font-weight-bold">Information only</dt>
       <dd class="govuk-!-margin-left-0">
-        <ul class="govuk-list govuk-!-margin-bottom-0">
+        <ul class="govuk-list">
           {% for risk in infoOnlyRiskLevel %}
             <li>{{ risk.description }}</li>
           {% endfor %}
