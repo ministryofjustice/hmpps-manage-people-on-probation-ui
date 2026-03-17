@@ -1,3 +1,4 @@
+import { Request } from 'express'
 import { DateTime } from 'luxon'
 import logger from '../../logger'
 import {
@@ -27,7 +28,6 @@ import {
   isValidMobileNumber,
   isFutureDate,
 } from './validationUtils'
-import { PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
   activityLogValidation,
   appointmentsValidation,
@@ -36,7 +36,7 @@ import {
   eSuperVisionValidation,
   ESupervisionValidationArgs,
 } from '../properties'
-import { Validateable, ValidationSpec } from '../models/Errors'
+import { ValidationSpec } from '../models/Errors'
 
 const loggerSpy = jest.spyOn(logger, 'info')
 const crn = 'X000001'
@@ -286,11 +286,13 @@ describe('isFutureDate', () => {
 })
 
 describe('validates edit personal contact details request with spec', () => {
-  const testRequest: PersonalDetailsUpdateRequest = {
-    phoneNumber: 'sakjdhaskdhjsakdkj',
-    mobileNumber: 'sakjdhaskdhjsakdkj',
-    emailAddress: 'test',
-  }
+  const testRequest = {
+    body: {
+      phoneNumber: 'sakjdhaskdhjsakdkj',
+      mobileNumber: 'sakjdhaskdhjsakdkj',
+      emailAddress: 'test',
+    },
+  } as Request
   const expectedResult: Record<string, string> = {
     emailAddress: 'Enter an email address in the correct format.',
     mobileNumber: 'Enter a mobile number in the correct format.',
@@ -303,21 +305,20 @@ describe('validates edit personal contact details request with spec', () => {
       personDetailsValidation({ ...testRequest, editingMainAddress: false }),
       expectedResult,
     ],
-  ])(
-    '%s validateWithSpec(%s, %s)',
-    (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
-      expect(validateWithSpec(a, b)).toEqual(expected)
-    },
-  )
+  ])('%s validateWithSpec(%s, %s)', (_: string, a: Request, b: ValidationSpec, expected: Record<string, string>) => {
+    expect(validateWithSpec(a, b)).toEqual(expected)
+  })
 })
 
 describe('validates edit main address request with spec', () => {
-  const testRequest: PersonalDetailsUpdateRequest = {
-    buildingName: 'x'.repeat(36),
-    postcode: 'INVALID',
-    startDate: 'ENDDATE',
-    endDate: DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString(),
-  }
+  const testRequest = {
+    body: {
+      buildingName: 'x'.repeat(36),
+      postcode: 'INVALID',
+      startDate: 'ENDDATE',
+      endDate: DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString(),
+    },
+  } as Request
   const expectedResult: Record<string, string> = {
     addressTypeCode: 'Select an address type.',
     buildingName: 'Building name must be 35 characters or less.',
@@ -333,29 +334,29 @@ describe('validates edit main address request with spec', () => {
       personDetailsValidation({ ...testRequest, editingMainAddress: true }),
       expectedResult,
     ],
-  ])(
-    '%s validateWithSpec(%s, %s)',
-    (_: string, a: PersonalDetailsUpdateRequest, b: ValidationSpec, expected: Record<string, string>) => {
-      expect(validateWithSpec(a, b)).toEqual(expected)
-    },
-  )
+  ])('%s validateWithSpec(%s, %s)', (_: string, a: Request, b: ValidationSpec, expected: Record<string, string>) => {
+    expect(validateWithSpec(a, b)).toEqual(expected)
+  })
 })
 
 describe('validates appointment location and date time page request with spec', () => {
   const testRequest = {
-    appointments: {
-      [crn]: {
-        [id]: {
-          user: {
-            locationCode: 'code',
+    params: { crn, id },
+    body: {
+      appointments: {
+        [crn]: {
+          [id]: {
+            user: {
+              locationCode: 'code',
+            },
+            date: '21/11/2',
+            start: '09:00',
+            end: '09:30',
           },
-          date: '21/11/2',
-          start: '09:00',
-          end: '09:30',
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`appointments-${crn}-${id}-date`]: 'Enter a date in the correct format, for example 17/5/2024',
   }
@@ -375,9 +376,12 @@ describe('validates appointment location and date time page request with spec', 
 
 describe('validates contacts filter request with spec', () => {
   const testRequest = {
-    dateFrom: '10/4/2025',
-    dateTo: '6/4/2025',
-  }
+    params: { crn, id },
+    body: {
+      dateFrom: '10/4/2025',
+      dateTo: '6/4/2025',
+    },
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     dateTo: 'The date to must be on or after the date from',
   }
@@ -389,8 +393,11 @@ describe('validates contacts filter request with spec', () => {
 
 describe('validates documents filter request with spec', () => {
   const testRequest = {
-    dateFrom: '10/4/2025',
-  }
+    params: { crn, id },
+    body: {
+      dateFrom: '10/4/2025',
+    },
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     dateTo: 'Enter or select a to date',
   }
@@ -612,14 +619,17 @@ describe('validates checkin contact type preference', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          checkins: { preferredComs: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            checkins: { preferredComs: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-checkins-preferredComs`]:
       'Select how the person wants us to send a link to the service',
@@ -649,14 +659,17 @@ describe('validates checkin date preference', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          checkins: { interval: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            checkins: { interval: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-checkins-date`]:
       'Enter the date you would like the person to complete their first check in',
@@ -684,14 +697,17 @@ describe('validates edit contact', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          checkins: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            checkins: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-checkins-editCheckInMobile`]: 'Enter a mobile number in the correct format.',
     [`esupervision-${crn}-${id}-checkins-editCheckInEmail`]: 'Enter an email address in the correct format.',
@@ -718,14 +734,17 @@ describe('validates photo options page', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          checkins: { photoUploadOption: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            checkins: { photoUploadOption: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-checkins-photoUploadOption`]: 'Select an option to continue',
   }
@@ -749,14 +768,17 @@ describe('validates upload a photo page', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          checkins: { photoUpload: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            checkins: { photoUpload: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     photoUpload: 'Select a photo of the person',
   }
@@ -780,14 +802,17 @@ describe('validates manage checkin settings', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          manageCheckin: { interval: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            manageCheckin: { interval: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-manageCheckin-date`]:
       'Enter the date you would like the person to complete their next check in',
@@ -814,14 +839,17 @@ describe('validates stop checkin', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          manageCheckin: { stopCheckin: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            manageCheckin: { stopCheckin: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-manageCheckin-stopCheckin`]: 'Select yes if you want to stop check ins for the person',
   }
@@ -846,14 +874,17 @@ describe('validates stop checkin reason', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          manageCheckin: { stopCheckin: 'YES', reason: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            manageCheckin: { stopCheckin: 'YES', reason: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-manageCheckin-reason`]: 'Enter the reason for stopping',
   }
@@ -878,14 +909,17 @@ describe('validates manage edit contact', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          manageCheckin: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            manageCheckin: { editCheckInMobile: '071838893dsafsadf', editCheckInEmail: 'address1gmail.com' },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-manageCheckin-editCheckInMobile`]: 'Enter a mobile number in the correct format.',
     [`esupervision-${crn}-${id}-manageCheckin-editCheckInEmail`]: 'Enter an email address in the correct format.',
@@ -912,14 +946,17 @@ describe('validates manage checkin contact type preference', () => {
     jest.clearAllMocks()
   })
   const testRequest = {
-    esupervision: {
-      [crn]: {
-        [id]: {
-          manageCheckin: { preferredComs: undefined },
+    params: { crn, id },
+    body: {
+      esupervision: {
+        [crn]: {
+          [id]: {
+            manageCheckin: { preferredComs: undefined },
+          },
         },
       },
     },
-  } as unknown as Validateable
+  } as unknown as Request
   const expectedResult: Record<string, string> = {
     [`esupervision-${crn}-${id}-manageCheckin-checkInMobile`]: 'Enter a mobile number',
     [`esupervision-${crn}-${id}-manageCheckin-checkInEmail`]: 'Enter an email address',
@@ -949,8 +986,11 @@ describe('validates restart check in settings (start date and frequency of check
 
   it('should return errors when date and interval are missing', () => {
     const testRequest = {
-      esupervision: { [crn]: { [id]: { restartCheckin: { date: undefined, interval: undefined } } } },
-    } as unknown as Validateable
+      params: { crn, id },
+      body: {
+        esupervision: { [crn]: { [id]: { restartCheckin: { date: undefined, interval: undefined } } } },
+      },
+    } as unknown as Request
 
     const expectedResult: Record<string, string> = {
       [`esupervision-${crn}-${id}-restartCheckin-date`]:
@@ -968,8 +1008,11 @@ describe('validates restart check in settings (start date and frequency of check
   it('should return error when restart date is in the past', () => {
     const pastDate = DateTime.now().minus({ days: 1 }).toFormat('d/M/yyyy')
     const testRequest = {
-      esupervision: { [crn]: { [id]: { restartCheckin: { date: pastDate, interval: 'WEEKLY' } } } },
-    } as unknown as Validateable
+      params: { crn, id },
+      body: {
+        esupervision: { [crn]: { [id]: { restartCheckin: { date: pastDate, interval: 'WEEKLY' } } } },
+      },
+    } as unknown as Request
 
     const expectedResult: Record<string, string> = {
       [`esupervision-${crn}-${id}-restartCheckin-date`]: 'The next online check in date must be today or in the future',
@@ -985,8 +1028,11 @@ describe('validates restart check in settings (start date and frequency of check
 describe('validates restart contact preferences', () => {
   it('should return errors when preferredComs is missing', () => {
     const testRequest = {
-      esupervision: { [crn]: { [id]: { restartCheckin: { preferredComs: undefined } } } },
-    } as unknown as Validateable
+      params: { crn, id },
+      body: {
+        esupervision: { [crn]: { [id]: { restartCheckin: { preferredComs: undefined } } } },
+      },
+    } as unknown as Request
 
     const expectedResult: Record<string, string> = {
       [`esupervision-${crn}-${id}-restartCheckin-preferredComs`]:

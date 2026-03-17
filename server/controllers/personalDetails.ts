@@ -119,10 +119,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const editingMainAddress = req.path.includes('personal-details/edit-main-address')
       const { origin = '' } = req.query as Record<string, string>
-      const errorMessages = validateWithSpec(
-        req.body,
-        personDetailsValidation({ ...req.body, editingMainAddress, origin }),
-      )
+      const errorMessages = validateWithSpec(req, personDetailsValidation({ ...req.body, editingMainAddress, origin }))
       res.locals.errorMessages = errorMessages
       const updateFn = editingMainAddress ? 'updatePersonalDetailsAddress' : 'updatePersonalDetailsContact'
       let request: PersonalDetailsUpdateRequest = {

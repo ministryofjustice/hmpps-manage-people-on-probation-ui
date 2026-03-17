@@ -10,6 +10,8 @@ import {
   completeAddNotePage,
   completeSupportingInformationPage,
   checkRiskToStaffAlert,
+  completeRescheduleAppointmentPage,
+  getUuid,
 } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
@@ -18,9 +20,10 @@ import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
-const loadPage = (_crn = crn, typeOptionIndex = 1) => {
-  completeSentencePage(1, '', _crn)
+const loadPage = (urlCRN = crn, typeOptionIndex = 1) => {
+  completeSentencePage(1, '', urlCRN)
   completeTypePage(typeOptionIndex)
 }
 
@@ -61,6 +64,7 @@ describe('Pick a date, location and time for this appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Page is rendered with options for an appointment type which requires a location', () => {
     beforeEach(() => {
       loadPage()
@@ -579,6 +583,69 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should redirect to the supporting info page', () => {
       notePage = new AppointmentNotePage()
       notePage.checkOnPage()
+    })
+  })
+
+  const completeInvalidRescheduleDateTime = () => {
+    completeRescheduleAppointmentPage()
+    const rescheduleCyaPage = new RescheduleCheckYourAnswerPage()
+    rescheduleCyaPage.getSubmitBtn().click()
+    locationDateTimePage = new AppointmentLocationDateTimePage()
+    locationDateTimePage.getDatePickerInput().clear().type('21/2/2024')
+    locationDateTimePage.getElementInput(`startTime`).type('10:15')
+    locationDateTimePage.getElementInput(`endTime`).focus().type('10:30')
+    locationDateTimePage.getSubmitBtn().click()
+  }
+
+  describe('Rescheduled date', () => {
+    const urlCRN = 'X000001'
+    beforeEach(() => {
+      completeInvalidRescheduleDateTime()
+    })
+    it('should display the correct validation if rescheduled date, start and end time are the same as original appointment', () => {
+      getUuid().then(urlUUID => {
+        locationDateTimePage.checkErrorSummaryBox([
+          'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is incorrect, select a new date.',
+          'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new start time.',
+          'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new end time.',
+        ])
+        locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-date-error`).should($error => {
+          expect($error.text().trim()).to.include(
+            'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is incorrect, select a new date.',
+          )
+        })
+        locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-start-error`).should($error => {
+          expect($error.text().trim()).to.include(
+            'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new start time.',
+          )
+        })
+        locationDateTimePage.getElement(`#appointments-${urlCRN}-${urlUUID}-end-error`).should($error => {
+          expect($error.text().trim()).to.include(
+            'The original appointment was also arranged for 10:15am on Wednesday 21 February. If the original date is correct, select a new end time.',
+          )
+        })
+      })
+    })
+    it('should submit the page if date is changed', () => {
+      locationDateTimePage.getDatePickerInput().clear().type('22/2/2024')
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      const attendedCompliedPage = new AttendedCompliedPage()
+      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
+    })
+    it('should submit the page if start time is changed', () => {
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:20')
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      const attendedCompliedPage = new AttendedCompliedPage()
+      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
+    })
+    it('should submit the page if end time is changed', () => {
+      locationDateTimePage.getElementInput(`endTime`).clear().type('10:40')
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      const attendedCompliedPage = new AttendedCompliedPage()
+      attendedCompliedPage.checkPageTitle('Confirm Caroline attended and complied')
     })
   })
 })
