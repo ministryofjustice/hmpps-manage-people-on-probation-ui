@@ -18,7 +18,10 @@ import {
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
-import { ArrangedSession } from '../models/ArrangedSession'
+import { checkSendAuditMessage } from './testutils'
+import { SubjectType } from '../middleware/sendAuditMessage'
+
+jest.mock('@ministryofjustice/hmpps-audit-client')
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const uuid2 = 'f1654ea3-0abb-46eb-860b-654a96edbe21'
@@ -242,12 +245,14 @@ describe('controllers/arrangeAppointment', () => {
         },
       },
     })
+
     it('should delete the session errors', async () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
     it('should render the sentence page', async () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
+      checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR_PAGE', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,
@@ -343,6 +348,7 @@ describe('controllers/arrangeAppointment', () => {
         await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
       })
       it('should render the type page', () => {
+        checkSendAuditMessage(res, 'SELECT_MAS_ATTENDANCE_AND_APPOINTMENT_TYPE', crn, SubjectType.CRN)
         expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type-attendance`, {
           crn,
           id: uuid,
@@ -388,6 +394,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockReq.session.data.errors).toBeUndefined()
     })
     it('should render the attendance page', () => {
+      checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_ATTENDANCE', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/attendance`, {
         crn,
         id: uuid,
@@ -476,6 +483,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getLocationNotInList()(mockReq, res)
     })
     it('should render the location not in list page', () => {
+      checkSendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_UNLISTED_LOCATION', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-not-in-list`, {
         crn,
         id: uuid,
@@ -508,6 +516,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
+      checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_LOCATION_DT_TIME', crn, SubjectType.CRN)
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
         crn,
         id: uuid,
@@ -870,6 +879,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse()
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getSupportingInformation(hmppsAuthClient)(mockReq, mockRes)
+      checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_SUPPORTING_INFO', crn, SubjectType.CRN)
       expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/supporting-information`, {
         crn,
         id: uuid,
