@@ -201,7 +201,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { data } = req.session
       const url = encodeURIComponent(req.url)
       const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
-      await sendAuditMessage(res, 'SELECT_MAS_ATTENDANCE_AND_APPOINTMENT_TYPE', crn, SubjectType.CRN)
+      await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_TYPE_AND_ATTENDANCE', crn, SubjectType.CRN)
       if (!eventId) {
         if (isValidCrn(crn) && isValidUUID(id)) {
           return res.redirect(`/case/${crn}/arrange-appointment/${id}/sentence`)
@@ -288,7 +288,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { change, validation } = req.query as Record<string, string>
       const showValidation = validation === 'true'
       const isInPast = appointmentDateIsInPast(req)
-      await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_LOCATION_DT_TIME', crn, SubjectType.CRN)
+      await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       if (showValidation) {
         const errorMessages = {
           [`appointments-${crn}-${id}-date`]: 'Enter or select a date',
@@ -369,7 +369,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { alertDismissed = false } = req.session
       const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
       const isReschedule = isRescheduleAppointment(req)
-      await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_ATTENDANCE_COMPLIED', crn, SubjectType.CRN)
+      await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_ATTENDED_AND_COMPLIED', crn, SubjectType.CRN)
       res.render('pages/appointments/attended-complied', {
         crn,
         id,
@@ -522,7 +522,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       let location = null
-      await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CYA', crn, SubjectType.CRN)
+      await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CHECK_YOUR_ANSWERS', crn, SubjectType.CRN)
       const {
         start,
         date,

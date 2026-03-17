@@ -348,7 +348,7 @@ describe('controllers/arrangeAppointment', () => {
         await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
       })
       it('should render the type page', () => {
-        checkSendAuditMessage(res, 'SELECT_MAS_ATTENDANCE_AND_APPOINTMENT_TYPE', crn, SubjectType.CRN)
+        checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_TYPE_AND_ATTENDANCE', crn, SubjectType.CRN)
         expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type-attendance`, {
           crn,
           id: uuid,
@@ -516,7 +516,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
-      checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_LOCATION_DT_TIME', crn, SubjectType.CRN)
+      checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
         crn,
         id: uuid,
