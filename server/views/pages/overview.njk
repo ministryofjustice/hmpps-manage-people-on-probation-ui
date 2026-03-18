@@ -62,6 +62,15 @@
 {% set riskFlagsHtml %}
 {% if personRisks.riskFlags.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+    {% if noRiskLevel.length %}
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in noRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
     {% if highRiskLevel.length %}
       <dt class="govuk-!-font-weight-bold rosh--high">High</dt>
       <dd class="govuk-!-margin-left-0">
@@ -95,18 +104,8 @@
     {% if infoOnlyRiskLevel.length %}
       <dt class="govuk-!-font-weight-bold">Information only</dt>
       <dd class="govuk-!-margin-left-0">
-        <ul class="govuk-list">
-          {% for risk in infoOnlyRiskLevel %}
-            <li>{{ risk.description }}</li>
-          {% endfor %}
-        </ul>
-      </dd>
-    {% endif %}
-    {% if noRiskLevel.length %}
-      <dt>N/A</dt>
-      <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list govuk-!-margin-bottom-0">
-          {% for risk in noRiskLevel %}
+          {% for risk in infoOnlyRiskLevel %}
             <li>{{ risk.description }}</li>
           {% endfor %}
         </ul>
