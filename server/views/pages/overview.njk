@@ -15,6 +15,7 @@
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
 {% set infoOnlyRiskLevel = groupByLevel("INFORMATION_ONLY", personRisks.riskFlags) %}
+{% set noRiskLevel = groupByLevel(undefined, personRisks.riskFlags) %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check' %}
 {% set manageCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + offenderCheckinsByCRNResponse.uuid %}
 {% set personForename = overview.personalDetails.name.forename %}
@@ -61,6 +62,15 @@
 {% set riskFlagsHtml %}
 {% if personRisks.riskFlags.length %}
   <dl class="govuk-!-margin-top-0 govuk-!-margin-bottom-0">
+    {% if noRiskLevel.length %}
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in noRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
     {% if highRiskLevel.length %}
       <dt class="govuk-!-font-weight-bold rosh--high">High</dt>
       <dd class="govuk-!-margin-left-0">

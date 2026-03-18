@@ -1,11 +1,11 @@
 import { Need, RiskFlag } from '../data/model/risk'
 import { isRisk } from './isRisk'
 
-export const groupByLevel = (level: string, data: Need[] | RiskFlag[]) => {
+export const groupByLevel = (level: string | undefined, data: Need[] | RiskFlag[]) => {
   if (!data) {
     return []
   }
-  const targetLevel = level.toLowerCase()
+  const targetLevel = level?.toLowerCase()
   if (isRisk(data)) {
     return data.filter(item => item?.severity === level)
   }
