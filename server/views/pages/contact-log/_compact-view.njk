@@ -56,6 +56,10 @@
                     lastUpdatedBy: activity.lastUpdatedBy,
                     lastUpdated: activity.lastUpdated
                   }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact', 'Latest update: ') %}
+                  {% if activity.outcome %}
+                    {% set outcomeHtml = '<p class="govuk-body govuk-!-margin-bottom-3"><span class="govuk-!-font-weight-bold">Outcome:</span> ' + activity.outcome + '</p>' %}
+                    {% set notes = outcomeHtml + notes %}
+                  {% endif %}
               {{ govukDetails({
                   summaryHtml: rendersummaryText(activity),
                   html: notes,
