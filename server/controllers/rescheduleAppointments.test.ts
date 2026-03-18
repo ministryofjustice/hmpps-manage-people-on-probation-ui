@@ -6,10 +6,9 @@ import { appointmentDateIsInPast, cloneAppointmentAndRedirect, renderError } fro
 import rescheduleAppointmentController from './rescheduleAppointments'
 import { SubjectType } from '../middleware/sendAuditMessage'
 import { checkSendAuditMessage } from './testutils'
+
 jest.mock('../data/masApiClient')
 jest.mock('@ministryofjustice/hmpps-audit-client')
-
-
 
 jest.mock('uuid', () => ({
   v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
@@ -112,12 +111,15 @@ describe('rescheduleAppointmentController', () => {
 
       await rescheduleAppointmentController.getRescheduleAppointment(null)(req, res, null)
 
-      expect(renderSpy).toHaveBeenCalledWith('pages/reschedule/appointment', expect.objectContaining({
-        uploadedFiles,
-        errorMessages,
-        body,
-        showValidation: true,
-      }))
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/reschedule/appointment',
+        expect.objectContaining({
+          uploadedFiles,
+          errorMessages,
+          body,
+          showValidation: true,
+        }),
+      )
       expect(req.session.cache.uploadedFiles).toBeUndefined()
       expect(req.session.errorMessages).toBeUndefined()
       expect(req.session.body).toBeUndefined()
