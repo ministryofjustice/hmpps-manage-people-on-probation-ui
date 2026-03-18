@@ -53,6 +53,7 @@ generic-service:
       SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       SESSION_SECRET: "SESSION_SECRET"
+      FEEDBACK_EMAIL: "FEEDBACK_EMAIL"
     flipt-bootstrap-token:
       FLIPT_TOKEN: "TOKEN"
     elasticache-redis:
