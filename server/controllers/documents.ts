@@ -17,7 +17,7 @@ const routes = ['getDocuments'] as const
 const documentController: Controller<typeof routes, void> = {
   getDocuments: hmppsAuthClient => {
     return async (req, res) => {
-      const errors = validateWithSpec(req?.body ?? {}, documentSearchValidation())
+      const errors = validateWithSpec(req, documentSearchValidation())
       res.locals.errorMessages = errors
 
       function clearFilter(type: string, fields: string[]) {

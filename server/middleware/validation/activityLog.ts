@@ -23,7 +23,7 @@ const activityLog: Route<void> = (req, res, next): void => {
     clearSession()
     const dateToIsEmpty = isEmpty(req?.body?.dateTo)
     const dateFromIsEmpty = isEmpty(req?.body?.dateFrom)
-    errorMessages = validateWithSpec(req.body, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
+    errorMessages = validateWithSpec(req, activityLogValidation(dateToIsEmpty, dateFromIsEmpty))
 
     if (Object.keys(errorMessages).length) {
       req.session.errorMessages = errorMessages

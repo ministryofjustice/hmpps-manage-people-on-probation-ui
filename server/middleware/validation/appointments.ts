@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
+import { Request } from 'express'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
@@ -78,7 +79,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -94,7 +95,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -115,11 +116,12 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
           page: 'location-date-time',
+          previousStart: req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment?.previousStart || null,
         }),
         { now },
       ),
@@ -134,7 +136,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -151,7 +153,7 @@ const appointments: Route<void> = (req, res, next) => {
     render = 'pages/appointments/attended-complied'
 
     errorMessages = validateWithSpec(
-      req.body,
+      req,
       appointmentsValidation({
         crn,
         id,
@@ -168,7 +170,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -185,7 +187,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -204,7 +206,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -223,7 +225,7 @@ const appointments: Route<void> = (req, res, next) => {
     render = 'pages/appointments/add-note'
 
     errorMessages = validateWithSpec(
-      req.body,
+      req,
       appointmentsValidation({
         crn,
         id,
@@ -243,7 +245,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -263,7 +265,7 @@ const appointments: Route<void> = (req, res, next) => {
       errorMessages = {
         ...errorMessages,
         ...validateWithSpec(
-          unflattenBracketKeys(req.body),
+          { ...req, body: unflattenBracketKeys(req.body) } as Request,
           appointmentsValidation({
             crn,
             id,
@@ -281,7 +283,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,

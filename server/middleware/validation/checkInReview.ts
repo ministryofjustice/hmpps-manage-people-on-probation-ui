@@ -29,7 +29,7 @@ const checkInReview: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`case/${crn}/appointments/${id}/check-in/view`)) {
       render = `pages/check-in/view`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         checkInReviewValidation({
           crn,
           id,
@@ -43,7 +43,7 @@ const checkInReview: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`case/${crn}/appointments/${id}/check-in/review/identity`)) {
       render = `pages/check-in/review/identity`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         checkInReviewValidation({
           crn,
           id,
@@ -56,7 +56,7 @@ const checkInReview: Route<void> = (req, res, next) => {
     if (baseUrl.includes(`case/${crn}/appointments/${id}/check-in/review/expired`)) {
       render = `pages/check-in/review/expired`
       errorMessages = validateWithSpec(
-        req.body,
+        req,
         checkInReviewValidation({
           crn,
           id,
