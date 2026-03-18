@@ -884,12 +884,14 @@ describe('controllers/arrangeAppointment', () => {
         id: uuid,
         change,
       })
+      expect(spy).toHaveBeenCalledTimes(1)
     })
     it('should redirect to the location date time page if feature flag is disabled', async () => {
       const mockRes = createMockResponse({ flags: { enableSmsReminders: false } })
       const spy = jest.spyOn(mockRes, 'redirect')
       await controllers.arrangeAppointments.getTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-date-time`)
+      expect(spy).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -913,6 +915,7 @@ describe('controllers/arrangeAppointment', () => {
       const spy = jest.spyOn(mockRes, 'redirect')
       await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
       expect(spy).toHaveBeenCalledWith(redirectUrl)
+      expect(spy).toHaveBeenCalledTimes(1)
     })
     it('should redirect to correct url if editing mobile number', async () => {
       const url = '/text-message-confirmation'
@@ -929,6 +932,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(spy).toHaveBeenCalledWith(
         `/case/${crn}/personal-details/${uuid}/edit-contact-details?origin=appointments&back=${encodeURIComponent(url)}&change=${change}`,
       )
+      expect(spy).toHaveBeenCalledTimes(1)
     })
     it('should redirect to correct url if adding mobile number', async () => {
       const url = '/text-message-confirmation'
@@ -945,6 +949,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(spy).toHaveBeenCalledWith(
         `/case/${crn}/personal-details/${uuid}/edit-contact-details?origin=appointments&back=${encodeURIComponent(url)}&change=${change}`,
       )
+      expect(spy).toHaveBeenCalledTimes(1)
     })
     it('should redirect to the supporting information page', async () => {
       const url = '/text-message-confirmation'
@@ -957,7 +962,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(spy).toHaveBeenCalledWith(
         `/case/${crn}/arrange-appointment/${uuid}/supporting-information?back=${encodeURIComponent(url)}`,
       )
-      //
+      expect(spy).toHaveBeenCalledTimes(1)
     })
   })
 
