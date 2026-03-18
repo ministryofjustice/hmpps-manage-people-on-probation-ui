@@ -125,6 +125,7 @@ interface Locals {
   riskToStaff?: { id: number; level: RiskScore | null }
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
+  feedbackEmail?: string
 }
 
 export interface AppResponse extends Response {
