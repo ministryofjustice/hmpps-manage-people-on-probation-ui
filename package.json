@@ -263,10 +263,7 @@
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "^3.14.0"
     },
-    "@ministryofjustice/hmpps-audit-client": {
-      "fast-xml-parser": "^5.3.8",
-      "ajv": "^8.18.0"
-    },
+    "fast-xml-parser": "5.5.6",
     "serialize-javascript": "^7.0.3"
   }
 }
