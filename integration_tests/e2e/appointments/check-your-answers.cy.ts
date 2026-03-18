@@ -29,6 +29,7 @@ import AddNotePage from '../../pages/appointments/add-note.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
 const loadPage = ({
   hasVisor = false,
@@ -67,6 +68,7 @@ describe('Check your answers then confirm the appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Appointment date is in the future', () => {
     it('should render the page', () => {
       loadPage()
@@ -307,6 +309,23 @@ describe('Check your answers then confirm the appointment', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkOnPage()
       })
+    })
+  })
+  describe('Should not navigate to the text message confirmation page if feature flag is disabled', () => {
+    beforeEach(() => {
+      cy.task('stubDisableSmsReminders')
+      loadPage({ textMessageFeatureFlag: false })
+      cy.go('back')
+      const supportingInfoPage = new AppointmentNotePage()
+      supportingInfoPage.getBackLink().click()
+      const locationDateTimePage = new AppointmentLocationDateTimePage()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      supportingInfoPage.getSubmitBtn().click()
+    })
+    it('should be on the cya page', () => {
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.checkOnPage()
     })
   })
 })
