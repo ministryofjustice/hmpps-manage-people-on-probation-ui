@@ -195,6 +195,96 @@ describe('checkInsController', () => {
       })
     })
 
+    describe('Eligibility Pages', () => {
+      it('Renders eligibility denied page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-denied.njk', {
+          crn,
+          id,
+          back: req.query.back,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_NOT_ELIGIBLE_TO_USE_CHECK_IN', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
+    describe('getFullEligibilityPage', () => {
+      it('renders full eligibility page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.getFullEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-full.njk', {
+          crn,
+          id,
+          back: req.query.back,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_ELIGIBLE_TO_USE_CHECK_IN', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getFullEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
+    describe('getSupplementaryEligibilityPage', () => {
+      it('Renders supplementary eligibility page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.getSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-supplementary.njk', {
+          crn,
+          id,
+          back: req.query.back,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_ELIGIBLE_TO_USE_CHECK_IN_AS_EXISTING_F2F_CONTACT', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
     describe('postEligibilityPage', () => {
       it('redirects to denied page when eligibility-9 is selected', async () => {
         mockIsValidCrn.mockReturnValue(true)
@@ -1299,7 +1389,7 @@ describe('checkInsController', () => {
       const resReview = reviewRes('EXPIRED', 'comment')
       const reviewRenderSpy = jest.spyOn(resReview, 'render')
       await controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient)(req, resReview)
-
+      checkSendAuditMessage(resReview, 'VIEW_MAS_CHECK_IN_MISSED_AND_REVIEWED', crn, SubjectType.CRN)
       expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view-expired.njk', {
         crn: req.params.crn,
         id: req.params.id,
@@ -2576,6 +2666,35 @@ describe('checkInsController', () => {
       await controllers.checkIns.getRestartConfirmation(hmppsAuthClient)(req, res)
 
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${uuid}`)
+    })
+  })
+
+  describe('Photo Options Page', () => {
+    it('Renders photo options page when CRN and id are valid', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/check-in/photo-options.njk', {
+        crn,
+        id: uuid,
+        cya: false,
+      })
+      expect(mockRenderError).not.toHaveBeenCalled()
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_PHOTO_OPTIONS', crn, SubjectType.CRN)
+    })
+
+    it('returns 404 when CRN is invalid', async () => {
+      mockIsValidCrn.mockReturnValue(false)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      await controllers.checkIns.getPhotoOptionsPage(hmppsAuthClient)(req, res)
+
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
   })
 })
