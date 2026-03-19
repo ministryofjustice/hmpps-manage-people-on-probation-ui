@@ -1,11 +1,10 @@
 import ManageAppointmentPage from '../../../../pages/appointments/manage-appointment.page'
 import { loadPage } from './common'
 
-export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) => {
+export const checkArrangeNextAppointmentAction = () => {
   let manageAppointmentPage: ManageAppointmentPage
-  describe('Arrange next appointment action', () => {
+  describe('Arrange next appointment', () => {
     const name = 'Arrange next appointment'
-    const index = enableNonCompliance ? 4 : 3
     describe('Logged in user is COM', () => {
       describe('Appointment is in future with no next appointment arranged', () => {
         beforeEach(() => {
@@ -16,7 +15,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(index)
+            .getTaskLink(3)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -28,12 +27,12 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'You do not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
@@ -46,19 +45,19 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(index).should('contain.text', name)
+          manageAppointmentPage.getTaskName(3).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+          manageAppointmentPage.getTaskLink(3).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -72,12 +71,12 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -91,7 +90,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(index)
+            .getTaskLink(3)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -103,12 +102,12 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'You do not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
@@ -121,19 +120,19 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(index).should('contain.text', name)
+          manageAppointmentPage.getTaskName(3).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+          manageAppointmentPage.getTaskLink(3).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -147,7 +146,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
       })
@@ -162,7 +161,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(index)
+            .getTaskLink(3)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -174,12 +173,12 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Terry does not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
@@ -192,19 +191,19 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(index).should('contain.text', name)
+          manageAppointmentPage.getTaskName(3).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+          manageAppointmentPage.getTaskLink(3).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -217,19 +216,19 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(index).should('contain.text', name)
+          manageAppointmentPage.getTaskName(3).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+          manageAppointmentPage.getTaskLink(3).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -243,7 +242,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(index)
+            .getTaskLink(3)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -255,12 +254,12 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Terry does not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
@@ -273,19 +272,19 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(index).should('contain.text', name)
+          manageAppointmentPage.getTaskName(3).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+          manageAppointmentPage.getTaskLink(3).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -308,19 +307,19 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(index).should('contain.text', name)
+          manageAppointmentPage.getTaskName(3).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(index).should('not.exist')
+          manageAppointmentPage.getTaskLink(3).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(index)
+            .getTaskHint(3)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(index)
+            .getTaskStatus(3)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -332,7 +331,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
         loadPage()
       })
       it('should not display a link to arrange next appointment', () => {
-        manageAppointmentPage.getTaskLink(index).should('not.exist')
+        manageAppointmentPage.getTaskLink(3).should('not.exist')
       })
     })
   })
