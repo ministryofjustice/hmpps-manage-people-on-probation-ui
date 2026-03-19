@@ -113,6 +113,7 @@
   {% endif %}
 {% endblock %}
 {% block content %}
+  {{ flags.enableNonCompliance }}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">

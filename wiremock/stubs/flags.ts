@@ -313,8 +313,8 @@ const stubDisableOGRS4 = (): SuperAgentRequest =>
         flags: [
           ...flags.mappings[0].response.jsonBody.flags,
           {
-            key: 'enableOGRS4',
-            name: 'enableOGRS4',
+            key: 'enableNonCompliance',
+            name: 'enableNonCompliance',
             description: '',
             enabled: false,
             type: 'BOOLEAN_FLAG_TYPE',
