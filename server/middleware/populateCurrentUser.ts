@@ -24,7 +24,7 @@ export default function populateCurrentUser(
           logger.info('No user available')
         }
         if (userDetails) {
-          localsUser = { ...userDetails, ...localsUser, userId: userDetails.userId.toString() }
+          localsUser = { ...userDetails, ...localsUser, userId: userDetails?.userId?.toString() }
         } else {
           logger.info('No user details available')
         }

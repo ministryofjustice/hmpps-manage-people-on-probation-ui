@@ -21,8 +21,8 @@ export default class FlagService {
     const requests = flagList.map(flag => {
       const request: EvaluationRequest = {
         flagKey: flag,
-        entityId: context.email || 'anonymous',
-        context: { email: context.email },
+        entityId: context?.email ? context.email || 'anonymous' : flag,
+        context: context?.email ? { email: context.email } : {},
       }
       return request
     })
