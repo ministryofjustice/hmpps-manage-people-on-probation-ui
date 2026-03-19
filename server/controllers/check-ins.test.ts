@@ -12,6 +12,8 @@ import { postCheckInDetails } from '../middleware/postCheckInDetails'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import ESupervisionClient from '../data/eSupervisionClient'
 import { CheckinScheduleResponse, ESupervisionCheckIn } from '../data/model/esupervision'
+import { SubjectType } from '../middleware/sendAuditMessage'
+import { checkSendAuditMessage } from './testutils'
 
 jest.mock('../../logger', () => ({
   info: jest.fn(),
@@ -32,6 +34,7 @@ jest.mock('../middleware/postCheckInDetails', () => ({
 jest.mock('../data/masApiClient')
 jest.mock('../data/eSupervisionClient')
 jest.mock('../data/tokenStore/redisTokenStore')
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('@ministryofjustice/hmpps-audit-client')
 
 const mockMiddlewareFn = jest.fn()
@@ -146,6 +149,7 @@ describe('checkInsController', () => {
           guidanceUrl: 'https://probation-check-in-dev.hmpps.service.justice.gov.uk',
         })
         expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_CHECK_CHECK_IN_ELIGIBILITY', crn, SubjectType.CRN)
       })
       it('returns 404 when CRN is invalid', async () => {
         mockIsValidCrn.mockReturnValue(false)
@@ -296,6 +300,7 @@ describe('checkInsController', () => {
         cya,
         backLink: `/case/${crn}/appointments/${uuid}/check-in/supplementary-eligibility`,
       })
+      checkSendAuditMessage(res, 'VIEW_MAS_SETUP_ONLINE_CHECK_INS', crn, SubjectType.CRN)
     })
 
     it('renders with min date using double-digit day format (dd/M/yyyy)', async () => {
@@ -402,6 +407,8 @@ describe('checkInsController', () => {
         'test@example.com',
       )
 
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONTACT_PREFERENCES', crn, SubjectType.CRN)
+
       // render with contact details
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/contact-preference.njk', {
         crn,
@@ -479,7 +486,7 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.getEditContactPrePage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'EDIT_MAS_CHECK_IN_CONTACT_PREFERENCE', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/edit-contact-preference.njk', { crn, id: uuid })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
@@ -636,7 +643,7 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.postPhotoOptionsPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_UPLOAD-A-PHOTO', crn, SubjectType.CRN)
       expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/upload-a-photo`)
       expect(mockRenderError).not.toHaveBeenCalled()
     })
@@ -671,7 +678,7 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.getTakePhotoPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_TAKE_A_PHOTO', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/take-a-photo.njk', { crn, id: uuid, cya })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
@@ -706,7 +713,7 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.getUploadPhotoPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_UPLOAD_PHOTO', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/upload-a-photo.njk', { crn, id: uuid, cya })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
@@ -825,7 +832,7 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.getPhotoRulesPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_PHOTO_RULES', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/photo-rules.njk', { crn, id: uuid })
       expect(mockRenderError).not.toHaveBeenCalled()
     })
@@ -878,7 +885,7 @@ describe('checkInsController', () => {
       })
 
       await controllers.checkIns.getCheckinSummaryPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_SUMMARY', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/checkin-summary.njk',
         expect.objectContaining({
@@ -963,7 +970,7 @@ describe('checkInsController', () => {
       })
 
       await controllers.checkIns.getConfirmationPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalled()
       const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
       expect(template).toBe('pages/check-in/confirmation.njk')
@@ -1233,6 +1240,7 @@ describe('checkInsController', () => {
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
       })
+      checkSendAuditMessage(resReview, 'VIEW_MAS_ONLINE_CHECK_IN_MISSED', crn, SubjectType.CRN)
     })
 
     it('returns 404 when CRN is invalid', async () => {
@@ -1318,7 +1326,6 @@ describe('checkInsController', () => {
 
       const req = baseReq()
       await controllers.checkIns.getViewExpiredCheckIn(hmppsAuthClient)(req, res)
-
       expect(mockRenderError).toHaveBeenCalledWith(404)
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
@@ -1358,7 +1365,7 @@ describe('checkInsController', () => {
       const resReview = reviewRes('SUBMITTED')
       const reviewRenderSpy = jest.spyOn(resReview, 'render')
       await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
-
+      checkSendAuditMessage(resReview, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
       expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/identity.njk', {
         crn: req.params.crn,
         id: req.params.id,
@@ -1459,7 +1466,7 @@ describe('checkInsController', () => {
       const resReview = reviewRes('SUBMITTED')
       const reviewRenderSpy = jest.spyOn(resReview, 'render')
       await controllers.checkIns.getReviewNotesCheckIn(hmppsAuthClient)(req, resReview)
-
+      checkSendAuditMessage(resReview, 'VIEW_MAS_ONLINE_CHECK_IN_REVIEW_SUBMITTED', crn, SubjectType.CRN)
       expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/notes.njk', {
         crn: req.params.crn,
         id: req.params.id,
@@ -1675,6 +1682,7 @@ describe('checkInsController', () => {
       // token retrieval and MAS client call
       expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalledWith('testuser')
       expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-checkin.njk', {
         crn,
         mobile: '07700900000',
@@ -1734,6 +1742,7 @@ describe('checkInsController', () => {
         date: '01/01/2026',
         interval: 'WEEKLY',
       })
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN_SETTINGS', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/manage/checkin-settings.njk',
         expect.objectContaining({
@@ -1810,7 +1819,7 @@ describe('checkInsController', () => {
       const req = baseReq(data)
 
       await controllers.checkIns.getManageContactPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN_CONTACT', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-contact.njk', {
         crn,
         id: uuid,
@@ -1968,7 +1977,7 @@ describe('checkInsController', () => {
       expect(
         req.session.data?.esupervision?.[crn]?.[uuid]?.manageCheckin?.contactUpdated as unknown as boolean | undefined,
       ).toBeUndefined()
-
+      checkSendAuditMessage(res, 'EDIT_MAS_MANAGE_CHECK_IN_CONTACT', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/manage-edit-contact.njk', {
         crn,
         id: uuid,
@@ -2101,7 +2110,7 @@ describe('checkInsController', () => {
       })
 
       await controllers.checkIns.getStopCheckinPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_STOP_CHECK_IN', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalled()
       const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
       expect(template).toBe('pages/check-in/manage/stop-checkin.njk')
@@ -2190,7 +2199,7 @@ describe('checkInsController', () => {
       })
 
       await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalled()
       const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
       expect(template).toBe('pages/check-in/video.njk')
@@ -2248,7 +2257,7 @@ describe('checkInsController', () => {
         ['esupervision', crn, uuid, 'restartCheckin', 'preferredComs'],
         'EMAIL',
       )
-
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_WHEN_TO_COMPLETE_ONLINE_CHECK_IN', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/manage/restart-date-frequency.njk',
         expect.objectContaining({
@@ -2311,7 +2320,7 @@ describe('checkInsController', () => {
         ['esupervision', crn, uuid, 'restartCheckin', 'editCheckInEmail'],
         'test@example.com',
       )
-
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_RESTART_ONLINE_CHECK_IN', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/manage/restart-contact-preference.njk',
         expect.objectContaining({
@@ -2355,7 +2364,7 @@ describe('checkInsController', () => {
       req.query = { change: 'email' }
 
       await controllers.checkIns.getRestartEditContactPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'EDIT_MAS_MANAGE_RESTART_ONLINE_CHECK_IN', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith('pages/check-in/manage/restart-edit-contact.njk', {
         crn,
         id: uuid,
@@ -2452,7 +2461,7 @@ describe('checkInsController', () => {
       }
       const req = baseReq(data)
       await controllers.checkIns.getRestartSummaryPage(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_RESTART_ONLINE_CHECK_IN_SUMMARY', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/manage/restart-checkin-summary.njk',
         expect.objectContaining({
@@ -2545,7 +2554,7 @@ describe('checkInsController', () => {
       const req = baseReq(data)
 
       await controllers.checkIns.getRestartConfirmation(hmppsAuthClient)(req, res)
-
+      checkSendAuditMessage(res, 'VIEW_MAS_MANAGE_RESTART_ONLINE_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(
         'pages/check-in/manage/restart-confirmation.njk',
         expect.objectContaining({

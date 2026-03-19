@@ -20,6 +20,7 @@ import { postCheckinInComplete } from '../middleware/postCheckinComplete'
 import { ProbationPractitioner } from '../models/CaseDetail'
 import config from '../config'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = [
   'getStartSetup',
@@ -107,6 +108,7 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_CHECK_IN_ELIGIBILITY', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -150,6 +152,7 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_NOT_ELIGIBLE_TO_USE_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -172,6 +175,7 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_ELIGIBLE_TO_USE_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -195,6 +199,7 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_ELIGIBLE_TO_USE_CHECK_IN_AS_EXISTING_F2F_CONTACT', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -217,7 +222,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-
+      await sendAuditMessage(res, 'VIEW_MAS_SETUP_ONLINE_CHECK_INS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -258,6 +263,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONTACT_PREFERENCES', crn, SubjectType.CRN)
       if (req?.session?.errorMessages) {
         res.locals.errorMessages = req.session.errorMessages
         delete req?.session?.errorMessages
@@ -306,6 +312,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getPhotoOptionsPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_PHOTO_OPTIONS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -316,6 +323,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'EDIT_MAS_CHECK_IN_CONTACT_PREFERENCE', crn, SubjectType.CRN)
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -365,6 +373,7 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const photoUploadOption = getDataValue(data, ['esupervision', crn, id, 'checkins', 'photoUploadOption'])
       const redirectTo = photoUploadOption === 'TAKE_A_PIC' ? 'take-a-photo' : 'upload-a-photo'
+      await sendAuditMessage(res, `VIEW_MAS_CHECK_IN_${redirectTo.toUpperCase()}`, crn, SubjectType.CRN)
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/${redirectTo}`)
     }
   },
@@ -372,6 +381,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getTakePhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_TAKE_A_PHOTO', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -383,6 +393,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getUploadPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_UPLOAD_PHOTO', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -404,6 +415,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getPhotoRulesPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_PHOTO_RULES', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -496,6 +508,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getViewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_MISSED_AND_REVIEWED', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -523,6 +536,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (checkIn.status !== 'EXPIRED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
+      await sendAuditMessage(res, 'VIEW_MAS_ONLINE_CHECK_IN_MISSED', crn, SubjectType.CRN)
       return res.render('pages/check-in/review/expired.njk', { crn, id, back, checkIn })
     }
   },
@@ -540,6 +554,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
+      await sendAuditMessage(res, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
       return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn, videoLink })
     }
   },
@@ -572,6 +587,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
+      await sendAuditMessage(res, 'VIEW_MAS_ONLINE_CHECK_IN_REVIEW_SUBMITTED', crn, SubjectType.CRN)
       return res.render('pages/check-in/review/notes.njk', { crn, id, back, checkIn })
     }
   },
@@ -629,6 +645,7 @@ const checkInsController: Controller<typeof routes, void> = {
         photoUploadOption:
           savedUserDetails.photoUploadOption === 'TAKE_A_PIC' ? 'Take a photo using this device' : 'Upload a photo',
       }
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_SUMMARY', crn, SubjectType.CRN)
       return res.render('pages/check-in/checkin-summary.njk', { crn, id, userDetails })
     }
   },
@@ -663,6 +680,7 @@ const checkInsController: Controller<typeof routes, void> = {
           savedUserDetails.preferredComs === 'EMAIL' ? savedUserDetails.checkInEmail : savedUserDetails.checkInMobile,
         displayDay: dayOfWeek(DateTime.fromFormat(savedUserDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
       }
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
       return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
     }
   },
@@ -670,6 +688,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getCheckinVideoPage: HmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
       const { checkIn } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -692,6 +711,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getManageCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -719,6 +739,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getManageCheckinDatePage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN_SETTINGS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -769,6 +790,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getManageContactPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN_CONTACT', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -837,6 +859,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getManageEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'EDIT_MAS_MANAGE_CHECK_IN_CONTACT', crn, SubjectType.CRN)
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -917,6 +940,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getStopCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_STOP_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -952,7 +976,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
-
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_WHEN_TO_COMPLETE_ONLINE_CHECK_IN', crn, SubjectType.CRN)
       return res.render('pages/check-in/manage/restart-date-frequency.njk', {
         crn,
         id,
@@ -1006,7 +1030,7 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.restartCheckin?.contactUpdated
       }
-
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_RESTART_ONLINE_CHECK_IN', crn, SubjectType.CRN)
       return res.render('pages/check-in/manage/restart-contact-preference.njk', {
         crn,
         id,
@@ -1064,6 +1088,7 @@ const checkInsController: Controller<typeof routes, void> = {
         'restartCheckin',
         'editCheckInEmail',
       ])
+      await sendAuditMessage(res, 'EDIT_MAS_MANAGE_RESTART_ONLINE_CHECK_IN', crn, SubjectType.CRN)
       return res.render('pages/check-in/manage/restart-edit-contact.njk', {
         crn,
         id,
@@ -1133,7 +1158,7 @@ const checkInsController: Controller<typeof routes, void> = {
         checkInMobile: restartDetails.checkInMobile || caseData.mobileNumber || 'No mobile number',
         checkInEmail: restartDetails.checkInEmail || caseData.email || 'No email address',
       }
-
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_RESTART_ONLINE_CHECK_IN_SUMMARY', crn, SubjectType.CRN)
       return res.render('pages/check-in/manage/restart-checkin-summary.njk', {
         crn,
         id,
@@ -1208,7 +1233,7 @@ const checkInsController: Controller<typeof routes, void> = {
         displayDay: dayOfWeek(DateTime.fromFormat(savedDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
       }
       setDataValue(data, ['esupervision', crn, id, 'restartCheckin'], undefined)
-
+      await sendAuditMessage(res, 'VIEW_MAS_MANAGE_RESTART_ONLINE_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
       return res.render('pages/check-in/manage/restart-confirmation.njk', {
         crn,
         id,
