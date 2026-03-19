@@ -33,13 +33,21 @@
             <span data-qa='name'>{{ headerPersonName.forename }}{{' '}}{{ headerPersonName.surname }}</span>
         </h1>
         {% if flags.enableOGRS4 %}
+            {% set overallRisk = risksWidget.overallRisk %}
+            {% if overallRisk == 'VERY_HIGH' %}
+                {% set overallRisk = 'VERY HIGH' %}
+            {% endif %}
             {% set riskDataRosh = {
                 assessments: [
                     {
                         rosh: {
-                            name: 'ROSH',
-                            band: risksWidget.overallRisk
-                        }
+                            name: 'ROSH' if riskData
+                                .assessments[0]
+                                .rsr
+                                .band else 
+                                    'RISK OF SERIOUS HARM',
+                                    band: overallRisk
+                            }
                     }
                 ]
             } %}
@@ -63,7 +71,7 @@
         showScore: true
     })}}
             {% endif %}
-            {% if risksWidget.overallRisk and risksWidget.overallRisk !== 'NOT_FOUND' %}
+            {% if overallRisk and overallRisk !== 'NOT_FOUND' %}
                 {{ predictorBadge({
         data: riskDataRosh,
         predictor: 'rosh',

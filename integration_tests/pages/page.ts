@@ -197,6 +197,12 @@ export default abstract class Page {
         .should('contain.text', '0.28%')
         .get('[data-test-id=staticOrDynamic')
         .should('contain.text', 'Dynamic')
+
+      cy.get(`[data-predictor-badge]`)
+        .eq(1)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'RISK OF SERIOUS HARM')
+        .should('contain.text', 'VERY HIGH')
     } else {
       cy.get(`[data-predictor-badge]`)
         .eq(0)
@@ -207,13 +213,13 @@ export default abstract class Page {
         .should('contain.text', '0.05%')
         .get('[data-test-id=staticOrDynamic')
         .should('contain.text', 'Dynamic')
-    }
 
-    cy.get(`[data-predictor-badge]`)
-      .eq(1)
-      .get('[data-test-id=nameAndBand')
-      .should('contain.text', 'ROSH')
-      .should('contain.text', 'VERY HIGH')
+      cy.get(`[data-predictor-badge]`)
+        .eq(1)
+        .get('[data-test-id=nameAndBand')
+        .should('contain.text', 'ROSH')
+        .should('contain.text', 'VERY HIGH')
+    }
   }
 
   getElementByDataQA = (name: string): PageElement => cy.get(`[data-qa="${name}"]`)
