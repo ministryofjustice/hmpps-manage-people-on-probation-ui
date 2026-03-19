@@ -57,11 +57,27 @@ export interface AppointmentLocals {
   outcomeRecorded?: string
 }
 
+export interface LocalsUser {
+  userId?: string
+  username?: string
+  firstName?: string
+  surname?: string
+  email?: string
+  enabled?: boolean
+  roles?: string[]
+  active?: boolean
+  name?: string
+  authSource: string
+  uuid?: string
+  displayName?: string
+  token: string
+}
+
 interface Locals {
   errorMessages: Record<string, string>
   warningMessages: Record<string, string>
   filters?: ActivityLogFiltersResponse
-  user: { token: string; authSource: string; username?: string; roles?: string[] }
+  user: LocalsUser
   compactView?: boolean
   defaultView?: boolean
   requirement?: string
