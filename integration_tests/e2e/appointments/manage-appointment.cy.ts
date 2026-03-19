@@ -1,6 +1,6 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
-import { checkAppointmentDetails } from './imports'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
+import { checkAppointmentDetails } from './manage-appointment/imports'
 
 const crn = 'X778160'
 const appointmentId = '6'

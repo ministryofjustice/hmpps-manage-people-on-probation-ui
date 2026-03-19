@@ -1,7 +1,6 @@
 import Page from '../../pages/page'
 import AppointmentsPage from '../../pages/appointments'
 import DateFrequencyPage from '../../pages/check-ins/date-frequencey'
-import { getCheckinUuid, getUuid } from './imports'
 import ContactPreferencePage from '../../pages/check-ins/contact-preference'
 import PhotoOptionsPage from '../../pages/check-ins/photo-options'
 import EditContactPreferencePage from '../../pages/check-ins/edit-contact-preference'
@@ -28,6 +27,7 @@ import EligibilityCheckPage from '../../pages/check-ins/eligibility-check'
 import EligibilityFullPage from '../../pages/check-ins/eligibility-full'
 import EligibilitySupplementaryPage from '../../pages/check-ins/eligibility-supplementary'
 import EligibilityDeniedPage from '../../pages/check-ins/eligibility-denied'
+import { getCheckinUuid } from './utils'
 
 const loadPage = () => {
   cy.task('resetMocks')

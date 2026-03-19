@@ -1,15 +1,13 @@
-import {
-  crn,
-  uuid,
-  completeTypePage,
-  completeSentencePage,
-  checkPopHeader,
-  completeLocationDateTimePage,
-  checkRiskToStaffAlert,
-  completeTextMessageConfirmationPage,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+} from './utils'
 
 const loadPage = (_crn = crn) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)

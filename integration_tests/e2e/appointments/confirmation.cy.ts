@@ -4,25 +4,23 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import CheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 
+import { checkPopHeader } from './imports'
+import OverviewPage from '../../pages/overview'
+import YourCasesPage from '../../pages/myCases'
+import { date, startTime, endTime } from './imports/common'
 import {
-  completeCYAPage,
   completeSentencePage,
   completeTypePage,
-  completeSupportingInformationPage,
-  date,
-  endTime,
-  startTime,
-  checkPopHeader,
   completeLocationDateTimePage,
   completeAttendedCompliedPage,
   completeAddNotePage,
-  completeRescheduling,
-  completeRescheduleAppointmentPage,
-  getUuid,
   completeTextMessageConfirmationPage,
-} from './imports'
-import OverviewPage from '../../pages/overview'
-import YourCasesPage from '../../pages/myCases'
+  completeSupportingInformationPage,
+  completeCYAPage,
+  getUuid,
+  completeRescheduleAppointmentPage,
+  completeRescheduling,
+} from './utils'
 
 const loadPage = (crnOverride = '', dateInPast = false, completeTextMessageConfirmOptionIndex = 1) => {
   completeSentencePage(1, '', crnOverride)

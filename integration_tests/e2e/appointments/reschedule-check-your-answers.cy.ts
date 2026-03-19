@@ -1,15 +1,9 @@
 import { DateTime } from 'luxon'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import {
-  checkAppointmentSummary,
-  checkPopHeader,
-  getUuid,
-  to24HourTimeWithMinutes,
-  completeRescheduling,
-  completeRescheduleAppointmentPage,
-} from './imports'
+import { checkAppointmentSummary, checkPopHeader } from './imports'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import { completeRescheduleAppointmentPage, getUuid, completeRescheduling, to24HourTimeWithMinutes } from './utils'
 
 describe('Change appointment details and reschedule', () => {
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage

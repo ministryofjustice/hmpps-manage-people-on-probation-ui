@@ -1,18 +1,6 @@
 import { DateTime } from 'luxon'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import {
-  completeSentencePage,
-  completeTypePage,
-  crn,
-  uuid,
-  checkPopHeader,
-  completeAttendedCompliedPage,
-  completeAddNotePage,
-  completeSupportingInformationPage,
-  checkRiskToStaffAlert,
-  completeRescheduleAppointmentPage,
-  getUuid,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationNotInListPage from '../../pages/appointments/location-not-in-list.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
@@ -20,6 +8,16 @@ import AppointmentTypePage from '../../pages/appointments/type.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeAttendedCompliedPage,
+  completeAddNotePage,
+  completeSupportingInformationPage,
+  completeRescheduleAppointmentPage,
+  getUuid,
+} from './utils'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 
 const loadPage = (urlCRN = crn, typeOptionIndex = 1) => {

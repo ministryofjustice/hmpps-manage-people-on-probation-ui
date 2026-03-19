@@ -1,13 +1,15 @@
 import { DateTime } from 'luxon'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
+import { statusErrors } from '../../../server/properties/statusErrors'
+import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import AddNotePage from '../../pages/appointments/add-note.page'
+import AppointmentNotePage from '../../pages/appointments/note.page'
+import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import IndexPage from '../../pages'
 
 import {
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeTypePage,
-  completeSupportingInformationPage,
   checkPopHeader,
   checkAppointmentSummary,
   checkUpdateDateTime,
@@ -16,19 +18,18 @@ import {
   checkUpdateSensitivity,
   checkUpdateSentence,
   checkUpdateType,
-  completeAttendedCompliedPage,
-  completeAddNotePage,
-  crn,
-  uuid,
-  completeTextMessageConfirmationPage,
   checkUpdateTextMessageConfirmation,
 } from './imports'
-import { statusErrors } from '../../../server/properties/statusErrors'
-import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
-import AddNotePage from '../../pages/appointments/add-note.page'
-import AppointmentNotePage from '../../pages/appointments/note.page'
-import EditContactDetails from '../../pages/personalDetails/editContactDetails'
-import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+  completeSupportingInformationPage,
+  completeAttendedCompliedPage,
+  completeAddNotePage,
+} from './utils'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
 const loadPage = ({

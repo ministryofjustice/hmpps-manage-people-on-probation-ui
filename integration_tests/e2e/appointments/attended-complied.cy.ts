@@ -2,18 +2,10 @@ import { DateTime } from 'luxon'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
-import {
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeTypePage,
-  checkLogOutcomesAlert,
-  checkPopHeader,
-  crn,
-  uuid,
-} from './imports'
+import { checkLogOutcomesAlert, checkPopHeader } from './imports'
 import { dateWithYear } from '../../../server/utils'
-
-const appointmentId = '6'
+import { crn, uuid, appointmentId } from './imports/common'
+import { completeSentencePage, completeTypePage, completeLocationDateTimePage } from './utils'
 
 const loadManagePage = () => {
   cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
