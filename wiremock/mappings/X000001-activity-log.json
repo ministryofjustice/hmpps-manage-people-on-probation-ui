@@ -33,6 +33,7 @@
               "id": 12,
               "type": "Planned Video Contact (NS)",
               "action": "Warning letter sent",
+              "description": "MS Teams meeting",
               "startDateTime": "2045-03-22T10:15:00.382936Z",
               "endDateTime": "2045-03-22T10:30:00.382936Z",
               "rarToolKit": "Choices and Changes",
@@ -1190,7 +1191,7 @@
           "appointment": {
             "id": 12,
             "type": "Planned Video Contact (NS)",
-            "description": "",
+            "description": "MS Teams meeting",
             "action": "Warning letter sent",
             "startDateTime": "2045-03-22T10:15:00.382936Z",
             "endDateTime": "2045-03-22T10:30:00.382936Z",
