@@ -35,7 +35,6 @@ jest.mock('../data/masApiClient')
 jest.mock('../data/eSupervisionClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
-jest.mock('@ministryofjustice/hmpps-audit-client')
 
 const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
