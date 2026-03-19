@@ -3,6 +3,9 @@ import SentencePage from '../pages/sentence'
 import { checkPopHeader } from './appointments/imports'
 
 context('Sentence', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+  })
   it('Licence condition note page is rendered', () => {
     cy.visit('/case/X000001/sentence/licence-condition/7007/note/0')
     checkPopHeader()
