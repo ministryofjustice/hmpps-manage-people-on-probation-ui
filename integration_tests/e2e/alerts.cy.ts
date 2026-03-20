@@ -43,7 +43,32 @@ context('Alerts Dashboard', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
     page.noAlertsMessage().should('not.exist')
-    page.getElement('[data-qa="alertsTable"]').should('be.visible')
+    page
+      .getElement('[data-qa="alertsTable"]')
+      .should('be.visible')
+      .within(() => {
+        cy.get('tbody tr')
+          .first()
+          .within(() => {
+            cy.get('[data-qa="alertPerson"]').invoke('text').should('contain', 'Wolff, Caroline')
+            cy.get('[data-qa="alertDate"]').invoke('text').should('contain', '10 Jul 2025')
+
+            cy.get('.alert-checkbox')
+              .invoke('attr', 'aria-label')
+              .should('equal', 'Select alert for Caroline Wolff on 10 July 2025')
+          })
+        cy.get('tbody tr')
+          .eq(3)
+          .within(() => {
+            cy.get('[data-qa="alertPerson"]').invoke('text').should('contain', 'Berge, Alton')
+            cy.get('[data-qa="alertDate"]').invoke('text').should('contain', '9 Jul 2025')
+
+            cy.get('.alert-checkbox')
+              .invoke('attr', 'aria-label')
+              .should('equal', 'Select alert for Alton Berge on 9 July 2025')
+          })
+      })
+
     page.getElement('[data-qa="clearSelectedAlerts"]').should('be.visible')
   })
 
