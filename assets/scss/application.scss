@@ -797,3 +797,17 @@ body.feature-disabled {
   gap: 5px;
   margin-left: auto;
 }
+
+@media (min-width: 40.0625em) {
+  .govuk-summary-list__actions {
+    width: 25%;
+  }
+}
+
+.govuk-table__cell {
+  a {
+    max-width: 100%;
+    display: block;
+    word-break: break-word;
+  }
+}
