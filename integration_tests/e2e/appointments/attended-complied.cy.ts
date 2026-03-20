@@ -65,7 +65,7 @@ describe('Log attended and complied appointment', () => {
     const manageJourney = true
 
     beforeEach(() => {
-      cy.task('stubPastAppointmentNoOutcomeNoNotes')
+      cy.task('stubAppointment', { isFuture: false, hasOutcome: false, notes: false })
       loadManagePage()
       manageAppointmentPage = new ManageAppointmentPage()
       manageAppointmentPage.getTaskLink(1).click()

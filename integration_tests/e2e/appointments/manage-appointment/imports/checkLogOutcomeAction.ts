@@ -11,7 +11,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
       })
       describe('Appointment is in the future with no outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, hasOutcome: false })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -24,7 +24,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
       })
       describe('Appointment is in the future with outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubAppointmentCompliedWithFutureDate')
+          cy.task('stubAppointment', { isFuture: true, hasOutcome: true, hasComplied: true })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -43,7 +43,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
       })
       describe('Appointment is in the past, with no outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentNoOutcomeNoNotes')
+          cy.task('stubAppointment', { isFuture: false, hasOutcome: false })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -62,7 +62,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
       })
       describe('Appointment is in the past, with outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', { isFuture: false, hasOutcome: true, hasComplied: true, notes: false })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -83,7 +83,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
     if (!enableNonCompliance) {
       describe('Appointment is in the future with no outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubAppointmentNonCompliedWithFutureDate')
+          cy.task('stubAppointment', { isFuture: true, hasOutcome: false })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -104,7 +104,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
       })
       describe('Appointment is in the past, with no outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentNoOutcomeNoNotes')
+          cy.task('stubAppointment', { isFuture: false, hasOutcome: false, notes: false })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -126,7 +126,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
       })
       describe('Appointment is in the past, with outcome logged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', { isFuture: false, hasOutcome: true, hasComplied: true })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })

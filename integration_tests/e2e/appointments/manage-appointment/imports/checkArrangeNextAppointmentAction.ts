@@ -9,7 +9,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
     describe('Logged in user is COM', () => {
       describe('Appointment is in future with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubIsComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -40,7 +40,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in future with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubIsComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -65,7 +65,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in the future with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubIsComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -84,7 +84,13 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in past with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubIsComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -115,7 +121,13 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in past with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubIsComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -140,7 +152,13 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in the past with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubIsComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -155,7 +173,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
     describe('Logged in user is not COM', () => {
       describe('Appointment is in future with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: false, deliusManaged: false, notes: false })
           cy.task('stubNotComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -186,7 +204,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in future with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubNotComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -211,7 +229,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in future with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubNotComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -236,7 +254,13 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in past with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubNotComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -267,7 +291,13 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in past with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubNotComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
@@ -292,7 +322,7 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is sensitive', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentSensitive')
+          cy.task('stubAppointment', { isFuture: false, deliusManaged: false, isSensitive: true })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -302,7 +332,13 @@ export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) =>
       })
       describe('Appointment is in the past with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubNotComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()

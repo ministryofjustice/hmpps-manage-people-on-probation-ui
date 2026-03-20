@@ -23,31 +23,26 @@ const appointmentActions = (enableNonCompliance = true) => {
 
 const appointmentDetails = (enableNonCompliance = true) => {
   describe('MPOP managed appointment', () => {
-    checkAppointmentDetails({ withLocationOfficeNameTask: 'stubAppointmentWithLocationOffice', enableNonCompliance })
+    checkAppointmentDetails({ deliusManaged: false, enableNonCompliance })
   })
+
   describe('Delius managed appointment type, no outcome', () => {
     beforeEach(() => {
-      cy.task('stubAppointmentNDeliusManagedType')
+      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: false })
       loadPage()
     })
     checkAppointmentDetails({
-      task: 'stubAppointmentNDeliusManagedType',
-      noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesNoOutcome',
-      withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesNoOutcome',
-      withLocationOfficeNameTask: '',
       deliusManaged: true,
+      hasOutcome: false,
       enableNonCompliance,
     })
   })
   describe('Delius managed appointment type, complied', () => {
     beforeEach(() => {
-      cy.task('stubAppointmentNDeliusManagedTypeComplied')
+      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, hasComplied: true })
       loadPage()
     })
     checkAppointmentDetails({
-      task: 'stubAppointmentNDeliusManagedTypeComplied',
-      noNotesTask: 'stubAppointmentNDeliusManagedTypeNoNotesHasOutcome',
-      withNotesTask: 'stubAppointmentNDeliusManagedTypeWithNotesHasOutcome',
       deliusManaged: true,
       hasComplied: true,
       hasOutcome: true,
@@ -56,13 +51,10 @@ const appointmentDetails = (enableNonCompliance = true) => {
   })
   describe('Delius managed appointment, acceptable absence', () => {
     beforeEach(() => {
-      cy.task('stubAppointmentAcceptableAbsenceNoNotes')
+      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, acceptableAbsence: true })
       loadPage()
     })
     checkAppointmentDetails({
-      task: 'stubAppointmentAcceptableAbsenceNoNotes',
-      noNotesTask: 'stubAppointmentAcceptableAbsenceNoNotes',
-      withNotesTask: 'stubAppointmentAcceptableAbsenceWithNotes',
       deliusManaged: true,
       hasComplied: false,
       acceptableAbsence: true,
@@ -72,13 +64,10 @@ const appointmentDetails = (enableNonCompliance = true) => {
   })
   describe('Delius managed appointment, unacceptable absence', () => {
     beforeEach(() => {
-      cy.task('stubAppointmentUnacceptableAbsenceNoNotes')
+      cy.task('stubAppointment', { deliusManaged: true, hasOutcome: true, acceptableAbsence: false })
       loadPage()
     })
     checkAppointmentDetails({
-      task: 'stubAppointmentUnacceptableAbsenceNoNotes',
-      noNotesTask: 'stubAppointmentUnacceptableAbsenceNoNotes',
-      withNotesTask: 'stubAppointmentUnacceptableAbsenceWithNotes',
       deliusManaged: true,
       hasComplied: false,
       acceptableAbsence: false,
@@ -92,6 +81,9 @@ describe('Manage an appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+  afterEach(() => {
+    cy.task('resetMocks')
+  })
   it('should render the page', () => {
     loadPage()
     manageAppointmentPage = new ManageAppointmentPage()
@@ -99,9 +91,11 @@ describe('Manage an appointment', () => {
     manageAppointmentPage.checkPageTitle('Manage planned office visit (NS) with Terry Jones')
     manageAppointmentPage.getLastUpdated().should('contain.text', 'Last updated by Paul Smith on 20 March 2023')
   })
+
   describe('Alert banner', () => {
     checkAlertBanner()
   })
+
   describe('Appointment actions', () => {
     it('should display the section title', () => {
       loadPage()
@@ -138,7 +132,7 @@ describe('Manage an appointment', () => {
     })
     describe('Appointment type is NDelius managed', () => {
       beforeEach(() => {
-        cy.task('stubAppointmentNDeliusManagedType')
+        cy.task('stubAppointment', { deliusManaged: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })

@@ -7,7 +7,7 @@ export const checkUploadDocumentsAction = () => {
   describe('Upload documents action', () => {
     describe('Appointment has associated documents', () => {
       beforeEach(() => {
-        cy.task('stubFutureAppointmentManagedTypeWithDocs')
+        cy.task('stubAppointment', { isFuture: true, deliusManaged: false, documents: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })

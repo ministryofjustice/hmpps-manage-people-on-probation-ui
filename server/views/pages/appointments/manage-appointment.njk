@@ -109,7 +109,6 @@
   {% endif %}
 {% endblock %}
 {% block content %}
-  {{ flags.enableNonCompliance }}
   {% if not hidePageHeader %}
     {% include "../../partials/pop-header.njk" %}
     <hr class="govuk-section-break--l">
@@ -173,7 +172,7 @@
         tag: {
           text: notesStatus,
           classes: "govuk-tag--" + notesTagColour
-        } if not hasNotes or (hasNotes and not appointment.isInPast) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
+        } if not hasNotes or (hasNotes and not appointment.isInPast and not appointment.hasOutcome) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
         text: 'Completed' if hasNotes and appointment.hasOutcome
       } 
     },
@@ -247,7 +246,7 @@
           }
         ]
       }
-    } if sentence and flags.enableNonCompliance,
+    } if sentence and flags.enableNonCompliance and not appointment.deliusManaged,
     {
       key: {
         text: "Date and time"
