@@ -1,5 +1,6 @@
 import { Controller, FileCache, FileUploadResponse } from '../@types'
 import MasApiClient from '../data/masApiClient'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = ['postUploadFile', 'postDeleteFile'] as const
 
@@ -16,6 +17,7 @@ const fileUploadController: Controller<typeof routes, any> = {
       let status = 200
       const file = req.file as Express.Multer.File
       const { id, crn } = req.body
+      await sendAuditMessage(res, 'ADD_NOTE_MANAGE_APPOINTMENT_FILE_UPLOAD', crn, SubjectType.CRN)
       const { originalname: originalName, size } = file
       const errors = {
         type: 'The selected file must be a PDF or Word document',
