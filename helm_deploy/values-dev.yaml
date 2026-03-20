@@ -47,6 +47,7 @@ generic-service:
       - unilink_staff
       - moj_cloud_platform
       - accessibility-testing-1
+    kpmg-pen-1: 195.68.59.72/29
 
   scheduledDowntime:
     enabled: true
