@@ -28,6 +28,7 @@ export const checkAppointmentDetails = (
     hasComplied = false,
     hasRarActivity = true,
     hasOutcomeText = false,
+    enableNonCompliance = true,
   }: Args = {} as Args,
 ) => {
   let page: ManageAppointmentPage
@@ -69,7 +70,8 @@ export const checkAppointmentDetails = (
     })
   }
   it('should display the date and time with Reschedule link when date is in past', () => {
-    const index = deliusManaged && hasOutcome ? 2 : 1
+    let index = deliusManaged && hasOutcome ? 2 : 1
+    if (enableNonCompliance) index += 1
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
     manageAppointmentPage
       .getAppointmentDetailsListItem(index, 'value')
@@ -86,7 +88,8 @@ export const checkAppointmentDetails = (
   })
 
   it('should display the full location address', () => {
-    const index = deliusManaged && hasOutcome ? 3 : 2
+    let index = deliusManaged && hasOutcome ? 3 : 2
+    if (enableNonCompliance) index += 1
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Location')
     manageAppointmentPage
       .getAppointmentDetailsListItem(index, 'value')
@@ -108,7 +111,8 @@ export const checkAppointmentDetails = (
   })
   if (withLocationOfficeNameTask) {
     it('should display only the office name for the location', () => {
-      const index = deliusManaged && hasOutcome ? 3 : 2
+      let index = deliusManaged && hasOutcome ? 3 : 2
+      if (enableNonCompliance) index += 1
       cy.task(withLocationOfficeNameTask)
       cy.visit('/case/X778160/appointments/appointment/6/manage')
       page = new ManageAppointmentPage()
@@ -121,7 +125,8 @@ export const checkAppointmentDetails = (
     if (task) {
       cy.task(task)
     }
-    const index = deliusManaged && hasOutcome ? 4 : 3
+    let index = deliusManaged && hasOutcome ? 4 : 3
+    if (enableNonCompliance) index += 1
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Attending')
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Terry Jones')
     if (!deliusManaged) {
@@ -141,20 +146,23 @@ export const checkAppointmentDetails = (
   })
   if (hasRarActivity) {
     it(`should display the RAR activity`, () => {
+      const index = enableNonCompliance ? 6 : 5
       cy.task('stubAppointmentUnacceptableAbsenceWithRAR')
       cy.visit('/case/X778160/appointments/appointment/6/manage')
       page = new ManageAppointmentPage()
-      manageAppointmentPage.getAppointmentDetailsListItem(5, 'value').should('contain.text', 'Stepping Stones')
+      manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Stepping Stones')
     })
   } else {
     it(`should display the RAR activity as 'Not provided'`, () => {
-      manageAppointmentPage.getAppointmentDetailsListItem(5, 'key').should('contain.text', 'RAR activity')
-      manageAppointmentPage.getAppointmentDetailsListItem(5, 'value').should('contain.text', 'Not provided')
-      manageAppointmentPage.getAppointmentDetailsListItem(5, 'actions').should('not.exist')
+      const index = enableNonCompliance ? 6 : 5
+      manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'RAR activity')
+      manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Not provided')
+      manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
     })
   }
   it('should display the VISOR report', () => {
-    const index = deliusManaged && hasOutcome ? 6 : 5
+    let index = deliusManaged && hasOutcome ? 6 : 5
+    if (enableNonCompliance) index += 1
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'VISOR report')
     manageAppointmentPage.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'No')
     if (!deliusManaged) {
@@ -173,7 +181,8 @@ export const checkAppointmentDetails = (
     }
   })
   it('should display the correct values if notes added to appointment', () => {
-    const index = deliusManaged && hasOutcome ? 7 : 6
+    let index = deliusManaged && hasOutcome ? 7 : 6
+    if (enableNonCompliance) index += 1
     cy.task(withNotesTask ?? 'stubFutureAppointmentManagedTypeWithNotes')
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
@@ -216,7 +225,8 @@ export const checkAppointmentDetails = (
   })
 
   it('should display the correct values if no notes added to appointment', () => {
-    const index = deliusManaged && hasOutcome ? 7 : 6
+    let index = deliusManaged && hasOutcome ? 7 : 6
+    if (enableNonCompliance) index += 1
     cy.task(noNotesTask ?? 'stubFutureAppointmentManagedTypeNoNotes')
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
@@ -243,7 +253,8 @@ export const checkAppointmentDetails = (
   }
   it('should display sensitive', () => {
     const baseIndex = deliusManaged && hasOutcome ? 8 : 7
-    const index = baseIndex + (hasOutcomeText ? 1 : 0)
+    let index = baseIndex + (hasOutcomeText ? 1 : 0)
+    if (enableNonCompliance) index += 1
     if (task) {
       cy.task(task)
     }

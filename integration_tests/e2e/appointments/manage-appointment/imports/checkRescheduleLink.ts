@@ -2,8 +2,9 @@ import ManageAppointmentPage from '../../../../pages/appointments/manage-appoint
 import RescheduleAppointmentPage from '../../../../pages/appointments/reschedule-appointment.page'
 import { loadPage } from './common'
 
-export const checkRescheduleLink = () => {
+export const checkRescheduleLink = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
+  const index = enableNonCompliance ? 2 : 1
   describe('Appointment Reschedule link', () => {
     beforeEach(() => {
       loadPage()
@@ -11,7 +12,7 @@ export const checkRescheduleLink = () => {
     })
 
     describe('Complied appointment with future date', () => {
-      const name = 'Log attended and complied appointment'
+      const name = 'Log appointment outcome'
       beforeEach(() => {
         cy.task('stubAppointmentCompliedWithFutureDate')
         loadPage()
@@ -19,18 +20,17 @@ export const checkRescheduleLink = () => {
       })
       describe('Appointment in future with outcome recorded', () => {
         it('Should not display Reschedule link', () => {
-          manageAppointmentPage.getTaskName(1).should('contain.text', name)
-          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(1, 'value')
+            .getAppointmentDetailsListItem(index, 'value')
             .should('contain.text', '21 February 2034 at 10:15am to 10:30am')
-          manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+          manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
         })
       })
     })
 
     describe('Appointment in future with no outcome recorded', () => {
-      const name = 'Log attended and complied appointment'
+      const name = 'Log appointment outcome'
       beforeEach(() => {
         cy.task('stubAppointmentNonCompliedWithFutureDate')
         loadPage()
@@ -38,13 +38,12 @@ export const checkRescheduleLink = () => {
       })
       describe('Appointment in future with no outcome recorded', () => {
         it('should display the reschedule link ', () => {
-          manageAppointmentPage.getTaskName(1).should('contain.text', name)
-          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(1, 'value')
+            .getAppointmentDetailsListItem(index, 'value')
             .should('contain.text', '21 February 2034 at 10:15am to 10:30am')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(1, 'actions')
+            .getAppointmentDetailsListItem(index, 'actions')
             .find('a')
             .should('contain.text', 'Reschedule')
             .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
@@ -56,7 +55,7 @@ export const checkRescheduleLink = () => {
     })
 
     describe('Appointment in past with outcome recorded', () => {
-      const name = 'Log attended and complied appointment'
+      const name = 'Log appointment outcome'
       beforeEach(() => {
         cy.task('stubAppointmentCompliedWithPastDate')
         loadPage()
@@ -64,18 +63,17 @@ export const checkRescheduleLink = () => {
       })
       describe('Appointment in past with outcome recorded', () => {
         it('Should not display Reschedule link', () => {
-          manageAppointmentPage.getTaskName(1).should('contain.text', name)
-          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(1, 'value')
+            .getAppointmentDetailsListItem(index, 'value')
             .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
-          manageAppointmentPage.getAppointmentDetailsListItem(1, 'actions').should('not.exist')
+          manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
         })
       })
     })
 
     describe('Appointment in past with no outcome recorded', () => {
-      const name = 'Log attended and complied appointment'
+      const name = 'Log appointment outcome'
       beforeEach(() => {
         cy.task('stubAppointmentNonCompliedWithPastDate')
         loadPage()
@@ -83,13 +81,12 @@ export const checkRescheduleLink = () => {
       })
       describe('Non complied appointment is in the past', () => {
         it('should display the reschedule link ', () => {
-          manageAppointmentPage.getTaskName(1).should('contain.text', name)
-          manageAppointmentPage.getAppointmentDetailsListItem(1, 'key').should('contain.text', 'Date and time')
+          manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(1, 'value')
+            .getAppointmentDetailsListItem(index, 'value')
             .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
           manageAppointmentPage
-            .getAppointmentDetailsListItem(1, 'actions')
+            .getAppointmentDetailsListItem(index, 'actions')
             .find('a')
             .should('contain.text', 'Reschedule')
             .should('have.attr', 'href', `/case/X778160/appointment/6/reschedule`)
