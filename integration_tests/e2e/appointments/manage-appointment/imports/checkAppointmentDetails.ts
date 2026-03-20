@@ -1,4 +1,6 @@
 import ManageAppointmentPage from '../../../../pages/appointments/manage-appointment.page'
+import SentencePage from '../../../../pages/sentence'
+import { loadPage } from './common'
 
 interface Args {
   hasOutcome?: boolean
@@ -23,6 +25,7 @@ export const checkAppointmentDetails = (
 ) => {
   const args = { deliusManaged, hasOutcome, acceptableAbsence, hasComplied, enableNonCompliance }
   let page: ManageAppointmentPage
+  let sentencePage: SentencePage
   const manageAppointmentPage = new ManageAppointmentPage()
   let outcomeStatus = ''
   if (hasOutcome && hasComplied) outcomeStatus = 'Complied'
@@ -69,6 +72,9 @@ export const checkAppointmentDetails = (
         .find('a')
         .should('contain.text', 'View sentence details')
         .should('have.attr', 'href', `/case/${crn}/sentence`)
+        .click()
+      sentencePage = new SentencePage()
+      sentencePage.checkOnPage()
     })
   }
 
@@ -77,6 +83,8 @@ export const checkAppointmentDetails = (
       ? 'should display the date and time with Reschedule link when date is in past'
       : 'should display the date and time with no Reschedule link',
     () => {
+      cy.task('stubAppointment', { ...args })
+      loadPage()
       let index = deliusManaged && hasOutcome ? 2 : 1
       if (enableNonCompliance && !deliusManaged) index += 1
       manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
