@@ -3,14 +3,13 @@ import ManageAppointmentPage from '../../pages/appointments/manage-appointment.p
 import AddNotePage from '../../pages/appointments/add-note.page'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import config from '../../../server/config'
+import { crn, uuid } from './imports/common'
 import {
-  completeAttendedCompliedPage,
-  completeLocationDateTimePage,
   completeSentencePage,
   completeTypePage,
-  crn,
-  uuid,
-} from './imports'
+  completeLocationDateTimePage,
+  completeAttendedCompliedPage,
+} from './utils'
 
 describe('Add a note', () => {
   let manageAppointmentPage: ManageAppointmentPage

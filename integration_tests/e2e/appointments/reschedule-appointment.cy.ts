@@ -1,7 +1,7 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
-import { getUuid } from './imports'
+import { getUuid } from './utils'
 
 describe('Reschedule Appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage

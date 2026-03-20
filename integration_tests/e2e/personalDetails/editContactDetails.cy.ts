@@ -2,14 +2,14 @@ import AppointmentNotePage from '../../pages/appointments/note.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import Page from '../../pages/page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import { uuid } from '../appointments/imports/common'
 import {
-  uuid,
+  normalise,
   completeSentencePage,
   completeTypePage,
   completeLocationDateTimePage,
   completeTextMessageConfirmationPage,
-  normalise,
-} from '../appointments/imports'
+} from '../appointments/utils'
 
 const submitInvalidPhoneNumber = (page: EditContactDetails, field: string) => {
   page.getElementInput(field).clear().type('1-2345X')

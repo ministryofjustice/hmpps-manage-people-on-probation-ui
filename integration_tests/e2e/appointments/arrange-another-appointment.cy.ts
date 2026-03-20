@@ -7,8 +7,6 @@ import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import SupportingInformationPage from '../../pages/appointments/note.page'
 import {
   checkAppointmentSummary,
-  getUuid,
-  crn,
   checkUpdateType,
   checkUpdateSentence,
   checkUpdateLocation,
@@ -18,6 +16,8 @@ import {
   checkUpdateBackLinkRefresh,
 } from './imports'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn } from './imports/common'
+import { getUuid } from './utils'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)

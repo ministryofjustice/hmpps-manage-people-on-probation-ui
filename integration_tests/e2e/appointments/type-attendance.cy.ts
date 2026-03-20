@@ -6,18 +6,17 @@ import 'cypress-plugin-tab'
 import mockResponse from '../../../wiremock/mappings/appointment-types.json'
 import { AppointmentType } from '../../../server/models/Appointments'
 import { getWiremockData, Wiremock } from '../../utils'
-import {
-  checkPopHeader,
-  checkRiskToStaffAlert,
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeSupportingInformationPage,
-  completeTextMessageConfirmationPage,
-  completeTypePage,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import { toSentenceCase } from '../../../server/utils'
 import AttendancePage from '../../pages/appointments/attendance.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+  completeSupportingInformationPage,
+} from './utils'
 
 const mockData = mockResponse as Wiremock
 
