@@ -235,7 +235,7 @@
         text: "Sentence"
       },
       value: {
-        html: '<span data-qa="sentenceValue">' + sentence + '</span>' 
+        html: '<span data-qa="sentenceValue">' + sentence | default('Details unavailable') + '</span>' 
       },
       actions: {
         classes: "govuk-!-white-space-nowrap",
@@ -245,7 +245,7 @@
             text: "View sentence details"
           }
         ]
-      }
+      } if sentence
     } if sentence and flags.enableNonCompliance and not appointment.deliusManaged,
     {
       key: {
