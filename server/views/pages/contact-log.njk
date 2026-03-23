@@ -43,15 +43,18 @@
       }) }}
     {% endif %}
   {% endif %}
-  {{ mojBanner({
-      type: 'success',
-      html: '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact created</h2><p class="govuk-body">You may need to refresh the page to see it in the contacts list.</p>',
-      classes: 'govuk-!-margin-bottom-2',
-      attributes: { "data-qa": "contactCreated"},
-      iconFallbackText: 'Success'
-  }) if showSuccessBanner and flags.enableCreateContact == true }}
+ {% if flags.enableCreateContact and showSuccessBanner %}
+   {% set bannerType = 'warning' if uploadFailed else 'success' %}
+   {% set bannerHtml = '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">The contact was created by the files did not upload</h2><p class="govuk-body">You may need to refresh the page to see it in the contacts list. You can use NDelius to add files to the contact</p>' if uploadFailed else '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact created</h2><p class="govuk-body">You may need to refresh the page to see it in the contacts list.</p>' %}
+   {{ mojBanner({
+       type: bannerType,
+       html: bannerHtml,
+       classes: 'govuk-!-margin-bottom-2',
+       attributes: { "data-qa": "uploadFailed" if uploadFailed else "contactCreated" },
+       iconFallbackText: 'Success' if not uploadFailed
+   }) }}
+ {% endif %}
 {% endblock %}
-
 {% block pageContent %}
 
   <div class="govuk-grid-row govuk-!-margin-top-4">

@@ -73,6 +73,7 @@ const activityLogController: Controller<typeof routes, void> = {
         errorMessages: req.session.errorMessages,
         groupedActivities: groupActivitiesByDate(personActivity.activities),
         showSuccessBanner: req.query?.showSuccessBanner,
+        uploadFailed: req.query?.uploadFailed,
       })
     }
   },
