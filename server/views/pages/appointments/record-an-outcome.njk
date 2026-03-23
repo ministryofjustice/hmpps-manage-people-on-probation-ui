@@ -1,5 +1,5 @@
 {% extends "../_form.njk" %}
-{% set title = "Which appointment are you recording an outcome for...?" if actionType == "outcome" else
+{% set title = "Which appointment are you recording an outcome for?" if actionType == "outcome" else
     "Which appointment?" %}
 {% set pageTitle = makePageTitle({
     pageHeading: ["Record an outcome", "Outcome"]
@@ -10,12 +10,11 @@
     {% set appointmentRadioItems = [] %}
     {% for appointment in contactResponse.content %}
         {% set appointmentRadioItems = (appointmentRadioItems.push({
-            html: '<strong>' + appointment.type.description + '</strong><br />' + appointment.date | dateWithDayAndWithYear + ' from ' + timeFromTo(appointment.start, appointment.end),
+            html: '<strong>' + appointment.type.description + '</strong><br />' + appointment.date | dateWithDayAndWithoutYear + ' from ' + timeFromTo(appointment.start, appointment.end),
             value: appointment.id,
             checked: contactId == appointment.id
         }), appointmentRadioItems) %}
     {% endfor %}
-    <p> TEST ...{{ ('Manage ' + appointment.type) | toSentenceCase }} with {{ appointment.officer.name | fullName }}</p>
     {{ govukRadios({
            name: "appointment-id",
            fieldset: {},
