@@ -217,4 +217,10 @@ context('Overview', () => {
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
   })
+
+  it('Overview page with risk to probation staff is rendered', () => {
+    cy.visit('/case/X777916', { failOnStatusCode: false })
+    Page.verifyOnPage(OverviewPage)
+    checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
+  })
 })
