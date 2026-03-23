@@ -19,6 +19,7 @@ import alertsRoutes from './alerts'
 import eSuperVisionCheckInsRoutes from './eSupervisionCheckins'
 import rescheduleAppointmentRoutes from './rescheduleAppointments'
 import whatsNew from './whatsNew'
+import appointmentOutcomesRoutes from './appointmentOutcomes'
 
 export default function routes(router: Router, services: Services): Router {
   home(router, services)
@@ -36,6 +37,7 @@ export default function routes(router: Router, services: Services): Router {
   interventionsRoutes(router, services)
   arrangeAppointmentRoutes(router, services)
   rescheduleAppointmentRoutes(router, services)
+  appointmentOutcomesRoutes(router, services)
   documentsRoutes(router, services)
   alertsRoutes(router, services)
   eSuperVisionCheckInsRoutes(router, services)
