@@ -2,7 +2,7 @@
 {% if riskToStaff or riskToProbationStaff %}
   {% set html %}
     {% if riskToProbationStaff %}
-      <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ forename }}&apos;s risk to probation staff flag</a><br>
+      <a href="/case/{{ crn }}/risk/flag/{{ riskToProbationStaff.id }}">View {{ forename }}&apos;s risk to probation staff flag</a><br>
     {% endif %}
     {% if riskToStaff %}
       <a href="/case/{{ crn }}/risk/flag/{{ riskToStaff.id }}">View {{ forename }}&apos;s {{riskLevelLabel(riskToStaff.level) | lower}} risk to staff flag</a>
