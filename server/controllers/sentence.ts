@@ -2,6 +2,7 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import { Controller } from '../@types'
 import MasApiClient from '../data/masApiClient'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = [
   'getSentence',
@@ -103,6 +104,7 @@ const sentenceController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+      await sendAuditMessage(res, 'VIEW_MAS_SENTENCE_PREVIOUS_ORDER', crn, SubjectType.CRN)
       const masClient = new MasApiClient(token)
       const previousOrderDetail = await masClient.getSentencePreviousOrder(crn, eventNumber)
       return res.render('pages/sentence/previous-orders/previous-order', {
