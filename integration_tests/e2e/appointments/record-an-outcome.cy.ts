@@ -20,11 +20,11 @@ context('Record an outcome', () => {
       cy.get('.govuk-radios').find('.govuk-radios__item').should('have.length', 2)
       cy.get('label[for="appointment-id"]')
         .should('contain.text', 'Phone call')
-        .should('contain.text', 'Thursday 21 March from 10:15am to 10:30am')
+        .should('contain.text', 'Thursday 21 March 2024 from 10:15am to 10:30am')
       cy.get('input#appointment-id').should('not.be.checked')
       cy.get('label[for="appointment-id-2"]')
         .should('contain.text', 'Other call')
-        .should('contain.text', 'Wednesday 21 February from 10:15am to 10:30am')
+        .should('contain.text', 'Wednesday 21 February 2024 from 10:15am to 10:30am')
       cy.get('input#appointment-id-2').should('not.be.checked')
     })
     it('should display validation if continue is clicked without selecting an appointment', () => {
