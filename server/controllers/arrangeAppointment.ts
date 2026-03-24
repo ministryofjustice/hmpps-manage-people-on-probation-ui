@@ -561,13 +561,22 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsSent = smsOptIn?.includes('YES')
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
 
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const probationPractitioner = await masClient.getProbationPractitioner(crn)
-      const probationPractitionerName = probationPractitioner.unallocated
-        ? 'unallocated probation practitioner'
-        : `${probationPractitioner.name.forename}`
-
+      let attendingName = 'your'
+      if (attending.username.toUpperCase() !== res.locals.user.username) {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const masClient = new MasApiClient(token)
+        try {
+          const probationPractitioner = await masClient.getProbationPractitioner(crn)
+          const probationPractitionersForename = probationPractitioner.name.forename || ''
+          const formattedName =
+            probationPractitionersForename.charAt(0).toUpperCase() +
+            probationPractitionersForename.slice(1).toLowerCase()
+          // First letter of the PPs name should be uppercase as per requirement
+          attendingName = `${formattedName}´s`
+        } catch {
+          attendingName = `The officer´s`
+        }
+      }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
@@ -583,7 +592,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         crn,
         backendId,
         isOutLookEventFailed,
-        probationPractitionerName,
+        attendingName,
         url,
         isInPast,
         appointmentType,
