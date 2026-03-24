@@ -11,6 +11,7 @@ interface Args {
   hasRarActivity?: boolean
   withLocationOfficeNameTask?: string
   enableNonCompliance?: boolean
+  hasOutcomeText?: boolean
 }
 
 const crn = 'X778160'
@@ -26,6 +27,7 @@ export const checkAppointmentDetails = (
     acceptableAbsence = false,
     hasComplied = false,
     hasRarActivity = true,
+    hasOutcomeText = false,
   }: Args = {} as Args,
 ) => {
   let page: ManageAppointmentPage
@@ -228,8 +230,20 @@ export const checkAppointmentDetails = (
     }
   })
 
+  if (hasOutcomeText) {
+    it('should display the outcome text', () => {
+      const index = deliusManaged && hasOutcome ? 8 : 7
+      cy.task('stubAppointmentWithOutcomeText')
+      cy.visit('/case/X778160/appointments/appointment/6/manage')
+      page = new ManageAppointmentPage()
+      page.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Outcome')
+      page.getAppointmentDetailsListItem(index, 'value').should('contain.text', 'Recalled to custody')
+      page.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
+    })
+  }
   it('should display sensitive', () => {
-    const index = deliusManaged && hasOutcome ? 8 : 7
+    const baseIndex = deliusManaged && hasOutcome ? 8 : 7
+    const index = baseIndex + (hasOutcomeText ? 1 : 0)
     if (task) {
       cy.task(task)
     }

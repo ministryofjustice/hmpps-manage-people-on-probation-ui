@@ -210,6 +210,18 @@ describe('Manage an appointment', () => {
         hasOutcome: true,
       })
     })
+    describe('MPOP managed appointment with outcome text', () => {
+      beforeEach(() => {
+        cy.task('stubAppointmentWithOutcomeText')
+        loadPage()
+        manageAppointmentPage = new ManageAppointmentPage()
+      })
+      checkAppointmentDetails({
+        noNotesTask: 'stubAppointmentWithOutcomeText',
+        withNotesTask: 'stubFutureAppointmentManagedTypeWithNotes',
+        hasOutcomeText: true,
+      })
+    })
   })
 
   describe('Associated documents', () => {
