@@ -578,7 +578,6 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         }
       }
 
-
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
