@@ -283,6 +283,40 @@ describe('/controllers/activityLogController', () => {
         }),
       )
     })
+
+    it('should pass showSuccessBanner to the template when present in query', async () => {
+      const reqWithSuccess = httpMocks.createRequest({
+        params: { crn },
+        query: { page: '', view: 'default', showSuccessBanner: 'true' },
+        session: { activityLogFilters: {} },
+      })
+      const resWithFlag = mockAppResponse({ filters: {}, flags: { enableContactLog: true } })
+      const renderSpyWithFlag2 = jest.spyOn(resWithFlag, 'render')
+
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithSuccess, resWithFlag)
+
+      expect(renderSpyWithFlag2).toHaveBeenCalledWith(
+        'pages/contact-log',
+        expect.objectContaining({ showSuccessBanner: 'true', uploadFailed: undefined }),
+      )
+    })
+
+    it('should pass uploadFailed to the template when present in query', async () => {
+      const reqWithUploadFailed = httpMocks.createRequest({
+        params: { crn },
+        query: { page: '', view: 'default', showSuccessBanner: 'true', uploadFailed: 'true' },
+        session: { activityLogFilters: {} },
+      })
+      const resWithFlag = mockAppResponse({ filters: {}, flags: { enableContactLog: true } })
+      const renderSpyWithFlag2 = jest.spyOn(resWithFlag, 'render')
+
+      await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithUploadFailed, resWithFlag)
+
+      expect(renderSpyWithFlag2).toHaveBeenCalledWith(
+        'pages/contact-log',
+        expect.objectContaining({ showSuccessBanner: 'true', uploadFailed: 'true' }),
+      )
+    })
   })
   describe('getActivity', () => {
     beforeEach(async () => {
