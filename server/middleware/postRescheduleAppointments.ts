@@ -75,7 +75,7 @@ export const postRescheduleAppointments = (
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
       const message = buildCaseLink(config.domain, crn, contactId.toString())
-      const subject = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const subject = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
       const rescheduleEventRequest: RescheduleEventRequest = {
         rescheduledEventRequest: {
           recipients: [
