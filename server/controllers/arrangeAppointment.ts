@@ -560,17 +560,14 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const smsOptIn = getDataValue<SmsOptInOptions>(data, ['appointments', crn, id, 'smsOptIn'])
       const smsSent = smsOptIn?.includes('YES')
       await sendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_CONFIRMATION', crn, SubjectType.CRN)
-      let attendingName = 'your '
-      if (attending.username.toUpperCase() !== res.locals.user.username) {
-        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-        const masClient = new MasApiClient(token)
-        try {
-          const user = await masClient.getUserDetails(attending.username.toUpperCase())
-          attendingName = `${forename}´s`
-        } catch {
-          attendingName = `The officer´s`
-        }
-      }
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const probationPractitioner = await masClient.getProbationPractitioner(crn)
+      const probationPractitionerName = probationPractitioner.unallocated
+        ? 'unallocated probation practitioner'
+        : `${probationPractitioner.name.forename}`
+
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data
@@ -586,7 +583,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         crn,
         backendId,
         isOutLookEventFailed,
-        attendingName,
+        probationPractitionerName,
         url,
         isInPast,
         appointmentType,
