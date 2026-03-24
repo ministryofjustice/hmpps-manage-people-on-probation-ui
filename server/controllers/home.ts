@@ -2,6 +2,7 @@ import { Controller } from '../@types'
 import config from '../config'
 import DeliusClient from '../data/deliusClient'
 import MasApiClient from '../data/masApiClient'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = ['getHome', 'getHomeOld'] as const
 
@@ -14,6 +15,7 @@ const homeController: Controller<typeof routes, void> = {
       const { upcomingAppointments, appointmentsRequiringOutcome, appointmentsRequiringOutcomeCount } =
         await deliusClient.getHomepage(res.locals.user.username)
       const url = encodeURIComponent(req.url)
+      await sendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
       return res.render('pages/homepage/homepage', {
         upcomingAppointments,
         appointmentsRequiringOutcome,
