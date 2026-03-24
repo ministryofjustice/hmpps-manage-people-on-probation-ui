@@ -97,6 +97,10 @@ const postUpdateOffenderDetailsSpy = jest
   .spyOn(ESupervisionClient.prototype, 'postUpdateOffenderDetails')
   .mockImplementation(() => Promise.resolve({} as CheckinScheduleResponse))
 
+const getOffenderCheckinsByCRNSpy = jest
+  .spyOn(ESupervisionClient.prototype, 'getOffenderCheckinsByCRN')
+  .mockImplementation(async () => null)
+
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
 const mockIsValidUUID = isValidUUID as jest.MockedFunction<typeof isValidUUID>
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
@@ -1820,10 +1824,11 @@ describe('checkInsController', () => {
     it('sets session values from response and renders settings with min date', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-      ;(res.locals as any).offenderCheckinsByCRNResponse = {
+      const mockResponse = {
         firstCheckin: '01/01/2026',
         checkinInterval: 'WEEKLY',
       }
+      getOffenderCheckinsByCRNSpy.mockResolvedValueOnce(mockResponse as any)
       const req = baseReq({})
 
       await controllers.checkIns.getManageCheckinDatePage(hmppsAuthClient)(req, res)
@@ -2319,7 +2324,7 @@ describe('checkInsController', () => {
     it('sets session values and renders restart date page', async () => {
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
-      ;(res.locals as any).offenderCheckinsByCRNResponse = {
+      const mockResponse = {
         crn,
         uuid,
         status: 'INACTIVE',
@@ -2327,6 +2332,7 @@ describe('checkInsController', () => {
         checkinInterval: 'WEEKLY',
         contactPreference: 'EMAIL',
       }
+      getOffenderCheckinsByCRNSpy.mockResolvedValueOnce(mockResponse as any)
       const req = baseReq({})
 
       await controllers.checkIns.getRestartCheckinPage(hmppsAuthClient)(req, res)

@@ -62,81 +62,6 @@ const stubNoSanIndicator = (): SuperAgentRequest =>
 const stubNoSentencePlanAndSanIndicator = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false))
 
-const stubEnableESuperVision = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableManageCheckins',
-            name: 'enableManageCheckins',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubDisablePastAppointments = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
-      method: 'GET',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        namespace: {
-          key: 'manage-people-on-probation-ui',
-        },
-        flags: [
-          {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-        ],
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
 const stubDisableRescheduleAppointment = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
@@ -164,17 +89,6 @@ const stubDisableRescheduleAppointment = (): SuperAgentRequest =>
           {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -218,17 +132,6 @@ const stubDisableSmsReminders = (): SuperAgentRequest =>
           {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -303,17 +206,6 @@ const stubDisableCompliancePage = (): SuperAgentRequest =>
             rollouts: [],
           },
           {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableSmsReminders',
             name: 'enableSmsReminders',
             description: '',
@@ -370,17 +262,6 @@ const stubDisableTierLink = (): SuperAgentRequest =>
           {
             key: 'enableRepeatAppointments',
             name: 'enableRepeatAppointments',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
             description: '',
             enabled: true,
             type: 'BOOLEAN_FLAG_TYPE',
@@ -510,17 +391,6 @@ const stubDisableOGRS4 = (): SuperAgentRequest =>
             rollouts: [],
           },
           {
-            key: 'enableESuperVision',
-            name: 'enableESuperVision',
-            description: '',
-            enabled: true,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-11-17T15:28:37.920581Z',
-            updatedAt: '2025-11-17T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
-          {
             key: 'enableSmsReminders',
             name: 'enableSmsReminders',
             description: '',
@@ -620,8 +490,6 @@ export default {
   stubNoSentencePlan,
   stubNoSanIndicator,
   stubNoSentencePlanAndSanIndicator,
-  stubEnableESuperVision,
-  stubDisablePastAppointments,
   stubDisableRescheduleAppointment,
   stubDisableSmsReminders,
   stubDisableCompliancePage,

@@ -232,7 +232,6 @@
   {% endif %}
   {% endset %}
   {% endset %}
-  {% if flags.enableESuperVision === true %}
     {{ appSummaryCard({
         titleText: 'Online check ins',
         headingLevel: 3,
@@ -248,7 +247,6 @@
             ]
         } if hasPractitioner
     }) }}
-  {% endif %}
 
   {% set personalDetails %}
   {% set dateOfBirthAndAge %}

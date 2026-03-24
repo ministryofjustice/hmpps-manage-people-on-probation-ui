@@ -15,6 +15,7 @@ import {
   cloneAppointmentAndRedirect,
   renderError,
   getAttendedCompliedProps,
+  getCheckinOffenderDetails,
   AttendedCompliedAppointment,
 } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
@@ -43,6 +44,7 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/arnsApiClient')
+jest.mock('../data/eSupervisionClient')
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -62,6 +64,7 @@ jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
   getAttendedCompliedProps: jest.fn(),
+  getCheckinOffenderDetails: jest.fn(() => mockMiddlewareFn),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -78,6 +81,7 @@ const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.Mock
   typeof cloneAppointmentAndRedirect
 >
 const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
+const mockGetCheckinOffenderDetails = getCheckinOffenderDetails as jest.MockedFunction<typeof getCheckinOffenderDetails>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
 
