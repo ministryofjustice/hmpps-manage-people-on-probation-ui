@@ -19,6 +19,7 @@ interface Args {
   createNext?: boolean
   startDateTime?: string
   endDateTime?: string
+  outcome?: string
 }
 
 const getAppointmentStub = (
@@ -40,6 +41,7 @@ const getAppointmentStub = (
     createNext = false,
     startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
     endDateTime = '2024-02-21T10:30:00.382936Z[Europe/London]',
+    outcome = '',
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -130,7 +132,7 @@ const getAppointmentStub = (
             surname: 'Smith',
           },
           description: '',
-          outcome: '',
+          outcome,
           deliusManaged: false,
           isVisor: true,
           eventId: 48,
@@ -607,6 +609,11 @@ const stubAppointmentDuplicate = (): SuperAgentRequest =>
     },
   })
 
+const stubAppointmentWithOutcomeText = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ managedType: true, isFuture: false, notes: false, outcome: 'Recalled to custody' })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
+
 export default {
   stubFutureAppointmentManagedTypeNoNotes,
   stubAppointmentWithLocationOffice,
@@ -650,4 +657,5 @@ export default {
   stubAppointmentCompliedWithFutureDate,
   stubAppointmentCompliedWithPastDate,
   stubAppointmentNonCompliedWithPastDate,
+  stubAppointmentWithOutcomeText,
 }
