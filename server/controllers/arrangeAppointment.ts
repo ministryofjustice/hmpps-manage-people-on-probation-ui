@@ -572,11 +572,13 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
             probationPractitionersForename.charAt(0).toUpperCase() +
             probationPractitionersForename.slice(1).toLowerCase()
           // First letter of the PPs name should be uppercase as per requirement
-          attendingName = `${formattedName}´s`
+          attendingName = `${formattedName}'s`
         } catch {
-          attendingName = `The officer´s`
+          attendingName = `The officer's`
         }
       }
+
+
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
       const { isOutLookEventFailed } = data

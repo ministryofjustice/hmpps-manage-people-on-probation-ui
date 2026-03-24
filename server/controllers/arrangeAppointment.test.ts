@@ -1063,7 +1063,7 @@ describe('controllers/arrangeAppointment', () => {
         isOutLookEventFailed: false,
         appointmentType: null,
         smsSent: true,
-        attendingName: 'First´s',
+        attendingName: "First's",
         url: '',
       })
     })
@@ -1080,7 +1080,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
-        attendingName: 'First´s',
+        attendingName: "First's",
         url: encodeURIComponent('/reschedule/url'),
       })
     })
