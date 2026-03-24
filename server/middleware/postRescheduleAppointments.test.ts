@@ -14,6 +14,7 @@ import {
 } from '../models/Appointments'
 import { PersonAppointment } from '../data/model/schedule'
 import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
+import { PersonalDetails } from '../data/model/personalDetails'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -40,6 +41,11 @@ const mockEventResponse: EventResponse = {
   subject: 'Mock subject',
   startDate: tomorrow.toISODate(),
   endDate: tomorrow.toISODate(),
+}
+
+const mockPersonalDetails: Partial<PersonalDetails> = {
+  name: { forename: 'James', surname: 'Morrison' },
+  mobileNumber: '07700900000',
 }
 const putRescheduleAppointmentSpy = jest
   .spyOn(MasApiClient.prototype, 'putRescheduleAppointment')
@@ -125,6 +131,11 @@ const buildRequest = (appointment?: Record<string, string>): [httpMocks.MockRequ
           },
         },
         appointmentTypes: mockAppointmentTypes,
+        personalDetails: {
+          [crn]: {
+            overview: mockPersonalDetails,
+          },
+        },
       },
     },
   }
@@ -242,7 +253,7 @@ describe('middleware/postRescheduleAppointments', () => {
             durationInMinutes: 30,
             message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
             start: null,
-            subject: 'Planned Office Visit (NS) with ',
+            subject: 'Planned Office Visit (NS) with James Morrison',
             supervisionAppointmentUrn: 'ABCDE',
           },
           oldSupervisionAppointmentUrn: externalReference,
