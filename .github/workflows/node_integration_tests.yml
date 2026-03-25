@@ -36,6 +36,11 @@ jobs:
           ./node_modules
           ~/.cache/Cypress
         key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+    - name: install dependencies
+      if: steps.restore-cache.outputs.cache-hit != 'true'
+      shell: bash
+      run: |
+        npm run setup
     - name: download the artifacts
       uses: actions/download-artifact@v8
       with:
