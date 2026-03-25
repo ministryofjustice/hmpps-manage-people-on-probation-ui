@@ -11,6 +11,7 @@
 {% set severeScoring = groupByLevel("SEVERE", needs.identifiedNeeds) %}
 {% set standardScoring = groupByLevel("STANDARD", needs.identifiedNeeds) %}
 {% set withoutScore = needs.notIdentifiedNeeds %}
+{% set veryHighRiskLevel = groupByLevel("VERY HIGH", personRisks.riskFlags) %}
 {% set highRiskLevel = groupByLevel("HIGH", personRisks.riskFlags) %}
 {% set mediumRiskLevel = groupByLevel("MEDIUM", personRisks.riskFlags) %}
 {% set lowRiskLevel = groupByLevel("LOW", personRisks.riskFlags) %}
@@ -66,6 +67,16 @@
       <dd class="govuk-!-margin-left-0">
         <ul class="govuk-list">
           {% for risk in noRiskLevel %}
+            <li>{{ risk.description }}</li>
+          {% endfor %}
+        </ul>
+      </dd>
+    {% endif %}
+    {% if veryHighRiskLevel.length %}
+      <dt class="govuk-!-font-weight-bold rosh--very-high">Very High</dt>
+      <dd class="govuk-!-margin-left-0">
+        <ul class="govuk-list">
+          {% for risk in veryHighRiskLevel %}
             <li>{{ risk.description }}</li>
           {% endfor %}
         </ul>
