@@ -56,40 +56,41 @@
             </div>
         {% endif %}
     {% endif %}
-    {% set nextCheckinQuestionsText %}
-            {{ govukSummaryList({
-                rows: [
+    {% if flags.enableESupervisionCustomQuestions === true %}
+        {% set nextCheckinQuestionsText %}
+                {{ govukSummaryList({
+                    rows: [
+                        {
+                            key: { html: '<span data-qa="firstCheckInDueLabel">' + checkinLabel + '</span>' },
+                            value: { html: '<span data-qa="firstCheckInValue">' + checkinText + '</span>' }
+                        },
+                        {
+                            key: { html: '<span data-qa="question1Label">Question 1</span>' },
+                            value: { html: '<span data-qa="question1Value">How have you been feeling since we last spoke?</span>' }
+                        },
+                        {
+                            key: { html: '<span data-qa="question2Label">Question 2</span>' },
+                            value: { html: '<span data-qa="question2Value">Is there anything you need support with or want to let us know about?</span>' }
+                        }
+                    ]
+                }) }}
+        {% endset %}
+        {{ appSummaryCard({
+            titleText: 'Upcoming online check in',
+            headingLevel: 3,
+            classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+            attributes: {'data-qa': 'checkinQuestionsCard'},
+            html: nextCheckinQuestionsText,
+            actions: {
+                items: [
                     {
-                        key: { html: '<span data-qa="firstCheckInDueLabel">' + checkinLabel + '</span>' },
-                        value: { html: '<span data-qa="firstCheckInValue">' + checkinText + '</span>' }
-                    },
-                    {
-                        key: { html: '<span data-qa="question1Label">Question 1</span>' },
-                        value: { html: '<span data-qa="question1Value">How have you been feeling since we last spoke?</span>' }
-                    },
-                    {
-                        key: { html: '<span data-qa="question2Label">Question 2</span>' },
-                        value: { html: '<span data-qa="question2Value">Is there anything you need support with or want to let us know about?</span>' }
+                        text: 'Change questions',
+                        href: changeQuestionsLink
                     }
                 ]
-            }) }}
-    {% endset %}
-    {{ appSummaryCard({
-        titleText: 'Upcoming online check in',
-        headingLevel: 3,
-        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
-        attributes: {'data-qa': 'checkinQuestionsCard'},
-        html: nextCheckinQuestionsText,
-        actions: {
-            items: [
-                {
-                    text: 'Change questions',
-                    href: changeQuestionsLink
-                }
-            ]
-        } if showChange
-    }) }}
-
+            } if showChange
+        }) }}
+    {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}
