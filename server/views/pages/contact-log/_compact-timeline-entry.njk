@@ -10,7 +10,7 @@
 
 {% set titleHtml %}
     <ul class="govuk-list contact-activity__actions govuk-!-margin-bottom-0">
-    {% if entry.esupervisionId and flags.enableESuperVision  %}
+    {% if entry.esupervisionId %}
       <li><a href="{{ link }}" data-qa="esup-manage-link">Manage<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}

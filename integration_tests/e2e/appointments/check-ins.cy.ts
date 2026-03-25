@@ -31,7 +31,6 @@ import { getCheckinUuid } from './utils'
 
 const loadPage = () => {
   cy.task('resetMocks')
-  cy.task('stubEnableESuperVision')
   cy.visit(`/case/X000001/appointments`)
 }
 context('Appointment check-ins', () => {
@@ -769,7 +768,6 @@ context('check-ins error scenario ', () => {
 context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -790,7 +788,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -809,7 +806,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should show checkin details', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
 
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
@@ -852,7 +848,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to visit contact details page', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -891,7 +886,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to vist change settings page', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
@@ -917,7 +911,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to stop check in', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7`)
     const manageCheckins = new ManageCheckins()
     manageCheckins.checkOnPage()
@@ -944,7 +937,6 @@ context('check-ins overview and manage pages', () => {
 
   it('should able to stop and restart online check ins', () => {
     cy.task('resetMocks')
-    cy.task('stubEnableESuperVision')
     cy.visit(`/case/X778160/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/restart-checkin`)
 
     const restartDatePage = new RestartDateFrequencyPage()

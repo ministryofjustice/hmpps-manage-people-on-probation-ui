@@ -44,6 +44,7 @@ jest.mock('../data/hmppsAuthClient', () => {
     }
   })
 })
+jest.mock('../data/eSupervisionClient')
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
