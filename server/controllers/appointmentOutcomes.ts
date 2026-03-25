@@ -4,8 +4,8 @@ import { AppResponse } from '../models/Locals'
 const routes = [
   'getOutcome',
   'postOutcome',
-  'getFailedToComply',
-  'postFailedToComply',
+  'getAttendedFailedToComply',
+  'postAttendedFailedToComply',
   'getAcceptableAbsence',
   'postAcceptableAbsence',
   'getUnacceptableAbsence',
@@ -29,11 +29,11 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
   postOutcome: _hmppsAuthClient => {
     return async (req, res) => res.render('pages/appointments-outcomes/outcome')
   },
-  getFailedToComply: _hmppsAuthClient => {
-    return async (req, res) => res.render('pages/appointments-outcomes/failed-to-comply')
+  getAttendedFailedToComply: _hmppsAuthClient => {
+    return async (req, res) => res.render('pages/appointments-outcomes/attended-failed-to-comply')
   },
-  postFailedToComply: () => {
-    return async (req, res) => res.render('pages/appointments-outcomes/failed-to-comply')
+  postAttendedFailedToComply: () => {
+    return async (req, res) => res.render('pages/appointments-outcomes/attended-failed-to-comply')
   },
   getAcceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointments-outcomes/acceptable-absence')

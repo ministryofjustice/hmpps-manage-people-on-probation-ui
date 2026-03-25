@@ -13,8 +13,8 @@ describe('appointmentOutcomesController', () => {
   const testCases = [
     ['getOutcome', 'pages/appointments-outcomes/outcome'],
     ['postOutcome', 'pages/appointments-outcomes/outcome'],
-    ['getFailedToComply', 'pages/appointments-outcomes/failed-to-comply'],
-    ['postFailedToComply', 'pages/appointments-outcomes/failed-to-comply'],
+    ['getAttendedFailedToComply', 'pages/appointments-outcomes/attended-failed-to-comply'],
+    ['postAttendedFailedToComply', 'pages/appointments-outcomes/attended-failed-to-comply'],
     ['getAcceptableAbsence', 'pages/appointments-outcomes/acceptable-absence'],
     ['postAcceptableAbsence', 'pages/appointments-outcomes/acceptable-absence'],
     ['getUnacceptableAbsence', 'pages/appointments-outcomes/unacceptable-absence'],

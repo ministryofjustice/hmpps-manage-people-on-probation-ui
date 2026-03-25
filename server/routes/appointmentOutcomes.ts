@@ -9,12 +9,12 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.get('/case/:crn/appointments/appointment/:contactId/outcome', controllers.appointmentOutcomes.getOutcome())
   router.post('/case/:crn/appointments/appointment/:contactId/outcome', controllers.appointmentOutcomes.postOutcome())
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/failed-to-comply',
-    controllers.appointmentOutcomes.getFailedToComply(),
+    '/case/:crn/appointments/appointment/:contactId/attended-failed-to-comply',
+    controllers.appointmentOutcomes.getAttendedFailedToComply(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/failed-to-comply',
-    controllers.appointmentOutcomes.postFailedToComply(),
+    '/case/:crn/appointments/appointment/:contactId/attended-failed-to-comply',
+    controllers.appointmentOutcomes.postAttendedFailedToComply(),
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/acceptable-absence',
