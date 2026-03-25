@@ -39,6 +39,15 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
         : null
     res.locals.riskToProbationStaff = riskToProbationStaff ? { id: riskToProbationStaff?.id } : undefined
     res.locals.riskToStaff = riskToStaff ? { id: riskToStaff?.id, level } : undefined
+    personRisks.riskFlags = personRisks?.riskFlags?.map(item => {
+      if (item.description === 'Risk to Probation Staff') {
+        return {
+          ...item,
+          level: undefined,
+        }
+      }
+      return item
+    })
     res.locals.personRisks = personRisks
     return next()
   }
