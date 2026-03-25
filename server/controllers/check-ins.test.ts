@@ -2703,4 +2703,198 @@ describe('checkInsController', () => {
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
   })
+  describe('Additional questions for online check ins journey', () => {
+    describe('getStartQuestionsPage', () => {
+      it('renders start questions page when CRN is valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/instructions.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          data: req.session.data,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_START', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+
+      it('redirects if practitioner is unallocated', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+        getProbationPractitionerSpy.mockImplementationOnce(() =>
+          Promise.resolve({ unallocated: true } as ProbationPractitioner),
+        )
+
+        const req = baseReq()
+
+        await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments`)
+      })
+
+      it('renders start questions page when practitioner is allocated', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+        getProbationPractitionerSpy.mockImplementationOnce(() =>
+          Promise.resolve({ unallocated: false } as ProbationPractitioner),
+        )
+
+        const req = baseReq()
+        const { id } = req.params
+
+        await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/instructions.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          data: req.session.data,
+        })
+      })
+    })
+
+    describe('postStartQuestionsPage', () => {
+      it('redirects to add questions page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.postStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.postStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+
+      it('returns 404 when id is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(false)
+
+        const req = baseReq()
+        await controllers.checkIns.postStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
+    describe('getAddQuestionsPage', () => {
+      it('renders add questions page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params
+        await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/add-questions.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          data: req.session.data,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
+    describe('getPreviewFeelingPage', () => {
+      it('renders feeling preview page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({ mockData: 'value' })
+        const { id } = req.params
+        await controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/preview/feeling.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          data: req.session.data,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
+    describe('getPreviewSupportPage', () => {
+      it('renders support preview page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({ mockData: 'value' })
+        const { id } = req.params
+        await controllers.checkIns.getPreviewSupportPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/preview/support.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          data: req.session.data,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getPreviewSupportPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+  })
 })
