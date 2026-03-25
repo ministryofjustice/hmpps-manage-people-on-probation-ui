@@ -2,6 +2,7 @@
 {% set title = "Online check ins" %}
 {% set checkinLink = '/case/' + crn + '/appointments/check-in/eligibility-check' %}
 {% set changeDtLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/settings' %}
+{% set changeQuestionsLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/questions/start' %}
 {% set changeContactLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/contact' %}
 {% set stopCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/stop-checkin' %}
 {% set restartCheckinLink = '/case/' + crn + '/appointments/check-in/manage/' + id +  '/restart-checkin' %}
@@ -55,6 +56,40 @@
             </div>
         {% endif %}
     {% endif %}
+    {% set nextCheckinQuestionsText %}
+            {{ govukSummaryList({
+                rows: [
+                    {
+                        key: { html: '<span data-qa="firstCheckInDueLabel">' + checkinLabel + '</span>' },
+                        value: { html: '<span data-qa="firstCheckInValue">' + checkinText + '</span>' }
+                    },
+                    {
+                        key: { html: '<span data-qa="question1Label">Question 1</span>' },
+                        value: { html: '<span data-qa="question1Value">How have you been feeling since we last spoke?</span>' }
+                    },
+                    {
+                        key: { html: '<span data-qa="question2Label">Question 2</span>' },
+                        value: { html: '<span data-qa="question2Value">Is there anything you need support with or want to let us know about?</span>' }
+                    }
+                ]
+            }) }}
+    {% endset %}
+    {{ appSummaryCard({
+        titleText: 'Upcoming online check in',
+        headingLevel: 3,
+        classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+        attributes: {'data-qa': 'checkinQuestionsCard'},
+        html: nextCheckinQuestionsText,
+        actions: {
+            items: [
+                {
+                    text: 'Change questions',
+                    href: changeQuestionsLink
+                }
+            ]
+        } if showChange
+    }) }}
+
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
     {% set nextCheckinText %}

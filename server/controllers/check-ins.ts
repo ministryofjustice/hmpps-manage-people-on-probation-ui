@@ -77,6 +77,11 @@ const routes = [
   'getRestartSummaryPage',
   'postRestartSummaryPage',
   'getRestartConfirmation',
+  'getStartQuestionsPage',
+  'postStartQuestionsPage',
+  'getAddQuestionsPage',
+  'getPreviewFeelingPage',
+  'getPreviewSupportPage',
 ] as const
 
 interface OptionPair {
@@ -1260,6 +1265,91 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.offenderCheckinsByCRNResponse = await eSupervisionClient.postDeactivateOffender(id, body)
       }
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+    }
+  },
+
+  getStartQuestionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_START', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const practitioner = await masClient.getProbationPractitioner(crn)
+      if (practitioner.unallocated) {
+        return res.redirect(`/case/${crn}/appointments`)
+      }
+      const guidanceUrl = config.guidance.link
+      return res.render('pages/check-in/questions/instructions.njk', { crn, back, id, data: req.session.data })
+    }
+  },
+
+  postStartQuestionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+    }
+  },
+
+  getAddQuestionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+
+      return res.render('pages/check-in/questions/add-questions.njk', {
+        crn,
+        back,
+        id,
+        data: req.session.data,
+      })
+    }
+  },
+  getPreviewFeelingPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+
+      return res.render('pages/check-in/questions/preview/feeling.njk', {
+        crn,
+        back,
+        id,
+        data: req.session.data,
+      })
+    }
+  },
+  getPreviewSupportPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+
+      return res.render('pages/check-in/questions/preview/support.njk', {
+        crn,
+        back,
+        id,
+        data: req.session.data,
+      })
     }
   },
 }

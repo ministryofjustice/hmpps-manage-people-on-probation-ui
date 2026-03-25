@@ -294,4 +294,27 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     getCheckIn(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    // we can't fetch the check in yet because it only gets generated the day it becomes due. requires esup api change.
+    // getCheckIn(hmppsAuthClient),
+    controllers.checkIns.getStartQuestionsPage(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    autoStoreSessionData(hmppsAuthClient),
+    // getCheckIn(hmppsAuthClient),
+    controllers.checkIns.postStartQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/add', [
+    // getCheckIn(hmppsAuthClient),
+    controllers.checkIns.getAddQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling', [
+    controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/support', [
+    controllers.checkIns.getPreviewSupportPage(hmppsAuthClient),
+  ])
 }

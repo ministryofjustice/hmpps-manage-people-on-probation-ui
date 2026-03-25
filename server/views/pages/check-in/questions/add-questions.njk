@@ -1,0 +1,94 @@
+{% extends "../../_form.njk" %}
+{% set notStandardForm = true %}
+{% set title = "Add questions to " + case.name.forename + "'s next online check in" %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
+{% set formAnchorText = "Cancel and go back" %}
+{% set back = back if back else '' %}
+{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
+{% set addQuestionButtonText = "Add question" %}
+{% set buttonText = "Save questions" %}
+{% set previewFeelingPageLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/preview/feeling" %}
+{% set previewSupportPageLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/preview/support" %}
+
+
+{% block primary %}
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-two-thirds">
+      <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+          {{ title }}
+      </h2>
+    </div>
+  </div>
+
+  <div class="govuk-grid-row">
+    <div class="govuk-grid-column-full">
+            <h2 class="govuk-heading-m">Default questions</h2>
+            <p class="govuk-body">You cannot change or delete these questions.</p>
+
+
+
+            {{ govukTable({
+            captionClasses: "govuk-table__caption--m",
+            head: [
+                {
+                text: "Question"
+                },
+                {
+                text: "Action"
+                }
+            ],
+            rows: [
+                [
+                {
+                    text: "How have you been feeling since we last spoke?"
+                },
+                {
+                    html: '<a href="' + previewFeelingPageLink + '" class="govuk-link" data-qa="preview-feeling-link">Preview</a>'                }
+                ],
+                [
+                {
+                    text: "Is there anything you need support with or want to let us know about?"
+                },
+                {
+                    html: '<a href="' + previewSupportPageLink + '" class="govuk-link" data-qa="preview-support-link">Preview</a>'
+                }
+                ]
+            ]
+            }) }}
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+
+            <h2 class="govuk-heading-m">Additional questions</h2>
+            <p class="govuk-body">You can add up to 3 questions to {{case.name.forename}}'s online check in. These will only apply to their next online check in on <b>{day month year}</b>.</p>
+        </div>
+    </div>
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+
+
+
+            <div class="govuk-button-group">
+                {{ govukButton({
+                    text: addQuestionButtonText,
+                    type: "submit",
+                    classes: "govuk-button--secondary",
+                    attributes: { "data-qa": "add-question-btn" }
+                }) }}
+            </div>
+            <div class="govuk-button-group">
+                {{ govukButton({
+                    text: buttonText,
+                    type: "submit",
+                    attributes: { "data-qa": "save-questions-btn" }
+                }) }}
+                <a class="govuk-link" href="{{ formAnchorLink }}" data-qa="cancel-link">
+                    {{ formAnchorText }}
+                </a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
