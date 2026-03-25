@@ -48,7 +48,6 @@ export const getPersonRiskFlags = (hmppsAuthClient: HmppsAuthClient): Route<Prom
       }
       return item
     })
-    console.log(personRisks)
     res.locals.personRisks = personRisks
     return next()
   }
