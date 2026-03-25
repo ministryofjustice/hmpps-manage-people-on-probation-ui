@@ -1,0 +1,41 @@
+{% extends "../_form.njk" %}
+{% set title = 'Enforcement action for ' + personOnProbationFirstName + '’s failure to comply' %}
+{% set backLink = '/case/' + crn + '/appointments' %}
+
+{% block form %}
+  {{ govukRadios({
+    name: "enforcementAction",
+    fieldset: {
+      legend: {
+        text: "Select an action for " + personOnProbationFirstName + "’s failure to comply",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--m"
+      }
+    },
+    items: [
+      {
+        value: "SEND_LETTER",
+        text: "Send a letter"
+      },
+      {
+        value: "INITIATE_BREACH_RECALL",
+        text: breachRecallData
+      },
+      {
+        value: "INITIATE_BREACH_RECALL_AND_SEND_LETTER",
+        text: breachRecallData + " and send a letter"
+      },
+      {
+        value: "NO_FURTHER_ACTION",
+        text: "No further action"
+      },
+      {
+        divider: "or"
+      },
+      {
+        value: "DIFFERENT_ACTION",
+        text: "I want to add a different action"
+      }
+    ]
+  } | decorateFormAttributes(['appointments', crn, id, 'enforcementAction'])) }}
+{% endblock %}

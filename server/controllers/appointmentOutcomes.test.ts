@@ -6,12 +6,20 @@ import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
+import appointmentOutcomesController from './appointmentOutcomes'
+import MasApiClient from '../data/masApiClient'
 
 const crn = 'X000001'
 const id = '1234'
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const contactId = '1234'
 const change = '/change/url'
+
+jest.mock('../data/masApiClient')
+
+const mockHmppsAuthClient = {
+  getSystemClientToken: jest.fn().mockResolvedValue('token'),
+} as any
 
 jest.mock('../data/masApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
@@ -55,6 +63,8 @@ const baseUrl = '/crn/X000001/appointment/appointment/1234/outcome'
 
 const mockRes = (appointmentOutcome?: Partial<AppointmentOutcomeProps>) => {
   return mockAppResponse({
+    user: { username: 'user1' },
+    case: { name: { forename: 'Stuart' } },
     appointmentOutcome: {
       isValidParams: true,
       baseUrl,
@@ -71,6 +81,7 @@ const mockRes = (appointmentOutcome?: Partial<AppointmentOutcomeProps>) => {
 
 const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> => {
   const req = {
+    params: { crn: 'R000101' },
     session: {
       data: {
         appointments: {
@@ -207,5 +218,22 @@ describe('controllers/appointmentOutcomes', () => {
       controllers.appointmentOutcomes.postAddNote()(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage`)
     })
+  })
+
+  it('getAttendedFailedToComply should render correct view with breachRecallData', async () => {
+    const getBreachRecallInformationSpy = jest
+      .spyOn(MasApiClient.prototype, 'getBreachRecallInformation')
+      .mockResolvedValue('Initiate a breach')
+
+    const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
+    await handler(mockReq, mockRes)
+
+    expect(mockRes.render).toHaveBeenCalledWith('pages/appointments-outcomes/attended-failed-to-comply', {
+      breachRecallData: 'Initiate a breach',
+      personOnProbationFirstName: 'Stuart',
+      crn: 'R000101',
+    })
+
+    expect(getBreachRecallInformationSpy).toHaveBeenCalledWith('R000101')
   })
 })

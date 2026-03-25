@@ -12,12 +12,13 @@ import {
   getAppointmentOutcomeProps,
   getAppointmentOutcomeOptions,
   redirectWizard,
+  getPersonalDetails,
   checkAnswers,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getAppointmentOutcomeBackLink } from '../middleware/getAppointmentOutcomeBackLink'
 
-export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient }: Services) {
+export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const arrangeBasePath = '/case/:crn/arrange-appointment/:id/outcome'
   const manageBasePath = '/case/:crn/appointments/appointment/:contactId/outcome'
@@ -77,13 +78,17 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Failed to comply */
 
-  router.get(
+  router.all(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    controllers.appointmentOutcomes.getAttendedFailedToComply(),
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
   )
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    controllers.appointmentOutcomes.postAttendedFailedToComply(),
+    controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
+  )
+  router.get(
+    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
+    controllers.appointmentOutcomes.getAttendedFailedToComply(),
   )
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],

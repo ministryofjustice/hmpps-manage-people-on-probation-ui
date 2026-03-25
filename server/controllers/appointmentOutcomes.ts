@@ -5,6 +5,7 @@ import { AppointmentOutcomeType } from '../models/Appointments'
 import { getDataValue } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import MasApiClient from '../data/masApiClient'
 
 const routes = [
   'getOutcome',
@@ -105,8 +106,18 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       return res.redirect(change ?? redirect)
     }
   },
-  getAttendedFailedToComply: _hmppsAuthClient => {
-    return async (req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
+  getAttendedFailedToComply: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const breachRecallData = await masClient.getBreachRecallInformation(crn)
+      return res.render('pages/appointments-outcomes/attended-failed-to-comply', {
+        breachRecallData,
+        personOnProbationFirstName: res.locals.case.name.forename,
+        crn,
+      })
+    }
   },
   postAttendedFailedToComply: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
