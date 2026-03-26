@@ -443,7 +443,12 @@ const stubAppointmentDuplicate = (): SuperAgentRequest =>
   })
 
 const stubAppointmentWithOutcomeText = (): SuperAgentRequest => {
-  const stub = getAppointmentStub({ managedType: true, isFuture: false, notes: false, outcome: 'Recalled to custody' })
+  const stub = getAppointmentStub({
+    deliusManaged: false,
+    isFuture: false,
+    notes: false,
+    outcome: 'Recalled to custody',
+  })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
 

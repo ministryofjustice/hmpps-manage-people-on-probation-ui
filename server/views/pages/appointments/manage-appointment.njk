@@ -7,6 +7,10 @@
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% set sentence = sentences[0].order.description %}
+{% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/attended-complied' %}
+{% if flags.enableNonCompliance %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' %}
+{% endif %}
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
@@ -154,8 +158,7 @@
       hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
       } if not flags.enableNonCompliance and not appointment.isInPast,
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/attended-complied' if (flags.enableNonCompliance and not appointment.hasOutcome) or (not flags.enableNonCompliance and appointment.isInPast and not appointment.hasOutcome),
-      
+      href: outcomeLink if not appointment.hasOutcome,
       status: {
         tag: {
           text: compliedStatus,
