@@ -41,7 +41,6 @@ jobs:
       shell: bash
       run: |
         npm run setup
-        cd ~/.cache/Cypress
     - name: build npm
       shell: bash
       run: |
