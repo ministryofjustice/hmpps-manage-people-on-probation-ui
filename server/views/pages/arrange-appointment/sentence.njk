@@ -5,6 +5,7 @@
   (back if back else 
     '/case/' + crn + '/appointments'
   ) %}
+{% set breadcrumb = 'Arrange an appointment' %}
 {% block alertBanner %}
   {% include "../../partials/_risk-to-staff-alert.njk" %}
 {% endblock %}
