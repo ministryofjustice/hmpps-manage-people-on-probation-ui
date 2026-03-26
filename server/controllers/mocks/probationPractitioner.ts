@@ -16,4 +16,5 @@ export const probationPractitioner: ProbationPractitioner = {
   },
   unallocated: false,
   username: 'DeborahFern',
+  email: 'deborah.fern@testemail.com',
 }

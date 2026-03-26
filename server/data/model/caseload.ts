@@ -49,7 +49,9 @@ export interface Provider {
 export interface User {
   staffCode?: string
   username: string
+  name: Name
   nameAndRole: string
+  email?: string
   selected?: string
 }
 
@@ -108,6 +110,8 @@ export interface DefaultUserDetails {
   username: string
   homeArea: string
   team: string
+  email?: string
+  name: Name
 }
 
 export interface UserProviders {

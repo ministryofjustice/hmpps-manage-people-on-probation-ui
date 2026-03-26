@@ -15,6 +15,7 @@ export interface AppointmentSessionUser {
   name?: Name
   locationCode?: string
   staffCode?: string
+  email?: string
 }
 
 export interface AppointmentSession {

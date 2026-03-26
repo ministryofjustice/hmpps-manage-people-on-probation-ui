@@ -22,7 +22,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { data } = req.session
     const {
-      user: { username, locationCode, teamCode },
+      user: { username, locationCode, teamCode, name, email },
       type,
       date,
       start,
@@ -68,9 +68,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
 
     const response = await masClient.postAppointments(crn, body)
-    const { email, firstName, surname } = res.locals.user
+    const { forename: firstName, surname } = name
     let outlookEventResponse: OutlookEventResponse
-    if (email && res.locals.flags.enableCalendarEvents) {
+    if (email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])

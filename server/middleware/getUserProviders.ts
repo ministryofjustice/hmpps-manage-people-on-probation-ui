@@ -18,9 +18,9 @@ export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     )
     const displayedUsers = users.map(u => {
       if (u.username.toUpperCase() === defaultUserDetails.username) {
-        return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
+        return { username: u.username, nameAndRole: u.nameAndRole, name: u.name, selected: 'selected' }
       }
-      return { username: u.username, nameAndRole: u.nameAndRole }
+      return { username: u.username, nameAndRole: u.nameAndRole, name: u.name }
     })
     req.session.data = {
       ...(req?.session?.data ?? {}),

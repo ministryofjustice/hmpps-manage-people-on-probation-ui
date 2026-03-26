@@ -11,6 +11,10 @@ const stubNoAllocatedProbationPractitionerProviderAccess = (): SuperAgentRequest
       jsonBody: {
         defaultUserDetails: {
           username: 'PETER-PARKER',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
           homeArea: 'London',
           team: 'Automated Allocation Team',
         },
@@ -41,19 +45,39 @@ const stubNoAllocatedProbationPractitionerProviderAccess = (): SuperAgentRequest
         users: [
           {
             username: 'andy-best',
+            name: {
+              forename: 'Andy',
+              surname: 'Best',
+            },
             nameAndRole: 'andy best (PS-PSO)',
+            email: 'andy.best@testemail.com',
           },
           {
             username: 'peter-parker',
+            name: {
+              forename: 'Peter',
+              surname: 'Parker',
+            },
             nameAndRole: 'peter parker (PS-PSO)',
+            email: 'peter.parker@testemail.com',
           },
           {
             username: 'tony-pan',
+            name: {
+              forename: 'Tony',
+              surname: 'Pan',
+            },
             nameAndRole: 'tony pan (PS-PSO)',
+            email: 'tony.pan@testemail.com',
           },
           {
             username: 'terry-jones',
+            name: {
+              forename: 'Terry',
+              surname: 'Jones',
+            },
             nameAndRole: 'terry jones (PS-PSO)',
+            email: 'terry.jones@testemail.com',
           },
         ],
       },

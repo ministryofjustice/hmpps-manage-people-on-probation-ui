@@ -33,6 +33,7 @@ import '../@types/express/index.d'
 import { getMinMaxDates } from '../utils/getMinMaxDates'
 import { PersonAppointment } from '../data/model/schedule'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import { User } from '../data/model/caseload'
 
 const routes = [
   'redirectToSentence',
@@ -262,10 +263,16 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const providerCode = body?.appointments?.[crn]?.[id]?.temp?.providerCode
       const teamCode = body?.appointments?.[crn]?.[id]?.temp?.teamCode
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
+      const staff = getDataValue<User[]>(data, ['staff', username])
+      const staffMember = staff?.find(person => person.username === username)
+      const email = staffMember?.email ?? null
+      const name = staffMember?.name ?? null
       if (providerCode) {
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
+        setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
+        setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
         await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)
@@ -315,7 +322,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       if (!locations?.length && appointment.type?.isLocationRequired) {
         return res.redirect(`/case/${crn}/arrange-appointment/${id}/location-not-in-list?noLocations=true`)
       }
-      const { _minDate, _maxDate } = getMinMaxDates()
+      const { _maxDate } = getMinMaxDates()
       res.locals.change = change as any
 
       return res.render(`pages/arrange-appointment/location-date-time`, {

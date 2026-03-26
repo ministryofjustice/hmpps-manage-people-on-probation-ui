@@ -90,11 +90,13 @@ export const getUserOptions = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     )
 
     let userOptions = users.map(user => {
-      const { username: staffUsername, nameAndRole, staffCode } = user
+      const { username: staffUsername, nameAndRole, staffCode, email, name } = user
       const option: User = {
         username: staffUsername,
         nameAndRole: convertToTitleCase(nameAndRole, [], regexIgnoreValuesInParentheses),
         staffCode,
+        email,
+        name,
       }
       if (staffUsername.toLowerCase() === selectedUser.toLowerCase()) {
         option.selected = 'selected'

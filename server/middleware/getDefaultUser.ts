@@ -3,6 +3,7 @@ import MasApiClient from '../data/masApiClient'
 import { Route } from '../@types'
 import { convertToTitleCase, getDataValue, setDataValue } from '../utils'
 import { Team, User } from '../data/model/caseload'
+import { Name } from '../data/model/personalDetails'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, res, next) => {
@@ -25,7 +26,9 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       return { teams, users }
     }
 
-    let attendingUsername = getDataValue(data, ['appointments', crn, id, 'user', 'username']) ?? null
+    let attendingUsername = getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) ?? null
+    let attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
+    let attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
     let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
     let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
     const [{ defaultUserDetails, providers, teams, users }, probationPractitioner] = await Promise.all([
@@ -41,16 +44,22 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       sessionStaff = users
       if (probationPractitioner.unallocated === false) {
         attendingUsername = probationPractitioner.username
+        attendingEmail = probationPractitioner.email
+        attendingName = probationPractitioner.name
         providerCode = probationPractitioner.provider.code
         teamCode = probationPractitioner.team.code
       } else {
         attendingUsername = defaultUserDetails?.username
+        attendingEmail = defaultUserDetails?.email
+        attendingName = defaultUserDetails.name
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
       }
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
+      setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
+      setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
       const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
       sessionTeams = providerTeams
       sessionStaff = providerStaff
@@ -81,6 +90,8 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
             staffCode: probationPractitioner.code,
             username: probationPractitioner.username,
             nameAndRole,
+            name: probationPractitioner.name,
+            email: probationPractitioner.email,
           },
         ]
       }

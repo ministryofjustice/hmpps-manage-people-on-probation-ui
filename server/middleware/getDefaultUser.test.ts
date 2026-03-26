@@ -34,6 +34,8 @@ const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue
 const crn = 'X000001'
 const uuid = 'a4615940-2808-4ab5-a8e0-feddecb8ae1a'
 const username = 'user-1'
+const name = { forename: 'Terry', surname: 'Jones' }
+const email = 'terry.jones@testemail.com'
 const providerCode = 'N50'
 const teamCode = 'N07IVH'
 const defaultUserProviderCode = 'N54'
@@ -59,6 +61,8 @@ const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} 
                 providerCode,
                 teamCode,
                 username,
+                email,
+                name,
                 ...user,
               },
             },
@@ -126,7 +130,7 @@ describe('/middleware/getDefaultUser()', () => {
           jest.spyOn(MasApiClient.prototype, 'getUserProviders').mockImplementationOnce(() => Promise.resolve(mock))
           await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
         })
-        it('should save the correct session values **', () => {
+        it('should save the correct session values', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             1,
             data,
@@ -148,11 +152,24 @@ describe('/middleware/getDefaultUser()', () => {
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
             4,
             data,
+            ['appointments', crn, uuid, 'user', 'email'],
+            probationPractitioner.email,
+          )
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            5,
+            data,
+            ['appointments', crn, uuid, 'user', 'name'],
+            probationPractitioner.name,
+          )
+
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(
+            6,
+            data,
             ['providers', username],
             [...mock.providers, probationPractitioner.provider],
           )
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            5,
+            7,
             data,
             ['teams', username],
             [...mock.teams, probationPractitioner.team].sort((a, b) =>
@@ -160,7 +177,7 @@ describe('/middleware/getDefaultUser()', () => {
             ),
           )
           expect(mockSetDataValue).toHaveBeenNthCalledWith(
-            6,
+            8,
             req.session.data,
             ['staff', username],
             [
@@ -169,9 +186,12 @@ describe('/middleware/getDefaultUser()', () => {
                 staffCode: probationPractitioner.code,
                 username: probationPractitioner.username,
                 nameAndRole: `${probationPractitioner.name.forename} ${probationPractitioner.name.surname} (PS - Other)`,
+                name: probationPractitioner.name,
+                email: probationPractitioner.email,
               },
             ],
           )
+
           expect(nextSpy).toHaveBeenCalledTimes(1)
         })
       })
@@ -180,13 +200,13 @@ describe('/middleware/getDefaultUser()', () => {
           await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
         })
         it('should save the user providers to session', () => {
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(4, data, ['providers', username], userProviders.providers)
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['providers', username], userProviders.providers)
         })
         it('should save the user teams to session', () => {
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(5, data, ['teams', username], userProviders.teams)
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(7, data, ['teams', username], userProviders.teams)
         })
         it('should save the user staff to session', () => {
-          expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['staff', username], userProviders.users)
+          expect(mockSetDataValue).toHaveBeenNthCalledWith(8, data, ['staff', username], userProviders.users)
         })
       })
     })
@@ -231,13 +251,13 @@ describe('/middleware/getDefaultUser()', () => {
         expect(getStaffByTeamSpy).toHaveBeenCalledWith(defaultUserTeamCode)
       })
       it('should save the user providers to session', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(4, data, ['providers', username], userProviders.providers)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['providers', username], userProviders.providers)
       })
       it('should save the user teams to session', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(5, data, ['teams', username], userProviders.teams)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(7, data, ['teams', username], userProviders.teams)
       })
       it('should save the user staff to session', () => {
-        expect(mockSetDataValue).toHaveBeenNthCalledWith(6, data, ['staff', username], userProviders.users)
+        expect(mockSetDataValue).toHaveBeenNthCalledWith(8, data, ['staff', username], userProviders.users)
       })
     })
   })
@@ -249,6 +269,8 @@ describe('/middleware/getDefaultUser()', () => {
           providerCode: probationPractitioner.provider.code,
           teamCode: probationPractitioner.team.code,
           username: probationPractitioner.username,
+          email: probationPractitioner.email,
+          name: probationPractitioner.name,
         },
       })
       const { data } = req.session
@@ -273,7 +295,7 @@ describe('/middleware/getDefaultUser()', () => {
             .mockImplementationOnce(() => Promise.resolve(mockAppointmentStaff))
           await getDefaultUser(hmppsAuthClient)(req, res, nextSpy)
         })
-        it('should save the correct session values :)', () => {
+        it('should save the correct session values', () => {
           const expectedProviders = [
             { code: 'N50', name: 'Greater Manchester' },
             { code: 'N54', name: 'North East Region' },
@@ -294,16 +316,31 @@ describe('/middleware/getDefaultUser()', () => {
               staffCode: 'N07B722',
               username: 'peter-parker',
               nameAndRole: 'Peter Parker (PS - Other)',
+              email: 'peter.parker@testemail.com',
+              name: {
+                forename: 'Peter',
+                surname: 'Parker',
+              },
             },
             {
               staffCode: 'N57A054',
               username: 'IainChambers',
               nameAndRole: 'Iain Chambers (PS - Other)',
+              email: 'iain.chambers@testemail.com',
+              name: {
+                forename: 'Iain',
+                surname: 'Chambers',
+              },
             },
             {
               staffCode: 'N07B795',
               username: 'DeborahFern',
               nameAndRole: 'Deborah Fern',
+              email: 'deborah.fern@testemail.com',
+              name: {
+                forename: 'Deborah',
+                surname: 'Fern',
+              },
             },
           ]
 
@@ -339,16 +376,31 @@ describe('/middleware/getDefaultUser()', () => {
           staffCode: 'N07B722',
           username: 'peter-parker',
           nameAndRole: 'Peter Parker (PS - Other)',
+          email: 'peter.parker@testemail.com',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
         },
         {
           staffCode: 'N57A054',
           username: 'IainChambers',
           nameAndRole: 'Iain Chambers (PS - Other)',
+          email: 'iain.chambers@testemail.com',
+          name: {
+            forename: 'Iain',
+            surname: 'Chambers',
+          },
         },
         {
           staffCode: 'N07B795',
           username: 'DeborahFern',
           nameAndRole: 'Deborah Fern (PS - Other)',
+          email: 'deborah.fern@testemail.com',
+          name: {
+            forename: 'Deborah',
+            surname: 'Fern',
+          },
         },
       ]
 
