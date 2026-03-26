@@ -75,10 +75,14 @@
   {% for appointment in pastAppointments %}
     {% set manageUrl = "/case/" + crn + "/appointments/appointment/" + appointment.id + "/manage?back=" + url %}
     {% set appointmentDetails %}
-    <a class='govuk-link' href={{ manageUrl }}>
-      {{ appointment.type | toSentenceCase }}
-      {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
-    </a>
+     <div class="contact-log-compact__contact-wrapper">
+        <div class="contact-log-compact__contact-content">
+          <a class='govuk-link' href={{ manageUrl }}>
+            {{ appointment.type | toSentenceCase }}
+          </a>
+        </div>
+        {{ appComplianceTag({ entry: appointment, classes: 'govuk-!-margin-left-2', compact: true }) }}
+      </div>
     {% endset %}
 
     {% set actionsButton %}
