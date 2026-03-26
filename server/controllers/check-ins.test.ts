@@ -133,6 +133,10 @@ describe('checkInsController', () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useRealTimers()
+    res.locals.flags = {
+      ...res.locals.flags,
+      enableESupervisionCustomQuestions: true,
+    }
   })
 
   describe('Eligibility Journey', () => {
@@ -2734,38 +2738,16 @@ describe('checkInsController', () => {
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
 
-      it('redirects if practitioner is unallocated', async () => {
+      it('redirects to case summary when enableESupervisionCustomQuestions flag is false', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
-        getProbationPractitionerSpy.mockImplementationOnce(() =>
-          Promise.resolve({ unallocated: true } as ProbationPractitioner),
-        )
 
         const req = baseReq()
+        res.locals.flags.enableESupervisionCustomQuestions = false
 
         await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
 
-        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments`)
-      })
-
-      it('renders start questions page when practitioner is allocated', async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsValidUUID.mockReturnValue(true)
-        getProbationPractitionerSpy.mockImplementationOnce(() =>
-          Promise.resolve({ unallocated: false } as ProbationPractitioner),
-        )
-
-        const req = baseReq()
-        const { id } = req.params
-
-        await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
-
-        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/instructions.njk', {
-          crn,
-          id,
-          back: req.query.back,
-          data: req.session.data,
-        })
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
       })
     })
 
@@ -2802,6 +2784,18 @@ describe('checkInsController', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
+
+      it('redirects to case summary when enableESupervisionCustomQuestions flag is false', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        res.locals.flags.enableESupervisionCustomQuestions = false
+
+        await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
+      })
     })
 
     describe('getAddQuestionsPage', () => {
@@ -2832,6 +2826,18 @@ describe('checkInsController', () => {
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+
+      it('redirects to case summary when enableESupervisionCustomQuestions flag is false', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        res.locals.flags.enableESupervisionCustomQuestions = false
+
+        await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
       })
     })
 
@@ -2864,6 +2870,18 @@ describe('checkInsController', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
+
+      it('redirects to case summary when enableESupervisionCustomQuestions flag is false', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        res.locals.flags.enableESupervisionCustomQuestions = false
+
+        await controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
+      })
     })
 
     describe('getPreviewSupportPage', () => {
@@ -2894,6 +2912,18 @@ describe('checkInsController', () => {
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+
+      it('redirects to case summary when enableESupervisionCustomQuestions flag is false', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        res.locals.flags.enableESupervisionCustomQuestions = false
+
+        await controllers.checkIns.getPreviewSupportPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}`)
       })
     })
   })

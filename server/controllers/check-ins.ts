@@ -1276,13 +1276,10 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const practitioner = await masClient.getProbationPractitioner(crn)
-      if (practitioner.unallocated) {
-        return res.redirect(`/case/${crn}/appointments`)
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
       }
-      const guidanceUrl = config.guidance.link
       return res.render('pages/check-in/questions/instructions.njk', { crn, back, id, data: req.session.data })
     }
   },
@@ -1290,7 +1287,6 @@ const checkInsController: Controller<typeof routes, void> = {
   postStartQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -1307,7 +1303,10 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       return res.render('pages/check-in/questions/add-questions.njk', {
         crn,
         back,
@@ -1325,7 +1324,10 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       return res.render('pages/check-in/questions/preview/feeling.njk', {
         crn,
         back,
@@ -1343,7 +1345,10 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       return res.render('pages/check-in/questions/preview/support.njk', {
         crn,
         back,

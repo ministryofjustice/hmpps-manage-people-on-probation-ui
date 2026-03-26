@@ -56,6 +56,8 @@
             </div>
         {% endif %}
     {% endif %}
+    {# flagging that the designs say 'next check in' - this isn't 
+    returned by the API yet so it will just say the first check in date #}
     {% if flags.enableESupervisionCustomQuestions === true %}
         {% set nextCheckinQuestionsText %}
                 {{ govukSummaryList({
