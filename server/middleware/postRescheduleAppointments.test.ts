@@ -13,8 +13,9 @@ import {
   RescheduleAppointmentResponse,
 } from '../models/Appointments'
 import { PersonAppointment } from '../data/model/schedule'
-import { EventResponse, RescheduleEventRequest } from '../data/model/OutlookEvent'
 import { PersonalDetails } from '../data/model/personalDetails'
+import { EventResponse } from '../data/model/OutlookEvent'
+import { LocalsUser } from '../models/Locals'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
@@ -65,7 +66,16 @@ const mockUserDetails: MasUserDetails = {
   roles: [],
 }
 
-jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockImplementation(() => Promise.resolve(mockUserDetails))
+const mockUser: LocalsUser = {
+  ...mockUserDetails,
+  userId: mockUserDetails.userId.toString(),
+  active: true,
+  name: 'Mock User',
+  authSource: 'delius',
+  uuid: 'uuid-1',
+  displayName: 'Mock User',
+  token: '123ABC',
+}
 
 const mockAppointment: AppointmentSession = {
   user: {
@@ -93,6 +103,7 @@ const mockAppointment: AppointmentSession = {
 
 const mockFlags = {
   enableOutlookEvent: true,
+  enableCalendarEvents: true,
 }
 
 const mockAppointmentTypes: AppointmentType[] = [
@@ -143,7 +154,7 @@ const buildRequest = (appointment?: Record<string, string>): [httpMocks.MockRequ
 }
 
 describe('middleware/postRescheduleAppointments', () => {
-  const res = mockAppResponse({
+  const mockLocals = {
     flags: mockFlags,
     case: {
       name: { forename: 'James', surname: 'Morrison' },
@@ -154,7 +165,9 @@ describe('middleware/postRescheduleAppointments', () => {
         externalReference,
       },
     },
-  })
+    user: mockUser,
+  }
+  const res = mockAppResponse(mockLocals)
 
   beforeEach(() => {
     jest.clearAllMocks()
@@ -238,7 +251,7 @@ describe('middleware/postRescheduleAppointments', () => {
   })
 
   describe('Send outlook invite', () => {
-    it('should create the outlook event if user email is defined', async () => {
+    it('should create the outlook event if user email is defined and calendar events feature flag is enabled', async () => {
       const [req] = buildRequest()
       await postRescheduleAppointments(hmppsAuthClient)(req, res)
       expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
@@ -267,22 +280,37 @@ describe('middleware/postRescheduleAppointments', () => {
     })
     it('should not create outlook event if user has no email address defined', async () => {
       const [req] = buildRequest()
-      jest.spyOn(MasApiClient.prototype, 'getUserDetails').mockImplementationOnce(() =>
-        Promise.resolve({
-          ...mockUserDetails,
-          email: '',
-        }),
-      )
-      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      const mockRes = mockAppResponse({
+        ...mockLocals,
+        user: { ...mockLocals.user, email: null },
+        flags: { enableCalendarEvents: true },
+      })
+      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
+      expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
+      expect(req.session.data.isOutLookEventFailed).toEqual(true)
+    })
+    it('should not create outlook event if calendar events feature flag is disabled', async () => {
+      const [req] = buildRequest()
+      const mockRes = mockAppResponse({
+        ...mockLocals,
+        user: { ...mockLocals.user, email: null },
+        flags: { enableCalendarEvents: false },
+      })
+      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
       expect(postRescheduleAppointmentEventSpy).not.toHaveBeenCalled()
       expect(req.session.data.isOutLookEventFailed).toEqual(true)
     })
     it('should set failed outlook response', async () => {
       const [req] = buildRequest()
+      const mockRes = mockAppResponse({
+        ...mockLocals,
+        user: { ...mockLocals.user, email: null },
+        flags: { enableCalendarEvents: true },
+      })
       jest
         .spyOn(SupervisionAppointmentClient.prototype, 'postRescheduleAppointmentEvent')
         .mockImplementation(() => Promise.resolve({ ...mockEventResponse, id: undefined }))
-      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+      await postRescheduleAppointments(hmppsAuthClient)(req, mockRes)
       expect(req.session.data.isOutLookEventFailed).toEqual(true)
     })
   })
