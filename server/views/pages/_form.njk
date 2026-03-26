@@ -1,11 +1,7 @@
 {% extends "../partials/layout.njk" %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% block beforeContent %}
-  {% if backLink %}
-    {{ govukBackLink({
-    href: backLink
-  }) }}
-  {% elif breadcrumb %}
+  {% if breadcrumb and flags.enableBreadcrumbs and not change %}
     {{ govukBreadcrumbs({
       items: [
         {
@@ -25,6 +21,10 @@
           text: breadcrumb
         }
       ]
+    }) }}
+  {% elif backLink %}
+    {{ govukBackLink({
+      href: backLink
     }) }}
   {% endif %}
 {% endblock %}

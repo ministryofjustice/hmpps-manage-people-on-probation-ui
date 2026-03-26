@@ -213,6 +213,18 @@ describe('controllers/arrangeAppointment', () => {
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
       })
     })
+    describe('back query parameter is provided', () => {
+      const back = 'back'
+      const mockReqwithBack = createMockRequest({ query: { back } })
+      beforeEach(async () => {
+        mockedIsValidCrn.mockReturnValue(true)
+        mockedIsValidUUID.mockReturnValue(true)
+        await controllers.arrangeAppointments.redirectToSentence()(mockReqwithBack, res)
+      })
+      it('should redirect to the sentence page keeping the query parameter', () => {
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${back}`)
+      })
+    })
     describe('if CRN or UUID are invalid format in request params', () => {
       beforeEach(async () => {
         mockedIsValidCrn.mockReturnValue(false)
@@ -1051,7 +1063,7 @@ describe('controllers/arrangeAppointment', () => {
         isOutLookEventFailed: false,
         appointmentType: null,
         smsSent: true,
-        attendingName: "First's",
+        attendingName: 'First’s',
         url: '',
       })
     })
@@ -1068,7 +1080,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
-        attendingName: "First's",
+        attendingName: 'First’s',
         url: encodeURIComponent('/reschedule/url'),
       })
     })
