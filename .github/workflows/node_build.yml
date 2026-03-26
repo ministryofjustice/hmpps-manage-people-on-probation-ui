@@ -40,6 +40,7 @@ jobs:
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
+        npm install
         npm run setup
     - name: build npm
       shell: bash
