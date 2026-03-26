@@ -158,7 +158,7 @@
       hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
       } if not flags.enableNonCompliance and not appointment.isInPast,
-      href: outcomeLink if not appointment.hasOutcome,
+      href: null if appointment.hasOutcome or (not appointment.hasOutcome and not flags.enableNonCompliance and not appointment.isInPast) else outcomeLink,
       status: {
         tag: {
           text: compliedStatus,

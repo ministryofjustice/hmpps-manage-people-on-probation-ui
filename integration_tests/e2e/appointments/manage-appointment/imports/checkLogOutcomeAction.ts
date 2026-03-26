@@ -19,7 +19,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
           manageAppointmentPage
             .getTaskLink(1)
             .should('contain.text', name)
-            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/attended-complied`)
+            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/outcome`)
         })
       })
       describe('Appointment is in the future with outcome logged', () => {
@@ -51,7 +51,7 @@ export const checkLogOutcomeAction = (enableNonCompliance = true) => {
           manageAppointmentPage
             .getTaskLink(1)
             .should('contain.text', name)
-            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/attended-complied`)
+            .should('have.attr', 'href', `/case/${crn}/appointments/appointment/${appointmentId}/outcome`)
         })
         it(`should display the status as 'Not started'`, () => {
           manageAppointmentPage

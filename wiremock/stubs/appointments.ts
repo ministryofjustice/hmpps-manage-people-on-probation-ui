@@ -357,7 +357,10 @@ const stubNextAppointment = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ deliusManaged: true, createNext: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
 }
-
+const stubAppointmentNoEventId = (): SuperAgentRequest => {
+  const stub = getAppointmentStub({ noEventId: true })
+  return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
+}
 const stubAppointmentPersonLevel = (): SuperAgentRequest => {
   const stub = getAppointmentStub({ noEventId: true, personLevel: true })
   return superagent.post('http://localhost:9091/__admin/mappings').send(stub)
@@ -468,4 +471,5 @@ export default {
   stubAppointmentDuplicate,
   stubNextAppointment,
   stubAppointmentWithOutcomeText,
+  stubAppointmentNoEventId,
 }
