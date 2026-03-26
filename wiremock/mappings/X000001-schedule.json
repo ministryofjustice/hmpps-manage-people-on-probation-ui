@@ -181,8 +181,6 @@
                 "endDateTime": "2024-02-12T10:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": true,
-                "isSystemContact": true,
-                "hasOutcome": true,
                 "wasAbsent": true,
                 "absentWaitingEvidence": true,
                 "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
