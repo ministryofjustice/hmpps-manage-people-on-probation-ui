@@ -266,7 +266,7 @@ describe('middleware/postRescheduleAppointments', () => {
             durationInMinutes: 30,
             message: expect.stringContaining('View the appointment on Manage people on probation (opens in new tab).'),
             start: null,
-            subject: 'Planned Office Visit (NS) with James Morrison',
+            subject: 'J. Morrison: planned office visit (NS)',
             supervisionAppointmentUrn: 'ABCDE',
           },
           oldSupervisionAppointmentUrn: externalReference,

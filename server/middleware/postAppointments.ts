@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
+import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -75,7 +75,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
-      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
+      const subject: string = `${firstInitialLastName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}: ${toSentenceCase(apptDescription, [], null, false, true)}`
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {
