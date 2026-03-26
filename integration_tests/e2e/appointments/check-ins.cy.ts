@@ -974,6 +974,8 @@ context('check-ins overview and manage pages', () => {
 
 context('check-ins add questions pages', () => {
   it('should allow a user to start the add questions to online check ins journey', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
     const instructionsPage = new InstructionsPage()
     instructionsPage.clickContinue()
@@ -982,6 +984,8 @@ context('check-ins add questions pages', () => {
   })
 
   it('should allow a user to view the default questions preview pages', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
     const instructionsPage = new InstructionsPage()
     instructionsPage.clickContinue()
@@ -1005,16 +1009,22 @@ context('check-ins add questions pages', () => {
   })
 
   it('should show the "Add question" button for additional custom questions', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="add-question-btn"]').should('be.visible')
   })
   it('should show the "Save questions" button', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="save-questions-btn"]').should('be.visible')
   })
   it('should show the "cancel and go back" button ', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="cancel-link"]').should('be.visible')
