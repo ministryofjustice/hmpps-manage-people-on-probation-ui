@@ -5,6 +5,27 @@
     {{ govukBackLink({
     href: backLink
   }) }}
+  {% elif breadcrumb %}
+    {{ govukBreadcrumbs({
+      items: [
+        {
+          text: "Cases",
+          href: "/case"
+        },
+        {
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
+          href: "/case/" + crn,
+          attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+        },
+        {
+          text: "Appointments",
+          href: "/case/" + crn + "/appointments"
+        },
+        {
+          text: breadcrumb
+        }
+      ]
+    }) }}
   {% endif %}
 {% endblock %}
 

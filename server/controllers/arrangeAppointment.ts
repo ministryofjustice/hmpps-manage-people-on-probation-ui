@@ -139,12 +139,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const uuid = uuidv4()
       const { crn } = req.params
-      const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(uuid)) {
         return renderError(404)(req, res)
-      }
-      if (back) {
-        return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${back}`)
       }
       return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
     }
@@ -153,25 +149,18 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const errors = req?.session?.data?.errors
       if (errors) {
-        delete req.session.data.errors
+        delete req.session?.data?.errors
       }
       const { crn, id } = req.params as Record<string, string>
       const { change, validation } = req.query
-      const { data } = req.session
-      let { back } = req.query
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
-      if (back) {
-        setDataValue(data, ['backLink', 'sentence'], back)
-      } else {
-        back = getDataValue(data, ['backLink', 'sentence'])
-      }
       const showValidation = validation === 'true'
       if (showValidation) {
         res.locals.errorMessages = {
           [`appointments-${crn}-${id}-eventId`]: 'Select what this appointment is for',
         }
       }
-      return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors, back })
+      return res.render(`pages/arrange-appointment/sentence`, { crn, id, change, errors })
     }
   },
   postSentence: () => {
