@@ -40,8 +40,8 @@ jobs:
       if: steps.restore-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
-        npm install
         npm run setup
+        cd ~/.cache/Cypress
     - name: build npm
       shell: bash
       run: |
