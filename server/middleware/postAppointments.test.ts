@@ -12,11 +12,11 @@ import {
   AppointmentSession,
   AppointmentsPostResponse,
   AppointmentType,
-  MasUserDetails,
 } from '../models/Appointments'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { OutlookEventRequestBody, OutlookEventResponse, SmsEventRequest } from '../data/model/OutlookEvent'
 import { mockAppResponse } from '../controllers/mocks'
+import { LocalsUser } from '../models/Locals'
 
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
 
@@ -203,16 +203,6 @@ const getExpectedRequestBody = (request?: Partial<AppointmentRequestBody>): Appo
   }
 }
 
-const mockUserDetailsResponse: MasUserDetails = {
-  userId: 1,
-  username,
-  firstName: 'John',
-  surname: 'Doe',
-  email: 'jdoe@example.com',
-  enabled: true,
-  roles: ['role1', 'role2'],
-}
-
 const mockOutlookEventResponse: OutlookEventResponse = {
   id: 'id',
   subject: 'sub',
@@ -228,7 +218,7 @@ const mockAppointmentsPostResponse: AppointmentsPostResponse = {
 const checkOutlookEventRequest = (smsRequest = false) => {
   const { date, start } = mockAppointment
   const smsEventRequest: SmsEventRequest = {
-    firstName: res.locals.case.name.forename,
+    firstName: mockUser.firstName,
     mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
@@ -239,8 +229,8 @@ const checkOutlookEventRequest = (smsRequest = false) => {
   const outlookEventRequestBody: OutlookEventRequestBody = {
     recipients: [
       {
-        emailAddress: mockUserDetailsResponse.email,
-        name: `${mockUserDetailsResponse.firstName} ${mockUserDetailsResponse.surname}`,
+        emailAddress: mockUser.email,
+        name: `${mockUser.firstName} ${mockUser.surname}`,
       },
     ],
     durationInMinutes: 750,
@@ -262,30 +252,41 @@ const checkOutlookEventRequest = (smsRequest = false) => {
   }
 }
 
+const mockUser: LocalsUser = {
+  userId: '123',
+  username: 'user-1',
+  firstName: 'Mock',
+  surname: 'User',
+  email: 'mock.user@email.com',
+  enabled: true,
+  roles: [],
+  active: true,
+  name: 'Mock User',
+  authSource: 'delius',
+  uuid: 'uuid-1',
+  displayName: 'Mock User',
+  token: '123ABC',
+}
+
 const mockCase: Partial<PersonalDetails> = {
   name: { forename: 'James', surname: 'Morrison' },
   mobileNumber: '07700900000',
 }
 
-const res = mockAppResponse({ case: mockCase })
+const res = mockAppResponse({ case: mockCase, user: mockUser, flags: { enableCalendarEvents: true } })
 
 const postAppointmentsSpy = jest
   .spyOn(MasApiClient.prototype, 'postAppointments')
   .mockResolvedValue(mockAppointmentsPostResponse)
 
-let getUserDetailsSpy: jest.SpyInstance
 let postOutlookCalendarEventSpy: jest.SpyInstance
 
 describe('/middleware/postAppointments', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
-
   describe('It should post the correct request body', () => {
     beforeEach(() => {
-      getUserDetailsSpy = jest
-        .spyOn(MasApiClient.prototype, 'getUserDetails')
-        .mockResolvedValue(mockUserDetailsResponse)
       postOutlookCalendarEventSpy = jest
         .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
         .mockResolvedValue(mockOutlookEventResponse)
@@ -295,7 +296,6 @@ describe('/middleware/postAppointments', () => {
       const response = await postAppointments(hmppsAuthClient)(mockReq, res)
       const expectedRequestBody = getExpectedRequestBody()
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
-      expect(getUserDetailsSpy).toHaveBeenCalledWith(username)
       expect(response).toEqual(mockAppointmentsPostResponse)
     })
     it('should not add the eventId to the request body if value in appointment session is PERSON_LEVEL_CONTACT', async () => {
@@ -350,13 +350,9 @@ describe('/middleware/postAppointments', () => {
       expect(postAppointmentsSpy).toHaveBeenCalledWith(crn, expectedRequestBody)
     })
   })
+
   describe('Outlook calendar event request', () => {
     describe('User has email', () => {
-      beforeEach(() => {
-        getUserDetailsSpy = jest
-          .spyOn(MasApiClient.prototype, 'getUserDetails')
-          .mockResolvedValue(mockUserDetailsResponse)
-      })
       it(`should send the request with no sms event if appointment.smsOptIn value is 'NO'`, async () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
@@ -414,11 +410,27 @@ describe('/middleware/postAppointments', () => {
     })
     describe('User does not have email', () => {
       const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
+      const mockRes = mockAppResponse({
+        case: mockCase,
+        user: { ...mockUser, email: null },
+        flags: { enableCalendarEvents: true },
+      })
       beforeEach(async () => {
-        getUserDetailsSpy = jest
-          .spyOn(MasApiClient.prototype, 'getUserDetails')
-          .mockResolvedValue({ ...mockUserDetailsResponse, email: '' })
-        await postAppointments(hmppsAuthClient)(mockReq, res)
+        await postAppointments(hmppsAuthClient)(mockReq, mockRes)
+      })
+      it('should not send the request', () => {
+        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
+      })
+      it('should set req.session.data.isOutLookEventFailed to true', () => {
+        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+      })
+    })
+
+    describe('enableCalendarEvents feature flag is disabled', () => {
+      const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
+      const mockRes = mockAppResponse({ case: mockCase, flags: { enableCalendarEvents: false } })
+      beforeEach(async () => {
+        await postAppointments(hmppsAuthClient)(mockReq, mockRes)
       })
       it('should not send the request', () => {
         expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
