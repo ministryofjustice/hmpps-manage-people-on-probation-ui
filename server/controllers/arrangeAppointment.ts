@@ -19,7 +19,6 @@ import {
   getUserOptions,
   findUncompleted,
   appointmentDateIsInPast,
-  getAttendedCompliedProps,
   isRescheduleAppointment,
 } from '../middleware'
 import { AppointmentSession, AppointmentsPostResponse, RescheduleAppointmentResponse } from '../models/Appointments'
@@ -376,7 +375,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       const { alertDismissed = false } = req.session
-      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const { forename, surname, appointment } = res.locals.attendedCompliedProps
       const isReschedule = isRescheduleAppointment(req)
       await sendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_ATTENDED_AND_COMPLIED', crn, SubjectType.CRN)
       res.render('pages/appointments/attended-complied', {
@@ -428,8 +427,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_NOTE', crn, SubjectType.CRN)
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
-
-      const { forename, appointment } = getAttendedCompliedProps(req, res)
+      const { forename, appointment } = res.locals.attendedCompliedProps
 
       return res.render('pages/appointments/add-note', {
         crn,

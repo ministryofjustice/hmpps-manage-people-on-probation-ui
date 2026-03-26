@@ -53,7 +53,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   if (req.url.includes('/attended-complied')) {
-    localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
+    localParams = { ...localParams, ...res.locals.attendedCompliedProps }
   }
 
   if (

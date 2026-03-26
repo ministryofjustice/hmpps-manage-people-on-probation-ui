@@ -1,19 +1,26 @@
+import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { getAttendedCompliedProps } from './getAttendedCompliedProps'
 import { mockAppResponse } from '../controllers/mocks'
-import { getDataValue } from '../utils'
+import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 
 const contactId = '12345'
 const crn = 'X000001'
-const id = 'b5719245-0f0a-4bbc-bbef-2d6a095e39f7'
+const uuid = 'b5719245-0f0a-4bbc-bbef-2d6a095e39f7'
 const forename = 'James'
 const surname = 'Morrison'
-const type = '3 Way Meeting (NS)'
+const typeDescription = '3 Way Meeting (NS)'
 const officerForename = 'John'
 const officerSurname = 'Smith'
-const startDateTime = '2025-10-11'
+const pastDate = '2025-10-11'
+const start = '09:00'
+const end = '10:00'
+const now = DateTime.now()
+const futureDate = now.plus({ day: 1 }).toFormat('yyyy-MM-dd')
 
-const buildRequest = (params?: Record<string, string>): httpMocks.MockRequest<any> => {
+const nextSpy = jest.fn()
+
+const buildRequest = ({ params = {}, date = pastDate, id = uuid, type = 'COPT' } = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
       contactId,
@@ -26,7 +33,10 @@ const buildRequest = (params?: Record<string, string>): httpMocks.MockRequest<an
         appointments: {
           [crn]: {
             [id]: {
-              date: startDateTime,
+              date,
+              start,
+              end,
+              type,
             },
           },
         },
@@ -36,7 +46,7 @@ const buildRequest = (params?: Record<string, string>): httpMocks.MockRequest<an
   return httpMocks.createRequest(req)
 }
 
-const buildResponse = (): httpMocks.MockResponse<any> => {
+const buildResponse = (date = pastDate, time = start): httpMocks.MockResponse<any> => {
   const locals = {
     case: {
       name: {
@@ -53,19 +63,19 @@ const buildResponse = (): httpMocks.MockResponse<any> => {
         },
       },
       appointment: {
-        type,
+        type: typeDescription,
         officer: {
           name: {
             forename: officerForename,
             surname: officerSurname,
           },
         },
-        startDateTime,
+        startDateTime: `${date}T${time}:00Z`,
       },
     },
     appointment: {
       type: {
-        description: type,
+        description: typeDescription,
       },
       attending: {
         name: `${officerForename} ${officerSurname}`,
@@ -83,36 +93,155 @@ jest.mock('../utils', () => {
   }
 })
 
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
+jest.mock('./appointmentDateIsInPast', () => ({
+  appointmentDateIsInPast: jest.fn(),
+}))
 
-const res = buildResponse()
+const mockAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
 
 describe('/middleware/getAttendedCompliedProps()', () => {
-  const expectedAppointment = {
-    type,
-    officer: {
-      name: {
-        forename: officerForename,
-        surname: officerSurname,
-      },
-    },
-    startDateTime,
-  }
-  it('should construct the appointment from res.locals.personAppointment if contactId in url', () => {
-    const req = buildRequest()
-    expect(getAttendedCompliedProps(req, res)).toStrictEqual({
-      forename,
-      surname,
-      appointment: expectedAppointment,
-    })
+  afterEach(() => {
+    jest.clearAllMocks()
   })
-  it('should construct the appointment from res.locals.appointment ans session if contactId not in url', () => {
-    const req = buildRequest({ contactId: undefined })
-    mockGetDataValue.mockReturnValueOnce(req.session.data.appointments[crn][id])
-    expect(getAttendedCompliedProps(req, res)).toStrictEqual({
+  it('should return the correct values if contactId in url params and appointment in the past and appointment type is non office based', () => {
+    const req = buildRequest({ params: { id: undefined }, id: contactId })
+    const res = buildResponse()
+    mockAppointmentDateIsInPast.mockReturnValue(true)
+    const expectedAppointment = res.locals.personAppointment.appointment
+    getAttendedCompliedProps(req, res, nextSpy)
+    expect(res.locals.attendedCompliedProps).toEqual(
+      expect.objectContaining({
+        forename,
+        surname,
+        appointment: expectedAppointment,
+        outcomeItems: expect.arrayContaining([
+          expect.objectContaining({ value: 'ATTENDED' }),
+          expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
+          expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        ]),
+      }),
+    )
+    expect(res.locals.attendedCompliedProps.outcomeItems).toHaveLength(5)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return the correct values if contactId in url params and appointment in the past and appointment type is office based', () => {
+    const req = buildRequest({ params: { id: undefined }, id: contactId, type: 'COAI' })
+    const res = buildResponse()
+    mockAppointmentDateIsInPast.mockReturnValue(true)
+    const expectedAppointment = res.locals.personAppointment.appointment
+    getAttendedCompliedProps(req, res, nextSpy)
+    expect(res.locals.attendedCompliedProps).toEqual(
+      expect.objectContaining({
+        forename,
+        surname,
+        appointment: expectedAppointment,
+        outcomeItems: expect.arrayContaining([
+          expect.objectContaining({ value: 'ATTENDED' }),
+          expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
+          expect.objectContaining({ value: 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES' }),
+          expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        ]),
+      }),
+    )
+    expect(res.locals.attendedCompliedProps.outcomeItems).toHaveLength(6)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return the correct values if contactId in url params and appointment in the future', () => {
+    const req = buildRequest({ params: { id: undefined }, date: futureDate, id: contactId })
+    const res = buildResponse(futureDate)
+    mockAppointmentDateIsInPast.mockReturnValue(false)
+    const expectedAppointment = {
+      ...res.locals.personAppointment.appointment,
+      startDateTime: `${futureDate}T${start}:00Z`,
+    }
+    getAttendedCompliedProps(req, res, nextSpy)
+    expect(res.locals.attendedCompliedProps).toStrictEqual({
       forename,
       surname,
       appointment: expectedAppointment,
+      outcomeItems: expect.arrayContaining([
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+        expect.objectContaining({ value: 'WILL_BE_RESCHEDULED' }),
+      ]),
     })
+    expect(res.locals.attendedCompliedProps.outcomeItems).toHaveLength(2)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return the correct values if uuid in url params and appointment in the past appointment type is non office based', () => {
+    const req = buildRequest({ params: { contactId: undefined, id: uuid }, id: uuid })
+    const res = buildResponse()
+    mockAppointmentDateIsInPast.mockReturnValue(true)
+    const expectedAppointment = res.locals.personAppointment.appointment
+    getAttendedCompliedProps(req, res, nextSpy)
+    expect(res.locals.attendedCompliedProps).toEqual(
+      expect.objectContaining({
+        forename,
+        surname,
+        appointment: expectedAppointment,
+        outcomeItems: expect.arrayContaining([
+          expect.objectContaining({ value: 'ATTENDED' }),
+          expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
+          expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        ]),
+      }),
+    )
+    expect(res.locals.attendedCompliedProps.outcomeItems).toHaveLength(5)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return the correct values if uuid in url params and appointment in the past appointment type is office based', () => {
+    const req = buildRequest({ params: { contactId: undefined, id: uuid }, id: uuid, type: 'COAI' })
+    const res = buildResponse()
+    mockAppointmentDateIsInPast.mockReturnValue(true)
+    const expectedAppointment = res.locals.personAppointment.appointment
+    getAttendedCompliedProps(req, res, nextSpy)
+    expect(res.locals.attendedCompliedProps).toEqual(
+      expect.objectContaining({
+        forename,
+        surname,
+        appointment: expectedAppointment,
+        outcomeItems: expect.arrayContaining([
+          expect.objectContaining({ value: 'ATTENDED' }),
+          expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
+          expect.objectContaining({ value: 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES' }),
+          expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
+          expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        ]),
+      }),
+    )
+    expect(res.locals.attendedCompliedProps.outcomeItems).toHaveLength(6)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
+  })
+
+  it('should return the correct values if uuid in url params and appointment in the future', () => {
+    const req = buildRequest({ params: { id: uuid, contactId: undefined }, date: futureDate, id: uuid })
+    const res = buildResponse(futureDate)
+    mockAppointmentDateIsInPast.mockReturnValue(false)
+    const expectedAppointment = {
+      ...res.locals.personAppointment.appointment,
+      startDateTime: `${futureDate}T${start}:00Z`,
+    }
+    getAttendedCompliedProps(req, res, nextSpy)
+    expect(res.locals.attendedCompliedProps).toStrictEqual({
+      forename,
+      surname,
+      appointment: expectedAppointment,
+      outcomeItems: expect.arrayContaining([
+        expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
+        expect.objectContaining({ value: 'WILL_BE_RESCHEDULED' }),
+      ]),
+    })
+    expect(res.locals.attendedCompliedProps.outcomeItems).toHaveLength(2)
+    expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

@@ -1,7 +1,7 @@
 import httpMocks from 'node-mocks-http'
 import { AppointmentSession, AppointmentType } from '../models/Appointments'
 import { Sentence } from '../data/model/sentenceDetails'
-import { constructNextAppointmentSession } from './constructAppointmentSession'
+import { createAppointmentSession } from './createAppointmentSession'
 import { Activity, PersonAppointment } from '../data/model/schedule'
 import { mockAppResponse } from '../controllers/mocks'
 import { Name } from '../data/model/personalDetails'
@@ -179,7 +179,7 @@ const expectedSession = (
   }
 }
 
-describe('/middleware/constructAppointmentSession', () => {
+describe('/middleware/createAppointmentSession', () => {
   const mockReq = (nextAppointment = 'KEEP_TYPE') => {
     return httpMocks.createRequest({
       params: {
@@ -205,8 +205,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual({
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual({
       eventId: '',
       username: res.locals.user.username,
       uuid: '',
@@ -221,8 +221,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         eventId: '49',
       }),
@@ -242,9 +242,9 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
+    createAppointmentSession(req, res, nextSpy)
     const { providerCode, teamCode, username: officerUserName, code } = mockAppointment.officer
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         user: {
           providerCode,
@@ -269,9 +269,9 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
+    createAppointmentSession(req, res, nextSpy)
     const { providerCode, teamCode, username: mockUsername, code } = mockAppointment.officer
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         user: {
           providerCode,
@@ -298,8 +298,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         user: {
           providerCode,
@@ -330,8 +330,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         user: {
           providerCode: '',
@@ -358,8 +358,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ requirementId: '1' }))
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(expectedSession({ requirementId: '1' }))
   })
   it('should add licenceConditionId if licence condition component in person appointment', () => {
     const mockAppt = mockPersonAppointmentResponse({
@@ -374,8 +374,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ licenceConditionId: '2' }))
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(expectedSession({ licenceConditionId: '2' }))
   })
 
   it('should add nsiId if nsi in person appointment', () => {
@@ -387,8 +387,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(expectedSession({ nsiId: '100' }))
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(expectedSession({ nsiId: '100' }))
   })
 
   it('should create the correct session from a person level appointment', () => {
@@ -402,8 +402,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({ eventId: 'PERSON_LEVEL_CONTACT', type: 'CODC' }),
     )
   })
@@ -418,8 +418,8 @@ describe('/middleware/constructAppointmentSession', () => {
       appointmentTypes: mockTypes,
     })
     const { providerCode, teamCode, username: mockUsername, code } = mockAppointment.officer
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         eventId: '',
         type: '',
@@ -444,8 +444,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toStrictEqual(
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         type: '',
         user: {
@@ -489,9 +489,9 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toBeDefined()
-    expect(res.locals.nextAppointmentSession.rescheduleAppointment).toEqual(rescheduleAppointment)
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toBeDefined()
+    expect(res.locals.appointmentSession.rescheduleAppointment).toEqual(rescheduleAppointment)
   })
 
   it('should not include rescheduleAppointment when selection is RESCHEDULE but no reschedule data in session', () => {
@@ -523,9 +523,9 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toBeDefined()
-    expect(res.locals.nextAppointmentSession.rescheduleAppointment).toStrictEqual({
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toBeDefined()
+    expect(res.locals.appointmentSession.rescheduleAppointment).toStrictEqual({
       previousEnd: '2024-02-21T10:30:00.382936Z[Europe/London]',
       previousStart: '2024-02-21T10:15:00.382936Z[Europe/London]',
     })
@@ -560,8 +560,8 @@ describe('/middleware/constructAppointmentSession', () => {
       personAppointment: mockAppt,
       appointmentTypes: mockTypes,
     })
-    constructNextAppointmentSession(req, res, nextSpy)
-    expect(res.locals.nextAppointmentSession).toBeDefined()
-    expect(res.locals.nextAppointmentSession).not.toHaveProperty('rescheduleAppointment')
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toBeDefined()
+    expect(res.locals.appointmentSession).not.toHaveProperty('rescheduleAppointment')
   })
 })

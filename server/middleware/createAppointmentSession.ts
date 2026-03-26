@@ -1,32 +1,30 @@
 import { Request, NextFunction } from 'express'
-import { DateTime } from 'luxon'
-import { AppointmentSession, YesNo } from '../models/Appointments'
 import { AppResponse } from '../models/Locals'
-import { dateIsInPast, isoToDateTime } from '../utils'
+import { isoToDateTime, setDataValue } from '../utils'
+import { AppointmentSession, AppointmentSessionSelection, YesNo } from '../models/Appointments'
 
 const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'No')
 
-export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
+export const createAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
-  const { crn, id } = req.params as Record<string, string>
-  const { nextAppointment: nextAppointmentSelection } = req.body
-
-  let nextAppointment: AppointmentSession = {
+  const { crn, id, contactId } = req.params as Record<string, string>
+  const selection: AppointmentSessionSelection = req?.body?.nextAppointment || 'KEEP_TYPE'
+  let appointmentSession: AppointmentSession = {
     eventId: '',
     username: res.locals.user.username,
     uuid: '',
   }
-
-  if (nextAppointmentSelection === 'KEEP_TYPE' || nextAppointmentSelection === 'RESCHEDULE') {
+  if (['KEEP_TYPE', 'RESCHEDULE'].includes(selection)) {
+    if (selection === 'RESCHEDULE') {
+      appointmentSession.rescheduleAppointment = {
+        ...(req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment ?? {}),
+        previousStart: appointment.startDateTime,
+        previousEnd: appointment.endDateTime,
+      }
+    }
     const { appointmentTypes } = res.locals
     let eventId = appointment?.eventId || ''
     const sentences = req?.session?.data?.sentences?.[crn]
-    const rescheduleAppointment = {
-      ...(req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment ?? {}),
-      previousStart: appointment.startDateTime,
-      previousEnd: appointment.endDateTime,
-    }
-
     if (!eventId && appointment?.eventNumber) {
       if (sentences) {
         eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
@@ -35,7 +33,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     if (eventId && !sentences.some(sentence => sentence.id === eventId)) {
       eventId = ''
     }
-
     const matchingType = appointmentTypes.find(t => t?.description === appointment?.type)
     let type = matchingType?.code || ''
 
@@ -46,7 +43,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     if (matchingType?.isLocationRequired === false && !locationCode) {
       locationCode = 'NO_LOCATION_REQUIRED'
     }
-
     let username = appointment?.officer?.username || ''
     let teamCode = appointment?.officer?.teamCode || ''
     const staffCode = appointment?.officer?.code || ''
@@ -62,7 +58,6 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       ;({ time: end } = isoToDateTime(appointment.endDateTime))
     }
     const externalReference = appointment?.externalReference || ''
-
     if (!eventId) {
       type = ''
     }
@@ -74,9 +69,8 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
     if (!eventId || !type || !providerCode || !teamCode || !username) {
       locationCode = ''
     }
-
-    nextAppointment = {
-      ...nextAppointment,
+    appointmentSession = {
+      ...appointmentSession,
       user: {
         providerCode,
         teamCode,
@@ -93,28 +87,26 @@ export const constructNextAppointmentSession = (req: Request, res: AppResponse, 
       uuid: '',
       externalReference,
     }
-
-    if (rescheduleAppointment && nextAppointmentSelection === 'RESCHEDULE') {
-      nextAppointment.rescheduleAppointment = rescheduleAppointment
-    }
-
     if (visorReport) {
-      nextAppointment.visorReport = visorReport
+      appointmentSession.visorReport = visorReport
     }
     if (appointment?.component?.type === 'REQUIREMENT') {
-      nextAppointment.requirementId = appointment?.component?.id.toString() || ''
+      appointmentSession.requirementId = appointment?.component?.id.toString() || ''
     }
     if (appointment?.component?.type === 'LICENCE_CONDITION') {
-      nextAppointment.licenceConditionId = appointment?.component?.id?.toString() || ''
+      appointmentSession.licenceConditionId = appointment?.component?.id?.toString() || ''
     }
     if (appointment?.nsiId) {
-      nextAppointment.nsiId = appointment.nsiId.toString()
+      appointmentSession.nsiId = appointment.nsiId.toString()
     }
     if (appointment?.officer?.name) {
-      nextAppointment.user.name = appointment.officer.name
+      appointmentSession.user.name = appointment.officer.name
     }
-    nextAppointment.smsOptIn = null
+    appointmentSession.smsOptIn = null
   }
-  res.locals.nextAppointmentSession = nextAppointment
+  res.locals.appointmentSession = appointmentSession
+  if (contactId) {
+    setDataValue(req.session.data, ['appointments', crn, contactId], appointmentSession)
+  }
   return next()
 }

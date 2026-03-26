@@ -1,6 +1,5 @@
 /* eslint-disable import/no-cycle */
 import { Response } from 'express'
-
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
@@ -8,13 +7,19 @@ import { Sentence } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
+import {
+  AppointmentSession,
+  AppointmentType,
+  NextAppointmentResponse,
+  YesNo,
+  AttendedCompliedAppointment,
+} from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
+import { Activity, PersonAppointment, PersonSchedule } from '../data/model/schedule'
 import { FileCache } from '../@types'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
@@ -122,7 +127,7 @@ interface Locals {
   backLink: string
   personAppointment?: PersonAppointment
   personSchedule?: PersonSchedule
-  nextAppointmentSession?: AppointmentSession
+  appointmentSession?: AppointmentSession
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
@@ -142,6 +147,14 @@ interface Locals {
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
   feedbackEmail?: string
+  attendedCompliedProps?: AttendedCompliedProps
+}
+
+export interface AttendedCompliedProps {
+  forename: string
+  surname: string
+  appointment: AttendedCompliedAppointment | Activity
+  outcomeItems: Option[]
 }
 
 export interface AppResponse extends Response {

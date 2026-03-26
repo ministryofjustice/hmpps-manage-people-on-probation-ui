@@ -1,12 +1,32 @@
-import { type AttendedCompliedAppointment } from '../middleware'
 import { type Name } from '../data/model/personalDetails'
 import { type Activity } from '../data/model/schedule'
 import { type Errors } from './Errors'
 import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
+import { Option } from './Option'
 
 export type YesNo = '' | 'Yes' | 'No'
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
+
+export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
+
+export type AppointmentOutcomeType =
+  | 'ATTENDED'
+  | 'ATTENDED_SENT_HOME_BEHAVIOUR'
+  | 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES'
+  | 'ACCEPTABLE_ABSENCE'
+  | 'UNACCEPTABLE_ABSENCE'
+  | 'EVIDENCE_REQUESTED'
+  | 'WILL_BE_RESCHEDULED'
+
+export interface AppointmentOutcome {
+  type: AppointmentOutcomeType
+  complied: 'YES' | 'NO'
+}
+
+export interface AppointmentOutcomeOption extends Option {
+  value: AppointmentOutcomeType
+}
 
 export interface AppointmentSessionUser {
   providerCode?: string
@@ -34,6 +54,7 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
+  outcome?: AppointmentOutcome
   outcomeRecorded?: YesNo
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
@@ -209,4 +230,12 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+}
+
+export interface AttendedCompliedAppointment {
+  type: string
+  officer: {
+    name: Name
+  }
+  startDateTime: string
 }

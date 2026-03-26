@@ -1,0 +1,38 @@
+{% extends "../_form.njk" %}
+{% set hideButton = true %}
+{% set backLink = "/case/" + crn + "/appointments/appointment/" + contactId + "/manage" %}
+{% if uuid %}
+  {% set backLink = "/case/" + crn + "/arrange-appointment/" + uuid + "/location-date-time" %}
+{% endif %}
+{% block form %}
+  {{ govukRadios({
+    formGroup: {
+      attributes: {
+        'data-qa': 'outcome'
+      } 
+    },
+    fieldset: {
+      legend: {
+        html: '<span data-qa="pageHeading">' + ('What was the outcome of this appointment?' if isInPast else 'Why will ' + headerPersonName.forename | convertToTitleCase + ' not attend this appointment?') + '</span>',
+        classes: "govuk-fieldset__legend--l"
+      }
+    },
+ hint: {
+        text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName | convertToTitleCase + " on " + appointment.startDateTime | dateWithDayAndWithYear + "."
+    },
+    errorMessage: {
+    text: "Select whether or not you wanted to arrange the next appointment"
+  } if errorMessages.nextAppointment,
+    items: outcomeItems
+   } | decorateFormAttributes(['appointments', crn, uuid or contactId,  'outcome', 'type'])) }}
+  <div class="govuk-button-group">
+    {{ govukButton({
+                    text: "Continue",
+                    type: "submit",
+                    attributes: { "data-qa": "submit-btn" }
+                }) }}
+    <a class="govuk-link" href="{{ backLink }}" data-qa="formAnchorLink">
+                    Cancel and go back
+                </a>
+  </div>
+{% endblock %}

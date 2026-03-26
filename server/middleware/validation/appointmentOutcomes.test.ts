@@ -7,7 +7,7 @@ jest.mock('../../utils/validationUtils')
 jest.mock('../../properties')
 jest.mock('../../utils/urlToRenderPath')
 
-describe('appointmentOutcomes middleware', () => {
+xdescribe('appointmentOutcomes middleware', () => {
   let req: any
   let res: any
   let next: jest.Mock

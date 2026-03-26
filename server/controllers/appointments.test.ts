@@ -16,9 +16,8 @@ import {
   renderError,
   getAttendedCompliedProps,
   getCheckinOffenderDetails,
-  AttendedCompliedAppointment,
 } from '../middleware'
-import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
+import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
@@ -63,8 +62,6 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
-  getAttendedCompliedProps: jest.fn(),
-  getCheckinOffenderDetails: jest.fn(() => mockMiddlewareFn),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -80,8 +77,6 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
-const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
-const mockGetCheckinOffenderDetails = getCheckinOffenderDetails as jest.MockedFunction<typeof getCheckinOffenderDetails>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
 
@@ -120,18 +115,17 @@ const mockAppointment: AttendedCompliedAppointment | Activity = {
   startDateTime: '2025-11-20',
 }
 
-mockGetAttendedCompliedProps.mockImplementation(() => ({
-  forename: 'Forename',
-  surname: 'Surname',
-  appointment: mockAppointment,
-}))
-
 const res = mockAppResponse({
   user: {
     username: 'user-1',
   },
   case: {
     mainAddress: {},
+  },
+  attendedCompliedProps: {
+    forename: 'Forename',
+    surname: 'Surname',
+    appointment: mockAppointment,
   },
 })
 
@@ -369,13 +363,15 @@ describe('controllers/appointments', () => {
     })
   })
 
+  /* Delete these tests after enableNonCompliance feature flag is removed 👇 */
+
   describe('get attended and complied', () => {
     beforeEach(async () => {
       await controllers.appointments.getAttendedComplied(hmppsAuthClient)(req, res)
     })
     checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-complied', {
         crn,
         alertDismissed: false,
         isInPast: true,
@@ -437,6 +433,9 @@ describe('controllers/appointments', () => {
       })
     })
   })
+
+  /* ----------------- 👆 -----------------  */
+
   describe('get add note', () => {
     const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
     const errorMessages = {
@@ -645,7 +644,7 @@ describe('controllers/appointments', () => {
         },
       })
       const mockRes = mockAppResponse({
-        nextAppointmentSession: {} as AppointmentSession,
+        appointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
       expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({})

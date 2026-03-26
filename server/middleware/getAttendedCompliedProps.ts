@@ -1,24 +1,18 @@
-import { Request } from 'express'
+import { DateTime } from 'luxon'
 import { Activity } from '../data/model/schedule'
-import { AppointmentSession } from '../models/Appointments'
-import { AppResponse } from '../models/Locals'
-import { getDataValue, convertToTitleCase } from '../utils'
-import { Name } from '../data/model/personalDetails'
+import { AppointmentSession, AttendedCompliedAppointment } from '../models/Appointments'
+import { getDataValue } from '../utils/getDataValue'
+import { convertToTitleCase } from '../utils/convertToTitleCase'
+import { outcomeOptions } from '../properties/outcomeOptions'
+import { appointmentDateIsInPast } from './appointmentDateIsInPast'
+import { Route } from '../@types'
 
-export interface AttendedCompliedAppointment {
-  type: string
-  officer: {
-    name: Name
-  }
-  startDateTime: string
-}
-
-export const getAttendedCompliedProps = (
-  req: Request,
-  res: AppResponse,
-): { forename: string; surname: string; appointment: AttendedCompliedAppointment | Activity } => {
-  const { crn, id, contactId } = req.params as Record<string, string>
+export const getAttendedCompliedProps: Route<void> = (req, res, next) => {
+  const { crn, id: uuid, contactId } = req.params as Record<string, string>
+  const id = uuid || contactId
+  const path = ['appointments', crn, id]
   const data = req?.session?.data
+  const appointmentSession = getDataValue<AppointmentSession>(data, path)
   let appointment: AttendedCompliedAppointment | Activity
   const { forename, surname } = res.locals.case.name
   if (contactId) {
@@ -31,9 +25,10 @@ export const getAttendedCompliedProps = (
     if (name) {
       ;[officerForename, officerSurname] = name.split(' ')
     }
-    const path = ['appointments', crn, id]
-    const appointmentSession = getDataValue<AppointmentSession>(data, path)
-    const startDateTime = appointmentSession?.date ?? ''
+    const startDateTime = DateTime.fromISO(`${appointmentSession.date}T${appointmentSession.start}`, {
+      zone: 'utc',
+    }).toISO({ suppressMilliseconds: true })
+
     appointment = {
       type: description,
       officer: {
@@ -42,5 +37,19 @@ export const getAttendedCompliedProps = (
       startDateTime,
     }
   }
-  return { forename, surname, appointment }
+  const isInPast = appointmentDateIsInPast(req)
+  let outcomeItems = outcomeOptions
+  if (isInPast && appointmentSession?.type && !['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
+    outcomeItems = outcomeOptions.filter(option => option.value !== 'WILL_BE_RESCHEDULED')
+  }
+  if (isInPast && appointmentSession?.type && ['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
+    outcomeItems = outcomeOptions.filter(
+      option => !['WILL_BE_RESCHEDULED', 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES'].includes(option.value),
+    )
+  }
+  if (!isInPast) {
+    outcomeItems = outcomeItems.filter(option => ['ACCEPTABLE_ABSENCE', 'WILL_BE_RESCHEDULED'].includes(option.value))
+  }
+  res.locals.attendedCompliedProps = { forename, surname, appointment, outcomeItems }
+  return next()
 }

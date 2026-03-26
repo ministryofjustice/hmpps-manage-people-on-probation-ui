@@ -74,14 +74,14 @@ const rescheduleAppointmentController: Controller<typeof routes, void> = {
       })
     }
   },
-  postRescheduleAppointment: hmppsAuthClient => {
+  postRescheduleAppointment: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      const { nextAppointmentSession } = res.locals
-      return cloneAppointmentAndRedirect(nextAppointmentSession, 'RESCHEDULE')(req, res)
+      const { appointmentSession } = res.locals
+      return cloneAppointmentAndRedirect(appointmentSession, 'RESCHEDULE')(req, res)
     }
   },
   getRescheduleCheckYourAnswer: _hmppsAuthClient => {
