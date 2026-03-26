@@ -17,6 +17,7 @@ const stubNoAllocatedProbationPractitionerProviderAccess = (): SuperAgentRequest
           },
           homeArea: 'London',
           team: 'Automated Allocation Team',
+          email: 'peter.parker@testemail.com',
         },
         providers: [
           {
