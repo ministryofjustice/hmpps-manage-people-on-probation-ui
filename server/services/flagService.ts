@@ -3,7 +3,7 @@ import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
 
 export default class FlagService {
-  async getFlags(): Promise<FeatureFlags> {
+  async getFlags(context: { email?: string }): Promise<FeatureFlags> {
     const namespace = 'manage-people-on-probation-ui'
     const fliptEvaluationClient = await FliptEvaluationClient.init(namespace, {
       url: config.flipt.url,
@@ -19,7 +19,11 @@ export default class FlagService {
       }
     })
     const requests = flagList.map(flag => {
-      const request: EvaluationRequest = { flagKey: flag, entityId: flag, context: {} }
+      const request: EvaluationRequest = {
+        flagKey: flag,
+        entityId: context?.email ? context.email || 'anonymous' : flag,
+        context: context?.email ? { email: context.email } : {},
+      }
       return request
     })
     const flags = fliptEvaluationClient.evaluateBatch(requests)
@@ -35,7 +39,6 @@ export default class FlagService {
     flagList.forEach(f => {
       featureFlags[f] = result(flags.responses, f)
     })
-
     return featureFlags
   }
 }

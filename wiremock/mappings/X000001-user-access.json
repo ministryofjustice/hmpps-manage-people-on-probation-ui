@@ -25,7 +25,13 @@
       "response": {
         "status": 200,
         "jsonBody": {
-          "roles": ["OIBT0002"]
+          "roles": ["OIBT0002"],
+          "userId": 1234,
+          "username": "USER1",
+          "firstName": "Test",
+          "surname": "User",
+          "email": "user@email.com",
+          "enabled": true
         },
         "headers": {
           "Content-Type": "application/json"

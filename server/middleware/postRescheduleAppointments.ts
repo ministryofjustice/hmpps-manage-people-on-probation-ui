@@ -28,18 +28,8 @@ export const postRescheduleAppointments = (
     const { externalReference: oldSupervisionAppointmentUrn } = res.locals.personAppointment.appointment
 
     const { data } = req.session
-    const {
-      date,
-      start,
-      end,
-      type,
-      notes,
-      sensitivity,
-      visorReport,
-      rescheduleAppointment,
-      outcomeRecorded,
-      user: { username },
-    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    const { date, start, end, type, notes, sensitivity, visorReport, rescheduleAppointment, outcomeRecorded } =
+      getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const selectedTeam = getDataValue(data, ['appointments', crn, uuid, 'user', 'teamCode'])
     const selectedLocation = getDataValue(data, ['appointments', crn, uuid, 'user', 'locationCode'])
     const staffCode = getDataValue(data, ['appointments', crn, uuid, 'user', 'staffCode'])
@@ -64,9 +54,9 @@ export const postRescheduleAppointments = (
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
     }
     const response = await masClient.putRescheduleAppointment(contactId, body)
-    const userDetails = await masClient.getUserDetails(username)
+    const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
-    if (userDetails?.email) {
+    if (email && res.locals.flags.enableCalendarEvents) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)
@@ -80,8 +70,8 @@ export const postRescheduleAppointments = (
         rescheduledEventRequest: {
           recipients: [
             {
-              emailAddress: userDetails.email,
-              name: `${userDetails.firstName} ${userDetails.surname}`,
+              emailAddress: email,
+              name: `${firstName} ${surname}`,
             },
           ],
           message,
@@ -96,7 +86,7 @@ export const postRescheduleAppointments = (
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
+    if (!email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
 
     return response
   }
