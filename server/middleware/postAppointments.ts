@@ -68,10 +68,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
 
     const response = await masClient.postAppointments(crn, body)
-    const userDetails = await masClient.getUserDetails(username)
+    const { email, firstName, surname } = res.locals.user
     let outlookEventResponse: OutlookEventResponse
-
-    if (userDetails?.email) {
+    if (email && res.locals.flags.enableCalendarEvents) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
@@ -80,8 +79,8 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {
-            emailAddress: userDetails.email,
-            name: `${userDetails.firstName} ${userDetails.surname}`,
+            emailAddress: email,
+            name: `${firstName} ${surname}`,
           },
         ],
         message,
@@ -90,10 +89,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
-      const {
-        name: { forename: firstName },
-        mobileNumber,
-      } = res.locals.case
+      const { mobileNumber } = res.locals.case
 
       if (smsOptIn?.includes('YES') && mobileNumber) {
         const {
@@ -115,7 +111,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outlookEventResponse = await masOutlookClient.postOutlookCalendarEvent(outlookEventRequestBody)
     }
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
+    if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
 
     return response
   }

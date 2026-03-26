@@ -12,5 +12,6 @@ export class FeatureFlags {
   enableTierLink?: boolean = undefined
   enableDeliusClient?: boolean = undefined
   enableOGRS4?: boolean = undefined
+  enableCalendarEvents?: boolean = undefined
   enableESupervisionCustomQuestions?: boolean = undefined
 }
