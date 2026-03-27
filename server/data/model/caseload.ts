@@ -49,10 +49,10 @@ export interface Provider {
 export interface User {
   staffCode?: string
   username: string
-  name: Name
   nameAndRole: string
-  email?: string
   selected?: string
+  name?: Name
+  email?: string
 }
 
 export interface Location {

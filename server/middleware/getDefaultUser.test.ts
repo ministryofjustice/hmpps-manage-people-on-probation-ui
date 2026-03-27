@@ -85,7 +85,7 @@ const buildRequest = ({ req = {}, params = {}, query = {}, user = {}, data = {} 
   return httpMocks.createRequest(request)
 }
 
-const res = mockAppResponse({ user: { username } })
+const res = mockAppResponse({ user: { username }, flags: { enableMAN2344: true } })
 
 const getUserProvidersSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserProviders')

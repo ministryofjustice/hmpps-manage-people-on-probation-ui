@@ -27,8 +27,12 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
     }
 
     let attendingUsername = getDataValue<string>(data, ['appointments', crn, id, 'user', 'username']) ?? null
-    let attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
-    let attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
+    let attendingEmail: string
+    let attendingName: Name
+    if (res.locals.flags.enableMAN2344) {
+      attendingEmail = getDataValue<string>(data, ['appointments', crn, id, 'user', 'email']) ?? null
+      attendingName = getDataValue<Name>(data, ['appointments', crn, id, 'user', 'name']) ?? null
+    }
     let providerCode = getDataValue(data, ['appointments', crn, id, 'user', 'providerCode']) ?? null
     let teamCode = getDataValue(data, ['appointments', crn, id, 'user', 'teamCode']) ?? null
     const [{ defaultUserDetails, providers, teams, users }, probationPractitioner] = await Promise.all([
@@ -44,22 +48,28 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
       sessionStaff = users
       if (probationPractitioner.unallocated === false) {
         attendingUsername = probationPractitioner.username
-        attendingEmail = probationPractitioner.email
-        attendingName = probationPractitioner.name
+        if (res.locals.flags.enableMAN2344) {
+          attendingEmail = probationPractitioner.email
+          attendingName = probationPractitioner.name
+        }
         providerCode = probationPractitioner.provider.code
         teamCode = probationPractitioner.team.code
       } else {
         attendingUsername = defaultUserDetails?.username
-        attendingEmail = defaultUserDetails?.email
-        attendingName = defaultUserDetails.name
+        if (res.locals.flags.enableMAN2344) {
+          attendingEmail = defaultUserDetails?.email
+          attendingName = defaultUserDetails.name
+        }
         providerCode = providers.find(provider => provider.name === defaultUserDetails.homeArea)?.code
         teamCode = teams.find(team => team.description === defaultUserDetails.team)?.code
       }
       setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
       setDataValue(data, ['appointments', crn, id, 'user', 'username'], attendingUsername)
-      setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
-      setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
+      if (res.locals.flags.enableMAN2344) {
+        setDataValue(data, ['appointments', crn, id, 'user', 'email'], attendingEmail)
+        setDataValue(data, ['appointments', crn, id, 'user', 'name'], attendingName)
+      }
       const { teams: providerTeams, users: providerStaff } = await getTeamsAndStaff(providerCode, teamCode)
       sessionTeams = providerTeams
       sessionStaff = providerStaff
@@ -84,16 +94,19 @@ export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<
           [],
           regexIgnoreValuesInParentheses,
         )
-        sessionStaff = [
-          ...sessionStaff,
-          {
-            staffCode: probationPractitioner.code,
-            username: probationPractitioner.username,
-            nameAndRole,
+        let sessionStaffItem: User = {
+          staffCode: probationPractitioner.code,
+          username: probationPractitioner.username,
+          nameAndRole,
+        }
+        if (res.locals.flags.enableMAN2344) {
+          sessionStaffItem = {
+            ...sessionStaffItem,
             name: probationPractitioner.name,
             email: probationPractitioner.email,
-          },
-        ]
+          }
+        }
+        sessionStaff = [...sessionStaff, sessionStaffItem]
       }
     }
     setDataValue(data, ['providers', username], sessionProviders)

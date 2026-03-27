@@ -265,14 +265,16 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       const username = body?.appointments?.[crn]?.[id]?.temp?.username
       const staff = getDataValue<User[]>(data, ['staff', username])
       const staffMember = staff?.find(person => person.username === username)
-      const email = staffMember?.email ?? null
-      const name = staffMember?.name ?? null
       if (providerCode) {
         setDataValue(data, ['appointments', crn, id, 'user', 'providerCode'], providerCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'teamCode'], teamCode)
         setDataValue(data, ['appointments', crn, id, 'user', 'username'], username)
-        setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
-        setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
+        if (res.locals.flags.enableMAN2344) {
+          const email = staffMember?.email ?? null
+          const name = staffMember?.name ?? null
+          setDataValue(data, ['appointments', crn, id, 'user', 'email'], email)
+          setDataValue(data, ['appointments', crn, id, 'user', 'name'], name)
+        }
         await getOfficeLocationsByTeamAndProvider(hmppsAuthClient)(req, res)
         await getUserOptions(hmppsAuthClient)(req, res)
         checkAnswers(req, res)

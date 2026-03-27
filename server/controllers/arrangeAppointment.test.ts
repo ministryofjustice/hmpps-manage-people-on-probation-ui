@@ -186,6 +186,7 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         surname: 'Wolff',
       },
     },
+    flags: { enableMAN2344: true },
     ...(localsResponse || {}),
   })
 

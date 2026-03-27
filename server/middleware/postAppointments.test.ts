@@ -275,7 +275,11 @@ const mockCase: Partial<PersonalDetails> = {
   mobileNumber: '07700900000',
 }
 
-const res = mockAppResponse({ case: mockCase, user: mockUser, flags: { enableCalendarEvents: true } })
+const res = mockAppResponse({
+  case: mockCase,
+  user: mockUser,
+  flags: { enableCalendarEvents: true, enableMAN2344: true },
+})
 
 const postAppointmentsSpy = jest
   .spyOn(MasApiClient.prototype, 'postAppointments')
@@ -419,7 +423,7 @@ describe('/middleware/postAppointments', () => {
       const mockRes = mockAppResponse({
         case: mockCase,
         user: { ...mockUser, email: null },
-        flags: { enableCalendarEvents: true },
+        flags: { enableCalendarEvents: true, enableMAN2344: true },
       })
       beforeEach(async () => {
         await postAppointments(hmppsAuthClient)(mockReq, mockRes)
