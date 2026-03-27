@@ -101,7 +101,6 @@ context('Appointment', () => {
       .invoke('attr', 'title')
       .should('eq', 'System generated')
 
-
     page.assertAnchorElementAtIndexWithin(
       '[class="govuk-table__row"]',
       1,
