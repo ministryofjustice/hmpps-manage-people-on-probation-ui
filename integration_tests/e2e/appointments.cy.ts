@@ -78,6 +78,28 @@ context('Appointment', () => {
     page.pastAppointmentDate(2).should('contain.text', '21 March 2024')
     page.pastAppointmentTime(2).should('contain.text', '10:15am to 10:30am')
     page.pastAppointmentType(2).should('contain.text', 'Phone call')
+    page.pastAppointmentType(4).should('contain.text', 'Planned video contact (NS)')
+    page.pastAppointmentType(4).should('contain.text', '⛭')
+    page.pastAppointmentType(4).should('contain.text', '?')
+    page.pastAppointmentType(4).should('contain.text', '!')
+    page
+      .pastAppointmentType(4)
+      .get('span.app-compliance-tag--compact')
+      .eq(1)
+      .invoke('attr', 'title')
+      .should('eq', 'Sensitive')
+    page
+      .pastAppointmentType(4)
+      .get('span.app-compliance-tag--compact')
+      .eq(2)
+      .invoke('attr', 'title')
+      .should('eq', 'Waiting for evidence')
+    page
+      .pastAppointmentType(4)
+      .get('span.app-compliance-tag--compact')
+      .eq(3)
+      .invoke('attr', 'title')
+      .should('eq', 'System generated')
 
     page.assertAnchorElementAtIndexWithin(
       '[class="govuk-table__row"]',
