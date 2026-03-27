@@ -1,12 +1,11 @@
 import EditMainAddress from '../../pages/personalDetails/editMainAddress'
 import mockResponse from '../../../wiremock/mappings/X000001-personal-detail.json'
-import { AddressType, PersonAddress } from '../../../server/data/model/personalDetails'
 import Page from '../../pages/page'
 import { getWiremockData, Wiremock } from '../../utils'
 
 const mockData = mockResponse as Wiremock
 
-const mainAddress = getWiremockData<PersonAddress>(mockData, '/mas/personal-details/X000001', 'mainAddress')
+const mainAddress = getWiremockData<any>(mockData, '/mas/personal-details/X000001', 'mainAddress')
 
 const { buildingName, buildingNumber, streetName, district, town, county, postcode } = mainAddress
 
@@ -24,7 +23,7 @@ context('Edit main address', () => {
   it('Edit main address page is rendered', () => {
     cy.visit('/case/X000001/personal-details/edit-main-address')
     const page = new EditMainAddress()
-    const addressTypes = getWiremockData<AddressType[]>(mockData, '/mas/personal-details/X000001', 'addressTypes')
+    const addressTypes = getWiremockData<any>(mockData, '/mas/personal-details/X000001', 'addressTypes')
     page.checkPageTitle('Edit main address for Caroline')
     page
       .getElementData('noFixedAddressGroup')
