@@ -46,6 +46,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
       const roleService = new RoleService(masClient)
+      console.log(`Service: ${roleService}`)
       const manageUsersAccess = await roleService.hasAccess(DeliusRoleEnum.MANAGE_USERS, res.locals.user.username)
       let action = 'VIEW_MAS_PERSONAL_DETAILS'
       let renderPath = 'pages/personal-details'
