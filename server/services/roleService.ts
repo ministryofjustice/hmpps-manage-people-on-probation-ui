@@ -10,7 +10,7 @@ export default class RoleService {
     console.log(`Role: ${role}`)
     const deliusRoles = await this.masApiClient.getDeliusRoles(username)
     // eslint-disable-next-line no-console
-    console.log(`Roles: ${deliusRoles}`)
+    console.log(`Roles: ${deliusRoles?.roles}`)
     return deliusRoles?.roles?.includes(role) === true
   }
 }
