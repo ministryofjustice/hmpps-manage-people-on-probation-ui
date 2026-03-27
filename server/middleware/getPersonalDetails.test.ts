@@ -195,7 +195,6 @@ describe('/middleware/getPersonalDetails', () => {
           },
           flags: {
             enableSentencePlan: false,
-            enableTierLink: true,
             enableOGRS4: true,
           },
         },
@@ -254,7 +253,6 @@ describe('/middleware/getPersonalDetails', () => {
           },
           flags: {
             enableSentencePlan: false,
-            enableTierLink: true,
             enableOGRS4: true,
           },
         },
@@ -293,7 +291,6 @@ describe('/middleware/getPersonalDetails', () => {
           },
           flags: {
             enableSentencePlan: false,
-            enableTierLink: true,
             enableOGRS4: false,
           },
         },
@@ -352,7 +349,6 @@ describe('/middleware/getPersonalDetails', () => {
           },
           flags: {
             enableSentencePlan: false,
-            enableTierLink: true,
             enableOGRS4: false,
           },
         },
@@ -634,25 +630,5 @@ describe('/middleware/getPersonalDetails', () => {
       showText: false,
       lastUpdatedDate: '',
     })
-  })
-  it('should not set res.locals.headerTierLink if feature flag is disabled', async () => {
-    jest
-      .spyOn(MasApiClient.prototype, 'getPersonalDetails')
-      .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
-    req = getReq()
-    res = mockAppResponse({
-      user: {
-        username: 'user-1',
-        roles: [],
-      },
-      flags: {
-        enableSentencePlan: true,
-        enableTierLink: false,
-        enableOGRS4: true,
-      },
-    })
-    await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
-    expect(res.locals.headerTierLink).toBeUndefined()
   })
 })
