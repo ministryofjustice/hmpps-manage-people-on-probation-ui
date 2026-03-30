@@ -3,7 +3,6 @@ export class FeatureFlags {
   [index: string]: boolean
   enableSentencePlan?: boolean = undefined
   enableSanIndicator?: boolean = undefined
-  enableProbFEComponent?: boolean = undefined
   enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined

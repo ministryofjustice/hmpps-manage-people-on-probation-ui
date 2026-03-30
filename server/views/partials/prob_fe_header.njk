@@ -1,9 +1,7 @@
 {% from "govuk/components/tag/macro.njk" import govukTag %}
 {% from "govuk/components/phase-banner/macro.njk" import govukPhaseBanner %}
 
-{% if flags.enableProbFEComponent !== true %}
-    {% include "./header.njk" %}
-{% elif feComponents.header and flags.enableProbFEComponent === true%}
+{% if feComponents.header %}
     {{ feComponents.header | safe }}
 {% else %}
     {% include "./_fallback_prob_fe_header.njk" %}
