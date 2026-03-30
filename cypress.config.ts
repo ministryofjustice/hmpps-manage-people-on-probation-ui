@@ -26,7 +26,7 @@ export default defineConfig({
     },
     baseUrl: 'http://localhost:3007',
     excludeSpecPattern: '**/!(*.cy).ts',
-    specPattern: 'integration_tests/e2e/appointments/**/*.cy.{js,jsx,ts,tsx}',
+    specPattern: 'integration_tests/e2e/**/*.cy.{js,jsx,ts,tsx}',
     supportFile: 'integration_tests/support/index.ts',
     experimentalRunAllSpecs: true,
     env: {
