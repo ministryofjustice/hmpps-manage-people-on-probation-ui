@@ -543,6 +543,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       completeDateInFuture()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
