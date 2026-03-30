@@ -5,12 +5,14 @@ import stubs from './wiremock/stubs'
 export default defineConfig({
   chromeWebSecurity: false,
   fixturesFolder: 'integration_tests/fixtures',
-  screenshotsFolder: 'integration_tests/screenshots',
-  videosFolder: 'integration_tests/videos',
+  screenshotsFolder: 'test_results/screenshots',
+  videosFolder: 'test_results/videos',
   reporter: 'cypress-multi-reporters',
   reporterOptions: {
     configFile: 'reporter-config.json',
   },
+  video: true,
+  screenshotOnRunFailure: true,
   taskTimeout: 60000,
   numTestsKeptInMemory: 20,
   experimentalMemoryManagement: true,
