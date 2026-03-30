@@ -1303,10 +1303,12 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG
+      // ESUPERVISION FEATURE FLAG CHECK
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
       }
+
+      // TODO: call the esup questions endpoint
       return res.render('pages/check-in/questions/add-questions.njk', {
         crn,
         back,
@@ -1318,43 +1320,40 @@ const checkInsController: Controller<typeof routes, void> = {
   getPreviewFeelingPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
       }
+
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+
       return res.render('pages/check-in/questions/preview/feeling.njk', {
         crn,
-        back,
+        back: req.query.back,
         id,
         data: req.session.data,
       })
     }
   },
+
   getPreviewSupportPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
-      const { back } = req.query
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${req.params.crn}`)
+      }
 
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
+      if (!isValidCrn(req.params.crn) || !isValidUUID(req.params.id)) {
         return renderError(404)(req, res)
       }
+
+      const { crn, id } = req.params
+      const { data } = req.session
+
       await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
-      // ESUPERVISION FEATURE FLAG
-      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${crn}`)
-      }
-      return res.render('pages/check-in/questions/preview/support.njk', {
-        crn,
-        back,
-        id,
-        data: req.session.data,
-      })
+
+      const viewData = { crn, id, back: req.query.back, data }
+      return res.render('pages/check-in/questions/preview/support.njk', viewData)
     }
   },
 }
