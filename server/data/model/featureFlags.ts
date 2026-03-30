@@ -12,4 +12,5 @@ export class FeatureFlags {
   enableDeliusClient?: boolean = undefined
   enableOGRS4?: boolean = undefined
   enableCalendarEvents?: boolean = undefined
+  enableBreadcrumbs?: boolean = undefined
 }

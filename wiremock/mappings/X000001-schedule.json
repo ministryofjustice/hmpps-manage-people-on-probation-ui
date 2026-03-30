@@ -198,6 +198,150 @@
                   "surname": "Smith"
                 },
                 "deliusManaged": true
+              },
+              {
+                "id": 4,
+                "type": "CP/UPW - appointment/attendance to test variable length (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 6,
+                "type": "Appointment with CRS provider (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 7,
+                "type": "Appointment with CRS provider (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 8,
+                "type": "Appointment with CRS provider for testing new icons (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 9,
+                "type": "Appointment with CRS provider for testing new icons (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 10,
+                "type": "CP/UPW - appointment/attendance (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
               }
             ]
           }
