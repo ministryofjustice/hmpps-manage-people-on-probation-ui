@@ -25,8 +25,19 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 const activityLogController: Controller<typeof routes, void> = {
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
-      const { query, body, params } = req
+      const { params } = req
       const { crn } = params
+
+      if (req.query?.showSuccessBanner) {
+        req.flash('contactCreated', req.query?.uploadFailed ? 'uploadFailed' : 'success')
+        const cleanParams = new URLSearchParams(req.query as Record<string, string>)
+        cleanParams.delete('showSuccessBanner')
+        cleanParams.delete('uploadFailed')
+        const cleanQuery = cleanParams.toString()
+        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
+      }
+
+      const { query, body } = req
       const { page = '0', view = '' } = query
       let currentView = view ?? req?.body?.view
       if (req?.query?.view === 'compact' || req?.body?.view === 'compact') {
@@ -38,7 +49,6 @@ const activityLogController: Controller<typeof routes, void> = {
 
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const currentPage = parseInt(page as string, 10)
       const pageSize = res.locals?.flags?.enableContactLog === true ? 25 : 10
       const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1
@@ -55,15 +65,6 @@ const activityLogController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-
-      if (req.query?.showSuccessBanner) {
-        req.flash('contactCreated', req.query?.uploadFailed ? 'uploadFailed' : 'success')
-        const cleanParams = new URLSearchParams(req.query as Record<string, string>)
-        cleanParams.delete('showSuccessBanner')
-        cleanParams.delete('uploadFailed')
-        const cleanQuery = cleanParams.toString()
-        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
-      }
 
       const baseUrl = req.url.split('?')[0]
       const template = res.locals?.flags?.enableContactLog === true ? 'pages/contact-log' : 'pages/activity-log'
