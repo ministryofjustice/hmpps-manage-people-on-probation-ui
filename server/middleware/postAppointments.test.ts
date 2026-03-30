@@ -237,7 +237,7 @@ const checkOutlookEventRequest = (smsRequest = false) => {
     message: expect.stringContaining(
       `<a href="http://localhost:3000/case/${crn}/appointments/appointment/${mockAppointmentsPostResponse.appointments[0].id}/manage?back=/case/${crn}/appointments" target="_blank" rel="external noopener noreferrer">View the appointment on Manage people on probation (opens in new tab).</a>`,
     ),
-    subject: `Planned Office Visit (NS) with James Morrison`,
+    subject: `J. Morrison: planned office visit (NS)`,
     start: dateTime(date, start).toISOString(),
     supervisionAppointmentUrn: mockAppointmentsPostResponse.appointments[0].externalReference,
   }
