@@ -37,6 +37,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outcomeRecorded,
       smsOptIn,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+
     const body: AppointmentRequestBody = {
       user: {
         username,
@@ -68,9 +69,20 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
 
     const response = await masClient.postAppointments(crn, body)
-    const { email, firstName, surname } = res.locals.user
+    let email: string | undefined
+    let name: Name
+    let firstName: string
+    let surname: string
+    if (res.locals.flags.enableMAN2344) {
+      ;({
+        user: { name, email },
+      } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid]))
+      ;({ forename: firstName, surname } = name)
+    } else {
+      ;({ email, firstName, surname } = res.locals.user)
+    }
     let outlookEventResponse: OutlookEventResponse
-    if (email && res.locals.flags.enableCalendarEvents) {
+    if (email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])

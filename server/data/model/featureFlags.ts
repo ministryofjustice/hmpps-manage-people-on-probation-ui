@@ -13,4 +13,5 @@ export class FeatureFlags {
   enableOGRS4?: boolean = undefined
   enableCalendarEvents?: boolean = undefined
   enableBreadcrumbs?: boolean = undefined
+  enableMAN2344?: boolean = undefined
 }

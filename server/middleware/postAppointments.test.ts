@@ -85,6 +85,8 @@ const mockAppointment: AppointmentSession = {
     locationCode: 'HMP',
     teamCode: 'TEA',
     username,
+    name: { forename: 'Mock', surname: 'User' },
+    email: 'mock.user@email.com',
   },
   type: 'COAP',
   date: '2025-03-12',
@@ -170,7 +172,7 @@ const createMockReq = (appointment: AppointmentSession) => {
 
 const getExpectedRequestBody = (request?: Partial<AppointmentRequestBody>): AppointmentRequestBody => {
   const {
-    user: { locationCode, username: _username, teamCode },
+    user: { locationCode, username: _username, teamCode, name, email },
     date,
     start,
     end,
@@ -273,7 +275,11 @@ const mockCase: Partial<PersonalDetails> = {
   mobileNumber: '07700900000',
 }
 
-const res = mockAppResponse({ case: mockCase, user: mockUser, flags: { enableCalendarEvents: true } })
+const res = mockAppResponse({
+  case: mockCase,
+  user: mockUser,
+  flags: { enableCalendarEvents: true, enableMAN2344: true },
+})
 
 const postAppointmentsSpy = jest
   .spyOn(MasApiClient.prototype, 'postAppointments')
@@ -408,27 +414,17 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
     })
-    describe('User does not have email', () => {
-      const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
+    describe('Attending user does not have email', () => {
+      const mockReq = createMockReq({
+        ...mockAppointment,
+        user: { ...mockAppointment.user, email: null },
+        smsOptIn: 'YES',
+      })
       const mockRes = mockAppResponse({
         case: mockCase,
         user: { ...mockUser, email: null },
-        flags: { enableCalendarEvents: true },
+        flags: { enableCalendarEvents: true, enableMAN2344: true },
       })
-      beforeEach(async () => {
-        await postAppointments(hmppsAuthClient)(mockReq, mockRes)
-      })
-      it('should not send the request', () => {
-        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
-      })
-      it('should set req.session.data.isOutLookEventFailed to true', () => {
-        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
-      })
-    })
-
-    describe('enableCalendarEvents feature flag is disabled', () => {
-      const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
-      const mockRes = mockAppResponse({ case: mockCase, flags: { enableCalendarEvents: false } })
       beforeEach(async () => {
         await postAppointments(hmppsAuthClient)(mockReq, mockRes)
       })

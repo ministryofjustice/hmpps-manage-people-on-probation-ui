@@ -51,6 +51,8 @@ export interface User {
   username: string
   nameAndRole: string
   selected?: string
+  name?: Name
+  email?: string
 }
 
 export interface Location {
@@ -108,6 +110,8 @@ export interface DefaultUserDetails {
   username: string
   homeArea: string
   team: string
+  email?: string
+  name: Name
 }
 
 export interface UserProviders {

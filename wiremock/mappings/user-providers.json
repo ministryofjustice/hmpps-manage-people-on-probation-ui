@@ -10,8 +10,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -44,19 +49,39 @@
           "users": [
             {
               "username": "andy-best",
-              "nameAndRole": "andy best (PS-PSO)"
+              "nameAndRole": "andy best (PS-PSO)",
+              "name": {
+                "forename": "Andy",
+                "surname": "Best"
+              },
+              "email": "andy.best@testemail.com"
             },
             {
               "username": "peter-parker",
-              "nameAndRole": "peter parker (PS-PSO)"
+              "nameAndRole": "peter parker (PS-PSO)",
+              "name": {
+                "forename": "Peter",
+                "surname": "Parker"
+              },
+              "email": "peter.parker@testemail.com"
             },
             {
               "username": "tony-pan",
-              "nameAndRole": "tony pan (PS-PSO)"
+              "nameAndRole": "tony pan (PS-PSO)",
+              "name": {
+                "forename": "Tony",
+                "surname": "Pan"
+              },
+              "email": "tony.pan@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "terry jones (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
@@ -75,8 +100,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -109,19 +139,39 @@
           "users": [
             {
               "username": "andy-best",
-              "nameAndRole": "andy best (PS-PSO)"
+              "nameAndRole": "andy best (PS-PSO)",
+              "name": {
+                "forename": "Andy",
+                "surname": "Best"
+              },
+              "email": "andy.best@testemail.com"
             },
             {
               "username": "peter-parker",
-              "nameAndRole": "peter parker (PS-PSO)"
+              "name": {
+                "forename": "Peter",
+                "surname": "Parker"
+              },
+              "nameAndRole": "peter parker (PS-PSO)",
+              "email": "peter.parker@testemail.com"
             },
             {
               "username": "tony-pan",
-              "nameAndRole": "tony pan (PS-PSO)"
+              "name": {
+                "forename": "Tony",
+                "surname": "Pan"
+              },
+              "nameAndRole": "tony pan (PS-PSO)",
+              "email": "tony.pan@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "terry jones (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
@@ -145,8 +195,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "peter-parker",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -179,15 +234,30 @@
           "users": [
             {
               "username": "max-parker",
-              "nameAndRole": "max parker (PS-PSO)"
+              "name": {
+                "forename": "Max",
+                "surname": "Parker"
+              },
+              "nameAndRole": "max parker (PS-PSO)",
+              "email": "max.parker@testemail.com"
             },
             {
               "username": "jon-smith",
-              "nameAndRole": "jon smith (PS-PSO)"
+              "name": {
+                "forename": "Jon",
+                "surname": "Smith"
+              },
+              "nameAndRole": "jon smith (PS-PSO)",
+              "email": "jon.smith@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "terry jones (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
@@ -214,8 +284,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -248,15 +323,30 @@
           "users": [
             {
               "username": "jon-quick",
-              "nameAndRole": "jon quick (PS-PSO)"
+              "name": {
+                "forename": "Jon",
+                "surname": "Quick"
+              },
+              "nameAndRole": "jon quick (PS-PSO)",
+              "email": "jon.quick@testemail.com"
             },
             {
               "username": "fred-plug",
-              "nameAndRole": "fred plug (PS-PSO)"
+              "name": {
+                "forename": "Fred",
+                "surname": "Plug"
+              },
+              "nameAndRole": "fred plug (PS-PSO)",
+              "email": "fred.plug@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "fred plug (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
@@ -280,8 +370,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -314,19 +409,39 @@
           "users": [
             {
               "username": "andy-best",
-              "nameAndRole": "andy best (PS-PSO)"
+              "name": {
+                "forename": "Andy",
+                "surname": "Best"
+              },
+              "nameAndRole": "andy best (PS-PSO)",
+              "email": "andy.best@testemail.com"
             },
             {
               "username": "peter-parker",
-              "nameAndRole": "peter parker (PS-PSO)"
+              "name": {
+                "forename": "Peter",
+                "surname": "Parker"
+              },
+              "nameAndRole": "peter parker (PS-PSO)",
+              "email": "peter.parker@testemail.com"
             },
             {
               "username": "tony-pan",
-              "nameAndRole": "tony pan (PS-PSO)"
+              "name": {
+                "forename": "Tony",
+                "surname": "Pan"
+              },
+              "nameAndRole": "tony pan (PS-PSO)",
+              "email": "tony.pan@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "terry jones (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
@@ -350,8 +465,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -384,15 +504,30 @@
           "users": [
             {
               "username": "george-parker",
-              "nameAndRole": "george parker (PS-PSO)"
+              "name": {
+                "forename": "George",
+                "surname": "Parker"
+              },
+              "nameAndRole": "george parker (PS-PSO)",
+              "email": "george.parker@testemail.com"
             },
             {
               "username": "jack-smith",
-              "nameAndRole": "jack smith (PS-PSO)"
+              "name": {
+                "forename": "Jack",
+                "surname": "Smith"
+              },
+              "nameAndRole": "jack smith (PS-PSO)",
+              "email": "jack.smith@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "terry jones (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
@@ -411,8 +546,13 @@
         "jsonBody": {
           "defaultUserDetails": {
             "username": "PETER-PARKER",
+            "name": {
+              "forename": "Peter",
+              "surname": "Parker"
+            },
             "homeArea": "London",
-            "team": "Automated Allocation Team"
+            "team": "Automated Allocation Team",
+            "email": "peter.parker@testemail.com"
           },
           "providers": [
             {
@@ -445,19 +585,39 @@
           "users": [
             {
               "username": "andy-best",
-              "nameAndRole": "andy best (PS-PSO)"
+              "name": {
+                "forename": "Andy",
+                "surname": "Best"
+              },
+              "nameAndRole": "andy best (PS-PSO)",
+              "email": "andy.best@testemail.com"
             },
             {
               "username": "peter-parker",
-              "nameAndRole": "peter parker (PS-PSO)"
+              "name": {
+                "forename": "Peter",
+                "surname": "Parker"
+              },
+              "nameAndRole": "peter parker (PS-PSO)",
+              "email": "peter.parker@testemail.com"
             },
             {
               "username": "tony-pan",
-              "nameAndRole": "tony pan (PS-PSO)"
+              "name": {
+                "forename": "Tony",
+                "surname": "Pan"
+              },
+              "nameAndRole": "tony pan (PS-PSO)",
+              "email": "tony.pan@testemail.com"
             },
             {
               "username": "terry-jones",
-              "nameAndRole": "terry jones (PS-PSO)"
+              "name": {
+                "forename": "Terry",
+                "surname": "Jones"
+              },
+              "nameAndRole": "terry jones (PS-PSO)",
+              "email": "terry.jones@testemail.com"
             }
           ]
         },
