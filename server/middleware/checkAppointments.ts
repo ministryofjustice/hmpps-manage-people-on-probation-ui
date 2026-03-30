@@ -42,7 +42,7 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     console.log(`Crn: ${crn}`)
     const checks = await masClient.checkAppointments(crn, body)
     // eslint-disable-next-line no-console
-    console.log(`Within: ${checks.isWithinOneHourOfMeetingWith}`)
+    console.log(`Within: ${JSON.stringify(checks)}`)
     const noErrorsOrWarnings = isEmptyObject(checks)
     if (noErrorsOrWarnings) {
       return next()
