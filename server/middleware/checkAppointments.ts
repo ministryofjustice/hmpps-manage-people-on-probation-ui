@@ -34,7 +34,15 @@ export const checkAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promi
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const body: CheckAppointment = { start, end }
+    // eslint-disable-next-line no-console
+    console.log(`Start: ${start}`)
+    // eslint-disable-next-line no-console
+    console.log(`End: ${end}`)
+    // eslint-disable-next-line no-console
+    console.log(`Crn: ${crn}`)
     const checks = await masClient.checkAppointments(crn, body)
+    // eslint-disable-next-line no-console
+    console.log(`Within: ${checks.isWithinOneHourOfMeetingWith}`)
     const noErrorsOrWarnings = isEmptyObject(checks)
     if (noErrorsOrWarnings) {
       return next()

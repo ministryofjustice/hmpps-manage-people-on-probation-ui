@@ -22,8 +22,6 @@ export default function setUpAuth(): Router {
   })
 
   router.get('/no-perm-autherror', (req, res) => {
-    // eslint-disable-next-line no-console
-    console.log('HEREHEREHEREHEREHERE')
     res.locals.backLink = req.query.backLink
     res.status(403)
     return res.render('no-perm-autherror')
