@@ -180,6 +180,25 @@ const appointments: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateAttendedFailedToComply = (): void => {
+    if (!req.url.includes(`appointment/${contactId}/attended-failed-to-comply`)) return
+
+    render = 'pages/appointments-outcomes/attended-failed-to-comply'
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentsValidation({
+          crn,
+          id: contactId,
+          contactId,
+          page: `attended-failed-to-comply`,
+        }),
+      ),
+    }
+  }
+
   const validateSupportingInformation = (): void => {
     if (!baseUrl.includes('/supporting-information')) return
 
@@ -300,6 +319,7 @@ const appointments: Route<void> = (req, res, next) => {
   validateRecordAnOutcome()
   validateAttendedComplied()
   validateManageAttendedComplied()
+  validateAttendedFailedToComply()
   validateAddNote()
   validateManageAddNote()
   validateReschedule()

@@ -220,20 +220,95 @@ describe('controllers/appointmentOutcomes', () => {
     })
   })
 
-  it('getAttendedFailedToComply should render correct view with breachRecallData', async () => {
+  it('getAttendedFailedToComply should render correct view with breachRecallData and isReferToProbationPractitioner false', async () => {
     const getBreachRecallInformationSpy = jest
       .spyOn(MasApiClient.prototype, 'getBreachRecallInformation')
       .mockResolvedValue('Initiate a breach')
+    const getPersonAppointmentSpy = jest
+      .spyOn(MasApiClient.prototype, 'getPersonAppointment')
+      .mockResolvedValue({ type: 'Office visit' } as any)
 
     const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
-    await handler(mockReq, mockRes)
+    await handler(
+      { ...mockReq, params: { crn: 'R000101', contactId: '123' } },
+      {
+        ...mockRes,
+        locals: {
+          ...mockRes.locals,
+          case: {
+            name: { forename: 'Stuart' },
+            staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
+          },
+        },
+      },
+    )
 
     expect(mockRes.render).toHaveBeenCalledWith('pages/appointments-outcomes/attended-failed-to-comply', {
       breachRecallData: 'Initiate a breach',
       personOnProbationFirstName: 'Stuart',
       crn: 'R000101',
+      id: '123',
+      isReferToProbationPractitioner: false,
     })
 
     expect(getBreachRecallInformationSpy).toHaveBeenCalledWith('R000101')
+  })
+
+  it('getAttendedFailedToComply should render correct view with isReferToProbationPractitioner true when responsible officer', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
+    jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Office visit' } as any)
+
+    const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
+    await handler(
+      { ...mockReq, params: { crn: 'R000101', contactId: '123' } },
+      {
+        ...mockRes,
+        locals: {
+          ...mockRes.locals,
+          case: {
+            name: { forename: 'Stuart' },
+            staffContacts: [{ responsibleOfficer: true, username: 'user1' }],
+          },
+        },
+      },
+    )
+
+    expect(mockRes.render).toHaveBeenCalledWith(
+      'pages/appointments-outcomes/attended-failed-to-comply',
+      expect.objectContaining({
+        isReferToProbationPractitioner: true,
+      }),
+    )
+  })
+
+  it('getAttendedFailedToComply should render correct view with isReferToProbationPractitioner true when telephone contact', async () => {
+    jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
+    jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Telephone contact' } as any)
+
+    const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
+    await handler(
+      { ...mockReq, params: { crn: 'R000101', contactId: '123' } },
+      {
+        ...mockRes,
+        locals: {
+          ...mockRes.locals,
+          case: {
+            name: { forename: 'Stuart' },
+            staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
+          },
+        },
+      },
+    )
+
+    expect(mockRes.render).toHaveBeenCalledWith(
+      'pages/appointments-outcomes/attended-failed-to-comply',
+      expect.objectContaining({
+        breachRecallData: 'Initiate a breach',
+        crn: 'R000101',
+        id: '123',
+        isReferToProbationPractitioner: false,
+        personOnProbationFirstName: 'Stuart',
+      }),
+    )
   })
 })

@@ -26,6 +26,13 @@
         text: breachRecallData + " and send a letter"
       },
       {
+        value: "REFER_TO_PP",
+        text: "Refer to probation practitioner",
+        hint: {
+          text: "Notify the allocated probation practitioner so they can take action."
+        }
+      } if isReferToProbationPractitioner,
+      {
         value: "NO_FURTHER_ACTION",
         text: "No further action"
       },

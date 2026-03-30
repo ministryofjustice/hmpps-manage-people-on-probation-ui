@@ -17,6 +17,7 @@ import {
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getAppointmentOutcomeBackLink } from '../middleware/getAppointmentOutcomeBackLink'
+import appointments from '../middleware/validation/appointments'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -84,6 +85,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   )
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
+    appointments,
     controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
   )
   router.get(

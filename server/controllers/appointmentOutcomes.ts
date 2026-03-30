@@ -108,14 +108,28 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
   },
   getAttendedFailedToComply: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn, contactId } = req.params
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const breachRecallData = await masClient.getBreachRecallInformation(crn)
+
+      // masClient.getPersonAppointment(crn, contactId)
+
+      const [breachRecallData] = await Promise.all([masClient.getBreachRecallInformation(crn)])
+
+      const appointmentType = res?.locals?.appointment?.type?.description
+
+      const personalDetails = res.locals.case as any
+      const responsibleOfficer = personalDetails?.staffContacts?.find((c: any) => c.responsibleOfficer)
+      const isResponsibleOfficer = responsibleOfficer?.username === res.locals.user.username
+      const isHomeVisitOrTelephoneAppointment = ['Telephone contact', 'Home visit'].includes(appointmentType)
+      const isReferToProbationPractitioner = isResponsibleOfficer || isHomeVisitOrTelephoneAppointment
+
       return res.render('pages/appointments-outcomes/attended-failed-to-comply', {
         breachRecallData,
         personOnProbationFirstName: res.locals.case.name.forename,
         crn,
+        id: contactId,
+        isReferToProbationPractitioner,
       })
     }
   },

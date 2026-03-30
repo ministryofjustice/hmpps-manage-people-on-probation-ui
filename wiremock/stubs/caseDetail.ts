@@ -32,6 +32,60 @@ const stubNoAllocatedCOM = (): SuperAgentRequest =>
     },
   })
 
+const stubProbationPractitioner = ({
+  crn,
+  username = 'DeborahFern',
+}: {
+  crn: string
+  username?: string
+}): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: `/mas/case/${crn}/probation-practitioner`,
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        responsibleOfficer: {
+          staff: {
+            username,
+          },
+        },
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubPersonAppointment = ({
+  crn,
+  contactId,
+  type = 'Office visit',
+}: {
+  crn: string
+  contactId: string
+  type?: string
+}): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: `/mas/case/${crn}/appointment/${contactId}`,
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        type,
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubNoAllocatedCOM,
+  stubProbationPractitioner,
+  stubPersonAppointment,
 }
