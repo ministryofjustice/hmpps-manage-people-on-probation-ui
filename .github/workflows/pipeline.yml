@@ -64,6 +64,7 @@ jobs:
       environment: ${{ matrix.environments }}
   build:
     name: Build docker image from hmpps-github-actions
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docker_build.yml # WORKFLOW_VERSION
     secrets: inherit
     needs:
@@ -76,7 +77,6 @@ jobs:
       docker_multiplatform: true
   deploy_dev:
     name: Deploy to the development environment
-    if: github.ref == 'refs/heads/main'
     needs:
       - build
       - helm_lint
