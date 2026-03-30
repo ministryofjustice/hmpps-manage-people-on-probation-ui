@@ -1,10 +1,31 @@
 {% extends "../partials/layout.njk" %}
 {% from "../_components/predictor-timeline-item/macro.njk" import predictorTimelineItem %}
 {% block beforeContent %}
-  {% if backLink %}
+  {% if breadcrumb and flags.enableBreadcrumbs and not change %}
+    {{ govukBreadcrumbs({
+      items: [
+        {
+          text: "Cases",
+          href: "/case"
+        },
+        {
+          text: headerPersonName.forename + ' ' + headerPersonName.surname,
+          href: "/case/" + crn,
+          attributes: { "data-ai-id": "breadcrumbPersonNameLink" }
+        },
+        {
+          text: "Appointments",
+          href: "/case/" + crn + "/appointments"
+        },
+        {
+          text: breadcrumb
+        }
+      ]
+    }) }}
+  {% elif backLink %}
     {{ govukBackLink({
-    href: backLink
-  }) }}
+      href: backLink
+    }) }}
   {% endif %}
 {% endblock %}
 
