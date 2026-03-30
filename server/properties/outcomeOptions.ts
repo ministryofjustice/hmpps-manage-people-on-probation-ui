@@ -9,7 +9,14 @@ export const outcomeOptions: AppointmentOutcomeOption[] = [
     value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
     text: 'Attended but sent home due to their behaviour',
     hint: {
-      text: 'For example, their behaviour was disruptive or they did not follow instructions. ',
+      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
+    },
+  },
+  {
+    value: 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS',
+    text: 'Attended but did not follow instructions',
+    hint: {
+      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
     },
   },
   {

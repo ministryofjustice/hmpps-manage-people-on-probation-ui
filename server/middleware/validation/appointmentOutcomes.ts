@@ -17,9 +17,11 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const matchUrl = uuid
     ? `/case/${crn}/arrange-appointment/${uuid}`
     : `/case/${crn}/appointments/appointment/${contactId}`
-  const id = uuid ?? contactId
+  const id = uuid || contactId
   let localParams: LocalParams = {
     crn,
+    uuid,
+    contactId,
     id,
     body,
   }

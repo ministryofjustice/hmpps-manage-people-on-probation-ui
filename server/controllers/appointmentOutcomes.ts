@@ -67,6 +67,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       const redirectMap: RedirectMap = {
         ATTENDED: `${baseUrl}/attended-complied`,
         ATTENDED_SENT_HOME_BEHAVIOUR: `${baseUrl}/attended-failed-to-comply`,
+        ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS: `${baseUrl}/attended-failed-to-comply`,
         ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES: `${baseUrl}/attended-failed-to-comply`,
         ACCEPTABLE_ABSENCE: `${baseUrl}/acceptable-absence`,
         UNACCEPTABLE_ABSENCE: `${baseUrl}/unacceptable-absence`,

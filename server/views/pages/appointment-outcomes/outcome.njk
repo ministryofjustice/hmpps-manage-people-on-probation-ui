@@ -20,9 +20,6 @@
  hint: {
         text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName | convertToTitleCase + " on " + appointment.startDateTime | dateWithDayAndWithYear + "."
     },
-    errorMessage: {
-    text: "Select whether or not you wanted to arrange the next appointment"
-  } if errorMessages.nextAppointment,
     items: outcomeItems
    } | decorateFormAttributes(['appointments', crn, uuid or contactId,  'outcome', 'type'])) }}
   <div class="govuk-button-group">
@@ -31,7 +28,7 @@
                     type: "submit",
                     attributes: { "data-qa": "submit-btn" }
                 }) }}
-    <a class="govuk-link" href="{{ backLink }}" data-qa="formAnchorLink">
+    <a class="govuk-link" href="{{ backLink }}" data-qa="cancelGoBackLink">
                     Cancel and go back
                 </a>
   </div>

@@ -28,7 +28,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     createAppointmentSession,
   )
   router.all(
-    [manageBasePath, `${manageBasePath}/attended-complied`, `${arrangeBasePath}/attended-complied`],
+    [arrangeBasePath, manageBasePath, `${manageBasePath}/attended-complied`, `${arrangeBasePath}/attended-complied`],
     getAttendedCompliedProps,
   )
   router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())

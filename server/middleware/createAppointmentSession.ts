@@ -30,12 +30,11 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
         eventId = sentences.find(sentence => sentence?.eventNumber === appointment.eventNumber)?.id || ''
       }
     }
-    if (eventId && !sentences.some(sentence => sentence.id === eventId)) {
+    if (eventId && !sentences.some(sentence => sentence.id.toString() === eventId.toString())) {
       eventId = ''
     }
     const matchingType = appointmentTypes.find(t => t?.description === appointment?.type)
     let type = matchingType?.code || ''
-
     if (!eventId && matchingType?.isPersonLevelContact === true) {
       eventId = 'PERSON_LEVEL_CONTACT'
     }

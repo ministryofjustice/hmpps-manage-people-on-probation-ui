@@ -6,7 +6,7 @@ import '../@types/express/index.d'
 
 export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
-  const id = uuid ?? contactId
+  const id = uuid || contactId
   let date: string
   let start: string
   let isInPast = false

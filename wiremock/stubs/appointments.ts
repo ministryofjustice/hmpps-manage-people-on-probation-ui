@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import superagent, { SuperAgentRequest } from 'superagent'
 import { WiremockMapping } from '../../integration_tests/utils'
 
@@ -14,6 +15,7 @@ interface Args {
   locationOfficeName?: boolean
   hasRarActivity?: boolean
   noEventId?: boolean
+  eventId?: number
   noType?: boolean
   noAttendee?: boolean
   noLocation?: boolean
@@ -21,6 +23,7 @@ interface Args {
   startDateTime?: string
   endDateTime?: string
   outcome?: string
+  inOffice?: boolean
 }
 
 const getAppointmentStub = (
@@ -37,6 +40,7 @@ const getAppointmentStub = (
     hasRarActivity = false,
     locationOfficeName = false,
     noEventId = false,
+    eventId = 48,
     noType = false,
     noAttendee = false,
     noLocation = false,
@@ -44,6 +48,7 @@ const getAppointmentStub = (
     startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
     endDateTime = '2024-02-21T10:30:00.382936Z[Europe/London]',
     outcome = '',
+    inOffice = true,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -137,7 +142,7 @@ const getAppointmentStub = (
           outcome,
           deliusManaged: false,
           isVisor: true,
-          eventId: 48,
+          eventId,
           component: {
             id: 0,
             description: '',
@@ -154,6 +159,9 @@ const getAppointmentStub = (
   if (!deliusManaged) {
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
   }
+  if (!inOffice) {
+    mapping.response.jsonBody.appointment.type = 'Planned Telephone Contact (NS)'
+  }
   if (personLevel) {
     mapping.response.jsonBody.appointment.type = 'Planned Doorstep Contact (NS)'
   }
@@ -161,6 +169,11 @@ const getAppointmentStub = (
   if (isFuture) {
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
+    const now = DateTime.now()
+    const start = now.plus({ days: 1 })
+    const end = start.plus({ hours: 1 })
+    mapping.response.jsonBody.appointment.startDateTime = start.toISODate()
+    mapping.response.jsonBody.appointment.endDateTime = end.toISODate()
   }
   if (notes) {
     mapping.response.jsonBody.appointment.appointmentNotes = [

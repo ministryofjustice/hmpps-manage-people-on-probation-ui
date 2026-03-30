@@ -40,11 +40,18 @@ export const getAttendedCompliedProps: Route<void> = (req, res, next) => {
   const isInPast = appointmentDateIsInPast(req)
   let outcomeItems = outcomeOptions
   if (isInPast && appointmentSession?.type && !['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
-    outcomeItems = outcomeOptions.filter(option => option.value !== 'WILL_BE_RESCHEDULED')
+    outcomeItems = outcomeOptions.filter(
+      option => !['WILL_BE_RESCHEDULED', 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS'].includes(option.value),
+    )
   }
   if (isInPast && appointmentSession?.type && ['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
     outcomeItems = outcomeOptions.filter(
-      option => !['WILL_BE_RESCHEDULED', 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES'].includes(option.value),
+      option =>
+        ![
+          'WILL_BE_RESCHEDULED',
+          'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES',
+          'ATTENDED_SENT_HOME_BEHAVIOUR',
+        ].includes(option.value),
     )
   }
   if (!isInPast) {

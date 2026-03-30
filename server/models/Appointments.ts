@@ -13,6 +13,7 @@ export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHED
 export type AppointmentOutcomeType =
   | 'ATTENDED'
   | 'ATTENDED_SENT_HOME_BEHAVIOUR'
+  | 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS'
   | 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES'
   | 'ACCEPTABLE_ABSENCE'
   | 'UNACCEPTABLE_ABSENCE'
@@ -203,11 +204,12 @@ export interface AppointmentsPostResponse {
 export interface LocalParams {
   crn: string
   id: string
+  contactId?: string
+  uuid?: string
   errors?: Errors
   body?: Record<string, string | string[]>
   _minDate?: string
   _maxDate?: string
-  contactId?: string
   uploadedFiles?: any
   personLevel?: boolean
   maxCharCount?: number
