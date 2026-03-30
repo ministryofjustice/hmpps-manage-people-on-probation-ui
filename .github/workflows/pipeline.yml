@@ -36,6 +36,8 @@ jobs:
     name: node build
     uses: ./.github/workflows/node_build.yml # WORKFLOW_VERSION
     secrets: inherit
+    with: 
+      install_command: 'npm run setup'
   # generic node unit tests - feel free to override with local tests if required
   node_unit_tests:
     name: node unit tests
@@ -64,7 +66,6 @@ jobs:
       environment: ${{ matrix.environments }}
   build:
     name: Build docker image from hmpps-github-actions
-    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docker_build.yml # WORKFLOW_VERSION
     secrets: inherit
     needs:
