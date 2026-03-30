@@ -60,6 +60,7 @@ jobs:
       # continue-on-error: true
       # replacing the above with if: always()
     - name: Merge unit and integration test coverage reports
+      if: always()
       shell: bash
       run: |
         npm run coverage-report
@@ -69,6 +70,12 @@ jobs:
       with:
         name: coverage_artifacts
         path: coverage/
+    - name: upload the test results
+      if: always()
+      uses: actions/upload-artifact@v7
+      with:
+        name: cypress_results
+        path: test_results/
     - name: fail the action if the tests failed
       if: ${{ steps.integration-tests.outcome == 'failure' }}
       uses: actions/github-script@v8
