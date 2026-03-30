@@ -77,6 +77,7 @@ const req = httpMocks.createRequest({
     activityLogFilters: { page: '', view: 'default', requirement: '' },
   },
 })
+req.flash = jest.fn().mockReturnValue([])
 
 const reqCompact = httpMocks.createRequest({
   params: {
@@ -89,6 +90,7 @@ const reqCompact = httpMocks.createRequest({
     activityLogFilters: { page: '', view: 'compact', requirement: '' },
   },
 })
+reqCompact.flash = jest.fn().mockReturnValue([])
 
 const reqDefault = httpMocks.createRequest({
   params: {
@@ -101,6 +103,7 @@ const reqDefault = httpMocks.createRequest({
     activityLogFilters: { page: '', view: 'default', requirement: '' },
   },
 })
+reqDefault.flash = jest.fn().mockReturnValue([])
 
 const res = mockAppResponse({
   filters: {
@@ -179,7 +182,6 @@ describe('/controllers/activityLogController', () => {
             activities: mockActivities.activities,
           },
         ],
-        showSuccessBanner: undefined,
       })
     })
     it('should request the person activity from the api with size 25 when enableContactLog is true', async () => {
@@ -217,27 +219,27 @@ describe('/controllers/activityLogController', () => {
             activities: mockActivities.activities,
           },
         ],
-        showSuccessBanner: undefined,
       })
     })
-    it('should pass showSuccessBanner to the template when present in the query', async () => {
+    it('should redirect to clean URL and store flash when showSuccessBanner is in query', async () => {
       const reqWithBanner = httpMocks.createRequest({
         params: { crn, id, noteId },
+        path: `/case/${crn}/activity-log`,
         query: { page: '', view: 'default', requirement: '', showSuccessBanner: 'true' },
         session: { activityLogFilters: { page: '', view: 'default', requirement: '' } },
       })
+      reqWithBanner.flash = jest.fn().mockReturnValue([])
       const resWithBanner = mockAppResponse({
         filters: { dateFrom: '', dateTo: '', keywords: '' },
         flags: { enableContactLog: true },
       })
-      const renderSpyWithBanner = jest.spyOn(resWithBanner, 'render')
+      const redirectSpy = jest.spyOn(resWithBanner, 'redirect')
 
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithBanner, resWithBanner)
 
-      expect(renderSpyWithBanner).toHaveBeenCalledWith(
-        'pages/contact-log',
-        expect.objectContaining({ showSuccessBanner: 'true' }),
-      )
+      expect(reqWithBanner.flash).toHaveBeenCalledWith('contactCreated', 'success')
+      expect(redirectSpy).toHaveBeenCalled()
+      expect(redirectSpy.mock.calls[0][0]).not.toContain('showSuccessBanner')
     })
     it('should calculate correct pagination when page is greater than 0', async () => {
       const reqWithPage = httpMocks.createRequest({
@@ -245,6 +247,7 @@ describe('/controllers/activityLogController', () => {
         query: { page: '1', view: 'default' },
         session: { activityLogFilters: {} },
       })
+      reqWithPage.flash = jest.fn().mockReturnValue([])
       const resWithPage = mockAppResponse({
         filters: { dateFrom: '', dateTo: '', keywords: '' },
         flags: { enableContactLog: false },
@@ -267,6 +270,7 @@ describe('/controllers/activityLogController', () => {
         query: { page: '1', view: 'default' },
         session: { activityLogFilters: {} },
       })
+      reqWithPage.flash = jest.fn().mockReturnValue([])
       const resWithPageAndFlag = mockAppResponse({
         filters: { dateFrom: '', dateTo: '', keywords: '' },
         flags: { enableContactLog: true },
@@ -284,38 +288,40 @@ describe('/controllers/activityLogController', () => {
       )
     })
 
-    it('should pass showSuccessBanner to the template when present in query', async () => {
+    it('should redirect to clean URL without showSuccessBanner and store it in flash', async () => {
       const reqWithSuccess = httpMocks.createRequest({
         params: { crn },
+        path: `/case/${crn}/activity-log`,
         query: { page: '', view: 'default', showSuccessBanner: 'true' },
         session: { activityLogFilters: {} },
       })
+      reqWithSuccess.flash = jest.fn().mockReturnValue([])
       const resWithFlag = mockAppResponse({ filters: {}, flags: { enableContactLog: true } })
-      const renderSpyWithFlag2 = jest.spyOn(resWithFlag, 'render')
+      const redirectSpy = jest.spyOn(resWithFlag, 'redirect')
 
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithSuccess, resWithFlag)
 
-      expect(renderSpyWithFlag2).toHaveBeenCalledWith(
-        'pages/contact-log',
-        expect.objectContaining({ showSuccessBanner: 'true', uploadFailed: undefined }),
-      )
+      expect(reqWithSuccess.flash).toHaveBeenCalledWith('contactCreated', 'success')
+      expect(redirectSpy).toHaveBeenCalled()
+      expect(redirectSpy.mock.calls[0][0]).not.toContain('showSuccessBanner')
     })
 
-    it('should pass uploadFailed to the template when present in query', async () => {
+    it('should store uploadFailed in flash and redirect to clean URL when uploadFailed is in query', async () => {
       const reqWithUploadFailed = httpMocks.createRequest({
         params: { crn },
+        path: `/case/${crn}/activity-log`,
         query: { page: '', view: 'default', showSuccessBanner: 'true', uploadFailed: 'true' },
         session: { activityLogFilters: {} },
       })
+      reqWithUploadFailed.flash = jest.fn().mockReturnValue([])
       const resWithFlag = mockAppResponse({ filters: {}, flags: { enableContactLog: true } })
-      const renderSpyWithFlag2 = jest.spyOn(resWithFlag, 'render')
+      const redirectSpy = jest.spyOn(resWithFlag, 'redirect')
 
       await controllers.activityLog.getOrPostActivityLog(hmppsAuthClient)(reqWithUploadFailed, resWithFlag)
 
-      expect(renderSpyWithFlag2).toHaveBeenCalledWith(
-        'pages/contact-log',
-        expect.objectContaining({ showSuccessBanner: 'true', uploadFailed: 'true' }),
-      )
+      expect(reqWithUploadFailed.flash).toHaveBeenCalledWith('contactCreated', 'uploadFailed')
+      expect(redirectSpy).toHaveBeenCalled()
+      expect(redirectSpy.mock.calls[0][0]).not.toContain('uploadFailed')
     })
   })
   describe('getActivity', () => {

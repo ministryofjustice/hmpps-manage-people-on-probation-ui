@@ -56,9 +56,18 @@ const activityLogController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
+      if (req.query?.showSuccessBanner) {
+        req.flash('contactCreated', req.query?.uploadFailed ? 'uploadFailed' : 'success')
+        const cleanParams = new URLSearchParams(req.query as Record<string, string>)
+        cleanParams.delete('showSuccessBanner')
+        cleanParams.delete('uploadFailed')
+        const cleanQuery = cleanParams.toString()
+        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
+      }
+
       const baseUrl = req.url.split('?')[0]
       const template = res.locals?.flags?.enableContactLog === true ? 'pages/contact-log' : 'pages/activity-log'
-      res.render(template, {
+      return res.render(template, {
         personActivity,
         crn,
         query: req.session.activityLogFilters,
@@ -72,8 +81,6 @@ const activityLogController: Controller<typeof routes, void> = {
         resultsEnd,
         errorMessages: req.session.errorMessages,
         groupedActivities: groupActivitiesByDate(personActivity.activities),
-        showSuccessBanner: req.query?.showSuccessBanner,
-        uploadFailed: req.query?.uploadFailed,
       })
     }
   },
