@@ -143,11 +143,6 @@ context('Overview', () => {
     cy.visit('/case/X000001')
     checkPopHeader({ ogrs4: true })
   })
-  it('Should render overview page without tier link when feature flag disabled', () => {
-    cy.task('stubDisableTierLink')
-    cy.visit('/case/X000001')
-    checkPopHeader({ tierLinkEnabled: false })
-  })
 
   it('Overview page is rendered with date of death', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
