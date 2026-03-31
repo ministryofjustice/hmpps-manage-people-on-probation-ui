@@ -41,6 +41,7 @@ describe('Pick a date, location and time for this appointment', () => {
     locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
     const tomorrow = now.plus({ days: 1 })
     const tomorrowIsInCurrentMonth = tomorrow.month === now.month
+    locationDateTimePage.getDatePickerInput().clear()
     locationDateTimePage.getDatePickerToggle().click()
     if (!tomorrowIsInCurrentMonth) {
       cy.get('.moj-js-datepicker-next-month').click()
@@ -52,6 +53,7 @@ describe('Pick a date, location and time for this appointment', () => {
   }
 
   const selectPastDate = () => {
+    locationDateTimePage.getDatePickerInput().clear()
     locationDateTimePage.getDatePickerToggle().click()
     if (!yesterdayIsInCurrentMonth) {
       cy.get('.moj-js-datepicker-prev-month').click()
@@ -229,6 +231,7 @@ describe('Pick a date, location and time for this appointment', () => {
       cy.clock(DateTime.fromISO(mockedNow).toMillis())
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).type('9:10')
@@ -281,6 +284,7 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).type('09:30')
@@ -358,9 +362,10 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   describe('Date is selected', () => {
-    const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
+    const value = DateTime.now().toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
     })
@@ -384,7 +389,6 @@ describe('Pick a date, location and time for this appointment', () => {
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const tomorrow = now.plus({ days: 1 })
       const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-
       locationDateTimePage.getDatePickerToggle().click()
       if (!yesterdayIsInCurrentMonth) {
         cy.get('.moj-js-datepicker-next-month').click()
