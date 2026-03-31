@@ -111,7 +111,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
 
         outlookEventRequestBody.smsEventRequest = {
-          firstName,
+          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
           mobileNumber,
           crn,
           smsOptIn: true,

@@ -217,10 +217,10 @@ const mockAppointmentsPostResponse: AppointmentsPostResponse = {
   appointments: [{ id: 12345, externalReference: '1234' }],
 }
 
-const checkOutlookEventRequest = (smsRequest = false) => {
+const checkOutlookEventRequest = (smsRequest = false, firstName = mockUser.firstName) => {
   const { date, start } = mockAppointment
   const smsEventRequest: SmsEventRequest = {
-    firstName: mockUser.firstName,
+    firstName,
     mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
@@ -371,12 +371,13 @@ describe('/middleware/postAppointments', () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)
+        const popFirstName = 'James'
         const mockReq = createMockReq({
           ...mockAppointment,
           smsOptIn: 'YES',
           smsPreview: {
             request: {
-              firstName: 'James',
+              firstName: popFirstName,
               dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
               includeWelshPreview: false,
               appointmentLocation: 'Mock Location',
@@ -387,7 +388,7 @@ describe('/middleware/postAppointments', () => {
         })
         await postAppointments(hmppsAuthClient)(mockReq, res)
         const smsRequest = true
-        checkOutlookEventRequest(smsRequest)
+        checkOutlookEventRequest(smsRequest, popFirstName)
       })
       it('should set req.session.data.isOutLookEventFailed to true if request does not have an id', async () => {
         postOutlookCalendarEventSpy = jest
