@@ -1,4 +1,3 @@
-import { DateTime } from 'luxon'
 import AppointmentSentencePage from '../../../pages/appointments/sentence.page'
 import { crn, uuid } from '../imports/common'
 
