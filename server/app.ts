@@ -25,6 +25,7 @@ import config from './config'
 import './sentry'
 import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
+import setUpSuccessBanner from './middleware/setUpSuccessBanner'
 import baseController from './baseController'
 import manageAppointmentRoutes from './routes/manageAppointmentRoutes'
 import testRoutes from './routes/testRoutes'
@@ -61,6 +62,7 @@ export default function createApp(services: Services): express.Application {
   const apiRouter = Router()
   app.use(testRoutes(apiRouter))
   app.use(setUpAuthentication())
+  app.use(setUpSuccessBanner())
   app.use(getFrontendComponents(services.probationComponentsApiService))
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))

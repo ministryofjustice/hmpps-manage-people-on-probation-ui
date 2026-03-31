@@ -51,4 +51,8 @@ export default class ActivityLogPage extends Page {
 
   getTimelineCardViewLink = (index: number): PageElement =>
     this.getActivity(index).find('.contact-activity__actions a').first()
+
+  getSuccessBanner = (): PageElement => cy.get('[data-qa="contactCreated"]')
+
+  getUploadFailedBanner = (): PageElement => cy.get('[data-qa="uploadFailed"]')
 }
