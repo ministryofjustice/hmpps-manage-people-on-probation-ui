@@ -25,6 +25,7 @@ export const completeLocationDateTimePage = ({
   const tomorrow = now.plus({ days: 1 })
   const yesterdayIsInCurrentMonth = yesterday.month === now.month
   const tomorrowIsInCurrentMonth = tomorrow.month === now.month
+  locationDateTimePage.getDatePickerInput().clear()
   locationDateTimePage.getDatePickerToggle().click()
   if (dateOverride) {
     const diff = (dateOverride.year - now.year) * 12 + (dateOverride.month - now.month)

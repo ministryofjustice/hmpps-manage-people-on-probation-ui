@@ -227,4 +227,12 @@ export default abstract class Page {
   hideMessageLink = (): PageElement => cy.get('#hide-message')
 
   getLogOutcomesAlertBanner = (): PageElement => cy.get('[data-module="serviceAlert"]')
+
+  getDatePickerToggle = () => {
+    return cy.get('.moj-datepicker__toggle')
+  }
+
+  getDatePickerInput = () => {
+    return cy.get('.moj-js-datepicker-input')
+  }
 }

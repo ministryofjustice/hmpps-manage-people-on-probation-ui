@@ -25,6 +25,7 @@ export const checkUpdateDateTime = (page: AppointmentCheckYourAnswersPage | Arra
       const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
       const dateTimePage = new AppointmentLocationDateTimePage()
+      dateTimePage.getDatePickerInput().clear()
       dateTimePage.getDatePickerToggle().click()
       if (newDate.month !== DateTime.now().month) {
         cy.get('.moj-js-datepicker-next-month').click()
