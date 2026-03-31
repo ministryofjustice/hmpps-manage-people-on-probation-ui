@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import ArrangeAnotherAppointmentPage from '../../../pages/appointments/arrange-another-appointment.page'
 import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-your-answers.page'
 import AppointmentLocationDateTimePage from '../../../pages/appointments/location-date-time.page'
@@ -9,7 +10,8 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   const locationPage = new AppointmentLocationDateTimePage()
   locationPage.getRadio('locationCode', 2).click()
   locationPage.getDatePickerToggle().click()
-  locationPage.getNextDayButton().click()
+  const change = page instanceof AppointmentCheckYourAnswersPage ? DateTime.now().plus({ days: 2 }) : undefined
+  locationPage.getNextDayButton(change).click()
   getUuid().then(uuidOveride => {
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).type(startTime)
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().type(endTime)

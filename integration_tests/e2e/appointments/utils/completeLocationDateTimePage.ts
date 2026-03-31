@@ -9,6 +9,7 @@ interface Props {
   next?: boolean
   dateInPast?: boolean
   dateOverride?: DateTime
+  changeFrom?: DateTime
 }
 
 export const completeLocationDateTimePage = ({
@@ -17,14 +18,15 @@ export const completeLocationDateTimePage = ({
   uuidOveride = '',
   dateInPast = false,
   dateOverride,
+  changeFrom,
 }: Props = {}) => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationDateTimePage = new AppointmentLocationDateTimePage()
-  const now = DateTime.now()
-  const yesterday = now.minus({ days: 1 })
-  const tomorrow = now.plus({ days: 1 })
+  const now = changeFrom || DateTime.now()
+  const yesterday = DateTime.now().minus({ days: 1 })
+  const future = DateTime.now().plus({ days: 2 })
   const yesterdayIsInCurrentMonth = yesterday.month === now.month
-  const tomorrowIsInCurrentMonth = tomorrow.month === now.month
+  const futureIsInCurrentMonth = future.month === now.month
   locationDateTimePage.getDatePickerToggle().click()
   if (dateOverride) {
     const diff = (dateOverride.year - now.year) * 12 + (dateOverride.month - now.month)
@@ -40,10 +42,10 @@ export const completeLocationDateTimePage = ({
     }
     cy.get(`[data-testid="${dateOverride.toFormat('d/M/yyyy')}"]`).click()
   } else if (!dateInPast) {
-    if (!tomorrowIsInCurrentMonth) {
+    if (!futureIsInCurrentMonth) {
       cy.get('.moj-js-datepicker-next-month').click()
     }
-    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    cy.get(`[data-testid="${future.toFormat('d/M/yyyy')}"]`).click()
   } else {
     if (!yesterdayIsInCurrentMonth) {
       cy.get('.moj-js-datepicker-prev-month').click()

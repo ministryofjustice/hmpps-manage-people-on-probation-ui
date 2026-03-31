@@ -32,7 +32,6 @@ describe('Add supporting information (optional)', () => {
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
   })
   it('should display validation errors if note is more than 12000 character', () => {
-    loadPage()
     const note = 'x'.repeat(12001)
     cy.get(`#appointments-${crn}-${uuid}-notes`).invoke('val', note).trigger('input')
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
@@ -45,7 +44,6 @@ describe('Add supporting information (optional)', () => {
   })
 
   it('should count a return as 1 character', () => {
-    loadPage()
     cy.get(`#appointments-${crn}-${uuid}-notes`).then($el => {
       const paragraph = 'x'.repeat(6000)
       const value = `${paragraph}\n\n${paragraph}`

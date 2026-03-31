@@ -122,6 +122,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('Change appointment values', () => {
       let cyaPage: AppointmentCheckYourAnswersPage
       beforeEach(() => {
+        cy.task('resetMocks')
         loadPage()
         cyaPage = new AppointmentCheckYourAnswersPage()
       })
@@ -135,7 +136,7 @@ describe('Check your answers then confirm the appointment', () => {
         checkUpdateLocation(cyaPage)
       })
       it('should update the date when value is changed', () => {
-        checkUpdateDateTime(cyaPage)
+        checkUpdateDateTime(cyaPage, DateTime.now().plus({ days: 2 }))
       })
       it('should update the text message confirmation when value is changed', () => {
         checkUpdateTextMessageConfirmation(cyaPage)
@@ -217,7 +218,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('changes future appointment to past appointment', () => {
       beforeEach(() => {
         changeDate()
-        completeLocationDateTimePage({ dateInPast: true })
+        completeLocationDateTimePage({ dateInPast: true, changeFrom: DateTime.now().plus({ days: 2 }) })
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         logOutcomePage = new AttendedCompliedPage()
@@ -237,7 +238,7 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        completeLocationDateTimePage()
+        completeLocationDateTimePage({ changeFrom: DateTime.now().minus({ days: 1 }) })
       })
       it('should redirect to the text message confirmation and supporting information pages', () => {
         textMessageConfirmPage = new TextMessageConfirmationPage()
@@ -256,8 +257,8 @@ describe('Check your answers then confirm the appointment', () => {
       beforeEach(() => {
         changeDate()
         const now = DateTime.now()
-        const dateOverride = now.plus({ days: 2 })
-        completeLocationDateTimePage({ dateOverride })
+        const dateOverride = now.plus({ days: 3 })
+        completeLocationDateTimePage({ dateOverride, changeFrom: DateTime.now().plus({ days: 2 }) })
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
@@ -269,10 +270,9 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        changeDate()
         const now = DateTime.now()
         const dateOverride = now.minus({ days: 2 })
-        completeLocationDateTimePage({ dateOverride })
+        completeLocationDateTimePage({ dateOverride, changeFrom: DateTime.now().minus({ days: 1 }) })
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         logOutcomePage = new AttendedCompliedPage()
@@ -292,7 +292,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('submits the same future appointment date', () => {
       beforeEach(() => {
         changeDate()
-        completeLocationDateTimePage()
+        completeLocationDateTimePage({ changeFrom: DateTime.now().plus({ days: 1 }) })
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
@@ -304,7 +304,7 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        completeLocationDateTimePage({ dateInPast: true })
+        completeLocationDateTimePage({ dateInPast: true, changeFrom: DateTime.now().minus({ days: 1 }) })
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
