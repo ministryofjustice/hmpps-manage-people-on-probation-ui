@@ -220,7 +220,7 @@ const mockAppointmentsPostResponse: AppointmentsPostResponse = {
 const checkOutlookEventRequest = (smsRequest = false) => {
   const { date, start } = mockAppointment
   const smsEventRequest: SmsEventRequest = {
-    firstName: mockUser.firstName,
+    firstName: mockCase.name.forename,
     mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
