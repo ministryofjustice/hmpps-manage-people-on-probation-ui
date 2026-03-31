@@ -112,17 +112,32 @@ const checkDefaultUserSelection = () => {
         username: 'DeborahFern',
         nameAndRole: 'Deborah Fern (PS - Other)',
         staffCode: 'N07B795',
+        email: 'deborah.fern@testemail.com',
+        name: {
+          forename: 'Deborah',
+          surname: 'Fern',
+        },
       },
       {
         username: 'IainChambers',
         nameAndRole: 'Iain Chambers (PS - Other)',
         staffCode: 'N57A054',
+        email: 'iain.chambers@testemail.com',
+        name: {
+          forename: 'Iain',
+          surname: 'Chambers',
+        },
       },
       {
         username: 'peter-parker',
         nameAndRole: 'Peter Parker (PS - Other)',
         staffCode: 'N07B722',
         selected: 'selected',
+        email: 'peter.parker@testemail.com',
+        name: {
+          forename: 'Peter',
+          surname: 'Parker',
+        },
       },
     ]
     expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
@@ -138,7 +153,7 @@ const checkDefaultUserSelection = () => {
   })
 }
 
-const res = mockAppResponse({ user: { username: loggedInUsername } })
+const res = mockAppResponse({ user: { username: loggedInUsername }, flags: { enableMAN2344: true } })
 
 const getUserProvidersSpy = jest
   .spyOn(MasApiClient.prototype, 'getUserProviders')
@@ -205,17 +220,32 @@ describe('/middleware/getUserOptions()', () => {
           username: 'DeborahFern',
           nameAndRole: 'Deborah Fern (PS - Other)',
           staffCode: 'N07B795',
+          email: 'deborah.fern@testemail.com',
+          name: {
+            forename: 'Deborah',
+            surname: 'Fern',
+          },
         },
         {
           username: 'IainChambers',
           nameAndRole: 'Iain Chambers (PS - Other)',
           staffCode: 'N57A054',
+          email: 'iain.chambers@testemail.com',
+          name: {
+            forename: 'Iain',
+            surname: 'Chambers',
+          },
           selected: 'selected',
         },
         {
           username: 'peter-parker',
           nameAndRole: 'Peter Parker (PS - Other)',
           staffCode: 'N07B722',
+          email: 'peter.parker@testemail.com',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
         },
       ]
       expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
@@ -325,16 +355,31 @@ describe('/middleware/getUserOptions()', () => {
           username: 'DeborahFern',
           nameAndRole: 'Deborah Fern (PS - Other)',
           staffCode: 'N07B795',
+          email: 'deborah.fern@testemail.com',
+          name: {
+            forename: 'Deborah',
+            surname: 'Fern',
+          },
         },
         {
           username: 'IainChambers',
           nameAndRole: 'Iain Chambers (PS - Other)',
           staffCode: 'N57A054',
+          email: 'iain.chambers@testemail.com',
+          name: {
+            forename: 'Iain',
+            surname: 'Chambers',
+          },
         },
         {
           username: 'peter-parker',
           nameAndRole: 'Peter Parker (PS - Other)',
           staffCode: 'N07B722',
+          email: 'peter.parker@testemail.com',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
           selected: 'selected',
         },
       ]
@@ -405,17 +450,32 @@ describe('/middleware/getUserOptions()', () => {
           username: 'DeborahFern',
           nameAndRole: 'Deborah Fern (PS - Other)',
           staffCode: 'N07B795',
+          email: 'deborah.fern@testemail.com',
+          name: {
+            forename: 'Deborah',
+            surname: 'Fern',
+          },
         },
         {
           username: 'IainChambers',
           nameAndRole: 'Iain Chambers (PS - Other)',
           staffCode: 'N57A054',
+          email: 'iain.chambers@testemail.com',
+          name: {
+            forename: 'Iain',
+            surname: 'Chambers',
+          },
         },
         {
           username: 'peter-parker',
           nameAndRole: 'Peter Parker (PS - Other)',
           staffCode: 'N07B722',
           selected: 'selected',
+          email: 'peter.parker@testemail.com',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
         },
       ]
       expect(res.locals.userStaff).toStrictEqual(expectedUserOptions)
@@ -458,17 +518,32 @@ describe('/middleware/getUserOptions()', () => {
           username: 'DeborahFern',
           nameAndRole: 'Deborah Fern (PS - Other)',
           staffCode: 'N07B795',
+          email: 'deborah.fern@testemail.com',
+          name: {
+            forename: 'Deborah',
+            surname: 'Fern',
+          },
         },
         {
           username: 'IainChambers',
           nameAndRole: 'Iain Chambers (PS - Other)',
           staffCode: 'N57A054',
           selected: 'selected',
+          email: 'iain.chambers@testemail.com',
+          name: {
+            forename: 'Iain',
+            surname: 'Chambers',
+          },
         },
         {
           username: 'peter-parker',
           nameAndRole: 'Peter Parker (PS - Other)',
           staffCode: 'N07B722',
+          email: 'peter.parker@testemail.com',
+          name: {
+            forename: 'Peter',
+            surname: 'Parker',
+          },
         },
       ]
       expect(mockSetDataValue).toHaveBeenNthCalledWith(1, data, ['providers', loggedInUsername], expectedProviders)

@@ -24,6 +24,7 @@ const stubNoAllocatedCOM = (): SuperAgentRequest =>
         },
         unallocated: true,
         username: 'DeborahFern',
+        email: 'deborah.fern@testemail.com',
       },
       headers: {
         'Content-Type': 'application/json',

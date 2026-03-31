@@ -3,7 +3,6 @@ export class FeatureFlags {
   [index: string]: boolean
   enableSentencePlan?: boolean = undefined
   enableSanIndicator?: boolean = undefined
-  enableProbFEComponent?: boolean = undefined
   enableSmsReminders?: boolean = undefined
   enableManageCheckins?: boolean = undefined
   enableCompliancePage?: boolean = undefined
@@ -14,4 +13,6 @@ export class FeatureFlags {
   enableOGRS4?: boolean = undefined
   enableCalendarEvents?: boolean = undefined
   enableESupervisionCustomQuestions?: boolean = undefined
+  enableBreadcrumbs?: boolean = undefined
+  enableMAN2344?: boolean = undefined
 }

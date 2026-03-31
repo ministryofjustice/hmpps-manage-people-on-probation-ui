@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import MasApiClient from '../data/masApiClient'
-import { fullName, getDataValue, handleQuotes } from '../utils'
+import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -65,7 +65,7 @@ export const postRescheduleAppointments = (
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
       const message = buildCaseLink(config.domain, crn, contactId.toString())
-      const subject = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
+      const subject: string = `${firstInitialLastName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}: ${toSentenceCase(apptDescription, [], null, false, true)}`
       const rescheduleEventRequest: RescheduleEventRequest = {
         rescheduledEventRequest: {
           recipients: [
