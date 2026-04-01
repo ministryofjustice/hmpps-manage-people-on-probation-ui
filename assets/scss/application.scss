@@ -799,8 +799,10 @@ body.feature-disabled {
 }
 
 @media (min-width: 40.0625em) {
-  .govuk-summary-list__actions {
-    width: 25%;
+  section[data-qa='appointmentDetails'] {
+    .govuk-summary-list__actions {
+      width: 25%;
+    }
   }
 }
 
