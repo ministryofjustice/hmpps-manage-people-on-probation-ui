@@ -66,6 +66,28 @@ context('Contacts', () => {
     cy.url().should('not.include', 'showSuccessBanner')
     page.getUploadFailedBanner().should('exist')
   })
+  it('should show the correct message in the success banner', () => {
+    cy.visit('/case/X000001/activity-log?showSuccessBanner=true')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getSuccessBanner().should('contain.text', 'Contact created')
+    page
+      .getSuccessBanner()
+      .should(
+        'contain.text',
+        'You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.',
+      )
+  })
+  it('should show the correct message in the upload failed banner', () => {
+    cy.visit('/case/X000001/activity-log?showSuccessBanner=true&uploadFailed=true')
+    const page = Page.verifyOnPage(ActivityLogPage)
+    page.getUploadFailedBanner().should('contain.text', 'The contact was created but the files did not upload')
+    page
+      .getUploadFailedBanner()
+      .should(
+        'contain.text',
+        'You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.',
+      )
+  })
   it('should not show success banner when navigating directly to activity log', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
