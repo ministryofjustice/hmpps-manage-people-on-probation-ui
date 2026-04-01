@@ -10,7 +10,10 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   const locationPage = new AppointmentLocationDateTimePage()
   locationPage.getRadio('locationCode', 2).click()
   const future = DateTime.now().plus({ days: 2 })
-  locationPage.getDatePickerInput().type(`${future.toFormat('d/M/yyyy')}`)
+  locationPage
+    .getDatePickerInput()
+    .clear()
+    .type(`${future.toFormat('d/M/yyyy')}`)
   getUuid().then(uuidOveride => {
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).type(startTime)
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().type(endTime)
