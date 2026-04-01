@@ -53,7 +53,7 @@ jobs:
   sonarcloud:
     name: SonarCloud
     uses: ./.github/workflows/sonarqube.yml
-    needs: [node_unit_tests]
+    needs: [node_unit_tests, node_integration_tests]
     secrets: inherit
   helm_lint:
     strategy:
@@ -66,9 +66,11 @@ jobs:
       environment: ${{ matrix.environments }}
   build:
     name: Build docker image from hmpps-github-actions
+    if: github.ref == 'refs/heads/main'
     uses: ./.github/workflows/docker_build.yml # WORKFLOW_VERSION
     secrets: inherit
     needs:
+      - node_integration_tests
       - node_unit_tests
     with:
       docker_registry: 'ghcr.io'
