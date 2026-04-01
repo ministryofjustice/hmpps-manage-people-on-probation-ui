@@ -235,8 +235,4 @@ export default abstract class Page {
   getDatePickerToggle = () => {
     return cy.get('.moj-datepicker__toggle')
   }
-
-  getDatePickerInput = () => {
-    return cy.get('.moj-js-datepicker-input')
-  }
 }
