@@ -284,7 +284,6 @@ describe('Confirmation page', () => {
           index: 1,
           crnOverride: crn,
           dateInPast: true,
-          changeFrom: DateTime.now().plus({ days: 2 }),
         })
         completeAttendedCompliedPage(false, crn, uuid)
         completeAddNotePage(crn, uuid)

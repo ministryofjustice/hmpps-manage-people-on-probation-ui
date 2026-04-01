@@ -9,9 +9,8 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   page.getSummaryListRow(4).find('.govuk-link').click()
   const locationPage = new AppointmentLocationDateTimePage()
   locationPage.getRadio('locationCode', 2).click()
-  locationPage.getDatePickerToggle().click()
-  const change = page instanceof AppointmentCheckYourAnswersPage ? DateTime.now().plus({ days: 2 }) : undefined
-  locationPage.getNextDayButton(change).click()
+  const future = DateTime.now().plus({ days: 2 })
+  locationPage.getDatePickerInput().type(`${future.toFormat('d/M/yyyy')}`)
   getUuid().then(uuidOveride => {
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).type(startTime)
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().type(endTime)

@@ -35,28 +35,18 @@ describe('Pick a date, location and time for this appointment', () => {
 
   const now = DateTime.now()
   const yesterday = now.minus({ days: 1 })
-  const yesterdayIsInCurrentMonth = yesterday.month === now.month
 
   const completeDateInFuture = () => {
     locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
     const future = now.plus({ days: 2 })
-    const futureIsInCurrentMonth = future.month === now.month
-    locationDateTimePage.getDatePickerToggle().click()
-    if (!futureIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-next-month').click()
-    }
-    cy.get(`[data-testid="${future.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
     locationDateTimePage.getElementInput(`startTime`).type('09:00')
     locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
     locationDateTimePage.getSubmitBtn().click()
   }
 
   const selectPastDate = () => {
-    locationDateTimePage.getDatePickerToggle().click()
-    if (!yesterdayIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-prev-month').click()
-    }
-    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
   }
 
   beforeEach(() => {
@@ -373,26 +363,14 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage = new AppointmentLocationDateTimePage()
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-prev-month').click()
-      }
-      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+      locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
     })
     it('should display the log an outcome alert banner', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if date is selected from the picker in the future', () => {
       const future = now.plus({ days: 2 })
-      const futureIsInCurrentMonth = future.month === now.month
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      if (!futureIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${future.toFormat('d/M/yyyy')}"]`).click()
+      locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
       it('should hide the alert banner', () => {
         locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
       })

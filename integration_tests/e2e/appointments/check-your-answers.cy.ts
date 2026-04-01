@@ -218,7 +218,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('changes future appointment to past appointment', () => {
       beforeEach(() => {
         changeDate()
-        completeLocationDateTimePage({ dateInPast: true, changeFrom: DateTime.now().plus({ days: 2 }) })
+        completeLocationDateTimePage({ dateInPast: true })
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         logOutcomePage = new AttendedCompliedPage()
@@ -238,7 +238,7 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        completeLocationDateTimePage({ changeFrom: DateTime.now().minus({ days: 1 }) })
+        completeLocationDateTimePage()
       })
       it('should redirect to the text message confirmation and supporting information pages', () => {
         textMessageConfirmPage = new TextMessageConfirmationPage()
@@ -258,7 +258,7 @@ describe('Check your answers then confirm the appointment', () => {
         changeDate()
         const now = DateTime.now()
         const dateOverride = now.plus({ days: 3 })
-        completeLocationDateTimePage({ dateOverride, changeFrom: DateTime.now().plus({ days: 2 }) })
+        completeLocationDateTimePage({ dateOverride })
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
@@ -272,7 +272,7 @@ describe('Check your answers then confirm the appointment', () => {
         changeDate(dateInPast)
         const now = DateTime.now()
         const dateOverride = now.minus({ days: 2 })
-        completeLocationDateTimePage({ dateOverride, changeFrom: DateTime.now().minus({ days: 1 }) })
+        completeLocationDateTimePage({ dateOverride })
       })
       it('should redirect to the log an outcome page, then add notes', () => {
         logOutcomePage = new AttendedCompliedPage()
@@ -292,7 +292,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('submits the same future appointment date', () => {
       beforeEach(() => {
         changeDate()
-        completeLocationDateTimePage({ changeFrom: DateTime.now().plus({ days: 1 }) })
+        completeLocationDateTimePage()
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
@@ -304,7 +304,7 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        completeLocationDateTimePage({ dateInPast: true, changeFrom: DateTime.now().minus({ days: 1 }) })
+        completeLocationDateTimePage({ dateInPast: true })
       })
       it('should redirect back to the cya page', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()

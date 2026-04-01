@@ -28,12 +28,7 @@ export const checkUpdateDateTime = (
       const changedEnd = '10:30'
       page.getSummaryListRow(5).find('.govuk-link').click()
       const dateTimePage = new AppointmentLocationDateTimePage()
-      dateTimePage.getDatePickerToggle().click()
-      const oldDate = current || DateTime.now()
-      if (newDate.month !== oldDate.month) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${newDate.day}/${newDate.month}/${newDate.year}"]`).click()
+      dateTimePage.getDatePickerInput().clear().type(`${newDate.day}/${newDate.month}/${newDate.year}`)
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).clear()
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).type(changedStart)
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).clear()

@@ -167,6 +167,10 @@ export default abstract class Page {
     return cy.get(selector)
   }
 
+  getDatePickerInput = (): PageElement => {
+    return cy.get(`[class="moj-date-picker"] input`)
+  }
+
   getElementInput = (name: string): PageElement => {
     return cy.get(`[data-qa="${name}"] input`)
   }
