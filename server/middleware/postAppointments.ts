@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase } from '../utils'
+import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -97,7 +97,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         ],
         message,
         subject,
-        start: dateTime(date, start).toISOString(),
+        start: isoFromDateTime(date, start),
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
@@ -111,7 +111,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
 
         outlookEventRequestBody.smsEventRequest = {
-          firstName,
+          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
           mobileNumber,
           crn,
           smsOptIn: true,
