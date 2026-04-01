@@ -3,18 +3,24 @@ import { Activity } from '../data/model/schedule'
 import { AppointmentSession, AttendedCompliedAppointment } from '../models/Appointments'
 import { getDataValue } from '../utils/getDataValue'
 import { convertToTitleCase } from '../utils/convertToTitleCase'
-import { outcomeOptions } from '../properties/outcomeOptions'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { Route } from '../@types'
+import { isNumericString, isValidCrn, isValidUUID } from '../utils'
 
-export const getAttendedCompliedProps: Route<void> = (req, res, next) => {
+export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
   const id = uuid || contactId
+  const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
+  const isValidParams = isValidCrn(crn) && isValidId
   const path = ['appointments', crn, id]
   const data = req?.session?.data
   const appointmentSession = getDataValue<AppointmentSession>(data, path)
   let appointment: AttendedCompliedAppointment | Activity
   const { forename, surname } = res.locals.case.name
+  const reqUrl = req.url.split('?')[0]
+  const baseUrl = uuid
+    ? `/case/${crn}/arrange-appointment/${id}/outcome`
+    : `/case/${crn}/appointments/appointment/${id}/outcome`
   if (contactId) {
     ;({ appointment } = res.locals.personAppointment)
   } else {
@@ -26,7 +32,7 @@ export const getAttendedCompliedProps: Route<void> = (req, res, next) => {
       ;[officerForename, officerSurname] = name.split(' ')
     }
     const startDateTime = DateTime.fromISO(`${appointmentSession.date}T${appointmentSession.start}`, {
-      zone: 'utc',
+      zone: 'Europe/London',
     }).toISO({ suppressMilliseconds: true })
 
     appointment = {
@@ -38,25 +44,20 @@ export const getAttendedCompliedProps: Route<void> = (req, res, next) => {
     }
   }
   const isInPast = appointmentDateIsInPast(req)
-  let outcomeItems = outcomeOptions
-  if (isInPast && appointmentSession?.type && !['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
-    outcomeItems = outcomeOptions.filter(
-      option => !['WILL_BE_RESCHEDULED', 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS'].includes(option.value),
-    )
+
+  res.locals.appointmentOutcome = {
+    forename,
+    surname,
+    appointment,
+    crn,
+    uuid,
+    contactId,
+    id,
+    isValidParams,
+    isInPast,
+    reqUrl,
+    baseUrl,
+    appointmentSession,
   }
-  if (isInPast && appointmentSession?.type && ['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
-    outcomeItems = outcomeOptions.filter(
-      option =>
-        ![
-          'WILL_BE_RESCHEDULED',
-          'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES',
-          'ATTENDED_SENT_HOME_BEHAVIOUR',
-        ].includes(option.value),
-    )
-  }
-  if (!isInPast) {
-    outcomeItems = outcomeItems.filter(option => ['ACCEPTABLE_ABSENCE', 'WILL_BE_RESCHEDULED'].includes(option.value))
-  }
-  res.locals.attendedCompliedProps = { forename, surname, appointment, outcomeItems }
   return next()
 }

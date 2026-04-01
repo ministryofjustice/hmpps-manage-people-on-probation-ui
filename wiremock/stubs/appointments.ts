@@ -24,6 +24,7 @@ interface Args {
   endDateTime?: string
   outcome?: string
   inOffice?: boolean
+  contactId?: string
 }
 
 const getAppointmentStub = (
@@ -49,11 +50,12 @@ const getAppointmentStub = (
     endDateTime = '2024-02-21T10:30:00.382936Z[Europe/London]',
     outcome = '',
     inOffice = true,
+    contactId = '6',
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
     request: {
-      urlPattern: '/mas/schedule/.*/appointment/6',
+      urlPattern: `/mas/schedule/.*/appointment/${contactId}`,
       method: 'GET',
     },
     response: {

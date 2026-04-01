@@ -9,7 +9,6 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
-import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
@@ -42,7 +41,7 @@ const appointments: Route<void> = (req, res, next) => {
   if (
     [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
   ) {
-    const { _minDate, _maxDate } = getMinMaxDates()
+    const { _maxDate } = getMinMaxDates()
 
     localParams = {
       ...localParams,
@@ -53,7 +52,7 @@ const appointments: Route<void> = (req, res, next) => {
   }
 
   if (req.url.includes('/attended-complied')) {
-    localParams = { ...localParams, ...res.locals.attendedCompliedProps }
+    localParams = { ...localParams, ...res.locals.appointmentOutcome }
   }
 
   if (

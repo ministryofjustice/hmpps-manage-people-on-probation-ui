@@ -1,10 +1,10 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { Controller } from '../@types'
-import { appointmentDateIsInPast, renderError } from '../middleware'
+import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentOutcomeType } from '../models/Appointments'
-import { isValidCrn, isNumericString, setDataValue, isValidUUID, getDataValue } from '../utils'
+import { isValidCrn, isNumericString, setDataValue, getDataValue } from '../utils'
 
 const routes = [
   'getOutcome',
@@ -35,35 +35,18 @@ type RedirectMap = {
 
 const appointmentOutcomesController: Controller<typeof routes, void | AppResponse> = {
   getOutcome: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, contactId, id: uuid } = req.params
-      // const id = uuid ?? contactId
-      const { forename, surname, appointment, outcomeItems } = res.locals.attendedCompliedProps
-      return res.render('pages/appointment-outcomes/outcome', {
-        forename,
-        surname,
-        appointment,
-        outcomeItems,
-        crn,
-        uuid,
-        contactId,
-        isInPast: appointmentDateIsInPast(req),
-      })
+    return async (_req, res) => {
+      return res.render('pages/appointment-outcomes/outcome')
     }
   },
   postOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId, id: uuid } = req.params
-      const isValidId = contactId ? isNumericString(contactId) : isValidUUID(uuid)
-      if (!isValidCrn(crn) || !isValidId) {
+      const { crn, contactId, isValidParams, baseUrl, id } = res.locals.appointmentOutcome
+      if (!isValidParams) {
         return renderError(404)(req, res)
       }
       const { data } = req.session
-      const id = contactId ?? uuid
       const type = getDataValue<AppointmentOutcomeType>(data, ['appointments', crn, id, 'outcome', 'type'])
-      const baseUrl = uuid
-        ? `/case/${crn}/arrange-appointment/${uuid}/outcome`
-        : `/case/${crn}/appointments/appointment/${contactId}/outcome`
       const redirectMap: RedirectMap = {
         ATTENDED: `${baseUrl}/attended-complied`,
         ATTENDED_SENT_HOME_BEHAVIOUR: `${baseUrl}/attended-failed-to-comply`,
@@ -79,8 +62,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
   },
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id: uuid, contactId } = req.params
-      const id = uuid ?? contactId
+      const { forename, surname, crn } = res.locals.appointmentOutcome
       const { alertDismissed = false } = req.session
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
@@ -90,28 +72,22 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { forename, surname, appointment } = res.locals.attendedCompliedProps
       const headerPersonName = { forename, surname }
       res.render('pages/appointment-outcomes/attended-complied', {
-        crn,
-        id,
         alertDismissed,
         isInPast: true,
         headerPersonName,
-        forename,
-        surname,
-        appointment,
       })
     }
   },
   postAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId: id } = req.params
-      if (!isValidCrn(crn) || !isNumericString(id)) {
+      const { crn, id, isValidParams } = res.locals.appointmentOutcome
+      if (!isValidParams) {
         return renderError(404)(req, res)
       }
       const { data } = req.session
-      setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true)
+      setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true) // <--- this needs refactoring
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },

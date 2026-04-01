@@ -1,9 +1,7 @@
 {% extends "../_form.njk" %}
 {% set hideButton = true %}
-{% set backLink = "/case/" + crn + "/appointments/appointment/" + contactId + "/manage" %}
-{% if uuid %}
-  {% set backLink = "/case/" + crn + "/arrange-appointment/" + uuid + "/location-date-time" %}
-{% endif %}
+{% set backLink = appointmentOutcome.backLink %}
+
 {% block form %}
   {{ govukRadios({
     formGroup: {
@@ -13,15 +11,15 @@
     },
     fieldset: {
       legend: {
-        html: '<span data-qa="pageHeading">' + ('What was the outcome of this appointment?' if isInPast else 'Why will ' + headerPersonName.forename | convertToTitleCase + ' not attend this appointment?') + '</span>',
+        html: '<span data-qa="pageHeading">' + ('What was the outcome of this appointment?' if appointmentOutcome.isInPast else 'Why will ' + headerPersonName.forename | convertToTitleCase + ' not attend this appointment?') + '</span>',
         classes: "govuk-fieldset__legend--l"
       }
     },
  hint: {
-        text: "Appointment: " + appointment.type + " with " + appointment.officer.name | fullName | convertToTitleCase + " on " + appointment.startDateTime | dateWithDayAndWithYear + "."
+        text: "Appointment: " + appointmentOutcome.appointment.type + " with " + appointmentOutcome.appointment.officer.name | fullName | convertToTitleCase + " on " + appointmentOutcome.appointment.startDateTime | dateWithDayAndWithYear + "."
     },
-    items: outcomeItems
-   } | decorateFormAttributes(['appointments', crn, uuid or contactId,  'outcome', 'type'])) }}
+    items: appointmentOutcome.options
+   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'type'])) }}
   <div class="govuk-button-group">
     {{ govukButton({
                     text: "Continue",

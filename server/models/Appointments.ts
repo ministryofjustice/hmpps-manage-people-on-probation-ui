@@ -55,7 +55,6 @@ export interface AppointmentSession {
   notes?: string
   sensitivity?: YesNo
   backendId?: number
-  outcome?: AppointmentOutcome
   outcomeRecorded?: YesNo
   contactId?: string
   rescheduleAppointment?: RescheduleAppointment
@@ -68,6 +67,9 @@ export interface AppointmentSession {
     username?: string
     isInPast?: boolean
     date?: string
+  }
+  outcome?: {
+    type: AppointmentOutcomeType
   }
 }
 
@@ -222,6 +224,7 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
+  options?: AppointmentOutcomeOption[]
 }
 
 export interface MasUserDetails {

@@ -214,7 +214,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { forename, surname, appointment } = res.locals.attendedCompliedProps
+      const { forename, surname, appointment } = res.locals.appointmentOutcome
       const headerPersonName = { forename, surname }
       res.render('pages/appointment-outcomes/attended-complied', {
         crn,

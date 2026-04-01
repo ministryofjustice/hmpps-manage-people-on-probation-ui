@@ -13,6 +13,7 @@ import {
   NextAppointmentResponse,
   YesNo,
   AttendedCompliedAppointment,
+  AppointmentOutcomeOption,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -25,6 +26,7 @@ import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
+import { outcomeOptions } from '../properties'
 
 export interface AppointmentLocals {
   meta: {
@@ -147,14 +149,24 @@ interface Locals {
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
   feedbackEmail?: string
-  attendedCompliedProps?: AttendedCompliedProps
+  appointmentOutcome?: AppointmentOutcomeProps
 }
 
-export interface AttendedCompliedProps {
+export interface AppointmentOutcomeProps {
   forename: string
   surname: string
   appointment: AttendedCompliedAppointment | Activity
-  outcomeItems: Option[]
+  crn: string
+  uuid: string | undefined
+  contactId: string | undefined
+  id: string
+  isInPast: boolean
+  isValidParams: boolean
+  reqUrl: string
+  baseUrl: string
+  appointmentSession?: AppointmentSession
+  backLink?: string
+  options?: AppointmentOutcomeOption[]
 }
 
 export interface AppResponse extends Response {

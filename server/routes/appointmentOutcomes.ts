@@ -9,37 +9,59 @@ import {
   createAppointmentSession,
   getAppointmentTypes,
   getSentences,
-  getAttendedCompliedProps,
+  getAppointmentOutcomeProps,
+  getAppointmentOutcomeOptions,
   redirectWizard,
   checkAnswers,
 } from '../middleware'
 import validate from '../middleware/validation/index'
+import { getAppointmentOutcomeBackLink } from '../middleware/getAppointmentOutcomeBackLink'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
   const arrangeBasePath = '/case/:crn/arrange-appointment/:id/outcome'
   const manageBasePath = '/case/:crn/appointments/appointment/:contactId/outcome'
 
+  /* get person appointment and create appointment session only in manage routes */
+
   router.all(
-    [manageBasePath, `${manageBasePath}/attended-complied`],
+    [manageBasePath, `${manageBasePath}/*path`],
     getPersonAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
     createAppointmentSession,
   )
+
+  /* redirect page if required session data is not present */
+
+  router.get(arrangeBasePath, redirectWizard(['eventId', 'type', 'date']))
+
+  /* get outcome props for all outcome routes */
+
   router.all(
-    [arrangeBasePath, manageBasePath, `${manageBasePath}/attended-complied`, `${arrangeBasePath}/attended-complied`],
-    getAttendedCompliedProps,
+    [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
+    getAppointmentOutcomeProps,
+    getAppointmentOutcomeBackLink,
   )
-  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
+
+  /* get outcome options only on the outcome page */
+
+  router.all([arrangeBasePath, manageBasePath], getAppointmentOutcomeOptions)
+
+  /* validate outcome options and store session data on all outcome post routes */
+
   router.post(
-    [arrangeBasePath, `${arrangeBasePath}/*path`, manageBasePath, `${manageBasePath}/*path`],
+    [arrangeBasePath, manageBasePath, `${arrangeBasePath}/*path`, `${manageBasePath}/*path`],
     validate.appointmentOutcomes,
     autoStoreSessionData(hmppsAuthClient),
   )
+
+  /* Outcome index  */
+
+  router.get([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.getOutcome())
   router.post([arrangeBasePath, manageBasePath], controllers.appointmentOutcomes.postOutcome())
 
-  router.get(`${arrangeBasePath}/attended-complied`, redirectWizard(['eventId', 'type', 'date']))
+  /* Attended and complied */
 
   router.get(
     [`${arrangeBasePath}/attended-complied`, `${manageBasePath}/attended-complied`],
@@ -53,68 +75,70 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postAttendedComplied(hmppsAuthClient),
   )
 
+  /* Failed to comply */
+
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/attended-failed-to-comply',
+    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.getAttendedFailedToComply(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/attended-failed-to-comply',
+    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.postAttendedFailedToComply(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/acceptable-absence',
+    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     controllers.appointmentOutcomes.getAcceptableAbsence(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/acceptable-absence',
+    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     controllers.appointmentOutcomes.postAcceptableAbsence(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/unacceptable-absence',
+    [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
     controllers.appointmentOutcomes.getUnacceptableAbsence(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/unacceptable-absence',
+    [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
     controllers.appointmentOutcomes.postUnacceptableAbsence(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/enforcement-action',
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
     controllers.appointmentOutcomes.getEnforcementAction(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/enforcement-action',
+    [`${arrangeBasePath}/enforcement-action`, `${manageBasePath}/enforcement-action`],
     controllers.appointmentOutcomes.postEnforcementAction(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/failed-to-attend',
+    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
     controllers.appointmentOutcomes.getFailedToAttend(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/failed-to-attend',
+    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
     controllers.appointmentOutcomes.postFailedToAttend(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/initiate-breach-or-recall',
+    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
     controllers.appointmentOutcomes.getInitiateBreachOrRecall(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/initiate-breach-or-recall',
+    [`${arrangeBasePath}/initiate-breach-or-recall`, `${manageBasePath}/initiate-breach-or-recall`],
     controllers.appointmentOutcomes.postInitiateBreachOrRecall(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/send-letter',
+    [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
     controllers.appointmentOutcomes.getSendLetter(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/send-letter',
+    [`${arrangeBasePath}/send-letter`, `${manageBasePath}/send-letter`],
     controllers.appointmentOutcomes.postSendLetter(),
   )
   router.get(
-    '/case/:crn/appointments/appointment/:contactId/outcome/update-enforcement-action',
+    [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
     controllers.appointmentOutcomes.getUpdateEnforcementAction(),
   )
   router.post(
-    '/case/:crn/appointments/appointment/:contactId/outcome/update-enforcement-action',
+    [`${arrangeBasePath}/update-enforcement-action`, `${manageBasePath}/update-enforcement-action`],
     controllers.appointmentOutcomes.postUpdateEnforcementAction(),
   )
 }
