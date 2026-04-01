@@ -1,6 +1,6 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true) => ({
+const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true, ogrs4SummaryCardDetail = false) => ({
   request: {
     urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
     method: 'GET',
@@ -39,6 +39,17 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true) => 
           name: 'enableOGRS4',
           description: '',
           enabled: ogrs4,
+          type: 'BOOLEAN_FLAG_TYPE',
+          createdAt: '2025-01-13T15:28:37.920581Z',
+          updatedAt: '2025-01-13T17:06:39.269084Z',
+          rules: [],
+          rollouts: [],
+        },
+        {
+          key: 'enableOGRS4SummaryCardDetail',
+          name: 'enableOGRS4SummaryCardDetail',
+          description: '',
+          enabled: ogrs4SummaryCardDetail,
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
@@ -303,6 +314,17 @@ const stubDisableTierLink = (): SuperAgentRequest =>
             rules: [],
             rollouts: [],
           },
+          {
+            key: 'enableOGRS4SummaryCardDetail',
+            name: 'enableOGRS4SummaryCardDetail',
+            description: '',
+            enabled: false,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2025-01-13T15:28:37.920581Z',
+            updatedAt: '2025-01-13T17:06:39.269084Z',
+            rules: [],
+            rollouts: [],
+          },
         ],
       },
       headers: {
@@ -442,6 +464,17 @@ const stubDisableOGRS4 = (): SuperAgentRequest =>
             type: 'BOOLEAN_FLAG_TYPE',
             createdAt: '2026-02-26T12:00:00.000000Z',
             updatedAt: '2026-02-26T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+          {
+            key: 'enableOGRS4SummaryCardDetail',
+            name: 'enableOGRS4SummaryCardDetail',
+            description: '',
+            enabled: false,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2025-01-13T15:28:37.920581Z',
+            updatedAt: '2025-01-13T17:06:39.269084Z',
             rules: [],
             rollouts: [],
           },
