@@ -27,7 +27,7 @@ export const completeLocationDateTimePage = ({
       .getDatePickerInput()
       .clear()
       .type(`${dateOverride.toFormat('d/M/yyyy')}`)
-  } else if (!dateInPast) {
+  } else if (dateInPast) {
     locationDateTimePage
       .getDatePickerInput()
       .clear()
