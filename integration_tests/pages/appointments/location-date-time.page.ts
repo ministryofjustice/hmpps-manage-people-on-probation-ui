@@ -36,10 +36,6 @@ export default class AppointmentLocationDateTimePage extends Page {
     return cy.get(`[data-testid="${future.toFormat('d/M/yyyy')}"]`)
   }
 
-  getDatePickerInput = () => {
-    return cy.get('.moj-js-datepicker-input')
-  }
-
   getTimePickerList = () => {
     return cy.get('.ui-timepicker-list')
   }

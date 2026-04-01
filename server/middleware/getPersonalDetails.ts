@@ -135,9 +135,7 @@ export const getPersonalDetails = (
     res.locals.headerPersonName = { forename: overview.name.forename, surname: overview.name.surname }
     res.locals.headerCRN = crn
     res.locals.headerDob = overview.dateOfBirth
-    if (res.locals?.flags?.enableTierLink) {
-      res.locals.headerTierLink = tierLink(crn)
-    }
+    res.locals.headerTierLink = tierLink(crn)
     if (overview?.dateOfDeath) {
       res.locals.dateOfDeath = overview.dateOfDeath
     }

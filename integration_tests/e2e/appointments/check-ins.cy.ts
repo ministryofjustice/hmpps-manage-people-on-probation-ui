@@ -34,6 +34,16 @@ const loadPage = () => {
   cy.task('resetMocks')
   cy.visit(`/case/X000001/appointments`)
 }
+
+const clickNextDayButton = () => {
+  const now = DateTime.now()
+  const tomorrow = now.plus({ days: 1 })
+  if (tomorrow.month !== now.month) {
+    cy.get('.moj-js-datepicker-next-month').click()
+  }
+  cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+}
+
 context('Appointment check-ins', () => {
   it('Appointments page with online check-ins', () => {
     loadPage()

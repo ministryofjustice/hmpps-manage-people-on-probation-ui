@@ -219,6 +219,7 @@ describe('Pick a date, location and time for this appointment', () => {
       cy.clock(DateTime.fromISO(mockedNow).toMillis())
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).type('9:10')
@@ -271,6 +272,7 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).type('09:30')
@@ -351,6 +353,7 @@ describe('Pick a date, location and time for this appointment', () => {
     const value = DateTime.now().toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
     })
