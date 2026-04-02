@@ -6,6 +6,11 @@
 {% set alert = '' %}
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
+{% set sentence = sentences[0].order.description %}
+{% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/attended-complied' %}
+{% if flags.enableNonCompliance %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' %}
+{% endif %}
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}
 {% endif %}
@@ -52,13 +57,13 @@
 {% set notesStatus = 'Not started' %}
 {% set outcomeStatus = '' %}
 {% set compliedStatus = 'Not started' %}
-{% set compliedTagColor = 'blue'  %}
+{% set compliedTagColor = 'blue' %}
 {% set outcomeTagColour = 'blue' %}
 {% set notesTagColour = 'blue' %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% if not canReschedule %}
-    {% set compliedStatus= 'Rescheduled' %}
-    {% set compliedTagColor = 'blue' %}
+  {% set compliedStatus = 'Rescheduled' %}
+  {% set compliedTagColor = 'blue' %}
 {% endif %}
 {% if appointment.hasOutcome and appointment.didTheyComply == true %}
   {% set outcomeStatus = 'Complied' %}
@@ -148,13 +153,12 @@
   items: [
     {
       title: {
-        html: '<span class="">Log attended and complied appointment</span>'
+        html: '<span>' + ('Log appointment outcome' if flags.enableNonCompliance else 'Log attended and complied appointment') + '</span>'
       },
-       hint: {
+      hint: {
         text: "You cannot log an attended and complied outcome until the appointment has happened."
-      } if not appointment.isInPast,
-      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/attended-complied' if appointment.isInPast and not appointment.hasOutcome,
-      
+      } if not flags.enableNonCompliance and not appointment.isInPast,
+      href: null if appointment.hasOutcome or (not appointment.hasOutcome and not flags.enableNonCompliance and not appointment.isInPast) else outcomeLink,
       status: {
         tag: {
           text: compliedStatus,
@@ -171,10 +175,23 @@
         tag: {
           text: notesStatus,
           classes: "govuk-tag--" + notesTagColour
-        } if not hasNotes or (hasNotes and not appointment.isInPast) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
+        } if not hasNotes or (hasNotes and not appointment.isInPast and not appointment.hasOutcome) or (hasNotes and appointment.isInPast and not appointment.hasOutcome),
         text: 'Completed' if hasNotes and appointment.hasOutcome
       } 
     },
+    {
+      title: {
+        text: "Upload documents"
+      },
+      href: '/case/' + crn + '/appointments/appointment/' + appointment.id + '/upload-file',
+      status: {
+        tag: {
+          text: 'No documents',
+          classes: "govuk-tag--blue"
+        } if appointment.documents.length == 0,
+        text: 'Uploaded' if appointment.documents.length > 0
+      } 
+    } if flags.enableNonCompliance,
     {
       title: {
         text: "Arrange next appointment"
@@ -216,6 +233,23 @@
         })
       }
     } if (outcomeStatus and appointment.deliusManaged),
+    {
+      key: {
+        text: "Sentence"
+      },
+      value: {
+        html: '<span data-qa="sentenceValue">' + sentence | default('Details unavailable') + '</span>' 
+      },
+      actions: {
+        classes: "govuk-!-white-space-nowrap",
+        items: [
+          {
+            href: "/case/" + crn + "/sentence",
+            text: "View sentence details"
+          }
+        ]
+      } if sentence
+    } if sentence and flags.enableNonCompliance and not appointment.deliusManaged,
     {
       key: {
         text: "Date and time"

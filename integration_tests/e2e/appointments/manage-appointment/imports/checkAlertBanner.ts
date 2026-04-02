@@ -5,7 +5,7 @@ export const checkAlertBanner = () => {
   let manageAppointmentPage: ManageAppointmentPage
   describe('Appointment is in the future', () => {
     beforeEach(() => {
-      cy.task('stubFutureAppointmentManagedTypeWithNotes')
+      cy.task('stubAppointment', { deliusManaged: false, notes: true })
       loadPage()
       manageAppointmentPage = new ManageAppointmentPage()
     })
@@ -15,7 +15,7 @@ export const checkAlertBanner = () => {
   })
   describe('Appointment is NDelius managed', () => {
     beforeEach(() => {
-      cy.task('stubAppointmentNDeliusManagedTypeNoNotesHasOutcome')
+      cy.task('stubAppointment', { deliusManaged: true, notes: false })
       loadPage()
     })
     it('should not display the alert', () => {
@@ -25,7 +25,7 @@ export const checkAlertBanner = () => {
   describe('Appointment is in the past', () => {
     describe('Outcome not logged and no notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentNoOutcomeNoNotes')
+        cy.task('stubAppointment', { deliusManaged: false, isFuture: false, hasOutcome: false, notes: false })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -37,7 +37,13 @@ export const checkAlertBanner = () => {
     })
     describe('Outcome logged and no notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentOutcomeNoNotes')
+        cy.task('stubAppointment', {
+          deliusManaged: false,
+          isFuture: false,
+          hasOutcome: true,
+          hasComplied: true,
+          notes: false,
+        })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -47,7 +53,7 @@ export const checkAlertBanner = () => {
     })
     describe('No outcome logged, has notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentNoOutcomeHasNotes')
+        cy.task('stubAppointment', { deliusManaged: false, isFuture: false, hasOutcome: false, notes: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })

@@ -15,4 +15,5 @@ export class FeatureFlags {
   enableESupervisionCustomQuestions?: boolean = undefined
   enableBreadcrumbs?: boolean = undefined
   enableMAN2344?: boolean = undefined
+  enableNonCompliance?: boolean = undefined
 }
