@@ -1,6 +1,7 @@
 import type { RequestHandler } from 'express'
 import ProbationComponentsService from '../services/ProbationComponentsService'
 import logger from '../../logger'
+import config from '../config'
 
 export default function getFrontendComponents(probationComponentsService: ProbationComponentsService): RequestHandler {
   return async (req, res, next) => {
@@ -27,10 +28,9 @@ export default function getFrontendComponents(probationComponentsService: Probat
       // will display fallback pages
       return next()
     }
-
     res.locals.feComponents = {
       header: replaceHashWithSlash(header?.html),
-      footer: footer?.html,
+      footer: updateLinks(footer?.html),
       cssIncludes: [...(header?.css || []), ...(footer?.css || [])],
       jsIncludes: [...(header?.javascript || []), ...(footer?.javascript || [])],
     }
@@ -49,4 +49,18 @@ function replaceHashWithSlash(source: string | null | undefined): string | null 
   if (!input.includes('#')) return input
   // Replace attribute values that equal exactly '#', preserving the quote style
   return input.replace(/=(['"])#\1/g, '=$1/$1')
+}
+
+export function updateLinks(input: string): string {
+  const policyRegex = new RegExp(
+    `<a([^>]*?)href=["']${config.apis.probationFrontendComponentsApi.url}/privacy-policy["']([^>]*)>`,
+    'gi',
+  )
+  const cookieRegex = new RegExp(
+    `<a([^>]*?)href=["']${config.apis.probationFrontendComponentsApi.url}/cookies-policy["']([^>]*)>`,
+    'gi',
+  )
+  return input
+    .replace(policyRegex, `<a$1href="/privacy-policy" target="_blank" rel="noopener noreferrer"$2>`)
+    .replace(cookieRegex, `<a$1href="/cookies-policy" target="_blank" rel="noopener noreferrer"$2>`)
 }
