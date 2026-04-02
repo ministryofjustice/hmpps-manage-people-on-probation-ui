@@ -1,12 +1,18 @@
+import { DateTime } from 'luxon'
 import ManageAppointmentPage from '../../../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../../../pages/appointments/reschedule-appointment.page'
 import { loadPage } from './common'
+
+const futureDate = DateTime.now().plus({ days: 1 }).toFormat('d MMMM yyyy')
 
 export const checkRescheduleLink = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
   const index = enableNonCompliance ? 2 : 1
   describe('Appointment Reschedule link', () => {
     beforeEach(() => {
+      if (enableNonCompliance) {
+        cy.task('stubEnableNonCompliance')
+      }
       loadPage()
       manageAppointmentPage = new ManageAppointmentPage()
     })
@@ -14,6 +20,9 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Complied appointment with future date', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
+        if (enableNonCompliance) {
+          cy.task('stubEnableNonCompliance')
+        }
         cy.task('stubAppointment', { hasOutcome: true, hasComplied: true, isFuture: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
@@ -23,7 +32,7 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
           manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
             .getAppointmentDetailsListItem(index, 'value')
-            .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
+            .should('contain.text', `${futureDate} at 12am to 12am`)
           manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
         })
       })
@@ -32,6 +41,9 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in future with no outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
+        if (enableNonCompliance) {
+          cy.task('stubEnableNonCompliance')
+        }
         cy.task('stubAppointment', { hasOutcome: false, isFuture: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
@@ -41,7 +53,7 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
           manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
             .getAppointmentDetailsListItem(index, 'value')
-            .should('contain.text', '21 February 2024 at 10:15am to 10:30am')
+            .should('contain.text', `${futureDate} at 12am to 12am`)
           manageAppointmentPage
             .getAppointmentDetailsListItem(index, 'actions')
             .find('a')
@@ -57,6 +69,9 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in past with outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
+        if (enableNonCompliance) {
+          cy.task('stubEnableNonCompliance')
+        }
         cy.task('stubAppointment', { hasOutcome: true, hasComplied: true, isFuture: false })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
@@ -75,6 +90,9 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
     describe('Appointment in past with no outcome recorded', () => {
       const name = 'Log appointment outcome'
       beforeEach(() => {
+        if (enableNonCompliance) {
+          cy.task('stubEnableNonCompliance')
+        }
         cy.task('stubAppointment', { hasOutcome: false, isFuture: false })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()

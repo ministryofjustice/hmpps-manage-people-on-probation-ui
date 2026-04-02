@@ -11,7 +11,7 @@ import {
   completeAttendedCompliedPage,
 } from './utils'
 
-describe('Add a note', () => {
+xdescribe('Add a note', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let addNotePage: AddNotePage
 

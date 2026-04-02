@@ -110,6 +110,9 @@ const checkPage = ({ first = false, arrangeAppointmentJourney = true, dateInPast
 describe('Appointment outcome', () => {
   let attendedCompliedPage: AttendedCompliedPage
   let attendedFailedToComplyPage: AttendedFailedToComplyPage
+  beforeEach(() => {
+    cy.task('stubEnableNonCompliance')
+  })
   afterEach(() => {
     cy.task('resetMocks')
     cy.clearCookies()
