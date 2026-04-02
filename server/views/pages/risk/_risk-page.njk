@@ -21,27 +21,14 @@
                 ]
             }) }}
             {% if risks.assessedOn %}
-                <p class="govuk-!-margin-bottom-2">
+                <p class="govuk-!-margin-bottom-6">
                     <a class="govuk-link--no-visited-state" target="_blank" rel="external noopener noreferrer" href="{{oasysLink}}" data-qa="oasysViewRiskAssessmentLink">
                         View the full risk assessment on OASys (opens in new tab).
                     </a>
                 </p>
             {% endif %}
-
         </div>
-        <div class='govuk-!-margin-bottom-4'>
-            {% include "./_rsr.njk" %}
-            {% include "./_ogrs.njk" %}
-            {% include "./_ogp.njk" %}
-            {% if flags.enableOGRS4 %}
-                {% include "./_ospdc.njk" %}
-                {% include "./_ospiic.njk" %}
-            {% else %}
-                {% include "./_osp.njk" %}
-            {% endif %}
-            {% include "./_ovp.njk" %}
-            {% include "./_snsv.njk" %}
-        </div>
+      {% include './_risk-scores-card.njk' %}
     {% else %}
         {% set html %}
         <h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }} class="govuk-heading-m">There is no OASys Layer 3 risk assessment for {{ personRisks.personSummary.name | fullName }}</h{{ scoresHeadingLevel if scoresHeadingLevel else '3'  }}>

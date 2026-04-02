@@ -21,16 +21,18 @@
         <section data-qa="allReoffendingPredictor">
             {{ predictorScale({
     data: riskData,
-    predictor: "allReoffendingPredictor"
-      }) }}
+    predictor: "allReoffendingPredictor",
+    excludeDate: true
+            }) }}
         </section>
     {% endif %}
     {% if showOGRS3 %}
         <section data-qa="ogp">
             {{ predictorScale({
     data: riskData,
-    predictor: "ogp"
-      }) }}
+    predictor: "ogp",
+    excludeDate: true
+            }) }}
         </section>
     {% endif %}
 {% else %}
