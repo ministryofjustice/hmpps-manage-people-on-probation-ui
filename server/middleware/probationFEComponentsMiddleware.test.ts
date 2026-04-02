@@ -113,7 +113,6 @@ describe('ProbationFEComponentsMiddleware', () => {
 })
 
 describe('updateLinks', () => {
-
   it('should update Privacy policy and Cookies policy links and add target blank', () => {
     const input = `
       <div>
