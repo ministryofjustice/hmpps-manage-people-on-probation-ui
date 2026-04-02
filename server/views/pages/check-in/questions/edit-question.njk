@@ -37,9 +37,13 @@
   <div class="govuk-form-group govuk-!-margin-bottom-6">
   {% endif %}
     
-    <label class="govuk-label govuk-label--m" for="{{ htmlId }}">
-      {{ question.prefix }}
+    <label class="govuk-visually-hidden" for="{{ htmlId }}">
+      {{ question.prefix }} [insert text] {{ question.suffix }}
     </label>
+
+    <span class="govuk-label govuk-label--m" aria-hidden="true">
+      {{ question.prefix }}
+    </span>
 
     {% if fieldError %}
       <p id="{{ htmlId }}-error" class="govuk-error-message">
@@ -52,7 +56,7 @@
            name="{{ inputName }}" 
            type="text" 
            value="{{ inputValue }}"
-           aria-describedby="{% if question.suffix %}suffix-{{ questionId }} {% endif %}{% if fieldError %}{{ htmlId }}-error{% endif %}">{% if question.suffix and question.suffix | trim == "?" %}<span class="govuk-label govuk-label--m govuk-!-display-inline-block govuk-!-margin-bottom-0 govuk-!-margin-left-2" id="suffix-{{ questionId }}">{{ question.suffix }}</span>{% endif %}
+           {% if fieldError %}aria-describedby="{{ htmlId }}-error"{% endif %}>
 
     {% if question.suffix and question.suffix | trim != "?" %}
       <span class="govuk-label govuk-label--m govuk-!-display-block govuk-!-margin-bottom-0 govuk-!-margin-top-2" id="suffix-{{ questionId }}">
