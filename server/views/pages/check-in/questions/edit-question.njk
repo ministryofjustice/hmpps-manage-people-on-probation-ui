@@ -3,8 +3,7 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
 {% set formAnchorText = "Cancel and go back" %}
-{% set back = back if back else '' %}
-{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
 {% set buttonText = "Continue" %}
 {% set htmlId = "esupervision-" + crn + "-" + id + "-manageQuestions-customQuestion" %}
 {% set inputName = "esupervision[" + crn + "][" + id + "][manageQuestions][customQuestion]" %}

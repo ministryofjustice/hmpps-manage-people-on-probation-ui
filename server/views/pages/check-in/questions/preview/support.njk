@@ -5,8 +5,7 @@
 {% set formAnchorText = "Back to questions" %}
 {% set formAnchorLink = "/case/"+ crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set notStandardForm = true %}
-{% set back = back if back else '' %}
-{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 
 
 
