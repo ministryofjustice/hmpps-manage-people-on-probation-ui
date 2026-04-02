@@ -1333,7 +1333,7 @@ const checkInsController: Controller<typeof routes, void> = {
       let savedQuestions = getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions'])
       if (!savedQuestions) {
         savedQuestions = {}
-        // TODO: Fetch current check in questions if they have already been submitted by the PP
+        // TODO: Fetch current check in questions if they have already been submitted by the PP (dependent on API changes)
         // PP can change up until the midnight before the check in is sent to the POP
         setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions'], savedQuestions)
       }

@@ -281,7 +281,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
 
     if (questionMatch) {
       const draftId = questionMatch[1]
-      const templateId = draftId.split('-')[0] // Extract it!
+      const templateId = draftId.split('-')[0]
       render = `pages/check-in/questions/edit-question`
 
       localParams.questionId = draftId

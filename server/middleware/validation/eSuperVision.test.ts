@@ -588,4 +588,62 @@ describe('Test eSuperVision validation', () => {
       })
     })
   })
+  describe('Test edit question', () => {
+    const editQuestionUrl = `/case/${crn}/appointments/check-in/manage/${id}/questions/1-f47ac10b-58cc-4372-a567-0e02b2c3d479/edit`
+
+    it('passes when customQuestion is provided', () => {
+      const esupervision = {
+        [crn]: {
+          [id]: {
+            manageQuestions: {
+              customQuestion: 'the housing service',
+            },
+          },
+        },
+      }
+      const req = makeReq({
+        url: editQuestionUrl,
+        body: { esupervision },
+        session: { data: { esupervision } },
+      })
+      const res = makeRes()
+      validation.eSuperVision(req, res, next)
+
+      expect(next).toHaveBeenCalled()
+    })
+
+    it('fails when customQuestion is empty', () => {
+      const bodyEsupervision = {
+        [crn]: {
+          [id]: {
+            manageQuestions: {
+              customQuestion: '',
+            },
+          },
+        },
+      }
+
+      const sessionEsupervision = {
+        [crn]: {
+          [id]: {
+            manageQuestions: {
+              availableQuestions: [{ id: '1', template: 'Have you heard back from [insert text]?' }],
+            },
+          },
+        },
+      }
+
+      const req = makeReq({
+        url: editQuestionUrl,
+        body: { esupervision: bodyEsupervision },
+        session: { data: { esupervision: sessionEsupervision } },
+      })
+      const res = makeRes()
+
+      validation.eSuperVision(req, res, next)
+
+      expect(res.render).toHaveBeenCalledWith('pages/check-in/questions/edit-question', expect.any(Object))
+      expect(next).not.toHaveBeenCalled()
+    })
+  })
 })
