@@ -10,6 +10,7 @@ export class FeatureFlags {
   enableCreateContact?: boolean = undefined
   enableDeliusClient?: boolean = undefined
   enableOGRS4?: boolean = undefined
+  enableOGRS4SummaryCardDetail?: boolean = undefined
   enableCalendarEvents?: boolean = undefined
   enableESupervisionCustomQuestions?: boolean = undefined
   enableBreadcrumbs?: boolean = undefined
