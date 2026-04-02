@@ -12,9 +12,10 @@ export interface AppointmentSessionUser {
   providerCode?: string
   teamCode?: string
   username?: string
-  name?: Name
   locationCode?: string
   staffCode?: string
+  name?: Name
+  email?: string
 }
 
 export interface AppointmentSession {

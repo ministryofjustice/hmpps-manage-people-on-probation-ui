@@ -35,17 +35,6 @@
               "rollouts": []
             },
             {
-              "key": "enableProbFEComponent",
-              "name": "enableProbFEComponent",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2025-01-13T15:28:37.920581Z",
-              "updatedAt": "2025-01-13T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableSmsReminders",
               "name": "enableSmsReminders",
               "description": "",
@@ -101,17 +90,6 @@
               "rollouts": []
             },
             {
-              "key": "enableTierLink",
-              "name": "enableTierLink",
-              "description": "",
-              "enabled": true,
-              "type": "BOOLEAN_FLAG_TYPE",
-              "createdAt": "2026-01-30T15:28:37.920581Z",
-              "updatedAt": "2026-01-30T17:06:39.269084Z",
-              "rules": [],
-              "rollouts": []
-            },
-            {
               "key": "enableDeliusClient",
               "name": "enableDeliusClient",
               "description": "",
@@ -127,6 +105,17 @@
               "name": "enableOGRS4",
               "description": "",
               "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-02-26T12:00:00.000000Z",
+              "updatedAt": "2026-02-26T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableOGRS4SummaryCardDetail",
+              "name": "enableOGRS4SummaryCardDetail",
+              "description": "",
+              "enabled": false,
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-02-26T12:00:00.000000Z",
               "updatedAt": "2026-02-26T12:00:00.000000Z",
@@ -163,6 +152,28 @@
               "type": "BOOLEAN_FLAG_TYPE",
               "createdAt": "2026-03-26T12:00:00.000000Z",
               "updatedAt": "2026-03-26T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableMAN2344",
+              "name": "enableMAN2344",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-02-26T12:00:00.000000Z",
+              "updatedAt": "2026-02-26T12:00:00.000000Z",
+              "rules": [],
+              "rollouts": []
+            },
+            {
+              "key": "enableNonCompliance",
+              "name": "enableNonCompliance",
+              "description": "",
+              "enabled": true,
+              "type": "BOOLEAN_FLAG_TYPE",
+              "createdAt": "2026-02-26T12:00:00.000000Z",
+              "updatedAt": "2026-02-26T12:00:00.000000Z",
               "rules": [],
               "rollouts": []
             }

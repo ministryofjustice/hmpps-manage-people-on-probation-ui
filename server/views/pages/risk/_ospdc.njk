@@ -15,15 +15,17 @@
   <section data-qa="directContactSexualReoffendingPredictor">
     {{ predictorScale({
     data: riskData,
-    predictor: "directContactSexualReoffendingPredictor"
-      }) }}
+    predictor: "directContactSexualReoffendingPredictor",
+    excludeDate: true
+    }) }}
   </section>
 {% endif %}
 {% if showOGRS3 %}
   <section data-qa="ospdc">
     {{ predictorScale({
     data: riskData,
-    predictor: "ospdc"
-      }) }}
+    predictor: "ospdc",
+    excludeDate: true
+    }) }}
   </section>
 {% endif %}

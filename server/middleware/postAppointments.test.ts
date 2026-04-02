@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { postAppointments, buildCaseLink } from './postAppointments'
-import { dateTime } from '../utils'
+import { dateTime, isoFromDateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -85,6 +85,8 @@ const mockAppointment: AppointmentSession = {
     locationCode: 'HMP',
     teamCode: 'TEA',
     username,
+    name: { forename: 'Mock', surname: 'User' },
+    email: 'mock.user@email.com',
   },
   type: 'COAP',
   date: '2025-03-12',
@@ -170,7 +172,7 @@ const createMockReq = (appointment: AppointmentSession) => {
 
 const getExpectedRequestBody = (request?: Partial<AppointmentRequestBody>): AppointmentRequestBody => {
   const {
-    user: { locationCode, username: _username, teamCode },
+    user: { locationCode, username: _username, teamCode, name, email },
     date,
     start,
     end,
@@ -215,10 +217,10 @@ const mockAppointmentsPostResponse: AppointmentsPostResponse = {
   appointments: [{ id: 12345, externalReference: '1234' }],
 }
 
-const checkOutlookEventRequest = (smsRequest = false) => {
+const checkOutlookEventRequest = (smsRequest = false, firstName = mockUser.firstName) => {
   const { date, start } = mockAppointment
   const smsEventRequest: SmsEventRequest = {
-    firstName: mockUser.firstName,
+    firstName,
     mobileNumber: res.locals.case.mobileNumber,
     crn,
     smsOptIn: true,
@@ -237,8 +239,8 @@ const checkOutlookEventRequest = (smsRequest = false) => {
     message: expect.stringContaining(
       `<a href="http://localhost:3000/case/${crn}/appointments/appointment/${mockAppointmentsPostResponse.appointments[0].id}/manage?back=/case/${crn}/appointments" target="_blank" rel="external noopener noreferrer">View the appointment on Manage people on probation (opens in new tab).</a>`,
     ),
-    subject: `Planned Office Visit (NS) with James Morrison`,
-    start: dateTime(date, start).toISOString(),
+    subject: `J. Morrison: planned office visit (NS)`,
+    start: isoFromDateTime(date, start),
     supervisionAppointmentUrn: mockAppointmentsPostResponse.appointments[0].externalReference,
   }
   expect(postOutlookCalendarEventSpy).toHaveBeenCalledWith(expect.objectContaining(outlookEventRequestBody))
@@ -273,7 +275,11 @@ const mockCase: Partial<PersonalDetails> = {
   mobileNumber: '07700900000',
 }
 
-const res = mockAppResponse({ case: mockCase, user: mockUser, flags: { enableCalendarEvents: true } })
+const res = mockAppResponse({
+  case: mockCase,
+  user: mockUser,
+  flags: { enableCalendarEvents: true, enableMAN2344: true },
+})
 
 const postAppointmentsSpy = jest
   .spyOn(MasApiClient.prototype, 'postAppointments')
@@ -365,12 +371,13 @@ describe('/middleware/postAppointments', () => {
         postOutlookCalendarEventSpy = jest
           .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
           .mockResolvedValueOnce(mockOutlookEventResponse)
+        const popFirstName = 'James'
         const mockReq = createMockReq({
           ...mockAppointment,
           smsOptIn: 'YES',
           smsPreview: {
             request: {
-              firstName: 'James',
+              firstName: popFirstName,
               dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
               includeWelshPreview: false,
               appointmentLocation: 'Mock Location',
@@ -381,7 +388,7 @@ describe('/middleware/postAppointments', () => {
         })
         await postAppointments(hmppsAuthClient)(mockReq, res)
         const smsRequest = true
-        checkOutlookEventRequest(smsRequest)
+        checkOutlookEventRequest(smsRequest, popFirstName)
       })
       it('should set req.session.data.isOutLookEventFailed to true if request does not have an id', async () => {
         postOutlookCalendarEventSpy = jest
@@ -408,27 +415,17 @@ describe('/middleware/postAppointments', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
       })
     })
-    describe('User does not have email', () => {
-      const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
+    describe('Attending user does not have email', () => {
+      const mockReq = createMockReq({
+        ...mockAppointment,
+        user: { ...mockAppointment.user, email: null },
+        smsOptIn: 'YES',
+      })
       const mockRes = mockAppResponse({
         case: mockCase,
         user: { ...mockUser, email: null },
-        flags: { enableCalendarEvents: true },
+        flags: { enableCalendarEvents: true, enableMAN2344: true },
       })
-      beforeEach(async () => {
-        await postAppointments(hmppsAuthClient)(mockReq, mockRes)
-      })
-      it('should not send the request', () => {
-        expect(postOutlookCalendarEventSpy).not.toHaveBeenCalled()
-      })
-      it('should set req.session.data.isOutLookEventFailed to true', () => {
-        expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
-      })
-    })
-
-    describe('enableCalendarEvents feature flag is disabled', () => {
-      const mockReq = createMockReq({ ...mockAppointment, smsOptIn: 'YES' })
-      const mockRes = mockAppResponse({ case: mockCase, flags: { enableCalendarEvents: false } })
       beforeEach(async () => {
         await postAppointments(hmppsAuthClient)(mockReq, mockRes)
       })

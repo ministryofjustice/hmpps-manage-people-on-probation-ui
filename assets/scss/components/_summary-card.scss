@@ -14,9 +14,19 @@
     }
   }
 
+  .app-summary-card__header-group {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
   .app-summary-card__title {
     @include govuk-font($size: 19);
     margin: 0;
+  }
+
+  .app-summary-card__subtitle {
+    @include govuk-font($size: 19);
   }
 
   .app-summary-card__meta {

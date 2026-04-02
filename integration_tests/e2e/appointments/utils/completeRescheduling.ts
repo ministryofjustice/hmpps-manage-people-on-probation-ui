@@ -14,9 +14,9 @@ export const completeRescheduling = (id: string, inPast = false) => {
   let addNotePage: AddNotePage
   let supportingInformationPage: AppointmentNotePage
   let textMessageConfirmPage: TextMessageConfirmationPage
-  const tomorrow = DateTime.now().plus({ days: 1 })
+  const future = DateTime.now().plus({ days: 2 })
   const yesterday = DateTime.now().minus({ days: 1 })
-  const appointmentDate = inPast ? yesterday : tomorrow
+  const appointmentDate = inPast ? yesterday : future
   dateTimePage.getDatePickerInput().clear().type(appointmentDate.toFormat('d/M/yyyy'))
   if (inPast) {
     dateTimePage.getLogOutcomesAlertBanner().should('be.visible')

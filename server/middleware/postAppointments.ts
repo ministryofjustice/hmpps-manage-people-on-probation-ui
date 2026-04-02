@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, fullName } from '../utils'
+import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -37,6 +37,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       outcomeRecorded,
       smsOptIn,
     } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+
     const body: AppointmentRequestBody = {
       user: {
         username,
@@ -68,14 +69,25 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     }
 
     const response = await masClient.postAppointments(crn, body)
-    const { email, firstName, surname } = res.locals.user
+    let email: string | undefined
+    let name: Name
+    let firstName: string
+    let surname: string
+    if (res.locals.flags.enableMAN2344) {
+      ;({
+        user: { name, email },
+      } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid]))
+      ;({ forename: firstName, surname } = name)
+    } else {
+      ;({ email, firstName, surname } = res.locals.user)
+    }
     let outlookEventResponse: OutlookEventResponse
-    if (email && res.locals.flags.enableCalendarEvents) {
+    if (email) {
       const appointmentId = response.appointments[0].id
       const message: string = buildCaseLink(config.domain, crn, appointmentId.toString())
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
-      const subject: string = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}`
+      const subject: string = `${firstInitialLastName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}: ${toSentenceCase(apptDescription, [], null, false, true)}`
       const outlookEventRequestBody: OutlookEventRequestBody = {
         recipients: [
           {
@@ -85,7 +97,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         ],
         message,
         subject,
-        start: dateTime(date, start).toISOString(),
+        start: isoFromDateTime(date, start),
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
@@ -99,7 +111,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         } = getDataValue<SmsPreviewRequest>(data, ['appointments', crn, uuid, 'smsPreview', 'request'])
 
         outlookEventRequestBody.smsEventRequest = {
-          firstName,
+          firstName: getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']).forename,
           mobileNumber,
           crn,
           smsOptIn: true,

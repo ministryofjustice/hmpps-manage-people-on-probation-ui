@@ -10,12 +10,21 @@
 <section class="app-summary-card
   {%- if params.classes %} {{ params.classes }}{% endif %}"
   {%- for attribute, value in params.attributes %} {{attribute}}="{{value}}"{% endfor %}>
-  {% if params.titleHtml or params.titleText or params.actions %}
+  {% if params.titleHtml or params.titleText or params.subTitleHtml or params.subTitleText or params.actions %}
   <header class="app-summary-card__header">
     {% set headingLevel = params.headingLevel if params.headingLevel else 2 %}
+    {% if params.subTitleHtml or params.subTitleText %}
+    <div class="app-summary-card__header-group">
+    {% endif %}
     <h{{ headingLevel }} class="app-summary-card__title">
       {{ params.titleHtml | safe if params.titleHtml else params.titleText }}
     </h{{ headingLevel }}>
+    {% if params.subTitleHtml or params.subTitleText %}
+      <span class="app-summary-card__subtitle">
+        {{ params.subTitleHtml | safe if params.subTitleHtml else params.subTitleText }}
+      </span>
+    </div>
+    {% endif %}
     {% if params.actions.items.length %}
       <div class="app-summary-card__actions">
         {% if params.actions.items.length == 1 %}

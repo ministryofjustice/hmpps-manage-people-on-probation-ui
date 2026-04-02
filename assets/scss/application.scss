@@ -779,3 +779,37 @@ body.feature-disabled {
     margin: 0;
   }
 }
+
+.table-cell-link-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 280px;
+}
+
+.table-cell-link-content a {
+  display: inline-block;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.icon-container-right-aligned {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+
+@media (min-width: 40.0625em) {
+  section[data-qa='appointmentDetails'] {
+    .govuk-summary-list__actions {
+      width: 25%;
+    }
+  }
+}
+
+.govuk-table__cell {
+  a {
+    max-width: 100%;
+    display: block;
+    word-break: break-word;
+  }
+}

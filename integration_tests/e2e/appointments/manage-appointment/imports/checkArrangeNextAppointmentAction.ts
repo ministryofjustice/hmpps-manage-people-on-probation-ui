@@ -1,21 +1,22 @@
 import ManageAppointmentPage from '../../../../pages/appointments/manage-appointment.page'
 import { loadPage } from './common'
 
-export const checkArrangeNextAppointmentAction = () => {
+export const checkArrangeNextAppointmentAction = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
-  describe('Arrange next appointment', () => {
+  describe('Arrange next appointment action', () => {
     const name = 'Arrange next appointment'
+    const index = enableNonCompliance ? 4 : 3
     describe('Logged in user is COM', () => {
       describe('Appointment is in future with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubIsComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(3)
+            .getTaskLink(index)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -27,70 +28,76 @@ export const checkArrangeNextAppointmentAction = () => {
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'You do not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
       })
       describe('Appointment is in future with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubIsComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(3).should('contain.text', name)
+          manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('not.exist')
+          manageAppointmentPage.getTaskLink(index).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
       })
       describe('Appointment is in the future with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubIsComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
       })
       describe('Appointment is in past with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubIsComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(3)
+            .getTaskLink(index)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -102,51 +109,63 @@ export const checkArrangeNextAppointmentAction = () => {
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'You do not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
       })
       describe('Appointment is in past with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubIsComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(3).should('contain.text', name)
+          manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('not.exist')
+          manageAppointmentPage.getTaskLink(index).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
       })
       describe('Appointment is in the past with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubIsComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
       })
@@ -154,14 +173,14 @@ export const checkArrangeNextAppointmentAction = () => {
     describe('Logged in user is not COM', () => {
       describe('Appointment is in future with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: false, deliusManaged: false, notes: false })
           cy.task('stubNotComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(3)
+            .getTaskLink(index)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -173,76 +192,82 @@ export const checkArrangeNextAppointmentAction = () => {
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Terry does not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
       })
       describe('Appointment is in future with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubNotComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(3).should('contain.text', name)
+          manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('not.exist')
+          manageAppointmentPage.getTaskLink(index).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
       })
       describe('Appointment is in future with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubFutureAppointmentManagedTypeNoNotes')
+          cy.task('stubAppointment', { isFuture: true, deliusManaged: false, notes: false })
           cy.task('stubNotComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(3).should('contain.text', name)
+          manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('not.exist')
+          manageAppointmentPage.getTaskLink(index).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
       })
       describe('Appointment is in past with no next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubNotComNoNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display a link to arrange next appointment', () => {
           manageAppointmentPage
-            .getTaskLink(3)
+            .getTaskLink(index)
             .should('contain.text', name)
             .should(
               'have.attr',
@@ -254,44 +279,50 @@ export const checkArrangeNextAppointmentAction = () => {
         })
         it('should display the hint text', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Terry does not have any other appointments arranged with Eula.')
         })
         it(`should display the status tag as 'Not started'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('contain.html', 'class="govuk-tag govuk-tag--blue"')
             .should('contain.text', 'Not started')
         })
       })
       describe('Appointment is in past with next appointment arranged', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubNotComNextAppointment')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(3).should('contain.text', name)
+          manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('not.exist')
+          manageAppointmentPage.getTaskLink(index).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at The Building on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
       })
       describe('Appointment is sensitive', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentSensitive')
+          cy.task('stubAppointment', { isFuture: false, deliusManaged: false, isSensitive: true })
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
@@ -301,25 +332,31 @@ export const checkArrangeNextAppointmentAction = () => {
       })
       describe('Appointment is in the past with next appointment arranged at POP home address', () => {
         beforeEach(() => {
-          cy.task('stubPastAppointmentOutcomeNoNotes')
+          cy.task('stubAppointment', {
+            isFuture: false,
+            deliusManaged: false,
+            hasOutcome: true,
+            hasComplied: true,
+            notes: false,
+          })
           cy.task('stubNotComNextAppointmentAtHome')
           loadPage()
           manageAppointmentPage = new ManageAppointmentPage()
         })
         it('should display the task name', () => {
-          manageAppointmentPage.getTaskName(3).should('contain.text', name)
+          manageAppointmentPage.getTaskName(index).should('contain.text', name)
         })
         it('should not display a link to arrange next appointment', () => {
-          manageAppointmentPage.getTaskLink(3).should('not.exist')
+          manageAppointmentPage.getTaskLink(index).should('not.exist')
         })
         it('should display the appointment details in the hint', () => {
           manageAppointmentPage
-            .getTaskHint(3)
+            .getTaskHint(index)
             .should('contain.text', 'Other call arranged with Eula at their home on 21 February 2024.')
         })
         it(`should display the status as 'Completed'`, () => {
           manageAppointmentPage
-            .getTaskStatus(3)
+            .getTaskStatus(index)
             .should('not.contain.html', 'class="govuk-tag')
             .should('contain.text', 'Completed')
         })
@@ -331,7 +368,7 @@ export const checkArrangeNextAppointmentAction = () => {
         loadPage()
       })
       it('should not display a link to arrange next appointment', () => {
-        manageAppointmentPage.getTaskLink(3).should('not.exist')
+        manageAppointmentPage.getTaskLink(index).should('not.exist')
       })
     })
   })

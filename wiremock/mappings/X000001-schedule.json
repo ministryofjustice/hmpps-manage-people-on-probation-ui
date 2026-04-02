@@ -181,6 +181,152 @@
                 "endDateTime": "2024-02-12T10:30:00.382936Z",
                 "rarToolKit": "Choices and Changes",
                 "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 4,
+                "type": "CP/UPW - appointment/attendance to test variable length (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 6,
+                "type": "Appointment with CRS provider (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 7,
+                "type": "Appointment with CRS provider (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 8,
+                "type": "Appointment with CRS provider for testing new icons (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "absentWaitingEvidence": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 9,
+                "type": "Appointment with CRS provider for testing new icons (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "hasOutcome": true,
+                "wasAbsent": true,
+                "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
+                "lastUpdated": "2023-03-20",
+                "officer": {
+                  "name": {
+                    "forename": "Paulie",
+                    "surname": "Walnuts"
+                  }
+                },
+                "lastUpdatedBy": {
+                  "forename": "Paul",
+                  "surname": "Smith"
+                },
+                "deliusManaged": true
+              },
+              {
+                "id": 10,
+                "type": "CP/UPW - appointment/attendance (NS)",
+                "startDateTime": "2024-02-12T10:15:00.382936Z",
+                "endDateTime": "2024-02-12T10:30:00.382936Z",
+                "rarToolKit": "Choices and Changes",
+                "isSensitive": true,
+                "isSystemContact": true,
+                "hasOutcome": true,
                 "wasAbsent": true,
                 "absentWaitingEvidence": true,
                 "appointmentNote": { "id": 1, "createdBy": "", "note": "Some notes", "hasNoteBeenTruncated": false },
@@ -788,23 +934,7 @@
             },
             "repeating": true,
             "nonComplianceReason": "",
-            "documents": [
-              {
-                "id": "83fdbf8a-a2f2-43b4-93ef-67e71c04fc58",
-                "name": "Eula-Schmeler-X000001-UPW.pdf",
-                "lastUpdated": "2023-04-06T11:06:25.672587+01:00"
-              },
-              {
-                "id": "c2650260-9568-476e-a293-0b168027a5f1",
-                "name": "Eula-Schmeler-X000001-UPW.pdf",
-                "lastUpdated": "2023-04-06T11:09:45.860739+01:00"
-              },
-              {
-                "id": "b82e444b-c77c-4d44-bf99-4ce4dc426ff4",
-                "name": "Eula-Schmeler-X000001-UPW.pdf",
-                "lastUpdated": "2023-04-06T11:21:17.06356+01:00"
-              }
-            ],
+            "documents": [],
             "isRarRelated": true,
             "rarCategory": "",
             "acceptableAbsence": true,

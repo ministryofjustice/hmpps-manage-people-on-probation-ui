@@ -137,6 +137,10 @@ describe('checkInsController', () => {
       ...res.locals.flags,
       enableESupervisionCustomQuestions: true,
     }
+    res.locals.flags = {
+      ...res.locals.flags,
+      enableESupervisionCustomQuestions: true,
+    }
   })
 
   describe('Eligibility Journey', () => {

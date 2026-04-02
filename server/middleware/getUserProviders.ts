@@ -17,10 +17,20 @@ export const getUserProviders = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       teamCode,
     )
     const displayedUsers = users.map(u => {
-      if (u.username.toUpperCase() === defaultUserDetails.username) {
-        return { username: u.username, nameAndRole: u.nameAndRole, selected: 'selected' }
+      if (res.locals.flags.enableMAN2344) {
+        return {
+          username: u.username,
+          nameAndRole: u.nameAndRole,
+          name: u?.name,
+          email: u?.email,
+          ...(u.username.toUpperCase() === defaultUserDetails.username ? { selected: 'selected' } : {}),
+        }
       }
-      return { username: u.username, nameAndRole: u.nameAndRole }
+      return {
+        username: u.username,
+        nameAndRole: u.nameAndRole,
+        ...(u.username.toUpperCase() === defaultUserDetails.username ? { selected: 'selected' } : {}),
+      }
     })
     req.session.data = {
       ...(req?.session?.data ?? {}),

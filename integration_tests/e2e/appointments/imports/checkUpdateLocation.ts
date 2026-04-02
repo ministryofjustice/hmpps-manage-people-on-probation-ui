@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import ArrangeAnotherAppointmentPage from '../../../pages/appointments/arrange-another-appointment.page'
 import AppointmentCheckYourAnswersPage from '../../../pages/appointments/check-your-answers.page'
 import AppointmentLocationDateTimePage from '../../../pages/appointments/location-date-time.page'
@@ -8,8 +9,11 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   page.getSummaryListRow(4).find('.govuk-link').click()
   const locationPage = new AppointmentLocationDateTimePage()
   locationPage.getRadio('locationCode', 2).click()
-  locationPage.getDatePickerToggle().click()
-  locationPage.getNextDayButton().click()
+  const future = DateTime.now().plus({ days: 2 })
+  locationPage
+    .getDatePickerInput()
+    .clear()
+    .type(`${future.toFormat('d/M/yyyy')}`)
   getUuid().then(uuidOveride => {
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).type(startTime)
     locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().type(endTime)

@@ -191,7 +191,7 @@ export default abstract class Page {
       cy.get(`[data-predictor-badge]`)
         .eq(0)
         .get('[data-test-id=nameAndBand')
-        .should('contain.text', 'COMBINED SERIOUS REOFFENDING PREDICTOR')
+        .should('contain.text', 'Combined serious reoffending predictor')
         .should('contain.text', 'LOW')
         .get('[data-test-id=score')
         .should('contain.text', '0.28%')
@@ -227,4 +227,12 @@ export default abstract class Page {
   hideMessageLink = (): PageElement => cy.get('#hide-message')
 
   getLogOutcomesAlertBanner = (): PageElement => cy.get('[data-module="serviceAlert"]')
+
+  getDatePickerToggle = () => {
+    return cy.get('.moj-datepicker__toggle')
+  }
+
+  getDatePickerInput = () => {
+    return cy.get('.moj-js-datepicker-input')
+  }
 }

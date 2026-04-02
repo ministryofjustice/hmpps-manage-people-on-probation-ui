@@ -45,7 +45,15 @@
   {% endif %}
  {% if flags.enableCreateContact and showSuccessBanner %}
    {% set bannerType = 'warning' if uploadFailed else 'success' %}
-   {% set bannerHtml = '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">The contact was created by the files did not upload</h2><p class="govuk-body">You may need to refresh the page to see it in the contacts list. You can use NDelius to add files to the contact</p>' if uploadFailed else '<h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact created</h2><p class="govuk-body">You may need to refresh the page to see it in the contacts list.</p>' %}
+   {% set bannerSharedParagraph %}<p class="govuk-body">You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.</p>{% endset %}
+   {% set bannerHtml %}
+     {% if uploadFailed %}
+       <h2 class="govuk-heading-m govuk-!-margin-bottom-1">The contact was created but the files did not upload</h2>
+     {% else %}
+       <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact created</h2>
+     {% endif %}
+     {{ bannerSharedParagraph | safe }}
+   {% endset %}
    {{ mojBanner({
        type: bannerType,
        html: bannerHtml,

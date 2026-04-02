@@ -20,35 +20,23 @@ export const completeLocationDateTimePage = ({
 }: Props = {}) => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationDateTimePage = new AppointmentLocationDateTimePage()
-  const now = DateTime.now()
-  const yesterday = now.minus({ days: 1 })
-  const tomorrow = now.plus({ days: 1 })
-  const yesterdayIsInCurrentMonth = yesterday.month === now.month
-  const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-  locationDateTimePage.getDatePickerToggle().click()
+  const yesterday = DateTime.now().minus({ days: 1 })
+  const future = DateTime.now().plus({ days: 2 })
   if (dateOverride) {
-    const diff = (dateOverride.year - now.year) * 12 + (dateOverride.month - now.month)
-    if (diff < 0) {
-      for (let i = 0; i > diff; i -= 1) {
-        cy.get('.moj-js-datepicker-prev-month').click()
-      }
-    }
-    if (diff > 0) {
-      for (let i = 0; i < diff; i += 1) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-    }
-    cy.get(`[data-testid="${dateOverride.toFormat('d/M/yyyy')}"]`).click()
-  } else if (!dateInPast) {
-    if (!tomorrowIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-next-month').click()
-    }
-    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage
+      .getDatePickerInput()
+      .clear()
+      .type(`${dateOverride.toFormat('d/M/yyyy')}`)
+  } else if (dateInPast) {
+    locationDateTimePage
+      .getDatePickerInput()
+      .clear()
+      .type(`${yesterday.toFormat('d/M/yyyy')}`)
   } else {
-    if (!yesterdayIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-prev-month').click()
-    }
-    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage
+      .getDatePickerInput()
+      .clear()
+      .type(`${future.toFormat('d/M/yyyy')}`)
   }
   locationDateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
   locationDateTimePage

@@ -16,7 +16,8 @@
     <section data-qa="seriousViolentReoffendingPredictor">
       {{ predictorScale({
     data: riskData,
-    predictor: "seriousViolentReoffendingPredictor"
+    predictor: "seriousViolentReoffendingPredictor",
+    excludeDate: true
       }) }}
     </section>
   {% endif %}
@@ -24,7 +25,8 @@
     <section data-qa="snsv">
       {{ predictorScale({
     data: riskData,
-    predictor: "snsv"
+    predictor: "snsv",
+    excludeDate: true
       }) }}
     </section>
   {% endif %}

@@ -39,12 +39,12 @@ describe('Confirmation page', () => {
   let confirmPage: AppointmentConfirmationPage
 
   const checkRescheduleConfirm = (inPast = false) => {
-    const tomorrow = DateTime.now().plus({ days: 1 })
+    const future = DateTime.now().plus({ days: 2 })
     const yesterday = DateTime.now().minus({ days: 1 })
     checkPopHeader()
     confirmPage.checkPageTitle('Appointment rescheduled')
     cy.get('.govuk-panel__body').find('strong').should('contain.text', 'Planned office visit (NS)')
-    const expectedDate = inPast ? yesterday : tomorrow
+    const expectedDate = inPast ? yesterday : future
     cy.get('[data-qa="appointment-date"]')
       .invoke('text')
       .then(text => {
@@ -56,13 +56,60 @@ describe('Confirmation page', () => {
     cy.task('resetMocks')
   })
 
+  describe('Attending user has no listed email address', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+      cy.task('stubProbationPractitionerNoEmail')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+    })
+    it('should render the page with error message when no user details found from MAS API', () => {
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+      confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
+      confirmPage
+        .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
+          )
+        })
+      confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
+          )
+        })
+
+      cy.get('[data-qa="outlook-err-msg-1"]').should(
+        'contain.text',
+        'There is a technical problem with Outlook and we could not send a calendar invitation.',
+      )
+      cy.get('[data-qa="outlook-err-msg-2"]').should(
+        'contain.text',
+        'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
+      )
+
+      confirmPage.getSubmitBtn().click()
+      const nextAppointmentPage = new OverviewPage()
+      nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
+      nextAppointmentPage.checkOnPage()
+    })
+  })
+
   describe('Appointment arranged in the future', () => {
     beforeEach(() => {
-      loadPage()
       confirmPage = new AppointmentConfirmationPage()
     })
 
     it('should render the page', () => {
+      loadPage()
       checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
       confirmPage.checkPageTitle('Appointment arranged')
       confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
@@ -160,99 +207,51 @@ describe('Confirmation page', () => {
       const appointmentsPage = new YourCasesPage()
       appointmentsPage.checkOnPage()
     })
-
-    describe('Should render the page with error message, when SVA client API call fails', () => {
-      beforeEach(() => {
-        cy.task('resetMocks')
-        cy.task('stubSchuleOutlookEvent500Response')
-        loadPage()
-        confirmPage = new AppointmentConfirmationPage()
-      })
-      it('should render the page with error message', () => {
-        checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
-        confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
-        confirmPage
-          .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
-            )
-          })
-        confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
-        confirmPage
-          .getWhatHappensNext()
-          .find('p:nth-of-type(1)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
-            )
-          })
-
-        cy.get('[data-qa="outlook-err-msg-1"]').should(
-          'contain.text',
-          'There is a technical problem with Outlook and we could not send a calendar invitation.',
-        )
-        cy.get('[data-qa="outlook-err-msg-2"]').should(
-          'contain.text',
-          'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
-        )
-
-        confirmPage.getSubmitBtn().click()
-        const nextAppointmentPage = new OverviewPage()
-        nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
-        nextAppointmentPage.checkOnPage()
-      })
+  })
+  describe('Should render the page with error message, when SVA client API call fails', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+      cy.task('stubSchuleOutlookEvent500Response')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
     })
+    it('should render the page with error message', () => {
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+      confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
+      confirmPage
+        .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
+          )
+        })
+      confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
+          )
+        })
 
-    describe('User details error', () => {
-      beforeEach(() => {
-        cy.task('resetMocks')
-        cy.task('stubUserDetails404Response')
-        loadPage()
-        confirmPage = new AppointmentConfirmationPage()
-      })
-      it('should render the page with error message when no user details found from MAS API', () => {
-        checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
-        confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
-        confirmPage
-          .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
-            )
-          })
-        confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
-        confirmPage
-          .getWhatHappensNext()
-          .find('p:nth-of-type(1)')
-          .invoke('text')
-          .then(text => {
-            const normalizedText = text.replace(/\s+/g, ' ').trim()
-            expect(normalizedText).to.include(
-              `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
-            )
-          })
+      cy.get('[data-qa="outlook-err-msg-1"]').should(
+        'contain.text',
+        'There is a technical problem with Outlook and we could not send a calendar invitation.',
+      )
+      cy.get('[data-qa="outlook-err-msg-2"]').should(
+        'contain.text',
+        'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
+      )
 
-        cy.get('[data-qa="outlook-err-msg-1"]').should(
-          'contain.text',
-          'There is a technical problem with Outlook and we could not send a calendar invitation.',
-        )
-        cy.get('[data-qa="outlook-err-msg-2"]').should(
-          'contain.text',
-          'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
-        )
-
-        confirmPage.getSubmitBtn().click()
-        const nextAppointmentPage = new OverviewPage()
-        nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
-        nextAppointmentPage.checkOnPage()
-      })
+      confirmPage.getSubmitBtn().click()
+      const nextAppointmentPage = new OverviewPage()
+      nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
+      nextAppointmentPage.checkOnPage()
     })
   })
   describe('Appointment arranged in the past', () => {
@@ -281,7 +280,11 @@ describe('Confirmation page', () => {
       const cyaPage = new CheckYourAnswersPage()
       cyaPage.getSummaryListRow(5).find('.govuk-link').click()
       getUuid().then(uuid => {
-        completeLocationDateTimePage({ index: 1, crnOverride: crn, dateInPast: true })
+        completeLocationDateTimePage({
+          index: 1,
+          crnOverride: crn,
+          dateInPast: true,
+        })
         completeAttendedCompliedPage(false, crn, uuid)
         completeAddNotePage(crn, uuid)
         completeCYAPage()
@@ -375,6 +378,52 @@ describe('Confirmation page', () => {
           .eq(1)
           .should('contain.text', 'The appointment has been updated on the NDelius contact log and officer diary.')
       })
+    })
+  })
+  describe('Attending user has no listed email address', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+      cy.task('stubProbationPractitionerNoEmail')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+    })
+    it('should render the page with error message when no user details found from MAS API', () => {
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+      confirmPage.getPanel().find('strong').should('contain.text', 'Planned office visit (NS)')
+      confirmPage
+        .getElement('[data-qa="appointment-date"]:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `${dayOfWeek(date)} ${dateWithYear(date)} from ${to12HourTime(startTime)} to ${to12HourTime(endTime)}`,
+          )
+        })
+      confirmPage.getWhatHappensNext().find('h2').should('contain.text', 'What happens next')
+      confirmPage
+        .getWhatHappensNext()
+        .find('p:nth-of-type(1)')
+        .invoke('text')
+        .then(text => {
+          const normalizedText = text.replace(/\s+/g, ' ').trim()
+          expect(normalizedText).to.include(
+            `Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.`,
+          )
+        })
+
+      cy.get('[data-qa="outlook-err-msg-1"]').should(
+        'contain.text',
+        'There is a technical problem with Outlook and we could not send a calendar invitation.',
+      )
+      cy.get('[data-qa="outlook-err-msg-2"]').should(
+        'contain.text',
+        'The appointment has been added to the NDelius contact log and officer diary, along with any supporting information.',
+      )
+
+      confirmPage.getSubmitBtn().click()
+      const nextAppointmentPage = new OverviewPage()
+      nextAppointmentPage.getTab('overview').should('contain.text', 'Overview')
+      nextAppointmentPage.checkOnPage()
     })
   })
 })

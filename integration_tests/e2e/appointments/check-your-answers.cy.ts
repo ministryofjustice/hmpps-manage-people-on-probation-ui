@@ -122,6 +122,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('Change appointment values', () => {
       let cyaPage: AppointmentCheckYourAnswersPage
       beforeEach(() => {
+        cy.task('resetMocks')
         loadPage()
         cyaPage = new AppointmentCheckYourAnswersPage()
       })
@@ -135,7 +136,7 @@ describe('Check your answers then confirm the appointment', () => {
         checkUpdateLocation(cyaPage)
       })
       it('should update the date when value is changed', () => {
-        checkUpdateDateTime(cyaPage)
+        checkUpdateDateTime(cyaPage, DateTime.now().plus({ days: 2 }))
       })
       it('should update the text message confirmation when value is changed', () => {
         checkUpdateTextMessageConfirmation(cyaPage)
@@ -256,7 +257,7 @@ describe('Check your answers then confirm the appointment', () => {
       beforeEach(() => {
         changeDate()
         const now = DateTime.now()
-        const dateOverride = now.plus({ days: 2 })
+        const dateOverride = now.plus({ days: 3 })
         completeLocationDateTimePage({ dateOverride })
       })
       it('should redirect back to the cya page', () => {
@@ -269,7 +270,6 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        changeDate()
         const now = DateTime.now()
         const dateOverride = now.minus({ days: 2 })
         completeLocationDateTimePage({ dateOverride })

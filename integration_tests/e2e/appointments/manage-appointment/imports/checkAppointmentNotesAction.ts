@@ -7,7 +7,7 @@ export const checkAppointmentNotesAction = () => {
     const name = 'Add appointment notes'
     describe('Appointment in future and has no notes', () => {
       beforeEach(() => {
-        cy.task('stubFutureAppointmentManagedTypeNoNotes')
+        cy.task('stubAppointment', { isFuture: true, deliusManaged: false, hasOutcome: false, notes: false })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -26,7 +26,7 @@ export const checkAppointmentNotesAction = () => {
     })
     describe('Appointment in future and has notes', () => {
       beforeEach(() => {
-        cy.task('stubFutureAppointmentManagedTypeWithNotes')
+        cy.task('stubAppointment', { isFuture: true, deliusManaged: false, hasOutcome: false, notes: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -45,7 +45,7 @@ export const checkAppointmentNotesAction = () => {
     })
     describe('Appointment in past and has no notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentNoOutcomeNoNotes')
+        cy.task('stubAppointment', { isFuture: false, hasOutcome: false, notes: false })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -64,7 +64,7 @@ export const checkAppointmentNotesAction = () => {
     })
     describe('Appointment in past no outcome recorded and has notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentNoOutcomeHasNotes')
+        cy.task('stubAppointment', { isFuture: false, hasOutcome: false, notes: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -83,7 +83,7 @@ export const checkAppointmentNotesAction = () => {
     })
     describe('Appointment in past has outcome recorded and has notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentOutcomeHasNotes')
+        cy.task('stubAppointment', { isFuture: false, hasOutcome: true, hasComplied: true, notes: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -102,7 +102,7 @@ export const checkAppointmentNotesAction = () => {
     })
     describe('Appointment in future has outcome recorded and has notes', () => {
       beforeEach(() => {
-        cy.task('stubFutureAppointmentOutcomeHasNotes')
+        cy.task('stubAppointment', { isFuture: true, hasOutcome: true, hasComplied: true, notes: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })
@@ -121,7 +121,7 @@ export const checkAppointmentNotesAction = () => {
     })
     describe('Appointment in past and has notes', () => {
       beforeEach(() => {
-        cy.task('stubPastAppointmentWithNotes')
+        cy.task('stubAppointment', { isFuture: false, hasOutcome: false, notes: true })
         loadPage()
         manageAppointmentPage = new ManageAppointmentPage()
       })

@@ -35,28 +35,18 @@ describe('Pick a date, location and time for this appointment', () => {
 
   const now = DateTime.now()
   const yesterday = now.minus({ days: 1 })
-  const yesterdayIsInCurrentMonth = yesterday.month === now.month
 
   const completeDateInFuture = () => {
     locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-    const tomorrow = now.plus({ days: 1 })
-    const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-    locationDateTimePage.getDatePickerToggle().click()
-    if (!tomorrowIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-next-month').click()
-    }
-    cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+    const future = now.plus({ days: 2 })
+    locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
     locationDateTimePage.getElementInput(`startTime`).type('09:00')
     locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
     locationDateTimePage.getSubmitBtn().click()
   }
 
   const selectPastDate = () => {
-    locationDateTimePage.getDatePickerToggle().click()
-    if (!yesterdayIsInCurrentMonth) {
-      cy.get('.moj-js-datepicker-prev-month').click()
-    }
-    cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+    locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
   }
 
   beforeEach(() => {
@@ -229,6 +219,7 @@ describe('Pick a date, location and time for this appointment', () => {
       cy.clock(DateTime.fromISO(mockedNow).toMillis())
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).type('9:10')
@@ -281,6 +272,7 @@ describe('Pick a date, location and time for this appointment', () => {
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
+      // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
       locationDateTimePage.getElementInput(`startTime`).type('09:30')
@@ -358,9 +350,10 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   describe('Date is selected', () => {
-    const value = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
+    const value = DateTime.now().toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
+      locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
     })
@@ -372,27 +365,15 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Date is selected from the picker which is in the past', () => {
     beforeEach(() => {
       loadPage()
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-prev-month').click()
-      }
-      cy.get(`[data-testid="${yesterday.toFormat('d/M/yyyy')}"]`).click()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
+      locationDateTimePage.getDatePickerInput().type(yesterday.toFormat('d/M/yyyy'))
     })
     it('should display the log an outcome alert banner', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if date is selected from the picker in the future', () => {
-      const tomorrow = now.plus({ days: 1 })
-      const tomorrowIsInCurrentMonth = tomorrow.month === now.month
-
-      locationDateTimePage.getDatePickerToggle().click()
-      if (!yesterdayIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      if (!tomorrowIsInCurrentMonth) {
-        cy.get('.moj-js-datepicker-next-month').click()
-      }
-      cy.get(`[data-testid="${tomorrow.toFormat('d/M/yyyy')}"]`).click()
+      const future = now.plus({ days: 2 })
+      locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
       it('should hide the alert banner', () => {
         locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
       })
@@ -408,8 +389,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().should('be.visible')
     })
     it('should hide the alert banner if a date is entered in the future', () => {
-      const tomorrow = now.plus({ days: 1 }).toFormat('d/M/yyyy')
-      locationDateTimePage.getDatePickerInput().clear().type(tomorrow)
+      const future = now.plus({ days: 2 }).toFormat('d/M/yyyy')
+      locationDateTimePage.getDatePickerInput().clear().type(future)
       locationDateTimePage.getLogOutcomesAlertBanner().should('not.be.visible')
     })
   })
@@ -543,6 +524,7 @@ describe('Pick a date, location and time for this appointment', () => {
   describe('Location and date in future are selected, then continue is clicked', () => {
     beforeEach(() => {
       loadPage()
+      locationDateTimePage = new AppointmentLocationDateTimePage()
       completeDateInFuture()
       locationDateTimePage
         .getWarning('isWithinOneHourOfMeetingWith')
