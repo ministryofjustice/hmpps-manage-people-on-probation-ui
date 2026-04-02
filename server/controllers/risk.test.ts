@@ -261,4 +261,15 @@ describe('riskController', () => {
       })
     })
   })
+  describe('getRiskPredictorScoresDetail', () => {
+    beforeEach(async () => {
+      await controllers.risk.getRiskPredictorScoresDetail(hmppsAuthClient)(req, res)
+    })
+    checkAuditMessage(res, 'VIEW_MAS_RISKS_DETAIL', uuidv4(), crn, 'CRN')
+    it('should render the risk predictor scores detail page', () => {
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/risk-predictor-scores-detail', {
+        crn,
+      })
+    })
+  })
 })
