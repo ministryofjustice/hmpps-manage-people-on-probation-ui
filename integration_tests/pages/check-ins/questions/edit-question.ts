@@ -6,7 +6,7 @@ export default class EditQuestionPage extends Page {
   }
 
   enterCustomQuestion(text: string) {
-    cy.get('input[name*="[manageQuestions][customQuestion]"]').type(text)
+    cy.get('input[name*="[manageQuestions][customQuestion]"]').type(`{selectall}{backspace}${text}`)
   }
 
   clearCustomQuestion() {

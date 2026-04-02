@@ -26,19 +26,19 @@ export default class AddQuestionsPage extends Page {
   }
 
   verifyQuestionInList(expectedText: string) {
-    cy.get('.govuk-summary-list').should('contain.text', expectedText)
+    cy.get('.govuk-table').should('contain.text', expectedText)
   }
 
   verifyQuestionNotInList(expectedText: string) {
-    cy.get('.govuk-summary-list').should('not.contain.text', expectedText)
+    cy.get('.govuk-table').should('not.contain.text', expectedText)
   }
 
   clickEditForQuestion(index: number) {
-    cy.get('a:contains("Edit")').eq(index).click()
+    cy.get('[data-qa="edit-question-link"]').eq(index).click()
   }
 
   clickDeleteForQuestion(index: number) {
-    cy.get('a:contains("Delete")').eq(index).click()
+    cy.get('[data-qa="delete-question-link"]').eq(index).click()
   }
 
   verifyAddQuestionButtonHidden() {

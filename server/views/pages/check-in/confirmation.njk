@@ -10,6 +10,7 @@
 {% set overViewLink = "/case/" + crn %}
 {% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
 {% set overViewPage = "/case/" + crn %}
+{# {% set questionsStartPage = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %} #}
 
 {% set panelHtml %}
 <div class="govuk-!-font-size-36">
@@ -45,6 +46,7 @@
       {% if flags.enableESupervisionCustomQuestions === true %}
       <h2 class="govuk-heading-m govuk-!-margin-top-6">Add additional questions to {{case.name.forename}}'s online check in</h2>
       <p class="govuk-body">You can add up to 3 additional questions to {{case.name.forename}}'s next online check in, you will have until 23:59 the day before the next check in to add questions. We will send you a reminder before their next check in.</p>
+      <a class="govuk-link" href={questionsStartPage}>Add additional questions to {{case.name.forename}}'s first online check in</a>
       {% endif %}
     </div>
   </div>
