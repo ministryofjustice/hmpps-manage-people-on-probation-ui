@@ -68,6 +68,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/manage',
+    getSentences(hmppsAuthClient),
     getNextComAppointment(hmppsAuthClient),
     controllers.appointments.getManageAppointment(hmppsAuthClient),
   )

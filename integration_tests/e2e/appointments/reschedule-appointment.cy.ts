@@ -12,7 +12,7 @@ describe('Reschedule Appointment', () => {
     cy.visit('/case/X000001/appointments/appointment/6/manage')
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage
-      .getAppointmentDetailsListItem(1, 'actions')
+      .getAppointmentDetailsListItem(2, 'actions')
       .find('a')
       .should('contain.text', 'Reschedule')
       .should('have.attr', 'href', `/case/X000001/appointment/6/reschedule`)
