@@ -77,8 +77,8 @@ describe('Arrange another appointment', () => {
     it('should display the outlook invite inset text', () => {
       getUuid().then(uuid => {
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-        const tomorrow = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
-        dateTimePage.getDatePickerInput().clear().type(tomorrow)
+        const future = DateTime.now().plus({ days: 2 }).toFormat('d/M/yyyy')
+        dateTimePage.getDatePickerInput().clear().type(future)
         dateTimePage.getElementInput(`startTime`).type('09:10')
         dateTimePage.getElementInput(`endTime`).focus().type('10:30')
         dateTimePage.getSubmitBtn().click()

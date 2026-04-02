@@ -9,7 +9,7 @@ describe('Change appointment details and reschedule', () => {
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
   let dateTimePage: AppointmentLocationDateTimePage
   const crn = 'X000001'
-  const tomorrow = DateTime.now().plus({ days: 1 })
+  const future = DateTime.now().plus({ days: 2 })
   const startTime = '09:10'
   const endTime = '10:30'
 
@@ -84,7 +84,7 @@ describe('Change appointment details and reschedule', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `${dayOfWeek(tomorrow.toISODate())} ${dateWithYear(tomorrow.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+              `${dayOfWeek(future.toISODate())} ${dateWithYear(future.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
             )
           })
         cy.get('[data-qa="calendarInviteInset"]').should('be.visible')
