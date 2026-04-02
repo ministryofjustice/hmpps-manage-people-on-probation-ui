@@ -1,4 +1,6 @@
 import config from '../config'
+
+// eslint-disable-next-line import/no-cycle
 import RestClient from './restClient'
 import { AvailableComponent, ComponentsResponse } from '../@types/probationComponent'
 

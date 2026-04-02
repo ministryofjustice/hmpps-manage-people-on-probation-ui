@@ -1,3 +1,4 @@
+/* eslint-disable import/no-cycle */
 import RestClient from './restClient'
 import config from '../config'
 

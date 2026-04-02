@@ -14,7 +14,6 @@ import {
   PersonalDetailsUpdateRequest,
   PersonSummary,
   ProvisionOverview,
-  ProfessionalContact,
 } from './model/personalDetails'
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
@@ -23,6 +22,7 @@ import { PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
 import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
+import { ProfessionalContact } from './model/professionalContact'
 import { LicenceConditionNoteDetails } from './model/licenceConditionNoteDetails'
 import { RequirementNoteDetails } from './model/requirementNoteDetails'
 import { PreviousOrderDetail } from './model/previousOrderDetail'

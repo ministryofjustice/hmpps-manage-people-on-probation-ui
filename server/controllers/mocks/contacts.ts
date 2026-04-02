@@ -1,4 +1,4 @@
-import { ProfessionalContact } from '../../data/model/personalDetails'
+import { ProfessionalContact } from '../../data/model/professionalContact'
 
 export const mockContacts = {
   name: {
