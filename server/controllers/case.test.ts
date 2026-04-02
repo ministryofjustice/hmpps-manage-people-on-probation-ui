@@ -25,9 +25,9 @@ import {
   PersonalDetails,
   Provisions,
   Document,
+  Contact,
 } from '../data/model/personalDetails'
 import { PersonalDetailsSession } from '../models/Data'
-import { Contact } from '../data/model/professionalContact'
 import { ProbationPractitioner } from '../models/CaseDetail'
 
 jest.mock('../data/masApiClient')

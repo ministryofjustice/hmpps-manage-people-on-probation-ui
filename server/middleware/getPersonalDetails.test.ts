@@ -33,8 +33,8 @@ import {
   Document,
   AddressType,
   PersonalDetails,
+  Contact,
 } from '../data/model/personalDetails'
-import { Contact } from '../data/model/professionalContact'
 import { SentencePlan } from '../data/model/sentencePlan'
 import config from '../config'
 import logger from '../../logger'

@@ -2,16 +2,19 @@ import nock from 'nock'
 import { HttpsAgent } from 'agentkeepalive'
 import { AgentConfig, type ApiConfig } from '../config'
 import RestClient from './restClient'
-import { isValidHost, isValidPath } from '../utils'
+import { isValidHost } from '../utils/isValidHost'
+import { isValidPath } from '../utils/isValidPath'
 import logger from '../../logger'
 import { ErrorSummary } from './model/common'
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
+jest.mock('../utils/isValidHost', () => {
   return {
-    ...actualUtils,
-    isValidPath: jest.fn(),
     isValidHost: jest.fn(),
+  }
+})
+jest.mock('../utils/isValidPath', () => {
+  return {
+    isValidPath: jest.fn(),
   }
 })
 

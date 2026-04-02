@@ -1,4 +1,4 @@
-import { Contact } from '../data/model/professionalContact'
+import { Contact } from '../data/model/personalDetails'
 import { roleDescription } from './roleDescription'
 
 const mockContact = {
