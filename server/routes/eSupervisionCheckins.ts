@@ -294,4 +294,23 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     getCheckIn(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
   ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    controllers.checkIns.getStartQuestionsPage(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postStartQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/add', [
+    controllers.checkIns.getAddQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling', [
+    controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/support', [
+    controllers.checkIns.getPreviewSupportPage(hmppsAuthClient),
+  ])
 }

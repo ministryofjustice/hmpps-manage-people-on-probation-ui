@@ -1,0 +1,71 @@
+{% extends "../../../_form.njk" %}
+{% set title = "Is there anything you need support with or want to let us know about?" %}
+{% set pageTitle = title %}
+{% set buttonText = "Back to questions" %}
+{% set formAnchorText = "Back to questions" %}
+{% set formAnchorLink = "/case/"+ crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set notStandardForm = true %}
+{% set back = back if back else '' %}
+{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+
+
+
+{% block primary %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <p class="govuk-hint govuk-body govuk-!-margin-bottom-2">Question preview</p>
+            <h2 class="govuk-heading-l govuk-!-margin-top-0 govuk-!-margin-bottom-2 govuk-!-padding-top-0" data-qa="pageHeading">
+                {{ pageTitle }}
+            </h2>
+            <p class="govuk-hint">
+                This could be anything you're worrying about, struggling with or just want to let us know.
+            </p>
+
+            <div class="govuk-form-group disabled-checkboxes">
+                <div class="govuk-checkboxes">
+                    
+                    {% set supportOptions = [
+                        { label: "Mental health", id: "mentalHealthSupport", text: "Tell us what you want us to know about mental health (optional)" },
+                        { label: "Alcohol", id: "alcoholSupport", text: "Tell us what you want us to know about alcohol (optional)" },
+                        { label: "Drugs", id: "drugsSupport", text: "Tell us what you want us to know about drugs (optional)" },
+                        { label: "Money", id: "moneySupport", text: "Tell us what you want us to know about money (optional)" },
+                        { label: "Housing", id: "housingSupport", text: "Tell us what you want us to know about housing (optional)" },
+                        { label: "Support system (family, relationships, friends)", id: "supportSystemSupport", text: "Tell us what you want us to know about your support system (optional)" },
+                        { label: "Something else", id: "otherSupport", text: "Tell us what you want us to know about (optional)" }
+                    ] %}
+
+                    {% for item in supportOptions %}
+                        <div class="govuk-checkboxes__item">
+                            <input class="govuk-checkboxes__input" id="{{ item.id }}-checkbox" name="assistance" type="checkbox" checked disabled aria-disabled="true" onclick="return false;" onkeydown="if(event.key === ' ') return false;">
+                            <label class="govuk-label govuk-checkboxes__label" for="{{ item.id }}-checkbox">
+                                {{ item.label }}
+                            </label>
+                        </div>
+                        <div class="govuk-checkboxes__conditional">
+                            {{ govukTextarea({
+                                name: item.id,
+                                id: item.id + "-textarea",
+                                label: { text: item.text },
+                                attributes: { "readonly": "readonly" }
+                            }) }}
+                        </div>
+                    {% endfor %}
+
+                    <div class="govuk-checkboxes__divider">or</div>
+
+                    <div class="govuk-checkboxes__item">
+                        <input class="govuk-checkboxes__input" id="no-help-checkbox" name="assistance" type="checkbox" readonly disabled>
+                        <label class="govuk-label govuk-checkboxes__label" for="no-help-checkbox">
+                            No, I do not need help
+                        </label>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="govuk-button-group">
+                <a href="{{ formAnchorLink }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
+            </div>
+        </div>
+    </div>
+{% endblock %}
