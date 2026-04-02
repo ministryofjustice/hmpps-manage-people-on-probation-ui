@@ -113,7 +113,6 @@ describe('ProbationFEComponentsMiddleware', () => {
 })
 
 describe('updateLinks', () => {
-  const baseUrl = 'http://localhost:8100'
 
   it('should update Privacy policy and Cookies policy links and add target blank', () => {
     const input = `
