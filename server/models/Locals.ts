@@ -1,6 +1,5 @@
-/* eslint-disable import/no-cycle */
-import { Response } from 'express'
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { Response } from 'express'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
@@ -21,12 +20,11 @@ import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineIte
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
 import { Activity, PersonAppointment, PersonSchedule } from '../data/model/schedule'
-import { FileCache } from '../@types'
+import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
 import { ESupervisionCheckIn, OffenderCheckinsByCRNResponse } from '../data/model/esupervision'
-import { outcomeOptions } from '../properties'
 
 export interface AppointmentLocals {
   meta: {

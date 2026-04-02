@@ -4,7 +4,7 @@ import { Controller } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentOutcomeType } from '../models/Appointments'
-import { isValidCrn, isNumericString, setDataValue, getDataValue } from '../utils'
+import { setDataValue, getDataValue } from '../utils'
 
 const routes = [
   'getOutcome',

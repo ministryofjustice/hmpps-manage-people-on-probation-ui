@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Location, Provider, Team, User } from '../data/model/caseload'
 import { PersonalDetails } from '../data/model/personalDetails'

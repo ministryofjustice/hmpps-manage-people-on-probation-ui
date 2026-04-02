@@ -1,4 +1,3 @@
-/* eslint-disable import/no-cycle */
 import type { UserDetails } from '../../services/userService'
 import type { ActivityLogCache } from '../index'
 import { Errors } from '../../models/Errors'

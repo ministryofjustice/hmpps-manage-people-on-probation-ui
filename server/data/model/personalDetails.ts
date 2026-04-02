@@ -1,6 +1,4 @@
-/* eslint-disable import/no-cycle */
 import { Note } from './note'
-import { Contact } from './professionalContact'
 
 export interface Name {
   forename: string
@@ -217,6 +215,25 @@ export interface Disability {
   disabilityNote?: Note
   lastUpdated: string
   lastUpdatedBy: Name
+}
+
+export interface ProfessionalContact {
+  name: Name
+  currentContacts: Contact[]
+  previousContacts: Contact[]
+}
+
+export interface Contact {
+  name: string
+  telephoneNumber: string
+  email: string
+  provider: string
+  probationDeliveryUnit: string
+  team: string
+  allocationDate: string
+  allocatedUntil?: string
+  responsibleOfficer: boolean
+  prisonOffenderManager: boolean
 }
 
 export type Origin = 'appointments' | undefined
