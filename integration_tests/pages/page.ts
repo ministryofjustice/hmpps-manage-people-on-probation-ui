@@ -191,7 +191,7 @@ export default abstract class Page {
       cy.get(`[data-predictor-badge]`)
         .eq(0)
         .get('[data-test-id=nameAndBand')
-        .should('contain.text', 'COMBINED SERIOUS REOFFENDING PREDICTOR')
+        .should('contain.text', 'Combined serious reoffending predictor')
         .should('contain.text', 'LOW')
         .get('[data-test-id=score')
         .should('contain.text', '0.28%')

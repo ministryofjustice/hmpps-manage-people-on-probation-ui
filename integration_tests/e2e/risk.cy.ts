@@ -42,13 +42,15 @@ const checkRiskPageView = (
 ) => {
   const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
   const subHeadingLevel = !sentencePlanLink && !sentencePlanText ? '4' : '5'
+  page.getElementData('riskScoresCard').should('exist')
+  page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
   if (ogrs4Enabled) {
     if (ogrs4) {
       page
         .getElementData('combinedSeriousReoffendingPredictor')
         .get(`h2`)
-        .should('contain.text', 'Combined Serious Reoffending Predictor')
-      page.getElementData('allReoffendingPredictor').get(`h2`).should('contain.text', 'All Reoffending Predictor')
+        .should('contain.text', 'Combined serious reoffending predictor')
+      page.getElementData('allReoffendingPredictor').get(`h2`).should('contain.text', 'All reoffending predictor')
       page
         .getElementData('allReoffendingPredictor')
         .get('[data-test-id=staticOrDynamic]')
@@ -56,34 +58,37 @@ const checkRiskPageView = (
       page
         .getElementData('directContactSexualReoffendingPredictor')
         .get('h2')
-        .should('contain.text', 'Direct Contact - Sexual Reoffending Predictor')
+        .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
       page
         .getElementData('indirectImageContactSexualReoffendingPredictor')
         .get('h2')
-        .should('contain.text', 'Direct Contact - Sexual Reoffending Predictor')
+        .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
       page
         .getElementData('violentReoffendingPredictor')
         .get(`h2`)
-        .should('contain.text', 'Violent Reoffending Predictor')
+        .should('contain.text', 'Violent reoffending predictor')
       page
         .getElementData('seriousViolentReoffendingPredictor')
         .get(`h2`)
-        .should('contain.text', 'Serious Violent Reoffending Predictor')
-      page.getElementData('oasysScoreHistory').find('.govuk-heading-m').should('contain.text', 'Scores history')
-      page.getElementData('oasysScoreHistory').find('.predictor-timeline-link-btn').eq(0).click()
+        .should('contain.text', 'Serious violent reoffending predictor')
       page
         .getElementData('oasysScoreHistory')
-        .find('.predictor-timeline-link-btn')
+        .find('.govuk-heading-m')
+        .should('contain.text', 'Risk predictor scores history')
+      page.getElementData('oasysScoreHistory').find('.arns-predictor-timeline-link-btn').eq(0).click()
+      page
+        .getElementData('oasysScoreHistory')
+        .find('.arns-predictor-timeline-link-btn')
         .eq(0)
         .should('contain.text', 'Close')
-      page.getElementData('oasysScoreHistory').find('.predictor-timeline-section').eq(0).should('be.visible')
+      page.getElementData('oasysScoreHistory').find('.arns-predictor-timeline-section').eq(0).should('be.visible')
       page
         .getElementData('oasysScoreHistory')
-        .find('.predictor-timeline-section')
+        .find('.arns-predictor-timeline-section')
         .eq(0)
-        .find('.predictor-timeline-item--low')
+        .find('.arns-predictor-timeline-item--low')
         .eq(0)
-        .should('contain.text', 'All Reoffending Predictor')
+        .should('contain.text', 'All reoffending predictor')
     } else {
       page.getElementData('ovp').should('exist')
       page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
@@ -93,9 +98,9 @@ const checkRiskPageView = (
       if (!sanIndicator) {
         page
           .getElementData('oasysScoreHistory')
-          .find('.predictor-timeline-section')
+          .find('.arns-predictor-timeline-section')
           .eq(0)
-          .find('.legacy-predictor-timeline-item--low')
+          .find('.arns-legacy-predictor-timeline-item--low')
           .eq(0)
           .should('contain.text', 'OGRS')
       }
