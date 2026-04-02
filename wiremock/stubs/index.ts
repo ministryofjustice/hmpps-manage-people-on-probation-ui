@@ -44,4 +44,18 @@ export default {
   ...eSupervisionAPI,
   ...document,
   ...overdueOutcomes,
+  stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
+    superagent.post('http://localhost:9091/__admin/mappings').send({
+      request: {
+        method: 'GET',
+        urlPattern: '/breachRecall',
+      },
+      response: {
+        status: 200,
+        body: args.data,
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      },
+    }),
 }

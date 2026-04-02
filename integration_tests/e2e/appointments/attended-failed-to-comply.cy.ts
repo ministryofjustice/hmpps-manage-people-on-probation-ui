@@ -11,12 +11,8 @@ describe('Attended but failed to comply', () => {
   let attendedFailedToComplyPage: AttendedFailedToComplyPage
 
   beforeEach(() => {
-    cy.task('reset')
-    cy.task('stubSignIn')
-    cy.task('stubAuthUser')
-    cy.task('stubProbationSearch')
-    cy.task('stubDeliusPersonalDetails', { crn })
-    cy.task('stubBreachRecallInformation', { crn, data: 'Initiate a breach' })
+    cy.task('resetMocks')
+    cy.task('stubBreachRecallInformation', { data: 'Initiate a breach' })
     cy.task('stubProbationPractitioner', { crn, username: 'USER1' })
     cy.task('stubPersonAppointment', { crn, contactId, type: 'Office visit' })
     loadPage()
@@ -42,13 +38,14 @@ describe('Attended but failed to comply', () => {
     cy.get('.govuk-hint').should('contain.text', 'Notify the allocated probation practitioner so they can take action.')
     cy.get('label[for="appointments-X778160-123456-enforcementAction-5"]').should('contain.text', 'No further action')
     cy.get('.govuk-radios__divider').should('contain.text', 'or')
-    cy.get('label[for="appointments-X778160-123456-enforcementAction-7"]').should(
+    cy.get('label[for="appointments-X778160-123456-enforcementAction-6"]').should(
       'contain.text',
       'I want to add a different action',
     )
   })
 
   it('should display the correct radio buttons when isReferToProbationPractitioner is false', () => {
+    cy.task('stubBreachRecallInformation', { data: 'Initiate a breach' })
     cy.task('stubProbationPractitioner', { crn, username: 'OTHER_USER' })
     cy.task('stubPersonAppointment', { crn, contactId, type: 'Office visit' })
     loadPage()
