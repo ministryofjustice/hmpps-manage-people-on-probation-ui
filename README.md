@@ -23,8 +23,11 @@ You'll need to install:
 Install NPM package dependencies:
 
 ```shell
-npm install
+npm run setup
 ```
+
+If this fails run `npm install` first to ensure package-lock.json is inline with package.json
+
 
 ### Run the service
 
