@@ -1,0 +1,31 @@
+{% extends "../../_form.njk" %}
+{% set title = "How to write questions for an online service" %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/"+  crn %}
+{% set formAnchorText = "Cancel and go to " + case.name.forename + "'s overview" %}
+{% set back = back if back else '' %}
+{% set backLink =  '/case/' + crn + '/'  + back %}
+{% set buttonText = "Add questions to online check ins" %}
+
+{% block form %}
+            <h2 class="govuk-heading-m">Things to consider</h2>
+            <p class="govuk-body">Online check ins are very different to face-to-face appointments, as they remove the personal connection and can feel quite detached for people on probation.</p>
+            <p>We’ve also heard from people on probation that they are reluctant to write some things down as they are concerned it could be used against them.</p>
+            <h3 class="govuk-heading-s">What you should do when writing questions for online check ins</h3>
+            <p class="govuk-body">Think about how the question will come across to someone reading it without the context of a face-to-face conversation.</p>
+            <p class="govuk-body govuk-!-margin-bottom-0">You should:</p>
+            <ul class="govuk-list govuk-list--bullet govuk-!-margin-left-2">
+                <li>consider if a question is appropriate for an online service</li>
+                <li>think about the person’s circumstances when asking questions about topics that could be upsetting or dangerous, such as drugs, alcohol or abusive relationships</li>
+                <li>avoid asking about more than one topic in a single question</li>
+                <li>avoid using complicated language or words that have a simpler alternative</li>
+                <li>check spelling and grammar</li>
+            </ul>
+            <h2 class="govuk-heading-m">How you can tailor questions</h2>
+            <p class="govuk-body">You can choose from a list of questions with spaces for you to add your own text. This allows you to tailor the questions based on what you’d like to know about the person.</p>
+            <h3 class="govuk-heading-s">Examples of tailored questions</h3>
+            <p class="govuk-body govuk-!-margin-bottom-0">Before: Have you been able to [insert your text here]?</p>
+            <p class="govuk-body">After: Have you been able to speak with your GP about your health?</p>
+        </div>
+    </div>
+{% endblock %}

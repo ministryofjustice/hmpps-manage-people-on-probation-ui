@@ -29,6 +29,10 @@ import EligibilityFullPage from '../../pages/check-ins/eligibility-full'
 import EligibilitySupplementaryPage from '../../pages/check-ins/eligibility-supplementary'
 import EligibilityDeniedPage from '../../pages/check-ins/eligibility-denied'
 import { getCheckinUuid } from './utils'
+import AddQuestionsPage from '../../pages/check-ins/questions/add-questions'
+import InstructionsPage from '../../pages/check-ins/questions/instructions'
+import PreviewFeelingPage from '../../pages/check-ins/questions/preview/feeling'
+import PreviewSupportPage from '../../pages/check-ins/questions/preview/support'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -1035,5 +1039,64 @@ context('check-ins overview and manage pages', () => {
     const restartConfirmPage = new RestartConfirmationPage()
     restartConfirmPage.checkOnPage()
     restartConfirmPage.getPanel().should('contain.text', 'Online check ins restarted')
+  })
+})
+
+context('check-ins add questions pages', () => {
+  it('should allow a user to start the add questions to online check ins journey', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.checkOnPage()
+  })
+
+  it('should allow a user to view the default questions preview pages', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.getElement('.govuk-table').should('contain.text', 'How have you been feeling')
+    addQuestionsPage.getElement('.govuk-table').should('contain.text', 'Is there anything you need support with')
+    addQuestionsPage.clickPreviewFeeling()
+    const feelingPreview = new PreviewFeelingPage()
+    feelingPreview.checkOnPage()
+    feelingPreview.getElement('.govuk-textarea').first().should('have.attr', 'readonly')
+    feelingPreview.clickBackToQuestions()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickPreviewSupport()
+    const supportPreview = new PreviewSupportPage()
+    supportPreview.checkOnPage()
+    supportPreview.clickBackToQuestions()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickCancel()
+    instructionsPage.checkOnPage()
+  })
+
+  it('should show the "Add question" button for additional custom questions', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.getElement('[data-qa="add-question-btn"]').should('be.visible')
+  })
+  it('should show the "Save questions" button', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.getElement('[data-qa="save-questions-btn"]').should('be.visible')
+  })
+  it('should show the "cancel and go back" button ', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.getElement('[data-qa="cancel-link"]').should('be.visible')
   })
 })
