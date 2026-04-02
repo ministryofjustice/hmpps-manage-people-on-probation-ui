@@ -11,8 +11,13 @@ export default class DateFrequencyPage extends Page {
   }
 
   getNextDayButton = () => {
-    const nextDay = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
-    return cy.get(`[data-testid="${nextDay}"]`)
+    const now = DateTime.now()
+    const future = now.plus({ days: 2 })
+    const futureIsInCurrentMonth = future.month === now.month
+    if (!futureIsInCurrentMonth) {
+      cy.get('.moj-js-datepicker-next-month').click()
+    }
+    return cy.get(`[data-testid="${future.toFormat('d/M/yyyy')}"]`)
   }
 
   getFrequency = () => {
