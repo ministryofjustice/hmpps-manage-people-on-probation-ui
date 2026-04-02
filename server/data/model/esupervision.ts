@@ -180,5 +180,23 @@ export interface ReactivateOffenderRequest {
   }
 }
 
+export interface EsupervisionQuestion {
+  id: string
+  policy: 'CUSTOM' | 'DEFAULT'
+  template: string
+  example: string
+  responseFormat: 'TEXT' | 'MULTIPLECHOICE'
+  responseSpec: {
+    id: string
+    label: string
+    detailsLabel: string
+    detailsId: string
+  }
+}
+
+export interface EsupervisionQuestionsList {
+  questions: EsupervisionQuestion[]
+}
+
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
 export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'

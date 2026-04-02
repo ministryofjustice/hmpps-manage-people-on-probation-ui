@@ -1,0 +1,72 @@
+{% extends "../../_form.njk" %}
+{% set title = "What do you want to ask " + case.name.forename + "?" %}
+{% set showAnchorLink = true %}
+{% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
+{% set formAnchorText = "Cancel and go back" %}
+{% set back = back if back else '' %}
+{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
+{% set buttonText = "Continue" %}
+{% set htmlId = "esupervision-" + crn + "-" + id + "-manageQuestions-customQuestion" %}
+{% set inputName = "esupervision[" + crn + "][" + id + "][manageQuestions][customQuestion]" %}
+{% set fieldError = errorMessages[htmlId] %}
+{% set inputValue = data.esupervision[crn][id].manageQuestions.customQuestion | default(data.esupervision[crn][id].manageQuestions.savedQuestions[questionId], true) %}
+
+{% block form %}
+
+  {% set detailsHtml %}
+    <p class="govuk-body"><b>You should:</b></p>
+    <ul class="govuk-list govuk-list--bullet">
+      <li>consider if a question is appropriate for an online service</li>
+      <li>think about the person’s circumstances when asking questions about topics that could be upsetting or dangerous, such as drugs, alcohol or abusive relationships</li>
+      <li>avoid asking about more than one topic in a single question</li>
+      <li>avoid using complicated language or words that have a simpler alternative</li>
+      <li>check spelling and grammar</li>
+    </ul>
+    <p class="govuk-body"><br>For example:</p>
+    <p class="govuk-body">Have you been able to follow up with the housing service we referred you to recently?</p>
+    <p class="govuk-body">Have you been able to book a doctor’s appointment?</p>
+  {% endset %}
+
+  {{ govukDetails({
+    summaryText: "Writing questions for online check ins",
+    html: detailsHtml
+  }) }}
+
+  {% if fieldError %}
+  <div class="govuk-form-group govuk-form-group--error" id="{{ htmlId }}-group">
+  {% else %}
+  <div class="govuk-form-group govuk-!-margin-bottom-6">
+  {% endif %}
+    
+    <label class="govuk-label govuk-label--m" for="{{ htmlId }}">
+      {{ question.prefix }}
+    </label>
+
+    {% if fieldError %}
+      <p id="{{ htmlId }}-error" class="govuk-error-message">
+        <span class="govuk-visually-hidden">Error:</span> {{ fieldError.text | default(fieldError) }}
+      </p>
+    {% endif %}
+  
+    <input class="govuk-input govuk-!-margin-bottom-2 govuk-!-width-three-quarters govuk-!-display-inline-block {% if fieldError %}govuk-input--error{% endif %}" 
+           id="{{ htmlId }}" 
+           name="{{ inputName }}" 
+           type="text" 
+           value="{{ inputValue }}"
+           aria-describedby="{% if question.suffix %}suffix-{{ questionId }} {% endif %}{% if fieldError %}{{ htmlId }}-error{% endif %}">{% if question.suffix and question.suffix | trim == "?" %}<span class="govuk-label govuk-label--m govuk-!-display-inline-block govuk-!-margin-bottom-0 govuk-!-margin-left-2" id="suffix-{{ questionId }}">{{ question.suffix }}</span>{% endif %}
+
+    {% if question.suffix and question.suffix | trim != "?" %}
+      <span class="govuk-label govuk-label--m govuk-!-display-block govuk-!-margin-bottom-0 govuk-!-margin-top-2" id="suffix-{{ questionId }}">
+        {{ question.suffix }}
+      </span>
+    {% endif %}
+
+  </div>
+  
+<input type="hidden" name="_csrf" value="{{ csrfToken }}">
+  {{ govukWarningText({
+    text: "Do not include information that could be sensitive or lead to harm if read by someone who is not the person",
+    iconFallbackText: "Warning"
+  }) }}
+
+{% endblock %}

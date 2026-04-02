@@ -1,9 +1,11 @@
+import { EsupervisionQuestion } from '../data/model/esupervision'
 import { Errors } from './Errors'
 
 export interface ESupervisionSession {
   checkins?: CheckinUserDetails
   manageCheckin?: CheckinUserDetails
   restartCheckin?: CheckinUserDetails
+  manageQuestions?: ManageQuestionsSession
 }
 
 export interface CheckinUserDetails {
@@ -22,6 +24,12 @@ export interface CheckinUserDetails {
   eligibility?: string[]
   eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
 }
+
+export interface ManageQuestionsSession {
+  availableQuestions?: EsupervisionQuestion[]
+  savedQuestions?: Record<string, string>
+  customQuestion?: string
+}
 export interface LocalParams {
   crn: string
   id: string
@@ -36,4 +44,9 @@ export interface LocalParams {
   contactSaved?: string
   editCheckInMobile?: string
   editCheckInEmail?: string
+  questionId?: string
+  question?: {
+    prefix: string
+    suffix: string
+  }
 }

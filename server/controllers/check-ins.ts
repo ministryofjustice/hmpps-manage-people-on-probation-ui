@@ -21,6 +21,7 @@ import { ProbationPractitioner } from '../models/CaseDetail'
 import config from '../config'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
+import { parseQuestionTemplate } from '../utils/esupervisionParseTemplate'
 
 const routes = [
   'getStartSetup',
@@ -80,8 +81,15 @@ const routes = [
   'getStartQuestionsPage',
   'postStartQuestionsPage',
   'getAddQuestionsPage',
+  'postAddQuestionsPage',
   'getPreviewFeelingPage',
   'getPreviewSupportPage',
+  'getQuestionsListPage',
+  'postQuestionsListPage',
+  'getEditQuestionPage',
+  'postEditQuestionPage',
+  'getSelectQuestionPage',
+  'getDeleteQuestion',
 ] as const
 
 interface OptionPair {
@@ -1268,6 +1276,8 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  // manage check in questions
+
   getStartQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
@@ -1297,33 +1307,96 @@ const checkInsController: Controller<typeof routes, void> = {
   getAddQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
-      const { back } = req.query
-
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_ADD_QUESTIONS', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
       }
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+
+      const { data } = req.session
+
+      let availableQuestions =
+        getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions']) || []
+      if (availableQuestions.length === 0) {
+        const eSupClient = new ESupervisionClient(token)
+        // this is currently mock data, waiting for API changes to be made
+        const questionsList = await eSupClient.getQuestionsList('en-GB')
+        availableQuestions = questionsList.questions
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'], availableQuestions)
+      }
+
+      let savedQuestions = getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions'])
+      if (!savedQuestions) {
+        savedQuestions = {}
+        // TODO: Fetch current check in questions if they have already been submitted by the PP
+        // PP can change up until the midnight before the check in is sent to the POP
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions'], savedQuestions)
+      }
+
+      const addedQuestions = Object.entries(savedQuestions)
+        .map(([qId, answer]) => {
+          if (!answer || (answer as string).trim() === '') return null
+
+          const templateId = qId.split('-')[0]
+          const templateData = parseQuestionTemplate(availableQuestions, templateId)
+
+          if (!templateData) return null
+
+          return {
+            id: qId,
+            fullText: `${templateData.prefix} ${answer}${templateData.suffix}`.trim(),
+          }
+        })
+        .filter(q => q !== null)
+
       return res.render('pages/check-in/questions/add-questions.njk', {
         crn,
-        back,
         id,
-        data: req.session.data,
+        case: personalDetails,
+        addedQuestions,
+        data,
       })
     }
   },
+
+  postAddQuestionsPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const savedQuestions =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions']) || {}
+
+      // TBC payload structure
+      const questionsPayload = Object.entries(savedQuestions).map(([draftId, answer]) => ({
+        templateId: draftId.split('-')[0],
+        answer,
+      }))
+
+      // Send to API when it is ready
+      // const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      // const eSupClient = new ESupervisionClient(token)
+
+      res.locals.success = true
+      setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
+
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+    }
+  },
+
   getPreviewFeelingPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
-
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_FEELING_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
@@ -1340,11 +1413,10 @@ const checkInsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const { crn, id } = req.params
       const { back } = req.query
-
+      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
-      await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
         return res.redirect(`/case/${crn}`)
@@ -1355,6 +1427,158 @@ const checkInsController: Controller<typeof routes, void> = {
         id,
         data: req.session.data,
       })
+    }
+  },
+
+  getQuestionsListPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      const { back } = req.query
+      await sendAuditMessage(res, 'VIEW_MAS_LIST_CHECK_IN_LIST_QUESTIONS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const eSupClient = new ESupervisionClient(token)
+
+      const personalDetails = await masClient.getPersonalDetails(crn)
+      const questionsList = await eSupClient.getQuestionsList('en-GB')
+
+      setDataValue(
+        req.session.data,
+        ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'],
+        questionsList.questions,
+      )
+      // redirect if questions >= 3
+      const savedQuestions =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions']) || {}
+      if (Object.keys(savedQuestions).length >= 3) {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+      }
+      return res.render('pages/check-in/questions/list-questions.njk', {
+        crn,
+        id,
+        back,
+        case: personalDetails,
+        questionsList,
+        data: req.session.data,
+      })
+    }
+  },
+
+  postQuestionsListPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+    }
+  },
+
+  getEditQuestionPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, questionId } = req.params
+      const { back } = req.query
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_EDIT', crn, SubjectType.CRN)
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const personalDetails = await masClient.getPersonalDetails(crn)
+
+      let availableQuestions =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions']) || []
+
+      if (availableQuestions.length === 0) {
+        const eSupClient = new ESupervisionClient(token)
+        const questionsList = await eSupClient.getQuestionsList('en-GB')
+        availableQuestions = questionsList.questions
+        setDataValue(
+          req.session.data,
+          ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'],
+          availableQuestions,
+        )
+      }
+
+      const templateId = questionId.split('-')[0]
+      const questionForView = parseQuestionTemplate(availableQuestions, templateId)
+
+      if (!questionForView) return renderError(404)(req, res)
+
+      return res.render('pages/check-in/questions/edit-question.njk', {
+        crn,
+        id,
+        questionId,
+        back,
+        case: personalDetails,
+        question: questionForView,
+        data: req.session.data,
+      })
+    }
+  },
+
+  postEditQuestionPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, questionId } = req.params
+      const { data } = req.session
+
+      const answer = req.body?.esupervision?.[crn]?.[id]?.manageQuestions?.customQuestion
+
+      if (answer && answer.trim() !== '') {
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions', questionId], answer.trim())
+
+        if (data.esupervision?.[crn]?.[id]?.manageQuestions?.customQuestion !== undefined) {
+          delete data.esupervision[crn][id].manageQuestions.customQuestion
+        }
+      }
+
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+    }
+  },
+
+  getSelectQuestionPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, templateId } = req.params
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_SELECT', crn, SubjectType.CRN)
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const savedQuestions =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions']) || {}
+      if (Object.keys(savedQuestions).length >= 3) {
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+      }
+      const draftId = `${templateId}-${uuidv4()}`
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/${draftId}/edit`)
+    }
+  },
+
+  getDeleteQuestion: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id, questionId } = req.params
+      const { data } = req.session
+      await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_DELETE', crn, SubjectType.CRN)
+
+      // ESUPERVISION FEATURE FLAG
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
+
+      if (data.esupervision?.[crn]?.[id]?.manageQuestions?.savedQuestions?.[questionId]) {
+        delete data.esupervision[crn][id].manageQuestions.savedQuestions[questionId]
+      }
+
+      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
     }
   },
 }
