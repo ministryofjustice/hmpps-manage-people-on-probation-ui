@@ -803,13 +803,12 @@ body.feature-disabled {
     .govuk-summary-list__actions {
       width: 25%;
     }
-  }
-}
-
-.govuk-table__cell {
-  a {
-    max-width: 100%;
-    display: block;
-    word-break: break-word;
+    .govuk-table__cell {
+      a {
+        max-width: 100%;
+        display: block;
+        word-break: break-word;
+      }
+    }
   }
 }
