@@ -129,6 +129,8 @@ describe('updateLinks', () => {
     expect(output).toContain(`href="/cookies-policy"`)
     expect(output).toContain(`target="_blank"`)
     expect(output).toContain(`rel="noopener noreferrer"`)
+    expect(output).toContain(`data-qa="cookiesPolicyLink"`)
+    expect(output).toContain(`data-qa="privacyPolicyLink"`)
   })
 
   it('should not modify unrelated links', () => {

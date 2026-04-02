@@ -7,7 +7,10 @@
 
 {% block beforeContent %}
     {{ govukBackLink({
-        href: backLink
+        href: backLink,
+        attributes: {
+            "data-qa": "back-link"
+        }
     }) }}
 {% endblock %}
 

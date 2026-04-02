@@ -61,6 +61,12 @@ export function updateLinks(input: string): string {
     'gi',
   )
   return input
-    .replace(policyRegex, `<a$1href="/privacy-policy" target="_blank" rel="noopener noreferrer"$2>`)
-    .replace(cookieRegex, `<a$1href="/cookies-policy" target="_blank" rel="noopener noreferrer"$2>`)
+    .replace(
+      policyRegex,
+      `<a$1href="/privacy-policy" target="_blank" rel="noopener noreferrer" data-qa="privacyPolicyLink"$2>`,
+    )
+    .replace(
+      cookieRegex,
+      `<a$1href="/cookies-policy" target="_blank" rel="noopener noreferrer" data-qa="cookiesPolicyLink"$2>`,
+    )
 }
