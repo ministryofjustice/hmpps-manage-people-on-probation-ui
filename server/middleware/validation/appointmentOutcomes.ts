@@ -5,12 +5,13 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
+import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
   let errorMessages = res?.locals?.errorMessages || {}
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
   const { crn, id, isInPast, baseUrl, reqUrl } = res.locals.appointmentOutcome
-
+  const { maxCharCount } = config
   let localParams: LocalParams
 
   if (req.url.includes(`${baseUrl}/attended-complied`)) {
@@ -39,6 +40,21 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateAddNote = (): void => {
+    if (!baseUrl.includes(`${baseUrl}/add-note`)) return
+    render = 'pages/appointment-outcomes/add-note'
+    errorMessages = validateWithSpec(
+      req,
+      appointmentOutcomesValidation({
+        crn,
+        id,
+        page: `outcome/add-note`,
+        notes: req.body.appointments[crn][id].notes,
+        maxCharCount: maxCharCount as number,
+      }),
+    )
+  }
+
   const validateAttendedComplied = (): void => {
     if (reqUrl !== `${baseUrl}/attended-complied`) return
     render = 'pages/appointment-outcomes/attended-complied'
@@ -47,12 +63,13 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
       appointmentOutcomesValidation({
         crn,
         id,
-        page: `arrange-appointment/${id}/outcome/attended-complied`,
+        page: `outcome/attended-complied`,
       }),
     )
   }
 
   validateOutcome()
+  validateAddNote()
   validateAttendedComplied()
 
   if (Object.keys(errorMessages).length) {

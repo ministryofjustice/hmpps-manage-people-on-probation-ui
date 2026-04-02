@@ -1,14 +1,18 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
-import { Controller } from '../@types'
+import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentOutcomeType } from '../models/Appointments'
 import { setDataValue, getDataValue } from '../utils'
+import config from '../config'
+import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
 const routes = [
   'getOutcome',
   'postOutcome',
+  'getAddNote',
+  'postAddNote',
   'getAttendedComplied',
   'postAttendedComplied',
   'getAttendedFailedToComply',
@@ -48,7 +52,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       const { data } = req.session
       const type = getDataValue<AppointmentOutcomeType>(data, ['appointments', crn, id, 'outcome', 'type'])
       const redirectMap: RedirectMap = {
-        ATTENDED: `${baseUrl}/attended-complied`,
+        ATTENDED: `${baseUrl}/add-note`,
         ATTENDED_SENT_HOME_BEHAVIOUR: `${baseUrl}/attended-failed-to-comply`,
         ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS: `${baseUrl}/attended-failed-to-comply`,
         ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES: `${baseUrl}/attended-failed-to-comply`,
@@ -58,6 +62,51 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
       return res.redirect(redirectMap[type])
+    }
+  },
+  getAddNote: () => {
+    return async (req, res) => {
+      const { crn } = res.locals.appointmentOutcome
+      let uploadedFiles: FileCache[] = []
+      let errorMessages = null
+      let body = null
+      if (req?.session?.cache?.uploadedFiles) {
+        uploadedFiles = req.session.cache.uploadedFiles
+        delete req.session.cache.uploadedFiles
+      }
+      if (req?.session?.errorMessages) {
+        errorMessages = req.session.errorMessages
+        delete req.session.errorMessages
+      }
+      if (req?.session?.body) {
+        body = req.session.body
+        delete req.session.body
+      }
+      await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_NOTE', crn, SubjectType.CRN)
+      const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
+      return res.render('pages/appointment-outcomes/add-note', {
+        useDecorator: true,
+        errorMessages,
+        body,
+        validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
+        maxFileSize,
+        fileUploadLimit,
+        uploadedFiles,
+        maxCharCount,
+      })
+    }
+  },
+  postAddNote: _hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, isValidParams, contactId, uuid } = res.locals.appointmentOutcome
+      const { change } = req.query as Record<string, string>
+      if (!isValidParams) {
+        return renderError(404)(req, res)
+      }
+      const redirect = uuid
+        ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
+        : `/case/${crn}/appointments/appointment/${contactId}/manage`
+      return res.redirect(change ?? redirect)
     }
   },
   getAttendedComplied: _hmppsAuthClient => {

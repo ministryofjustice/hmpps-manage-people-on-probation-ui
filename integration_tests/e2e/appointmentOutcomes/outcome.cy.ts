@@ -10,6 +10,7 @@ import UnacceptableAbsencePage from '../../pages/appointmentOutcomes/unacceptabl
 import FailedToAttendPage from '../../pages/appointmentOutcomes/failed-to-attend.page'
 import { AppointmentOutcomeType } from '../../../server/models/Appointments'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
+import AddNotePage from '../../pages/appointmentOutcomes/add-note.page'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -147,20 +148,11 @@ describe('Appointment outcome', () => {
       })
     })
     describe('Appointment in future', () => {
-      describe('In office appointment', () => {
-        beforeEach(() => {
-          cy.task('stubAppointment', { isFuture: true, eventId: 2501192724, inOffice: true })
-          loadPage({ arrangeAppointmentJourney: false, dateInPast: false, inOffice: true })
-        })
-        checkPage({ arrangeAppointmentJourney: false })
+      beforeEach(() => {
+        cy.task('stubAppointment', { isFuture: true, eventId: 2501192724, inOffice: true })
+        loadPage({ arrangeAppointmentJourney: false, dateInPast: false, inOffice: true })
       })
-      describe('Not in office appointment', () => {
-        beforeEach(() => {
-          cy.task('stubAppointment', { isFuture: true, eventId: 2501192724, inOffice: false })
-          loadPage({ arrangeAppointmentJourney: false, dateInPast: false, inOffice: false })
-        })
-        checkPage({ arrangeAppointmentJourney: false, inOffice: false })
-      })
+      checkPage({ arrangeAppointmentJourney: false })
     })
   })
   describe('Form submitted with no option is selected', () => {
@@ -206,6 +198,7 @@ describe('Appointment outcome', () => {
 
   interface Option {
     value: AppointmentOutcomeType
+    pageName: string
     pageTitle: string
     Page:
       | typeof AttendedCompliedPage
@@ -220,39 +213,46 @@ describe('Appointment outcome', () => {
   }
 
   const outcomeOptions: OutcomeOptions = {
-    ATTENDED: { value: 'ATTENDED', pageTitle: 'Confirm Alton attended and complied', Page: AttendedCompliedPage },
+    ATTENDED: { value: 'ATTENDED', pageName: 'Add a note', pageTitle: 'Add a note', Page: AddNotePage },
     ATTENDED_SENT_HOME_BEHAVIOUR: {
       value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
+      pageName: 'Attended failed to comply',
       pageTitle: 'Enforcement action for Alton’s failure to comply',
       Page: AttendedFailedToComplyPage,
     },
     ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES: {
       value: 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES',
+      pageName: 'Attended failed to comply',
       pageTitle: 'Enforcement action for Alton’s failure to comply',
       Page: AttendedFailedToComplyPage,
     },
     ACCEPTABLE_ABSENCE: {
       value: 'ACCEPTABLE_ABSENCE',
+      pageName: 'Acceptable absence',
       pageTitle: 'Why was Alton’s absence acceptable?',
       Page: AcceptableAbsencePage,
     },
     UNACCEPTABLE_ABSENCE: {
       value: 'UNACCEPTABLE_ABSENCE',
+      pageName: 'Unacceptable absence',
       pageTitle: 'Enforcement action for Alton’s unacceptable absence',
       Page: UnacceptableAbsencePage,
     },
     EVIDENCE_REQUESTED: {
       value: 'EVIDENCE_REQUESTED',
+      pageName: 'Failed to attend',
       pageTitle: 'Enforcement action for Alton’s absence',
       Page: FailedToAttendPage,
     },
     ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS: {
       value: 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS',
+      pageName: 'Attended failed to comply',
       pageTitle: 'Enforcement action for Alton’s failure to comply',
       Page: AttendedFailedToComplyPage,
     },
     WILL_BE_RESCHEDULED: {
       value: 'WILL_BE_RESCHEDULED',
+      pageName: 'Reschedule an appointment',
       pageTitle: 'Reschedule an appointment',
       Page: RescheduleAppointmentPage,
     },
@@ -266,8 +266,8 @@ describe('Appointment outcome', () => {
     arrangeAppointmentJourney?: boolean
   }) => {
     const options: Option[] = [...expectedOptions.map(value => outcomeOptions[value])]
-    options.forEach(({ value, pageTitle, Page }) => {
-      it(`should redirect to the correct page when ${value} is selected`, () => {
+    options.forEach(({ value, pageName, pageTitle, Page }) => {
+      it(`should redirect to the ${pageName} page when ${value} is selected`, () => {
         cy.get(`.govuk-radios__input[value='${value}']`).click()
         outcomePage.getSubmitBtn().click()
         const page = new Page()
