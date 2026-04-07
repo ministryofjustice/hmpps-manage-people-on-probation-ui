@@ -42,9 +42,9 @@ const checkRiskPageView = (
 ) => {
   const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
   const subHeadingLevel = !sentencePlanLink && !sentencePlanText ? '4' : '5'
-  page.getElementData('riskScoresCard').should('exist')
-  page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
   if (ogrs4Enabled) {
+    page.getElementData('riskScoresCard').should('exist')
+    page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
     if (ogrs4) {
       page
         .getElementData('combinedSeriousReoffendingPredictor')
@@ -106,6 +106,7 @@ const checkRiskPageView = (
       }
     }
   } else {
+    page.getElementData('riskScoresCard').should('not.exist')
     page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
     page
       .getElementData('ogrs')
