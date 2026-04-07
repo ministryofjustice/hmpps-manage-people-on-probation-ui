@@ -17,11 +17,15 @@
 {% set latestAssessment = riskData.assessments | first if riskData.assessments else null %}
 {% set latestAssessmentDateString = "Last updated: " + latestAssessment.completedDate if latestAssessment else null %}
 
-{{ appSummaryCard({
-  attributes: {'data-qa': 'riskScoresCard'},
-  titleText: "Risk predictor scores",
-  subTitleText: latestAssessmentDateString,
-  headingLevel: scoresHeadingLevel | default('3'),
-  classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-  html: scaleContent
-}) }}
+{% if flags.enableOGRS4 %}
+  {{ appSummaryCard({
+    attributes: {'data-qa': 'riskScoresCard'},
+    titleText: "Risk predictor scores",
+    subTitleText: latestAssessmentDateString,
+    headingLevel: scoresHeadingLevel | default('3'),
+    classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
+    html: scaleContent
+  }) }}
+{% else %}
+  {{ scaleContent | safe }}
+{% endif %}
