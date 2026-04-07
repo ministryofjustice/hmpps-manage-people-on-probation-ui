@@ -17,7 +17,7 @@ export const getAttendedCompliedProps = (
   req: Request,
   res: AppResponse,
 ): { forename: string; surname: string; appointment: AttendedCompliedAppointment | Activity } => {
-  const { crn, id, contactId } = req.params
+  const { crn, id, contactId } = req.params as Record<string, string>
   const data = req?.session?.data
   let appointment: AttendedCompliedAppointment | Activity
   const { forename, surname } = res.locals.case.name

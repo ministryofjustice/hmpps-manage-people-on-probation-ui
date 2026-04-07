@@ -99,7 +99,7 @@ const checkinIntervals: OptionPair[] = [
 const checkInsController: Controller<typeof routes, void> = {
   getStartSetup: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { back } = req.query
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -111,7 +111,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_CHECK_IN_ELIGIBILITY', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -130,7 +130,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const eligibility = req.body?.esupervision?.[crn]?.[id]?.checkins?.eligibility
 
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -155,7 +155,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getEligibilityDeniedPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_NOT_ELIGIBLE_TO_USE_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -167,7 +167,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postEligibilityDeniedPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -178,7 +178,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getFullEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_ELIGIBLE_TO_USE_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -190,7 +190,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postFullEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -202,7 +202,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getSupplementaryEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_ELIGIBLE_TO_USE_CHECK_IN_AS_EXISTING_F2F_CONTACT', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -214,7 +214,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postSupplementaryEligibilityPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -226,7 +226,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_SETUP_ONLINE_CHECK_INS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -257,7 +257,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -267,7 +267,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONTACT_PREFERENCES', crn, SubjectType.CRN)
       if (req?.session?.errorMessages) {
         res.locals.errorMessages = req.session.errorMessages
@@ -299,7 +299,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postContactPreferencePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -316,7 +316,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getPhotoOptionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_PHOTO_OPTIONS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -327,7 +327,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'EDIT_MAS_CHECK_IN_CONTACT_PREFERENCE', crn, SubjectType.CRN)
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -340,7 +340,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postEditContactPrePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -371,7 +371,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postPhotoOptionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -385,7 +385,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getTakePhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_TAKE_A_PHOTO', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -397,7 +397,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getUploadPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_UPLOAD_PHOTO', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -409,7 +409,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postUploadaPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -419,7 +419,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getPhotoRulesPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_PHOTO_RULES', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -431,7 +431,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getUpdateCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -461,7 +461,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getViewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -481,7 +481,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postViewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -512,7 +512,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getViewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_MISSED_AND_REVIEWED', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -529,7 +529,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getReviewExpiredCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -548,7 +548,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getReviewIdentityCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -566,7 +566,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postReviewIdentityCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -577,7 +577,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getReviewNotesCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { checkIn } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -599,7 +599,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postReviewCheckIn: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -628,7 +628,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postPhotoRulesPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -637,7 +637,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getCheckinSummaryPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -671,7 +671,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getConfirmationPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -692,7 +692,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getCheckinVideoPage: HmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
       const { checkIn } = res.locals
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -704,7 +704,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postTakeAPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { userPhotoUpload } = req.body
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -715,7 +715,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -743,7 +743,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageCheckinDatePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN_SETTINGS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -765,7 +765,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageCheckinDatePage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -794,7 +794,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_MANAGE_CHECK_IN_CONTACT', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -824,7 +824,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -863,7 +863,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getManageEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'EDIT_MAS_MANAGE_CHECK_IN_CONTACT', crn, SubjectType.CRN)
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -906,7 +906,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   postManageEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       const { previousMobile, previousEmail } = req.body
 
@@ -944,7 +944,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getStopCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_MANAGE_STOP_CHECK_IN', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -955,7 +955,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getRestartCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -994,7 +994,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postRestartCheckinPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -1008,7 +1008,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getRestartContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (req?.session?.errorMessages) {
         res.locals.errorMessages = req.session.errorMessages
         delete req?.session?.errorMessages
@@ -1050,7 +1050,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postRestartContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change } = req.body
       const url =
         change === 'main'
@@ -1062,7 +1062,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getRestartEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { change } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
@@ -1106,7 +1106,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postRestartEditContactPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       const { previousMobile, previousEmail } = req.body
 
@@ -1149,7 +1149,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getRestartSummaryPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
       const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -1175,7 +1175,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postRestartSummaryPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
 
       const restartDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
@@ -1214,7 +1214,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getRestartConfirmation: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
 
       const savedDetails = getDataValue(data, ['esupervision', crn, id, 'restartCheckin'])
@@ -1250,7 +1250,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postManageStopCheckin: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -1270,7 +1270,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getStartQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_START', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -1286,7 +1286,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   postStartQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) {
         return renderError(404)(req, res)
       }
@@ -1296,7 +1296,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
   getAddQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
 
       if (!isValidCrn(crn) || !isValidUUID(id)) {
@@ -1319,7 +1319,7 @@ const checkInsController: Controller<typeof routes, void> = {
   },
   getPreviewFeelingPage: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
@@ -1340,14 +1340,14 @@ const checkInsController: Controller<typeof routes, void> = {
   getPreviewSupportPage: hmppsAuthClient => {
     return async (req, res) => {
       if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-        return res.redirect(`/case/${req.params.crn}`)
+        return res.redirect(`/case/${req.params.crn as string}`)
       }
 
-      if (!isValidCrn(req.params.crn) || !isValidUUID(req.params.id)) {
+      if (!isValidCrn(req.params.crn as string) || !isValidUUID(req.params.id as string)) {
         return renderError(404)(req, res)
       }
 
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { data } = req.session
 
       await sendAuditMessage(res, 'VIEW_MAS_PREVIEW_SUPPORT_CHECK_IN_QUESTIONS', crn, SubjectType.CRN)

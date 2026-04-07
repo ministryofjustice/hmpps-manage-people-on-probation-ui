@@ -118,7 +118,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postAppointments: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -128,7 +128,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getManageAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn, contactId } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MANAGE_APPOINTMENT',
         who: res.locals.user.username,
@@ -172,7 +172,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const actionType = 'outcome'
       const { contactId } = req.query
       await auditService.sendAuditMessage({
@@ -193,7 +193,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   postRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, actionType } = req.params
+      const { crn, actionType } = req.params as Record<string, string>
       const appointmentId = req?.body?.['appointment-id'] as string
       if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
         return renderError(404)(req, res)
@@ -205,7 +205,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { alertDismissed = false } = req.session
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
@@ -230,7 +230,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId: id } = req.params
+      const { crn, contactId: id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
@@ -241,7 +241,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getAddNote: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'ADD_APPOINTMENT_NOTES',
         who: res.locals.user.username,
@@ -278,7 +278,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId: id } = req.params
+      const { crn, contactId: id } = req.params as Record<string, string>
 
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
@@ -323,7 +323,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn, contactId } = req.params as Record<string, string>
       const { data } = req.session
       let { back } = req.query
       if (back) {
@@ -353,11 +353,8 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   postNextAppointment: _hmppsAuthClient => {
     return async (req, res) => {
-      const {
-        params: { crn, contactId },
-        body,
-        url,
-      } = req
+      const { body, url } = req
+      const { crn, contactId } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
@@ -375,7 +372,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getAppointmentNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId, noteId } = req.params
+      const { crn, contactId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)
