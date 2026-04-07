@@ -36,6 +36,7 @@
 {% from "arns/components/predictor-timeline/macro.njk" import predictorTimeline %}
 
 {% block head %}
+  <a id="top"></a>
   <link href="/assets/css/app.css?{{ version }}" rel="stylesheet"/>
   {% if feComponents.cssIncludes %}
     {% for css in feComponents.cssIncludes %}
