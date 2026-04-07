@@ -57,6 +57,17 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true, ogr
           rules: [],
           rollouts: [],
         },
+        {
+          key: 'enableSentencePlanUrl',
+          name: 'enableSentencePlanUrl',
+          description: '',
+          enabled: true,
+          type: 'BOOLEAN_FLAG_TYPE',
+          createdAt: '2025-01-13T15:28:37.920581Z',
+          updatedAt: '2025-01-13T17:06:39.269084Z',
+          rules: [],
+          rollouts: [],
+        },
       ],
     },
     headers: {
@@ -390,6 +401,39 @@ const stubEnableESupervisionCustomQuestions = (): SuperAgentRequest =>
     },
   })
 
+const stubDisableSentencePlanUrl = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
+      method: 'GET',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        namespace: {
+          key: 'manage-people-on-probation-ui',
+        },
+        flags: [
+          ...flags.mappings[0].response.jsonBody.flags,
+          {
+            key: 'enableSentencePlanUrl',
+            name: 'enableSentencePlanUrl',
+            description: '',
+            enabled: false,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-02-26T12:00:00.000000Z',
+            updatedAt: '2026-02-26T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
+        ],
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
 export default {
   stubNoSentencePlan,
   stubNoSanIndicator,
@@ -401,4 +445,5 @@ export default {
   stubDisableOGRS4,
   stubEnableESupervisionCustomQuestions,
   stubDisableNonCompliance,
+  stubDisableSentencePlanUrl,
 }

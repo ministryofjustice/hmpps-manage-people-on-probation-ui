@@ -18,4 +18,5 @@ export class FeatureFlags {
   enableNonCompliance?: boolean = undefined
   enableMopCookiePolicy?: boolean = undefined
   enableMopPrivacyPolicy?: boolean = undefined
+  enableSentencePlanUrl?: boolean = undefined
 }
