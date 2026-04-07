@@ -591,12 +591,12 @@ describe('Test eSuperVision validation', () => {
   describe('Test edit question', () => {
     const editQuestionUrl = `/case/${crn}/appointments/check-in/manage/${id}/questions/1-f47ac10b-58cc-4372-a567-0e02b2c3d479/edit`
 
-    it('passes when customQuestion is provided', () => {
+    it('passes when draftQuestionInput is provided', () => {
       const esupervision = {
         [crn]: {
           [id]: {
             manageQuestions: {
-              customQuestion: 'the housing service',
+              draftQuestionInput: 'the housing service',
             },
           },
         },
@@ -612,12 +612,12 @@ describe('Test eSuperVision validation', () => {
       expect(next).toHaveBeenCalled()
     })
 
-    it('fails when customQuestion is empty', () => {
+    it('fails when draftQuestionInput is empty', () => {
       const bodyEsupervision = {
         [crn]: {
           [id]: {
             manageQuestions: {
-              customQuestion: '',
+              draftQuestionInput: '',
             },
           },
         },

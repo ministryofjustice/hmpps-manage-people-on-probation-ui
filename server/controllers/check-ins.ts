@@ -1307,6 +1307,7 @@ const checkInsController: Controller<typeof routes, void> = {
   getAddQuestionsPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params
+      const { back } = req.query
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_ADD_QUESTIONS', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
@@ -1330,15 +1331,25 @@ const checkInsController: Controller<typeof routes, void> = {
         setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'], availableQuestions)
       }
 
-      let savedQuestions = getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions'])
-      if (!savedQuestions) {
-        savedQuestions = {}
+      let questionTemplateAndInputs = getDataValue(data, [
+        'esupervision',
+        crn,
+        id,
+        'manageQuestions',
+        'questionTemplateAndInputs',
+      ])
+      if (!questionTemplateAndInputs) {
+        questionTemplateAndInputs = {}
         // TODO: Fetch current check in questions if they have already been submitted by the PP (dependent on API changes)
         // PP can change up until the midnight before the check in is sent to the POP
-        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions'], savedQuestions)
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs'],
+          questionTemplateAndInputs,
+        )
       }
 
-      const addedQuestions = Object.entries(savedQuestions)
+      const addedQuestions = Object.entries(questionTemplateAndInputs)
         .map(([qId, answer]) => {
           if (!answer || (answer as string).trim() === '') return null
 
@@ -1357,6 +1368,7 @@ const checkInsController: Controller<typeof routes, void> = {
       return res.render('pages/check-in/questions/add-questions.njk', {
         crn,
         id,
+        back,
         case: personalDetails,
         addedQuestions,
         data,
@@ -1369,11 +1381,11 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
-      const savedQuestions =
-        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions']) || {}
+      const questionTemplateAndInputs =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs']) || {}
 
       // TBC payload structure
-      const questionsPayload = Object.entries(savedQuestions).map(([draftId, answer]) => ({
+      const questionsPayload = Object.entries(questionTemplateAndInputs).map(([draftId, answer]) => ({
         templateId: draftId.split('-')[0],
         answer,
       }))
@@ -1453,9 +1465,9 @@ const checkInsController: Controller<typeof routes, void> = {
         questionsList.questions,
       )
       // redirect if questions >= 3
-      const savedQuestions =
-        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions']) || {}
-      if (Object.keys(savedQuestions).length >= 3) {
+      const questionTemplateAndInputs =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs']) || {}
+      if (Object.keys(questionTemplateAndInputs).length >= 3) {
         return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
       }
       return res.render('pages/check-in/questions/list-questions.njk', {
@@ -1529,13 +1541,17 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id, questionId } = req.params
       const { data } = req.session
 
-      const answer = req.body?.esupervision?.[crn]?.[id]?.manageQuestions?.customQuestion
+      const answer = req.body?.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput
 
       if (answer && answer.trim() !== '') {
-        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions', questionId], answer.trim())
+        setDataValue(
+          data,
+          ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs', questionId],
+          answer.trim(),
+        )
 
-        if (data.esupervision?.[crn]?.[id]?.manageQuestions?.customQuestion !== undefined) {
-          delete data.esupervision[crn][id].manageQuestions.customQuestion
+        if (data.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput !== undefined) {
+          delete data.esupervision[crn][id].manageQuestions.draftQuestionInput
         }
       }
 
@@ -1553,9 +1569,9 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
-      const savedQuestions =
-        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'savedQuestions']) || {}
-      if (Object.keys(savedQuestions).length >= 3) {
+      const questionTemplateAndInputs =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs']) || {}
+      if (Object.keys(questionTemplateAndInputs).length >= 3) {
         return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
       }
       const draftId = `${templateId}-${uuidv4()}`
@@ -1574,8 +1590,8 @@ const checkInsController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}`)
       }
 
-      if (data.esupervision?.[crn]?.[id]?.manageQuestions?.savedQuestions?.[questionId]) {
-        delete data.esupervision[crn][id].manageQuestions.savedQuestions[questionId]
+      if (data.esupervision?.[crn]?.[id]?.manageQuestions?.questionTemplateAndInputs?.[questionId]) {
+        delete data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[questionId]
       }
 
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)

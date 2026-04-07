@@ -137,10 +137,6 @@ describe('checkInsController', () => {
       ...res.locals.flags,
       enableESupervisionCustomQuestions: true,
     }
-    res.locals.flags = {
-      ...res.locals.flags,
-      enableESupervisionCustomQuestions: true,
-    }
   })
 
   describe('Eligibility Journey', () => {
@@ -2786,7 +2782,7 @@ describe('checkInsController', () => {
               id: '1',
               template: 'Have you heard back from [insert text]?',
               policy: 'CUSTOM',
-              example: '',
+              example: 'your GP',
               responseFormat: 'TEXT',
               responseSpec: {} as any,
             },
@@ -2794,7 +2790,7 @@ describe('checkInsController', () => {
               id: '2',
               template: 'How are things at [insert text]?',
               policy: 'CUSTOM',
-              example: '',
+              example: 'your new job',
               responseFormat: 'TEXT',
               responseSpec: {} as any,
             },
@@ -2946,7 +2942,7 @@ describe('checkInsController', () => {
             [crn]: {
               [uuid]: {
                 manageQuestions: {
-                  savedQuestions: {
+                  questionTemplateAndInputs: {
                     '1-f47ac10b-58cc-4372-a567-0e02b2c3d479': 'work',
                     '2-a81bc81b-dead-4e5d-abff-90865d1e13b1': 'the housing service',
                     '3-c91350a4-37a4-4422-92e1-7d121bc1e612': 'your landlord',
@@ -3103,7 +3099,7 @@ describe('checkInsController', () => {
             [crn]: {
               [uuid]: {
                 manageQuestions: {
-                  customQuestion: '  the housing service  ',
+                  draftQuestionInput: 'the housing service',
                 },
               },
             },
@@ -3116,7 +3112,7 @@ describe('checkInsController', () => {
             [crn]: {
               [id]: {
                 manageQuestions: {
-                  customQuestion: '  the housing service  ',
+                  draftQuestionInput: 'the housing service',
                 },
               },
             },
@@ -3127,16 +3123,23 @@ describe('checkInsController', () => {
 
         expect(mockSetDataValue).toHaveBeenCalledWith(
           req.session.data,
-          ['esupervision', crn, id, 'manageQuestions', 'savedQuestions', '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'],
+          [
+            'esupervision',
+            crn,
+            id,
+            'manageQuestions',
+            'questionTemplateAndInputs',
+            '1-f47ac10b-58cc-4372-a567-0e02b2c3d479',
+          ],
           'the housing service',
         )
-        expect(req.session.data.esupervision[crn][id].manageQuestions.customQuestion).toBeUndefined()
+        expect(req.session.data.esupervision[crn][id].manageQuestions.draftQuestionInput).toBeUndefined()
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
       })
     })
 
     describe('getSelectQuestionPage', () => {
-      it('redirects to edit question page with generated draftId', async () => {
+      it('redirects to edit question page', async () => {
         mockIsValidCrn.mockReturnValue(true)
         mockIsValidUUID.mockReturnValue(true)
 
@@ -3159,7 +3162,7 @@ describe('checkInsController', () => {
             [crn]: {
               [uuid]: {
                 manageQuestions: {
-                  savedQuestions: {
+                  questionTemplateAndInputs: {
                     '1-f47ac10b-58cc-4372-a567-0e02b2c3d479': 'work',
                     '2-a81bc81b-dead-4e5d-abff-90865d1e13b1': 'the housing service',
                     '3-c91350a4-37a4-4422-92e1-7d121bc1e612': 'your landlord',
@@ -3200,7 +3203,7 @@ describe('checkInsController', () => {
             [crn]: {
               [uuid]: {
                 manageQuestions: {
-                  savedQuestions: {
+                  questionTemplateAndInputs: {
                     '1-f47ac10b-58cc-4372-a567-0e02b2c3d479': 'work',
                     '2-a81bc81b-dead-4e5d-abff-90865d1e13b1': 'the housing service',
                     '3-c91350a4-37a4-4422-92e1-7d121bc1e612': 'your landlord',
@@ -3216,12 +3219,12 @@ describe('checkInsController', () => {
         await controllers.checkIns.getDeleteQuestion(hmppsAuthClient)(req, res)
 
         expect(
-          req.session.data.esupervision[crn][id].manageQuestions.savedQuestions[
+          req.session.data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[
             '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'
           ],
         ).toBeUndefined()
         expect(
-          req.session.data.esupervision[crn][id].manageQuestions.savedQuestions[
+          req.session.data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[
             '2-a81bc81b-dead-4e5d-abff-90865d1e13b1'
           ],
         ).toBeDefined()

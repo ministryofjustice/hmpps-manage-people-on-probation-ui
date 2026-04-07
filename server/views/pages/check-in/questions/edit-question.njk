@@ -5,10 +5,10 @@
 {% set formAnchorText = "Cancel and go back" %}
 {% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
 {% set buttonText = "Continue" %}
-{% set htmlId = "esupervision-" + crn + "-" + id + "-manageQuestions-customQuestion" %}
-{% set inputName = "esupervision[" + crn + "][" + id + "][manageQuestions][customQuestion]" %}
+{% set htmlId = "esupervision-" + crn + "-" + id + "-manageQuestions-draftQuestionInput" %}
+{% set inputName = "esupervision[" + crn + "][" + id + "][manageQuestions][draftQuestionInput]" %}
 {% set fieldError = errorMessages[htmlId] %}
-{% set inputValue = data.esupervision[crn][id].manageQuestions.customQuestion | default(data.esupervision[crn][id].manageQuestions.savedQuestions[questionId], true) %}
+{% set inputValue = data.esupervision[crn][id].manageQuestions.draftQuestionInput | default(data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[questionId], true) %}
 
 {% block form %}
 
@@ -58,6 +58,11 @@
            value="{{ inputValue }}"
            {% if fieldError %}aria-describedby="{{ htmlId }}-error"{% endif %}>
 
+    {% if question.suffix and question.suffix | trim == "?" %}
+      <span class="govuk-label govuk-label--m govuk-!-display-inline-block govuk-!-margin-bottom-0 govuk-!-margin-left-2" aria-hidden="true">
+        {{ question.suffix }}
+      </span>
+    {% endif %}
     {% if question.suffix and question.suffix | trim != "?" %}
       <span class="govuk-label govuk-label--m govuk-!-display-block govuk-!-margin-bottom-0 govuk-!-margin-top-2" id="suffix-{{ questionId }}">
         {{ question.suffix }}

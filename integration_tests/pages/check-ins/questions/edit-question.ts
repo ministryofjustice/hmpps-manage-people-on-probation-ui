@@ -5,12 +5,8 @@ export default class EditQuestionPage extends Page {
     super('What do you want to ask')
   }
 
-  enterCustomQuestion(text: string) {
-    cy.get('input[name*="[manageQuestions][customQuestion]"]').type(`{selectall}{backspace}${text}`)
-  }
-
-  clearCustomQuestion() {
-    cy.get('input[name*="[manageQuestions][customQuestion]"]').clear()
+  enterDraftQuestionInput(text: string) {
+    cy.get('input[name*="[manageQuestions][draftQuestionInput]"]').type(`{selectall}{backspace}${text}`)
   }
 
   clickContinue() {

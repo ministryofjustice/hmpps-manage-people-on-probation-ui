@@ -356,7 +356,7 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
-    [`[esupervision][${crn}][${id}][manageQuestions][customQuestion]`]: {
+    [`[esupervision][${crn}][${id}][manageQuestions][draftQuestionInput]`]: {
       optional: page !== 'edit-question',
       checks: [
         {

@@ -8,8 +8,4 @@ export default class ListQuestionsPage extends Page {
   clickAddTemplateByIndex(index: number) {
     cy.get('[data-qa="add-question-link"]').eq(index).click()
   }
-
-  clickCancelAndGoBack() {
-    cy.get('[data-qa="formAnchorLink"]').click()
-  }
 }

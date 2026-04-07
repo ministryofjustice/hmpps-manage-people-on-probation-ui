@@ -27,8 +27,8 @@ export interface CheckinUserDetails {
 
 export interface ManageQuestionsSession {
   availableQuestions?: EsupervisionQuestion[]
-  savedQuestions?: Record<string, string>
-  customQuestion?: string
+  questionTemplateAndInputs?: Record<string, string>
+  draftQuestionInput?: string
 }
 export interface LocalParams {
   crn: string
