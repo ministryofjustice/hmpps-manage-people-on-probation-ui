@@ -30,7 +30,11 @@ export default function getFrontendComponents(probationComponentsService: Probat
     }
     res.locals.feComponents = {
       header: replaceHashWithSlash(header?.html),
-      footer: updateLinks(footer?.html),
+      footer: updateLinks(
+        res.locals.flags?.enableMopCookiePolicy,
+        res.locals.flags?.enableMopPrivacyPolicy,
+        footer?.html,
+      ),
       cssIncludes: [...(header?.css || []), ...(footer?.css || [])],
       jsIncludes: [...(header?.javascript || []), ...(footer?.javascript || [])],
     }
@@ -51,15 +55,20 @@ function replaceHashWithSlash(source: string | null | undefined): string | null 
   return input.replace(/=(['"])#\1/g, '=$1/$1')
 }
 
-export function updateLinks(input: string): string {
-  const policyRegex = new RegExp(
-    `<a([^>]*?)href=["']${config.apis.probationFrontendComponentsApi.url}/privacy-policy["']([^>]*)>`,
-    'gi',
-  )
-  const cookieRegex = new RegExp(
-    `<a([^>]*?)href=["']${config.apis.probationFrontendComponentsApi.url}/cookies-policy["']([^>]*)>`,
-    'gi',
-  )
+export function updateLinks(enableMopPrivacyPolicy: boolean, enableMopCookiePolicy: boolean, input: string): string {
+  const policyRegex = enableMopPrivacyPolicy
+    ? new RegExp(
+        `<a([^>]*?)href=["']${config.apis.probationFrontendComponentsApi.url}/privacy-policy["']([^>]*)>`,
+        'gi',
+      )
+    : /$^/
+
+  const cookieRegex = enableMopCookiePolicy
+    ? new RegExp(
+        `<a([^>]*?)href=["']${config.apis.probationFrontendComponentsApi.url}/cookies-policy["']([^>]*)>`,
+        'gi',
+      )
+    : /$^/
   return input
     .replace(
       policyRegex,
