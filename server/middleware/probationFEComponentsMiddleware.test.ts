@@ -38,7 +38,9 @@ describe('ProbationFEComponentsMiddleware', () => {
       cssIncludes: ['a.css'],
       jsIncludes: ['a.js'],
     }
-    const { req, res } = createReqRes({ session: { feComponents: cached } })
+    const { req, res } = createReqRes({
+      session: { feComponents: cached, enableMopCookiePolicy: true, enableMopPrivacyPolicy: true },
+    })
 
     const fakeService = { getProbationFEComponents: jest.fn() }
 

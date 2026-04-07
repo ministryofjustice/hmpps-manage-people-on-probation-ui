@@ -7,8 +7,17 @@ export default function getFrontendComponents(probationComponentsService: Probat
   return async (req, res, next) => {
     // Check if FE components are already cached in the session
     const cached = (req.session as any)?.feComponents
-    if (cached?.header && cached?.footer) {
+    const cachedCookiePolicyStatus = (req.session as any)?.enableMopCookiePolicy
+    const cachedPrivacyPolicyStatus = (req.session as any)?.enableMopPrivacyPolicy
+    if (
+      cached?.header &&
+      cached?.footer &&
+      res.locals.flags?.enableMopCookiePolicy === cachedCookiePolicyStatus &&
+      res.locals.flags?.enableMopPrivacyPolicy === cachedPrivacyPolicyStatus
+    ) {
       res.locals.feComponents = cached
+      res.locals.enableMopCookiePolicy = req.session?.enableMopCookiePolicy
+      res.locals.enableMopPrivacyPolicy = req.session?.enableMopPrivacyPolicy
       return next()
     }
 
@@ -31,16 +40,20 @@ export default function getFrontendComponents(probationComponentsService: Probat
     res.locals.feComponents = {
       header: replaceHashWithSlash(header?.html),
       footer: updateLinks(
-        res.locals.flags?.enableMopCookiePolicy,
         res.locals.flags?.enableMopPrivacyPolicy,
+        res.locals.flags?.enableMopCookiePolicy,
         footer?.html,
       ),
       cssIncludes: [...(header?.css || []), ...(footer?.css || [])],
       jsIncludes: [...(header?.javascript || []), ...(footer?.javascript || [])],
     }
+    res.locals.enableMopPrivacyPolicy = res.locals.flags?.enableMopPrivacyPolicy
+    res.locals.enableMopCookiePolicy = res.locals.flags?.enableMopCookiePolicy
 
     if (req?.session) {
       ;(req.session as any).feComponents = res.locals.feComponents
+      ;(req.session as any).enableMopCookiePolicy = res.locals.enableMopCookiePolicy
+      ;(req.session as any).enableMopPrivacyPolicy = res.locals.enableMopPrivacyPolicy
     }
 
     return next()
