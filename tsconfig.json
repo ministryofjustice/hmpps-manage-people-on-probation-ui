@@ -18,7 +18,6 @@
     "typeRoots": ["./server/@types", "./node_modules/@types"],
     "inlineSources": true,
     "ignoreDeprecations": "5.0",
-    "types": ["node", "jest"],
 
     // Set `sourceRoot` to  "/" to strip the build path prefix
     // from generated source code references.

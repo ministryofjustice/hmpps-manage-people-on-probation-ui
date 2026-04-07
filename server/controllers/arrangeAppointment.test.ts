@@ -696,7 +696,7 @@ describe('controllers/arrangeAppointment', () => {
     })
   })
 
-  xdescribe('postLocationDateTime', () => {
+  describe('postLocationDateTime', () => {
     it('should return a 404 status and render the error page, if CRN or UUID in request params are invalid', async () => {
       mockedIsValidCrn.mockReturnValue(false)
       mockedIsValidUUID.mockReturnValue(false)
