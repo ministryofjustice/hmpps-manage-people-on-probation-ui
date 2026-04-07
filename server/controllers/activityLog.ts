@@ -26,7 +26,7 @@ const activityLogController: Controller<typeof routes, void> = {
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
       const { params } = req
-      const { crn } = params
+      const { crn } = params as Record<string, string>
 
       if (req.query?.showSuccessBanner) {
         req.flash('contactCreated', req.query?.uploadFailed ? 'uploadFailed' : 'success')
@@ -87,7 +87,7 @@ const activityLogController: Controller<typeof routes, void> = {
   },
   getActivity: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       let { url } = req
       url = encodeURIComponent(url)

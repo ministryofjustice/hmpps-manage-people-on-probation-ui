@@ -19,7 +19,7 @@ export const redirectWizard = (
   route: RouteKey = 'appointments',
 ): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const mapping: Mapping = {
       appointments: {
         dataPath: ['appointments', crn, id],

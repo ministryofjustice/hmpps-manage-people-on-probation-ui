@@ -7,7 +7,7 @@ export const checkAnswers = (req: Request, res: AppResponse, next?: NextFunction
   const { change } = req.query
   if (change) {
     const { data } = req.session
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     let { appointmentTypes } = res.locals
     const { userLocations, appointment } = res.locals
     const session: AppointmentSession = getDataValue(data, ['appointments', crn, id])
