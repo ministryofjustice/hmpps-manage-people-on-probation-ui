@@ -103,7 +103,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
       }
       const { mobileNumber } = res.locals.case
 
-      if (smsOptIn?.includes('YES') && mobileNumber) {
+      if (smsOptIn?.includes('YES') && res.locals.flags.enableSmsReminders && mobileNumber) {
         const {
           includeWelshPreview: includeWelshTranslation,
           appointmentLocation = null,
