@@ -366,7 +366,7 @@ describe('controllers/appointments', () => {
     })
     checkAuditMessage(res, 'VIEW_RECORD_AN_OUTCOME', uuidv4(), crn, 'CRN')
     it('should render the record an outcome page', () => {
-      expect(renderSpy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-complied', {
+      expect(renderSpy).toHaveBeenCalledWith('pages/appointments/attended-complied', {
         crn,
         alertDismissed: false,
         isInPast: true,

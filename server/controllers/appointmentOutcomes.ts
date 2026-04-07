@@ -1,10 +1,8 @@
-import { v4 } from 'uuid'
-import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
 import { AppointmentOutcomeType } from '../models/Appointments'
-import { setDataValue, getDataValue } from '../utils'
+import { getDataValue } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 
@@ -13,8 +11,6 @@ const routes = [
   'postOutcome',
   'getAddNote',
   'postAddNote',
-  'getAttendedComplied',
-  'postAttendedComplied',
   'getAttendedFailedToComply',
   'postAttendedFailedToComply',
   'getAcceptableAbsence',
@@ -107,37 +103,6 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
         : `/case/${crn}/appointments/appointment/${contactId}/manage`
       return res.redirect(change ?? redirect)
-    }
-  },
-  getAttendedComplied: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { forename, surname, crn } = res.locals.appointmentOutcome
-      const { alertDismissed = false } = req.session
-      await auditService.sendAuditMessage({
-        action: 'VIEW_RECORD_AN_OUTCOME',
-        who: res.locals.user.username,
-        subjectId: crn,
-        subjectType: 'CRN',
-        correlationId: v4(),
-        service: 'hmpps-manage-people-on-probation-ui',
-      })
-      const headerPersonName = { forename, surname }
-      res.render('pages/appointment-outcomes/attended-complied', {
-        alertDismissed,
-        isInPast: true,
-        headerPersonName,
-      })
-    }
-  },
-  postAttendedComplied: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id, isValidParams } = res.locals.appointmentOutcome
-      if (!isValidParams) {
-        return renderError(404)(req, res)
-      }
-      const { data } = req.session
-      setDataValue(data, ['appointments', crn, id, 'outcomeRecorded'], true) // <--- this needs refactoring
-      return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => {

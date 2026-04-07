@@ -41,7 +41,6 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
-  getAttendedCompliedProps: jest.fn(),
 }))
 
 jest.mock('./arrangeAppointment', () => ({

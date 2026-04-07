@@ -216,7 +216,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
       const { forename, surname, appointment } = res.locals.appointmentOutcome
       const headerPersonName = { forename, surname }
-      res.render('pages/appointment-outcomes/attended-complied', {
+      res.render('pages/appointments/attended-complied', {
         crn,
         alertDismissed,
         isInPast: true,

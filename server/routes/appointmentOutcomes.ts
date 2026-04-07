@@ -73,20 +73,6 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 
-  /* Attended and complied */
-
-  router.get(
-    [`${arrangeBasePath}/attended-complied`, `${manageBasePath}/attended-complied`],
-    controllers.appointmentOutcomes.getAttendedComplied(hmppsAuthClient),
-  )
-
-  router.post(`${arrangeBasePath}/attended-complied`, checkAnswers)
-
-  router.post(
-    [`${arrangeBasePath}/attended-complied`, `${manageBasePath}/attended-complied`],
-    controllers.appointmentOutcomes.postAttendedComplied(hmppsAuthClient),
-  )
-
   /* Failed to comply */
 
   router.get(

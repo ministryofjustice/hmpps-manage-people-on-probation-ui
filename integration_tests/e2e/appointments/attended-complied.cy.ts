@@ -19,7 +19,7 @@ const loadPage = () => {
 
 const isAttendedCompliedPage = true
 
-xdescribe('Log attended and complied appointment', () => {
+describe('Log attended and complied appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let recordAnOutcomePage: AttendedCompliedPage
   let addNotePage: AddNotePage
