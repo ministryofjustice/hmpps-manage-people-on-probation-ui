@@ -39,7 +39,7 @@ import ListQuestionsPage from '../../pages/check-ins/questions/list-questions'
 const loadPage = () => {
   cy.task('resetMocks')
   cy.visit(`/case/X000001/appointments`)
-  cy.task('stubGetQuestionsList')
+  cy.task('stubGetQuestionsTemplates')
 }
 
 const clickNextDayButton = () => {
@@ -1108,7 +1108,7 @@ context('check-ins add questions pages', () => {
   it('should trigger validation errors when trying to save a blank custom question', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
-    cy.task('stubGetQuestionsList')
+    cy.task('stubGetQuestionsTemplates')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
 
     const addQuestionsPage = new AddQuestionsPage()
@@ -1126,7 +1126,7 @@ context('check-ins add questions pages', () => {
   it('should allow a user to add, edit, and delete a custom question', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
-    cy.task('stubGetQuestionsList')
+    cy.task('stubGetQuestionsTemplates')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
 
     const addQuestionsPage = new AddQuestionsPage()
@@ -1164,7 +1164,7 @@ context('check-ins add questions pages', () => {
   it('should enforce the maximum limit of 3 custom questions', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
-    cy.task('stubGetQuestionsList')
+    cy.task('stubGetQuestionsTemplates')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
 
     const addQuestionsPage = new AddQuestionsPage()

@@ -2776,7 +2776,7 @@ describe('checkInsController', () => {
 
     describe('getAddQuestionsPage', () => {
       beforeEach(() => {
-        jest.spyOn(ESupervisionClient.prototype, 'getQuestionsList').mockResolvedValue({
+        jest.spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates').mockResolvedValue({
           questions: [
             {
               id: '1',
@@ -2900,7 +2900,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const getQuestionsListSpy = jest
-          .spyOn(ESupervisionClient.prototype, 'getQuestionsList')
+          .spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates')
           .mockImplementation(() =>
             Promise.resolve({ questions: [{ id: '1', template: 'Have you heard back from [insert text]?' }] } as any),
           )
@@ -2934,7 +2934,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const getQuestionsListSpy = jest
-          .spyOn(ESupervisionClient.prototype, 'getQuestionsList')
+          .spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates')
           .mockImplementation(() => Promise.resolve({ questions: [] } as any))
 
         const req = baseReq({

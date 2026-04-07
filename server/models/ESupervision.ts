@@ -1,4 +1,4 @@
-import { EsupervisionQuestion } from '../data/model/esupervision'
+import { EsupervisionQuestionTemplatesList } from '../data/model/esupervision'
 import { Errors } from './Errors'
 
 export interface ESupervisionSession {
@@ -26,7 +26,7 @@ export interface CheckinUserDetails {
 }
 
 export interface ManageQuestionsSession {
-  availableQuestions?: EsupervisionQuestion[]
+  availableQuestions?: EsupervisionQuestionTemplatesList[]
   questionTemplateAndInputs?: Record<string, string>
   draftQuestionInput?: string
 }

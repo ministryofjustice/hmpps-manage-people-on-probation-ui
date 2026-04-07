@@ -65,7 +65,7 @@ const stubOffenderSetupComplete500Response = (): SuperAgentRequest =>
       },
     },
   })
-export const stubGetQuestionsList = () => {
+export const stubGetQuestionsTemplates = () => {
   return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       method: 'GET',
@@ -361,5 +361,5 @@ export default {
   stubOffenderSetup422Response,
   stubOffenderSetup500Response,
   stubOffenderSetupComplete500Response,
-  stubGetQuestionsList,
+  stubGetQuestionsTemplates,
 }

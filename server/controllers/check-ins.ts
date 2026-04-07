@@ -1326,7 +1326,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (availableQuestions.length === 0) {
         const eSupClient = new ESupervisionClient(token)
         // this is currently mock data, waiting for API changes to be made
-        const questionsList = await eSupClient.getQuestionsList('en-GB')
+        const questionsList = await eSupClient.getQuestionsTemplates('en-GB')
         availableQuestions = questionsList.questions
         setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'], availableQuestions)
       }
@@ -1457,7 +1457,7 @@ const checkInsController: Controller<typeof routes, void> = {
       const eSupClient = new ESupervisionClient(token)
 
       const personalDetails = await masClient.getPersonalDetails(crn)
-      const questionsList = await eSupClient.getQuestionsList('en-GB')
+      const questionsList = await eSupClient.getQuestionsTemplates('en-GB')
 
       setDataValue(
         req.session.data,
@@ -1510,7 +1510,7 @@ const checkInsController: Controller<typeof routes, void> = {
 
       if (availableQuestions.length === 0) {
         const eSupClient = new ESupervisionClient(token)
-        const questionsList = await eSupClient.getQuestionsList('en-GB')
+        const questionsList = await eSupClient.getQuestionsTemplates('en-GB')
         availableQuestions = questionsList.questions
         setDataValue(
           req.session.data,

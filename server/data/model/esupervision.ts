@@ -180,7 +180,7 @@ export interface ReactivateOffenderRequest {
   }
 }
 
-export interface EsupervisionQuestion {
+export interface EsupervisionQuestionTemplatesList {
   id: string
   policy: 'CUSTOM' | 'DEFAULT'
   template: string
@@ -194,8 +194,8 @@ export interface EsupervisionQuestion {
   }
 }
 
-export interface EsupervisionQuestionsList {
-  questions: EsupervisionQuestion[]
+export interface EsupervisionQuestionTemplatesResponse {
+  questions: EsupervisionQuestionTemplatesList[]
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
