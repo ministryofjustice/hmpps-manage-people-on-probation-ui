@@ -3,14 +3,24 @@ export const parseQuestionTemplate = (availableQuestions: any[], questionId: str
 
   if (!selectedQuestion) return null
 
-  const sections = selectedQuestion.template.split(/\[.*?\]/)
-  const prefix = sections[0] || ''
-  let suffix = sections[1] || ''
+  const { template } = selectedQuestion
+  const start = template.indexOf('[')
+  const end = template.indexOf(']', start)
 
-  if (suffix.trimStart().match(/^[a-zA-Z]/)) {
-    suffix = ` ${suffix.trimStart()}`
+  let prefix: string
+  let rawSuffix: string
+
+  if (start !== -1 && end !== -1) {
+    prefix = template.substring(0, start)
+    rawSuffix = template.substring(end + 1)
   } else {
-    suffix = suffix.trimStart()
+    prefix = template
+    rawSuffix = ''
+  }
+
+  let suffix = rawSuffix.trimStart()
+  if (suffix.match(/^[a-zA-Z]/)) {
+    suffix = ` ${suffix}`
   }
 
   return {
