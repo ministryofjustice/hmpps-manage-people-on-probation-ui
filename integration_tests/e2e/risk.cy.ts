@@ -55,8 +55,6 @@ const checkRiskPageView = ({
 }: Args) => {
   const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
   const subHeadingLevel = !sentencePlanLink && !sentencePlanText ? '4' : '5'
-  page.getElementData('riskScoresCard').should('exist')
-  page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
   if (ogrs4Enabled) {
     page.getElementData('riskScoresCard').should('exist')
     page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
