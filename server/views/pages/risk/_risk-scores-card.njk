@@ -16,6 +16,19 @@
 
 {% set latestAssessment = riskData.assessments | first if riskData.assessments else null %}
 {% set latestAssessmentDateString = "Last updated: " + latestAssessment.completedDate if latestAssessment else null %}
+{% set ogrs4Version = riskData.assessments[0].outputVersion == "2" %}
+{% set detailsPageLink = {
+  items: [
+    {
+      href: "/case/" + crn + "/risk/detail",
+      text: "View risk predictor score details",
+      classes: "govuk-link--no-visited-state",
+      attributes: {
+      "data-qa": "viewRiskPredictorScoreDetails"
+    }
+    }
+  ]
+} %}
 
 {% if flags.enableOGRS4 %}
   {{ appSummaryCard({
@@ -24,7 +37,8 @@
     subTitleText: latestAssessmentDateString,
     headingLevel: scoresHeadingLevel | default('3'),
     classes: 'govuk-!-margin-bottom-6 app-summary-card--large-title',
-    html: scaleContent
+    html: scaleContent,
+    actions: detailsPageLink if ogrs4Version and flags.enableOGRS4SummaryCardDetail else null
   }) }}
 {% else %}
   {{ scaleContent | safe }}
