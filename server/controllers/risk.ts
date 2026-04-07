@@ -13,6 +13,7 @@ const routes = [
   'getRiskFlagSingleNote',
   'getRiskRemovalFlagSingleNote',
   'getRemovedRiskFlags',
+  'getRiskPredictorScoresDetail',
 ] as const
 
 const riskController: Controller<typeof routes, void> = {
@@ -135,6 +136,22 @@ const riskController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       res.render('pages/risk/removed-risk-flags', {
+        crn,
+      })
+    }
+  },
+  getRiskPredictorScoresDetail: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_RISKS_DETAIL',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      return res.render('pages/risk/risk-predictor-scores-detail', {
         crn,
       })
     }
