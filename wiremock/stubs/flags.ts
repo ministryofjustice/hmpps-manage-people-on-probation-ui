@@ -356,17 +356,6 @@ const stubEnableNonCompliance = (): SuperAgentRequest =>
             rules: [],
             rollouts: [],
           },
-          {
-            key: 'enableOGRS4SummaryCardDetail',
-            name: 'enableOGRS4SummaryCardDetail',
-            description: '',
-            enabled: false,
-            type: 'BOOLEAN_FLAG_TYPE',
-            createdAt: '2025-01-13T15:28:37.920581Z',
-            updatedAt: '2025-01-13T17:06:39.269084Z',
-            rules: [],
-            rollouts: [],
-          },
         ],
       },
       headers: {
