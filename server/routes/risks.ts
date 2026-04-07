@@ -25,4 +25,6 @@ export default function risksRoutes(router: Router, { hmppsAuthClient, arnsCompo
     getPersonRiskFlags(hmppsAuthClient),
     controllers.risk.getRemovedRiskFlags(hmppsAuthClient),
   )
+
+  router.get('/case/:crn/risk/detail', controllers.risk.getRiskPredictorScoresDetail(hmppsAuthClient))
 }
