@@ -7,7 +7,7 @@
             {% endif %}
             <p class="govuk-body">
                 {% if sentencePlan.showLink %}
-                    <a href="{{ sentencePlanLink() }}/crn/{{ crn }}/plan" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
+                    <a href="{% if flags.enableSentencePlanUrl %}{{ sentencePlanLink(flags.enableSentencePlanUrl) }}/{{ crn }}{% else %}{{ sentencePlanLink(flags.enableSentencePlanUrl) }}/crn/{{ crn }}/plan{% endif %}" target="_blank" rel="external noopener noreferrer">View the sentence plan (opens in new tab)</a>.</p>
             {% endif %}
             {% if sentencePlan.showText %}
 You cannot view this sentence plan. Only the allocated probation practitioner can access it.
