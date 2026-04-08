@@ -32,7 +32,6 @@ beforeEach(() => {
     },
     'token-1',
   )
-  nock.cleanAll()
 })
 
 describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method => {
@@ -43,7 +42,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
     nock.cleanAll() // Removes all interceptors
     nock.restore() // Restores http/https modules
     nock.activate() // Re-activate for the next test
