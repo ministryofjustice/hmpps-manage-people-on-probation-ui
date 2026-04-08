@@ -42,6 +42,10 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     nock.cleanAll()
   })
 
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   it('should return response body', async () => {
     nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
       [method]('/api/test')
@@ -138,6 +142,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
         .reply(500, (_, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
+        .persist()
 
       await expect(restClient[method]<ErrorSummary>({ path: `/test`, handle500: true })).rejects.toThrow(
         'This is a test error',
@@ -185,6 +190,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
         .reply(500, (_uri, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
+        .persist()
 
       await expect(
         restClient[method]<ErrorSummary>({
