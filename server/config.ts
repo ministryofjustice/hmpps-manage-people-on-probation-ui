@@ -82,6 +82,7 @@ export default {
   },
   sentencePlan: {
     link: get('SENTENCE_PLAN_LINK', 'https://sentence-plan-dummy-url', requiredInProduction),
+    linkV2: get('SENTENCE_PLAN_LINK_V2', 'https://sentence-plan-dummy-url-v2/crn', requiredInProduction),
   },
   interventions: {
     link: get('INTERVENTIONS_LINK', 'https://interventions-dummy-url', requiredInProduction),
