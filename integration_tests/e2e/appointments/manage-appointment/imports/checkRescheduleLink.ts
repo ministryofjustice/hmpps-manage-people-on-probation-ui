@@ -3,7 +3,10 @@ import ManageAppointmentPage from '../../../../pages/appointments/manage-appoint
 import RescheduleAppointmentPage from '../../../../pages/appointments/reschedule-appointment.page'
 import { loadPage } from './common'
 
-const futureDate = DateTime.now().plus({ days: 1 }).toFormat('d MMMM yyyy')
+const now = DateTime.now().plus({ days: 1 })
+const futureDate = now.toFormat('d MMMM yyyy')
+const startTime = '9am'
+const endTime = '10am'
 
 export const checkRescheduleLink = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
@@ -32,7 +35,7 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
           manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
             .getAppointmentDetailsListItem(index, 'value')
-            .should('contain.text', `${futureDate} at 12am to 12am`)
+            .should('contain.text', `${futureDate} at ${startTime} to ${endTime}`)
           manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').should('not.exist')
         })
       })
@@ -53,7 +56,7 @@ export const checkRescheduleLink = (enableNonCompliance = true) => {
           manageAppointmentPage.getAppointmentDetailsListItem(index, 'key').should('contain.text', 'Date and time')
           manageAppointmentPage
             .getAppointmentDetailsListItem(index, 'value')
-            .should('contain.text', `${futureDate} at 12am to 12am`)
+            .should('contain.text', `${futureDate} at ${startTime} to ${endTime}`)
           manageAppointmentPage
             .getAppointmentDetailsListItem(index, 'actions')
             .find('a')
