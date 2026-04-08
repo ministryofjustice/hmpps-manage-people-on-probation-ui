@@ -19,7 +19,7 @@ export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
       : null
   }
   if (
-    [`${baseUrl}/enforcement-action`, `${baseUrl}/send-a-letter`, `${baseUrl}/initiate-breach-or-recall`].some(
+    [`${baseUrl}/enforcement-action`, `${baseUrl}/send-letter`, `${baseUrl}/initiate-breach-or-recall`].some(
       route => route === reqUrl,
     )
   ) {

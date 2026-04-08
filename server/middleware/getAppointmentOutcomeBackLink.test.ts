@@ -118,7 +118,7 @@ describe('/middleware/getAppointmentOutcomeBackLink()', () => {
 
     const outcomePages = {
       'enforcement action page': 'enforcement-action',
-      'send a letter page': 'send-a-letter',
+      'send a letter page': 'send-letter',
       'initiate breach or recall page': 'initiate-breach-or-recall',
     }
 

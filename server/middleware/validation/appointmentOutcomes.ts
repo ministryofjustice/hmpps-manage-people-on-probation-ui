@@ -3,8 +3,6 @@ import { appointmentOutcomesValidation } from '../../properties'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
-import { getMinMaxDates } from '../../utils/getMinMaxDates'
-import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import config from '../../config'
 
 const appointmentOutcomes: Route<void> = (req, res, next) => {
@@ -12,16 +10,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
   const { crn, id, isInPast, baseUrl, reqUrl } = res.locals.appointmentOutcome
   const { maxCharCount } = config
-  let localParams: LocalParams
-
-  if (req.url.includes(`${baseUrl}/attended-complied`)) {
-    const { _maxDate } = getMinMaxDates()
-    localParams = {
-      ...localParams,
-      isReschedule: isRescheduleAppointment(req),
-      _maxDate,
-    }
-  }
+  const localParams: LocalParams = null
 
   const validateOutcome = (): void => {
     if (reqUrl !== baseUrl) return
@@ -41,7 +30,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   }
 
   const validateAddNote = (): void => {
-    if (!baseUrl.includes(`${baseUrl}/add-note`)) return
+    if (!reqUrl.includes(`${baseUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
     errorMessages = validateWithSpec(
       req,
@@ -55,26 +44,12 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     )
   }
 
-  const validateAttendedComplied = (): void => {
-    if (reqUrl !== `${baseUrl}/attended-complied`) return
-    render = 'pages/appointment-outcomes/attended-complied'
-    errorMessages = validateWithSpec(
-      req,
-      appointmentOutcomesValidation({
-        crn,
-        id,
-        page: `outcome/attended-complied`,
-      }),
-    )
-  }
-
   validateOutcome()
   validateAddNote()
-  validateAttendedComplied()
 
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
-    return res.render(render, { errorMessages, ...localParams })
+    return res.render(render, { errorMessages, ...(localParams ?? {}) })
   }
   return next()
 }
