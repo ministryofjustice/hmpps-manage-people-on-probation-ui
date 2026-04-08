@@ -16,7 +16,7 @@ $no-score-border-colour: #505a5f;
 $no-score-background-colour: #ffffff;
 $mappa-colour: #4c2c92;
 
-@import '../../node_modules/govuk-frontend/dist/govuk/all';
+@import '../../node_modules/govuk-frontend/dist/govuk/index';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
 @import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/arns/components/predictor-badge/_predictor-badge';
 @import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/arns/components/predictor-scale/_predictor-scale';
@@ -28,7 +28,7 @@ $mappa-colour: #4c2c92;
 @import 'assets/scss/local';
 @import './components/photo';
 @import './components/sortable-table';
-@import '../../node_modules/govuk-frontend/dist/govuk/base';
+@import '../../node_modules/govuk-frontend/dist/govuk/_base';
 @import '../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table';
 @import './components/predictor-scores';
 @import './components/risk-flag-widget';

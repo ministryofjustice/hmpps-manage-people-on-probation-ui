@@ -76,14 +76,14 @@ $predictor-score-background-colour: #f3f2f1;
   }
 
   & .predictor-timeline-item-v1__level {
-    @include govuk-font(14, 'regular');
+    @include govuk-font(16, 'regular');
 
     float: left;
     color: $text-colour;
   }
 
   & .predictor-timeline-item-v1__score {
-    @include govuk-font(14, 'bold');
+    @include govuk-font(16, 'bold');
 
     float: right;
     color: govuk-colour('black');
@@ -251,16 +251,16 @@ $predictor-score-background-colour: #f3f2f1;
   }
 
   & h3 {
-    @include govuk-font(14, 'bold');
+    @include govuk-font(16, 'bold');
   }
 
   & p {
-    @include govuk-font(14, 'regular');
+    @include govuk-font(16, 'regular');
   }
 }
 
 .score-label__card-bottom p {
-  @include govuk-font(14, 'bold');
+  @include govuk-font(16, 'bold');
 
   margin: 0;
 }
