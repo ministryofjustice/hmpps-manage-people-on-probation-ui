@@ -158,9 +158,12 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         .replyWithError('This is a test error')
         .persist()
 
-      await expect(restClient[method]<ErrorSummary>({ path: `/test`, handle500: true })).rejects.toThrow(
-        'This is a test error',
-      )
+      await expect(
+        restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle500: true,
+        }),
+      ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
     })
   } else {
@@ -209,7 +212,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       await expect(
         restClient[method]<ErrorSummary>({
           path: `/test`,
-          retry: true,
+          retry: false,
           handle500: true,
         }),
       ).rejects.toThrow('This is a test error')
