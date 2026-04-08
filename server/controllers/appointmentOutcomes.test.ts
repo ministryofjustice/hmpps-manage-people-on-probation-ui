@@ -61,10 +61,16 @@ const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue
 
 const baseUrl = '/crn/X000001/appointment/appointment/1234/outcome'
 
-const mockRes = (appointmentOutcome?: Partial<AppointmentOutcomeProps>) => {
+const mockRes = ({
+  appointmentOutcome,
+  appointmentCase,
+}: {
+  appointmentOutcome?: Partial<AppointmentOutcomeProps>
+  appointmentCase?: Record<string, any>
+} = {}) => {
   return mockAppResponse({
     user: { username: 'user1' },
-    case: { name: { forename: 'Stuart' } },
+    case: { name: { forename: 'Stuart' }, ...(appointmentCase ?? {}) },
     appointmentOutcome: {
       isValidParams: true,
       baseUrl,
@@ -119,7 +125,7 @@ describe('controllers/appointmentOutcomes', () => {
   describe('postOutcome', () => {
     it('should redirect to the error page if params are invalid', () => {
       const req = mockReq()
-      const res = mockRes({ isValidParams: false })
+      const res = mockRes({ appointmentOutcome: { isValidParams: false } })
       controllers.appointmentOutcomes.postOutcome()(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
@@ -193,7 +199,7 @@ describe('controllers/appointmentOutcomes', () => {
   describe('postAddNote', () => {
     it('should redirect to the error page if params are invalid', () => {
       const req = mockReq()
-      const res = mockRes({ isValidParams: false })
+      const res = mockRes({ appointmentOutcome: { isValidParams: false } })
       controllers.appointmentOutcomes.postAddNote()(req, res)
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
@@ -206,74 +212,60 @@ describe('controllers/appointmentOutcomes', () => {
     })
     it('should redirect to the check your answers page if arrange appointment journey', () => {
       const req = mockReq()
-      const res = mockRes({ uuid, contactId: undefined, id: uuid })
+      const res = mockRes({ appointmentOutcome: { uuid, contactId: undefined, id: uuid } })
       const spy = jest.spyOn(res, 'redirect')
       controllers.appointmentOutcomes.postAddNote()(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
     })
     it('should redirect to the manage appointment page if manage journey', () => {
       const req = mockReq()
-      const res = mockRes({ uuid: undefined, contactId, id: contactId })
+      const res = mockRes({ appointmentOutcome: { uuid: undefined, contactId, id: contactId } })
       const spy = jest.spyOn(res, 'redirect')
       controllers.appointmentOutcomes.postAddNote()(req, res)
       expect(spy).toHaveBeenCalledWith(`/case/${crn}/appointments/appointment/${contactId}/manage`)
     })
   })
 
-  it('getAttendedFailedToComply should render correct view with breachRecallData and isReferToProbationPractitioner false', async () => {
-    const getBreachRecallInformationSpy = jest
-      .spyOn(MasApiClient.prototype, 'getBreachRecallInformation')
-      .mockResolvedValue('Initiate a breach')
-    const getPersonAppointmentSpy = jest
-      .spyOn(MasApiClient.prototype, 'getPersonAppointment')
-      .mockResolvedValue({ type: 'Office visit' } as any)
-
-    const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
-    await handler(
-      { ...mockReq, params: { crn: 'R000101', contactId: '123' } },
-      {
-        ...mockRes,
-        locals: {
-          ...mockRes.locals,
-          case: {
-            name: { forename: 'Stuart' },
-            staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
-          },
+  describe('getAttendedFailedToComply', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes({
+        appointmentCase: {
+          name: { forename: 'Stuart' },
+          staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
         },
-      },
-    )
-
-    expect(mockRes.render).toHaveBeenCalledWith('pages/appointments-outcomes/attended-failed-to-comply', {
-      breachRecallData: 'Initiate a breach',
-      personOnProbationFirstName: 'Stuart',
-      crn: 'R000101',
-      id: '123',
-      isReferToProbationPractitioner: false,
+      })
+      const getBreachRecallInformationSpy = jest
+        .spyOn(MasApiClient.prototype, 'getBreachRecallInformation')
+        .mockResolvedValue('Initiate a breach')
+      const spy = jest.spyOn(res, 'render')
+      await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointments-outcomes/attended-failed-to-comply', {
+        breachRecallData: 'Initiate a breach',
+        personOnProbationFirstName: 'Stuart',
+        isReferToProbationPractitioner: false,
+      })
+      expect(getBreachRecallInformationSpy).toHaveBeenCalledWith(crn)
     })
-
-    expect(getBreachRecallInformationSpy).toHaveBeenCalledWith('R000101')
+    it('should', () => {
+      jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
+      jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Office visit' } as any)
+    })
   })
 
-  it('getAttendedFailedToComply should render correct view with isReferToProbationPractitioner true when responsible officer', async () => {
+  it('should render correct view with isReferToProbationPractitioner true when responsible officer', async () => {
     jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
     jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Office visit' } as any)
-
-    const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
-    await handler(
-      { ...mockReq, params: { crn: 'R000101', contactId: '123' } },
-      {
-        ...mockRes,
-        locals: {
-          ...mockRes.locals,
-          case: {
-            name: { forename: 'Stuart' },
-            staffContacts: [{ responsibleOfficer: true, username: 'user1' }],
-          },
-        },
+    const req = mockReq({ params: { crn: 'R000101', contactId: '123' } })
+    const res = mockRes({
+      appointmentCase: {
+        name: { forename: 'Stuart' },
+        staffContacts: [{ responsibleOfficer: true, username: 'user1' }],
       },
-    )
-
-    expect(mockRes.render).toHaveBeenCalledWith(
+    })
+    const spy = jest.spyOn(res, 'render')
+    await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
+    expect(spy).toHaveBeenCalledWith(
       'pages/appointments-outcomes/attended-failed-to-comply',
       expect.objectContaining({
         isReferToProbationPractitioner: true,
@@ -281,31 +273,22 @@ describe('controllers/appointmentOutcomes', () => {
     )
   })
 
-  it('getAttendedFailedToComply should render correct view with isReferToProbationPractitioner true when telephone contact', async () => {
+  it('should render correct view with isReferToProbationPractitioner true when telephone contact', async () => {
     jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
     jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Telephone contact' } as any)
-
-    const handler = appointmentOutcomesController.getAttendedFailedToComply(mockHmppsAuthClient)
-    await handler(
-      { ...mockReq, params: { crn: 'R000101', contactId: '123' } },
-      {
-        ...mockRes,
-        locals: {
-          ...mockRes.locals,
-          case: {
-            name: { forename: 'Stuart' },
-            staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
-          },
-        },
+    const req = mockReq({ params: { crn: 'R000101', contactId: '123' } })
+    const res = mockRes({
+      appointmentCase: {
+        name: { forename: 'Stuart' },
+        staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
       },
-    )
-
-    expect(mockRes.render).toHaveBeenCalledWith(
+    })
+    const spy = jest.spyOn(res, 'render')
+    await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
+    expect(spy).toHaveBeenCalledWith(
       'pages/appointments-outcomes/attended-failed-to-comply',
       expect.objectContaining({
         breachRecallData: 'Initiate a breach',
-        crn: 'R000101',
-        id: '123',
         isReferToProbationPractitioner: false,
         personOnProbationFirstName: 'Stuart',
       }),

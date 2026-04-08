@@ -29,6 +29,24 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateAttendedFailedToComply = (): void => {
+    if (!req.url.includes(`${baseUrl}/attended-failed-to-comply`)) return
+
+    render = 'pages/appointments-outcomes/attended-failed-to-comply'
+
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/attended-failed-to-comply`,
+        }),
+      ),
+    }
+  }
+
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
@@ -45,6 +63,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   }
 
   validateOutcome()
+  validateAttendedFailedToComply()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {
