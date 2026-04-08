@@ -253,7 +253,6 @@ const checkRiskPageView = ({
     page.getElementData('plan').should('exist')
     page.getElementData('plan').get('h3').should('contain.text', 'Plan')
     page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 10 October 2025')
-    // cy.pause()
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
     if (sentencePlanUrlEnabled) {
       page

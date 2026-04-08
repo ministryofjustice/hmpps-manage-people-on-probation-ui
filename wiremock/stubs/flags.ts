@@ -1,7 +1,13 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 import * as flags from '../mappings/flipt.json'
 
-const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true, ogrs4SummaryCardDetail = false) => ({
+const getArnsStub = (
+  sentencePlan = true,
+  sanIndicator = true,
+  ogrs4 = true,
+  ogrs4SummaryCardDetail = false,
+  sentencePlanUrl = true,
+) => ({
   request: {
     urlPathPattern: '/flipt/internal/v1/evaluation/snapshot/namespace/manage-people-on-probation-ui',
     method: 'GET',
@@ -61,7 +67,7 @@ const getArnsStub = (sentencePlan = true, sanIndicator = true, ogrs4 = true, ogr
           key: 'enableSentencePlanUrl',
           name: 'enableSentencePlanUrl',
           description: '',
-          enabled: true,
+          enabled: sentencePlanUrl,
           type: 'BOOLEAN_FLAG_TYPE',
           createdAt: '2025-01-13T15:28:37.920581Z',
           updatedAt: '2025-01-13T17:06:39.269084Z',
