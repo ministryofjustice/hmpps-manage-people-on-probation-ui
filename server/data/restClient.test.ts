@@ -40,12 +40,13 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     jest.clearAllMocks()
     mockedIsValidHost.mockReturnValue(true)
     mockedIsValidPath.mockReturnValue(true)
-    nock.cleanAll()
   })
 
   afterEach(() => {
     jest.clearAllMocks()
-    nock.cleanAll()
+    nock.cleanAll() // Removes all interceptors
+    nock.restore() // Restores http/https modules
+    nock.activate() // Re-activate for the next test
   })
 
   it('should return response body', async () => {
