@@ -156,7 +156,6 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
         .replyWithError('This is a test error')
-        .persist()
 
       await expect(
         restClient[method]<ErrorSummary>({
@@ -165,6 +164,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
+      nock.cleanAll()
     })
   } else {
     it('should handle 404s if configured to do so', async () => {
@@ -207,7 +207,6 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
         .replyWithError('This is a test error')
-        .persist()
 
       await expect(
         restClient[method]<ErrorSummary>({
@@ -217,6 +216,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
+      nock.cleanAll()
     })
   }
 
