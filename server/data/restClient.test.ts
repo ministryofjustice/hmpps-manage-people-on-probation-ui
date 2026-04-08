@@ -37,27 +37,9 @@ beforeEach(() => {
 describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method => {
   beforeEach(() => {
     jest.clearAllMocks()
-    restClient = new RestClient(
-      'api-name',
-      {
-        url: 'http://localhost:8080/api',
-        timeout: {
-          response: 1000,
-          deadline: 1000,
-        },
-        agent: new AgentConfig(1000),
-      },
-      'token-1',
-    )
     mockedIsValidHost.mockReturnValue(true)
     mockedIsValidPath.mockReturnValue(true)
-  })
-
-  afterEach(() => {
-    jest.resetAllMocks()
-    nock.cleanAll() // Removes all interceptors
-    nock.restore() // Restores http/https modules
-    nock.activate() // Re-activate for the next test
+    nock.cleanAll()
   })
 
   it('should return response body', async () => {
@@ -155,17 +137,12 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     it('should log any errors if found', async () => {
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
-        .replyWithError('This is a test error')
+        .reply(500, (_, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
 
-      await expect(
-        restClient[method]<ErrorSummary>({
-          path: `/test`,
-          handle500: true,
-        }),
-      ).rejects.toThrow('This is a test error')
+      await expect(restClient[method]<ErrorSummary>({ path: `/test`, handle500: true })).rejects.toThrow(
+        'This is a test error',
+      )
       expect(nock.isDone()).toBe(true)
-      nock.abortPendingRequests()
-      nock.cleanAll()
     })
   } else {
     it('should handle 404s if configured to do so', async () => {
@@ -207,18 +184,16 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     it('should log any errors if found', async () => {
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
-        .replyWithError('This is a test error')
+        .reply(500, (_uri, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
 
       await expect(
         restClient[method]<ErrorSummary>({
           path: `/test`,
-          retry: false,
+          retry: true,
           handle500: true,
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
-      nock.abortPendingRequests()
-      nock.cleanAll()
     })
   }
 
