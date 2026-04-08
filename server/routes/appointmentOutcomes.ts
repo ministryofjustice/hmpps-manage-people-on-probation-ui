@@ -63,7 +63,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
 
   /* Add note */
 
-  router.all([`${arrangeBasePath}/add-note`, `${manageBasePath}/add-note`], getPersonAppointment(hmppsAuthClient))
+  router.all(`${manageBasePath}/add-note`, getPersonAppointment(hmppsAuthClient))
 
   router.get(
     [`${arrangeBasePath}/add-note`, `${manageBasePath}/add-note`],
