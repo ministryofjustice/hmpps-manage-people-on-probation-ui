@@ -20,6 +20,7 @@ import eSuperVisionCheckInsRoutes from './eSupervisionCheckins'
 import rescheduleAppointmentRoutes from './rescheduleAppointments'
 import whatsNew from './whatsNew'
 import appointmentOutcomesRoutes from './appointmentOutcomes'
+import footerRoute from './footer'
 
 export default function routes(router: Router, services: Services): Router {
   home(router, services)
@@ -42,5 +43,6 @@ export default function routes(router: Router, services: Services): Router {
   alertsRoutes(router, services)
   eSuperVisionCheckInsRoutes(router, services)
   whatsNew(router, services)
+  footerRoute(router, services)
   return router
 }
