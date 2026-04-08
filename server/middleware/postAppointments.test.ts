@@ -278,7 +278,7 @@ const mockCase: Partial<PersonalDetails> = {
 const res = mockAppResponse({
   case: mockCase,
   user: mockUser,
-  flags: { enableCalendarEvents: true, enableMAN2344: true },
+  flags: { enableCalendarEvents: true, enableMAN2344: true, enableSmsReminders: true },
 })
 
 const postAppointmentsSpy = jest
@@ -424,7 +424,7 @@ describe('/middleware/postAppointments', () => {
       const mockRes = mockAppResponse({
         case: mockCase,
         user: { ...mockUser, email: null },
-        flags: { enableCalendarEvents: true, enableMAN2344: true },
+        flags: { enableCalendarEvents: true, enableMAN2344: true, enableSmsReminders: true },
       })
       beforeEach(async () => {
         await postAppointments(hmppsAuthClient)(mockReq, mockRes)
