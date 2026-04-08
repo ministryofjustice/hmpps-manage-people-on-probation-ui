@@ -164,6 +164,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
+      nock.abortPendingRequests()
       nock.cleanAll()
     })
   } else {
@@ -216,6 +217,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
+      nock.abortPendingRequests()
       nock.cleanAll()
     })
   }
