@@ -32,6 +32,7 @@ beforeEach(() => {
     },
     'token-1',
   )
+  nock.cleanAll()
 })
 
 describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method => {
@@ -44,6 +45,7 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
 
   afterEach(() => {
     jest.clearAllMocks()
+    nock.cleanAll()
   })
 
   it('should return response body', async () => {
