@@ -82,6 +82,9 @@ const getArnsStub = (
   },
 })
 
+const stubOgrs4SummaryCardEnabled = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, false, true, true))
+
 const stubNoSentencePlan = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send(getArnsStub(false, true))
 
@@ -452,4 +455,5 @@ export default {
   stubEnableESupervisionCustomQuestions,
   stubDisableNonCompliance,
   stubDisableSentencePlanUrl,
+  stubOgrs4SummaryCardEnabled,
 }

@@ -6,23 +6,34 @@
     {% set isStatic = true if riskData
         .assessments[0]
         .allReoffendingPredictor
-        .staticOrDynamic == "Static" else 
+        .staticOrDynamic == "Static" else
             false %}
     {% set band_ogrs3 = riskData
         .assessments[0]
         .ogrs3
         .band %}
-    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" and isStatic == true else 
+    {% set showOGRS4 = true if band_ogrs4 and band_ogrs4 != "NOT APPLICABLE" and isStatic == true else
         false %}
-    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else 
+    {% set showOGRS3 = true if band_ogrs3 and band_ogrs3 != "NOT APPLICABLE" else
         false %}
     {% if showOGRS4 %}
         <section data-qa="allReoffendingPredictor">
-            {{ predictorScale({
-    data: riskData,
-    predictor: "allReoffendingPredictor",
-    excludeDate: true
-            }) }}
+            {% if flags.enableOGRS4SummaryCardDetail %}
+                <div class="arns-summary-card-expanded-badge-spacing">
+                    {{ expandedPredictorBadge({
+                            data: riskData,
+                            predictor: "allReoffendingPredictor",
+                            excludeDate: true,
+                            fixedWidth: false
+                        }) }}
+                </div>
+            {% else %}
+                {{ predictorScale({
+                    data: riskData,
+                    predictor: "allReoffendingPredictor",
+                    excludeDate: true
+                }) }}
+            {% endif %}
         </section>
     {% endif %}
     {% if showOGRS3 %}

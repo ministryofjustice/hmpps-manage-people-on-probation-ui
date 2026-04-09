@@ -14,11 +14,20 @@
 
   {% if showOGRS4 %}
     <section data-qa="seriousViolentReoffendingPredictor">
-      {{ predictorScale({
-    data: riskData,
-    predictor: "seriousViolentReoffendingPredictor",
-    excludeDate: true
-      }) }}
+      {% if flags.enableOGRS4SummaryCardDetail %}
+        {{ expandedPredictorBadge({
+            data: riskData,
+            predictor: "seriousViolentReoffendingPredictor",
+            excludeDate: true,
+            fixedWidth: false
+          }) }}
+      {% else %}
+        {{ predictorScale({
+          data: riskData,
+          predictor: "seriousViolentReoffendingPredictor",
+          excludeDate: true
+        }) }}
+      {% endif %}
     </section>
   {% endif %}
   {% if showOGRS3 %}
