@@ -121,13 +121,13 @@ export default class ESupervisionClient extends RestClient {
   }
 
   // assigns additional questions to a check in
-  async postAssignQuestionsToCheckIn(
-    crn: string,
-    assignQuestionsRequest: AssignQuestionsRequest,
-  ): Promise<AssignQuestionsResponse> {
-    return this.put({
-      path: `/v2/questions/assign?crn=${crn}`,
-      data: assignQuestionsRequest,
-    })
-  }
+  // async postAssignQuestionsToCheckIn(
+  //   crn: string,
+  //   assignQuestionsRequest: AssignQuestionsRequest,
+  // ): Promise<AssignQuestionsResponse> {
+  //   return this.put({
+  //     path: `/v2/questions/assign?crn=${crn}`,
+  //     data: assignQuestionsRequest,
+  //   })
+  // }
 }
