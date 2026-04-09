@@ -19,7 +19,7 @@ const routes = [
 const riskController: Controller<typeof routes, void> = {
   getRisk: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { username } = res.locals.user
       const token = await hmppsAuthClient.getSystemClientToken(username)
       await auditService.sendAuditMessage({
@@ -59,7 +59,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRiskFlag: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -86,7 +86,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRiskFlagSingleNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, noteId } = req.params
+      const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -106,7 +106,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRiskRemovalFlagSingleNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, noteId } = req.params
+      const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -126,7 +126,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRemovedRiskFlags: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_REMOVED_RISKS',
         who: res.locals.user.username,
@@ -142,7 +142,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRiskPredictorScoresDetail: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_RISKS_DETAIL',
         who: res.locals.user.username,

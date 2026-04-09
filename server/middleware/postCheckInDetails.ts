@@ -11,7 +11,7 @@ export const postCheckInDetails = (
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<{ setup: OffenderSetup; uploadLocation: LocationInfo }>> => {
   return async (req, res) => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const eSupervisionClient = new ESupervisionClient(token)
     const savedUserDetails = req.session.data?.esupervision?.[crn]?.[id]?.checkins

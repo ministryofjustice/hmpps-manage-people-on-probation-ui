@@ -8,7 +8,7 @@ import { parseQuestionTemplate } from '../../utils/esupervisionParseTemplate'
 
 const eSuperVision: Route<void> = (req, res, next) => {
   const { url, params, body } = req
-  const { crn, id } = params
+  const { crn, id } = params as Record<string, string>
   const { checkInMinDate, checkInMobile, checkInEmail } = body
   const editCheckInMobile = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInMobile'])
   const editCheckInEmail = getDataValue(req.session.data, ['esupervision', crn, id, 'checkins', 'editCheckInEmail'])

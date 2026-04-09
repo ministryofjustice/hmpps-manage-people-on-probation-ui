@@ -31,19 +31,11 @@ describe('Health checks', () => {
     fakeManageUsersApi.get('/health/ping').reply(200, { status: 'UP' })
     return request(app).get('/health').expect(200)
   })
-
   it('Health checks shows DOWN', async () => {
-    fakeAuthClient.get('/health/ping').reply(503, { status: 'DOWN' })
-    fakeManageUsersApi.get('/health/ping').reply(503, { status: 'DOWN' })
+    fakeAuthClient.get('/health/ping').reply(503, { status: 'DOWN' }).persist()
+    fakeManageUsersApi.get('/health/ping').reply(503, { status: 'DOWN' }).persist()
     return request(app).get('/health').expect(503)
   })
-
-  it('Health checks shows UP', async () => {
-    fakeAuthClient.get('/health/ping').reply(200, { status: 'UP' })
-    fakeManageUsersApi.get('/health/ping').reply(200, { status: 'UP' })
-    return request(app).get('/health').expect(200)
-  })
-
   it('Ping checks shows UP', async () => {
     const response = await request(app).get('/ping').expect(200)
     expect(response.body.status).toEqual('UP')

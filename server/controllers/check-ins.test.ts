@@ -146,7 +146,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-check.njk', {
@@ -190,7 +190,7 @@ describe('checkInsController', () => {
         )
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.getEligibilityPage(hmppsAuthClient)(req, res)
 
@@ -209,7 +209,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-denied.njk', {
@@ -239,7 +239,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getFullEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-full.njk', {
@@ -269,7 +269,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/eligibility-supplementary.njk', {
@@ -299,7 +299,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.body = {
           esupervision: { [crn]: { [id]: { checkins: { eligibility: 'eligibility-9' } } } },
         }
@@ -313,7 +313,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.body = {
           esupervision: { [crn]: { [id]: { checkins: { eligibility: 'eligibility-none' } } } },
         }
@@ -327,7 +327,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.body = {
           esupervision: { [crn]: { [id]: { checkins: { eligibility: ['eligibility-1'] } } } },
         }
@@ -343,7 +343,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.postFullEligibilityPage(hmppsAuthClient)(req, res)
 
@@ -356,7 +356,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient)(req, res)
 
@@ -2714,7 +2714,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getStartQuestionsPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/instructions.njk', {
@@ -2745,7 +2745,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.postStartQuestionsPage(hmppsAuthClient)(req, res)
 
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
@@ -2810,7 +2810,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith(
@@ -2845,7 +2845,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq({ mockData: 'value' })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/preview/feeling.njk', {
@@ -2876,7 +2876,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq({ mockData: 'value' })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getPreviewSupportPage(hmppsAuthClient)(req, res)
 
         expect(renderSpy).toHaveBeenCalledWith('pages/check-in/questions/preview/support.njk', {
@@ -2917,7 +2917,7 @@ describe('checkInsController', () => {
           )
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.getQuestionsListPage(hmppsAuthClient)(req, res)
 
         expect(getQuestionsListSpy).toHaveBeenCalledWith('en-GB')
@@ -2963,7 +2963,7 @@ describe('checkInsController', () => {
             },
           },
         })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
 
         await controllers.checkIns.getQuestionsListPage(hmppsAuthClient)(req, res)
 
@@ -2999,7 +2999,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         await controllers.checkIns.postQuestionsListPage(hmppsAuthClient)(req, res)
 
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
@@ -3050,7 +3050,7 @@ describe('checkInsController', () => {
             },
           },
         })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.params.questionId = '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'
 
         await controllers.checkIns.getEditQuestionPage(hmppsAuthClient)(req, res)
@@ -3126,7 +3126,7 @@ describe('checkInsController', () => {
             },
           },
         })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.params.questionId = '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'
         req.body = {
           esupervision: {
@@ -3165,7 +3165,7 @@ describe('checkInsController', () => {
         mockIsValidUUID.mockReturnValue(true)
 
         const req = baseReq()
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.params.templateId = '1'
 
         await controllers.checkIns.getSelectQuestionPage(hmppsAuthClient)(req, res)
@@ -3193,7 +3193,7 @@ describe('checkInsController', () => {
             },
           },
         })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.params.templateId = '1'
 
         await controllers.checkIns.getSelectQuestionPage(hmppsAuthClient)(req, res)
@@ -3234,7 +3234,7 @@ describe('checkInsController', () => {
             },
           },
         })
-        const { id } = req.params
+        const { id } = req.params as Record<string, string>
         req.params.questionId = '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'
 
         await controllers.checkIns.getDeleteQuestion(hmppsAuthClient)(req, res)

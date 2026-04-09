@@ -60,7 +60,9 @@
 {% block bodyStart %}{% endblock %}
 
 {% block footer %}
-  {% include "./_survey-useful.njk" %}
+  {% if not hideSurveyUsefulSections %}
+    {% include "./_survey-useful.njk" %}
+  {% endif %}
   {% include "./prob_fe_footer.njk" %}
 {% endblock %}
 {% block bodyEnd %}

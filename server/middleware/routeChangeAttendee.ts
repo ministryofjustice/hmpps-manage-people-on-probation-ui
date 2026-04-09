@@ -4,10 +4,10 @@ import { setDataValue } from '../utils'
 export const routeChangeAttendee = (req: Request, res: Response, next: NextFunction) => {
   const {
     body,
-    params: { crn, id },
     query: { change },
     url,
   } = req
+  const { crn, id } = req.params as Record<string, string>
   if (body?.['submit-btn'] === '') {
     return next()
   }

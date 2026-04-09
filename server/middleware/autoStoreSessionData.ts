@@ -9,7 +9,7 @@ import '../@types/express/index.d'
 export const autoStoreSessionData = (_hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, _res, next) => {
     const newSessionData: Data = req?.session?.data ?? {}
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const inputs: Record<string, any> = req.body ?? {}
 
     const deleteValues = (keys: string[]): void => {

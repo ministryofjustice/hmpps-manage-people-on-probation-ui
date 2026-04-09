@@ -8,7 +8,7 @@ const booleanToYesNo = (answer: boolean): YesNo => (answer === true ? 'Yes' : 'N
 
 export const constructNextAppointmentSession = (req: Request, res: AppResponse, next: NextFunction) => {
   const { appointment } = res.locals.personAppointment
-  const { crn, id } = req.params
+  const { crn, id } = req.params as Record<string, string>
   const { nextAppointment: nextAppointmentSelection } = req.body
 
   let nextAppointment: AppointmentSession = {

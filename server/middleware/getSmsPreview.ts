@@ -10,7 +10,7 @@ import { Data } from '../models/Data'
 
 export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void>> => {
   return async (req, res, next?) => {
-    const { crn, id: uuid } = req.params
+    const { crn, id: uuid } = req.params as Record<string, string>
     const { username } = res.locals.user
     const {
       name: { forename: firstName },
