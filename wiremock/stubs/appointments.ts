@@ -171,9 +171,11 @@ const getAppointmentStub = (
   if (isFuture) {
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
-    const now = DateTime.now().plus({ days: 1 }).setZone('Europe/London')
-    const start = now.set({ hour: 9, minute: 0, second: 0 })
-    const end = now.set({ hour: 10, minute: 0, second: 0 })
+
+    const now = DateTime.now().setZone('Europe/London')
+    const start = now.plus({ days: 1 }).set({ hour: 9, minute: 0, second: 0 })
+    const end = now.plus({ days: 1 }).set({ hour: 10, minute: 0, second: 0 })
+
     mapping.response.jsonBody.appointment.startDateTime = start.toISO({ suppressMilliseconds: true })
     mapping.response.jsonBody.appointment.endDateTime = end.toISO({ suppressMilliseconds: true })
   }
