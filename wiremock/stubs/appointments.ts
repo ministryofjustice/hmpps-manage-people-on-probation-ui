@@ -172,7 +172,7 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
 
-    const now = DateTime.now().setZone('Europe/London')
+    const now = DateTime.now().plus({ days: 1 }).setZone('Europe/London')
     const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00Z`
     const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00Z`
 
