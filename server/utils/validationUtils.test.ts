@@ -173,7 +173,7 @@ describe('is a valid mobile number', () => {
 describe('time is now or in future', () => {
   beforeEach(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
   })
   afterAll(() => {
     jest.useRealTimers()
