@@ -20,6 +20,11 @@ export type AppointmentOutcomeType =
   | 'EVIDENCE_REQUESTED'
   | 'WILL_BE_RESCHEDULED'
 
+export type AppointmentEnforcementAction =
+  | 'SEND_LETTER'
+  | 'INITIATE_BREACH_RECALL'
+  | 'INITIATE_BREACH_RECALL_AND_SEND_LETTER'
+
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
   complied: 'YES' | 'NO'
@@ -70,6 +75,7 @@ export interface AppointmentSession {
   }
   outcome?: {
     type: AppointmentOutcomeType
+    enforcementAction: AppointmentEnforcementAction
   }
 }
 

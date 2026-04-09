@@ -112,17 +112,14 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       const masClient = new MasApiClient(token)
       const { crn } = res.locals.appointmentOutcome
       const [breachRecallData] = await Promise.all([masClient.getBreachRecallInformation(crn)])
-      console.dir(res.locals.appointmentOutcome, { depth: null })
-      console.dir(breachRecallData, { depth: null })
       const appointmentType = res?.locals?.appointment?.type?.description
-
       const personalDetails = res.locals.case as any
       const responsibleOfficer = personalDetails?.staffContacts?.find((c: any) => c.responsibleOfficer)
       const isResponsibleOfficer = responsibleOfficer?.username === res.locals.user.username
       const isHomeVisitOrTelephoneAppointment = ['Telephone contact', 'Home visit'].includes(appointmentType)
       const isReferToProbationPractitioner = isResponsibleOfficer || isHomeVisitOrTelephoneAppointment
 
-      return res.render('pages/appointments-outcomes/attended-failed-to-comply', {
+      return res.render('pages/appointment-outcomes/attended-failed-to-comply', {
         breachRecallData,
         personOnProbationFirstName: res.locals.case.name.forename,
         isReferToProbationPractitioner,

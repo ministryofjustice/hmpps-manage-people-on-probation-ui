@@ -240,7 +240,7 @@ describe('controllers/appointmentOutcomes', () => {
         .mockResolvedValue('Initiate a breach')
       const spy = jest.spyOn(res, 'render')
       await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith('pages/appointments-outcomes/attended-failed-to-comply', {
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply', {
         breachRecallData: 'Initiate a breach',
         personOnProbationFirstName: 'Stuart',
         isReferToProbationPractitioner: false,
@@ -266,7 +266,7 @@ describe('controllers/appointmentOutcomes', () => {
     const spy = jest.spyOn(res, 'render')
     await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
     expect(spy).toHaveBeenCalledWith(
-      'pages/appointments-outcomes/attended-failed-to-comply',
+      'pages/appointment-outcomes/attended-failed-to-comply',
       expect.objectContaining({
         isReferToProbationPractitioner: true,
       }),
@@ -286,7 +286,7 @@ describe('controllers/appointmentOutcomes', () => {
     const spy = jest.spyOn(res, 'render')
     await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
     expect(spy).toHaveBeenCalledWith(
-      'pages/appointments-outcomes/attended-failed-to-comply',
+      'pages/appointment-outcomes/attended-failed-to-comply',
       expect.objectContaining({
         breachRecallData: 'Initiate a breach',
         isReferToProbationPractitioner: false,

@@ -83,14 +83,14 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     getPersonalDetails(hmppsAuthClient, arnsComponents),
   )
+  router.get(
+    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
+    controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
+  )
   router.post(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     appointments,
-    controllers.appointmentOutcomes.getAttendedFailedToComply(hmppsAuthClient),
-  )
-  router.get(
-    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
-    controllers.appointmentOutcomes.getAttendedFailedToComply(),
+    controllers.appointmentOutcomes.postAttendedFailedToComply(hmppsAuthClient),
   )
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
