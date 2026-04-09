@@ -151,7 +151,7 @@ export const timeIsNotLaterThan = (args: any[]) => {
 }
 
 export const isValidRescheduledDateTime = (_args: any[], _now: DateTime, request: Request) => {
-  const { crn, id } = request.params
+  const { crn, id } = request.params as Record<string, string>
   const date = request.body?.appointments?.[crn]?.[id]?.date
   const start = request.body?.appointments?.[crn]?.[id]?.start
   const end = request.body?.appointments?.[crn]?.[id]?.end

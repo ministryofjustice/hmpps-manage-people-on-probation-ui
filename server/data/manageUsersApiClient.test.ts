@@ -32,7 +32,9 @@ describe('manageUsersApiClient', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-    nock.cleanAll()
+    nock.cleanAll() // Removes all interceptors
+    nock.restore() // Restores http/https modules
+    nock.activate() // Re-activate for the next test
   })
 
   describe('getUser', () => {

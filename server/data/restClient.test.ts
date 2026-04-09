@@ -137,11 +137,15 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     it('should log any errors if found', async () => {
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
-        .reply(500, (_, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
+        .reply(500, { message: 'This is a test error' })
+        .persist()
 
-      await expect(restClient[method]<ErrorSummary>({ path: `/test`, handle500: true })).rejects.toThrow(
-        'This is a test error',
-      )
+      await expect(
+        restClient[method]<ErrorSummary>({
+          path: `/test`,
+          handle500: false,
+        }),
+      ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)
     })
   } else {
@@ -184,13 +188,12 @@ describe.each(['get', 'post', 'put', 'delete'] as const)('Method: %s', method =>
     it('should log any errors if found', async () => {
       nock('http://localhost:8080', { reqheaders: { authorization: 'Bearer token-1' } })
         [method]('/api/test')
-        .reply(500, (_uri, _body, cb) => cb(new Error('This is a test error'), [500, 'Error body']))
+        .reply(500, { message: 'This is a test error' })
 
       await expect(
         restClient[method]<ErrorSummary>({
           path: `/test`,
-          retry: true,
-          handle500: true,
+          handle500: false,
         }),
       ).rejects.toThrow('This is a test error')
       expect(nock.isDone()).toBe(true)

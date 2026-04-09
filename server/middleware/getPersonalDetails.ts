@@ -21,7 +21,7 @@ export const getPersonalDetails = (
   arnsComponents: ArnsComponents,
 ): Route<Promise<void>> => {
   return async (req, res, next) => {
-    const { crn } = req.params
+    const { crn } = req.params as Record<string, string>
     let sentencePlan: SentencePlan
     let overview: PersonalDetails
     let risks: RiskSummary

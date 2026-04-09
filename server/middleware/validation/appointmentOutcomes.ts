@@ -8,7 +8,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   let errorMessages = res?.locals?.errorMessages || {}
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
   const { params, body } = req
-  const { crn, id, contactId } = params
+  const { crn, id, contactId } = params as Record<string, string>
   const baseUrl = req.url.split('?')[0]
 
   const localParams: LocalParams = {
