@@ -5,7 +5,7 @@
 {% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 {% set addQuestionLinkBase = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" %}
 {% set addQuestionText = "Add" %}
-{% set questions = questionsList.questions %}
+{% set templates = templatesList.templates %}
 
 {% set tableData = {
   firstCellIsHeader: true,
@@ -27,16 +27,16 @@
   rows: []
 } %}
 
-{% for question in questions %}
+{% for template in templates %}
     {% set row = tableData.rows.push([
         {
-            html: '<strong>' + question.template + '</strong>'
+            html: '<strong>' + template.displayTemplate + '</strong>'
         },
         {
-            text: question.example
+            text: template.example
         },
         {
-            html: '<a href="' + addQuestionLinkBase + question.id + '/select" class="govuk-link" data-qa="add-question-link">' + addQuestionText +'</a>'
+            html: '<a href="' + addQuestionLinkBase + template.id + '/select" class="govuk-link" data-qa="add-question-link">' + addQuestionText +'</a>'
         }
     ]) %}
 {% endfor %}

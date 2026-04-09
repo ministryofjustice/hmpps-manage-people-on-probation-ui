@@ -2,6 +2,8 @@ import config from '../config'
 import RestClient from './restClient'
 
 import {
+  AssignQuestionsRequest,
+  AssignQuestionsResponse,
   CheckinScheduleRequest,
   CheckinScheduleResponse,
   DeactivateOffenderRequest,
@@ -109,34 +111,23 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
-  // gets question templates
-  async getQuestionsTemplates(lang: string): Promise<EsupervisionQuestionTemplatesResponse> {
+  async getQuestionsTemplates(lang: string = 'en-GB'): Promise<EsupervisionQuestionTemplatesResponse> {
     // return this.get({
     //   path: `/v2/questions/templates?lang=${lang}`,
     // })
-    // temporary use of mock data
+    // temporary use of mock data, swap for path above when API is ready
     const response: EsupervisionQuestionTemplatesResponse = esupervisionAdditionalQuestions
     return response
   }
 
-  // assigns selected questions to a check in
-  // async postAssignQuestionsToCheckIn(
-  //   uuid: string,
-  //   reactivateOffenderRequest: ReactivateOffenderRequest,
-  // ): Promise<CheckinScheduleResponse> {
-  //   return this.post({
-  //     path: `/v2/question-list/assign`,
-  //     data: {},
-  //   })
-  // }
-
-  // when questions have already been assigned to a check in
-  // async getAssignedQuestionsList(lang: string): Promise<EsupervisionQuestionTemplatesResponse> {
-  //   return this.get({
-  //     path: `/v2/questions/question-list/assign/{id}`,
-  //   })
-  //   const response: EsupervisionQuestionTemplatesResponse = {
-  //   }
-  //   return response
-  // }
+  // assigns additional questions to a check in
+  async postAssignQuestionsToCheckIn(
+    crn: string,
+    assignQuestionsRequest: AssignQuestionsRequest,
+  ): Promise<AssignQuestionsResponse> {
+    return this.put({
+      path: `/v2/questions/assign?crn=${crn}`,
+      data: assignQuestionsRequest,
+    })
+  }
 }

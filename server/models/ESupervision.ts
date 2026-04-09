@@ -26,7 +26,7 @@ export interface CheckinUserDetails {
 }
 
 export interface ManageQuestionsSession {
-  availableQuestions?: EsupervisionQuestionTemplatesList[]
+  availableTemplates?: EsupervisionQuestionTemplatesList[]
   questionTemplateAndInputs?: Record<string, string>
   draftQuestionInput?: string
 }

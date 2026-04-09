@@ -286,9 +286,9 @@ const eSuperVision: Route<void> = (req, res, next) => {
 
       localParams.questionId = draftId
 
-      const availableQuestions =
-        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions']) || []
-      const questionData = parseQuestionTemplate(availableQuestions, templateId)
+      const availableTemplates =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
+      const questionData = parseQuestionTemplate(availableTemplates, templateId)
       if (questionData) {
         localParams.question = questionData
       }

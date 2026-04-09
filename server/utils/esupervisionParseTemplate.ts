@@ -1,31 +1,17 @@
-export const parseQuestionTemplate = (availableQuestions: any[], questionId: string | number) => {
-  const selectedQuestion = availableQuestions?.find((q: any) => String(q.id) === String(questionId))
+export const parseQuestionTemplate = (availableTemplates: any[], questionId: string | number) => {
+  const selectedTemplate = availableTemplates?.find((q: any) => String(q.id) === String(questionId))
 
-  if (!selectedQuestion) return null
+  if (!selectedTemplate) return null
 
-  const { template } = selectedQuestion
-  const start = template.indexOf('[')
-  const end = template.indexOf(']', start)
-
-  let prefix: string
-  let rawSuffix: string
-
-  if (start !== -1 && end !== -1) {
-    prefix = template.substring(0, start)
-    rawSuffix = template.substring(end + 1)
-  } else {
-    prefix = template
-    rawSuffix = ''
-  }
-
-  let suffix = rawSuffix.trimStart()
-  if (suffix.match(/^[a-zA-Z]/)) {
-    suffix = ` ${suffix}`
-  }
+  const { template, responseSpec } = selectedTemplate
+  const placeholderWord = responseSpec?.placeholders?.[0]
+  const splitTarget = `{{${placeholderWord}}}`
+  const [prefix, suffix = ''] = template.split(splitTarget)
 
   return {
-    id: selectedQuestion.id,
-    prefix: prefix.trimEnd(),
+    id: selectedTemplate.id,
+    prefix,
     suffix,
+    placeholderWord,
   }
 }

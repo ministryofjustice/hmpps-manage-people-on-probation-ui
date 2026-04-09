@@ -627,7 +627,7 @@ describe('Test eSuperVision validation', () => {
         [crn]: {
           [id]: {
             manageQuestions: {
-              availableQuestions: [{ id: '1', template: 'Have you heard back from [insert text]?' }],
+              availableTemplates: [{ id: '1', template: 'Have you heard back from {{thing}}?' }],
             },
           },
         },

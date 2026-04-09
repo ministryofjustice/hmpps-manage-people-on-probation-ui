@@ -2777,22 +2777,29 @@ describe('checkInsController', () => {
     describe('getAddQuestionsPage', () => {
       beforeEach(() => {
         jest.spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates').mockResolvedValue({
-          questions: [
+          templates: [
             {
-              id: '1',
-              template: 'Have you heard back from [insert text]?',
-              policy: 'CUSTOM',
-              example: 'your GP',
+              id: 1,
+              template: 'How has {{thing}} been going recently?',
+              example: 'unpaid work, college course, work, apprenticeship, university course, sentence plan, training',
               responseFormat: 'TEXT',
-              responseSpec: {} as any,
+              responseSpec: {
+                hint: 'Hint for the question about the {{thing}}',
+                placeholders: ['thing'],
+                domain_msg_head: 'How do they feel the {{thing}} has gone recently?',
+              },
             },
             {
-              id: '2',
-              template: 'How are things at [insert text]?',
-              policy: 'CUSTOM',
-              example: 'your new job',
+              id: 2,
+              template: 'How have things been feeling {{thing}} recently? ',
+              example:
+                'home, work, relationships with family, appointments with other bodies, physical or mental health, recovery journey',
               responseFormat: 'TEXT',
-              responseSpec: {} as any,
+              responseSpec: {
+                hint: 'Hint for the question about the {{thing}}',
+                placeholders: ['thing'],
+                domain_msg_head: 'How do they feel about the {{thing}}?',
+              },
             },
           ],
         })
@@ -2902,7 +2909,11 @@ describe('checkInsController', () => {
         const getQuestionsListSpy = jest
           .spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates')
           .mockImplementation(() =>
-            Promise.resolve({ questions: [{ id: '1', template: 'Have you heard back from [insert text]?' }] } as any),
+            Promise.resolve({
+              templates: [
+                { id: '1', template: 'Have you heard back from {{thing}}?', responseSpec: { placeholders: ['thing'] } },
+              ],
+            } as any),
           )
 
         const req = baseReq()
@@ -2912,8 +2923,8 @@ describe('checkInsController', () => {
         expect(getQuestionsListSpy).toHaveBeenCalledWith('en-GB')
         expect(mockSetDataValue).toHaveBeenCalledWith(
           req.session.data,
-          ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'],
-          [{ id: '1', template: 'Have you heard back from [insert text]?' }],
+          ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
+          [{ id: '1', template: 'Have you heard back from {{thing}}?', responseSpec: { placeholders: ['thing'] } }],
         )
         expect(renderSpy).toHaveBeenCalledWith(
           'pages/check-in/questions/list-questions.njk',
@@ -3027,7 +3038,13 @@ describe('checkInsController', () => {
             [crn]: {
               [uuid]: {
                 manageQuestions: {
-                  availableQuestions: [{ id: '1', template: 'Have you heard back from [insert text]?' }],
+                  availableTemplates: [
+                    {
+                      id: '1',
+                      template: 'Have you heard back from {{thing}}?',
+                      responseSpec: { placeholders: ['thing'] },
+                    },
+                  ],
                 },
               },
             },
@@ -3045,7 +3062,11 @@ describe('checkInsController', () => {
             id,
             questionId: '1-f47ac10b-58cc-4372-a567-0e02b2c3d479',
             case: mockPersonalDetails,
-            question: expect.objectContaining({ prefix: 'Have you heard back from', suffix: '?' }),
+            question: expect.objectContaining({
+              prefix: 'Have you heard back from ',
+              suffix: '?',
+              placeholderWord: 'thing',
+            }),
             data: req.session.data,
           }),
         )
@@ -3062,7 +3083,7 @@ describe('checkInsController', () => {
             [crn]: {
               [uuid]: {
                 manageQuestions: {
-                  availableQuestions: [{ id: '1', template: 'Have you heard back from [insert text]?' }],
+                  availableTemplates: [{ id: '1', template: 'Have you heard back from {{thing}}?' }],
                 },
               },
             },

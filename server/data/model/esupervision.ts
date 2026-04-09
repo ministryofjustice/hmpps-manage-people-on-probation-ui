@@ -180,22 +180,36 @@ export interface ReactivateOffenderRequest {
   }
 }
 
+export interface AssignQuestionsRequest {
+  questions: {
+    id: number
+    params: {
+      placeholders: Record<string, string>
+      responseFormat: string
+    }
+  }[]
+  language: string
+  author: string
+}
+
+export interface AssignQuestionsResponse {
+  listId: number
+}
+
 export interface EsupervisionQuestionTemplatesList {
-  id: string
-  policy: 'CUSTOM' | 'DEFAULT'
+  id: number
   template: string
   example: string
-  responseFormat: 'TEXT' | 'MULTIPLECHOICE'
+  responseFormat: 'TEXT'
   responseSpec: {
-    id: string
-    label: string
-    detailsLabel: string
-    detailsId: string
+    hint: string
+    placeholders: string[]
+    domain_msg_head: string
   }
 }
 
 export interface EsupervisionQuestionTemplatesResponse {
-  questions: EsupervisionQuestionTemplatesList[]
+  templates: EsupervisionQuestionTemplatesList[]
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

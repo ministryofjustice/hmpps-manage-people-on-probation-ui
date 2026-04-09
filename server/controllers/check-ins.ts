@@ -6,6 +6,7 @@ import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
+  AssignQuestionsRequest,
   CheckinScheduleRequest,
   DeactivateOffenderRequest,
   ESupervisionNote,
@@ -1321,14 +1322,14 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const { data } = req.session
 
-      let availableQuestions =
-        getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions']) || []
-      if (availableQuestions.length === 0) {
+      let availableTemplates =
+        getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
+      if (availableTemplates.length === 0) {
         const eSupClient = new ESupervisionClient(token)
         // this is currently mock data, waiting for API changes to be made
-        const questionsList = await eSupClient.getQuestionsTemplates('en-GB')
-        availableQuestions = questionsList.questions
-        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'], availableQuestions)
+        const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
+        availableTemplates = templatesList.templates
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'], availableTemplates)
       }
 
       let questionTemplateAndInputs = getDataValue(data, [
@@ -1350,17 +1351,17 @@ const checkInsController: Controller<typeof routes, void> = {
       }
 
       const addedQuestions = Object.entries(questionTemplateAndInputs)
-        .map(([qId, answer]) => {
-          if (!answer || (answer as string).trim() === '') return null
+        .map(([qId, inputValue]) => {
+          if (!inputValue || (inputValue as string).trim() === '') return null
 
           const templateId = qId.split('-')[0]
-          const templateData = parseQuestionTemplate(availableQuestions, templateId)
+          const templateData = parseQuestionTemplate(availableTemplates, templateId)
 
           if (!templateData) return null
 
           return {
             id: qId,
-            fullText: `${templateData.prefix} ${answer}${templateData.suffix}`.trim(),
+            fullText: `${templateData.prefix} ${inputValue}${templateData.suffix}`.trim(),
           }
         })
         .filter(q => q !== null)
@@ -1381,21 +1382,43 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id } = req.params
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
-      const questionTemplateAndInputs =
-        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs']) || {}
+      const manageQuestionsSession = getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions']) || {}
+      const questionTemplateAndInputs = manageQuestionsSession.questionTemplateAndInputs || {}
+      const availableTemplates = manageQuestionsSession.availableTemplates || []
 
-      // TBC payload structure
-      const questionsPayload = Object.entries(questionTemplateAndInputs).map(([draftId, answer]) => ({
-        templateId: draftId.split('-')[0],
-        answer,
-      }))
+      const formattedQuestions = Object.entries(questionTemplateAndInputs).map(([draftId, inputValue]) => {
+        const templateId = draftId.split('-')[0]
 
-      // Send to API when it is ready
-      // const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      // const eSupClient = new ESupervisionClient(token)
+        const originalTemplate = availableTemplates.find((t: any) => String(t.id) === String(templateId))
+        const placeholderKey = originalTemplate?.responseSpec?.placeholders?.[0] || 'text'
+        const responseFormat = originalTemplate?.responseFormat || 'TEXT'
 
-      res.locals.success = true
-      setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
+        return {
+          id: parseInt(templateId, 10),
+          params: {
+            placeholders: {
+              [placeholderKey]: inputValue as string,
+            },
+            responseFormat,
+          },
+        }
+      })
+
+      const body: AssignQuestionsRequest = {
+        questions: formattedQuestions,
+        language: 'en-GB',
+        author: res.locals.user.username,
+      }
+
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const eSupClient = new ESupervisionClient(token)
+      // enable when API is ready
+      // const response = await eSupClient.postAssignQuestionsToCheckIn(crn, body)
+
+      // if (response?.listId) {
+      //   res.locals.success = true
+      //   setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
+      // }
 
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }
@@ -1457,12 +1480,12 @@ const checkInsController: Controller<typeof routes, void> = {
       const eSupClient = new ESupervisionClient(token)
 
       const personalDetails = await masClient.getPersonalDetails(crn)
-      const questionsList = await eSupClient.getQuestionsTemplates('en-GB')
+      const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
 
       setDataValue(
         req.session.data,
-        ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'],
-        questionsList.questions,
+        ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
+        templatesList.templates,
       )
       // redirect if questions >= 3
       const questionTemplateAndInputs =
@@ -1470,12 +1493,17 @@ const checkInsController: Controller<typeof routes, void> = {
       if (Object.keys(questionTemplateAndInputs).length >= 3) {
         return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
       }
+      // replace curly braces placeholder with [insert text] for presentation
+      const displayTemplates = templatesList.templates.map((q: any) => ({
+        ...q,
+        displayTemplate: q.template.replace(/{{.*?}}/, '[insert text]'),
+      }))
       return res.render('pages/check-in/questions/list-questions.njk', {
         crn,
         id,
         back,
         case: personalDetails,
-        questionsList,
+        templatesList: { templates: displayTemplates },
         data: req.session.data,
       })
     }
@@ -1505,22 +1533,22 @@ const checkInsController: Controller<typeof routes, void> = {
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
 
-      let availableQuestions =
-        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableQuestions']) || []
+      let availableTemplates =
+        getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
 
-      if (availableQuestions.length === 0) {
+      if (availableTemplates.length === 0) {
         const eSupClient = new ESupervisionClient(token)
-        const questionsList = await eSupClient.getQuestionsTemplates('en-GB')
-        availableQuestions = questionsList.questions
+        const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
+        availableTemplates = templatesList.templates
         setDataValue(
           req.session.data,
-          ['esupervision', crn, id, 'manageQuestions', 'availableQuestions'],
-          availableQuestions,
+          ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
+          availableTemplates,
         )
       }
 
       const templateId = questionId.split('-')[0]
-      const questionForView = parseQuestionTemplate(availableQuestions, templateId)
+      const questionForView = parseQuestionTemplate(availableTemplates, templateId)
 
       if (!questionForView) return renderError(404)(req, res)
 
@@ -1541,13 +1569,13 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id, questionId } = req.params
       const { data } = req.session
 
-      const answer = req.body?.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput
+      const inputValue = req.body?.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput
 
-      if (answer && answer.trim() !== '') {
+      if (inputValue && inputValue.trim() !== '') {
         setDataValue(
           data,
           ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs', questionId],
-          answer.trim(),
+          inputValue.trim(),
         )
 
         if (data.esupervision?.[crn]?.[id]?.manageQuestions?.draftQuestionInput !== undefined) {
