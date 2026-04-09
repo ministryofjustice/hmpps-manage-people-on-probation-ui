@@ -171,7 +171,6 @@
     "prom-client": "^15.1.3",
     "redis": "5.11.0",
     "slugify": "^1.6.9",
-    "promise-retry": "2.0.1",
     "superagent": "^10.2.2",
     "timepicker": "^1.14.1",
     "url-value-parser": "^2.2.0",
