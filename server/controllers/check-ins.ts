@@ -1496,7 +1496,7 @@ const checkInsController: Controller<typeof routes, void> = {
       // replace curly braces placeholder with [insert text] for presentation
       const displayTemplates = templatesList.templates.map((q: any) => ({
         ...q,
-        displayTemplate: q.template.replace(/{{.*?}}/, '[insert text]'),
+        displayTemplate: q.template.replace(/{{[^}]+}}/, '[insert text]'),
       }))
       return res.render('pages/check-in/questions/list-questions.njk', {
         crn,
