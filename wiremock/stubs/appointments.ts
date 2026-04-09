@@ -173,11 +173,11 @@ const getAppointmentStub = (
     mapping.response.jsonBody.appointment.isPastAppointment = false
 
     const now = DateTime.now().setZone('Europe/London')
-    const start = now.plus({ days: 1 }).set({ hour: 9, minute: 0, second: 0 })
-    const end = now.plus({ days: 1 }).set({ hour: 10, minute: 0, second: 0 })
+    const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00Z`
+    const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00Z`
 
-    mapping.response.jsonBody.appointment.startDateTime = start.toISO({ suppressMilliseconds: true })
-    mapping.response.jsonBody.appointment.endDateTime = end.toISO({ suppressMilliseconds: true })
+    mapping.response.jsonBody.appointment.startDateTime = start
+    mapping.response.jsonBody.appointment.endDateTime = end
   }
   if (notes) {
     mapping.response.jsonBody.appointment.appointmentNotes = [
