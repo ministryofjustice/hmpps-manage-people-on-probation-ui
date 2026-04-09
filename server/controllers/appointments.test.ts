@@ -529,7 +529,7 @@ describe('controllers/appointments', () => {
         })
         it('should send the patch request to the api', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId, 10),
+            id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
             sensitive: true,
             outcomeRecorded: false,
@@ -577,7 +577,7 @@ describe('controllers/appointments', () => {
         })
         it('should send the patch request to the api', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId, 10),
+            id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
             sensitive: true,
             outcomeRecorded: true,

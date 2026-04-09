@@ -18,7 +18,7 @@ export const cacheUploadedFiles = (req: Request, res: AppResponse, next: NextFun
       ]
     }
   }
-  const { contactId: id } = req.params
+  const { contactId: id } = req.params as Record<string, string>
   const uploadedFiles: FileCache[] = []
 
   for (const file of filesAdded) {

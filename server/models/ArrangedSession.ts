@@ -5,7 +5,7 @@ export class ArrangedSession {
   params: any
 
   constructor(params: any) {
-    this.params = params
+    this.params = params as Record<string, string>
     this.params.date = this.getDateString(params)
     this.params.startTime = params.startTime ?? '10:00am'
     this.params.endTime = params.endTime ?? '11:00am'

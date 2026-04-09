@@ -7,7 +7,7 @@ import { Name } from '../data/model/personalDetails'
 
 export const getDefaultUser = (hmppsAuthClient: HmppsAuthClient): Route<Promise<void | null>> => {
   return async (req, res, next) => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const { username } = res.locals.user
     const { data } = req.session
     // eslint-disable-next-line no-useless-escape

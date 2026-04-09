@@ -16,7 +16,9 @@ describe('Service healthcheck', () => {
 
   afterEach(() => {
     nock.abortPendingRequests()
-    nock.cleanAll()
+    nock.cleanAll() // Removes all interceptors
+    nock.restore() // Restores http/https modules
+    nock.activate() // Re-activate for the next test
   })
 
   describe('Check healthy', () => {

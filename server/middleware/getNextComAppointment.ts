@@ -5,7 +5,7 @@ import MasApiClient from '../data/masApiClient'
 
 export const getNextComAppointment = (hmppsAuthClient: HmppsAuthClient) => {
   return async (req: Request, res: AppResponse, next: NextFunction): Promise<void> => {
-    const { crn, contactId } = req.params
+    const { crn, contactId } = req.params as Record<string, string>
     const { username } = res.locals.user
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
