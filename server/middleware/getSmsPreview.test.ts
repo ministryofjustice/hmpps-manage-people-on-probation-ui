@@ -78,6 +78,7 @@ const res = mockAppResponse({
       postcode: 'MN12 4PP',
     },
   },
+  flags: { enableSmsReminders: true },
 })
 const hmppsAuthClient = new HmppsAuthClient(tokenStore)
 
