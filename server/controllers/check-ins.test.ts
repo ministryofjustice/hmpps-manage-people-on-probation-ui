@@ -3157,6 +3157,24 @@ describe('checkInsController', () => {
         expect(req.session.data.esupervision[crn][id].manageQuestions.draftQuestionInput).toBeUndefined()
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
       })
+
+      it('does not save to session if input is empty or whitespace, but still redirects', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params as Record<string, string>
+        req.params.questionId = '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'
+
+        req.body = {
+          esupervision: { [crn]: { [id]: { manageQuestions: { draftQuestionInput: '   ' } } } },
+        }
+
+        await controllers.checkIns.postEditQuestionPage(hmppsAuthClient)(req, res)
+
+        expect(mockSetDataValue).not.toHaveBeenCalled()
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
+      })
     })
 
     describe('getSelectQuestionPage', () => {

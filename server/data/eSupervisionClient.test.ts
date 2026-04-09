@@ -10,6 +10,7 @@ import {
   DeactivateOffenderRequest,
   ReactivateOffenderRequest,
 } from './model/esupervision'
+import { esupervisionAdditionalQuestions } from '../controllers/mocks/esupervisionAdditionalQuestions'
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -356,6 +357,18 @@ describe('ESupervisionClient', () => {
         .reply(200, response)
 
       const output = await client.postReactivateOffender(checkInUuid, body)
+      expect(output).toEqual(response)
+    })
+  })
+
+  // this needs to be updated when we connect to the real API
+  describe('getQuestionsTemplates', () => {
+    it('should get questions templates', async () => {
+      const response = esupervisionAdditionalQuestions
+
+      fakeESupervisionApi.post(`/v2/`).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+
+      const output = await client.getQuestionsTemplates()
       expect(output).toEqual(response)
     })
   })
