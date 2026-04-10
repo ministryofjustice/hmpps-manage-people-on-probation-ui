@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import superagent, { SuperAgentRequest } from 'superagent'
 import { WiremockMapping } from '../../integration_tests/utils'
 
@@ -14,6 +15,7 @@ interface Args {
   locationOfficeName?: boolean
   hasRarActivity?: boolean
   noEventId?: boolean
+  eventId?: number
   noType?: boolean
   noAttendee?: boolean
   noLocation?: boolean
@@ -21,6 +23,8 @@ interface Args {
   startDateTime?: string
   endDateTime?: string
   outcome?: string
+  inOffice?: boolean
+  contactId?: string
 }
 
 const getAppointmentStub = (
@@ -37,6 +41,7 @@ const getAppointmentStub = (
     hasRarActivity = false,
     locationOfficeName = false,
     noEventId = false,
+    eventId = 48,
     noType = false,
     noAttendee = false,
     noLocation = false,
@@ -44,11 +49,13 @@ const getAppointmentStub = (
     startDateTime = '2024-02-21T10:15:00.382936Z[Europe/London]',
     endDateTime = '2024-02-21T10:30:00.382936Z[Europe/London]',
     outcome = '',
+    inOffice = true,
+    contactId = '6',
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
     request: {
-      urlPattern: '/mas/schedule/.*/appointment/6',
+      urlPattern: `/mas/schedule/.*/appointment/${contactId}`,
       method: 'GET',
     },
     response: {
@@ -137,7 +144,7 @@ const getAppointmentStub = (
           outcome,
           deliusManaged: false,
           isVisor: true,
-          eventId: 48,
+          eventId,
           component: {
             id: 0,
             description: '',
@@ -154,6 +161,9 @@ const getAppointmentStub = (
   if (!deliusManaged) {
     mapping.response.jsonBody.appointment.type = '3 Way Meeting (NS)'
   }
+  if (!inOffice) {
+    mapping.response.jsonBody.appointment.type = 'Planned Telephone Contact (NS)'
+  }
   if (personLevel) {
     mapping.response.jsonBody.appointment.type = 'Planned Doorstep Contact (NS)'
   }
@@ -161,6 +171,13 @@ const getAppointmentStub = (
   if (isFuture) {
     mapping.response.jsonBody.appointment.isInPast = false
     mapping.response.jsonBody.appointment.isPastAppointment = false
+
+    const now = DateTime.now().plus({ days: 1 }).setZone('Europe/London')
+    const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00Z`
+    const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00Z`
+
+    mapping.response.jsonBody.appointment.startDateTime = start
+    mapping.response.jsonBody.appointment.endDateTime = end
   }
   if (notes) {
     mapping.response.jsonBody.appointment.appointmentNotes = [

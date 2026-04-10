@@ -81,9 +81,6 @@ describe('Manage an appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
-  afterEach(() => {
-    cy.task('resetMocks')
-  })
   it('should render the page', () => {
     loadPage()
     manageAppointmentPage = new ManageAppointmentPage()
@@ -119,13 +116,13 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
+        cy.task('stubEnableNonCompliance')
         loadPage()
       })
       appointmentActions()
     })
     describe('enableNonCompliance feature flag is disabled', () => {
       beforeEach(() => {
-        cy.task('stubDisableNonCompliance')
         loadPage()
       })
       appointmentActions(false)
@@ -150,6 +147,7 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is enabled', () => {
       beforeEach(() => {
+        cy.task('stubEnableNonCompliance')
         loadPage()
       })
       appointmentDetails()
@@ -157,7 +155,6 @@ describe('Manage an appointment', () => {
     })
     describe('enableNonCompliance feature flag is disabled', () => {
       beforeEach(() => {
-        cy.task('stubDisableNonCompliance')
         loadPage()
       })
       appointmentDetails(false)

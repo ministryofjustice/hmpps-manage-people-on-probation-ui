@@ -382,7 +382,7 @@ describe('checkInsController', () => {
   describe('getDateFrequencyPage', () => {
     it('renders with min date using single-digit day format (d/M/yyyy)', async () => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-07-01T09:00:00Z'))
+      jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime())
 
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
@@ -402,7 +402,7 @@ describe('checkInsController', () => {
 
     it('renders with min date using double-digit day format (dd/M/yyyy)', async () => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-07-09T09:00:00Z'))
+      jest.setSystemTime(new Date('2025-07-09T09:00:00Z').getTime())
 
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)

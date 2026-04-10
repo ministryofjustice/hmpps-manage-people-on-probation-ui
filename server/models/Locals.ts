@@ -1,21 +1,26 @@
-/* eslint-disable import/no-cycle */
-import { Response } from 'express'
-
 import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
+import { Response } from 'express'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
 import { Sentence } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
-import { AppointmentSession, AppointmentType, NextAppointmentResponse, YesNo } from './Appointments'
+import {
+  AppointmentSession,
+  AppointmentType,
+  NextAppointmentResponse,
+  YesNo,
+  AttendedCompliedAppointment,
+  AppointmentOutcomeOption,
+} from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
 import { PersonRiskFlags, RiskScore, RiskSummary, RoshRiskWidgetDto, TimelineItem } from '../data/model/risk'
 import { TierCalculation } from '../data/tierApiClient'
 import { ErrorSummary } from '../data/model/common'
-import { PersonAppointment, PersonSchedule } from '../data/model/schedule'
-import { FileCache } from '../@types'
+import { Activity, PersonAppointment, PersonSchedule } from '../data/model/schedule'
+import { FileCache } from '../@types/FileUpload.type'
 import { SentencePlan } from './Risk'
 import { ContactResponse } from '../data/model/overdueOutcomes'
 import { SmsPreviewResponse } from '../data/model/OutlookEvent'
@@ -122,7 +127,7 @@ interface Locals {
   backLink: string
   personAppointment?: PersonAppointment
   personSchedule?: PersonSchedule
-  nextAppointmentSession?: AppointmentSession
+  appointmentSession?: AppointmentSession
   nextAppointment?: NextAppointmentResponse
   fileErrorStatus?: number
   uploadedFiles?: FileCache[]
@@ -142,6 +147,24 @@ interface Locals {
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
   feedbackEmail?: string
+  appointmentOutcome?: AppointmentOutcomeProps
+}
+
+export interface AppointmentOutcomeProps {
+  forename: string
+  surname: string
+  appointment: AttendedCompliedAppointment | Activity
+  crn: string
+  uuid: string | undefined
+  contactId: string | undefined
+  id: string
+  isInPast: boolean
+  isValidParams: boolean
+  reqUrl: string
+  baseUrl: string
+  appointmentSession?: AppointmentSession
+  backLink?: string
+  options?: AppointmentOutcomeOption[]
 }
 
 export interface AppResponse extends Response {

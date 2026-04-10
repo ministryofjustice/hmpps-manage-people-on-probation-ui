@@ -6,7 +6,7 @@ import controllers from '../controllers'
 import {
   autoStoreSessionData,
   cacheUploadedFiles,
-  constructNextAppointmentSession,
+  createAppointmentSession,
   getAppointment,
   getAppointmentTypes,
   getOfficeLocationsByTeamAndProvider,
@@ -47,7 +47,7 @@ const rescheduleAppointmentRoutes = async (router: Router, { hmppsAuthClient, ar
     autoStoreSessionData(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    constructNextAppointmentSession,
+    createAppointmentSession,
     getUserProviders(hmppsAuthClient),
     controllers.rescheduleAppointments.postRescheduleAppointment(hmppsAuthClient),
   )

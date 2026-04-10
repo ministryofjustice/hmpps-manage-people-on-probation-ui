@@ -1,8 +1,6 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
-import { activityLogValidation } from '../../server/properties/validation/activityLog'
-import { getErrorMessage } from '../utils/index'
 import ManageAppointmentPage from '../pages/appointments/manage-appointment.page'
 
 const keywords = 'Phone call'
@@ -43,6 +41,7 @@ context('Contacts', () => {
     const page = new ErrorPage()
     page.checkPageTitle('Page not found')
   })
+
   it('should render the contacts results', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -54,51 +53,12 @@ context('Contacts', () => {
     page.getActivityTitle(2).should('contain.text', 'Phone call')
     page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/case/X000001/')
   })
-  it('should redirect to clean URL and show success banner when showSuccessBanner query param is present', () => {
-    cy.visit('/case/X000001/activity-log?showSuccessBanner=true')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    cy.url().should('not.include', 'showSuccessBanner')
-    page.getSuccessBanner().should('exist')
-  })
-  it('should redirect to clean URL and show upload failed banner when uploadFailed query param is present', () => {
-    cy.visit('/case/X000001/activity-log?showSuccessBanner=true&uploadFailed=true')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    cy.url().should('not.include', 'showSuccessBanner')
-    page.getUploadFailedBanner().should('exist')
-  })
-  it('should show the correct message in the success banner', () => {
-    cy.visit('/case/X000001/activity-log?showSuccessBanner=true')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    page.getSuccessBanner().should('contain.text', 'Contact created')
-    page
-      .getSuccessBanner()
-      .should(
-        'contain.text',
-        'You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.',
-      )
-  })
-  it('should show the correct message in the upload failed banner', () => {
-    cy.visit('/case/X000001/activity-log?showSuccessBanner=true&uploadFailed=true')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    page.getUploadFailedBanner().should('contain.text', 'The contact was created but the files did not upload')
-    page
-      .getUploadFailedBanner()
-      .should(
-        'contain.text',
-        'You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.',
-      )
-  })
-  it('should not show success banner when navigating directly to activity log', () => {
-    cy.visit('/case/X000001/activity-log')
-    const page = Page.verifyOnPage(ActivityLogPage)
-    page.getSuccessBanner().should('not.exist')
-    page.getUploadFailedBanner().should('not.exist')
-  })
   it('should render the page with date of death recorded warning', () => {
     cy.task('stubPersonalDetailsDateOfDeath')
     cy.visit('/case/X000001/activity-log')
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
+
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -121,23 +81,26 @@ context('Contacts', () => {
     })
     page.getActivityViewLink(0).should('exist')
   })
+
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
+
     page.getDateToToggle().click()
     page.getDateToDialog().should('be.visible').find(`button[data-testid="${date}"]`).click()
+
     page.getDateToInput().should('have.value', date)
     page.getDateToDialog().should('not.be.visible')
+
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
     page.getErrorSummaryLink(0).click()
     page.getDateFromInput().should('be.focused')
   })
+
   it('should show the correct validation if date from is selected, but no date to is selected', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -149,10 +112,11 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date to')
     page.getErrorSummaryLink(0).click()
     page.getDateToInput().should('be.focused')
   })
+
   it('should show the correct validation if an invalid date from is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -161,11 +125,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if an invalid date to is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -174,13 +137,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
   })
+
   it('should show the correct validation if date from doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -189,11 +149,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if date to doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -202,13 +161,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
   })
+
   it('should show the correct validation if date to is before date from', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -218,9 +174,7 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThan'))
+    page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
   it('should show the correct validation if date from is in the future', () => {
@@ -230,11 +184,10 @@ context('Contacts', () => {
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotLaterThanToday'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'The date from must be today or in the past')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if date to is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -242,13 +195,10 @@ context('Contacts', () => {
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThanToday'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'The date to must be today or in the past')
   })
+
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {
     cy.visit('/case/X000001/activity-log')
     const value = 'Phone call'

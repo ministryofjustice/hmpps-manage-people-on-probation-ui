@@ -502,7 +502,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getLocationDateTime', () => {
     beforeAll(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+      jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
     })
     afterAll(() => {
       jest.useRealTimers()
@@ -661,7 +661,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getLocationDateTime for double digit date', () => {
     beforeAll(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-07-10T09:00:00Z')) // 10:00 BST
+      jest.setSystemTime(new Date('2025-07-10T09:00:00Z').getTime()) // 10:00 BST
     })
     afterAll(() => {
       jest.useRealTimers()

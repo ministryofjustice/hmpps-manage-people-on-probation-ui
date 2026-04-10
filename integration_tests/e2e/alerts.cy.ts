@@ -1,7 +1,6 @@
 import Page from '../pages'
 import AlertsPage from '../pages/alerts'
 import OverviewPage from '../pages/overview'
-import { apiErrors } from '../../server/properties'
 
 context('Alerts Dashboard', () => {
   afterEach(() => {
@@ -20,7 +19,10 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsUnavailable')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    cy.get('.govuk-error-summary__list').should(
+      'contain.text',
+      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 
@@ -35,7 +37,10 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsServerError')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    cy.get('.govuk-error-summary__list').should(
+      'contain.text',
+      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 

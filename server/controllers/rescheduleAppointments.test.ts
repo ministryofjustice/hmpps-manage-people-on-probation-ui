@@ -128,17 +128,17 @@ describe('rescheduleAppointmentController', () => {
 
   describe('postRescheduleAppointment', () => {
     it('should call cloneAppointmentAndRedirect', async () => {
-      const nextAppointmentSession: AppointmentSession = {
+      const appointmentSession: AppointmentSession = {
         type: 'some-type',
       }
       const req = httpMocks.createRequest({
         params: { crn, id },
       })
-      res.locals.nextAppointmentSession = nextAppointmentSession
+      res.locals.appointmentSession = appointmentSession
 
       await rescheduleAppointmentController.postRescheduleAppointment(null)(req, res, null)
 
-      expect(mockedCloneAppointmentAndRedirect).toHaveBeenCalledWith(nextAppointmentSession, 'RESCHEDULE')
+      expect(mockedCloneAppointmentAndRedirect).toHaveBeenCalledWith(appointmentSession, 'RESCHEDULE')
       expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
     })
 
