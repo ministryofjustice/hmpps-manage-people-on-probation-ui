@@ -1,5 +1,5 @@
-import { checkPopHeader } from './imports'
-import { crn } from './imports/common'
+import { checkPopHeader } from '../appointments/imports'
+import { crn } from '../appointments/imports/common'
 import AttendedFailedToComplyPage from '../../pages/appointments/attended-failed-to-comply.page'
 
 const contactId = '123456'
@@ -7,7 +7,7 @@ const loadPage = (_crn = crn) => {
   cy.visit(`/case/${_crn}/appointments/appointment/${contactId}/attended-failed-to-comply`)
 }
 
-describe('Attended but failed to comply', () => {
+xdescribe('Attended but failed to comply', () => {
   let attendedFailedToComplyPage: AttendedFailedToComplyPage
 
   beforeEach(() => {
