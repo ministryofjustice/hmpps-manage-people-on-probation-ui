@@ -12,7 +12,6 @@ import PhotoRulesPage from '../../pages/check-ins/photo-rules'
 import CheckYourAnswersPage from '../../pages/check-ins/check-your-answers'
 import CheckinConfirmationPage from '../../pages/check-ins/confirmation.page'
 import TakeAPhotoPage from '../../pages/check-ins/take-a-photo'
-import { statusErrors } from '../../../server/properties'
 import OverviewPage from '../../pages/overview'
 import ManageCheckins from '../../pages/check-ins/manage-checkins'
 import ManageContactPage from '../../pages/check-ins/manage-contact'
@@ -785,8 +784,10 @@ context('check-ins error scenario ', () => {
 
   it('Should able to show error page, when checkin registration fails', () => {
     loadPage()
+
     cy.task('stubOffenderSetupComplete500Response')
     cy.get('[data-qa="online-checkin-btn"]').click()
+
     const eligibilityCheckPage = new EligibilityCheckPage()
     eligibilityCheckPage.getOptionOne().click()
     eligibilityCheckPage.getSubmitBtn().click()
@@ -794,6 +795,7 @@ context('check-ins error scenario ', () => {
     eligibilitySupplementaryPage.checkOnPage()
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
+
     dateFrequencyPage.checkOnPage()
     const now = DateTime.now()
     const future = now.plus({ days: 2 })
@@ -803,8 +805,10 @@ context('check-ins error scenario ', () => {
       .type(`${future.toFormat('d/M/yyyy')}`)
     dateFrequencyPage.getFrequency().find('.govuk-radios__item').eq(0).find('.govuk-radios__input').click()
     dateFrequencyPage.getSubmitBtn().click()
+
     const contactPreferencePage = new ContactPreferencePage()
     contactPreferencePage.checkOnPage()
+
     contactPreferencePage
       .getCheckInPreferredComs()
       .find('.govuk-radios__item')
@@ -818,6 +822,7 @@ context('check-ins error scenario ', () => {
     takeAPhotoOptionsPage.getSubmitBtn().click()
     takeAPhotoOptionsPage.getBackLink().click()
     takeAPhotoOptionsPage.checkOnPage()
+
     takeAPhotoOptionsPage.getPhotoOptions().find('.govuk-radios__item').eq(1).find('.govuk-radios__input').click()
     takeAPhotoOptionsPage.getSubmitBtn().click()
     const uploadAPhoto = new UploadAPhotoPage()
@@ -826,12 +831,16 @@ context('check-ins error scenario ', () => {
     uploadAPhoto.continueButton().click()
     const photoRules = new PhotoRulesPage()
     photoRules.checkOnPage()
+
     photoRules.getSubmitBtn().click()
     const checkYourAnswersPage = new CheckYourAnswersPage()
     checkYourAnswersPage.checkOnPage()
     checkYourAnswersPage.getSubmitBtn().click()
-    cy.get('h1').should('contain.text', statusErrors[500].title)
-    cy.get('[data-qa="errorMessage"]').should('contain.html', statusErrors[500].message)
+    cy.get('h1').should('contain.text', 'Sorry, there is a problem with the service')
+    cy.get('[data-qa="errorMessage"]').should(
+      'contain.html',
+      '<p>Try again later.</p><p>Any information you entered has not been saved. When the service is available, you will need to start again.</p>',
+    )
   })
 })
 

@@ -1,0 +1,33 @@
+{% extends "../_form.njk" %}
+{% set hideButton = true %}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+  {{ govukRadios({
+    formGroup: {
+      attributes: {
+        'data-qa': 'outcome'
+      } 
+    },
+    fieldset: {
+      legend: {
+        html: '<span data-qa="pageHeading">' + ('What was the outcome of this appointment?' if appointmentOutcome.isInPast else 'Why will ' + headerPersonName.forename | convertToTitleCase + ' not attend this appointment?') + '</span>',
+        classes: "govuk-fieldset__legend--l"
+      }
+    },
+ hint: {
+        text: "Appointment: " + appointmentOutcome.appointment.type + " with " + appointmentOutcome.appointment.officer.name | fullName | convertToTitleCase + " on " + appointmentOutcome.appointment.startDateTime | dateWithDayAndWithYear + "."
+    },
+    items: appointmentOutcome.options
+   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'type'])) }}
+  <div class="govuk-button-group">
+    {{ govukButton({
+                    text: "Continue",
+                    type: "submit",
+                    attributes: { "data-qa": "submit-btn" }
+                }) }}
+    <a class="govuk-link" href="{{ backLink }}" data-qa="cancelGoBackLink">
+                    Cancel and go back
+                </a>
+  </div>
+{% endblock %}

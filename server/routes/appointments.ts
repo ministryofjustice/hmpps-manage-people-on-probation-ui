@@ -4,13 +4,14 @@ import type { Services } from '../services'
 import type { Route } from '../@types'
 import controllers from '../controllers'
 import {
-  constructNextAppointmentSession,
+  createAppointmentSession,
   getAppointmentTypes,
   getSentences,
   getUserProviders,
   getNextComAppointment,
   getOverdueOutcomes,
   getPersonRiskFlags,
+  getAppointmentOutcomeProps,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
@@ -38,7 +39,13 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     controllers.appointments.postRecordAnOutcome(hmppsAuthClient),
   )
 
-  router.all('/case/:crn/appointments/appointment/:contactId/attended-complied', getPersonAppointment(hmppsAuthClient))
+  /* Delete these routes after enableNonCompliance feature flag is removed 👇 */
+
+  router.all(
+    '/case/:crn/appointments/appointment/:contactId/attended-complied',
+    getPersonAppointment(hmppsAuthClient),
+    getAppointmentOutcomeProps,
+  )
 
   get(
     '/case/:crn/appointments/appointment/:contactId/attended-complied',
@@ -51,6 +58,8 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     controllers.appointments.postAttendedComplied(hmppsAuthClient),
   )
 
+  /* ----------------- 👆 -----------------  */
+
   router.get(
     '/case/:crn/appointments/appointment/:contactId/next-appointment',
     getNextComAppointment(hmppsAuthClient),
@@ -62,7 +71,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
     validate.appointments,
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    constructNextAppointmentSession,
+    createAppointmentSession,
     getUserProviders(hmppsAuthClient),
     controllers.appointments.postNextAppointment(hmppsAuthClient),
   )

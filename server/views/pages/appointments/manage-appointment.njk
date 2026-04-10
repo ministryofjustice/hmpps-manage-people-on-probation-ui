@@ -7,9 +7,9 @@
 {% set documents = [] %}
 {% set location = addressToList(appointment.location).join('<br>') | safe %}
 {% set sentence = sentences[0].order.description %}
-{% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/attended-complied' %}
+{% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/attended-complied' %}
 {% if flags.enableNonCompliance %}
-  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + appointment.id + '/outcome' %}
+  {% set outcomeLink = '/case/' + crn + '/appointments/appointment/' + contactId + '/outcome' %}
 {% endif %}
 {% if appointment.location.officeName %}
   {% set location = appointment.location.officeName %}

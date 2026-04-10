@@ -9,6 +9,7 @@ interface Args {
   hasComplied?: boolean
   enableNonCompliance?: boolean
   hasOutcomeText?: boolean
+  isFuture?: boolean
 }
 
 const crn = 'X778160'
@@ -21,9 +22,10 @@ export const checkAppointmentDetails = (
     hasComplied = false,
     hasOutcomeText = false,
     enableNonCompliance = true,
+    isFuture = true,
   }: Args = {} as Args,
 ) => {
-  const args = { deliusManaged, hasOutcome, acceptableAbsence, hasComplied, enableNonCompliance }
+  const args = { deliusManaged, hasOutcome, acceptableAbsence, hasComplied, enableNonCompliance, isFuture }
   let page: ManageAppointmentPage
   let sentencePage: SentencePage
   const manageAppointmentPage = new ManageAppointmentPage()
@@ -83,7 +85,10 @@ export const checkAppointmentDetails = (
       ? 'should display the date and time with Reschedule link when date is in past'
       : 'should display the date and time with no Reschedule link',
     () => {
-      cy.task('stubAppointment', { ...args })
+      if (enableNonCompliance) {
+        cy.task('stubEnableNonCompliance')
+      }
+      cy.task('stubAppointment', { ...args, isFuture: false })
       loadPage()
       let index = deliusManaged && hasOutcome ? 2 : 1
       if (enableNonCompliance && !deliusManaged) index += 1
@@ -128,6 +133,9 @@ export const checkAppointmentDetails = (
   it('should display only the office name for the location', () => {
     let index = deliusManaged && hasOutcome ? 3 : 2
     if (enableNonCompliance && !deliusManaged) index += 1
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', { ...args, locationOfficeName: true })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
@@ -136,6 +144,9 @@ export const checkAppointmentDetails = (
       .should('contain.text', 'Leamington Probation Office')
   })
   it('should display the attending officer', () => {
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', { ...args })
     let index = deliusManaged && hasOutcome ? 4 : 3
     if (enableNonCompliance && !deliusManaged) index += 1
@@ -157,6 +168,9 @@ export const checkAppointmentDetails = (
     }
   })
   it(`should display the RAR activity`, () => {
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', {
       ...args,
       isFuture: true,
@@ -184,6 +198,9 @@ export const checkAppointmentDetails = (
     }
   })
   it('should display with no RAR activity', () => {
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', {
       ...args,
       isFuture: true,
@@ -233,6 +250,9 @@ export const checkAppointmentDetails = (
   it('should display the correct values if notes added to appointment', () => {
     let index = deliusManaged && hasOutcome ? 7 : 6
     if (enableNonCompliance && !deliusManaged) index += 1
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', { ...args, notes: true })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()
@@ -277,6 +297,9 @@ export const checkAppointmentDetails = (
   it('should display the correct values if no notes added to appointment', () => {
     let index = deliusManaged && hasOutcome ? 7 : 6
     if (enableNonCompliance && !deliusManaged) index += 1
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', {
       ...args,
       isFuture: true,
@@ -297,6 +320,9 @@ export const checkAppointmentDetails = (
   if (hasOutcomeText) {
     it('should display the outcome text', () => {
       const index = deliusManaged && hasOutcome ? 8 : 7
+      if (enableNonCompliance) {
+        cy.task('stubEnableNonCompliance')
+      }
       cy.task('stubAppointmentWithOutcomeText')
       cy.visit('/case/X778160/appointments/appointment/6/manage')
       page = new ManageAppointmentPage()
@@ -309,6 +335,9 @@ export const checkAppointmentDetails = (
     const baseIndex = deliusManaged && hasOutcome ? 8 : 7
     let index = baseIndex + (hasOutcomeText ? 1 : 0)
     if (enableNonCompliance && !deliusManaged) index += 1
+    if (enableNonCompliance) {
+      cy.task('stubEnableNonCompliance')
+    }
     cy.task('stubAppointment', { ...args })
     cy.visit('/case/X778160/appointments/appointment/6/manage')
     page = new ManageAppointmentPage()

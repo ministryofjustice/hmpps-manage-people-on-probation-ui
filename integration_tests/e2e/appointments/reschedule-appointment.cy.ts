@@ -8,11 +8,12 @@ describe('Reschedule Appointment', () => {
   let rescheduleAppointmentPage: RescheduleAppointmentPage
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
 
-  const loadPage = () => {
+  const loadPage = (enableNonCompliance = false) => {
     cy.visit('/case/X000001/appointments/appointment/6/manage')
+    const index = enableNonCompliance ? 2 : 1
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage
-      .getAppointmentDetailsListItem(2, 'actions')
+      .getAppointmentDetailsListItem(index, 'actions')
       .find('a')
       .should('contain.text', 'Reschedule')
       .should('have.attr', 'href', `/case/X000001/appointment/6/reschedule`)

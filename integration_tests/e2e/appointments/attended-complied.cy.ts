@@ -61,7 +61,7 @@ describe('Log attended and complied appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
-  /*
+
   describe('Manage appointment journey', () => {
     const manageJourney = true
 
@@ -87,7 +87,7 @@ describe('Log attended and complied appointment', () => {
     })
     checkValidation(manageJourney)
   })
-    */
+
   describe('Arrange appointment journey - date selected in the past', () => {
     beforeEach(() => {
       loadPage()

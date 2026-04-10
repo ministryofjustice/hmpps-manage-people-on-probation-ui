@@ -5,7 +5,6 @@ import { addParameters } from '@ministryofjustice/probation-search-frontend/util
 import { Controller, FileCache } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import {
-  toRoshWidget,
   isNumericString,
   isValidCrn,
   isMatchingAddress,
@@ -14,7 +13,7 @@ import {
   getDataValue,
   canRescheduleAppointment,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
@@ -190,7 +189,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-
   postRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn, actionType } = req.params as Record<string, string>
@@ -203,6 +201,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       )
     }
   },
+  /* Delete these controllers after enableNonCompliance feature flag is removed 👇 */
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params as Record<string, string>
@@ -215,7 +214,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const { forename, surname, appointment } = res.locals.appointmentOutcome
       const headerPersonName = { forename, surname }
       res.render('pages/appointments/attended-complied', {
         crn,
@@ -239,6 +238,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },
+  /* ----------------- 👆 -----------------  */
   getAddNote: _hmppsAuthClient => {
     return async (req, res) => {
       const { crn } = req.params as Record<string, string>
@@ -359,13 +359,13 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
-      const { nextAppointmentSession } = res.locals
+      const { appointmentSession } = res.locals
       if (nextAppointment === 'CHANGE_TYPE') {
         const uuid = v4()
         return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
       }
       if (nextAppointment === 'KEEP_TYPE') {
-        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
+        return cloneAppointmentAndRedirect(appointmentSession)(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
