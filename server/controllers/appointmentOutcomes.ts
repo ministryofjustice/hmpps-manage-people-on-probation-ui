@@ -6,6 +6,7 @@ import { getDataValue } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
+import { Sentence } from '../data/model/sentenceDetails'
 
 const routes = [
   'getOutcome',
@@ -110,7 +111,14 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     return async (req, res) => {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
-      const { crn } = res.locals.appointmentOutcome
+      const { crn, id, appointmentSession } = res.locals.appointmentOutcome
+      const { data } = req.session
+      const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
+      const eventId = appointmentSession?.eventId
+      const sentenceType =
+        eventId && eventId !== 'PERSON_LEVEL_CONTACT'
+          ? sentences.find(s => s.id.toString() === eventId)?.sentenceType
+          : null
       const [breachRecallData] = await Promise.all([masClient.getBreachRecallInformation(crn)])
       const appointmentType = res?.locals?.appointment?.type?.description
       const personalDetails = res.locals.case as any
@@ -123,6 +131,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         breachRecallData,
         personOnProbationFirstName: res.locals.case.name.forename,
         isReferToProbationPractitioner,
+        sentenceType,
       })
     }
   },

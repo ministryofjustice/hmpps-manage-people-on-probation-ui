@@ -1,9 +1,13 @@
 {% extends "../_form.njk" %}
 {% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s failure to comply' %}
 {% set backLink = '/case/' + crn + '/appointments' %}
+{% set initiateText = 'Initiate a ' + (
+'breach' if sentenceType == 'COMMUNITY' else 
+  'recall'
+) %}
 
 {% block form %}
-    {{ govukRadios({
+  {{ govukRadios({
     name: "enforcementAction",
     fieldset: {
       legend: {
@@ -19,12 +23,13 @@
       },
       {
         value: "INITIATE_BREACH_RECALL",
-        text: breachRecallData
-      },
+        text: initiateText,
+      }  if sentenceType in ['COMMUNITY', 'CUSTODY'],
       {
         value: "INITIATE_BREACH_RECALL_AND_SEND_LETTER",
-        text: breachRecallData + " and send a letter"
-      },
+        text: initiateText + " and send a letter"
+      }  if sentenceType in ['COMMUNITY', 'CUSTODY'],
+      {
       {
         value: "REFER_TO_PROBATION_PRACTITIONER",
         text: "Refer to probation practitioner",

@@ -6,6 +6,7 @@ import { convertToTitleCase } from '../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { Route } from '../@types'
 import { isNumericString, isValidCrn, isValidUUID } from '../utils'
+import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 
 export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
@@ -44,6 +45,12 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     }
   }
   const isInPast = appointmentDateIsInPast(req)
+  const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
+  const eventId = appointmentSession?.eventId
+  const sentenceType: SentenceType =
+    eventId && eventId !== 'PERSON_LEVEL_CONTACT'
+      ? sentences.find(_sentence => _sentence.id.toString() === eventId)?.sentenceType
+      : null
 
   res.locals.appointmentOutcome = {
     forename,
@@ -58,6 +65,7 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     reqUrl,
     baseUrl,
     appointmentSession,
+    sentenceType,
   }
   return next()
 }

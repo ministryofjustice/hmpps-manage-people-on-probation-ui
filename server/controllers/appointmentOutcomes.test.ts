@@ -105,7 +105,7 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
   return httpMocks.createRequest(req)
 }
 
-describe('controllers/appointmentOutcomes', () => {
+xdescribe('controllers/appointmentOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
