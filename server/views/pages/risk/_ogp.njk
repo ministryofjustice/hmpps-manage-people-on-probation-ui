@@ -32,7 +32,9 @@
                 {{ predictorScale({
                     data: riskData,
                     predictor: "allReoffendingPredictor",
-                    excludeDate: true
+                    excludeDate: true,
+                    headingLevel: 4,
+                    headingClass: "xs"
                 }) }}
             {% endif %}
         </section>
@@ -40,9 +42,11 @@
     {% if showOGRS3 %}
         <section data-qa="ogp">
             {{ predictorScale({
-    data: riskData,
-    predictor: "ogp",
-    excludeDate: true
+                data: riskData,
+                predictor: "ogp",
+                excludeDate: true,
+                headingLevel: 4,
+                headingClass: "xs"
             }) }}
         </section>
     {% endif %}

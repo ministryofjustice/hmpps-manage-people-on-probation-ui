@@ -26,7 +26,9 @@
       {{ predictorScale({
         data: riskData,
         predictor: 'indirectImageContactSexualReoffendingPredictor',
-        excludeDate: true
+        excludeDate: true,
+        headingLevel: 4,
+        headingClass: "xs"
       }) }}
     {% endif %}
   </section>
@@ -34,9 +36,11 @@
 {% if showOGRS3 %}
   <section data-qa="ospiic">
     {{ predictorScale({
-    data: riskData,
-    predictor: 'ospiic',
-    excludeDate: true
+      data: riskData,
+      predictor: 'ospiic',
+      excludeDate: true,
+      headingLevel: 4,
+      headingClass: "xs"
     }) }}
   </section>
 {% endif %}
