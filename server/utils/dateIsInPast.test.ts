@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import { dateIsInPast } from './dateIsInPast'
 
 describe('utils/dateIsInPast', () => {
-  const now = DateTime.now()
+  const now = DateTime.now().setZone('Europe/London')
   const today = now.toFormat('yyyy-M-d')
   it('should return false if no date', () => {
     expect(dateIsInPast(undefined)).toEqual({ isInPast: false, isToday: false })

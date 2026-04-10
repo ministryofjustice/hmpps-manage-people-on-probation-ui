@@ -11,7 +11,7 @@ export default class RestartDateFrequencyPage extends Page {
   }
 
   getNextDayButton = () => {
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     const futureIsInCurrentMonth = future.month === now.month
     if (!futureIsInCurrentMonth) {

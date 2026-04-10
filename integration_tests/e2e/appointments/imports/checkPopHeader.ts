@@ -8,7 +8,7 @@ export const checkPopHeader = ({
   ogrs4 = false,
 } = {}) => {
   if (!ogrs4) {
-    cy.clock(DateTime.now().toMillis())
+    cy.clock(DateTime.now().setZone('Europe/London').toMillis())
     cy.get('h1').should('contain.text', name)
     cy.get('[data-qa="crn"]').should('contain.text', headerCrn)
     cy.get('[data-qa="headerDateOfBirthValue"]').should('contain.text', '18 August 1979')

@@ -48,7 +48,7 @@ export const isNotLaterThanToday = (args: any[]) => {
     return true
   }
   const date = DateTime.fromFormat(args[0], 'd/M/yyyy')
-  return date.isValid && date <= DateTime.now()
+  return date.isValid && date <= DateTime.now().setZone('Europe/London')
 }
 
 export const isTodayOrLater = (args: any[]) => {
@@ -60,7 +60,7 @@ export const isTodayOrLater = (args: any[]) => {
     return false
   }
 
-  return date.startOf('day') >= DateTime.now().startOf('day')
+  return date.startOf('day') >= DateTime.now().setZone('Europe/London').startOf('day')
 }
 
 export const isFutureDate = (args: any[]) => {
@@ -76,7 +76,7 @@ export const timeIsNotEarlierThan = (args: any[]) => {
   if (!args[0]) {
     return true
   }
-  const dateNow = DateTime.now().toSQLDate()
+  const dateNow = DateTime.now().setZone('Europe/London').toSQLDate()
   const notEarlierThanTime = DateTime.fromJSDate(dateTime(dateNow, args[0]))
   const date = DateTime.fromJSDate(dateTime(dateNow, args[1]))
   if (!notEarlierThanTime || !date.isValid) {
@@ -107,7 +107,7 @@ export const timeIsNowOrInFuture = (args: any[], mockDateToOverride?: DateTime) 
       second: 0,
       millisecond: 0,
     })
-    const now = mockDateToOverride || DateTime.now()
+    const now = mockDateToOverride || DateTime.now().setZone('Europe/London')
     return dateAndTime >= now
   }
   return true
@@ -141,7 +141,7 @@ export const timeIsNotLaterThan = (args: any[]) => {
   if (!args[0]) {
     return true
   }
-  const dateNow = DateTime.now().toSQLDate()
+  const dateNow = DateTime.now().setZone('Europe/London').toSQLDate()
   const notLaterThanDate = DateTime.fromJSDate(dateTime(dateNow, args[0]))
   const date = DateTime.fromJSDate(dateTime(dateNow, args[1]))
   if (!notLaterThanDate.isValid || !date.isValid) {

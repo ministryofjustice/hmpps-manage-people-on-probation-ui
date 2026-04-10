@@ -114,7 +114,7 @@ const mockedUuidv4 = uuidv4 as jest.Mock
 
 const req = httpMocks.createRequest({ params: { crn, id: uuid }, session: { data: {} } })
 
-const now = DateTime.now()
+const now = DateTime.now().setZone('Europe/London')
 const tomorrow = now.plus({ days: 1 }).toFormat('yyyy-M-d')
 
 const createMockRequest = ({

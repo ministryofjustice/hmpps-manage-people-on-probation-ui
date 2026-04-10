@@ -136,7 +136,7 @@ describe('Check your answers then confirm the appointment', () => {
         checkUpdateLocation(cyaPage)
       })
       it('should update the date when value is changed', () => {
-        checkUpdateDateTime(cyaPage, DateTime.now().plus({ days: 2 }))
+        checkUpdateDateTime(cyaPage, DateTime.now().setZone('Europe/London').plus({ days: 2 }))
       })
       it('should update the text message confirmation when value is changed', () => {
         checkUpdateTextMessageConfirmation(cyaPage)
@@ -256,7 +256,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('changes future appointment date to another date in the future', () => {
       beforeEach(() => {
         changeDate()
-        const now = DateTime.now()
+        const now = DateTime.now().setZone('Europe/London')
         const dateOverride = now.plus({ days: 3 })
         completeLocationDateTimePage({ dateOverride })
       })
@@ -270,7 +270,7 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        const now = DateTime.now()
+        const now = DateTime.now().setZone('Europe/London')
         const dateOverride = now.minus({ days: 2 })
         completeLocationDateTimePage({ dateOverride })
       })

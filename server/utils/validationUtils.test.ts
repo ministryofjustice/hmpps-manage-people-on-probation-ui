@@ -127,9 +127,17 @@ describe('is not later than today', () => {
     ['null', [null], true],
     ['undefined', [undefined], true],
     ['populated invalid date', ['XXDFDS'], false],
-    ['populated valid', [DateTime.now().plus({ days: -1 }).toFormat('d/M/yyyy').toString()], true],
-    ['populated valid', [DateTime.now().toFormat('d/M/yyyy').toString()], true],
-    ['populated invalid', [DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString()], false],
+    [
+      'populated valid',
+      [DateTime.now().setZone('Europe/London').plus({ days: -1 }).toFormat('d/M/yyyy').toString()],
+      true,
+    ],
+    ['populated valid', [DateTime.now().setZone('Europe/London').toFormat('d/M/yyyy').toString()], true],
+    [
+      'populated invalid',
+      [DateTime.now().setZone('Europe/London').plus({ days: 1 }).toFormat('d/M/yyyy').toString()],
+      false,
+    ],
   ])('%s isNotLaterThanToday(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(isNotLaterThanToday(a)).toEqual(expected)
   })
@@ -141,9 +149,17 @@ describe('is today or later', () => {
     ['null', [null], false],
     ['undefined', [undefined], false],
     ['populated invalid date', ['XXDFDS'], false],
-    ['populated valid', [DateTime.now().plus({ days: -1 }).toFormat('d/M/yyyy').toString()], false],
-    ['populated valid', [DateTime.now().toFormat('d/M/yyyy').toString()], true],
-    ['populated invalid', [DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString()], true],
+    [
+      'populated valid',
+      [DateTime.now().setZone('Europe/London').plus({ days: -1 }).toFormat('d/M/yyyy').toString()],
+      false,
+    ],
+    ['populated valid', [DateTime.now().setZone('Europe/London').toFormat('d/M/yyyy').toString()], true],
+    [
+      'populated invalid',
+      [DateTime.now().setZone('Europe/London').plus({ days: 1 }).toFormat('d/M/yyyy').toString()],
+      true,
+    ],
   ])('%s isTodayOrLater(%s, %s)', (_: string, a: [], expected: boolean) => {
     expect(isTodayOrLater(a)).toEqual(expected)
   })
@@ -316,7 +332,7 @@ describe('validates edit main address request with spec', () => {
       buildingName: 'x'.repeat(36),
       postcode: 'INVALID',
       startDate: 'ENDDATE',
-      endDate: DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy').toString(),
+      endDate: DateTime.now().setZone('Europe/London').plus({ days: 1 }).toFormat('d/M/yyyy').toString(),
     },
   } as Request
   const expectedResult: Record<string, string> = {
@@ -1006,7 +1022,7 @@ describe('validates restart check in settings (start date and frequency of check
   })
 
   it('should return error when restart date is in the past', () => {
-    const pastDate = DateTime.now().minus({ days: 1 }).toFormat('d/M/yyyy')
+    const pastDate = DateTime.now().setZone('Europe/London').minus({ days: 1 }).toFormat('d/M/yyyy')
     const testRequest = {
       params: { crn, id },
       body: {

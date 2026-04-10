@@ -22,7 +22,7 @@ export const appointmentDateIsInPast = (req: Request, _res?: Response): boolean 
     format = 'yyyy-M-d'
   }
   if (date) {
-    const dt = DateTime.fromFormat(date, format)
+    const dt = DateTime.fromFormat(date, format, { zone: 'Europe/London' })
     if (dt.isValid) {
       ;({ isInPast } = dateIsInPast(dt.toFormat('yyyy-M-d'), start))
     }

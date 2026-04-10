@@ -20,8 +20,8 @@ export const completeLocationDateTimePage = ({
 }: Props = {}) => {
   const suffix = index > 1 ? `-${index}` : ''
   const locationDateTimePage = new AppointmentLocationDateTimePage()
-  const yesterday = DateTime.now().minus({ days: 1 })
-  const future = DateTime.now().plus({ days: 2 })
+  const yesterday = DateTime.now().setZone('Europe/London').minus({ days: 1 })
+  const future = DateTime.now().setZone('Europe/London').plus({ days: 2 })
   if (dateOverride) {
     locationDateTimePage
       .getDatePickerInput()

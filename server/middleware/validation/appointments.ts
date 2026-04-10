@@ -110,7 +110,7 @@ const appointments: Route<void> = (req, res, next) => {
     localParams._minDate = req.body._minDate
     localParams._maxDate = req.body._maxDate
 
-    const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now()
+    const now = getMockedTime() ? DateTime.fromISO(getMockedTime()!) : DateTime.now().setZone('Europe/London')
 
     errorMessages = {
       ...errorMessages,

@@ -39,8 +39,8 @@ describe('Confirmation page', () => {
   let confirmPage: AppointmentConfirmationPage
 
   const checkRescheduleConfirm = (inPast = false) => {
-    const future = DateTime.now().plus({ days: 2 })
-    const yesterday = DateTime.now().minus({ days: 1 })
+    const future = DateTime.now().setZone('Europe/London').plus({ days: 2 })
+    const yesterday = DateTime.now().setZone('Europe/London').minus({ days: 1 })
     checkPopHeader()
     confirmPage.checkPageTitle('Appointment rescheduled')
     cy.get('.govuk-panel__body').find('strong').should('contain.text', 'Planned office visit (NS)')

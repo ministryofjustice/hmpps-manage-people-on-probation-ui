@@ -30,7 +30,7 @@ describe('Log attended and complied appointment', () => {
   const checkContent = (manageJourney = false) => {
     const name = 'Alton Berge'
     const headerCrn = 'X778160'
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const yesterday = now.minus({ days: 1 })
     const date = dateWithYear(yesterday.toISODate())
     const dayName = yesterday.toFormat('cccc')

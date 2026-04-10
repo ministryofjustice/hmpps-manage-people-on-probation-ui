@@ -9,7 +9,7 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
   page.getSummaryListRow(4).find('.govuk-link').click()
   const locationPage = new AppointmentLocationDateTimePage()
   locationPage.getRadio('locationCode', 2).click()
-  const future = DateTime.now().plus({ days: 2 })
+  const future = DateTime.now().setZone('Europe/London').plus({ days: 2 })
   locationPage
     .getDatePickerInput()
     .clear()

@@ -39,7 +39,7 @@ const loadPage = () => {
 }
 
 const clickNextDayButton = () => {
-  const now = DateTime.now()
+  const now = DateTime.now().setZone('Europe/London')
   const tomorrow = now.plus({ days: 1 })
   if (tomorrow.month !== now.month) {
     cy.get('.moj-js-datepicker-next-month').click()
@@ -213,7 +213,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -236,7 +236,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -265,7 +265,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -298,7 +298,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -326,7 +326,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -368,7 +368,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -414,7 +414,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -464,7 +464,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -513,7 +513,7 @@ context('Appointment check-ins', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -629,7 +629,7 @@ context('check-ins error scenario ', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -659,7 +659,7 @@ context('check-ins error scenario ', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -689,7 +689,7 @@ context('check-ins error scenario ', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -744,7 +744,7 @@ context('check-ins error scenario ', () => {
     eligibilitySupplementaryPage.getSubmitBtn().click()
     const dateFrequencyPage = new DateFrequencyPage()
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -797,7 +797,7 @@ context('check-ins error scenario ', () => {
     const dateFrequencyPage = new DateFrequencyPage()
 
     dateFrequencyPage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     dateFrequencyPage
       .getDatePickerInput()
@@ -1020,7 +1020,7 @@ context('check-ins overview and manage pages', () => {
 
     const restartDatePage = new RestartDateFrequencyPage()
     restartDatePage.checkOnPage()
-    const now = DateTime.now()
+    const now = DateTime.now().setZone('Europe/London')
     const future = now.plus({ days: 2 })
     restartDatePage
       .getDatePickerInput()

@@ -33,7 +33,7 @@ describe('Pick a date, location and time for this appointment', () => {
   let cyaPage: AppointmentCheckYourAnswersPage
   let textMessageConfirmPage: TextMessageConfirmationPage
 
-  const now = DateTime.now()
+  const now = DateTime.now().setZone('Europe/London')
   const yesterday = now.minus({ days: 1 })
 
   const completeDateInFuture = () => {
@@ -350,7 +350,7 @@ describe('Pick a date, location and time for this appointment', () => {
   })
 
   describe('Date is selected', () => {
-    const value = DateTime.now().toFormat('d/M/yyyy')
+    const value = DateTime.now().setZone('Europe/London').toFormat('d/M/yyyy')
     beforeEach(() => {
       loadPage()
       locationDateTimePage.getDatePickerInput().clear()

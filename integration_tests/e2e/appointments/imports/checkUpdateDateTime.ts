@@ -18,7 +18,7 @@ export const checkUpdateDateTime = (
 ) => {
   getCrn().then(pageCrn => {
     getUuid().then(pageUuid => {
-      const newDate = DateTime.now().plus({ days: 3 }).set({
+      const newDate = DateTime.now().setZone('Europe/London').plus({ days: 3 }).set({
         hour: 7,
         minute: 30,
         second: 0,

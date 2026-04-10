@@ -61,7 +61,7 @@ const buildRequest = ({
 
 const res = httpMocks.createResponse()
 
-const now = DateTime.now()
+const now = DateTime.now().setZone('Europe/London')
 const date = now.plus({ days: 1 }).toFormat('d/M/yyyy')
 
 describe('/middleware/appointmentDateIsInPast()', () => {

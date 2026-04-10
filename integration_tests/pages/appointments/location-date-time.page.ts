@@ -27,8 +27,8 @@ export default class AppointmentLocationDateTimePage extends Page {
   }
 
   getNextDayButton = (change?: DateTime) => {
-    const now = change || DateTime.now()
-    const future = DateTime.now().plus({ days: 2 })
+    const now = change || DateTime.now().setZone('Europe/London')
+    const future = DateTime.now().setZone('Europe/London').plus({ days: 2 })
     const futureIsInCurrentMonth = future.month === now.month
     if (!futureIsInCurrentMonth) {
       cy.get('.moj-js-datepicker-next-month').click()

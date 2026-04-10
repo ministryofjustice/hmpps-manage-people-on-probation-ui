@@ -9,7 +9,7 @@ describe('Change appointment details and reschedule', () => {
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
   let dateTimePage: AppointmentLocationDateTimePage
   const crn = 'X000001'
-  const future = DateTime.now().plus({ days: 2 })
+  const future = DateTime.now().setZone('Europe/London').plus({ days: 2 })
   const startTime = '09:10'
   const endTime = '10:30'
 

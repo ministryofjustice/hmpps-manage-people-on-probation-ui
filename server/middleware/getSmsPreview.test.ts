@@ -1,4 +1,5 @@
 import httpMocks from 'node-mocks-http'
+import { DateTime } from 'luxon'
 import { getSmsPreview } from './getSmsPreview'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
@@ -41,32 +42,35 @@ const mockSmsPreview: SmsPreviewResponse = {
     'Dear James,\n\nYou have an appointment at Leamington Probation Office on Monday 11 August at 2pm.\n\nThis is an automated message. Do not reply.',
 }
 
-const constructMockAppointmentSession = (smsPreviewRequest = {}): AppointmentSession => ({
-  user: {
-    username,
-    teamCode: 'mock-team-code',
-    locationCode,
-  },
-  eventId: '1',
-  type,
-  date,
-  start,
-  end: '15:30',
-  sensitivity: 'Yes',
-  outcomeRecorded: 'Yes',
-  smsPreview: {
-    request: {
-      firstName: 'James',
-      dateAndTimeOfAppointment: `${date}T${start}:00.000Z`,
-      appointmentTypeCode: type,
-      includeWelshPreview: false,
-      appointmentLocation,
-      ...(smsPreviewRequest ?? {}),
-    },
-    preview: mockSmsPreview,
-  },
-})
+const constructMockAppointmentSession = (smsPreviewRequest = {}): AppointmentSession => {
+  const zonedDateTime = DateTime.fromFormat(`${date} ${start}`, 'yyyy-MM-dd HH:mm', { zone: 'Europe/London' }).toISO()
 
+  return {
+    user: {
+      username,
+      teamCode: 'mock-team-code',
+      locationCode,
+    },
+    eventId: '1',
+    type,
+    date,
+    start,
+    end: '15:30',
+    sensitivity: 'Yes',
+    outcomeRecorded: 'Yes',
+    smsPreview: {
+      request: {
+        firstName: 'James',
+        dateAndTimeOfAppointment: zonedDateTime,
+        appointmentTypeCode: type,
+        includeWelshPreview: false,
+        appointmentLocation,
+        ...(smsPreviewRequest ?? {}),
+      },
+      preview: mockSmsPreview,
+    },
+  }
+}
 const postSmsPreviewSpy = jest
   .spyOn(SupervisionAppointmentClient.prototype, 'postSmsPreview')
   .mockImplementation(() => Promise.resolve(mockSmsPreview))
