@@ -6,7 +6,6 @@ import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
-import appointmentOutcomesController from './appointmentOutcomes'
 import MasApiClient from '../data/masApiClient'
 
 const crn = 'X000001'

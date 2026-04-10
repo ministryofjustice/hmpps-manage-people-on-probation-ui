@@ -40,6 +40,7 @@ interface Args {
   ogrs4?: boolean
   ogrs4Enabled?: boolean
   sentencePlanUrlEnabled?: boolean
+  ogrs4SummaryCardDetailEnabled?: boolean
 }
 
 const checkRiskPageView = ({
@@ -50,6 +51,7 @@ const checkRiskPageView = ({
   ogrs4 = false,
   ogrs4Enabled = true,
   sentencePlanUrlEnabled = true,
+  ogrs4SummaryCardDetailEnabled = false,
 }: Args) => {
   const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
   const subHeadingLevel = !sentencePlanLink && !sentencePlanText ? '4' : '5'
@@ -57,31 +59,80 @@ const checkRiskPageView = ({
     page.getElementData('riskScoresCard').should('exist')
     page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
     if (ogrs4) {
-      page
-        .getElementData('combinedSeriousReoffendingPredictor')
-        .get(`h2`)
-        .should('contain.text', 'Combined serious reoffending predictor')
-      page.getElementData('allReoffendingPredictor').get(`h2`).should('contain.text', 'All reoffending predictor')
-      page
-        .getElementData('allReoffendingPredictor')
-        .get('[data-test-id=staticOrDynamic]')
-        .should('contain.text', 'Dynamic')
-      page
-        .getElementData('directContactSexualReoffendingPredictor')
-        .get('h2')
-        .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
-      page
-        .getElementData('indirectImageContactSexualReoffendingPredictor')
-        .get('h2')
-        .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
-      page
-        .getElementData('violentReoffendingPredictor')
-        .get(`h2`)
-        .should('contain.text', 'Violent reoffending predictor')
-      page
-        .getElementData('seriousViolentReoffendingPredictor')
-        .get(`h2`)
-        .should('contain.text', 'Serious violent reoffending predictor')
+      if (ogrs4SummaryCardDetailEnabled) {
+        page.getElementData('viewRiskPredictorScoreDetails').should('exist')
+        page
+          .getElementData('combinedSeriousReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Combined serious reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Combined serious reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="All reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'All reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="All reoffending predictor LOW"]')
+          .get('[data-test-id=staticOrDynamic]')
+          .should('contain.text', 'Dynamic')
+        page
+          .getElementData('directContactSexualReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Direct contact \u2013 sexual reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('indirectImageContactSexualReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Images and indirect contact \u2013 sexual reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Images and indirect contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('violentReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Violent reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Violent reoffending predictor')
+        page
+          .getElementData('seriousViolentReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Serious violent reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Serious violent reoffending predictor')
+      } else {
+        page
+          .getElementData('combinedSeriousReoffendingPredictor')
+          .get('[data-predictor-scale="Combined serious reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Combined serious reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-predictor-scale="All reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'All reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-predictor-scale="All reoffending predictor"]')
+          .get('[data-test-id=staticOrDynamic]')
+          .should('contain.text', 'Dynamic')
+        page
+          .getElementData('directContactSexualReoffendingPredictor')
+          .get('[data-predictor-scale="Direct contact \u2013 sexual reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('indirectImageContactSexualReoffendingPredictor')
+          .get('[data-predictor-scale="Images and indirect contact \u2013 sexual reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Images and indirect contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('violentReoffendingPredictor')
+          .get('[data-predictor-scale="Violent reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Violent reoffending predictor')
+        page
+          .getElementData('seriousViolentReoffendingPredictor')
+          .get('[data-predictor-scale="Serious violent reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Serious violent reoffending predictor')
+      }
       page
         .getElementData('oasysScoreHistory')
         .find('.govuk-heading-m')
@@ -403,6 +454,20 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     checkRiskPageView({ page, sentencePlanLink: false, ogrs4: true })
+  })
+
+  it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data and expanded badge', () => {
+    cy.task('stubPredictorScoresOGRS4')
+    cy.task('stubOgrs4SummaryCardEnabled')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView({
+      page,
+      sentencePlanLink: false,
+      ogrs4Enabled: true,
+      ogrs4: true,
+      ogrs4SummaryCardDetailEnabled: true,
+    })
   })
 
   it('Risk overview page is rendered with OGRS4 feature flag disabled', () => {
