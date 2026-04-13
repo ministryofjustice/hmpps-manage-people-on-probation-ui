@@ -4,7 +4,6 @@ import { getDataValue } from '../utils'
 
 export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
   const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id } = res.locals.appointmentOutcome
-  console.log({ reqUrl, baseUrl, baseOutcomeUrl })
   let backLink = baseOutcomeUrl
   if (reqUrl === baseOutcomeUrl) {
     backLink = uuid ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`

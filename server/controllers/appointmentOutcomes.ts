@@ -110,23 +110,9 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       return res.redirect(change ?? redirect)
     }
   },
-  getAttendedFailedToComply: hmppsAuthClient => {
+  getAttendedFailedToComply: _hmppsAuthClient => {
     return async (req, res) => {
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const masClient = new MasApiClient(token)
-      const { crn, id, appointmentSession } = res.locals.appointmentOutcome
-      const { data } = req.session
-      const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
-      const eventId = appointmentSession?.eventId
-      const sentenceType =
-        eventId && eventId !== 'PERSON_LEVEL_CONTACT'
-          ? sentences.find(s => s.id.toString() === eventId)?.sentenceType
-          : null
-
-      return res.render('pages/appointment-outcomes/attended-failed-to-comply', {
-        personOnProbationFirstName: res.locals.case.name.forename,
-        sentenceType,
-      })
+      return res.render('pages/appointment-outcomes/attended-failed-to-comply')
     }
   },
   postAttendedFailedToComply: () => {
@@ -141,12 +127,12 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         'enforcementAction',
       ])
       if (enforcementAction === 'NO_FURTHER_ACTION') {
-        // patch appoibntment with outcome and enforcement action here before redirecting to completed url
+        // patch appointment with outcome and enforcement action here before redirecting to completed url
       }
       const redirectMap: EnforcementRedirectMap = {
         SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
         BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
+        BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
         REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
         NO_FURTHER_ACTION: completedUrl,
         DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,

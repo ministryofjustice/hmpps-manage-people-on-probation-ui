@@ -6,7 +6,6 @@ import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
-import MasApiClient from '../data/masApiClient'
 
 const crn = 'X000001'
 const id = '1234'
@@ -58,7 +57,9 @@ jest.mock('./arrangeAppointment', () => ({
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
 const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
-const baseUrl = '/crn/X000001/appointment/appointment/1234/outcome'
+const baseUrl = '/crn/X000001/appointment/appointment/1234'
+const baseOutcomeUrl = '/crn/X000001/appointment/appointment/1234/outcome'
+const completedUrl = `/completed/route`
 
 const mockRes = ({
   appointmentOutcome,
@@ -73,6 +74,8 @@ const mockRes = ({
     appointmentOutcome: {
       isValidParams: true,
       baseUrl,
+      baseOutcomeUrl,
+      completedUrl,
       contactId,
       uuid,
       id: contactId,
@@ -105,7 +108,7 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
   return httpMocks.createRequest(req)
 }
 
-xdescribe('controllers/appointmentOutcomes', () => {
+describe('controllers/appointmentOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
   })
@@ -134,7 +137,7 @@ xdescribe('controllers/appointmentOutcomes', () => {
       const spy = jest.spyOn(res, 'redirect')
       mockGetDataValue.mockReturnValueOnce('ATTENDED')
       controllers.appointmentOutcomes.postOutcome()(req, res)
-      expect(spy).toHaveBeenCalledWith(`${baseUrl}/add-note`)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
     })
   })
 
@@ -228,69 +231,34 @@ xdescribe('controllers/appointmentOutcomes', () => {
   describe('getAttendedFailedToComply', () => {
     it('should render the correct view', async () => {
       const req = mockReq()
-      const res = mockRes({
-        appointmentCase: {
-          name: { forename: 'Stuart' },
-          staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
-        },
-      })
-      const getBreachRecallInformationSpy = jest
-        .spyOn(MasApiClient.prototype, 'getBreachRecallInformation')
-        .mockResolvedValue('Initiate a breach')
+      const res = mockRes()
       const spy = jest.spyOn(res, 'render')
-      await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
-      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply', {
-        breachRecallData: 'Initiate a breach',
-        personOnProbationFirstName: 'Stuart',
-        isReferToProbationPractitioner: false,
+      controllers.appointmentOutcomes.getAttendedFailedToComply()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/attended-failed-to-comply')
+    })
+  })
+
+  describe('postAttendedFailedToComply', () => {
+    // it('should patch appointment with outcome and enforcement action', () => {
+
+    // })
+    it('should redirect to the correct page based on enforcement action', () => {
+      const checks = {
+        SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
+        BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+        BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+        REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
+        NO_FURTHER_ACTION: completedUrl,
+        DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
+      }
+      Object.entries(checks).forEach(([enforcementAction, redirectUrl]) => {
+        const req = mockReq()
+        const res = mockRes()
+        const spy = jest.spyOn(res, 'redirect')
+        mockGetDataValue.mockReturnValueOnce(enforcementAction)
+        controllers.appointmentOutcomes.postAttendedFailedToComply()(req, res)
+        expect(spy).toHaveBeenCalledWith(redirectUrl)
       })
-      expect(getBreachRecallInformationSpy).toHaveBeenCalledWith(crn)
     })
-    it('should', () => {
-      jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
-      jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Office visit' } as any)
-    })
-  })
-
-  it('should render correct view with isReferToProbationPractitioner true when responsible officer', async () => {
-    jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
-    jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Office visit' } as any)
-    const req = mockReq({ params: { crn: 'R000101', contactId: '123' } })
-    const res = mockRes({
-      appointmentCase: {
-        name: { forename: 'Stuart' },
-        staffContacts: [{ responsibleOfficer: true, username: 'user1' }],
-      },
-    })
-    const spy = jest.spyOn(res, 'render')
-    await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
-    expect(spy).toHaveBeenCalledWith(
-      'pages/appointment-outcomes/attended-failed-to-comply',
-      expect.objectContaining({
-        isReferToProbationPractitioner: true,
-      }),
-    )
-  })
-
-  it('should render correct view with isReferToProbationPractitioner true when telephone contact', async () => {
-    jest.spyOn(MasApiClient.prototype, 'getBreachRecallInformation').mockResolvedValue('Initiate a breach')
-    jest.spyOn(MasApiClient.prototype, 'getPersonAppointment').mockResolvedValue({ type: 'Telephone contact' } as any)
-    const req = mockReq({ params: { crn: 'R000101', contactId: '123' } })
-    const res = mockRes({
-      appointmentCase: {
-        name: { forename: 'Stuart' },
-        staffContacts: [{ responsibleOfficer: true, username: 'other-user' }],
-      },
-    })
-    const spy = jest.spyOn(res, 'render')
-    await controllers.appointmentOutcomes.getAttendedFailedToComply(mockHmppsAuthClient)(req, res)
-    expect(spy).toHaveBeenCalledWith(
-      'pages/appointment-outcomes/attended-failed-to-comply',
-      expect.objectContaining({
-        breachRecallData: 'Initiate a breach',
-        isReferToProbationPractitioner: false,
-        personOnProbationFirstName: 'Stuart',
-      }),
-    )
   })
 })

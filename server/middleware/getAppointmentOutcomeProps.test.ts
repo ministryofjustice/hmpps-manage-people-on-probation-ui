@@ -1,9 +1,8 @@
 import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { getAppointmentOutcomeProps } from './getAppointmentOutcomeProps'
-import { mockAppResponse } from '../controllers/mocks'
+import { mockAppResponse, probationPractitioner as mockProbationPractitioner } from '../controllers/mocks'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
-import { getDataValue } from '../utils'
 import { Sentence } from '../data/model/sentenceDetails'
 
 const contactId = '12345'
@@ -49,7 +48,13 @@ const mockSentences: Sentence[] = [
   },
 ]
 
-const buildRequest = ({ params = {}, date = pastDate, id = uuid, type = 'COPT' } = {}): httpMocks.MockRequest<any> => {
+const buildRequest = ({
+  params = {},
+  date = pastDate,
+  id = uuid,
+  type = 'COPT',
+  eventId = '48',
+} = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
       contactId,
@@ -60,6 +65,9 @@ const buildRequest = ({ params = {}, date = pastDate, id = uuid, type = 'COPT' }
     url,
     session: {
       data: {
+        sentences: {
+          [crn]: mockSentences,
+        },
         appointments: {
           [crn]: {
             [id]: {
@@ -67,8 +75,13 @@ const buildRequest = ({ params = {}, date = pastDate, id = uuid, type = 'COPT' }
               start,
               end,
               type,
-              eventId: '48',
+              eventId,
             },
+          },
+        },
+        personalDetails: {
+          [crn]: {
+            probationPractitioner: mockProbationPractitioner,
           },
         },
       },
@@ -77,8 +90,9 @@ const buildRequest = ({ params = {}, date = pastDate, id = uuid, type = 'COPT' }
   return httpMocks.createRequest(req)
 }
 
-const buildResponse = (date = pastDate, time = start): httpMocks.MockResponse<any> => {
+const buildResponse = ({ date = pastDate, time = start, username = 'user-1' } = {}): httpMocks.MockResponse<any> => {
   const locals = {
+    user: { username },
     case: {
       name: {
         forename,
@@ -129,11 +143,8 @@ jest.mock('./appointmentDateIsInPast', () => ({
 }))
 
 const mockAppointmentDateIsInPast = appointmentDateIsInPast as jest.MockedFunction<typeof appointmentDateIsInPast>
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
-mockGetDataValue.mockReturnValue(mockSentences)
-
-xdescribe('/middleware/getAppointmentOutcomeProps()', () => {
+describe('/middleware/getAppointmentOutcomeProps()', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })
@@ -161,9 +172,39 @@ xdescribe('/middleware/getAppointmentOutcomeProps()', () => {
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
           sentenceType: 'COMMUNITY',
+          isProbationPractitioner: false,
         }),
       )
+
       expect(nextSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('should add the correct values to res.locals.appointmentOutcome if user is probation practitioner and sentence type is CUSTODY', () => {
+      const req = buildRequest({ params: { contactId: undefined }, eventId: '49' })
+      const res = buildResponse({ username: 'DeborahFern' })
+      mockAppointmentDateIsInPast.mockReturnValueOnce(true)
+      jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
+      getAppointmentOutcomeProps(req, res, nextSpy)
+      expect(res.locals.appointmentOutcome).toEqual(
+        expect.objectContaining({
+          forename,
+          surname,
+          appointment: res.locals.personAppointment.appointment,
+          crn,
+          uuid,
+          contactId: undefined,
+          id: uuid,
+          isValidParams: true,
+          isInPast: true,
+          reqUrl: url,
+          baseUrl: `/case/${crn}/arrange-appointment/${uuid}`,
+          baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
+          completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
+          appointmentSession: req.session.data.appointments[crn][uuid],
+          sentenceType: 'CUSTODY',
+          isProbationPractitioner: true,
+        }),
+      )
     })
   })
   describe('Manage appointment journey', () => {
@@ -190,6 +231,7 @@ xdescribe('/middleware/getAppointmentOutcomeProps()', () => {
           completedUrl: `/case/${crn}/appointments/appointment/${contactId}/manage`,
           appointmentSession: req.session.data.appointments[crn][contactId],
           sentenceType: 'COMMUNITY',
+          isProbationPractitioner: false,
         }),
       )
       expect(nextSpy).toHaveBeenCalledTimes(1)
