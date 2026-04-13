@@ -20,6 +20,7 @@ import {
   mockAppResponse,
   mockSentencePlans,
   mockRiskData,
+  probationPractitioner,
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
 import SentencePlanApiClient from '../data/sentencePlanApiClient'
@@ -85,6 +86,9 @@ const getRiskDataSpy = jest
 const searchUserCaseloadSpy = jest
   .spyOn(MasApiClient.prototype, 'searchUserCaseload')
   .mockImplementation(() => Promise.resolve(mockUserCaseload))
+const getProbationPractitionerSpy = jest
+  .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
+  .mockImplementation(() => Promise.resolve(probationPractitioner))
 let getPersonalDetailsSpy: jest.SpyInstance
 let getPlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
@@ -155,6 +159,7 @@ const mock = ({
     },
     risks: mockRisks,
     tierCalculation: mockTierCalculation,
+    probationPractitioner,
   }
   if (ogrs4Enabled) {
     mockPersonalDetails.riskData = mockRiskData
@@ -214,6 +219,7 @@ describe('/middleware/getPersonalDetails', () => {
       expect(searchUserCaseloadSpy).toHaveBeenCalledWith(res.locals.user.username, '', '', {
         nameOrCrn: req.params.crn,
       })
+      expect(getProbationPractitionerSpy).toHaveBeenCalledWith(req.params.crn)
       expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
       expect(predictorsSpy).not.toHaveBeenCalled()
       expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')

@@ -15,6 +15,7 @@ import { PersonalDetails } from '../data/model/personalDetails'
 import { RiskScoresDto, RiskSummary } from '../data/model/risk'
 import { UserCaseload } from '../data/model/caseload'
 import { ErrorSummary } from '../data/model/common'
+import { ProbationPractitioner } from '../models/CaseDetail'
 
 export const getPersonalDetails = (
   hmppsAuthClient: HmppsAuthClient,
@@ -29,6 +30,7 @@ export const getPersonalDetails = (
     let userCaseload: UserCaseload
     let riskData: RiskData
     let predictors: RiskScoresDto[] | ErrorSummary
+    let probationPractitioner: ProbationPractitioner
     if (!req?.session?.data?.personalDetails?.[crn] || process.env.NODE_ENV === 'development') {
       const { username } = res.locals.user
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
@@ -38,20 +40,22 @@ export const getPersonalDetails = (
       const sentencePlanClient = new SentencePlanApiClient(token)
       const authOptions = asUser(res.locals.user.token)
       if (res?.locals?.flags?.enableOGRS4) {
-        ;[overview, risks, tierCalculation, userCaseload, riskData] = await Promise.all([
+        ;[overview, risks, tierCalculation, userCaseload, riskData, probationPractitioner] = await Promise.all([
           masClient.getPersonalDetails(crn),
           arnsClient.getRisks(crn),
           tierClient.getCalculationDetails(crn),
           masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
           arnsComponents.getRiskData(authOptions, 'crn', crn),
+          masClient.getProbationPractitioner(crn),
         ])
       } else {
-        ;[overview, risks, tierCalculation, userCaseload, predictors] = await Promise.all([
+        ;[overview, risks, tierCalculation, userCaseload, predictors, probationPractitioner] = await Promise.all([
           masClient.getPersonalDetails(crn),
           arnsClient.getRisks(crn),
           tierClient.getCalculationDetails(crn),
           masClient.searchUserCaseload(username, '', '', { nameOrCrn: crn }),
           arnsClient.getPredictorsAll(crn),
+          masClient.getProbationPractitioner(crn),
         ])
       }
 
@@ -96,6 +100,7 @@ export const getPersonalDetails = (
               risks,
               tierCalculation,
               riskData,
+              probationPractitioner,
             },
           },
         }
@@ -110,6 +115,7 @@ export const getPersonalDetails = (
               risks,
               tierCalculation,
               predictors,
+              probationPractitioner,
             },
           },
         }
