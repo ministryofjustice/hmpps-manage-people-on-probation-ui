@@ -4,7 +4,6 @@ import controllers from '.'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import SentencePlanApiClient from '../data/sentencePlanApiClient'
 import { checkAuditMessage } from './testutils'
 import { findReplace, toPredictors, toRoshWidget } from '../utils'
 import TierApiClient from '../data/tierApiClient'
@@ -17,14 +16,12 @@ import {
   mockPredictors,
   mockNeeds,
   mockSanIndicatorResponse,
-  mockSentencePlans,
   mockUserCaseload,
 } from './mocks'
 import config from '../config'
 import { UserCaseload } from '../data/model/caseload'
 
 jest.mock('../data/masApiClient')
-jest.mock('../data/sentencePlanApiClient')
 jest.mock('../data/interventionsApiClient')
 jest.mock('../data/tokenStore/redisTokenStore')
 jest.mock('@ministryofjustice/hmpps-audit-client')
@@ -95,13 +92,9 @@ describe('riskController', () => {
   })
   describe('getRisk', () => {
     describe('CRN has sentence plan, user does not have SENTENCE_PLAN role, pop in users caseload', () => {
-      let getPlanByCrnSpy: jest.SpyInstance
       const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        getPlanByCrnSpy = jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       checkAuditMessage(mockRes, 'VIEW_MAS_RISKS', uuidv4(), crn, 'CRN')
@@ -128,9 +121,6 @@ describe('riskController', () => {
       })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
@@ -148,7 +138,6 @@ describe('riskController', () => {
       const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
@@ -166,7 +155,6 @@ describe('riskController', () => {
       const mockRes = mockAppResponse({ user: { username, roles: ['MANAGE_SUPERVISIONS', 'SENTENCE_PLAN'] } })
       const spy = jest.spyOn(mockRes, 'render')
       beforeEach(async () => {
-        jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
@@ -188,9 +176,6 @@ describe('riskController', () => {
         jest
           .spyOn(MasApiClient.prototype, 'searchUserCaseload')
           .mockImplementationOnce(() => Promise.resolve(mockNoUserCaseload))
-        jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
         await controllers.risk.getRisk(hmppsAuthClient)(req, mockRes)
       })
       it('should render the risk page', () => {
@@ -204,11 +189,8 @@ describe('riskController', () => {
       })
     })
 
-    describe('Sentence plan api returns an error', () => {
+    describe('Assessment Platform API returns an error', () => {
       beforeEach(async () => {
-        jest
-          .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-          .mockImplementationOnce(() => Promise.reject(new Error()))
         await controllers.risk.getRisk(hmppsAuthClient)(req, res)
       })
       it('should render the risk page', () => {
