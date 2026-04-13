@@ -9,6 +9,7 @@ import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
+import validateDateInput from './date-time'
 import './photo'
 
 arnsFrontend.initAll()
@@ -333,4 +334,5 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
+validateDateInput()
 new ServiceAlert()
