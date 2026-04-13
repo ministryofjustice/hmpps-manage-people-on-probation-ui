@@ -30,7 +30,7 @@
 
     {{ mojBanner({
         type: 'success',
-        text: 'Check in settings saved',
+        html: successMessageHtml if successMessageHtml else 'Check in settings saved',
         classes: 'govuk-!-margin-bottom-2',
         attributes: { "data-qa": "updateBanner"},
         iconFallbackText: 'Success'

@@ -747,7 +747,28 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.settingsUpdated
       }
-      return res.render('pages/check-in/manage/manage-checkin.njk', { crn, id, mobile, email, showChange })
+      const questionsUpdated = getDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'])
+
+      let successMessageHtml: string | undefined
+
+      if (questionsUpdated) {
+        res.locals.success = true
+        const forename = personalDetails?.name?.forename || 'the person'
+        successMessageHtml = `
+          <strong>You have added additional questions to ${forename}’s next online check in</strong>
+          <br>
+          Additional questions will only apply to their next check in
+        `
+        setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], undefined)
+      }
+      return res.render('pages/check-in/manage/manage-checkin.njk', {
+        crn,
+        id,
+        mobile,
+        email,
+        showChange,
+        successMessageHtml,
+      })
     }
   },
   getManageCheckinDatePage: hmppsAuthClient => {
@@ -1416,8 +1437,8 @@ const checkInsController: Controller<typeof routes, void> = {
       // const response = await eSupClient.postAssignQuestionsToCheckIn(crn, body)
 
       // if (response?.listId) {
-      //   res.locals.success = true
-      //   setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
+      // setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], true)
+      // setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
       // }
 
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
@@ -1494,10 +1515,20 @@ const checkInsController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}/questions/add`)
       }
       // replace curly braces placeholder with [insert text] for presentation
-      const displayTemplates = templatesList.templates.map((q: any) => ({
-        ...q,
-        displayTemplate: q.template.replace(/{{[^}]+}}/, '[insert text]'),
-      }))
+      const displayTemplates = templatesList.templates.map((q: any) => {
+        const start = q.template.indexOf('{{')
+        const end = q.template.indexOf('}}', start)
+
+        let displayTemplate = q.template
+        if (start !== -1 && end !== -1) {
+          displayTemplate = `${q.template.substring(0, start)}[insert text]${q.template.substring(end + 2)}`
+        }
+
+        return {
+          ...q,
+          displayTemplate,
+        }
+      })
       return res.render('pages/check-in/questions/list-questions.njk', {
         crn,
         id,

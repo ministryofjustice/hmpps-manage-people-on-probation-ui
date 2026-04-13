@@ -2839,6 +2839,65 @@ describe('checkInsController', () => {
       })
     })
 
+    describe('postAddQuestionsPage', () => {
+      it('maps session data to payload and redirects to manage page on success', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({
+          esupervision: {
+            [crn]: {
+              [uuid]: {
+                manageQuestions: {
+                  availableTemplates: [{ id: '1', responseFormat: 'TEXT', responseSpec: { placeholders: ['thing'] } }],
+                  questionTemplateAndInputs: {
+                    '1-f47ac10b-58cc-4372-a567-0e02b2c3d479': 'the housing service',
+                  },
+                },
+              },
+            },
+          },
+        })
+        const { id } = req.params as Record<string, string>
+
+        await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
+        expect(hmppsAuthClient.getSystemClientToken).toHaveBeenCalled()
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}`)
+      })
+
+      it('handles completely empty session data by redirecting to manage page', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({})
+        const { id } = req.params as Record<string, string>
+
+        await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}`)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+      })
+
+      it('returns 404 when id is not a valid UUID', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(false)
+
+        const req = baseReq()
+        await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+      })
+    })
+
     describe('getPreviewFeelingPage', () => {
       it('renders feeling preview page when CRN and id are valid', async () => {
         mockIsValidCrn.mockReturnValue(true)
@@ -3072,6 +3131,39 @@ describe('checkInsController', () => {
         )
         expect(mockRenderError).not.toHaveBeenCalled()
         checkSendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_EDIT', crn, SubjectType.CRN)
+      })
+
+      it('fetches templates from API and saves to session if none are in session data', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const getQuestionsListSpy = jest
+          .spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates')
+          .mockResolvedValue({
+            templates: [
+              {
+                id: '1',
+                template: 'Have you heard back from {{thing}}?',
+                responseSpec: { placeholders: ['thing'] },
+              },
+            ],
+          } as any)
+
+        const req = baseReq()
+        const { id } = req.params as Record<string, string>
+        req.params.questionId = '1-f47ac10b-58cc-4372-a567-0e02b2c3d479'
+
+        await controllers.checkIns.getEditQuestionPage(hmppsAuthClient)(req, res)
+
+        expect(getQuestionsListSpy).toHaveBeenCalledWith('en-GB')
+
+        expect(mockSetDataValue).toHaveBeenCalledWith(
+          req.session.data,
+          ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
+          expect.any(Array),
+        )
+
+        expect(renderSpy).toHaveBeenCalled()
       })
 
       it('returns 404 when templateId cannot be parsed/found', async () => {
