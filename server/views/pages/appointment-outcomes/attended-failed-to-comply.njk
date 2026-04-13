@@ -22,21 +22,20 @@
         text: "Send a letter"
       },
       {
-        value: "INITIATE_BREACH_RECALL",
-        text: initiateText,
+        value: "BREACH_RECALL_INITIATED",
+        text: initiateText
       }  if sentenceType in ['COMMUNITY', 'CUSTODY'],
       {
-        value: "INITIATE_BREACH_RECALL_AND_SEND_LETTER",
+        value: "BREACH_RECALL_INITIATED_AND_SEND_LETTER",
         text: initiateText + " and send a letter"
       }  if sentenceType in ['COMMUNITY', 'CUSTODY'],
       {
-      {
-        value: "REFER_TO_PROBATION_PRACTITIONER",
+        value: "REFER_TO_OFFENDER_MANAGER",
         text: "Refer to probation practitioner",
         hint: {
           text: "Notify the allocated probation practitioner so they can take action."
         }
-      } if isReferToProbationPractitioner,
+      } if not isProbationPractitioner,
       {
         value: "NO_FURTHER_ACTION",
         text: "No further action"
@@ -49,5 +48,5 @@
         text: "I want to add a different action"
       }
     ]
-  } | decorateFormAttributes(['appointments', crn, id, 'enforcementAction'])) }}
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
 {% endblock %}

@@ -22,8 +22,11 @@ export type AppointmentOutcomeType =
 
 export type AppointmentEnforcementAction =
   | 'SEND_LETTER'
-  | 'INITIATE_BREACH_RECALL'
-  | 'INITIATE_BREACH_RECALL_AND_SEND_LETTER'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
+  | 'REFER_TO_OFFENDER_MANAGER'
+  | 'NO_FURTHER_ACTION'
+  | 'DIFFERENT_ACTION'
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType

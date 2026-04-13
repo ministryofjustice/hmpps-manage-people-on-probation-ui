@@ -119,6 +119,7 @@
             {
               "id": 49,
               "eventNumber": "1234567",
+              "sentenceType": "COMMUNITY",
               "order": {
                 "description": "Pre-Sentence"
               },
@@ -129,6 +130,7 @@
             {
               "id": 48,
               "eventNumber": "7654321",
+              "sentenceType": "COMMUNITY",
               "order": {
                 "description": "Default Sentence Type (12 Months)",
                 "startDate": "2025-05-31"

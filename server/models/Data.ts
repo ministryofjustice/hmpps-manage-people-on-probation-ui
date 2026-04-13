@@ -9,6 +9,7 @@ import { Errors } from './Errors'
 import { ESupervisionSession } from './ESupervision'
 import { SentencePlan } from './Risk'
 import { ErrorSummary } from '../data/model/common'
+import { ProbationPractitioner } from './CaseDetail'
 
 export interface PersonalDetailsSession {
   overview: PersonalDetails
@@ -17,6 +18,7 @@ export interface PersonalDetailsSession {
   tierCalculation: TierCalculation
   riskData?: RiskData
   predictors?: RiskScoresDto[] | ErrorSummary
+  probationPractitioner?: ProbationPractitioner
 }
 
 export interface Data {

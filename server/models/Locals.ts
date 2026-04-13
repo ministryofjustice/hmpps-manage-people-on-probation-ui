@@ -162,10 +162,13 @@ export interface AppointmentOutcomeProps {
   isValidParams: boolean
   reqUrl: string
   baseUrl: string
+  baseOutcomeUrl: string
+  completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
   options?: AppointmentOutcomeOption[]
   sentenceType?: SentenceType
+  isProbationPractitioner?: boolean
 }
 
 export interface AppResponse extends Response {

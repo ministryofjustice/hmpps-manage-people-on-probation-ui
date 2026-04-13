@@ -8,12 +8,12 @@ import config from '../../config'
 const appointmentOutcomes: Route<void> = (req, res, next) => {
   let errorMessages = res?.locals?.errorMessages || {}
   let render = res?.locals?.renderPath || urlToRenderPath(req, res)
-  const { crn, id, isInPast, baseUrl, reqUrl } = res.locals.appointmentOutcome
+  const { crn, id, isInPast, baseOutcomeUrl, reqUrl } = res.locals.appointmentOutcome
   const { maxCharCount } = config
   const localParams: LocalParams = null
 
   const validateOutcome = (): void => {
-    if (reqUrl !== baseUrl) return
+    if (reqUrl !== baseOutcomeUrl) return
     render = 'pages/appointment-outcomes/outcome'
     errorMessages = {
       ...errorMessages,
@@ -30,7 +30,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   }
 
   const validateAttendedFailedToComply = (): void => {
-    if (!req.url.includes(`${baseUrl}/attended-failed-to-comply`)) return
+    if (!req.url.includes(`${baseOutcomeUrl}/attended-failed-to-comply`)) return
 
     render = 'pages/appointments-outcomes/attended-failed-to-comply'
 
@@ -48,7 +48,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   }
 
   const validateAddNote = (): void => {
-    if (!reqUrl.includes(`${baseUrl}/add-note`)) return
+    if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
     errorMessages = validateWithSpec(
       req,
