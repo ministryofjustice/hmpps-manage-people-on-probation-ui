@@ -3,7 +3,7 @@ import { DateTime } from 'luxon'
 import { getSmsPreview } from './getSmsPreview'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
-import { isoFromDateTime, setDataValue } from '../utils'
+import { zonedFromDateTime, setDataValue } from '../utils'
 import { mockAppResponse } from '../controllers/mocks'
 import { Location } from '../data/model/caseload'
 import { AppointmentSession } from '../models/Appointments'
@@ -144,7 +144,7 @@ describe('middleware/getSmsPreview', () => {
     return {
       firstName: 'James',
       appointmentLocation,
-      dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+      dateAndTimeOfAppointment: zonedFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
       includeWelshPreview: false,
       appointmentTypeCode: mockAppointmentSession.type,
     }
@@ -172,7 +172,7 @@ describe('middleware/getSmsPreview', () => {
     const expectedRequestBody: SmsPreviewRequest = {
       firstName: 'James',
       appointmentLocation,
-      dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+      dateAndTimeOfAppointment: zonedFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
       includeWelshPreview: false,
       appointmentTypeCode: mockAppointmentSession.type,
     }
@@ -299,7 +299,7 @@ describe('middleware/getSmsPreview', () => {
     const expectedRequestBody: SmsPreviewRequest = {
       firstName: 'James',
       appointmentLocation,
-      dateAndTimeOfAppointment: isoFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
+      dateAndTimeOfAppointment: zonedFromDateTime(mockAppointmentSession.date, mockAppointmentSession.start),
       includeWelshPreview: true,
       appointmentTypeCode: mockAppointmentSession.type,
     }

@@ -4,7 +4,7 @@ import { Route } from '../@types'
 import { HmppsAuthClient } from '../data'
 import { SmsPreviewRequest, SmsPreviewResponse, SmsPreviewSession } from '../data/model/OutlookEvent'
 import { AppointmentSession } from '../models/Appointments'
-import { getDataValue, isoFromDateTime, responseIsError, setDataValue } from '../utils'
+import { getDataValue, zonedFromDateTime, responseIsError, setDataValue } from '../utils'
 import { Location } from '../data/model/caseload'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import { Data } from '../models/Data'
@@ -31,13 +31,18 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
     } = appointment
     const preferredLanguage = getDataValue<string>(data, ['personalDetails', crn, 'overview', 'preferredLanguage'])
     const includeWelshPreview = preferredLanguage === 'Welsh'
-    const dateAndTimeOfAppointment = isoFromDateTime(date, start)
+    const dateAndTimeOfAppointment = zonedFromDateTime(date, start)
+
     const body: SmsPreviewRequest = {
       firstName,
       dateAndTimeOfAppointment,
       appointmentTypeCode,
       includeWelshPreview,
     }
+    console.log("SMS preview request*******************************")
+    console.dir(body, {path: null})
+    console.log('*******************************')
+
     const locationMatch = locations.find(loc => loc.code === locationCode)
     if (locationMatch) {
       appointmentLocation =
@@ -51,6 +56,10 @@ export const getSmsPreview = (hmppsAuthClient: HmppsAuthClient): Route<Promise<v
       const masOutlookClient = new SupervisionAppointmentClient(token)
       try {
         const response = await masOutlookClient.postSmsPreview(body)
+
+        console.log('SMS preview response*******************************')
+        console.dir(response, { path: null })
+        console.log('*******************************')
         if (!responseIsError<SmsPreviewResponse>(response)) {
           preview = response
         }

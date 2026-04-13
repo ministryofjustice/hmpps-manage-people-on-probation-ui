@@ -1,7 +1,7 @@
-import { isoFromDateTime } from './isoFromDateTime'
+import { zonedFromDateTime } from './zonedFromDateTime'
 
 describe('utils/isoFromDateTime', () => {
   it('should return an ISO date', () => {
-    expect(isoFromDateTime('2026-06-22', '17:05')).toEqual('2026-06-22T17:05:00.000+01:00')
+    expect(zonedFromDateTime('2026-06-22', '17:05')).toEqual('2026-06-22T17:05:00.000+01:00')
   })
 })

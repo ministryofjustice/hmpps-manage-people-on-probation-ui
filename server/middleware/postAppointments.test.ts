@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
 import { postAppointments, buildCaseLink } from './postAppointments'
-import { dateTime, isoFromDateTime } from '../utils'
+import { dateTime, zonedFromDateTime } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import SupervisionAppointmentClient from '../data/SupervisionAppointmentClient'
 import HmppsAuthClient from '../data/hmppsAuthClient'
@@ -240,7 +240,7 @@ const checkOutlookEventRequest = (smsRequest = false, firstName = mockUser.first
       `<a href="http://localhost:3000/case/${crn}/appointments/appointment/${mockAppointmentsPostResponse.appointments[0].id}/manage?back=/case/${crn}/appointments" target="_blank" rel="external noopener noreferrer">View the appointment on Manage people on probation (opens in new tab).</a>`,
     ),
     subject: `J. Morrison: planned office visit (NS)`,
-    start: isoFromDateTime(date, start),
+    start: zonedFromDateTime(date, start),
     supervisionAppointmentUrn: mockAppointmentsPostResponse.appointments[0].externalReference,
   }
   expect(postOutlookCalendarEventSpy).toHaveBeenCalledWith(expect.objectContaining(outlookEventRequestBody))

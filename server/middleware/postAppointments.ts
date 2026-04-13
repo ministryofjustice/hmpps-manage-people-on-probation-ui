@@ -1,5 +1,5 @@
 import MasApiClient from '../data/masApiClient'
-import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, isoFromDateTime } from '../utils'
+import { getDataValue, dateTime, handleQuotes, firstInitialLastName, toSentenceCase, zonedFromDateTime } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -97,7 +97,7 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
         ],
         message,
         subject,
-        start: isoFromDateTime(date, start),
+        start: zonedFromDateTime(date, start),
         durationInMinutes: getDurationInMinutes(body.start, body.end),
         supervisionAppointmentUrn: response.appointments[0].externalReference,
       }
