@@ -57,7 +57,7 @@ const constructMockAppointmentSession = (smsPreviewRequest = {}): AppointmentSes
   smsPreview: {
     request: {
       firstName: 'James',
-      dateAndTimeOfAppointment: `${date}T${start}:00.000Z`,
+      dateAndTimeOfAppointment: `${date}T${start}:00.000+00:00`,
       appointmentTypeCode: type,
       includeWelshPreview: false,
       appointmentLocation,
