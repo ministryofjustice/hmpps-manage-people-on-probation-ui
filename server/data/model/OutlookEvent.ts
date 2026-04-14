@@ -52,9 +52,14 @@ export interface EventResponse {
   id?: string
   subject: string
   startDate: string
-  endDate: string
+  endDate: string,
+  smsResponse?: SmsResponse ,
 }
 
+export interface SmsResponse {
+  englishNotificationId: string
+  welshNotificationId?: string
+}
 export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
 
 export interface SmsPreviewRequest {
