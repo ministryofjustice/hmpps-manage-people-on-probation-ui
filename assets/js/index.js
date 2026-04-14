@@ -2,15 +2,16 @@
 /* eslint-disable no-restricted-globals */
 
 import * as arnsFrontend from '@ministryofjustice/hmpps-arns-frontend-components-lib/dist/js/all'
-import { DateTime } from 'luxon'
+import * as luxon from 'luxon'
 import './appInsights'
 import './predictors'
 import { BackendSortableTable } from './backend-sortable-table.mjs'
 import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
-import validateDateInput from './date-time'
 import './photo'
+
+const { DateTime } = luxon
 
 arnsFrontend.initAll()
 
@@ -234,6 +235,7 @@ class ServiceAlert {
     this.handleStartTimeChange = this.handleStartTimeChange.bind(this)
     this.handleRequest = this.handleRequest.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
+    this.formatDateChange = this.formatDateChange.bind(this)
 
     this.init()
   }
@@ -245,7 +247,7 @@ class ServiceAlert {
 
     if (this.dateInput) {
       this.dateInput.addEventListener('keyup', this.handleDateChange)
-      this.dateInput.addEventListener('change', this.handleDateChange)
+      this.dateInput.addEventListener('change', this.formatDateChange)
     }
   }
 
@@ -315,6 +317,17 @@ class ServiceAlert {
     this.showAlert(isInPast)
   }
 
+  async formatDateChange() {
+    const { value } = this.dateInput
+    this.dateInput.value = standardiseDateValue(this.dateInput.value)
+    const dt = DateTime.fromFormat(value, 'd/M/yyyy')
+    if (dt.isValid) {
+      await this.handleRequest(true)
+    } else {
+      this.showAlert(false)
+    }
+  }
+
   async handleDateChange() {
     const { value } = this.dateInput
     const dt = DateTime.fromFormat(value, 'd/M/yyyy')
@@ -326,6 +339,28 @@ class ServiceAlert {
   }
 }
 
+function standardiseDateValue(dateValue) {
+  if (!dateValue) {
+    return dateValue
+  }
+  const separators = ['/', '-', '.', ' ', '_']
+  const formats = []
+  for (let i = 0; i < separators.length; i += 1) {
+    const seperator = separators[i]
+    formats.push(`d${seperator}M${seperator}yyyy`)
+    formats.push(`d${seperator}M${seperator}yy`)
+  }
+  for (let j = 0; j < formats.length; j += 1) {
+    const format = formats[j]
+    const date = DateTime.fromFormat(dateValue, format)
+    if (date.isValid) {
+      const newDateValue = date.toFormat('d/M/yyyy')
+      return newDateValue
+    }
+  }
+  return dateValue
+}
+
 setNoFixedAddressConditional()
 resetConditionals()
 attendanceSelectors()
@@ -334,5 +369,4 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
-validateDateInput()
 new ServiceAlert()
