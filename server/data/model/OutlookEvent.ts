@@ -31,6 +31,7 @@ export interface OutlookEventResponse {
   startDate: string
   endDate: string
   attendees: string[]
+  smsResponse: SmsResponse
 }
 
 export interface RescheduleEventRequest {
@@ -52,8 +53,7 @@ export interface EventResponse {
   id?: string
   subject: string
   startDate: string
-  endDate: string,
-  smsResponse?: SmsResponse ,
+  endDate: string
 }
 
 export interface SmsResponse {
