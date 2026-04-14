@@ -1,8 +1,8 @@
 {% extends "../_form.njk" %}
 {% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s failure to comply' %}
-{% set backLink = '/case/' + crn + '/appointments' %}
+{% set backLink = appointmentOutcome.backLink %}
 {% set initiateText = 'Initiate a ' + (
-'breach' if sentenceType == 'COMMUNITY' else 
+'breach' if appointmentOutcome.sentenceType == 'COMMUNITY' else 
   'recall'
 ) %}
 
@@ -24,18 +24,18 @@
       {
         value: "BREACH_RECALL_INITIATED",
         text: initiateText
-      }  if sentenceType in ['COMMUNITY', 'CUSTODY'],
+      }  if appointmentOutcome.sentenceType in ['COMMUNITY', 'CUSTODY'],
       {
         value: "BREACH_RECALL_INITIATED_AND_SEND_LETTER",
         text: initiateText + " and send a letter"
-      }  if sentenceType in ['COMMUNITY', 'CUSTODY'],
+      }  if appointmentOutcome.sentenceType in ['COMMUNITY', 'CUSTODY'],
       {
         value: "REFER_TO_OFFENDER_MANAGER",
         text: "Refer to probation practitioner",
         hint: {
           text: "Notify the allocated probation practitioner so they can take action."
         }
-      } if not isProbationPractitioner,
+      } if not appointmentOutcome.isProbationPractitioner,
       {
         value: "NO_FURTHER_ACTION",
         text: "No further action"

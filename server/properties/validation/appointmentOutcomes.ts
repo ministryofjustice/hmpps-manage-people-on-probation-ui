@@ -19,6 +19,16 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
         },
       ],
     },
+    [`[appointments][${crn}][${id}][outcome][enforcementAction]`]: {
+      optional: page !== `outcome/attended-failed-to-comply`,
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an action for this failure to comply',
+          log: 'Appointment enforcement action not selected',
+        },
+      ],
+    },
     [`[appointments][${crn}][${id}][outcome][complied]`]: {
       optional: page !== `outcome/attended-complied`,
       checks: [

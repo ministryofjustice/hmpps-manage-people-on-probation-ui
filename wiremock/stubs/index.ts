@@ -20,6 +20,7 @@ import user from './user'
 import eSupervisionAPI from './eSupervisionAPI'
 import document from './document'
 import overdueOutcomes from './overdueOutcomes'
+import sentences from './sentences'
 
 export default {
   resetMocks: (): Promise<Array<Response>> =>
@@ -44,6 +45,7 @@ export default {
   ...eSupervisionAPI,
   ...document,
   ...overdueOutcomes,
+  ...sentences,
   stubBreachRecallInformation: (args: { data: string }): Promise<Response> =>
     superagent.post('http://localhost:9091/__admin/mappings').send({
       request: {

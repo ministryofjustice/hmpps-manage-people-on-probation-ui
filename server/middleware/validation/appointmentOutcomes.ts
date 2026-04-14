@@ -32,7 +32,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateAttendedFailedToComply = (): void => {
     if (!req.url.includes(`${baseOutcomeUrl}/attended-failed-to-comply`)) return
 
-    render = 'pages/appointments-outcomes/attended-failed-to-comply'
+    render = 'pages/appointment-outcomes/attended-failed-to-comply'
 
     errorMessages = {
       ...errorMessages,
