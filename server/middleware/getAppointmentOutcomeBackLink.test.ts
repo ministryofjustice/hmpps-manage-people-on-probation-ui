@@ -124,10 +124,10 @@ describe('/middleware/getAppointmentOutcomeBackLink()', () => {
 
     const selectedOutcomeTypes: SelectedOutcomeTypes = {
       ATTENDED_SENT_HOME_BEHAVIOUR: 'attended-failed-to-comply',
-      ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS: 'attended-failed-to-comply',
-      ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES: 'attended-failed-to-comply',
+      ATTENDED_FAILED_TO_COMPLY: 'attended-failed-to-comply',
+      ATTENDED_SENT_HOME_SERVICE_ISSUES: 'attended-failed-to-comply',
       UNACCEPTABLE_ABSENCE: 'unacceptable-absence',
-      EVIDENCE_REQUESTED: 'failed-to-attend',
+      FAILED_TO_ATTEND: 'failed-to-attend',
     }
     Object.entries(outcomePages).forEach(([pageTitle, pageUrl]) => {
       Object.entries(selectedOutcomeTypes).forEach(([type, url]: [AppointmentOutcomeType, string]) => {

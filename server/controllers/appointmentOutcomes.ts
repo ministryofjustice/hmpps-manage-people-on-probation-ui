@@ -54,12 +54,12 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       const type = getDataValue<AppointmentOutcomeType>(data, ['appointments', crn, id, 'outcome', 'type'])
       const redirectMap: OutcomeRedirectMap = {
         ATTENDED: `${baseOutcomeUrl}/add-note`,
+        ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
         ATTENDED_SENT_HOME_BEHAVIOUR: `${baseOutcomeUrl}/attended-failed-to-comply`,
-        ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS: `${baseOutcomeUrl}/attended-failed-to-comply`,
-        ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,
+        ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,
         ACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/acceptable-absence`,
         UNACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/unacceptable-absence`,
-        EVIDENCE_REQUESTED: `${baseOutcomeUrl}/failed-to-attend`,
+        FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
       return res.redirect(redirectMap[type])

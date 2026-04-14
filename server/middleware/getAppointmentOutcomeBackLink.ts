@@ -25,8 +25,8 @@ export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
   ) {
     switch (type) {
       case 'ATTENDED_SENT_HOME_BEHAVIOUR':
-      case 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS':
-      case 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES':
+      case 'ATTENDED_FAILED_TO_COMPLY':
+      case 'ATTENDED_SENT_HOME_SERVICE_ISSUES':
         backLink = `${baseOutcomeUrl}/attended-failed-to-comply` // used for all 3 pages
         break
       case 'UNACCEPTABLE_ABSENCE':
