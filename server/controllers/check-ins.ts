@@ -1309,9 +1309,9 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       return res.render('pages/check-in/questions/instructions.njk', { crn, back, id, data: req.session.data })
     }
   },
@@ -1333,9 +1333,9 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_ADD_QUESTIONS', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
@@ -1454,9 +1454,9 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       return res.render('pages/check-in/questions/preview/feeling.njk', {
         crn,
         back,
@@ -1474,9 +1474,9 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       return res.render('pages/check-in/questions/preview/support.njk', {
         crn,
         back,
@@ -1493,9 +1493,9 @@ const checkInsController: Controller<typeof routes, void> = {
       await sendAuditMessage(res, 'VIEW_MAS_LIST_CHECK_IN_LIST_QUESTIONS', crn, SubjectType.CRN)
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const eSupClient = new ESupervisionClient(token)
@@ -1557,9 +1557,9 @@ const checkInsController: Controller<typeof routes, void> = {
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_EDIT', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personalDetails = await masClient.getPersonalDetails(crn)
@@ -1623,9 +1623,9 @@ const checkInsController: Controller<typeof routes, void> = {
       const { crn, id, templateId } = req.params as Record<string, string>
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_SELECT', crn, SubjectType.CRN)
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
       if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
 
       const questionTemplateAndInputs =
@@ -1645,9 +1645,9 @@ const checkInsController: Controller<typeof routes, void> = {
       await sendAuditMessage(res, 'VIEW_MAS_ADD_CHECK_IN_QUESTIONS_DELETE', crn, SubjectType.CRN)
 
       // ESUPERVISION FEATURE FLAG
-      // if (res.locals.flags.enableESupervisionCustomQuestions === false) {
-      //  return res.redirect(`/case/${crn}`)
-      // }
+      if (res.locals.flags.enableESupervisionCustomQuestions === false) {
+        return res.redirect(`/case/${crn}`)
+      }
 
       if (data.esupervision?.[crn]?.[id]?.manageQuestions?.questionTemplateAndInputs?.[questionId]) {
         delete data.esupervision[crn][id].manageQuestions.questionTemplateAndInputs[questionId]
