@@ -231,6 +231,7 @@ class ServiceAlert {
 
     this.handleDismiss = this.handleDismiss.bind(this)
     this.showAlert = this.showAlert.bind(this)
+    this.handleTimeChange = this.handleTimeChange.bind(this)
     this.handleStartTimeChange = this.handleStartTimeChange.bind(this)
     this.handleEndTimeChange = this.handleEndTimeChange.bind(this)
     this.handleRequest = this.handleRequest.bind(this)
