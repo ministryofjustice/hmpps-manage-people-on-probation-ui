@@ -6,11 +6,29 @@
                 Manage
             </a>
     {% else %}
-        <a class="govuk-link govuk-link--no-visited-state"
-               target="_blank"
-               href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
-               aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
-                Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
-        </a>
+        {% if flags.enableDeepLinks and appointment.type in drugHistoryContactTypes %}
+            {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
+                <a class="govuk-link govuk-link--no-visited-state"
+                       target="_blank"
+                       href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) }}"
+                       aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
+                        Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
+                </a>
+            {% else %}
+                <a class="govuk-link govuk-link--no-visited-state"
+                       target="_blank"
+                       href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}"
+                       aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
+                        Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
+                </a>
+            {% endif %}
+        {% else %}
+            <a class="govuk-link govuk-link--no-visited-state"
+                   target="_blank"
+                   href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}"
+                   aria-label="Manage {{ appointment.type | lower }} appointment on NDelius">
+                    Manage on NDelius<span class="govuk-visually-hidden"> (opens in new tab)</span>
+            </a>
+        {% endif %}
     {% endif %}
 {% endmacro %}
