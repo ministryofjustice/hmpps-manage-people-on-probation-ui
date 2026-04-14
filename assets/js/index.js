@@ -2,7 +2,7 @@
 /* eslint-disable no-restricted-globals */
 
 import * as arnsFrontend from '@ministryofjustice/hmpps-arns-frontend-components-lib/dist/js/all'
-import * as luxon from 'luxon'
+import { DateTime } from 'luxon'
 import './appInsights'
 import './predictors'
 import { BackendSortableTable } from './backend-sortable-table.mjs'
@@ -10,8 +10,6 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
-
-const { DateTime } = luxon
 
 arnsFrontend.initAll()
 
@@ -318,14 +316,8 @@ class ServiceAlert {
   }
 
   async formatDateChange() {
-    const { value } = this.dateInput
     this.dateInput.value = standardiseDateValue(this.dateInput.value)
-    const dt = DateTime.fromFormat(value, 'd/M/yyyy')
-    if (dt.isValid) {
-      await this.handleRequest(true)
-    } else {
-      this.showAlert(false)
-    }
+    await this.handleDateChange()
   }
 
   async handleDateChange() {
