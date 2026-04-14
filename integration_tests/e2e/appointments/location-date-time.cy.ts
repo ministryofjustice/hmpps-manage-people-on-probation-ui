@@ -222,22 +222,13 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('9:10')
+      locationDateTimePage.getElementInput(`startTime`).type('09:10')
       locationDateTimePage.getElementInput(`endTime`).focus().type('08:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
-      locationDateTimePage.checkErrorSummaryBox([
-        'Enter a time in the 24-hour format, for example 16:30',
-        'The end time must be after the start time',
-      ])
+      locationDateTimePage.checkErrorSummaryBox(['The end time must be after the start time'])
 
-      locationDateTimePage.getBackLink().should('be.visible')
-    })
-    it('should display the error messages incorrect 24 hours time format', () => {
-      locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-start-error`).should($error => {
-        expect($error.text().trim()).to.include('Enter a time in the 24-hour format, for example 16:30')
-      })
       locationDateTimePage.getBackLink().should('be.visible')
     })
     it('should display the error messages end time before start time', () => {

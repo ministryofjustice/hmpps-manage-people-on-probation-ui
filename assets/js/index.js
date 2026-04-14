@@ -250,6 +250,7 @@ class ServiceAlert {
     }
 
     if (this.startInput) {
+      this.endInput.addEventListener('change', this.handleTimeChange)
       this.startInput.addEventListener('change', this.handleStartTimeChange)
     }
     if (this.endInput) {
@@ -290,16 +291,8 @@ class ServiceAlert {
     }
   }
 
-  async handleTimeChange(startOrEnd = 'start') {
-    let value = ''
-    if (startOrEnd === 'start') {
-      this.startInput.value = standardiseTimeValue(this.startInput.value)
-      value = this.startInput.value
-    } else if (startOrEnd === 'end') {
-      this.endInput.value = standardiseTimeValue(this.endInput.value)
-      value = this.endInput.value
-    }
-    const time = DateTime.fromFormat(value, 'H:mm')
+  async handleTimeChange(event) {
+    const time = DateTime.fromFormat(event.target.value, 'H:mm')
     if (time.isValid) {
       await this.handleRequest()
     } else {
@@ -307,12 +300,12 @@ class ServiceAlert {
     }
   }
 
-  async handleStartTimeChange() {
-    await this.handleTimeChange('start')
+  handleStartTimeChange() {
+    this.startInput.value = standardiseTimeValue(this.startInput.value)
   }
 
-  async handleEndTimeChange() {
-    await this.handleTimeChange('end')
+  handleEndTimeChange() {
+    this.endInput.value = standardiseTimeValue(this.endInput.value)
   }
 
   async handleRequest(dateEvent = false) {
@@ -330,9 +323,9 @@ class ServiceAlert {
     this.dismissed = alertDismissed
 
     if (dateEvent) {
-      this.startInput.removeEventListener('keyup', this.handleStartTimeChange)
+      this.startInput.removeEventListener('keyup', this.handleTimeChange)
       if (isToday) {
-        this.startInput.addEventListener('keyup', this.handleStartTimeChange)
+        this.startInput.addEventListener('keyup', this.handleTimeChange)
       }
     }
 
