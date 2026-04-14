@@ -25,7 +25,9 @@
         {{ predictorScale({
           data: riskData,
           predictor: "seriousViolentReoffendingPredictor",
-          excludeDate: true
+          excludeDate: true,
+          headingLevel: 4,
+          headingClass: "xs"
         }) }}
       {% endif %}
     </section>
@@ -33,9 +35,11 @@
   {% if showOGRS3 %}
     <section data-qa="snsv">
       {{ predictorScale({
-    data: riskData,
-    predictor: "snsv",
-    excludeDate: true
+        data: riskData,
+        predictor: "snsv",
+        excludeDate: true,
+        headingLevel: 4,
+        headingClass: "xs"
       }) }}
     </section>
   {% endif %}
