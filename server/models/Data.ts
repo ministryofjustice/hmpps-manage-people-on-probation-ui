@@ -21,6 +21,8 @@ export interface PersonalDetailsSession {
 
 export interface Data {
   isOutLookEventFailed?: any
+  isEnglishNotificationFailed?: any
+  isWelshNotificationFailed?: any
   appointments?: {
     [crn: string]: {
       [id: string]: AppointmentSession

@@ -125,6 +125,9 @@ export const postAppointments = (hmppsAuthClient: HmppsAuthClient): Route<Promis
     // Setting isOutLookEventFailed to display error based on API responses.
     if (!email || !outlookEventResponse?.id) data.isOutLookEventFailed = true
 
+    if (smsOptIn && !outlookEventResponse?.smsResponse?.englishNotificationId) data.isEnglishNotificationFailed = true
+
+    if (smsOptIn && !outlookEventResponse?.smsResponse?.welshNotificationId) data.isWelshNotificationFailed = true
     return response
   }
 }

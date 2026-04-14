@@ -1063,7 +1063,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: null,
-        smsSent: true,
+        isSmsResponse: undefined,
         attendingName: 'First’s',
         url: '',
       })

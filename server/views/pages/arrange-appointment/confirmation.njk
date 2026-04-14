@@ -49,9 +49,18 @@
   <div class="govuk-grid-row">
     <div class="govuk-grid-column-two-thirds" data-qa="what-happens-next">
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
+
       {% if flags.enableSmsReminders == true %}
-        {% if smsSent %}
+        {% if !isEnglishNotificationFailed && !isWelshNotificationFailed %}
           <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+
+          {% if isEnglishNotificationFailed %}
+            <p class="govuk-body">There is a technical problem with the English SMS and we could not send a SMS text notification
+          {% endif %}
+
+          {% if isWelshNotificationFailed %}
+            <p class="govuk-body">There is a technical problem with the Welsh SMS and we could not send a SMS text notification
+          {% endif %} 
         {% else %}
           <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
         {% endif %}
