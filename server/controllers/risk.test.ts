@@ -240,12 +240,92 @@ describe('riskController', () => {
       })
       expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
         personRiskFlag: mockFormattedRiskFlag,
+        showRiskLevel: false,
         crn,
       })
     })
-    it('should render the person risk flag page', () => {
+
+    it('should set showRiskLevel to true when level description is: Risk to Staff', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Staff' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
       expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
-        personRiskFlag: mockFormattedRiskFlag,
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Children', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Children' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Known Adult', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Known Adult' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Prisoner', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Prisoner' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
+        crn,
+      })
+    })
+
+    it('should set showRiskLevel to true when level description is: Risk to Public', async () => {
+      const riskToStaffFlag = {
+        ...mockPersonRiskFlag,
+        riskFlag: { ...mockPersonRiskFlag.riskFlag, description: 'Risk to Public' },
+      }
+      getPersonRiskFlagSpy.mockImplementationOnce(() => Promise.resolve(riskToStaffFlag))
+      mockFindReplace.mockImplementationOnce(() => riskToStaffFlag)
+
+      await controllers.risk.getRiskFlag(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith('pages/risk/flag', {
+        personRiskFlag: riskToStaffFlag,
+        showRiskLevel: true,
         crn,
       })
     })
