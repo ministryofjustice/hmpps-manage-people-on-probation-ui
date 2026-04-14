@@ -40,8 +40,8 @@ describe('Pick a date, location and time for this appointment', () => {
     locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
     const future = now.plus({ days: 2 })
     locationDateTimePage.getDatePickerInput().type(future.toFormat('d/M/yyyy'))
-    locationDateTimePage.getElementInput(`startTime`).type('09:00')
-    locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+    locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+    locationDateTimePage.getElementInput(`startTime`).focus().clear().type('09:30')
     locationDateTimePage.getSubmitBtn().click()
   }
 
@@ -222,8 +222,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:10')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('08:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:10')
+      locationDateTimePage.getElementInput(`endTime`).focus().clear().type('08:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -244,8 +244,8 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerInput().clear().type('xxxxxxxx')
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('10:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('10:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -266,8 +266,8 @@ describe('Pick a date, location and time for this appointment', () => {
       // locationDateTimePage.getDatePickerInput().clear()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:30')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('09:30')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box', () => {
@@ -286,8 +286,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('10:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:00')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('09:00')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the error summary box again', () => {
@@ -307,8 +307,8 @@ describe('Pick a date, location and time for this appointment', () => {
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('11:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('11:15')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('11:00')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('11:15')
       locationDateTimePage.getSubmitBtn().click()
     })
     it('should display the overlapping appointment warning', () => {
@@ -402,7 +402,7 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('08:00')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('08:00')
     })
     it('should display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
@@ -426,7 +426,7 @@ describe('Pick a date, location and time for this appointment', () => {
       loadPage()
       locationDateTimePage.getDatePickerToggle().click()
       locationDateTimePage.getActiveDayButton().click()
-      locationDateTimePage.getElementInput(`startTime`).type('10:00')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('10:00')
     })
     it('should not display the log an outcome alert banner', () => {
       cy.wait('@isInPast')
@@ -457,8 +457,8 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should persist the log an outcome alert banner when past date is submitted and cancel and go back link is clicked from log an outcome page', () => {
       selectPastDate()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
@@ -470,8 +470,8 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should persist the log an outcome banner when change link is clicked on check your answers page', () => {
       selectPastDate()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
@@ -502,8 +502,8 @@ describe('Pick a date, location and time for this appointment', () => {
     })
     it('should not re-show the alert banner when the form is submitted, then the back link is clicked on the next page', () => {
       locationDateTimePage.getLogOutcomesAlertBanner().find('.moj-alert__dismiss').click()
-      locationDateTimePage.getElementInput(`startTime`).type('09:00')
-      locationDateTimePage.getElementInput(`endTime`).focus().type('09:30')
+      locationDateTimePage.getElementInput(`startTime`).clear().type('09:00')
+      locationDateTimePage.getElementInput(`startTime`).focus().clear().type('09:30')
       locationDateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
       locationDateTimePage.getSubmitBtn().click()
       locationDateTimePage.getSubmitBtn().click()
@@ -563,8 +563,8 @@ describe('Pick a date, location and time for this appointment', () => {
     rescheduleCyaPage.getSubmitBtn().click()
     locationDateTimePage = new AppointmentLocationDateTimePage()
     locationDateTimePage.getDatePickerInput().clear().type('21/2/2024')
-    locationDateTimePage.getElementInput(`startTime`).type('10:15')
-    locationDateTimePage.getElementInput(`endTime`).focus().type('10:30')
+    locationDateTimePage.getElementInput(`startTime`).clear().type('10:15')
+    locationDateTimePage.getElementInput(`startTime`).focus().clear().type('10:30')
     locationDateTimePage.getSubmitBtn().click()
   }
 

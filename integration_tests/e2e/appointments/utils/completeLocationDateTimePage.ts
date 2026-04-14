@@ -38,7 +38,10 @@ export const completeLocationDateTimePage = ({
       .clear()
       .type(`${future.toFormat('d/M/yyyy')}`)
   }
-  locationDateTimePage.getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`).type(startTime)
+  locationDateTimePage
+    .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-start`)
+    .clear()
+    .type(startTime)
   locationDateTimePage
     .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-end`)
     .focus()
