@@ -353,6 +353,7 @@ function standardiseTimeValue(timeValue) {
   for (let i = 0; i < separators.length; i += 1) {
     const seperator = separators[i]
     formats.push(`H${seperator}mm`)
+    formats.push(`h${seperator}mma`)
   }
   for (let j = 0; j < formats.length; j += 1) {
     const format = formats[j]

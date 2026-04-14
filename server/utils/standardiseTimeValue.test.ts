@@ -21,6 +21,16 @@ describe('utils/standardiseTimeValue', () => {
     const result = standardiseTimeValue(input)
     expect(result).toStrictEqual('07:3')
   })
+  it('should remove am treating as 24h', () => {
+    const input = '01:30am'
+    const result = standardiseTimeValue(input)
+    expect(result).toStrictEqual('01:30')
+  })
+  it('should remove pm treating as 24h', () => {
+    const input = '01:30pm'
+    const result = standardiseTimeValue(input)
+    expect(result).toStrictEqual('13:30')
+  })
   describe('should change alternate separators to :', () => {
     it('should change / to :', () => {
       const input = '01/30'
