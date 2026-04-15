@@ -15,8 +15,8 @@ export const checkUpdateLocation = (page: AppointmentCheckYourAnswersPage | Arra
     .clear()
     .type(`${future.toFormat('d/M/yyyy')}`)
   getUuid().then(uuidOveride => {
-    locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).type(startTime)
-    locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().type(endTime)
+    locationPage.getElement(`#appointments-${crn}-${uuidOveride}-start`).clear().type(startTime)
+    locationPage.getElement(`#appointments-${crn}-${uuidOveride}-end`).focus().clear().type(endTime)
   })
   locationPage.getSubmitBtn().click()
   locationPage.getSubmitBtn().click()
