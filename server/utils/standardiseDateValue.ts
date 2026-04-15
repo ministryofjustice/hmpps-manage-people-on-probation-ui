@@ -4,7 +4,7 @@ export const standardiseDateValue = (dateValue: string | undefined): string | un
   if (!dateValue) {
     return dateValue
   }
-  const separators = ['/', '-', '.', ' ', '_']
+  const separators = ['/', '-', '.', ' ', '_', ':']
   const formats: string[] = []
   for (let i = 0; i < separators.length; i += 1) {
     const seperator = separators[i]

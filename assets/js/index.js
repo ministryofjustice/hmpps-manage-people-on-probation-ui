@@ -335,7 +335,7 @@ function standardiseDateValue(dateValue) {
   if (!dateValue) {
     return dateValue
   }
-  const separators = ['/', '-', '.', ' ', '_']
+  const separators = ['/', '-', '.', ' ', '_', ':']
   const formats = []
   for (let i = 0; i < separators.length; i += 1) {
     const seperator = separators[i]
