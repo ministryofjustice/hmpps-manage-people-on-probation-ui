@@ -1818,7 +1818,7 @@ describe('checkInsController', () => {
 
     it('sets canEditQuestions to false if the time is after 23:59 the day before the check in is due', async () => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2026-04-15T00:00:00+01:00'))
+      jest.setSystemTime(new Date('2026-04-15T12:00:00Z'))
 
       mockIsValidCrn.mockReturnValue(true)
       mockIsValidUUID.mockReturnValue(true)
