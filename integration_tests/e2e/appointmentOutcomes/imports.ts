@@ -1,0 +1,37 @@
+import Page from '../../pages/page'
+
+export interface ExpectedOption<TPage extends Page> {
+  value: string
+  text: string
+  hint?: string
+  Page: Constructor<TPage>
+  pageName: string
+  pageTitle?: string
+}
+
+type Constructor<T = any> = new (...args: any[]) => T
+
+export const checkOptions = <TPage extends Page>(options: ExpectedOption<TPage>[]): void => {
+  options.forEach(({ value, text, hint }, index) => {
+    cy.get('.govuk-radios__item').eq(index).find('label').should('contain.text', text)
+    if (hint) {
+      cy.get('.govuk-radios__item').eq(index).find('.govuk-hint').should('contain.text', hint)
+    }
+    cy.get(`.govuk-radios__input[value=${value}]`).should('exist')
+  })
+}
+
+export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs extends Record<string, any>>(
+  options: ExpectedOption<TPage>[],
+  loadPageFunc: (args: any) => void,
+  args: TArgs = {} as TArgs,
+): void => {
+  options.forEach(({ value, Page: RedirectPage, pageTitle }) => {
+    loadPageFunc(args)
+    const outcomePage = new args.Page()
+    cy.get(`.govuk-radios__input[value=${value}]`).click()
+    outcomePage.getSubmitBtn().click()
+    const page = new RedirectPage()
+    page.checkPageTitle(pageTitle!)
+  })
+}

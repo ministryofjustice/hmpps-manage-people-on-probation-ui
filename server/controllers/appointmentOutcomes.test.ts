@@ -116,7 +116,7 @@ describe('controllers/appointmentOutcomes', () => {
       const req = mockReq()
       const res = mockRes()
       const spy = jest.spyOn(res, 'redirect')
-      mockGetDataValue.mockReturnValueOnce('ATTENDED')
+      mockGetDataValue.mockReturnValueOnce('ATTENDED_COMPLIED')
       controllers.appointmentOutcomes.postOutcome()(req, res)
       expect(spy).toHaveBeenCalledWith(`${baseUrl}/add-note`)
     })
