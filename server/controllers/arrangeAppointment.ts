@@ -607,6 +607,7 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         url,
         isInPast,
         appointmentType,
+        smsSent,
         isEnglishNotificationFailed,
         isWelshNotificationFailed,
       })

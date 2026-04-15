@@ -426,6 +426,23 @@ describe('Confirmation page', () => {
       nextAppointmentPage.checkOnPage()
     })
   })
+
+  describe('SMS reminder', () => {
+    beforeEach(() => {
+      cy.task('resetMocks')
+      cy.task('stubPostMasOutlookEventWithEnglishSMS')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+    })
+
+    it('should render the page with an alert banner of type warning when the English language SMS reminder fails to send', () => {})
+
+    it('should render the page with an alert banner of type information when the Welsh language SMS reminder fails to send', () => {})
+
+    it('should render the page with an alert banner of type warning when both the English and Welsh language SMS reminder fails to send', () => {})
+
+    it('should render the page with a text letting the user know the SMS reminder has been sent', () => {})
+  })
 })
 
 export const to12HourTime = (time: string): string => {

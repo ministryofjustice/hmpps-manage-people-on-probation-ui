@@ -1,4 +1,5 @@
 {% extends "../_form.njk" %}
+{%- from "moj/components/alert/macro.njk" import mojAlert -%}
 {% set rearranging = appointment['rearrange-or-cancel'] %}
 {% set buttonText = "Return to " + case.name.forename + "'s overview" %}
 {% set notStandardForm = true %}
@@ -51,16 +52,45 @@
       <h2 class="govuk-heading-m govuk-!-margin-top-6">What happens next</h2>
 
       {% if flags.enableSmsReminders == true %}
-        {% if !isEnglishNotificationFailed && !isWelshNotificationFailed %}
-          <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+        {% if smsSent %}
+          {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
+            <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+            {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
+              {{ mojAlert({
+              variant: "warning",
+              title: "We could not send a confirmation text message to " + case.name.forename,
+              showTitleAsHeading: true,
+              dismissible: false,
+              html: "You need to give " + case.name.forename + " the appointment details.",
+              attributes: {
+                'data-qa': 'sms-err-msg-english'
+              }
+            }) }}
 
-          {% if isEnglishNotificationFailed %}
-            <p class="govuk-body">There is a technical problem with the English SMS and we could not send a SMS text notification
+          {% elif isWelshNotificationFailed and not isEnglishNotificationFailed %}
+          {{ mojAlert({
+            variant: "information",
+            title: "We could not send a confirmation text message to " + case.name.forename + " in Welsh",
+            showTitleAsHeading: true,
+            dismissible: false,
+            html: case.name.forename + " has received the appointment details in English. We have logged the text as a contact on nDelius.",
+            attributes: {
+              'data-qa': 'sms-err-msg-welsh'
+            }
+          }) }}
+
+          {% else %}
+            {{ mojAlert({
+              variant: "warning",
+              title: "We could not send a confirmation text message to " + case.name.forename,
+              showTitleAsHeading: true,
+              dismissible: false,
+              html: "You need to give " + case.name.forename + " the appointment details.",
+              attributes: {
+                'data-qa': 'sms-err-msg-all'
+              }
+            }) }}
           {% endif %}
-
-          {% if isWelshNotificationFailed %}
-            <p class="govuk-body">There is a technical problem with the Welsh SMS and we could not send a SMS text notification
-          {% endif %} 
         {% else %}
           <p class="govuk-body">You need to give {{ case.name.forename }} the appointment details.</p>
         {% endif %}
