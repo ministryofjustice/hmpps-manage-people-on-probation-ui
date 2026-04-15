@@ -17,5 +17,11 @@ export default function testRoutes(router: Router) {
     req.session.mockedTime = DateTime.fromISO(time).toISO()
     return res.sendStatus(200)
   })
+  router.post('/__test/clear-session', (req, res) => {
+    req.session.destroy((err: any) => {
+      if (err) return res.status(500).send('Failed to clear session')
+      return res.sendStatus(200)
+    })
+  })
   return router
 }

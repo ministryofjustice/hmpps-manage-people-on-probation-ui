@@ -25,8 +25,6 @@ type RedirectPages =
   | AddNotePage
 
 const loadPage = ({ manageJourney = true, dateInPast = false, inOffice = true, id = appointmentId } = {}) => {
-  cy.clearCookies()
-  cy.clearLocalStorage()
   cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { isFuture: dateInPast === false, eventId: 2501192724, inOffice })
   if (!manageJourney) {
@@ -206,6 +204,9 @@ const checkPage = ({ manageJourney = true } = {}) => {
 }
 
 describe('Appointment outcome', () => {
+  before(() => {
+    cy.request('POST', '/__test/clear-session')
+  })
   afterEach(() => {
     cy.task('resetMocks')
   })

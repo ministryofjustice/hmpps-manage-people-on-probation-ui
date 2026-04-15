@@ -126,6 +126,9 @@ const checkPage = ({ manageJourney = true } = {}) => {
 }
 
 describe('Attended but failed to comply', () => {
+  before(() => {
+    cy.request('POST', '/__test/clear-session')
+  })
   afterEach(() => {
     cy.task('resetMocks')
   })
