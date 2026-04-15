@@ -37,28 +37,28 @@ const loadPage = ({ manageJourney = true, sentenceType = 'community', isProbatio
   outcomePage.getSubmitBtn().click()
 }
 
-type Pages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
+type RedirectPages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
 
 const getExpectedOptions = ({
   isProbationPractitioner = false,
   sentenceType = 'community',
-} = {}): ExpectedOption<Pages>[] => {
+} = {}): ExpectedOption<RedirectPages>[] => {
   const text = sentenceType === 'community' ? 'breach' : 'recall'
-  const expectedOptions: ExpectedOption<Pages>[] = [
-    { value: 'SEND_LETTER', text: 'Send a letter', Page: SendLetterPage, pageName: 'Send a letter' },
+  const expectedOptions: ExpectedOption<RedirectPages>[] = [
+    { value: 'SEND_LETTER', text: 'Send a letter', RedirectPage: SendLetterPage, redirectPageName: 'Send a letter' },
     {
       value: 'BREACH_RECALL_INITIATED',
       text: `Initiate a ${text}`,
-      Page: InitiateBreachOrRecallPage,
-      pageName: `Initiate a ${text}`,
-      pageTitle: `Initiate a ${text}`,
+      RedirectPage: InitiateBreachOrRecallPage,
+      redirectPageName: `Initiate a ${text}`,
+      redirectPageTitle: `Initiate a ${text}`,
     },
     {
       value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
       text: `Initiate a ${text} and send a letter`,
-      Page: InitiateBreachOrRecallPage,
-      pageName: `Initiate a ${text}`,
-      pageTitle: `Initiate a ${text}`,
+      RedirectPage: InitiateBreachOrRecallPage,
+      redirectPageName: `Initiate a ${text}`,
+      redirectPageTitle: `Initiate a ${text}`,
     },
   ]
   if (!isProbationPractitioner) {
@@ -66,23 +66,23 @@ const getExpectedOptions = ({
       value: 'REFER_TO_OFFENDER_MANAGER',
       text: 'Refer to probation practitioner',
       hint: 'Notify the allocated probation practitioner so they can take action.',
-      pageName: 'Add a note',
-      Page: AddNotePage,
+      redirectPageName: 'Add a note',
+      RedirectPage: AddNotePage,
     })
   }
   expectedOptions.push(
     {
       value: 'NO_FURTHER_ACTION',
       text: 'No further action',
-      Page: AddNotePage,
-      pageName: 'Add a note',
+      RedirectPage: AddNotePage,
+      redirectPageName: 'Add a note',
     },
     {
       value: 'DIFFERENT_ACTION',
       text: 'I want to add a different action',
-      Page: EnforcementActionPage,
-      pageName: 'Enforcement action',
-      pageTitle: 'Select an enforcement action for Alton’s failure to comply',
+      RedirectPage: EnforcementActionPage,
+      redirectPageName: 'Enforcement action',
+      redirectPageTitle: 'Select an enforcement action for Alton’s failure to comply',
     },
   )
   return expectedOptions

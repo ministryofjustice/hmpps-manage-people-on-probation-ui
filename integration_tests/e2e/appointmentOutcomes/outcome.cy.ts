@@ -16,7 +16,7 @@ import { ExpectedOption, checkOptionRedirectsToCorrectPage, checkOptions } from 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
 
-type Pages =
+type RedirectPages =
   | AttendedCompliedPage
   | AttendedFailedToComplyPage
   | AcceptableAbsencePage
@@ -40,24 +40,24 @@ const loadPage = ({ manageJourney = true, dateInPast = false, inOffice = true, i
   }
 }
 
-const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOption<Pages>[] => {
-  const options: ExpectedOption<Pages>[] = []
+const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOption<RedirectPages>[] => {
+  const options: ExpectedOption<RedirectPages>[] = []
   if (dateInPast) {
     options.push(
       {
         value: 'ATTENDED',
         text: 'Attended - complied',
-        pageName: 'Add a note',
-        pageTitle: 'Add a note',
-        Page: AddNotePage,
+        redirectPageName: 'Add a note',
+        redirectPageTitle: 'Add a note',
+        RedirectPage: AddNotePage,
       },
       {
         value: 'ATTENDED_FAILED_TO_COMPLY',
         text: 'Attended - failed to comply',
         hint: 'For example, their behaviour was disruptive or they did not follow instructions.',
-        pageName: 'Attended failed to comply',
-        pageTitle: 'Enforcement action for Alton’s failure to comply',
-        Page: AttendedFailedToComplyPage,
+        redirectPageName: 'Attended failed to comply',
+        redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
+        RedirectPage: AttendedFailedToComplyPage,
       },
     )
     if (inOffice) {
@@ -65,16 +65,16 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         {
           value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
           text: 'Attended - sent home (behaviour)',
-          pageName: 'Attended failed to comply',
-          pageTitle: 'Enforcement action for Alton’s failure to comply',
-          Page: AttendedFailedToComplyPage,
+          redirectPageName: 'Attended failed to comply',
+          redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
+          RedirectPage: AttendedFailedToComplyPage,
         },
         {
           value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
           text: 'Attended - sent home (service issues)',
-          pageName: 'Attended failed to comply',
-          pageTitle: 'Enforcement action for Alton’s failure to comply',
-          Page: AttendedFailedToComplyPage,
+          redirectPageName: 'Attended failed to comply',
+          redirectPageTitle: 'Enforcement action for Alton’s failure to comply',
+          RedirectPage: AttendedFailedToComplyPage,
         },
       )
     }
@@ -83,9 +83,9 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
     value: 'ACCEPTABLE_ABSENCE',
     text: 'Acceptable absence',
     hint: 'They provided an acceptable reason or evidence.',
-    pageName: 'Acceptable absence',
-    pageTitle: 'Why was Alton’s absence acceptable?',
-    Page: AcceptableAbsencePage,
+    redirectPageName: 'Acceptable absence',
+    redirectPageTitle: 'Why was Alton’s absence acceptable?',
+    RedirectPage: AcceptableAbsencePage,
   })
   if (dateInPast) {
     options.push(
@@ -93,17 +93,17 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
         value: 'UNACCEPTABLE_ABSENCE',
         text: 'Unacceptable absence',
         hint: 'They did not provide suitable evidence.',
-        pageName: 'Unacceptable absence',
-        pageTitle: 'Enforcement action for Alton’s unacceptable absence',
-        Page: UnacceptableAbsencePage,
+        redirectPageName: 'Unacceptable absence',
+        redirectPageTitle: 'Enforcement action for Alton’s unacceptable absence',
+        RedirectPage: UnacceptableAbsencePage,
       },
       {
         value: 'FAILED_TO_ATTEND',
         text: 'Failed to attend',
         hint: 'You may still need to request and review evidence.',
-        pageName: 'Failed to attend',
-        pageTitle: 'Enforcement action for Alton’s absence',
-        Page: FailedToAttendPage,
+        redirectPageName: 'Failed to attend',
+        redirectPageTitle: 'Enforcement action for Alton’s absence',
+        RedirectPage: FailedToAttendPage,
       },
     )
   }
@@ -111,9 +111,9 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
     options.push({
       value: 'WILL_BE_RESCHEDULED',
       text: 'The appointment will be rescheduled',
-      pageName: 'Reschedule an appointment',
-      pageTitle: 'Reschedule an appointment',
-      Page: RescheduleAppointmentPage,
+      redirectPageName: 'Reschedule an appointment',
+      redirectPageTitle: 'Reschedule an appointment',
+      RedirectPage: RescheduleAppointmentPage,
     })
   }
   return options
@@ -206,9 +206,6 @@ const checkPage = ({ manageJourney = true } = {}) => {
 }
 
 describe('Appointment outcome', () => {
-  beforeEach(() => {
-    cy.task('resetMocks')
-  })
   afterEach(() => {
     cy.task('resetMocks')
   })
