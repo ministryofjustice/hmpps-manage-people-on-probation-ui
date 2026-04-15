@@ -1,3 +1,20 @@
 {% extends "../_form.njk" %}
-{# placeholder title below - will be removed #}
-{% set title = "Why was Alton’s absence acceptable?" %}
+{# {% set title = "Why was " + appointmentOutcome.forename + "’s absence acceptable?" %} #}
+{% set backLink = appointmentOutcome.backLink %}
+
+{% block form %}
+  {{ govukRadios({
+    name: "enforcementAction",
+    fieldset: {
+      legend: {
+        text: "Why was " + appointmentOutcome.forename + "’s absence acceptable?",
+        isPageHeading: false,
+        classes: "govuk-fieldset__legend--l"
+      }
+    },
+     hint: {
+        text: appointmentOutcome.appointmentHintText
+    },
+    items: appointmentOutcome.options
+  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
+{% endblock %}

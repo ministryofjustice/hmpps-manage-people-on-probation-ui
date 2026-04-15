@@ -15,6 +15,7 @@ import {
   getPersonalDetails,
   getAppointmentAttendedFailedToComplyOptions,
   getAppointmentOutcomeBackLink,
+  getAppointmentAcceptableAbsenceOptions,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 
@@ -52,6 +53,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.all(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     getAppointmentAttendedFailedToComplyOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
+    getAppointmentAcceptableAbsenceOptions,
   )
 
   /* validate outcome options and store session data on all outcome post routes */
@@ -95,6 +101,9 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.postAttendedFailedToComply(),
   )
+
+  /* Acceptable absence */
+
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     controllers.appointmentOutcomes.getAcceptableAbsence(),
@@ -103,6 +112,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     controllers.appointmentOutcomes.postAcceptableAbsence(),
   )
+
   router.get(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
     controllers.appointmentOutcomes.getUnacceptableAbsence(),

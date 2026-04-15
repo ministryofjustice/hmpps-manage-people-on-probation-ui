@@ -31,9 +31,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
 
   const validateAttendedFailedToComply = (): void => {
     if (!req.url.includes(`${baseOutcomeUrl}/attended-failed-to-comply`)) return
-
     render = 'pages/appointment-outcomes/attended-failed-to-comply'
-
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
@@ -42,6 +40,24 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           crn,
           id,
           page: `outcome/attended-failed-to-comply`,
+        }),
+      ),
+    }
+  }
+
+  const validateAcceptableAbsence = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/acceptable-absence`)) return
+    render = 'pages/appointment-outcomes/acceptable-absence'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/acceptable-absence`,
+          msg: 'Select why their absence was acceptable',
+          log: 'Acceptable absence reason not selected',
         }),
       ),
     }
@@ -64,6 +80,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
 
   validateOutcome()
   validateAttendedFailedToComply()
+  validateAcceptableAbsence()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {

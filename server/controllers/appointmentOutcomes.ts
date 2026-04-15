@@ -118,7 +118,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
   postAttendedFailedToComply: () => {
     return async (req, res) => {
       const { data } = req.session
-      const { crn, id, baseOutcomeUrl, completedUrl } = res.locals.appointmentOutcome
+      const { crn, id, baseOutcomeUrl } = res.locals.appointmentOutcome
       const enforcementAction = getDataValue<AppointmentEnforcementAction>(data, [
         'appointments',
         crn,
@@ -126,9 +126,6 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         'outcome',
         'enforcementAction',
       ])
-      if (enforcementAction === 'NO_FURTHER_ACTION') {
-        // patch appointment with outcome and enforcement action here before redirecting to completed url
-      }
       const redirectMap: EnforcementRedirectMap = {
         SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
         INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
@@ -144,7 +141,10 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
   },
   postAcceptableAbsence: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
+    return async (req, res) => {
+      const { baseOutcomeUrl } = res.locals.appointmentOutcome
+      return res.redirect(`${baseOutcomeUrl}/add-note`)
+    }
   },
   getUnacceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')

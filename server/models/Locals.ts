@@ -151,6 +151,11 @@ interface Locals {
   appointmentOutcome?: AppointmentOutcomeProps
 }
 
+export interface AppointmentOutcomeSentence {
+  type: SentenceType
+  length: number | null
+}
+
 export interface AppointmentOutcomeProps {
   forename: string
   surname: string
@@ -168,6 +173,7 @@ export interface AppointmentOutcomeProps {
   appointmentSession?: AppointmentSession
   backLink?: string
   options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  sentence?: AppointmentOutcomeSentence
   sentenceType?: SentenceType
   isProbationPractitioner?: boolean
   appointmentHintText?: string

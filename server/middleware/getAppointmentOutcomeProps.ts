@@ -6,7 +6,8 @@ import { convertToTitleCase } from '../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { Route } from '../@types'
 import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../utils'
-import { Sentence, SentenceType } from '../data/model/sentenceDetails'
+import { Sentence } from '../data/model/sentenceDetails'
+import { AppointmentOutcomeSentence } from '../models/Locals'
 
 export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
@@ -47,9 +48,22 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   const isInPast = appointmentDateIsInPast(req)
   const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
   const eventId = appointmentSession?.eventId
-  const sentenceType: SentenceType = eventId
-    ? sentences.find(_sentence => _sentence.id.toString() === eventId)?.sentenceType
+  const appointmentSentence: Sentence = eventId
+    ? sentences.find(_sentence => _sentence.id.toString() === eventId)
     : null
+  const startDate = appointmentSentence?.order?.startDate
+  const endDate = appointmentSentence?.order?.endDate
+  let sentenceLength = null
+  if (startDate && endDate) {
+    const start = DateTime.fromISO(startDate)
+    const end = DateTime.fromISO(endDate)
+    sentenceLength = end.diff(start, 'months').months
+  }
+  console.log({ startDate, endDate, sentenceLength })
+  const sentence: AppointmentOutcomeSentence = {
+    type: appointmentSentence?.sentenceType,
+    length: sentenceLength,
+  }
 
   const appointmentHintText = `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
   const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
@@ -69,7 +83,7 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     baseOutcomeUrl,
     completedUrl,
     appointmentSession,
-    sentenceType,
+    sentence,
     isProbationPractitioner,
     appointmentHintText,
   }

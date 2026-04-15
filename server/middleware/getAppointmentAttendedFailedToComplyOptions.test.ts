@@ -10,7 +10,7 @@ const buildResponse = ({
 } = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
-      sentenceType,
+      sentence: { type: sentenceType },
       isProbationPractitioner,
     },
   }
