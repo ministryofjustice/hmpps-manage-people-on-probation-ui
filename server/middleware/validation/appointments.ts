@@ -12,7 +12,6 @@ import { getMockedTime } from '../../routes/testRoutes'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
-import { standardiseTimeValue } from '../../utils/standardiseTimeValue'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
