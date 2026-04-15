@@ -146,6 +146,7 @@ describe('ESupervisionClient', () => {
         videoUrl: 'string',
         snapshotUrl: 'string',
         autoIdCheck: 'MATCH',
+        idMatched: true,
         manualIdCheck: 'MATCH',
         flaggedResponses: ['string'],
         checkinLogs: {
@@ -216,6 +217,7 @@ describe('ESupervisionClient', () => {
         videoUrl: 'string',
         snapshotUrl: 'string',
         autoIdCheck: 'MATCH',
+        idMatched: true,
         manualIdCheck: 'MATCH',
         flaggedResponses: ['string'],
         checkinLogs: {
@@ -280,6 +282,7 @@ describe('ESupervisionClient', () => {
         videoUrl: 'string',
         snapshotUrl: 'string',
         autoIdCheck: 'MATCH',
+        idMatched: true,
         manualIdCheck: 'MATCH',
         flaggedResponses: ['string'],
         checkinLogs: {

@@ -5,7 +5,6 @@ import ActivityLogPage from '../pages/activityLog'
 import CheckInReviewExpiredPage from '../pages/check-ins/review/expired.page'
 import CheckInReviewIdentityPage from '../pages/check-ins/review/identity.page'
 import CheckInReviewNotesPage from '../pages/check-ins/review/notes.page'
-import CheckInVideoPage from '../pages/check-ins/video.page'
 import ViewExpiredCheckInPage from '../pages/check-ins/view-expired.page'
 
 const crn = 'X000001'
@@ -29,18 +28,6 @@ context('check in reviews', () => {
       .find('.govuk-summary-list__actions .govuk-tag')
       .should('contain.text', 'Identity confirmed')
 
-    page
-      .getSummaryListRow(4, 'checkInSummary')
-      .find('.govuk-summary-list__key')
-      .should('contain.text', 'Check in video')
-    page
-      .getSummaryListRow(4, 'checkInSummary')
-      .find('.govuk-summary-list__value .govuk-link')
-      .should(
-        'have.attr',
-        'href',
-        `/case/${crn}/appointments/${reviewedId}/check-in/video?back=${encodeURIComponent(`/case/${crn}/appointments/${reviewedId}/check-in/view`)}`,
-      )
     page.getBackLink().click()
     Page.verifyOnPage(ActivityLogPage)
   })
@@ -65,19 +52,6 @@ context('check in reviews', () => {
     cy.visit(`/case/${crn}/appointments/${submittedId}/check-in/update`)
     const page = Page.verifyOnPage(CheckInReviewIdentityPage)
 
-    page
-      .getSummaryListRow(4, 'identitySummary')
-      .find('.govuk-summary-list__key')
-      .should('contain.text', 'Check in video')
-    page
-      .getSummaryListRow(4, 'identitySummary')
-      .find('.govuk-summary-list__value .govuk-link')
-      .should(
-        'have.attr',
-        'href',
-        `/case/${crn}/appointments/${submittedId}/check-in/video?back=${encodeURIComponent(`/case/${crn}/appointments/${submittedId}/check-in/review/identity`)}`,
-      )
-
     page.getRadio('confirmIdentity', 1).click()
     page.getSubmitBtn().click()
     const page2 = Page.verifyOnPage(CheckInReviewNotesPage)
@@ -86,16 +60,5 @@ context('check in reviews', () => {
     page.checkOnPage()
     page.getSubmitBtn().click()
     page2.checkOnPage()
-  })
-
-  it('Review video for check in', () => {
-    cy.visit(`/case/${crn}/appointments/${reviewedId}/check-in/video`)
-    const page = Page.verifyOnPage(CheckInVideoPage)
-
-    page.getSubmitBtn().click()
-    const page2 = Page.verifyOnPage(ViewCheckInPage)
-
-    page2.getSummaryListRow(4, 'checkInSummary').find('.govuk-summary-list__value .govuk-link').click()
-    page.checkOnPage()
   })
 })

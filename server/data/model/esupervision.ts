@@ -18,6 +18,9 @@ export interface ESupervisionCheckIn {
   videoUrl?: string
   snapshotUrl?: string
   autoIdCheck?: Match
+  livenessResult?: 'LIVE' | 'NOT_LIVE' | 'ERROR'
+  livenessConfidence?: number
+  idMatched?: boolean
   manualIdCheck?: Match
   flaggedResponses: string[]
   furtherActions?: string

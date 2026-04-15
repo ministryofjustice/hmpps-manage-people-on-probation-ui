@@ -98,7 +98,7 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
-                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
+                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.idMatched else "Fail"}}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
@@ -122,12 +122,6 @@
                     {% else %}
                     <span>No image available</span>
                     {% endif %}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Check in video</dt>
-                <dd class="govuk-summary-list__value">
-                    <a href="{{ videoLink }}" class="govuk-link">View video</a>
                 </dd>
             </div>
             <div class="govuk-summary-list__row">

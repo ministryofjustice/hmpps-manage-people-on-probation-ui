@@ -1269,7 +1269,6 @@ describe('checkInsController', () => {
         id: req.params.id,
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
-        videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
       })
     })
 
@@ -1468,7 +1467,6 @@ describe('checkInsController', () => {
         id: req.params.id,
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
-        videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
       })
     })
 
@@ -2288,34 +2286,6 @@ describe('checkInsController', () => {
     })
   })
 
-  describe('getCheckinVideoPage', () => {
-    it('renders video in page', async () => {
-      mockIsValidCrn.mockReturnValue(true)
-      mockIsValidUUID.mockReturnValue(true)
-      const req = httpMocks.createRequest({
-        params: { crn, id: uuid },
-      })
-
-      await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
-      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
-      expect(renderSpy).toHaveBeenCalled()
-      const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
-      expect(template).toBe('pages/check-in/video.njk')
-      expect(context.crn).toBe(crn)
-      expect(context.id).toBe(uuid)
-    })
-
-    it('returns 404 when CRN and uuid is invalid', async () => {
-      mockIsValidCrn.mockReturnValue(false)
-      mockIsValidUUID.mockReturnValue(false)
-
-      const req = baseReq()
-      await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
-
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-    })
-  })
   describe('getRestartCheckinPage', () => {
     it('returns 404 when CRN or id invalid', async () => {
       mockIsValidCrn.mockReturnValue(false)

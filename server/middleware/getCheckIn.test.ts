@@ -58,6 +58,9 @@ const checkInResponseMock = {
   videoUrl: 'string',
   snapshotUrl: 'string',
   autoIdCheck: 'MATCH',
+  livenessResult: 'LIVE',
+  livenessConfidence: 95,
+  idMatched: true,
   manualIdCheck: 'MATCH',
   flaggedResponses: ['string'],
   checkinLogs: {
