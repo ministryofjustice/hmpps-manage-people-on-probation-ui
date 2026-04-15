@@ -3,6 +3,7 @@
 
 import { ApplicationInsights } from '@microsoft/applicationinsights-web'
 import { ClickAnalyticsPlugin } from '@microsoft/applicationinsights-clickanalytics-js'
+import * as arnsCustomAppInsights from '@ministryofjustice/hmpps-arns-frontend-components-lib/dist/js/arns-custom-app-insights'
 
 document.initialiseTelemetry = (applicationInsightsConnectionString, applicationInsightsRoleName, userName) => {
   if (!applicationInsightsConnectionString) {
@@ -63,4 +64,5 @@ document.initialiseTelemetry = (applicationInsightsConnectionString, application
   appInsights.addTelemetryInitializer(telemetryInitializer)
   appInsights.trackPageView()
   appInsights.trackEvent({ name: 'screenSize', properties: { width: window.innerWidth, height: window.innerHeight } })
+  arnsCustomAppInsights.init(appInsights)
 }

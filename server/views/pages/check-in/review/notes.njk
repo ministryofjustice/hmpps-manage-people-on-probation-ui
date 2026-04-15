@@ -130,20 +130,30 @@
                 </div>
             {% endif %}
 
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
-                <dd class="govuk-summary-list__actions">
-                    {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
-                        {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
-                    {% endif %}
-                </dd>
-            </div>
+            {% if checkIn.surveyResponse.customQuestions %}
+                {% for cq in checkIn.surveyResponse.customQuestions | split %}
+                    <div class="govuk-summary-list__row">
+                        <dt class="govuk-summary-list__key">{{ cq.question }}</dt>
+                        <dd class="govuk-summary-list__value">{{ cq.response }}</dd>
+                        <dd class="govuk-summary-list__actions"></dd>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
             {% if checkIn.surveyResponse.callbackDetails %}
                 <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">What they want to talk about</dt>
-                <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callbackDetails }}</dd>
-                <dd class="govuk-summary-list__actions"></dd>
+                    <dt class="govuk-summary-list__key">If they need us to contact them before their next appointment</dt>
+                    <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callback | userFriendlyString }}</dd>
+                    <dd class="govuk-summary-list__actions">
+                        {% if checkIn.flaggedResponses and 'callback' in checkIn.flaggedResponses %}
+                            {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
+                        {% endif %}
+                    </dd>
+                </div>
+                <div class="govuk-summary-list__row">
+                    <dt class="govuk-summary-list__key">What they want to talk about</dt>
+                    <dd class="govuk-summary-list__value">{{ checkIn.surveyResponse.callbackDetails }}</dd>
+                    <dd class="govuk-summary-list__actions"></dd>
                 </div>
             {% endif %}
         </dl>

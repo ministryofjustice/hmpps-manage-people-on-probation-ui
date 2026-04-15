@@ -14,19 +14,32 @@
 
   {% if showOGRS4 %}
     <section data-qa="seriousViolentReoffendingPredictor">
-      {{ predictorScale({
-    data: riskData,
-    predictor: "seriousViolentReoffendingPredictor",
-    excludeDate: true
-      }) }}
+      {% if flags.enableOGRS4SummaryCardDetail %}
+        {{ expandedPredictorBadge({
+            data: riskData,
+            predictor: "seriousViolentReoffendingPredictor",
+            excludeDate: true,
+            fixedWidth: false
+          }) }}
+      {% else %}
+        {{ predictorScale({
+          data: riskData,
+          predictor: "seriousViolentReoffendingPredictor",
+          excludeDate: true,
+          headingLevel: 4,
+          headingClass: "xs"
+        }) }}
+      {% endif %}
     </section>
   {% endif %}
   {% if showOGRS3 %}
     <section data-qa="snsv">
       {{ predictorScale({
-    data: riskData,
-    predictor: "snsv",
-    excludeDate: true
+        data: riskData,
+        predictor: "snsv",
+        excludeDate: true,
+        headingLevel: 4,
+        headingClass: "xs"
       }) }}
     </section>
   {% endif %}

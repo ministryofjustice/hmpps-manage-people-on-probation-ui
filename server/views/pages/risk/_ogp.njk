@@ -19,19 +19,34 @@
 
     {% if showOGRS4 %}
         <section data-qa="allReoffendingPredictor">
-            {{ predictorScale({
-    data: riskData,
-    predictor: "allReoffendingPredictor",
-    excludeDate: true
-            }) }}
+            {% if flags.enableOGRS4SummaryCardDetail %}
+                <div class="arns-summary-card-expanded-badge-spacing">
+                    {{ expandedPredictorBadge({
+                        data: riskData,
+                        predictor: "allReoffendingPredictor",
+                        excludeDate: true,
+                        fixedWidth: false
+                    }) }}
+                </div>
+            {% else %}
+                {{ predictorScale({
+                    data: riskData,
+                    predictor: "allReoffendingPredictor",
+                    excludeDate: true,
+                    headingLevel: 4,
+                    headingClass: "xs"
+                }) }}
+            {% endif %}
         </section>
     {% endif %}
     {% if showOGRS3 %}
         <section data-qa="ogp">
             {{ predictorScale({
-    data: riskData,
-    predictor: "ogp",
-    excludeDate: true
+                data: riskData,
+                predictor: "ogp",
+                excludeDate: true,
+                headingLevel: 4,
+                headingClass: "xs"
             }) }}
         </section>
     {% endif %}

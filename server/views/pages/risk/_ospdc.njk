@@ -13,19 +13,34 @@
 
 {% if showOGRS4 %}
   <section data-qa="directContactSexualReoffendingPredictor">
-    {{ predictorScale({
-    data: riskData,
-    predictor: "directContactSexualReoffendingPredictor",
-    excludeDate: true
-    }) }}
+    {% if flags.enableOGRS4SummaryCardDetail %}
+      <div class="arns-summary-card-expanded-badge-spacing">
+        {{ expandedPredictorBadge({
+            data: riskData,
+            predictor: "directContactSexualReoffendingPredictor",
+            excludeDate: true,
+            fixedWidth: false
+          }) }}
+      </div>
+    {% else %}
+      {{ predictorScale({
+        data: riskData,
+        predictor: "directContactSexualReoffendingPredictor",
+        excludeDate: true,
+        headingLevel: 4,
+        headingClass: "xs"
+      }) }}
+    {% endif %}
   </section>
 {% endif %}
 {% if showOGRS3 %}
   <section data-qa="ospdc">
     {{ predictorScale({
-    data: riskData,
-    predictor: "ospdc",
-    excludeDate: true
+      data: riskData,
+      predictor: "ospdc",
+      excludeDate: true,
+      headingLevel: 4,
+      headingClass: "xs"
     }) }}
   </section>
 {% endif %}
