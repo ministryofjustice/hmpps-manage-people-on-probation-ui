@@ -2,7 +2,7 @@ import { AppointmentOutcomeOption } from '../models/Appointments'
 
 export const outcomeOptions: AppointmentOutcomeOption[] = [
   {
-    value: 'ATTENDED',
+    value: 'ATTENDED_COMPLIED',
     text: 'Attended - complied',
   },
   {

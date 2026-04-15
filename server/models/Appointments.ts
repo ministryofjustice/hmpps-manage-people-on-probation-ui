@@ -11,7 +11,7 @@ export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
 
 export type AppointmentOutcomeType =
-  | 'ATTENDED'
+  | 'ATTENDED_COMPLIED'
   | 'ATTENDED_FAILED_TO_COMPLY'
   | 'ATTENDED_SENT_HOME_BEHAVIOUR'
   | 'ATTENDED_SENT_HOME_SERVICE_ISSUES'

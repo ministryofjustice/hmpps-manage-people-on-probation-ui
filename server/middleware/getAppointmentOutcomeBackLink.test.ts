@@ -41,7 +41,7 @@ const appointment = (id: string, type: AppointmentOutcomeType) => ({
 const mockReq = ({
   id = uuid,
   request = {},
-  outcomeType = 'ATTENDED',
+  outcomeType = 'ATTENDED_COMPLIED',
 }: {
   id?: string
   request?: Record<string, any>

@@ -53,7 +53,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       const { data } = req.session
       const type = getDataValue<AppointmentOutcomeType>(data, ['appointments', crn, id, 'outcome', 'type'])
       const redirectMap: OutcomeRedirectMap = {
-        ATTENDED: `${baseOutcomeUrl}/add-note`,
+        ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
         ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
         ATTENDED_SENT_HOME_BEHAVIOUR: `${baseOutcomeUrl}/attended-failed-to-comply`,
         ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,

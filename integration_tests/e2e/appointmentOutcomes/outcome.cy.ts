@@ -45,7 +45,7 @@ const getExpectedOptions = ({ inOffice = true, dateInPast = true }): ExpectedOpt
   if (dateInPast) {
     options.push(
       {
-        value: 'ATTENDED',
+        value: 'ATTENDED_COMPLIED',
         text: 'Attended - complied',
         redirectPageName: 'Add a note',
         redirectPageTitle: 'Add a note',

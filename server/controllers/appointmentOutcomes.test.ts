@@ -96,7 +96,7 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
           crn: {
             [contactId]: {
               outcome: {
-                type: 'ATTENDED',
+                type: 'ATTENDED_COMPLIED',
               },
             },
           },
@@ -135,7 +135,7 @@ describe('controllers/appointmentOutcomes', () => {
       const req = mockReq()
       const res = mockRes()
       const spy = jest.spyOn(res, 'redirect')
-      mockGetDataValue.mockReturnValueOnce('ATTENDED')
+      mockGetDataValue.mockReturnValueOnce('ATTENDED_COMPLIED')
       controllers.appointmentOutcomes.postOutcome()(req, res)
       expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
     })

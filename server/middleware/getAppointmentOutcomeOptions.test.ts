@@ -114,7 +114,7 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
         expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
@@ -132,7 +132,7 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
         expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
         expect.objectContaining({ value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES' }),
@@ -167,7 +167,7 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
         expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
@@ -185,7 +185,7 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
         expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
         expect.objectContaining({ value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES' }),
