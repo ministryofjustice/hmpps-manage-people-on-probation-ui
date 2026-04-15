@@ -31,8 +31,8 @@ export const checkUpdateDateTime = (
       dateTimePage.getDatePickerInput().clear().type(`${newDate.day}/${newDate.month}/${newDate.year}`)
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).clear()
       dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-start`).type(changedStart)
-      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).clear()
-      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).focus().type(changedEnd)
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).focus().clear()
+      dateTimePage.getElement(`#appointments-${pageCrn}-${pageUuid}-end`).type(changedEnd)
       // Ignore warnings
       dateTimePage.getSubmitBtn().click()
       dateTimePage.getSubmitBtn().click()

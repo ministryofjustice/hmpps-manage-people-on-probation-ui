@@ -45,6 +45,7 @@ export const completeLocationDateTimePage = ({
   locationDateTimePage
     .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-end`)
     .focus()
+    .clear()
     .type(endTime)
   locationDateTimePage
     .getElement(`#appointments-${crnOverride || crn}-${uuidOveride || uuid}-user-locationCode${suffix}`)
