@@ -1,14 +1,22 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import { dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import {
+  dateWithDayAndWithYear,
+  dayOfWeek,
+  getDataValue,
+  handleQuotes,
+  isValidCrn,
+  isValidUUID,
+  setDataValue,
+} from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
-  AssignQuestionsRequest,
   CheckinScheduleRequest,
   DeactivateOffenderRequest,
+  EsupervisionAssignQuestionsRequest,
   ESupervisionNote,
   ESupervisionReview,
   ReactivateOffenderRequest,
@@ -740,6 +748,20 @@ const checkInsController: Controller<typeof routes, void> = {
       setDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'checkInEmail'], email)
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       const checkinRes = res.locals?.offenderCheckinsByCRNResponse
+      const eSupClient = new ESupervisionClient(token)
+      let upcomingCheckin = null
+      try {
+        const response = await eSupClient.getUpcomingCheckinQuestions(crn)
+        upcomingCheckin = response || null
+      } catch (error) {
+        logger.info(`No upcoming check in questions found for CRN ${crn}`)
+      }
+      // questions can be edited until 23:59 the day before a check in is sent out
+      const today = new Date().setHours(0, 0, 0, 0)
+      const checkinDate = upcomingCheckin?.expectedCheckinDate
+        ? new Date(upcomingCheckin.expectedCheckinDate).setHours(0, 0, 0, 0)
+        : null
+      const canEditQuestions = checkinDate ? today < checkinDate : false
       const showChange = checkinRes?.status === 'VERIFIED'
       setDataValue(req.session.data, ['esupervision', crn, id, 'manageCheckin', 'preferredComs'], undefined)
       const settingsUpdated = getDataValue(data, ['esupervision', crn, id, 'manageCheckin', 'settingsUpdated'])
@@ -754,10 +776,12 @@ const checkInsController: Controller<typeof routes, void> = {
       if (questionsUpdated) {
         res.locals.success = true
         const forename = personalDetails?.name?.forename || 'the person'
+        const rawCheckinDate = upcomingCheckin?.expectedCheckinDate
+        const nextCheckinDate = dateWithDayAndWithYear(rawCheckinDate)
         successMessageHtml = `
           <strong>You have added additional questions to ${forename}’s next online check in</strong>
           <br>
-          Additional questions will only apply to their next check in
+          Additional questions will only apply to their next check in${nextCheckinDate ? ` on ${nextCheckinDate}` : ''}
         `
         setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], undefined)
       }
@@ -767,6 +791,8 @@ const checkInsController: Controller<typeof routes, void> = {
         mobile,
         email,
         showChange,
+        upcomingCheckin,
+        canEditQuestions,
         successMessageHtml,
       })
     }
@@ -1347,7 +1373,6 @@ const checkInsController: Controller<typeof routes, void> = {
         getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates']) || []
       if (availableTemplates.length === 0) {
         const eSupClient = new ESupervisionClient(token)
-        // this is currently mock data, waiting for API changes to be made
         const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
         availableTemplates = templatesList.templates
         setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'], availableTemplates)
@@ -1360,10 +1385,27 @@ const checkInsController: Controller<typeof routes, void> = {
         'manageQuestions',
         'questionTemplateAndInputs',
       ])
+      // Fetch current check in questions if they have already been submitted
       if (!questionTemplateAndInputs) {
         questionTemplateAndInputs = {}
-        // TODO: Fetch current check in questions if they have already been submitted by the PP (dependent on API changes)
-        // PP can change up until the midnight before the check in is sent to the POP
+        try {
+          const eSupClient = new ESupervisionClient(token)
+          const response = await eSupClient.getUpcomingCheckinQuestionItems(crn, 'en-GB')
+          const items = response?.upcoming?.items || []
+          items.forEach((item: any) => {
+            const draftId = `${item.template.id}-${uuidv4()}`
+            const inputValue = Object.values(item.params || {})[0] || ''
+
+            questionTemplateAndInputs[draftId] = inputValue
+          })
+        } catch (error: any) {
+          if (error?.status === 404 || error?.response?.status === 404) {
+            logger.info(`No upcoming questions found for CRN ${crn}.`)
+          } else {
+            logger.error(`Failed to fetch upcoming questions for CRN ${crn}:`, error)
+            return renderError(error?.status || 500)(req, res)
+          }
+        }
         setDataValue(
           data,
           ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs'],
@@ -1425,7 +1467,7 @@ const checkInsController: Controller<typeof routes, void> = {
         }
       })
 
-      const body: AssignQuestionsRequest = {
+      const body: EsupervisionAssignQuestionsRequest = {
         questions: formattedQuestions,
         language: 'en-GB',
         author: res.locals.user.username,
@@ -1433,13 +1475,12 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const eSupClient = new ESupervisionClient(token)
-      // enable when API is ready
-      // const response = await eSupClient.postAssignQuestionsToCheckIn(crn, body)
+      const response = await eSupClient.putAssignQuestionsToCheckIn(crn, body)
 
-      // if (response?.listId) {
-      // setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], true)
-      // setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
-      // }
+      if (response?.listId) {
+        setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], true)
+        setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
+      }
 
       return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
     }

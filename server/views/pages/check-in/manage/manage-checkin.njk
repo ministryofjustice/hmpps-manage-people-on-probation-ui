@@ -56,26 +56,29 @@
             </div>
         {% endif %}
     {% endif %}
-    {# flagging that the designs say 'next check in' - this isn't 
-    returned by the API yet so it will just say the first check in date #}
     {% if flags.enableESupervisionCustomQuestions === true %}
+        {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithDayAndWithoutYear %}
+        {% set rows = [
+            {
+                key: { html: '<span data-qa="nextCheckInDueLabel">Next check in</span>' },
+                value: { html: '<span data-qa="nextCheckInValue">' + nextCheckinText + '</span>' }
+            }
+        ] %}
+        {% if upcomingCheckin %}
+        {% for item in upcomingCheckin.questions %}
+            {% if loop.index0 < 3 %}
+                {% set questionNumber = loop.index %}
+                {% set rows = (rows.push({
+                    key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
+                    value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
+                }), rows) %}
+            {% endif %}
+        {% endfor %}
+        {% endif %}
         {% set nextCheckinQuestionsText %}
-                {{ govukSummaryList({
-                    rows: [
-                        {
-                            key: { html: '<span data-qa="firstCheckInDueLabel">' + checkinLabel + '</span>' },
-                            value: { html: '<span data-qa="firstCheckInValue">' + checkinText + '</span>' }
-                        },
-                        {
-                            key: { html: '<span data-qa="question1Label">Question 1</span>' },
-                            value: { html: '<span data-qa="question1Value">How have you been feeling since we last spoke?</span>' }
-                        },
-                        {
-                            key: { html: '<span data-qa="question2Label">Question 2</span>' },
-                            value: { html: '<span data-qa="question2Value">Is there anything you need support with or want to let us know about?</span>' }
-                        }
-                    ]
-                }) }}
+            {{ govukSummaryList({
+                rows: rows
+            }) }}
         {% endset %}
         {{ appSummaryCard({
             titleText: 'Upcoming online check in',
@@ -90,7 +93,7 @@
                         href: changeQuestionsLink
                     }
                 ]
-            } if showChange
+            } if showChange and canEditQuestions
         }) }}
     {% endif %}
     {% set checkin %}

@@ -180,7 +180,8 @@ export interface ReactivateOffenderRequest {
   }
 }
 
-export interface AssignQuestionsRequest {
+// PUT /v2/questions/assignment
+export interface EsupervisionAssignQuestionsRequest {
   questions: {
     id: number
     params: {
@@ -192,8 +193,14 @@ export interface AssignQuestionsRequest {
   author: string
 }
 
-export interface AssignQuestionsResponse {
+export interface EsupervisionAssignQuestionsResponse {
+  expectedCheckinDate: string
   listId: number
+}
+
+// GET /v2/questions/templates
+export interface EsupervisionQuestionTemplatesResponse {
+  templates: EsupervisionQuestionTemplatesList[]
 }
 
 export interface EsupervisionQuestionTemplatesList {
@@ -204,12 +211,38 @@ export interface EsupervisionQuestionTemplatesList {
   responseSpec: {
     hint: string
     placeholders: string[]
-    domain_msg_head: string
+  }
+  policy$hmpps_esupervision_api?: string
+}
+
+// GET /v2/questions/upcoming/{crn}/question-items
+export interface EsupervisionUpcomingQuestionItemsResponse {
+  upcoming: {
+    expectedCheckinDate: string
+    items: EsupervisionUpcomingQuestionItem[]
   }
 }
 
-export interface EsupervisionQuestionTemplatesResponse {
-  templates: EsupervisionQuestionTemplatesList[]
+export interface EsupervisionUpcomingQuestionItem {
+  template: {
+    id: number
+    template: string
+    responseFormat: 'TEXT'
+    responseSpec: Record<string, string>
+    example: string
+    policy$hmpps_esupervision_api: string
+  }
+  params: Record<string, string>
+}
+
+// GET /v2/questions/upcoming/{crn}/offender-questions
+export interface EsupervisionUpcomingQuestionsResponse {
+  expectedCheckinDate: string
+  questions: {
+    question: string
+    format: string
+    spec: { [key: string]: string }
+  }[]
 }
 
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'

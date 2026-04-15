@@ -9,6 +9,10 @@ import {
   ESupervisionReview,
   DeactivateOffenderRequest,
   ReactivateOffenderRequest,
+  EsupervisionUpcomingQuestionsResponse,
+  EsupervisionUpcomingQuestionItemsResponse,
+  EsupervisionAssignQuestionsResponse,
+  EsupervisionAssignQuestionsRequest,
 } from './model/esupervision'
 import { esupervisionAdditionalQuestions } from '../controllers/mocks/esupervisionAdditionalQuestions'
 
@@ -361,14 +365,77 @@ describe('ESupervisionClient', () => {
     })
   })
 
-  // this needs to be updated when we connect to the real API
   describe('getQuestionsTemplates', () => {
     it('should get questions templates', async () => {
       const response = esupervisionAdditionalQuestions
 
-      fakeESupervisionApi.post(`/v2/`).matchHeader('authorization', `Bearer ${token.access_token}`).reply(200, response)
+      fakeESupervisionApi
+        .get(`/v2/questions/templates?language=en-GB`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
 
       const output = await client.getQuestionsTemplates()
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getUpcomingCheckinQuestions', () => {
+    it('should get upcoming questions items', async () => {
+      const crn = 'X000001'
+      const response: EsupervisionUpcomingQuestionsResponse = {
+        expectedCheckinDate: '',
+        questions: [],
+      }
+
+      fakeESupervisionApi
+        .get(`/v2/questions/upcoming/${crn}/offender-questions?language=en-GB`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.getUpcomingCheckinQuestions(crn)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('getUpcomingCheckinQuestionItems', () => {
+    it('should get upcoming question items', async () => {
+      const crn = 'X000001'
+      const response: EsupervisionUpcomingQuestionItemsResponse = {
+        upcoming: {
+          expectedCheckinDate: '',
+          items: [],
+        },
+      }
+
+      fakeESupervisionApi
+        .get(`/v2/questions/upcoming/${crn}/question-items?language=en-GB`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.getUpcomingCheckinQuestionItems(crn)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('putAssignQuestionsToCheckIn', () => {
+    it('should assign questions to check in', async () => {
+      const crn = 'X000001'
+      const request: EsupervisionAssignQuestionsRequest = {
+        questions: [],
+        language: 'en-GB',
+        author: 'SYSTEM',
+      }
+
+      const response: EsupervisionAssignQuestionsResponse = {
+        expectedCheckinDate: '',
+        listId: 3,
+      }
+      fakeESupervisionApi
+        .put(`/v2/questions/assign?crn=${crn}`, request as Record<string, any>)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.putAssignQuestionsToCheckIn(crn, request)
       expect(output).toEqual(response)
     })
   })

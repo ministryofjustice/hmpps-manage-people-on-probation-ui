@@ -1786,7 +1786,131 @@ describe('checkInsController', () => {
         id: uuid,
         email: 'test@example.com',
         showChange: false,
+        upcomingCheckin: null,
+        canEditQuestions: false,
+        successMessageHtml: undefined,
       })
+    })
+
+    it('sets canEditQuestions to true if the time is before 23:59 the day before the check in is due', async () => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date('2026-04-14T23:59:00+01:00'))
+
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      const req = baseReq()
+      jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestions').mockResolvedValueOnce({
+        expectedCheckinDate: '2026-04-15T10:00:00+01:00',
+        questions: [],
+      } as any)
+
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/manage-checkin.njk',
+        expect.objectContaining({
+          canEditQuestions: true,
+        }),
+      )
+
+      jest.useRealTimers()
+    })
+
+    it('sets canEditQuestions to false if the time is after 23:59 the day before the check in is due', async () => {
+      jest.useFakeTimers()
+      jest.setSystemTime(new Date('2026-04-15T00:00:00+01:00'))
+
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+
+      jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestions').mockResolvedValueOnce({
+        expectedCheckinDate: '2026-04-15T10:00:00+01:00',
+        questions: [],
+      } as any)
+
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/manage-checkin.njk',
+        expect.objectContaining({
+          canEditQuestions: false,
+        }),
+      )
+
+      jest.useRealTimers()
+    })
+
+    it('generates successMessageHtml and clears session flag when questions are updated', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+      ;(mockPersonalDetails as any).name = { forename: 'Stuart' }
+      const data = {
+        esupervision: {
+          [crn]: {
+            [uuid]: {
+              questionsUpdated: true,
+            },
+          },
+        },
+      }
+      const req = baseReq(data)
+
+      jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestions').mockResolvedValueOnce({
+        expectedCheckinDate: '2026-04-15T10:00:00+01:00',
+        questions: [],
+      } as any)
+
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+
+      expect(res.locals.success).toEqual(true)
+
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/manage-checkin.njk',
+        expect.objectContaining({
+          successMessageHtml: expect.stringContaining('Stuart’s next online check in'),
+        }),
+      )
+
+      expect(mockSetDataValue).toHaveBeenCalledWith(
+        req.session.data,
+        ['esupervision', crn, uuid, 'questionsUpdated'],
+        undefined,
+      )
+    })
+
+    it('passes a populated list of upcoming questions to the view', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const mockUpcomingResponse = {
+        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        questions: [
+          {
+            question: 'How is your job going?',
+            format: 'TEXT',
+            spec: { hint: 'This is a hint.' },
+          },
+          {
+            question: 'How was your appointment?',
+            format: 'TEXT',
+            spec: { hint: 'This is a hint.' },
+          },
+        ],
+      }
+
+      jest
+        .spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestions')
+        .mockResolvedValueOnce(mockUpcomingResponse as any)
+      await controllers.checkIns.getManageCheckinPage(hmppsAuthClient)(req, res)
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/check-in/manage/manage-checkin.njk',
+        expect.objectContaining({
+          upcomingCheckin: mockUpcomingResponse,
+        }),
+      )
     })
 
     it('note when changes have occured', async () => {
@@ -2786,7 +2910,6 @@ describe('checkInsController', () => {
               responseSpec: {
                 hint: 'Hint for the question about the {{thing}}',
                 placeholders: ['thing'],
-                domain_msg_head: 'How do they feel the {{thing}} has gone recently?',
               },
             },
             {
@@ -2798,7 +2921,6 @@ describe('checkInsController', () => {
               responseSpec: {
                 hint: 'Hint for the question about the {{thing}}',
                 placeholders: ['thing'],
-                domain_msg_head: 'How do they feel about the {{thing}}?',
               },
             },
           ],

@@ -254,6 +254,121 @@
         },
         "transformers": ["response-template"]
       }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/questions/templates",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "templates": [
+            {
+              "id": 1,
+              "template": "How has {{thing}} been going recently?",
+              "example": "unpaid work, college course, work, apprenticeship, university course, sentence plan, training",
+              "responseFormat": "TEXT",
+              "responseSpec": {
+                "hint": "Hint for the question about the {{thing}}",
+                "placeholders": ["thing"]
+              }
+            },
+            {
+              "id": 2,
+              "template": "How have things been feeling {{thing}} recently?",
+              "example": "home, work, relationships with family, appointments with other bodies, physical or mental health, recovery journey",
+              "responseFormat": "TEXT",
+              "responseSpec": {
+                "hint": "Hint for the question about the {{thing}}",
+                "placeholders": ["thing"]
+              }
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/questions/upcoming/.+?/offender-questions",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
+          "questions": [
+            {
+              "question": "How was your appointment??",
+              "format": "TEXT",
+              "spec": {
+                "hint": "Hint for the question about the {{thing}}"
+              }
+            }
+          ]
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/questions/upcoming/.+?/question-items",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "upcoming": {
+            "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
+            "items": [
+              {
+                "template": {
+                  "id": 1,
+                  "template": "How has {{thing}} been going recently?",
+                  "responseFormat": "TEXT",
+                  "responseSpec": {
+                    "hint": "Hint for the question about the {{thing}}"
+                  },
+                  "example": "unpaid work, college course, work, apprenticeship, university course, sentence plan, training",
+                  "policy$hmpps_esupervision_api": "123"
+                },
+                "params": {
+                  "thing": "work"
+                }
+              }
+            ]
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/questions/assign",
+        "queryParameters": {
+          "crn": {
+            "matches": ".*"
+          }
+        },
+        "method": "PUT"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
+          "listId": 3
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
     }
   ]
 }

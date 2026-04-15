@@ -2,15 +2,17 @@ import config from '../config'
 import RestClient from './restClient'
 
 import {
-  AssignQuestionsRequest,
-  AssignQuestionsResponse,
   CheckinScheduleRequest,
   CheckinScheduleResponse,
   DeactivateOffenderRequest,
+  EsupervisionAssignQuestionsRequest,
+  EsupervisionAssignQuestionsResponse,
   ESupervisionCheckIn,
   ESupervisionNote,
   EsupervisionQuestionTemplatesResponse,
   ESupervisionReview,
+  EsupervisionUpcomingQuestionItemsResponse,
+  EsupervisionUpcomingQuestionsResponse,
   LocationInfo,
   OffenderCheckinsByCRNResponse,
   OffenderInfo,
@@ -111,23 +113,41 @@ export default class ESupervisionClient extends RestClient {
     })
   }
 
-  async getQuestionsTemplates(lang: string = 'en-GB'): Promise<EsupervisionQuestionTemplatesResponse> {
-    // return this.get({
-    //   path: `/v2/questions/templates?lang=${lang}`,
-    // })
-    // temporary use of mock data, swap for path above when API is ready
-    const response: EsupervisionQuestionTemplatesResponse = esupervisionAdditionalQuestions
-    return response
+  // GET /v2/questions/templates (use in the list questions page)
+  async getQuestionsTemplates(language: string = 'en-GB'): Promise<EsupervisionQuestionTemplatesResponse> {
+    return this.get({
+      path: `/v2/questions/templates?language=${language}`,
+    })
   }
 
-  // assigns additional questions to a check in
-  // async postAssignQuestionsToCheckIn(
-  //   crn: string,
-  //   assignQuestionsRequest: AssignQuestionsRequest,
-  // ): Promise<AssignQuestionsResponse> {
-  //   return this.put({
-  //     path: `/v2/questions/assign?crn=${crn}`,
-  //     data: assignQuestionsRequest,
-  //   })
-  // }
+  // PUT /v2/questions/assignment (use to assign questions to next check in)
+  async putAssignQuestionsToCheckIn(
+    crn: string,
+    assignQuestionsRequest: EsupervisionAssignQuestionsRequest,
+  ): Promise<EsupervisionAssignQuestionsResponse> {
+    return this.put({
+      path: `/v2/questions/assign?crn=${crn}`,
+      data: assignQuestionsRequest,
+    })
+  }
+
+  // GET /v2/questions/upcoming/{crn}/question-items (use in the add/edit questions pages)
+  async getUpcomingCheckinQuestionItems(
+    crn: string,
+    language: string = 'en-GB',
+  ): Promise<EsupervisionUpcomingQuestionItemsResponse> {
+    return this.get({
+      path: `/v2/questions/upcoming/${crn}/question-items?language=${language}`,
+    })
+  }
+
+  // GET /v2/questions/upcoming/{crn}/offender-questions (use in the manage check in page)
+  async getUpcomingCheckinQuestions(
+    crn: string,
+    language: string = 'en-GB',
+  ): Promise<EsupervisionUpcomingQuestionsResponse> {
+    return this.get({
+      path: `/v2/questions/upcoming/${crn}/offender-questions?language=${language}`,
+    })
+  }
 }

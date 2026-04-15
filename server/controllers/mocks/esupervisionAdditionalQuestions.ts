@@ -10,7 +10,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -22,7 +21,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -34,7 +32,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -45,7 +42,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -57,7 +53,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -69,7 +64,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -80,7 +74,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -91,7 +84,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -102,7 +94,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -114,7 +105,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -126,7 +116,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -138,7 +127,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -150,7 +138,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -162,7 +149,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -174,7 +160,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -186,7 +171,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -197,7 +181,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -209,7 +192,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -221,7 +203,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
     {
@@ -233,7 +214,6 @@ export const esupervisionAdditionalQuestions: EsupervisionQuestionTemplatesRespo
       responseSpec: {
         hint: 'Hint for the question about the {{thing}}',
         placeholders: ['thing'],
-        domain_msg_head: 'Did they finish {{thing}}?',
       },
     },
   ],
