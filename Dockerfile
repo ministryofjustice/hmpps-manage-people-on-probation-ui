@@ -25,15 +25,20 @@ ENV BUILD_NUMBER=${BUILD_NUMBER}
 ENV GIT_REF=${GIT_REF}
 ENV GIT_BRANCH=${GIT_BRANCH}
 
-RUN sed -i 's/dl-cdn.alpinelinux.org/uk.alpinelinux.org/g' /etc/apk/repositories && \
-    apk update && \
-    apk add --no-cache \
-        libssl3 \
-        openssl \
-        python3 \
-        make \
-        g++ \
-        ca-certificates
+RUN apk add --no-cache \
+    python3 \
+    python3-dev \
+    build-base \
+    ca-certificates
+
+#RUN apk update && apk add --no-cache \
+#    libssl3=3.3.6-r0 \
+#    build-base=0.5-r3 \
+#    python3=3.12.12-r0 \
+#    python3-dev=3.12.12-r0 \
+#    make=4.4.1-r2 \
+#    g++=14.2.0-r4 \
+#    ca-certificates=20250911-r0
 
 # Stage: build assets
 FROM base as build
