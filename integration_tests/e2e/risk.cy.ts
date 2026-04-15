@@ -153,10 +153,10 @@ const checkRiskPageView = ({
         .should('contain.text', 'All reoffending predictor')
     } else {
       page.getElementData('ovp').should('exist')
-      page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
-      page.getElementData('ogrs').get(`h2`).should('contain.text', 'OGRS')
-      page.getElementData('ogp').get(`h2`).should('contain.text', 'OGP')
-      page.getElementData('ovp').get(`h2`).should('contain.text', 'OVP')
+      page.getElementData('rsr').should('contain.text', 'RSR')
+      page.getElementData('ogrs').should('contain.text', 'OGRS')
+      page.getElementData('ogp').should('contain.text', 'OGP')
+      page.getElementData('ovp').should('contain.text', 'OVP')
       if (!sanIndicator) {
         page
           .getElementData('oasysScoreHistory')
