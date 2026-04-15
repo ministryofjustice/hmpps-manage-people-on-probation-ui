@@ -5,7 +5,7 @@ import { getDataValue } from '../utils/getDataValue'
 import { convertToTitleCase } from '../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { Route } from '../@types'
-import { isNumericString, isValidCrn, isValidUUID } from '../utils'
+import { dateWithDayAndWithYear, fullName, isNumericString, isValidCrn, isValidUUID } from '../utils'
 import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 
 export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
@@ -50,6 +50,8 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   const sentenceType: SentenceType = eventId
     ? sentences.find(_sentence => _sentence.id.toString() === eventId)?.sentenceType
     : null
+
+  const appointmentHintText = `Appointment: ${appointment.type} with ${convertToTitleCase(fullName(appointment.officer.name))} on ${dateWithDayAndWithYear(appointment.startDateTime)}.`
   const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
   const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
   res.locals.appointmentOutcome = {
@@ -69,6 +71,7 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     appointmentSession,
     sentenceType,
     isProbationPractitioner,
+    appointmentHintText,
   }
   return next()
 }

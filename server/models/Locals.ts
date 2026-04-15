@@ -13,6 +13,7 @@ import {
   YesNo,
   AttendedCompliedAppointment,
   AppointmentOutcomeOption,
+  AppointmentEnforcementActionOption,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -166,9 +167,10 @@ export interface AppointmentOutcomeProps {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  options?: AppointmentOutcomeOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
   sentenceType?: SentenceType
   isProbationPractitioner?: boolean
+  appointmentHintText?: string
 }
 
 export interface AppResponse extends Response {

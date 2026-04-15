@@ -1,5 +1,5 @@
 import { Route } from '../@types'
-import { outcomeOptions } from '../properties/outcomeOptions'
+import { outcomeOptions } from '../properties/appointment-outcomes'
 
 export const getAppointmentOutcomeOptions: Route<void> = (_req, res, next) => {
   const { isInPast, appointmentSession } = res.locals.appointmentOutcome
