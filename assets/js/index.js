@@ -370,8 +370,8 @@ function standardiseDateValue(dateValue) {
     }
   }
   return dateValue
-}  
-  
+}
+
 function standardiseTimeValue(timeValue) {
   if (!timeValue) {
     return timeValue
