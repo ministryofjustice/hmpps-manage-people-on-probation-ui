@@ -90,6 +90,9 @@
                 {% endfor %}
 
                 {{ govukTable({
+                    attributes: {
+                        "data-qa": "custom-questions-table"
+                    },
                     head: [
                     { 
                       text: "Question", 

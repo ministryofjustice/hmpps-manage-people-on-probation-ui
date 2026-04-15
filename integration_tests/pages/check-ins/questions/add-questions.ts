@@ -30,7 +30,13 @@ export default class AddQuestionsPage extends Page {
   }
 
   verifyQuestionNotInList(expectedText: string) {
-    cy.get('.govuk-table').should('not.contain.text', expectedText)
+    cy.get('body').then($body => {
+      if ($body.find('[data-qa="custom-questions-table"]').length > 0) {
+        cy.get('[data-qa="custom-questions-table"]').should('not.contain.text', expectedText)
+      } else {
+        cy.get('[data-qa="custom-questions-table"]').should('not.exist')
+      }
+    })
   }
 
   clickEditForQuestion(index: number) {

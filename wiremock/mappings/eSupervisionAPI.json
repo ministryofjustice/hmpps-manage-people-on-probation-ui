@@ -325,23 +325,7 @@
         "jsonBody": {
           "upcoming": {
             "expectedCheckinDate": "2026-04-20T10:00:00+01:00",
-            "items": [
-              {
-                "template": {
-                  "id": 1,
-                  "template": "How has {{thing}} been going recently?",
-                  "responseFormat": "TEXT",
-                  "responseSpec": {
-                    "hint": "Hint for the question about the {{thing}}"
-                  },
-                  "example": "unpaid work, college course, work, apprenticeship, university course, sentence plan, training",
-                  "policy$hmpps_esupervision_api": "123"
-                },
-                "params": {
-                  "thing": "work"
-                }
-              }
-            ]
+            "items": []
           }
         },
         "headers": {

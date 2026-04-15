@@ -1049,6 +1049,9 @@ context('check-ins add questions pages', () => {
   it('should allow a user to start the add questions to online check ins journey', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
     const instructionsPage = new InstructionsPage()
     instructionsPage.clickContinue()
@@ -1059,6 +1062,10 @@ context('check-ins add questions pages', () => {
   it('should allow a user to view the default questions preview pages', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
     const instructionsPage = new InstructionsPage()
     instructionsPage.clickContinue()
@@ -1084,6 +1091,10 @@ context('check-ins add questions pages', () => {
   it('should show the "Add question" button for additional custom questions', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="add-question-btn"]').should('be.visible')
@@ -1092,6 +1103,10 @@ context('check-ins add questions pages', () => {
   it('should show the "Save questions" button', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="save-questions-btn"]').should('be.visible')
@@ -1100,6 +1115,10 @@ context('check-ins add questions pages', () => {
   it('should show the "cancel and go back" button ', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="cancel-link"]').should('be.visible')
@@ -1109,6 +1128,9 @@ context('check-ins add questions pages', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
 
     const addQuestionsPage = new AddQuestionsPage()
@@ -1127,7 +1149,13 @@ context('check-ins add questions pages', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
-    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
 
     const addQuestionsPage = new AddQuestionsPage()
 
@@ -1165,7 +1193,12 @@ context('check-ins add questions pages', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
     cy.task('stubGetQuestionsTemplates')
-    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
 
     const addQuestionsPage = new AddQuestionsPage()
 
@@ -1190,7 +1223,7 @@ context('check-ins add questions pages', () => {
     addQuestionsPage.checkOnPage()
     addQuestionsPage.clickAddQuestion()
     listQuestionsPage.checkOnPage()
-    listQuestionsPage.clickAddTemplateByIndex(2)
+    listQuestionsPage.clickAddTemplateByIndex(1)
     editQuestionPage.checkOnPage()
     editQuestionPage.enterDraftQuestionInput('your physical health')
     editQuestionPage.clickContinue()

@@ -83,9 +83,70 @@ export const stubGetQuestionsTemplates = () => {
     },
   })
 }
+
+const stubAssignQuestions = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'PUT',
+      urlPathPattern: '/v2/questions/assign',
+      queryParameters: {
+        crn: {
+          matches: '.*',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        listId: 3,
+      },
+    },
+  })
+}
+
+const stubGetUpcomingCheckinQuestions = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'GET',
+      urlPattern: '/v2/questions/upcoming/.+?/offender-questions\\?language=en-GB',
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        questions: [],
+      },
+    },
+  })
+}
+
+const stubGetUpcomingCheckinQuestionItems = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'GET',
+      urlPattern: '/v2/questions/upcoming/.+?/question-items\\?language=en-GB',
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        upcoming: {
+          expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+          items: [],
+        },
+      },
+    },
+  })
+}
 export default {
   stubOffenderSetup422Response,
   stubOffenderSetup500Response,
   stubOffenderSetupComplete500Response,
   stubGetQuestionsTemplates,
+  stubGetUpcomingCheckinQuestionItems,
+  stubGetUpcomingCheckinQuestions,
+  stubAssignQuestions,
 }
