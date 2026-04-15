@@ -8,7 +8,6 @@ import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import { ExpectedOption, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
@@ -38,16 +37,9 @@ const loadPage = ({ manageJourney = true, sentenceType = 'community', isProbatio
   outcomePage.getSubmitBtn().click()
 }
 
-type Pages =
-  | SendLetterPage
-  | InitiateBreachOrRecallPage
-  | AddNotePage
-  | EnforcementActionPage
-  | ManageAppointmentPage
-  | AppointmentCheckYourAnswersPage
+type Pages = SendLetterPage | InitiateBreachOrRecallPage | AddNotePage | EnforcementActionPage
 
 const getExpectedOptions = ({
-  manageJourney = true,
   isProbationPractitioner = false,
   sentenceType = 'community',
 } = {}): ExpectedOption<Pages>[] => {
@@ -82,9 +74,8 @@ const getExpectedOptions = ({
     {
       value: 'NO_FURTHER_ACTION',
       text: 'No further action',
-      Page: manageJourney ? ManageAppointmentPage : AppointmentCheckYourAnswersPage,
-      pageName: manageJourney ? 'Manage appointment' : 'Check your answers',
-      pageTitle: manageJourney ? 'Manage 3 way meeting (NS) with Terry Jones' : 'Check your answers',
+      Page: AddNotePage,
+      pageName: 'Add a note',
     },
     {
       value: 'DIFFERENT_ACTION',
@@ -104,12 +95,12 @@ const checkPage = ({ manageJourney = true } = {}) => {
     attendedFailedToComplyPage.checkPageTitle('Enforcement action for Alton’s failure to comply')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
     cy.get('legend').should('contain.text', 'Select an action for Alton’s failure to comply')
-    const options = getExpectedOptions({ manageJourney })
+    const options = getExpectedOptions()
     checkOptions(options)
   })
   it('should render the page if sentence type is custody and user is probation practitioner', () => {
     loadPage({ manageJourney, sentenceType: 'custody', isProbationPractitioner: true })
-    const options = getExpectedOptions({ manageJourney, sentenceType: 'custody', isProbationPractitioner: true })
+    const options = getExpectedOptions({ sentenceType: 'custody', isProbationPractitioner: true })
     checkOptions(options)
   })
   it('should have the correct back link', () => {
@@ -122,7 +113,6 @@ const checkPage = ({ manageJourney = true } = {}) => {
   it('should show validation error when no option is selected', () => {
     const msg = 'Select an action for this failure to comply'
     loadPage({ manageJourney })
-    const options = getExpectedOptions({ manageJourney })
     attendedFailedToComplyPage = new AttendedFailedToComplyPage()
     attendedFailedToComplyPage.getSubmitBtn().click()
     attendedFailedToComplyPage.checkErrorSummaryBox([msg])
@@ -130,15 +120,12 @@ const checkPage = ({ manageJourney = true } = {}) => {
     cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
   })
   it('should redirect to the correct page when an option is selected', () => {
-    const options = getExpectedOptions({ manageJourney })
+    const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, { Page: AttendedFailedToComplyPage, manageJourney })
   })
 }
 
 describe('Attended but failed to comply', () => {
-  beforeEach(() => {
-    cy.task('resetMocks')
-  })
   afterEach(() => {
     cy.task('resetMocks')
   })

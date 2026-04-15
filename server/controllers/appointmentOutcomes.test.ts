@@ -239,16 +239,13 @@ describe('controllers/appointmentOutcomes', () => {
   })
 
   describe('postAttendedFailedToComply', () => {
-    // it('should patch appointment with outcome and enforcement action', () => {
-
-    // })
     it('should redirect to the correct page based on enforcement action', () => {
       const checks = {
         SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
         BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
         BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
         REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
-        NO_FURTHER_ACTION: completedUrl,
+        NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
         DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
       }
       Object.entries(checks).forEach(([enforcementAction, redirectUrl]) => {

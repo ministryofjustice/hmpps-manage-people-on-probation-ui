@@ -134,7 +134,7 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
         BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
         REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
-        NO_FURTHER_ACTION: completedUrl,
+        NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
         DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
       }
       return res.redirect(redirectMap[enforcementAction])
