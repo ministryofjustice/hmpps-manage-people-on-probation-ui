@@ -49,9 +49,9 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="identitySummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
-                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.idMatched else "Fail"}}</dd>
+                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
                 <dd class="govuk-summary-list__actions">
-                    {% if not checkIn.idMatched %}
+                    {% if checkIn.autoIdCheck != "MATCH" %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>

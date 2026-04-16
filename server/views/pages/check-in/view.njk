@@ -98,7 +98,7 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
-                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.idMatched else "Fail"}}</dd>
+                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>
@@ -111,13 +111,13 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image from check in video</dt>
+                <dt class="govuk-summary-list__key">Image from check in</dt>
                 <dd class="govuk-summary-list__value">
                     {% if checkIn.snapshotUrl %}
                         <img
                         src="{{ checkIn.snapshotUrl }}"
                         class="es-profile-image es-profile-image--small"
-                        alt="Snapshot from video of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                        alt="image from check in of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                         crossorigin />
                     {% else %}
                     <span>No image available</span>

@@ -50,7 +50,6 @@
           "videoUrl": "string",
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
-          "idMatched": true,
           "manualIdCheck": "MATCH",
           "flaggedResponses": ["string"],
           "checkinLogs": {
@@ -255,7 +254,6 @@
           "videoUrl": "string",
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
-          "idMatched": true,
           "flaggedResponses": ["string"],
           "checkinLogs": {
             "hint": "ALL",
@@ -317,7 +315,6 @@
           "videoUrl": "string",
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
-          "idMatched": true,
           "manualIdCheck": "MATCH",
           "flaggedResponses": ["string"],
           "checkinLogs": {
@@ -380,7 +377,6 @@
           "videoUrl": "string",
           "snapshotUrl": "string",
           "autoIdCheck": "MATCH",
-          "idMatched": true,
           "manualIdCheck": "MATCH",
           "flaggedResponses": ["string"],
           "checkinLogs": {

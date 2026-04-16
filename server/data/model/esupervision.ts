@@ -20,7 +20,6 @@ export interface ESupervisionCheckIn {
   autoIdCheck?: Match
   livenessResult?: 'LIVE' | 'NOT_LIVE' | 'ERROR'
   livenessConfidence?: number
-  idMatched?: boolean
   manualIdCheck?: Match
   flaggedResponses: string[]
   furtherActions?: string
