@@ -19,6 +19,10 @@ const loadPage = ({ manageJourney = true, sentenceLength = 25 } = {}): void => {
   cy.task('stubEnableNonCompliance')
   cy.task('stubSentences', { endDate })
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
+  cy.request({
+    method: 'POST',
+    url: 'http://localhost:3007/__test/clear-session',
+  })
   if (manageJourney) {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
