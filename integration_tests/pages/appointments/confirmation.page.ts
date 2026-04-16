@@ -34,10 +34,10 @@ export default class AppointmentConfirmationPage extends Page {
   }
 
   getWelshSMSErrorMsg = () => {
-    return cy.get(`data-qa="sms-err-msg-welsh"`)
+    return cy.get(`[data-qa="sms-err-msg-welsh"]`)
   }
 
   getCombinedSMSErrorMsg = () => {
-    return cy.get(`data-qa="sms-err-msg-combined"`)
+    return cy.get(`[data-qa="sms-err-msg-combined"]`)
   }
 }

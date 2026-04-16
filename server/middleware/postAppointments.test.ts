@@ -493,7 +493,7 @@ describe('/middleware/postAppointments', () => {
           smsPreview: {
             request: {
               firstName: 'James',
-              includeWelshPreview: false,
+              includeWelshPreview: true,
               appointmentLocation: 'Mock Location',
               appointmentTypeCode: 'COAP',
               dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',

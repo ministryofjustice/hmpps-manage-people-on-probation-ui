@@ -14,6 +14,10 @@ const stubPostMasOutlookEvent = (): SuperAgentRequest =>
         startDate: '2025-10-16T14:55:23.537Z',
         endDate: '2025-10-16T15:55:23.537Z',
         attendees: ['attendees-1', 'attendees-2'],
+        smsResponse: {
+          englishNotificationId: 'english-sms-1',
+          welshNotificationId: 'welsh-sms-1',
+        },
       },
       headers: {
         'Content-Type': 'application/json',
@@ -52,7 +56,31 @@ const stubUserDetails404Response = (): SuperAgentRequest =>
     },
   })
 
-const stubPostMasOutlookEventWithEnglishSMS = (): SuperAgentRequest =>
+const stubPostMasOutlookEventWithNoEnglishId = (): SuperAgentRequest =>
+  superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      urlPattern: '/supervision/calendar/event',
+      method: 'POST',
+    },
+    response: {
+      status: 200,
+      jsonBody: {
+        id: 'id-1',
+        subject: 'subject',
+        startDate: '2025-10-16T14:55:23.537Z',
+        endDate: '2025-10-16T15:55:23.537Z',
+        attendees: ['attendees-1', 'attendees-2'],
+        smsResponse: {
+          welshNotificationId: 'english-sms-1',
+        },
+      },
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    },
+  })
+
+const stubPostMasOutlookEventNoWelshId = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPattern: '/supervision/calendar/event',
@@ -68,55 +96,6 @@ const stubPostMasOutlookEventWithEnglishSMS = (): SuperAgentRequest =>
         attendees: ['attendees-1', 'attendees-2'],
         smsResponse: {
           englishNotificationId: 'english-sms-1',
-        },
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubPostMasOutlookEventWithWelshSMS = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPattern: '/supervision/calendar/event',
-      method: 'POST',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        id: 'id-1',
-        subject: 'subject',
-        startDate: '2025-10-16T14:55:23.537Z',
-        endDate: '2025-10-16T15:55:23.537Z',
-        attendees: ['attendees-1', 'attendees-2'],
-        smsResponse: {
-          welshNotificationId: 'welsh-sms-1',
-        },
-      },
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    },
-  })
-
-const stubPostMasOutlookEventWithEnglishAndWelshSMS = (): SuperAgentRequest =>
-  superagent.post('http://localhost:9091/__admin/mappings').send({
-    request: {
-      urlPattern: '/supervision/calendar/event',
-      method: 'POST',
-    },
-    response: {
-      status: 200,
-      jsonBody: {
-        id: 'id-1',
-        subject: 'subject',
-        startDate: '2025-10-16T14:55:23.537Z',
-        endDate: '2025-10-16T15:55:23.537Z',
-        attendees: ['attendees-1', 'attendees-2'],
-        smsResponse: {
-          englishNotificationId: 'english-sms-1',
-          welshNotificationId: 'welsh-sms-1',
         },
       },
       headers: {
@@ -129,7 +108,6 @@ export default {
   stubPostMasOutlookEvent,
   stubSchuleOutlookEvent500Response,
   stubUserDetails404Response,
-  stubPostMasOutlookEventWithEnglishSMS,
-  stubPostMasOutlookEventWithWelshSMS,
-  stubPostMasOutlookEventWithEnglishAndWelshSMS,
+  stubPostMasOutlookEventWithNoEnglishId,
+  stubPostMasOutlookEventNoWelshId,
 }
