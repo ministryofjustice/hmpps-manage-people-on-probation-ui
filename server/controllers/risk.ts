@@ -16,6 +16,13 @@ const routes = [
   'getRiskPredictorScoresDetail',
 ] as const
 
+const riskFlagTypes: Set<string> = new Set([
+  'Risk to Staff',
+  'Risk to Children',
+  'Risk to Known Adult',
+  'Risk to Prisoner',
+  'Risk to Public',
+])
 const riskController: Controller<typeof routes, void> = {
   getRisk: hmppsAuthClient => {
     return async (req, res) => {
@@ -80,6 +87,7 @@ const riskController: Controller<typeof routes, void> = {
       })
       return res.render('pages/risk/flag', {
         personRiskFlag,
+        showRiskLevel: riskFlagTypes.has(personRiskFlag.riskFlag.description),
         crn,
       })
     }

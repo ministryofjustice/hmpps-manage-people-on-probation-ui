@@ -21,8 +21,8 @@ export const completeRescheduling = (id: string, inPast = false) => {
   if (inPast) {
     dateTimePage.getLogOutcomesAlertBanner().should('be.visible')
   }
-  dateTimePage.getElementInput(`startTime`).type(rescheduledStartTime)
-  dateTimePage.getElementInput(`endTime`).focus().type(rescheduledEndTime)
+  dateTimePage.getElementInput(`startTime`).clear().type(rescheduledStartTime)
+  dateTimePage.getElementInput(`endTime`).focus().clear().type(rescheduledEndTime)
   dateTimePage.getSubmitBtn().click()
   dateTimePage.getSubmitBtn().click()
   if (inPast) {

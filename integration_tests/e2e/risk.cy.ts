@@ -153,10 +153,10 @@ const checkRiskPageView = ({
         .should('contain.text', 'All reoffending predictor')
     } else {
       page.getElementData('ovp').should('exist')
-      page.getElementData('rsr').get(`h2`).should('contain.text', 'RSR')
-      page.getElementData('ogrs').get(`h2`).should('contain.text', 'OGRS')
-      page.getElementData('ogp').get(`h2`).should('contain.text', 'OGP')
-      page.getElementData('ovp').get(`h2`).should('contain.text', 'OVP')
+      page.getElementData('rsr').should('contain.text', 'RSR')
+      page.getElementData('ogrs').should('contain.text', 'OGRS')
+      page.getElementData('ogp').should('contain.text', 'OGP')
+      page.getElementData('ovp').should('contain.text', 'OVP')
       if (!sanIndicator) {
         page
           .getElementData('oasysScoreHistory')
@@ -553,12 +553,21 @@ context('Risk', () => {
         'href',
         'https://justiceuk.sharepoint.com/sites/HMPPS-HQ-NDST-ATW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=iEFxub&CID=82b28f43%2Dc021%2D465a%2Dbce3%2D11c8eb64c791&FolderCTID=0x012000789EB5A24184864D90305EEA82661286&id=%2Fsites%2FHMPPS%2DHQ%2DNDST%2DATW%2FShared%20Documents%2FNational%20Delius%20Guidance%2FNational%20Delius%20Case%20Recording%20Instructions%2FCRI019%20Registrations&sortField=Modified&isAscending=false&viewid=330f3b0b%2D9b57%2D4427%2Dad3f%2D8d5cffdc3885',
       )
+    page.getElementData('riskFlagLevel').should('not.exist')
   })
   it('Risk Detail page is rendered with expired review date', () => {
     cy.visit('/case/X000001/risk/flag/1')
     const page = new RiskDetailPage()
     page.checkPageTitle('Risk to Staff')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
+  })
+
+  it('Risk Detail page is rendered with risk level for Risk to Staff flag', () => {
+    cy.visit('/case/X000001/risk/flag/1')
+    const page = new RiskDetailPage()
+    page.checkPageTitle('Risk to Staff')
+    page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
+    page.getElementData('riskFlagLevel').should('contain.text', 'Medium')
   })
   it('Risk page is rendered with create a risk assessment on OASys link', () => {
     cy.visit('/case/X801756/risk')
