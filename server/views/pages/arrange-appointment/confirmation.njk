@@ -54,7 +54,7 @@
       {% if flags.enableSmsReminders == true %}
         {% if smsSent %}
           {% if not isEnglishNotificationFailed and not isWelshNotificationFailed %}
-            <p class="govuk-body">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
+            <p class="govuk-body" data-qa="sms-confirmation-msg">{{ case.name.forename }} will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.</p>
             {% elif isEnglishNotificationFailed and not isWelshNotificationFailed%}
               {{ mojAlert({
               variant: "warning",
@@ -87,7 +87,7 @@
               dismissible: false,
               html: "You need to give " + case.name.forename + " the appointment details.",
               attributes: {
-                'data-qa': 'sms-err-msg-all'
+                'data-qa': 'sms-err-msg-combined'
               }
             }) }}
           {% endif %}

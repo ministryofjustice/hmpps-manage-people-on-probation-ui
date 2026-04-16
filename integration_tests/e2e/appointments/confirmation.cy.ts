@@ -430,18 +430,56 @@ describe('Confirmation page', () => {
   describe('SMS reminder', () => {
     beforeEach(() => {
       cy.task('resetMocks')
+    })
+
+    it('should render the page with an alert banner of type warning when the English language SMS reminder fails to send', () => {
       cy.task('stubPostMasOutlookEventWithEnglishSMS')
       loadPage()
       confirmPage = new AppointmentConfirmationPage()
+
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+
+      confirmPage
+        .getEnglishSMSErrorMsg()
+        .should('contain.text', 'We could not send a confirmation text message to Alton')
     })
 
-    it('should render the page with an alert banner of type warning when the English language SMS reminder fails to send', () => {})
+    it('should render the page with an alert banner of type information when the Welsh language SMS reminder fails to send', () => {
+      cy.task('stubPostMasOutlookEventWithWelshSMS')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
 
-    it('should render the page with an alert banner of type information when the Welsh language SMS reminder fails to send', () => {})
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
 
-    it('should render the page with an alert banner of type warning when both the English and Welsh language SMS reminder fails to send', () => {})
+      confirmPage.getWelshSMSErrorMsg().should('contain.text', 'We could not send a confirmation text message to Alton')
+    })
 
-    it('should render the page with a text letting the user know the SMS reminder has been sent', () => {})
+    it('should render the page with an alert banner of type warning when both the English and Welsh language SMS reminder fails to send', () => {
+      cy.task('stubPostMasOutlookEventWithEnglishAndWelshSMS')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+
+      confirmPage
+        .getCombinedSMSErrorMsg()
+        .should('contain.text', 'We could not send a confirmation text message to Alton in Welsh')
+    })
+
+    it('should render the page with a text letting the user know the SMS reminder has been sent', () => {
+      cy.task('stubPostMasOutlookEvent')
+      loadPage()
+      confirmPage = new AppointmentConfirmationPage()
+
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
+
+      confirmPage
+        .getSMSConfirmationMsg()
+        .should(
+          'contain.text',
+          'Alton will receive a confirmation text message with the appointment details. This will also be logged as a contact on NDelius.',
+        )
+    })
   })
 })
 

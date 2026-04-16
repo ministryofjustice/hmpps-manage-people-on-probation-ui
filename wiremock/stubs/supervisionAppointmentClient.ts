@@ -68,7 +68,6 @@ const stubPostMasOutlookEventWithEnglishSMS = (): SuperAgentRequest =>
         attendees: ['attendees-1', 'attendees-2'],
         smsResponse: {
           englishNotificationId: 'english-sms-1',
-          welshNotificationId: 'welsh-sms-1',
         },
       },
       headers: {
