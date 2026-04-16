@@ -139,7 +139,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getConfirmationPage(hmppsAuthClient),
   )
 
-router.get('/case/:crn/appointments/check-in/manage/:id', [
+  router.get('/case/:crn/appointments/check-in/manage/:id', [
     controllers.checkIns.getManageCheckinPage(hmppsAuthClient),
   ])
 
