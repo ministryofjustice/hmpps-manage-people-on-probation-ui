@@ -356,13 +356,11 @@ function standardiseDateValue(dateValue) {
   }
   const separators = ['/', '-', '.', ' ', '_', ':']
   const formats = []
-  for (let i = 0; i < separators.length; i += 1) {
-    const seperator = separators[i]
+  for (const seperator of separators) {
     formats.push(`d${seperator}M${seperator}yyyy`)
     formats.push(`d${seperator}M${seperator}yy`)
   }
-  for (let j = 0; j < formats.length; j += 1) {
-    const format = formats[j]
+  for (const format of formats) {
     const date = DateTime.fromFormat(dateValue, format)
     if (date.isValid) {
       const newDateValue = date.toFormat('d/M/yyyy')
@@ -378,13 +376,11 @@ function standardiseTimeValue(timeValue) {
   }
   const separators = [':', '/', '-', '.', ' ', '_']
   const formats = []
-  for (let i = 0; i < separators.length; i += 1) {
-    const seperator = separators[i]
+  for (const seperator of separators) {
     formats.push(`H${seperator}mm`)
     formats.push(`h${seperator}mma`)
   }
-  for (let j = 0; j < formats.length; j += 1) {
-    const format = formats[j]
+  for (const format of formats) {
     const time = DateTime.fromFormat(timeValue, format)
     if (time.isValid) {
       const newTimeValue = time.toFormat('HH:mm')
