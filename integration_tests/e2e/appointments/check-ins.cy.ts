@@ -1207,6 +1207,7 @@ context('check-ins add questions pages', () => {
     const listQuestionsPage = new ListQuestionsPage()
     listQuestionsPage.clickAddTemplateByIndex(0)
     const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.checkOnPage()
     editQuestionPage.enterDraftQuestionInput('your apprenticeship')
     editQuestionPage.clickContinue()
 

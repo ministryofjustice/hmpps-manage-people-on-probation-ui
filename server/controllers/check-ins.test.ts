@@ -2911,6 +2911,7 @@ describe('checkInsController', () => {
                 hint: 'Hint for the question about the {{thing}}',
                 placeholders: ['thing'],
               },
+              policy$hmpps_esupervision_api: 'CUSTOMISABLE',
             },
             {
               id: 2,
@@ -2922,6 +2923,7 @@ describe('checkInsController', () => {
                 hint: 'Hint for the question about the {{thing}}',
                 placeholders: ['thing'],
               },
+              policy$hmpps_esupervision_api: 'CUSTOMISABLE',
             },
           ],
         })

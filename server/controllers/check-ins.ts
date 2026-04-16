@@ -1398,18 +1398,10 @@ const checkInsController: Controller<typeof routes, void> = {
 
           items.forEach((item: any) => {
             const isCustomisable = availableTemplates.some((t: any) => String(t.id) === String(item.template.id))
-
             if (isCustomisable) {
               const draftId = `${item.template.id}-${uuidv4()}`
-              let inputValue = ''
-              if (item.params && item.params.placeholders) {
-                inputValue = (Object.values(item.params.placeholders)[0] as string) || ''
-              } else if (item.params) {
-                inputValue = (Object.values(item.params)[0] as string) || ''
-              }
-              if (typeof inputValue === 'string' && inputValue.trim() !== '') {
-                questionTemplateAndInputs[draftId] = inputValue
-              }
+              const inputValue = Object.values(item.params?.placeholders || {})[0] || ''
+              questionTemplateAndInputs[draftId] = inputValue
             }
           })
         } catch (error: any) {
@@ -1462,21 +1454,17 @@ const checkInsController: Controller<typeof routes, void> = {
       const manageQuestionsSession = getDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions']) || {}
       const questionTemplateAndInputs = manageQuestionsSession.questionTemplateAndInputs || {}
       const availableTemplates = manageQuestionsSession.availableTemplates || []
-
       const formattedQuestions = Object.entries(questionTemplateAndInputs).map(([draftId, inputValue]) => {
-        const templateId = draftId.split('-')[0]
-
+        const templateId = parseInt(draftId.split('-')[0], 10)
         const originalTemplate = availableTemplates.find((t: any) => String(t.id) === String(templateId))
-        const placeholderKey = originalTemplate?.responseSpec?.placeholders?.[0] || 'text'
-        const responseFormat = originalTemplate?.responseFormat || 'TEXT'
 
         return {
-          id: parseInt(templateId, 10),
+          id: templateId,
           params: {
             placeholders: {
-              [placeholderKey]: inputValue as string,
+              [originalTemplate?.responseSpec?.placeholders?.[0] || 'text']: inputValue as string,
             },
-            responseFormat,
+            responseFormat: originalTemplate?.responseFormat || 'TEXT',
           },
         }
       })
@@ -1489,16 +1477,15 @@ const checkInsController: Controller<typeof routes, void> = {
           await eSupClient.deleteAssignedQuestionsFromCheckIn(crn)
           setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], false)
         } else {
-          const body: EsupervisionAssignQuestionsRequest = {
+          await eSupClient.putAssignQuestionsToCheckIn(crn, {
             questions: formattedQuestions,
             language: 'en-GB',
             author: res.locals.user.username,
-          }
-          await eSupClient.putAssignQuestionsToCheckIn(crn, body)
+          })
           setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], true)
         }
-        setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
 
+        setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
         return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
       } catch (error: any) {
         logger.error(`Failed to assign/delete questions for CRN ${crn}:`, error)

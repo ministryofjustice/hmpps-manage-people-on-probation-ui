@@ -272,7 +272,8 @@
               "responseSpec": {
                 "hint": "Hint for the question about the {{thing}}",
                 "placeholders": ["thing"]
-              }
+              },
+              "policy$hmpps_esupervision_api": "CUSTOMISABLE"
             },
             {
               "id": 2,
@@ -282,7 +283,8 @@
               "responseSpec": {
                 "hint": "Hint for the question about the {{thing}}",
                 "placeholders": ["thing"]
-              }
+              },
+              "policy$hmpps_esupervision_api": "CUSTOMISABLE"
             }
           ]
         },
