@@ -57,7 +57,7 @@ export interface EventResponse {
 }
 
 export interface SmsResponse {
-  englishNotificationId: string
+  englishNotificationId?: string
   welshNotificationId?: string
 }
 export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined

@@ -211,6 +211,10 @@ const mockOutlookEventResponse: OutlookEventResponse = {
   startDate: 'date',
   endDate: 'date',
   attendees: ['attendee1', 'attendee2'],
+  smsResponse: {
+    englishNotificationId: 'english-sms-id',
+    welshNotificationId: 'welsh-sms-id',
+  },
 }
 
 const mockAppointmentsPostResponse: AppointmentsPostResponse = {
@@ -434,6 +438,136 @@ describe('/middleware/postAppointments', () => {
       })
       it('should set req.session.data.isOutLookEventFailed to true', () => {
         expect(mockReq.session.data.isOutLookEventFailed).toEqual(true)
+      })
+    })
+
+    describe('SMS', () => {
+      beforeEach(() => {
+        jest.clearAllMocks()
+      })
+
+      it('should set req.session.data.isEnglishNotificationFailed to true if request does not have a englishNotificationId ', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce({
+            ...mockOutlookEventResponse,
+            id: 'id-1',
+            smsResponse: {
+              englishNotificationId: undefined,
+            },
+          })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          smsOptIn: 'YES',
+          smsPreview: {
+            request: {
+              firstName: 'James',
+              includeWelshPreview: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+            },
+            preview: {
+              englishSmsPreview: '',
+              welshSmsPreview: '',
+            },
+          },
+        })
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+        expect(mockReq.session.data.isEnglishNotificationFailed).toEqual(true)
+      })
+
+      it('should set req.session.data.isWelshNotificationFailed to true if request does not have a welshNotificationId ', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce({
+            ...mockOutlookEventResponse,
+            id: 'id-1',
+            smsResponse: {
+              welshNotificationId: undefined,
+            },
+          })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          smsOptIn: 'YES',
+          smsPreview: {
+            request: {
+              firstName: 'James',
+              includeWelshPreview: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+            },
+            preview: {
+              englishSmsPreview: '',
+              welshSmsPreview: '',
+            },
+          },
+        })
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+        expect(mockReq.session.data.isWelshNotificationFailed).toEqual(true)
+      })
+
+      it('should set req.session.data.isEnglishNotificationFailed to undefined if request has a englishNotificationId ', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce({
+            ...mockOutlookEventResponse,
+            id: 'id-1',
+            smsResponse: {
+              englishNotificationId: 'english-sms-id',
+            },
+          })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          smsOptIn: 'YES',
+          smsPreview: {
+            request: {
+              firstName: 'James',
+              includeWelshPreview: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+            },
+            preview: {
+              englishSmsPreview: '',
+              welshSmsPreview: '',
+            },
+          },
+        })
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+        expect(mockReq.session.data.isEnglishNotificationFailed).toEqual(undefined)
+      })
+
+      it('should set req.session.data.isEnglishNotificationFailed to undefined if request has a englishNotificationId ', async () => {
+        postOutlookCalendarEventSpy = jest
+          .spyOn(SupervisionAppointmentClient.prototype, 'postOutlookCalendarEvent')
+          .mockResolvedValueOnce({
+            ...mockOutlookEventResponse,
+            id: 'id-1',
+            smsResponse: {
+              welshNotificationId: 'welsh-sms-id',
+            },
+          })
+        const mockReq = createMockReq({
+          ...mockAppointment,
+          smsOptIn: 'YES',
+          smsPreview: {
+            request: {
+              firstName: 'James',
+              includeWelshPreview: false,
+              appointmentLocation: 'Mock Location',
+              appointmentTypeCode: 'COAP',
+              dateAndTimeOfAppointment: '2025-03-12T09:00:00.000Z',
+            },
+            preview: {
+              englishSmsPreview: '',
+              welshSmsPreview: '',
+            },
+          },
+        })
+        await postAppointments(hmppsAuthClient)(mockReq, res)
+        expect(mockReq.session.data.isWelshNotificationFailed).toEqual(undefined)
       })
     })
   })
