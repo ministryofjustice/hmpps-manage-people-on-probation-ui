@@ -57,7 +57,25 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           id,
           page: `outcome/acceptable-absence`,
           msg: 'Select why their absence was acceptable',
-          log: 'Acceptable absence reason not selected',
+          log: 'Acceptable absence action not selected',
+        }),
+      ),
+    }
+  }
+
+  const validateUnacceptableAbsence = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/unacceptable-absence`)) return
+    render = 'pages/appointment-outcomes/unacceptable-absence'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/acceptable-absence`,
+          msg: 'Select an action for their unacceptable absence',
+          log: 'Unacceptable absence action not selected',
         }),
       ),
     }
@@ -81,6 +99,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateOutcome()
   validateAttendedFailedToComply()
   validateAcceptableAbsence()
+  validateUnacceptableAbsence()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {

@@ -108,6 +108,15 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
   return httpMocks.createRequest(req)
 }
 
+const sharedRedirectChecks = {
+  SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
+  INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
+  NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
+  DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
+}
+
 describe('controllers/appointmentOutcomes', () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -240,20 +249,51 @@ describe('controllers/appointmentOutcomes', () => {
 
   describe('postAttendedFailedToComply', () => {
     it('should redirect to the correct page based on enforcement action', () => {
-      const checks = {
-        SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
-        INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
-        NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
-        DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
-      }
-      Object.entries(checks).forEach(([enforcementAction, redirectUrl]) => {
+      Object.entries(sharedRedirectChecks).forEach(([enforcementAction, redirectUrl]) => {
         const req = mockReq()
         const res = mockRes()
         const spy = jest.spyOn(res, 'redirect')
         mockGetDataValue.mockReturnValueOnce(enforcementAction)
         controllers.appointmentOutcomes.postAttendedFailedToComply()(req, res)
+        expect(spy).toHaveBeenCalledWith(redirectUrl)
+      })
+    })
+  })
+  describe('getAcceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/acceptable-absence')
+    })
+  })
+  describe('postAcceptableAbsence', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postAcceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
+  describe('getUnacceptableAbsence', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getUnacceptableAbsence()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/unacceptable-absence')
+    })
+  })
+  describe('postUnacceptableAbsence', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      Object.entries(sharedRedirectChecks).forEach(([enforcementAction, redirectUrl]) => {
+        const req = mockReq()
+        const res = mockRes()
+        const spy = jest.spyOn(res, 'redirect')
+        mockGetDataValue.mockReturnValueOnce(enforcementAction)
+        controllers.appointmentOutcomes.postUnacceptableAbsence()(req, res)
         expect(spy).toHaveBeenCalledWith(redirectUrl)
       })
     })

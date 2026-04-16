@@ -1,3 +1,4 @@
+import { Request, Response } from 'express'
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
@@ -5,8 +6,6 @@ import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/
 import { getDataValue } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
-import MasApiClient from '../data/masApiClient'
-import { Sentence } from '../data/model/sentenceDetails'
 
 const routes = [
   'getOutcome',
@@ -36,6 +35,27 @@ type OutcomeRedirectMap = {
 }
 type EnforcementRedirectMap = {
   [K in AppointmentEnforcementAction]?: string
+}
+
+const sharedRedirects = (req: Request, res: Response): void => {
+  const { data } = req.session
+  const { crn, id, baseOutcomeUrl } = res.locals.appointmentOutcome
+  const enforcementAction = getDataValue<AppointmentEnforcementAction>(data, [
+    'appointments',
+    crn,
+    id,
+    'outcome',
+    'enforcementAction',
+  ])
+  const redirectMap: EnforcementRedirectMap = {
+    SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
+    INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+    INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+    REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
+    NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
+    DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
+  }
+  return res.redirect(redirectMap[enforcementAction])
 }
 
 const appointmentOutcomesController: Controller<typeof routes, void | AppResponse> = {
@@ -111,31 +131,10 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => {
-    return async (req, res) => {
-      return res.render('pages/appointment-outcomes/attended-failed-to-comply')
-    }
+    return async (_req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
   },
   postAttendedFailedToComply: () => {
-    return async (req, res) => {
-      const { data } = req.session
-      const { crn, id, baseOutcomeUrl } = res.locals.appointmentOutcome
-      const enforcementAction = getDataValue<AppointmentEnforcementAction>(data, [
-        'appointments',
-        crn,
-        id,
-        'outcome',
-        'enforcementAction',
-      ])
-      const redirectMap: EnforcementRedirectMap = {
-        SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
-        INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
-        REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
-        NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
-        DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
-      }
-      return res.redirect(redirectMap[enforcementAction])
-    }
+    return async (req, res) => sharedRedirects(req, res)
   },
   getAcceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')
@@ -147,10 +146,10 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     }
   },
   getUnacceptableAbsence: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')
+    return async (_req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')
   },
   postUnacceptableAbsence: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/unacceptable-absence')
+    return async (req, res) => sharedRedirects(req, res)
   },
   getFailedToAttend: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/failed-to-attend')
