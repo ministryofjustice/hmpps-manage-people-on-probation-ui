@@ -59,7 +59,6 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     const end = DateTime.fromISO(endDate)
     sentenceLength = end.diff(start, 'months').months
   }
-  console.log({ startDate, endDate, sentenceLength })
   const sentence: AppointmentOutcomeSentence = {
     type: appointmentSentence?.sentenceType,
     length: sentenceLength,
