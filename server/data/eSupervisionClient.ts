@@ -126,7 +126,7 @@ export default class ESupervisionClient extends RestClient {
     assignQuestionsRequest: EsupervisionAssignQuestionsRequest,
   ): Promise<EsupervisionAssignQuestionsResponse> {
     return this.put({
-      path: `/v2/questions/assign?crn=${crn}`,
+      path: `/v2/questions/assignment?crn=${crn}`,
       data: assignQuestionsRequest,
     })
   }
@@ -148,6 +148,13 @@ export default class ESupervisionClient extends RestClient {
   ): Promise<EsupervisionUpcomingQuestionsResponse> {
     return this.get({
       path: `/v2/questions/upcoming/${crn}/offender-questions?language=${language}`,
+    })
+  }
+
+  // DELETE /v2/questions/upcoming/{crn}/question-items (use in the add questions pages if all existing questions are removed and submitted as empty)
+  async deleteAssignedQuestionsFromCheckIn(crn: string): Promise<{ message: string }> {
+    return this.delete({
+      path: `/v2/questions/assignment?crn=${crn}`,
     })
   }
 }

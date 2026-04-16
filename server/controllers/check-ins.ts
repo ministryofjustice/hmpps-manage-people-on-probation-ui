@@ -769,11 +769,11 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         delete req.session?.data?.esupervision?.[crn]?.[id]?.manageCheckin?.settingsUpdated
       }
-      const questionsUpdated = getDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'])
+      const questionsAdded = getDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'])
 
       let successMessageHtml: string | undefined
 
-      if (questionsUpdated) {
+      if (questionsAdded) {
         res.locals.success = true
         const forename = personalDetails?.name?.forename || 'the person'
         const rawCheckinDate = upcomingCheckin?.expectedCheckinDate
@@ -783,7 +783,7 @@ const checkInsController: Controller<typeof routes, void> = {
           <br>
           Additional questions will only apply to their next check in${nextCheckinDate ? ` on ${nextCheckinDate}` : ''}
         `
-        setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], undefined)
+        setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], undefined)
       }
       return res.render('pages/check-in/manage/manage-checkin.njk', {
         crn,
@@ -1374,7 +1374,10 @@ const checkInsController: Controller<typeof routes, void> = {
       if (availableTemplates.length === 0) {
         const eSupClient = new ESupervisionClient(token)
         const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
-        availableTemplates = templatesList.templates
+        const customisableTemplates = templatesList.templates.filter(
+          (t: any) => t.policy$hmpps_esupervision_api === 'CUSTOMISABLE',
+        )
+        availableTemplates = customisableTemplates
         setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'], availableTemplates)
       }
 
@@ -1392,11 +1395,22 @@ const checkInsController: Controller<typeof routes, void> = {
           const eSupClient = new ESupervisionClient(token)
           const response = await eSupClient.getUpcomingCheckinQuestionItems(crn, 'en-GB')
           const items = response?.upcoming?.items || []
-          items.forEach((item: any) => {
-            const draftId = `${item.template.id}-${uuidv4()}`
-            const inputValue = Object.values(item.params || {})[0] || ''
 
-            questionTemplateAndInputs[draftId] = inputValue
+          items.forEach((item: any) => {
+            const isCustomisable = availableTemplates.some((t: any) => String(t.id) === String(item.template.id))
+
+            if (isCustomisable) {
+              const draftId = `${item.template.id}-${uuidv4()}`
+              let inputValue = ''
+              if (item.params && item.params.placeholders) {
+                inputValue = (Object.values(item.params.placeholders)[0] as string) || ''
+              } else if (item.params) {
+                inputValue = (Object.values(item.params)[0] as string) || ''
+              }
+              if (typeof inputValue === 'string' && inputValue.trim() !== '') {
+                questionTemplateAndInputs[draftId] = inputValue
+              }
+            }
           })
         } catch (error: any) {
           if (error?.status === 404 || error?.response?.status === 404) {
@@ -1415,9 +1429,9 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const addedQuestions = Object.entries(questionTemplateAndInputs)
         .map(([qId, inputValue]) => {
-          if (!inputValue || (inputValue as string).trim() === '') return null
+          if (!inputValue || typeof inputValue !== 'string' || inputValue.trim() === '') return null
+          const templateId = parseInt(qId.split('-')[0], 10)
 
-          const templateId = qId.split('-')[0]
           const templateData = parseQuestionTemplate(availableTemplates, templateId)
 
           if (!templateData) return null
@@ -1467,22 +1481,29 @@ const checkInsController: Controller<typeof routes, void> = {
         }
       })
 
-      const body: EsupervisionAssignQuestionsRequest = {
-        questions: formattedQuestions,
-        language: 'en-GB',
-        author: res.locals.user.username,
-      }
+      try {
+        const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+        const eSupClient = new ESupervisionClient(token)
 
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const eSupClient = new ESupervisionClient(token)
-      const response = await eSupClient.putAssignQuestionsToCheckIn(crn, body)
-
-      if (response?.listId) {
-        setDataValue(req.session.data, ['esupervision', crn, id, 'questionsUpdated'], true)
+        if (formattedQuestions.length === 0) {
+          await eSupClient.deleteAssignedQuestionsFromCheckIn(crn)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], false)
+        } else {
+          const body: EsupervisionAssignQuestionsRequest = {
+            questions: formattedQuestions,
+            language: 'en-GB',
+            author: res.locals.user.username,
+          }
+          await eSupClient.putAssignQuestionsToCheckIn(crn, body)
+          setDataValue(req.session.data, ['esupervision', crn, id, 'questionsAdded'], true)
+        }
         setDataValue(req.session.data, ['esupervision', crn, id, 'manageQuestions'], undefined)
-      }
 
-      return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+        return res.redirect(`/case/${crn}/appointments/check-in/manage/${id}`)
+      } catch (error: any) {
+        logger.error(`Failed to assign/delete questions for CRN ${crn}:`, error)
+        return renderError(error?.status || 500)(req, res)
+      }
     }
   },
 
@@ -1543,11 +1564,15 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const personalDetails = await masClient.getPersonalDetails(crn)
       const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
+      const customisableTemplates = templatesList.templates.filter(
+        (t: any) => t.policy$hmpps_esupervision_api === 'CUSTOMISABLE',
+      )
+      const availableTemplates = customisableTemplates
 
       setDataValue(
         req.session.data,
         ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
-        templatesList.templates,
+        availableTemplates,
       )
       // redirect if questions >= 3
       const questionTemplateAndInputs =
@@ -1611,7 +1636,10 @@ const checkInsController: Controller<typeof routes, void> = {
       if (availableTemplates.length === 0) {
         const eSupClient = new ESupervisionClient(token)
         const templatesList = await eSupClient.getQuestionsTemplates('en-GB')
-        availableTemplates = templatesList.templates
+        const customisableTemplates = templatesList.templates.filter(
+          (t: any) => t.policy$hmpps_esupervision_api === 'CUSTOMISABLE',
+        )
+        availableTemplates = customisableTemplates
         setDataValue(
           req.session.data,
           ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],

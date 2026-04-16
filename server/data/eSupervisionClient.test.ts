@@ -431,11 +431,27 @@ describe('ESupervisionClient', () => {
         listId: 3,
       }
       fakeESupervisionApi
-        .put(`/v2/questions/assign?crn=${crn}`, request as Record<string, any>)
+        .put(`/v2/questions/assignment?crn=${crn}`, request as Record<string, any>)
         .matchHeader('authorization', `Bearer ${token.access_token}`)
         .reply(200, response)
 
       const output = await client.putAssignQuestionsToCheckIn(crn, request)
+      expect(output).toEqual(response)
+    })
+  })
+
+  describe('deleteAssignedQuestionsFromCheckIn', () => {
+    it('should delete assigned questions to check in', async () => {
+      const crn = 'X000001'
+
+      const response = { message: 'deleted' }
+
+      fakeESupervisionApi
+        .delete(`/v2/questions/assignment?crn=${crn}`)
+        .matchHeader('authorization', `Bearer ${token.access_token}`)
+        .reply(200, response)
+
+      const output = await client.deleteAssignedQuestionsFromCheckIn(crn)
       expect(output).toEqual(response)
     })
   })

@@ -335,7 +335,7 @@
     },
     {
       "request": {
-        "urlPathPattern": "/esupervision/v2/questions/assign",
+        "urlPathPattern": "/esupervision/v2/questions/assignment",
         "queryParameters": {
           "crn": {
             "matches": ".*"

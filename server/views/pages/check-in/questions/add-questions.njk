@@ -118,6 +118,8 @@
                 }) }}
             </div>
         {% endif %}
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <div class="govuk-button-group">
                 {{ govukButton({
                     text: buttonText,
@@ -128,6 +130,7 @@
                     {{ formAnchorText }}
                 </a>
             </div>
+            </form>
         </div>
     </div>
 {% endblock %}

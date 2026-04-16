@@ -66,13 +66,11 @@
         ] %}
         {% if upcomingCheckin %}
         {% for item in upcomingCheckin.questions %}
-            {% if loop.index0 < 3 %}
                 {% set questionNumber = loop.index %}
                 {% set rows = (rows.push({
                     key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
                     value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
                 }), rows) %}
-            {% endif %}
         {% endfor %}
         {% endif %}
         {% set nextCheckinQuestionsText %}

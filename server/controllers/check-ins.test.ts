@@ -1850,7 +1850,7 @@ describe('checkInsController', () => {
         esupervision: {
           [crn]: {
             [uuid]: {
-              questionsUpdated: true,
+              questionsAdded: true,
             },
           },
         },
@@ -1875,7 +1875,7 @@ describe('checkInsController', () => {
 
       expect(mockSetDataValue).toHaveBeenCalledWith(
         req.session.data,
-        ['esupervision', crn, uuid, 'questionsUpdated'],
+        ['esupervision', crn, uuid, 'questionsAdded'],
         undefined,
       )
     })
@@ -2959,6 +2959,48 @@ describe('checkInsController', () => {
         expect(mockRenderError).toHaveBeenCalledWith(404)
         expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
       })
+
+      it('safely extracts text from nested placeholders object from the API', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        jest.spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates').mockResolvedValue({
+          templates: [
+            {
+              id: 5,
+              template: 'How is {{thing}}?',
+              responseSpec: { placeholders: ['thing'] },
+              policy$hmpps_esupervision_api: 'CUSTOMISABLE',
+            },
+          ],
+        } as any)
+
+        jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestionItems').mockResolvedValue({
+          upcoming: {
+            items: [
+              {
+                template: { id: 5 },
+                params: {
+                  placeholders: { thing: 'work going' },
+                },
+              },
+            ],
+          },
+        } as any)
+
+        const req = baseReq()
+        await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockSetDataValue).toHaveBeenCalledWith(
+          req.session.data,
+          ['esupervision', crn, uuid, 'manageQuestions', 'questionTemplateAndInputs'],
+          expect.any(Object),
+        )
+
+        const setDataCall = mockSetDataValue.mock.calls.find(call => call[1].includes('questionTemplateAndInputs'))
+        const savedData = setDataCall[2]
+        expect(Object.values(savedData)).toContain('work going')
+      })
     })
 
     describe('postAddQuestionsPage', () => {
@@ -3017,6 +3059,42 @@ describe('checkInsController', () => {
         await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
 
         expect(mockRenderError).toHaveBeenCalledWith(404)
+      })
+
+      it('calls DELETE endpoint when there are no custom questions to save', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({
+          esupervision: {
+            [crn]: {
+              [uuid]: {
+                manageQuestions: {
+                  questionTemplateAndInputs: {},
+                  availableTemplates: [{ id: '3', responseSpec: { placeholders: ['thing'] } }],
+                },
+              },
+            },
+          },
+        })
+        const { id } = req.params as Record<string, string>
+
+        const deleteSpy = jest
+          .spyOn(ESupervisionClient.prototype, 'deleteAssignedQuestionsFromCheckIn')
+          .mockResolvedValue({ message: 'deleted' })
+        const putSpy = jest.spyOn(ESupervisionClient.prototype, 'putAssignQuestionsToCheckIn')
+
+        await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(deleteSpy).toHaveBeenCalledWith(crn)
+        expect(putSpy).not.toHaveBeenCalled()
+
+        expect(mockSetDataValue).toHaveBeenCalledWith(
+          req.session.data,
+          ['esupervision', crn, id, 'questionsAdded'],
+          false,
+        )
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}`)
       })
     })
 
@@ -3092,7 +3170,12 @@ describe('checkInsController', () => {
           .mockImplementation(() =>
             Promise.resolve({
               templates: [
-                { id: '1', template: 'Have you heard back from {{thing}}?', responseSpec: { placeholders: ['thing'] } },
+                {
+                  id: '1',
+                  template: 'Have you heard back from {{thing}}?',
+                  responseSpec: { placeholders: ['thing'] },
+                  policy$hmpps_esupervision_api: 'CUSTOMISABLE',
+                },
               ],
             } as any),
           )
@@ -3105,7 +3188,14 @@ describe('checkInsController', () => {
         expect(mockSetDataValue).toHaveBeenCalledWith(
           req.session.data,
           ['esupervision', crn, id, 'manageQuestions', 'availableTemplates'],
-          [{ id: '1', template: 'Have you heard back from {{thing}}?', responseSpec: { placeholders: ['thing'] } }],
+          [
+            {
+              id: '1',
+              template: 'Have you heard back from {{thing}}?',
+              responseSpec: { placeholders: ['thing'] },
+              policy$hmpps_esupervision_api: 'CUSTOMISABLE',
+            },
+          ],
         )
         expect(renderSpy).toHaveBeenCalledWith(
           'pages/check-in/questions/list-questions.njk',
@@ -3127,7 +3217,7 @@ describe('checkInsController', () => {
 
         const getQuestionsListSpy = jest
           .spyOn(ESupervisionClient.prototype, 'getQuestionsTemplates')
-          .mockImplementation(() => Promise.resolve({ questions: [] } as any))
+          .mockImplementation(() => Promise.resolve({ templates: [] } as any))
 
         const req = baseReq({
           esupervision: {
@@ -3267,6 +3357,7 @@ describe('checkInsController', () => {
                 id: '1',
                 template: 'Have you heard back from {{thing}}?',
                 responseSpec: { placeholders: ['thing'] },
+                policy$hmpps_esupervision_api: 'CUSTOMISABLE',
               },
             ],
           } as any)

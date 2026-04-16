@@ -88,7 +88,7 @@ const stubAssignQuestions = () => {
   return superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       method: 'PUT',
-      urlPathPattern: '/v2/questions/assign',
+      urlPathPattern: '/v2/questions/assignment',
       queryParameters: {
         crn: {
           matches: '.*',
@@ -141,6 +141,27 @@ const stubGetUpcomingCheckinQuestionItems = () => {
     },
   })
 }
+
+const stubDeleteAssignedQuestionsFromCheckIn = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'DELETE',
+      urlPathPattern: '/v2/questions/assignment',
+      queryParameters: {
+        crn: {
+          matches: '.*',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        message: 'deleted',
+      },
+    },
+  })
+}
 export default {
   stubOffenderSetup422Response,
   stubOffenderSetup500Response,
@@ -149,4 +170,5 @@ export default {
   stubGetUpcomingCheckinQuestionItems,
   stubGetUpcomingCheckinQuestions,
   stubAssignQuestions,
+  stubDeleteAssignedQuestionsFromCheckIn,
 }

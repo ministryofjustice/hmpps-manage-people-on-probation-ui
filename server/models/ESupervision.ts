@@ -6,7 +6,7 @@ export interface ESupervisionSession {
   manageCheckin?: CheckinUserDetails
   restartCheckin?: CheckinUserDetails
   manageQuestions?: ManageQuestionsSession
-  questionsUpdated?: boolean
+  questionsAdded?: boolean
 }
 
 export interface CheckinUserDetails {
