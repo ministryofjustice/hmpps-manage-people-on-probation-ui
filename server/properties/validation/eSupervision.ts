@@ -356,6 +356,16 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][manageQuestions][draftQuestionInput]`]: {
+      optional: page !== 'edit-question',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter what you want to ask',
+          log: 'Question text not entered',
+        },
+      ],
+    },
 
     photoUpload: {
       optional: page !== 'upload-a-photo',

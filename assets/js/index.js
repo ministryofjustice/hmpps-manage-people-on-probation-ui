@@ -224,13 +224,16 @@ class ServiceAlert {
 
     this.dateInput = document.querySelector('.moj-js-datepicker-input')
     this.startInput = document.querySelector('[data-qa="startTime"] input')
+    this.endInput = document.querySelector('[data-qa="endTime"] input')
     this.status = document.querySelector('[data-qa="serviceAlertStatus"]')
     this.dismissLink = this.alert.querySelector('.moj-alert__dismiss')
     this.dismissed = false
 
     this.handleDismiss = this.handleDismiss.bind(this)
     this.showAlert = this.showAlert.bind(this)
+    this.handleTimeChange = this.handleTimeChange.bind(this)
     this.handleStartTimeChange = this.handleStartTimeChange.bind(this)
+    this.handleEndTimeChange = this.handleEndTimeChange.bind(this)
     this.handleRequest = this.handleRequest.bind(this)
     this.handleDateChange = this.handleDateChange.bind(this)
 
@@ -245,6 +248,14 @@ class ServiceAlert {
     if (this.dateInput) {
       this.dateInput.addEventListener('keyup', this.handleDateChange)
       this.dateInput.addEventListener('change', this.handleDateChange)
+    }
+
+    if (this.startInput) {
+      this.endInput.addEventListener('change', this.handleTimeChange)
+      this.startInput.addEventListener('change', this.handleStartTimeChange)
+    }
+    if (this.endInput) {
+      this.endInput.addEventListener('change', this.handleEndTimeChange)
     }
   }
 
@@ -281,13 +292,21 @@ class ServiceAlert {
     }
   }
 
-  async handleStartTimeChange(event) {
+  async handleTimeChange(event) {
     const time = DateTime.fromFormat(event.target.value, 'H:mm')
     if (time.isValid) {
       await this.handleRequest()
     } else {
       this.showAlert(false)
     }
+  }
+
+  handleStartTimeChange() {
+    this.startInput.value = standardiseTimeValue(this.startInput.value)
+  }
+
+  handleEndTimeChange() {
+    this.endInput.value = standardiseTimeValue(this.endInput.value)
   }
 
   async handleRequest(dateEvent = false) {
@@ -305,9 +324,9 @@ class ServiceAlert {
     this.dismissed = alertDismissed
 
     if (dateEvent) {
-      this.startInput.removeEventListener('keyup', this.handleStartTimeChange)
+      this.startInput.removeEventListener('keyup', this.handleTimeChange)
       if (isToday) {
-        this.startInput.addEventListener('keyup', this.handleStartTimeChange)
+        this.startInput.addEventListener('keyup', this.handleTimeChange)
       }
     }
 
@@ -323,6 +342,28 @@ class ServiceAlert {
       this.showAlert(false)
     }
   }
+}
+
+function standardiseTimeValue(timeValue) {
+  if (!timeValue) {
+    return timeValue
+  }
+  const separators = [':', '/', '-', '.', ' ', '_']
+  const formats = []
+  for (let i = 0; i < separators.length; i += 1) {
+    const seperator = separators[i]
+    formats.push(`H${seperator}mm`)
+    formats.push(`h${seperator}mma`)
+  }
+  for (let j = 0; j < formats.length; j += 1) {
+    const format = formats[j]
+    const time = DateTime.fromFormat(timeValue, format)
+    if (time.isValid) {
+      const newTimeValue = time.toFormat('HH:mm')
+      return newTimeValue
+    }
+  }
+  return timeValue
 }
 
 setNoFixedAddressConditional()

@@ -180,5 +180,70 @@ export interface ReactivateOffenderRequest {
   }
 }
 
+// PUT /v2/questions/assignment
+export interface EsupervisionAssignQuestionsRequest {
+  questions: {
+    id: number
+    params: {
+      placeholders: Record<string, string>
+      responseFormat: string
+    }
+  }[]
+  language: string
+  author: string
+}
+
+export interface EsupervisionAssignQuestionsResponse {
+  expectedCheckinDate: string
+  listId: number
+}
+
+// GET /v2/questions/templates
+export interface EsupervisionQuestionTemplatesResponse {
+  templates: EsupervisionQuestionTemplatesList[]
+}
+
+export interface EsupervisionQuestionTemplatesList {
+  id: number
+  template: string
+  example: string
+  responseFormat: 'TEXT'
+  responseSpec: {
+    hint: string
+    placeholders: string[]
+  }
+  policy$hmpps_esupervision_api?: string
+}
+
+// GET /v2/questions/upcoming/{crn}/question-items
+export interface EsupervisionUpcomingQuestionItemsResponse {
+  upcoming: {
+    expectedCheckinDate: string
+    items: EsupervisionUpcomingQuestionItem[]
+  }
+}
+
+export interface EsupervisionUpcomingQuestionItem {
+  template: {
+    id: number
+    template: string
+    responseFormat: 'TEXT'
+    responseSpec: Record<string, string>
+    example: string
+    policy$hmpps_esupervision_api: string
+  }
+  params: Record<string, string>
+}
+
+// GET /v2/questions/upcoming/{crn}/offender-questions
+export interface EsupervisionUpcomingQuestionsResponse {
+  expectedCheckinDate: string
+  questions: {
+    question: string
+    format: string
+    spec: { [key: string]: string }
+  }[]
+}
+
 export type OffenderStatus = 'INITIAL' | 'VERIFIED' | 'INACTIVE'
 export type CheckInterval = 'WEEKLY' | 'TWO_WEEKS' | 'FOUR_WEEKS' | 'EIGHT_WEEKS'

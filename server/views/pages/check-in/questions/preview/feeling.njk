@@ -4,8 +4,7 @@
 {% set buttonText = "Back to questions" %}
 {% set notStandardForm = true %}
 {% set hideButton = true %}
-{% set back = back if back else '' %}
-{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
 
 
 {% block primary %}
@@ -90,13 +89,6 @@
 
                 </div>
             </div>
-
-            {{
-                govukInsetText({
-                    html: 'If you need to speak to someone urgently about how you are feeling, check the <a href="https://www.nhs.uk/mental-health/feelings-symptoms-behaviours/behaviours/help-for-suicidal-thoughts/" class="govuk-link" target="_blank">NHS website for help (opens in new tab)</a>.'
-                })
-            }}
-
             <div class="govuk-button-group">
                 <a href="{{ formAnchorLink }}" class="govuk-button" data-qa="submit-btn">{{ buttonText }}</a>
             </div>

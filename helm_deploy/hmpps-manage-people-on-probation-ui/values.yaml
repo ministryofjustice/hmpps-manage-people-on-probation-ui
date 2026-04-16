@@ -13,7 +13,7 @@ generic-service:
     host: app-hostname.local # override per environment
     modsecurity_enabled: true
     modsecurity_audit_enabled: true
-    modsecurity_github_team: mpop-tech
+    modsecurity_github_team: hmpps-manage-people-on-probation
     tlsSecretName: hmpps-manage-people-on-probation-ui-cert
 
   livenessProbe:
