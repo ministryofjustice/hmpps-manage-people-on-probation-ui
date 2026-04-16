@@ -3,8 +3,7 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn %}
 {% set formAnchorText = "Cancel and go to " + case.name.forename + "'s overview" %}
-{% set back = back if back else '' %}
-{% set backLink =  '/case/' + crn + '/'  + back %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id %}
 {% set buttonText = "Add questions to online check ins" %}
 
 {% block form %}

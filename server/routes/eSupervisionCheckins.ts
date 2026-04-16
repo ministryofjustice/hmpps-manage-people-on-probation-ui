@@ -307,6 +307,38 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     controllers.checkIns.getAddQuestionsPage(hmppsAuthClient),
   ])
 
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/add', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postAddQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/list', [
+    controllers.checkIns.getQuestionsListPage(hmppsAuthClient),
+  ])
+
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/list', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postQuestionsListPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit', [
+    controllers.checkIns.getEditQuestionPage(hmppsAuthClient),
+  ])
+
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit', [
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postEditQuestionPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/:templateId/select', [
+    controllers.checkIns.getSelectQuestionPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/delete', [
+    controllers.checkIns.getDeleteQuestion(hmppsAuthClient),
+  ])
+
   router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling', [
     controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient),
   ])
