@@ -36,6 +36,7 @@ export type AppointmentEnforcementAction =
   | 'RIC'
   | 'PROFESSIONAL_JUDGEMENT_DECISION'
   | 'ACCEPTABLE_FAILURE'
+  | 'DECISION_PENDING'
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
