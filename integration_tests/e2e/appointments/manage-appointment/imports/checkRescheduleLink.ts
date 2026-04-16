@@ -4,9 +4,11 @@ import RescheduleAppointmentPage from '../../../../pages/appointments/reschedule
 import { loadPage } from './common'
 
 const now = DateTime.now().plus({ days: 1 })
+const start = `${now.toFormat('yyyy-MM-dd')}T09:00:00+01:00`
+const end = `${now.toFormat('yyyy-MM-dd')}T10:00:00+01:00`
 const futureDate = now.toFormat('d MMMM yyyy')
-const startTime = '9am'
-const endTime = '10am'
+const startTime = DateTime.fromISO(start).toFormat('ha').toLowerCase()
+const endTime = DateTime.fromISO(end).toFormat('ha').toLowerCase()
 
 export const checkRescheduleLink = (enableNonCompliance = true) => {
   let manageAppointmentPage: ManageAppointmentPage
