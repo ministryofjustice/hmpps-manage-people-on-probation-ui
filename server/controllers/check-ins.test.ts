@@ -3003,6 +3003,53 @@ describe('checkInsController', () => {
         const savedData = setDataCall[2]
         expect(Object.values(savedData)).toContain('work going')
       })
+
+      it('skips fetching upcoming questions if they already exist in the session', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({
+          esupervision: {
+            [crn]: {
+              [uuid]: {
+                manageQuestions: {
+                  questionTemplateAndInputs: { '1-uuid': 'existing answer' },
+                  availableTemplates: [
+                    {
+                      id: '1',
+                      template: 'How is{{thing}}?',
+                      responseSpec: { placeholders: ['thing'] },
+                      policy$hmpps_esupervision_api: 'CUSTOMISABLE',
+                    },
+                  ],
+                },
+              },
+            },
+          },
+        })
+
+        const getUpcomingSpy = jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestionItems')
+
+        await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(getUpcomingSpy).not.toHaveBeenCalled()
+        expect(renderSpy).toHaveBeenCalledWith(
+          'pages/check-in/questions/add-questions.njk',
+          expect.objectContaining({
+            addedQuestions: [{ id: '1-uuid', fullText: 'How is existing answer?' }],
+          }),
+        )
+      })
+      it('renders 500 error page if fetching upcoming questions fails with non-404', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+        jest.spyOn(ESupervisionClient.prototype, 'getUpcomingCheckinQuestionItems').mockRejectedValue({ status: 500 })
+
+        const req = baseReq()
+        await controllers.checkIns.getAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(500)
+      })
     })
 
     describe('postAddQuestionsPage', () => {
@@ -3097,6 +3144,29 @@ describe('checkInsController', () => {
           false,
         )
         expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/check-in/manage/${id}`)
+      })
+
+      it('renders 500 error page if saving questions to the API fails', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq({
+          esupervision: {
+            [crn]: {
+              [uuid]: {
+                manageQuestions: {
+                  questionTemplateAndInputs: { '1-some-uuid': 'answer' },
+                  availableTemplates: [{ id: '1', responseSpec: { placeholders: ['text'] }, responseFormat: 'TEXT' }],
+                },
+              },
+            },
+          },
+        })
+        jest.spyOn(ESupervisionClient.prototype, 'putAssignQuestionsToCheckIn').mockRejectedValue({ status: 500 })
+
+        await controllers.checkIns.postAddQuestionsPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(500)
       })
     })
 
