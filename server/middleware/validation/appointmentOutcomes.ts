@@ -32,16 +32,19 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
-    errorMessages = validateWithSpec(
-      req,
-      appointmentOutcomesValidation({
-        crn,
-        id,
-        page: `outcome/add-note`,
-        notes: req.body.appointments[crn][id].notes,
-        maxCharCount: maxCharCount as number,
-      }),
-    )
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/add-note`,
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount: maxCharCount as number,
+        }),
+      ),
+    }
   }
 
   validateOutcome()
