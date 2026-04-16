@@ -27,6 +27,10 @@ type RedirectPages =
 const loadPage = ({ manageJourney = true, dateInPast = false, inOffice = true, id = appointmentId } = {}) => {
   cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { isFuture: dateInPast === false, eventId: 2501192724, inOffice })
+  cy.request({
+    method: 'POST',
+    url: 'http://localhost:3007/__test/clear-session',
+  })
   if (!manageJourney) {
     completeSentencePage()
     completeTypePage(inOffice ? 1 : 2)
@@ -196,6 +200,7 @@ const checkPage = ({ manageJourney = true } = {}) => {
   }
   it('should have the correct back link', () => {
     loadPage({ manageJourney, inOffice: true, dateInPast: true })
+    outcomePage = new OutcomePage()
     const expectedLink = manageJourney
       ? `/case/${crn}/appointments/appointment/${appointmentId}/manage`
       : `/case/${crn}/arrange-appointment/${uuid}/location-date-time`
@@ -204,9 +209,6 @@ const checkPage = ({ manageJourney = true } = {}) => {
 }
 
 describe('Appointment outcome', () => {
-  before(() => {
-    cy.request('POST', '/__test/clear-session')
-  })
   afterEach(() => {
     cy.task('resetMocks')
   })

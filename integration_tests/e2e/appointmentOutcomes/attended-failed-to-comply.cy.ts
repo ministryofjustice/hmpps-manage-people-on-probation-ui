@@ -15,6 +15,10 @@ let outcomePage: OutcomePage
 let attendedFailedToComplyPage: AttendedFailedToComplyPage
 
 const loadPage = ({ manageJourney = true, sentenceType = 'community', isProbationPractitioner = false } = {}): void => {
+  cy.request({
+    method: 'POST',
+    url: 'http://localhost:3007/__test/clear-session',
+  })
   cy.task('stubEnableNonCompliance')
   cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
   if (isProbationPractitioner) {
