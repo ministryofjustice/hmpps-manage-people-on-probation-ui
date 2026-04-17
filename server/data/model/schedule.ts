@@ -48,6 +48,9 @@ export interface Activity {
   rescheduledPop?: boolean
   didTheyComply?: boolean
   absentWaitingEvidence?: boolean
+  enforcementAction?: {
+    responseByDate?: string
+  }
   rearrangeOrCancelReason?: string
   rescheduledBy?: Name
   repeating?: boolean

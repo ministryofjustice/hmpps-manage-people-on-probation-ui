@@ -16,6 +16,7 @@ import {
   getAppointmentAttendedFailedToComplyOptions,
   getAppointmentOutcomeBackLink,
   getAppointmentAcceptableAbsenceOptions,
+  getAppointmentOutcomeEvidenceBy,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getAppointmentFailedToAttendOptions } from '../middleware/getAppointmentFailedToAttendOptions'
@@ -69,6 +70,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.all(
     [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
     getAppointmentFailedToAttendOptions,
+    getAppointmentOutcomeEvidenceBy,
   )
 
   /* validate outcome options and store session data on all outcome post routes */
