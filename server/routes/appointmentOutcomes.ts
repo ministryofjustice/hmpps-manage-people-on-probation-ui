@@ -13,9 +13,11 @@ import {
   getAppointmentOutcomeOptions,
   redirectWizard,
   checkAnswers,
+  parseMultipartBody,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getAppointmentOutcomeBackLink } from '../middleware/getAppointmentOutcomeBackLink'
+import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -47,6 +49,10 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   /* get outcome options only on the outcome page */
 
   router.all([arrangeBasePath, manageBasePath], getAppointmentOutcomeOptions)
+
+  /* run multer file upload error handler before validation */
+
+  router.post([`${manageBasePath}/add-note`], multerErrorHandler('fileUpload'), parseMultipartBody)
 
   /* validate outcome options and store session data on all outcome post routes */
 
