@@ -267,6 +267,194 @@
     },
     {
       "request": {
+        "urlPathPattern": "/esupervision/v2/offender_checkins/8fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uuid": "8fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "status": "SUBMITTED",
+          "dueDate": "2025-11-27",
+          "personalDetails": {
+            "crn": "X123456",
+            "name": {
+              "forename": "John",
+              "surname": "Smith"
+            },
+            "mobile": "07700900123",
+            "email": "john.smith@example.com",
+            "practitioner": {
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "email": "practitioner@example.com",
+              "localAdminUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "probationDeliveryUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "provider": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              }
+            }
+          },
+          "surveyResponse": {
+            "mentalHealth": "well",
+            "assistance": ["thing1", "thing2"],
+            "callback": "no"
+          },
+          "createdBy": "string",
+          "createdAt": "2025-11-27T15:40:42.399Z",
+          "submittedAt": "2025-11-27T15:40:42.399Z",
+          "videoUrl": "string",
+          "snapshotUrl": "string",
+          "autoIdCheck": "MATCH",
+          "livenessEnabled": true,
+          "livenessResult": "LIVE",
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offender_checkins/9fa85f64-5717-4562-b3fc-2c963f66afa6",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uuid": "9fa85f64-5717-4562-b3fc-2c963f66afa6",
+          "status": "SUBMITTED",
+          "dueDate": "2025-11-27",
+          "personalDetails": {
+            "crn": "X123456",
+            "name": {
+              "forename": "John",
+              "surname": "Smith"
+            },
+            "mobile": "07700900123",
+            "email": "john.smith@example.com",
+            "practitioner": {
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "email": "practitioner@example.com",
+              "localAdminUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "probationDeliveryUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "provider": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              }
+            }
+          },
+          "surveyResponse": {
+            "mentalHealth": "well",
+            "assistance": ["thing1", "thing2"],
+            "callback": "no"
+          },
+          "createdBy": "string",
+          "createdAt": "2025-11-27T15:40:42.399Z",
+          "submittedAt": "2025-11-27T15:40:42.399Z",
+          "videoUrl": "string",
+          "snapshotUrl": "string",
+          "autoIdCheck": "MATCH",
+          "livenessEnabled": true,
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
+        "urlPathPattern": "/esupervision/v2/offender_checkins/afa85f64-5717-4562-b3fc-2c963f66afa6",
+        "method": "GET"
+      },
+      "response": {
+        "status": 200,
+        "jsonBody": {
+          "uuid": "afa85f64-5717-4562-b3fc-2c963f66afa6",
+          "status": "SUBMITTED",
+          "dueDate": "2025-11-27",
+          "personalDetails": {
+            "crn": "X123456",
+            "name": {
+              "forename": "John",
+              "surname": "Smith"
+            },
+            "mobile": "07700900123",
+            "email": "john.smith@example.com",
+            "practitioner": {
+              "name": {
+                "forename": "John",
+                "surname": "Smith"
+              },
+              "email": "practitioner@example.com",
+              "localAdminUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "probationDeliveryUnit": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              },
+              "provider": {
+                "code": "N01ABC",
+                "description": "London North LAU"
+              }
+            }
+          },
+          "surveyResponse": {
+            "mentalHealth": "well",
+            "assistance": ["thing1", "thing2"],
+            "callback": "no"
+          },
+          "createdBy": "string",
+          "createdAt": "2025-11-27T15:40:42.399Z",
+          "submittedAt": "2025-11-27T15:40:42.399Z",
+          "videoUrl": "string",
+          "snapshotUrl": "string",
+          "autoIdCheck": "NO_MATCH",
+          "livenessEnabled": true,
+          "livenessResult": "LIVE",
+          "flaggedResponses": ["string"],
+          "checkinLogs": {
+            "hint": "ALL",
+            "logs": []
+          }
+        },
+        "headers": {
+          "Content-Type": "application/json;charset=UTF-8"
+        }
+      }
+    },
+    {
+      "request": {
         "urlPathPattern": "/esupervision/v2/offender_checkins/.*/review",
         "method": "POST"
       },
