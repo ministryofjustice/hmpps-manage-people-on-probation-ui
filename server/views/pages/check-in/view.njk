@@ -42,7 +42,7 @@
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="reviewSummary">
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Is this person in the video {{ checkIn.personalDetails.name.forename }}?</dt>
+                <dt class="govuk-summary-list__key">Is the person in the image from the check in {{ checkIn.personalDetails.name.forename }}?</dt>
                 <dd class="govuk-summary-list__value">{{"Yes" if checkIn.manualIdCheck == "MATCH" else "No"}}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if checkIn.manualIdCheck == "MATCH" %}
@@ -111,23 +111,17 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image from check in video</dt>
+                <dt class="govuk-summary-list__key">Image from check in</dt>
                 <dd class="govuk-summary-list__value">
                     {% if checkIn.snapshotUrl %}
                         <img
                         src="{{ checkIn.snapshotUrl }}"
                         class="es-profile-image es-profile-image--small"
-                        alt="Snapshot from video of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                        alt="Image from identity check of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                         crossorigin />
                     {% else %}
                     <span>No image available</span>
                     {% endif %}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Check in video</dt>
-                <dd class="govuk-summary-list__value">
-                    <a href="{{ videoLink }}" class="govuk-link">View video</a>
                 </dd>
             </div>
             <div class="govuk-summary-list__row">

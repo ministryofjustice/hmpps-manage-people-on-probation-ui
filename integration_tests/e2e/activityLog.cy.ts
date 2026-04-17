@@ -365,6 +365,11 @@ context('Contacts', () => {
       .find('.govuk-details__text')
       .should('contain.text', 'User-generated free text content')
     cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Turned up')
+
+    cy.get('.govuk-table').find('tr').eq(10).click()
+    cy.get('.govuk-details__text')
+      .find('[class*="govuk-!-font-weight-bold"]')
+      .should('contain.text', 'Enforcement Action:')
   })
 
   it('should not display the outcome field when the activity has no outcome', () => {
