@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-extraneous-dependencies
 import qs from 'qs'
 import express, { Router } from 'express'
 

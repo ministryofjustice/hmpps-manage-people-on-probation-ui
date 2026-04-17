@@ -179,7 +179,8 @@
     "uuid": "^13.0.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2",
-    "wiremock": "^3.13.1"
+    "wiremock": "^3.13.1",
+    "@types/qs": "6.15.0"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -209,7 +210,6 @@
     "@types/nunjucks": "^3.2.6",
     "@types/passport": "^1.0.17",
     "@types/passport-oauth2": "^1.4.17",
-    "@types/qs": "6.15.0",
     "@types/superagent": "^8.1.9",
     "@types/supertest": "^7.2.0",
     "@types/uuid": "^10.0.0",
