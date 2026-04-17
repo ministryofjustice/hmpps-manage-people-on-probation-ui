@@ -193,6 +193,7 @@ describe('controllers/appointments', () => {
         personRisks: undefined,
         hasDeceased: false,
         hasPractitioner: true,
+        canAccessCheckins: false,
         url: '',
       })
     })
@@ -210,6 +211,7 @@ describe('controllers/appointments', () => {
         crn,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
         url: '',
       })
     })

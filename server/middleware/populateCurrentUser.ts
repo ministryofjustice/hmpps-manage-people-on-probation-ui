@@ -25,6 +25,9 @@ export default function populateCurrentUser(
         }
         if (userDetails) {
           localsUser = { ...userDetails, ...localsUser, userId: userDetails?.userId?.toString() }
+          if (userDetails.staff?.probationDeliveryUnits) {
+            localsUser.probationDeliveryUnits = userDetails.staff.probationDeliveryUnits
+          }
         } else {
           logger.info('No user details available')
         }

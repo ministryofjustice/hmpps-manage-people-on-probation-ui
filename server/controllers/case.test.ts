@@ -160,6 +160,7 @@ describe('caseController', () => {
         appointmentsWithoutAnOutcomeCount: 3,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
     })
   })
@@ -198,6 +199,7 @@ describe('caseController', () => {
         appointmentsWithoutAnOutcomeCount: 3,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
     })
   })

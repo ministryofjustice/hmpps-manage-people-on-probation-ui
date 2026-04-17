@@ -76,6 +76,7 @@ export interface LocalsUser {
   uuid?: string
   displayName?: string
   token: string
+  probationDeliveryUnits?: Array<{ code: string; description: string }>
 }
 
 interface Locals {

@@ -78,6 +78,28 @@ describe('FlagService', () => {
       ]),
     )
   })
+  it('calls evaluateBatch with pduCodes in context when provided', async () => {
+    await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })
+    expect(mockEvaluateBatch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: email,
+          context: { email, pduCodes: 'PDU001,PDU002' },
+        }),
+      ]),
+    )
+  })
+  it('does not include pduCodes in context when empty array', async () => {
+    await service.getFlags({ email, pduCodes: [] })
+    expect(mockEvaluateBatch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: email,
+          context: { email },
+        }),
+      ]),
+    )
+  })
   it('calls evaluateBatch with correct requests if context.email does not exist', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [],

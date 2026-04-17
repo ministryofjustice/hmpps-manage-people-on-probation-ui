@@ -58,6 +58,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
+      const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/appointments', {
         upcomingAppointments,
@@ -66,6 +67,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         hasDeceased,
         hasPractitioner,
+        canAccessCheckins,
       })
     }
   },
