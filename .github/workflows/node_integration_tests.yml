@@ -83,7 +83,7 @@ jobs:
         path: test_results/
     - name: fail the action if the tests failed
       if: ${{ steps.integration-tests.outcome == 'failure' }}
-      uses: actions/github-script@v8
+      uses: actions/github-script@v9
       with:
         script: |
             core.setFailed('Integration tests failed')
