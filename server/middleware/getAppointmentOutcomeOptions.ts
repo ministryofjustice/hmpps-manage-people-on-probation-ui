@@ -5,18 +5,14 @@ export const getAppointmentOutcomeOptions: Route<void> = (_req, res, next) => {
   const { isInPast, appointmentSession } = res.locals.appointmentOutcome
   let options = outcomeOptions
   if (isInPast && appointmentSession?.type && !['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
-    options = outcomeOptions.filter(
-      option => !['WILL_BE_RESCHEDULED', 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS'].includes(option.value),
-    )
+    options = outcomeOptions.filter(option => !['WILL_BE_RESCHEDULED'].includes(option.value))
   }
   if (isInPast && appointmentSession?.type && ['COPT', 'COVC', 'CODC'].includes(appointmentSession.type)) {
     options = outcomeOptions.filter(
       option =>
-        ![
-          'WILL_BE_RESCHEDULED',
-          'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES',
-          'ATTENDED_SENT_HOME_BEHAVIOUR',
-        ].includes(option.value),
+        !['WILL_BE_RESCHEDULED', 'ATTENDED_SENT_HOME_SERVICE_ISSUES', 'ATTENDED_SENT_HOME_BEHAVIOUR'].includes(
+          option.value,
+        ),
     )
   }
   if (!isInPast) {

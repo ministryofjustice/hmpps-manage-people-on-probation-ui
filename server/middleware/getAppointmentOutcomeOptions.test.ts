@@ -114,11 +114,11 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
-        expect.objectContaining({ value: 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
+        expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
-        expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
       ]),
     )
     expect(res.locals.appointmentOutcome.options).toHaveLength(5)
@@ -132,15 +132,16 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
+        expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
-        expect.objectContaining({ value: 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES' }),
+        expect.objectContaining({ value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES' }),
         expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
-        expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(6)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(7)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 
@@ -166,11 +167,11 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
-        expect.objectContaining({ value: 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
+        expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
-        expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
       ]),
     )
     expect(res.locals.appointmentOutcome.options).toHaveLength(5)
@@ -184,15 +185,16 @@ describe('/middleware/getAppointmentOutcomeOptions()', () => {
     getAppointmentOutcomeOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ value: 'ATTENDED' }),
+        expect.objectContaining({ value: 'ATTENDED_COMPLIED' }),
+        expect.objectContaining({ value: 'ATTENDED_FAILED_TO_COMPLY' }),
         expect.objectContaining({ value: 'ATTENDED_SENT_HOME_BEHAVIOUR' }),
-        expect.objectContaining({ value: 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES' }),
+        expect.objectContaining({ value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES' }),
         expect.objectContaining({ value: 'ACCEPTABLE_ABSENCE' }),
         expect.objectContaining({ value: 'UNACCEPTABLE_ABSENCE' }),
-        expect.objectContaining({ value: 'EVIDENCE_REQUESTED' }),
+        expect.objectContaining({ value: 'FAILED_TO_ATTEND' }),
       ]),
     )
-    expect(res.locals.appointmentOutcome.options).toHaveLength(6)
+    expect(res.locals.appointmentOutcome.options).toHaveLength(7)
     expect(nextSpy).toHaveBeenCalledTimes(1)
   })
 })

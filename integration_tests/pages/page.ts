@@ -15,8 +15,10 @@ export default abstract class Page {
     cy.get('[data-qa=pageHeading]').contains(this.title)
   }
 
-  checkPageTitle = (title: string) => {
-    this.title = title
+  checkPageTitle = (title?: string) => {
+    if (title) {
+      this.title = title
+    }
     this.checkOnPage()
   }
 
