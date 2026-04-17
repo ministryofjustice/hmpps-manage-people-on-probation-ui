@@ -10,7 +10,7 @@ export const deliusDeepLinkUrl = (component: string, crn: string, contactId?: st
   return `${config.delius.link}/NDelius-war/delius/JSP/deeplink.xhtml?component=${component}&CRN=${crn}${idParam}${componentIdParam}`
 }
 
-export const drugHistoryContactTypes = [
+export const deepLinkContactTypes = [
   'CP/UPW - Appointment/Attendance (NS)',
   'Drug Test (Approved Premises)',
   'Drug Test (DRR)',

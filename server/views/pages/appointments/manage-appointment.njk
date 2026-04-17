@@ -218,7 +218,7 @@
           <p class="govuk-body">All links to change appointment details on NDelius open in a new tab.</p>
         {% else %}
           <p class="govuk-body">
-            {% if flags.enableDeepLinks and appointment.type in drugHistoryContactTypes %}
+            {% if flags.enableDeepLinks and appointment.type in deepLinkContactTypes and appointment.eventNumber %}
               {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
                 You can manage this appointment through the <a href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">unpaid work worksheet summary in NDelius (opens in a new tab)</a>.
               {% else %}
