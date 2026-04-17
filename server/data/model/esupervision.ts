@@ -1,6 +1,7 @@
 import { Note } from './note'
 
 type Match = 'MATCH' | 'NO_MATCH' | 'NO_FACE_DETECTED' | 'ERROR'
+type LivenessResult = 'LIVE' | 'NOT_LIVE' | 'ERROR'
 
 export interface ESupervisionCheckIn {
   uuid: string
@@ -18,7 +19,7 @@ export interface ESupervisionCheckIn {
   videoUrl?: string
   snapshotUrl?: string
   autoIdCheck?: Match
-  livenessResult?: string
+  livenessResult?: LivenessResult
   livenessEnabled?: boolean
   manualIdCheck?: Match
   flaggedResponses: string[]

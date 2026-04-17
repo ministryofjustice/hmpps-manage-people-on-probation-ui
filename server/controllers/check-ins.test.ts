@@ -1270,6 +1270,7 @@ describe('checkInsController', () => {
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
         videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
+        systemIdCheckPass: false,
       })
     })
 
@@ -1469,6 +1470,7 @@ describe('checkInsController', () => {
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
         videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
+        systemIdCheckPass: false,
       })
     })
 

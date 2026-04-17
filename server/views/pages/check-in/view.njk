@@ -98,12 +98,7 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="checkInSummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
-                {% if checkIn.livenessEnabled %}
-                    {% set systemPass = checkIn.livenessResult == "LIVE" and checkIn.autoIdCheck == "MATCH" %}
-                {% else %}
-                    {% set systemPass = checkIn.autoIdCheck == "MATCH" %}
-                {% endif %}
-                <dd class="govuk-summary-list__value">{{"Pass" if systemPass else "Fail"}}</dd>
+                <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>
             </div>
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">Image of {{ checkIn.personalDetails.name.forename }}</dt>

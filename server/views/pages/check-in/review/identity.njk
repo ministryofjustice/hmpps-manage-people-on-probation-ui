@@ -49,14 +49,9 @@
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="identitySummary">
             <div class="govuk-summary-list__row">
                 <dt class="govuk-summary-list__key">System ID check result</dt>
-                {% if checkIn.livenessEnabled %}
-                    {% set systemPass = checkIn.livenessResult == "LIVE" and checkIn.autoIdCheck == "MATCH" %}
-                {% else %}
-                    {% set systemPass = checkIn.autoIdCheck == "MATCH" %}
-                {% endif %}
-                <dd class="govuk-summary-list__value">{{"Pass" if systemPass else "Fail"}}</dd>
+                <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>
                 <dd class="govuk-summary-list__actions">
-                    {% if not systemPass %}
+                    {% if not systemIdCheckPass %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>

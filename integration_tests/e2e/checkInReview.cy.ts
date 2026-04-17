@@ -16,6 +16,7 @@ const reviewedId = '3fa85f64-5717-4562-b3fc-2c963f66afa6'
 const livenessPassId = '8fa85f64-5717-4562-b3fc-2c963f66afa6'
 const livenessFallbackId = '9fa85f64-5717-4562-b3fc-2c963f66afa6'
 const livenessNoMatchId = 'afa85f64-5717-4562-b3fc-2c963f66afa6'
+const reviewedLivenessId = 'bfa85f64-5717-4562-b3fc-2c963f66afa6'
 
 context('check in reviews', () => {
   it('Check in page for reviewed check in', () => {
@@ -125,6 +126,14 @@ context('check in reviews', () => {
 
     page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
     page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('not.exist')
+  })
+
+  it('Reviewed check-in view page shows Pass when liveness enabled with LIVE result and face MATCH', () => {
+    cy.visit(`/case/${crn}/appointments/${reviewedLivenessId}/check-in/update`)
+    const page = Page.verifyOnPage(ViewCheckInPage)
+
+    page.getSummaryListRow(1, 'checkInSummary').find('.govuk-summary-list__key').should('contain.text', 'System ID check result')
+    page.getSummaryListRow(1, 'checkInSummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
   })
 
   it('Review video for check in', () => {
