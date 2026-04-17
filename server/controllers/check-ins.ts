@@ -585,7 +585,6 @@ const checkInsController: Controller<typeof routes, void> = {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       await sendAuditMessage(res, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
-      return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn })
       return res.render('pages/check-in/review/identity.njk', {
         crn,
         id,
