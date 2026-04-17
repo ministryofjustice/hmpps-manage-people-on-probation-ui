@@ -4,8 +4,10 @@ import controllers from '.'
 import { getDataValue } from '../utils'
 import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
-import { AppointmentOutcomeProps } from '../models/Locals'
+import { AppointmentOutcomeProps, AppResponse } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
+import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
+import { appointmentOutcomeRequests } from './appointmentOutcomes'
 
 const crn = 'X000001'
 const id = '1234'
@@ -108,13 +110,38 @@ const mockReq = (request: Record<string, any> = {}): httpMocks.MockRequest<any> 
   return httpMocks.createRequest(req)
 }
 
-const sharedRedirectChecks = {
+type ExpectedRedirect = Partial<Record<AppointmentOutcomeType | AppointmentEnforcementAction, string>>
+
+const expectedRedirect: ExpectedRedirect = {
+  ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
+  ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
+  ATTENDED_SENT_HOME_BEHAVIOUR: `${baseOutcomeUrl}/attended-failed-to-comply`,
+  ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,
+  ACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/acceptable-absence`,
+  UNACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/unacceptable-absence`,
+  FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
+  WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
   SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
   INITIATE_BREACH_RECALL: `${baseOutcomeUrl}/initiate-breach-or-recall`,
   INITIATE_BREACH_RECALL_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+  DECISION_PENDING: `${baseOutcomeUrl}/add-note`,
   REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
   NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
   DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
+}
+
+const checkRedirects = (
+  controller: (typeof appointmentOutcomeRequests)[number],
+  expectedOptions: AppointmentEnforcementAction[] | AppointmentOutcomeType[],
+): void => {
+  expectedOptions.forEach(option => {
+    const req = mockReq()
+    const res = mockRes()
+    const spy = jest.spyOn(res, 'redirect')
+    mockGetDataValue.mockReturnValueOnce(option)
+    controllers.appointmentOutcomes[controller]()(req, res)
+    expect(spy).toHaveBeenCalledWith(expectedRedirect[option])
+  })
 }
 
 describe('controllers/appointmentOutcomes', () => {
@@ -141,12 +168,17 @@ describe('controllers/appointmentOutcomes', () => {
       expect(mockRenderError).toHaveBeenCalledWith(404)
     })
     it('should redirect to the correct page', () => {
-      const req = mockReq()
-      const res = mockRes()
-      const spy = jest.spyOn(res, 'redirect')
-      mockGetDataValue.mockReturnValueOnce('ATTENDED_COMPLIED')
-      controllers.appointmentOutcomes.postOutcome()(req, res)
-      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+      const expectedOptions: AppointmentOutcomeType[] = [
+        'ATTENDED_COMPLIED',
+        'ATTENDED_FAILED_TO_COMPLY',
+        'ATTENDED_SENT_HOME_BEHAVIOUR',
+        'ATTENDED_SENT_HOME_SERVICE_ISSUES',
+        'ACCEPTABLE_ABSENCE',
+        'UNACCEPTABLE_ABSENCE',
+        'FAILED_TO_ATTEND',
+        'WILL_BE_RESCHEDULED',
+      ]
+      checkRedirects('postOutcome', expectedOptions)
     })
   })
 
@@ -249,14 +281,15 @@ describe('controllers/appointmentOutcomes', () => {
 
   describe('postAttendedFailedToComply', () => {
     it('should redirect to the correct page based on enforcement action', () => {
-      Object.entries(sharedRedirectChecks).forEach(([enforcementAction, redirectUrl]) => {
-        const req = mockReq()
-        const res = mockRes()
-        const spy = jest.spyOn(res, 'redirect')
-        mockGetDataValue.mockReturnValueOnce(enforcementAction)
-        controllers.appointmentOutcomes.postAttendedFailedToComply()(req, res)
-        expect(spy).toHaveBeenCalledWith(redirectUrl)
-      })
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postAttendedFailedToComply', expectedOptions)
     })
   })
   describe('getAcceptableAbsence', () => {
@@ -288,14 +321,35 @@ describe('controllers/appointmentOutcomes', () => {
   })
   describe('postUnacceptableAbsence', () => {
     it('should redirect to the correct page based on enforcement action', () => {
-      Object.entries(sharedRedirectChecks).forEach(([enforcementAction, redirectUrl]) => {
-        const req = mockReq()
-        const res = mockRes()
-        const spy = jest.spyOn(res, 'redirect')
-        mockGetDataValue.mockReturnValueOnce(enforcementAction)
-        controllers.appointmentOutcomes.postUnacceptableAbsence()(req, res)
-        expect(spy).toHaveBeenCalledWith(redirectUrl)
-      })
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'INITIATE_BREACH_RECALL',
+        'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
+        'REFER_TO_OFFENDER_MANAGER',
+        'NO_FURTHER_ACTION',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postUnacceptableAbsence', expectedOptions)
+    })
+  })
+  describe('getFailedToAttend', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getFailedToAttend()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/failed-to-attend')
+    })
+  })
+  describe('postFailedToAttend', () => {
+    it('should redirect to the correct page based on enforcement action', () => {
+      const expectedOptions: AppointmentEnforcementAction[] = [
+        'SEND_LETTER',
+        'DECISION_PENDING',
+        'REFER_TO_OFFENDER_MANAGER',
+        'DIFFERENT_ACTION',
+      ]
+      checkRedirects('postFailedToAttend', expectedOptions)
     })
   })
 })

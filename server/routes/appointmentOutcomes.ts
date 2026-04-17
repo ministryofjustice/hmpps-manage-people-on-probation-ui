@@ -18,6 +18,7 @@ import {
   getAppointmentAcceptableAbsenceOptions,
 } from '../middleware'
 import validate from '../middleware/validation/index'
+import { getAppointmentFailedToAttendOptions } from '../middleware/getAppointmentFailedToAttendOptions'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -46,7 +47,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAppointmentOutcomeBackLink,
   )
 
-  /* run the outcome options middleware before validation */
+  /* run the outcome page options middleware before validation */
 
   router.all([arrangeBasePath, manageBasePath], getAppointmentOutcomeOptions)
 
@@ -63,6 +64,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
   router.all(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     getAppointmentAcceptableAbsenceOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/failed-to-attend`, `${manageBasePath}/failed-to-attend`],
+    getAppointmentFailedToAttendOptions,
   )
 
   /* validate outcome options and store session data on all outcome post routes */

@@ -13,6 +13,7 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     'outcome/attended-failed-to-comply',
     'outcome/acceptable-absence',
     'outcome/unacceptable-absence',
+    'outcome/failed-to-attend',
   ]
   const { crn, id, page, isInPast, msg, log } = args
   return {
