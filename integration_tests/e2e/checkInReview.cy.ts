@@ -132,7 +132,10 @@ context('check in reviews', () => {
     cy.visit(`/case/${crn}/appointments/${reviewedLivenessId}/check-in/update`)
     const page = Page.verifyOnPage(ViewCheckInPage)
 
-    page.getSummaryListRow(1, 'checkInSummary').find('.govuk-summary-list__key').should('contain.text', 'System ID check result')
+    page
+      .getSummaryListRow(1, 'checkInSummary')
+      .find('.govuk-summary-list__key')
+      .should('contain.text', 'System ID check result')
     page.getSummaryListRow(1, 'checkInSummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
   })
 
