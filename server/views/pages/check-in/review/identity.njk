@@ -48,7 +48,7 @@
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="identitySummary">
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">System ID check result</dt>
+                <dt class="govuk-summary-list__key">{{"System ID and liveness check result" if checkIn.livenessEnabled else "System ID check result"}}</dt>
                 <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>
                 <dd class="govuk-summary-list__actions">
                     {% if not systemIdCheckPass %}

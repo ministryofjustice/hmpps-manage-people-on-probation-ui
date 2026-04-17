@@ -99,7 +99,7 @@ context('check in reviews', () => {
     page
       .getSummaryListRow(1, 'identitySummary')
       .find('.govuk-summary-list__key')
-      .should('contain.text', 'System ID check result')
+      .should('contain.text', 'System ID and liveness check result')
     page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
     page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('not.exist')
   })
@@ -124,6 +124,11 @@ context('check in reviews', () => {
     cy.visit(`/case/${crn}/appointments/${submittedId}/check-in/update`)
     const page = Page.verifyOnPage(CheckInReviewIdentityPage)
 
+    page
+      .getSummaryListRow(1, 'identitySummary')
+      .find('.govuk-summary-list__key')
+      .should('contain.text', 'System ID check result')
+      .should('not.contain.text', 'liveness')
     page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
     page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('not.exist')
   })
@@ -135,7 +140,7 @@ context('check in reviews', () => {
     page
       .getSummaryListRow(1, 'checkInSummary')
       .find('.govuk-summary-list__key')
-      .should('contain.text', 'System ID check result')
+      .should('contain.text', 'System ID and liveness check result')
     page.getSummaryListRow(1, 'checkInSummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
   })
 
