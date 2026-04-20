@@ -1,4 +1,30 @@
-import { getPdu, getManagedBy } from './index'
+import CaseSearchService from '@ministryofjustice/probation-search-frontend/service/caseSearchService'
+import { getPdu, getManagedBy, services } from './index'
+import config from '../config'
+import { dataAccess } from '../data'
+
+jest.mock('../config', () => ({
+  env: 'test-env',
+  buildNumber: '1',
+  gitRef: '1234567',
+  productId: 'test',
+  branchName: 'test',
+  apis: {
+    hmppsAuth: {
+      url: 'http://localhost:8080/auth',
+      timeout: { response: 1000, deadline: 1000 },
+    },
+    arnsApi: {
+      url: 'http://localhost:8080/arns',
+      timeout: { response: 1000, deadline: 1000 },
+    },
+  },
+  redis: {
+    enabled: false,
+  },
+}))
+jest.mock('../data')
+jest.mock('@ministryofjustice/probation-search-frontend/service/caseSearchService')
 
 describe('Probation search component extra columns:Managed by and PDU', () => {
   describe('getPdu', () => {
@@ -151,6 +177,64 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
     it('should handle null/undefined results gracefully', () => {
       expect(getManagedBy(null)).toBe('Unallocated')
       expect(getManagedBy({})).toBe('Unallocated')
+    })
+  })
+
+  describe('Test services', () => {
+    const dataAccessMock = dataAccess as jest.Mock
+    const CaseSearchServiceMock = CaseSearchService as jest.Mock
+
+    it('should initialize CaseSearchService with correct parameters', () => {
+      const hmppsAuthClient = {}
+      dataAccessMock.mockReturnValue({
+        hmppsAuthClient,
+        applicationInfo: {},
+        manageUsersApiClient: {},
+        probationFrontendComponentsApiClient: {},
+        arnsComponents: {},
+      })
+
+      const result = services()
+
+      expect(CaseSearchServiceMock).toHaveBeenCalledWith({
+        oauthClient: hmppsAuthClient,
+        environment: config.env,
+        extraColumns: [
+          {
+            header: 'Managed by',
+            value: expect.any(Function),
+          },
+          {
+            header: 'PDU',
+            value: expect.any(Function),
+          },
+        ],
+      })
+      expect(result.searchService).toBeInstanceOf(CaseSearchService)
+    })
+
+    it('should correctly configure extraColumns value functions', () => {
+      dataAccessMock.mockReturnValue({
+        hmppsAuthClient: {},
+        applicationInfo: {},
+        manageUsersApiClient: {},
+        probationFrontendComponentsApiClient: {},
+        arnsComponents: {},
+      })
+
+      services()
+
+      const { extraColumns } = CaseSearchServiceMock.mock.calls[0][0]
+      const managedByColumn = extraColumns.find((c: any) => c.header === 'Managed by')
+      const pduColumn = extraColumns.find((c: any) => c.header === 'PDU')
+
+      const record = { offenderManagers: [{ active: true, staff: { forenames: 'John', surname: 'Smith' } }] }
+      expect(managedByColumn.value(record)).toBe('John Smith')
+
+      const pduRecord = {
+        offenderManagers: [{ active: true, team: { borough: { description: 'test borough' } } }],
+      }
+      expect(pduColumn.value(pduRecord)).toBe('Test Borough')
     })
   })
 })
