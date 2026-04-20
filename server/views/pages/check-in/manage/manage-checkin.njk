@@ -39,8 +39,18 @@
 
 {% block pageContent %}
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
-      {% set checkinLabel = 'First check in' %}
-      {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+      {% if flags.enableESupervisionCustomQuestions === true %}
+          {% set checkinLabel = 'Next check in' %}
+          {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
+              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithDayAndWithoutYear %}
+          {% else %}
+              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+          {% endif %}
+          
+      {% else %}
+          {% set checkinLabel = 'First check in' %}
+          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+      {% endif %}
         {% if flags.enableManageCheckins === true %}
             <div class="moj-button-group__item">
                 <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
