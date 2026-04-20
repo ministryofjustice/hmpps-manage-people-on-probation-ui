@@ -8,7 +8,8 @@ const nextSpy = jest.fn()
 const crn = 'X000001'
 const uuid = '9f4e0d84-c1af-4517-89f5-1c04d1aacc13'
 const contactId = '12345'
-const baseUrl = '/route/to/outcome'
+const baseUrl = '/route/to'
+const baseOutcomeUrl = '/route/to/outcome'
 const reqUrl = ''
 
 type SelectedOutcomeTypes = {
@@ -60,6 +61,7 @@ const mockRes = (appointmentOutcome: Partial<AppointmentOutcomeProps> = {}): htt
   const res = {
     locals: {
       appointmentOutcome: {
+        baseOutcomeUrl,
         baseUrl,
         reqUrl,
         crn,
@@ -82,38 +84,36 @@ describe('/middleware/getAppointmentOutcomeBackLink()', () => {
     const req = mockReq({ request, id: arrangeAppointmentJourney ? uuid : contactId })
     const localsVars = arrangeAppointmentJourney ? { uuid, id: uuid } : { id: contactId, contactId }
     it('should return correct link if on outcome page', () => {
-      const res = mockRes({ reqUrl: baseUrl, ...localsVars })
+      const res = mockRes({ reqUrl: baseOutcomeUrl, ...localsVars })
       getAppointmentOutcomeBackLink(req, res, nextSpy)
       expect(res.locals.appointmentOutcome.backLink).toEqual(
-        arrangeAppointmentJourney
-          ? `/case/${crn}/arrange-appointment/${uuid}/location-date-time`
-          : `/case/${crn}/appointments/appointment/${contactId}/manage`,
+        arrangeAppointmentJourney ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`,
       )
     })
     it('should return correct link if on attended complied page', () => {
-      const res = mockRes({ reqUrl: `${baseUrl}/attended-complied`, ...localsVars })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-complied`, ...localsVars })
       getAppointmentOutcomeBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseUrl)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on attended failed to comply page', () => {
-      const res = mockRes({ reqUrl: `${baseUrl}/attended-failed-to-comply`, ...localsVars })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/attended-failed-to-comply`, ...localsVars })
       getAppointmentOutcomeBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseUrl)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on acceptable absence page', () => {
-      const res = mockRes({ reqUrl: `${baseUrl}/acceptable-absence`, ...localsVars })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/acceptable-absence`, ...localsVars })
       getAppointmentOutcomeBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseUrl)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on unacceptable absence page', () => {
-      const res = mockRes({ reqUrl: `${baseUrl}/unacceptable-absence`, ...localsVars })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/unacceptable-absence`, ...localsVars })
       getAppointmentOutcomeBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseUrl)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
     it('should return correct link if on failed to attend page', () => {
-      const res = mockRes({ reqUrl: `${baseUrl}/failed-to-attend`, ...localsVars })
+      const res = mockRes({ reqUrl: `${baseOutcomeUrl}/failed-to-attend`, ...localsVars })
       getAppointmentOutcomeBackLink(req, res, nextSpy)
-      expect(res.locals.appointmentOutcome.backLink).toEqual(baseUrl)
+      expect(res.locals.appointmentOutcome.backLink).toEqual(baseOutcomeUrl)
     })
 
     const outcomePages = {
@@ -133,10 +133,10 @@ describe('/middleware/getAppointmentOutcomeBackLink()', () => {
       Object.entries(selectedOutcomeTypes).forEach(([type, url]: [AppointmentOutcomeType, string]) => {
         it(`should return correct link if on ${pageTitle} and selected outcome is ${type}`, () => {
           const mockedReq = mockReq({ id: arrangeAppointmentJourney ? uuid : contactId, outcomeType: type, request })
-          const res = mockRes({ reqUrl: `${baseUrl}/${pageUrl}`, ...localsVars })
+          const res = mockRes({ reqUrl: `${baseOutcomeUrl}/${pageUrl}`, ...localsVars })
           mockGetDataValue.mockReturnValue(type)
           getAppointmentOutcomeBackLink(mockedReq, res, nextSpy)
-          expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseUrl}/${url}`)
+          expect(res.locals.appointmentOutcome.backLink).toEqual(`${baseOutcomeUrl}/${url}`)
         })
       })
     })

@@ -281,5 +281,15 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
         },
       ],
     },
+    [`[appointments][${crn}][${id}][enforcementAction]`]: {
+      optional: page !== 'attended-failed-to-comply',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an action for their failure to comply',
+          log: 'Enforcement action not selected',
+        },
+      ],
+    },
   }
 }

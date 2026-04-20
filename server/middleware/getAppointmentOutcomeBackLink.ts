@@ -3,12 +3,10 @@ import { AppointmentOutcomeType } from '../models/Appointments'
 import { getDataValue } from '../utils'
 
 export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
-  const { baseUrl, reqUrl, uuid, crn, id } = res.locals.appointmentOutcome
-  let backLink = baseUrl
-  if (reqUrl === baseUrl) {
-    backLink = uuid
-      ? `/case/${crn}/arrange-appointment/${id}/location-date-time`
-      : `/case/${crn}/appointments/appointment/${id}/manage`
+  const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id } = res.locals.appointmentOutcome
+  let backLink = baseOutcomeUrl
+  if (reqUrl === baseOutcomeUrl) {
+    backLink = uuid ? `${baseUrl}/location-date-time` : `${baseUrl}/manage`
   }
   let type: AppointmentOutcomeType
   if (req?.body?.appointments?.[crn]?.[id]?.outcome?.type) {
@@ -19,21 +17,23 @@ export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
       : null
   }
   if (
-    [`${baseUrl}/enforcement-action`, `${baseUrl}/send-letter`, `${baseUrl}/initiate-breach-or-recall`].some(
-      route => route === reqUrl,
-    )
+    [
+      `${baseOutcomeUrl}/enforcement-action`,
+      `${baseOutcomeUrl}/send-letter`,
+      `${baseOutcomeUrl}/initiate-breach-or-recall`,
+    ].some(route => route === reqUrl)
   ) {
     switch (type) {
       case 'ATTENDED_SENT_HOME_BEHAVIOUR':
       case 'ATTENDED_FAILED_TO_COMPLY':
       case 'ATTENDED_SENT_HOME_SERVICE_ISSUES':
-        backLink = `${baseUrl}/attended-failed-to-comply` // used for all 3 pages
+        backLink = `${baseOutcomeUrl}/attended-failed-to-comply` // used for all 3 pages
         break
       case 'UNACCEPTABLE_ABSENCE':
-        backLink = `${baseUrl}/unacceptable-absence` // used for all 3 pages
+        backLink = `${baseOutcomeUrl}/unacceptable-absence` // used for all 3 pages
         break
       default:
-        backLink = `${baseUrl}/failed-to-attend` // <-- only used for EVIDENCE_REQUESTED type
+        backLink = `${baseOutcomeUrl}/failed-to-attend` // <-- only used for EVIDENCE_REQUESTED type
     }
   }
   res.locals.appointmentOutcome.backLink = backLink

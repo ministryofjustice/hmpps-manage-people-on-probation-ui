@@ -17,5 +17,11 @@ export default function testRoutes(router: Router) {
     req.session.mockedTime = DateTime.fromISO(time).toISO()
     return res.sendStatus(200)
   })
+
+  router.post('/__test/clear-session', (req, res) => {
+    res.clearCookie('connect.sid')
+    delete req.session.data
+    return res.sendStatus(200)
+  })
   return router
 }
