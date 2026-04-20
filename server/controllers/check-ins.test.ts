@@ -122,7 +122,8 @@ const baseReq = (data?: any) =>
     url: 'url',
   })
 
-const reviewRes = (status: string, reviewedAt?: string) => mockAppResponse({ checkIn: { status, reviewedAt } })
+const reviewRes = (status: string, reviewedAt?: string, checkInOverrides?: Record<string, unknown>) =>
+  mockAppResponse({ checkIn: { status, reviewedAt, ...checkInOverrides } })
 
 const res = mockAppResponse()
 const renderSpy = jest.spyOn(res, 'render')
@@ -1269,7 +1270,91 @@ describe('checkInsController', () => {
         id: req.params.id,
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
-        videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
+        systemIdCheckPass: false,
+      })
+    })
+
+    it('passes systemIdCheckPass as true when autoIdCheck is MATCH and liveness not enabled', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('REVIEWED', undefined, { autoIdCheck: 'MATCH', livenessEnabled: false })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: true,
+      })
+    })
+
+    it('passes systemIdCheckPass as true when liveness enabled with LIVE result and MATCH', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('REVIEWED', undefined, {
+        autoIdCheck: 'MATCH',
+        livenessEnabled: true,
+        livenessResult: 'LIVE',
+      })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: true,
+      })
+    })
+
+    it('passes systemIdCheckPass as false when liveness enabled but result is NOT_LIVE', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('REVIEWED', undefined, {
+        autoIdCheck: 'MATCH',
+        livenessEnabled: true,
+        livenessResult: 'NOT_LIVE',
+      })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: false,
+      })
+    })
+
+    it('passes systemIdCheckPass as false when liveness enabled with LIVE result but NO_MATCH', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('REVIEWED', undefined, {
+        autoIdCheck: 'NO_MATCH',
+        livenessEnabled: true,
+        livenessResult: 'LIVE',
+      })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getViewCheckIn(hmppsAuthClient)(req, resReview)
+
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/view.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: false,
       })
     })
 
@@ -1468,7 +1553,91 @@ describe('checkInsController', () => {
         id: req.params.id,
         back: req.query.back,
         checkIn: resReview.locals.checkIn,
-        videoLink: `/case/${req.params.crn}/appointments/${req.params.id}/check-in/video?back=${req.url}`,
+        systemIdCheckPass: false,
+      })
+    })
+
+    it('passes systemIdCheckPass as true when autoIdCheck is MATCH and liveness not enabled', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED', undefined, { autoIdCheck: 'MATCH', livenessEnabled: false })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
+      checkSendAuditMessage(resReview, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/identity.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: true,
+      })
+    })
+
+    it('passes systemIdCheckPass as true when liveness enabled with LIVE result and MATCH', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED', undefined, {
+        autoIdCheck: 'MATCH',
+        livenessEnabled: true,
+        livenessResult: 'LIVE',
+      })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
+      checkSendAuditMessage(resReview, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/identity.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: true,
+      })
+    })
+
+    it('passes systemIdCheckPass as false when liveness enabled but result is NOT_LIVE', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED', undefined, {
+        autoIdCheck: 'MATCH',
+        livenessEnabled: true,
+        livenessResult: 'NOT_LIVE',
+      })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
+      checkSendAuditMessage(resReview, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/identity.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: false,
+      })
+    })
+
+    it('passes systemIdCheckPass as false when liveness enabled with LIVE result but NO_MATCH', async () => {
+      mockIsValidCrn.mockReturnValue(true)
+      mockIsValidUUID.mockReturnValue(true)
+
+      const req = baseReq()
+      const resReview = reviewRes('SUBMITTED', undefined, {
+        autoIdCheck: 'NO_MATCH',
+        livenessEnabled: true,
+        livenessResult: 'LIVE',
+      })
+      const reviewRenderSpy = jest.spyOn(resReview, 'render')
+      await controllers.checkIns.getReviewIdentityCheckIn(hmppsAuthClient)(req, resReview)
+      checkSendAuditMessage(resReview, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
+      expect(reviewRenderSpy).toHaveBeenCalledWith('pages/check-in/review/identity.njk', {
+        crn: req.params.crn,
+        id: req.params.id,
+        back: req.query.back,
+        checkIn: resReview.locals.checkIn,
+        systemIdCheckPass: false,
       })
     })
 
@@ -2412,34 +2581,6 @@ describe('checkInsController', () => {
     })
   })
 
-  describe('getCheckinVideoPage', () => {
-    it('renders video in page', async () => {
-      mockIsValidCrn.mockReturnValue(true)
-      mockIsValidUUID.mockReturnValue(true)
-      const req = httpMocks.createRequest({
-        params: { crn, id: uuid },
-      })
-
-      await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
-      checkSendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
-      expect(renderSpy).toHaveBeenCalled()
-      const [template, context] = (renderSpy as jest.Mock).mock.calls.pop()
-      expect(template).toBe('pages/check-in/video.njk')
-      expect(context.crn).toBe(crn)
-      expect(context.id).toBe(uuid)
-    })
-
-    it('returns 404 when CRN and uuid is invalid', async () => {
-      mockIsValidCrn.mockReturnValue(false)
-      mockIsValidUUID.mockReturnValue(false)
-
-      const req = baseReq()
-      await controllers.checkIns.getCheckinVideoPage(hmppsAuthClient)(req, res)
-
-      expect(mockRenderError).toHaveBeenCalledWith(404)
-      expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-    })
-  })
   describe('getRestartCheckinPage', () => {
     it('returns 404 when CRN or id invalid', async () => {
       mockIsValidCrn.mockReturnValue(false)

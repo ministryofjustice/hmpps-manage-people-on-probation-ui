@@ -2,26 +2,23 @@ import { AppointmentOutcomeOption } from '../models/Appointments'
 
 export const outcomeOptions: AppointmentOutcomeOption[] = [
   {
-    value: 'ATTENDED',
-    text: 'Attended',
+    value: 'ATTENDED_COMPLIED',
+    text: 'Attended - complied',
+  },
+  {
+    value: 'ATTENDED_FAILED_TO_COMPLY',
+    text: 'Attended - failed to comply',
+    hint: {
+      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
+    },
   },
   {
     value: 'ATTENDED_SENT_HOME_BEHAVIOUR',
-    text: 'Attended but sent home due to their behaviour',
-    hint: {
-      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
-    },
+    text: 'Attended - sent home (behaviour)',
   },
   {
-    value: 'ATTENDED_DID_NOT_FOLLOW_INSTRUCTIONS',
-    text: 'Attended but did not follow instructions',
-    hint: {
-      text: 'For example, their behaviour was disruptive or they did not follow instructions.',
-    },
-  },
-  {
-    value: 'ATTENDED_SENT_HOME_PROBATION_SERVICE_ISSUES',
-    text: 'Attended but sent home due to Probation Service issues',
+    value: 'ATTENDED_SENT_HOME_SERVICE_ISSUES',
+    text: 'Attended - sent home (service issues)',
     hint: {
       text: 'For example, the building was unexpectedly closed.',
     },
@@ -41,8 +38,8 @@ export const outcomeOptions: AppointmentOutcomeOption[] = [
     },
   },
   {
-    value: 'EVIDENCE_REQUESTED',
-    text: 'I’m waiting for evidence before making a decision',
+    value: 'FAILED_TO_ATTEND',
+    text: 'Failed to attend',
     hint: {
       text: 'You may still need to request and review evidence.',
     },

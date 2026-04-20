@@ -17,6 +17,7 @@ import {
   CheckinScheduleRequest,
   DeactivateOffenderRequest,
   EsupervisionAssignQuestionsRequest,
+  ESupervisionCheckIn,
   ESupervisionNote,
   ESupervisionReview,
   ReactivateOffenderRequest,
@@ -31,6 +32,13 @@ import config from '../config'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import { parseQuestionTemplate } from '../utils/esupervisionParseTemplate'
+
+function systemIdCheckPass(checkIn: ESupervisionCheckIn): boolean {
+  if (checkIn.livenessEnabled) {
+    return checkIn.livenessResult === 'LIVE' && checkIn.autoIdCheck === 'MATCH'
+  }
+  return checkIn.autoIdCheck === 'MATCH'
+}
 
 const routes = [
   'getStartSetup',
@@ -66,7 +74,6 @@ const routes = [
   'getCheckinSummaryPage',
   'postCheckinSummaryPage',
   'getConfirmationPage',
-  'getCheckinVideoPage',
   'postTakeAPhotoPage',
   'postViewCheckIn',
   'getManageCheckinPage',
@@ -486,13 +493,16 @@ const checkInsController: Controller<typeof routes, void> = {
 
       const { checkIn } = res.locals
 
-      const url = encodeURIComponent(req.url)
-      const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
-
       if (checkIn.status !== 'REVIEWED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
-      return res.render('pages/check-in/view.njk', { crn, id, back, checkIn, videoLink })
+      return res.render('pages/check-in/view.njk', {
+        crn,
+        id,
+        back,
+        checkIn,
+        systemIdCheckPass: systemIdCheckPass(checkIn),
+      })
     }
   },
 
@@ -571,13 +581,17 @@ const checkInsController: Controller<typeof routes, void> = {
       }
       const { back } = req.query
       const { checkIn } = res.locals
-      const url = encodeURIComponent(req.url)
-      const videoLink = `/case/${crn}/appointments/${id}/check-in/video?back=${url}`
       if (checkIn.status !== 'SUBMITTED') {
         return res.redirect(`/case/${crn}/appointments/${id}/check-in/update${back ? `?back=${back}` : ''}`)
       }
       await sendAuditMessage(res, 'VIEW_MAS_REVIEW_CHECK_IN_AND_CONFIRM_IDENTITY', crn, SubjectType.CRN)
-      return res.render('pages/check-in/review/identity.njk', { crn, id, back, checkIn, videoLink })
+      return res.render('pages/check-in/review/identity.njk', {
+        crn,
+        id,
+        back,
+        checkIn,
+        systemIdCheckPass: systemIdCheckPass(checkIn),
+      })
     }
   },
 
@@ -707,18 +721,6 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
-  getCheckinVideoPage: HmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, id } = req.params as Record<string, string>
-      await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_VIDEO', crn, SubjectType.CRN)
-      const { checkIn } = res.locals
-      if (!isValidCrn(crn) || !isValidUUID(id)) {
-        return renderError(404)(req, res)
-      }
-      const { back } = req.query
-      return res.render('pages/check-in/video.njk', { crn, id, checkIn, back })
-    }
-  },
   postTakeAPhotoPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
