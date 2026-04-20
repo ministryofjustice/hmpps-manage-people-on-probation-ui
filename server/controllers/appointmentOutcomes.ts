@@ -149,9 +149,6 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
         'outcome',
         'enforcementAction',
       ])
-      if (enforcementAction === 'NO_FURTHER_ACTION') {
-        // patch appointment with outcome and enforcement action here before redirecting to completed url
-      }
       const redirectMap: EnforcementRedirectMap = {
         SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
         BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
