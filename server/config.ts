@@ -220,13 +220,13 @@ export default {
       },
       agent: new AgentConfig(Number(get('SVA_CLIENT_API_TIMEOUT_RESPONSE', 10000))),
     },
-    sentencePlanApi: {
-      url: get('SENTENCE_PLAN_API_URL', 'http://localhost:8100', requiredInProduction),
+    arnsAssessmentPlatformApi: {
+      url: get('ARNS_ASSESSMENT_PLATFORM_API_URL', 'http://localhost:8080', requiredInProduction),
       timeout: {
-        response: Number(get('SENTENCE_PLAN_API_TIMEOUT_RESPONSE', 10000)),
-        deadline: Number(get('SENTENCE_PLAN_API_TIMEOUT_RESPONSE', 10000)),
+        response: Number(get('ARNS_ASSESSMENT_PLATFORM_API_TIMEOUT_RESPONSE', 10000)),
+        deadline: Number(get('ARNS_ASSESSMENT_PLATFORM_API_TIMEOUT_RESPONSE', 10000)),
       },
-      agent: new AgentConfig(Number(get('INTERVENTIONS_API_TIMEOUT_RESPONSE', 10000))),
+      agent: new AgentConfig(Number(get('ARNS_ASSESSMENT_PLATFORM_API_TIMEOUT_RESPONSE', 10000))),
     },
     probationFrontendComponentsApi: {
       url: get('PROBATION_FRONTEND_COMPONENTS_API_URL', 'http://localhost:8100', requiredInProduction),

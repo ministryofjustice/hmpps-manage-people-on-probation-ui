@@ -18,11 +18,11 @@ import {
   mockRisks,
   mockUserCaseload,
   mockAppResponse,
-  mockSentencePlans,
+  mockSentencePlanResult,
   mockRiskData,
 } from '../controllers/mocks'
 import { UserCaseload } from '../data/model/caseload'
-import SentencePlanApiClient from '../data/sentencePlanApiClient'
+import ArnsAssessmentPlatformApiClient from '../data/arnsAssessmentPlatformApiClient'
 import { PersonalDetailsSession } from '../models/Data'
 import {
   Circumstances,
@@ -35,7 +35,6 @@ import {
   PersonalDetails,
   Contact,
 } from '../data/model/personalDetails'
-import { SentencePlan } from '../data/model/sentencePlan'
 import config from '../config'
 import logger from '../../logger'
 
@@ -86,7 +85,7 @@ const searchUserCaseloadSpy = jest
   .spyOn(MasApiClient.prototype, 'searchUserCaseload')
   .mockImplementation(() => Promise.resolve(mockUserCaseload))
 let getPersonalDetailsSpy: jest.SpyInstance
-let getPlanByCrnSpy: jest.SpyInstance
+let getSentencePlanByCrnSpy: jest.SpyInstance
 let req: httpMocks.MockRequest<any>
 let res: httpMocks.MockResponse<any>
 let nextSpy: jest.Mock
@@ -141,11 +140,7 @@ const overview = (crn = 'X000001'): PersonalDetails => ({
   staffContacts: [] as Contact[],
 })
 
-const mock = ({
-  crn = 'X000001',
-  lastUpdatedDate = mockSentencePlans[0].lastUpdatedDate,
-  ogrs4Enabled = true,
-} = {}): PersonalDetailsSession => {
+const mock = ({ crn = 'X000001', lastUpdatedDate = '', ogrs4Enabled = true } = {}): PersonalDetailsSession => {
   const mockPersonalDetails: PersonalDetailsSession = {
     overview: overview(crn),
     sentencePlan: {
@@ -171,9 +166,9 @@ describe('/middleware/getPersonalDetails', () => {
     jest.resetModules()
     jest.clearAllMocks()
     getPersonalDetailsSpy = jest.spyOn(MasApiClient.prototype, 'getPersonalDetails')
-    getPlanByCrnSpy = jest
-      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-      .mockImplementation(() => Promise.resolve(mockSentencePlans))
+    getSentencePlanByCrnSpy = jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementation(() => Promise.resolve(mockSentencePlanResult))
     nextSpy = jest.fn()
     process.env = { ...ORIGINAL_ENV }
   })
@@ -216,7 +211,7 @@ describe('/middleware/getPersonalDetails', () => {
       })
       expect(getRiskDataSpy).toHaveBeenCalledWith(mockAuthOptions, 'crn', 'X000002')
       expect(predictorsSpy).not.toHaveBeenCalled()
-      expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')
+      expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
       expect(req.session.data).toEqual(expected)
       expect(res.locals.case).toEqual(overview('X000002'))
       expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
@@ -312,7 +307,7 @@ describe('/middleware/getPersonalDetails', () => {
       })
       expect(getRiskDataSpy).not.toHaveBeenCalled()
       expect(predictorsSpy).toHaveBeenCalledWith(req.params.crn)
-      expect(getPlanByCrnSpy).toHaveBeenCalledWith('X000002')
+      expect(getSentencePlanByCrnSpy).toHaveBeenCalledWith('X000002', 'user-1')
       expect(req.session.data).toEqual(expected)
       expect(res.locals.case).toEqual(overview('X000002'))
       expect(res.locals.risksWidget).toEqual(toRoshWidget(mockRisks))
@@ -408,7 +403,7 @@ describe('/middleware/getPersonalDetails', () => {
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     await getPersonalDetails(hmppsAuthClient, arnsComponents)(req, res, nextSpy)
-    expect(getPlanByCrnSpy).not.toHaveBeenCalled()
+    expect(getSentencePlanByCrnSpy).not.toHaveBeenCalled()
   })
 
   it('should set the correct sentence plan local variaibles if sentence plan feature flag is disabled', async () => {
@@ -458,7 +453,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
-      lastUpdatedDate: '2025-10-10T16:08:54Z',
+      lastUpdatedDate: mockSentencePlanResult.lastUpdatedDate,
     })
   })
 
@@ -491,8 +486,8 @@ describe('/middleware/getPersonalDetails', () => {
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
-      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlanResult))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',
@@ -519,7 +514,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: true,
       showText: false,
-      lastUpdatedDate: mockSentencePlans[1].lastUpdatedDate,
+      lastUpdatedDate: mockSentencePlanResult.lastUpdatedDate,
     })
   })
 
@@ -528,14 +523,9 @@ describe('/middleware/getPersonalDetails', () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    const draftSentencePlan: SentencePlan[] = [
-      {
-        ...mockSentencePlans[0],
-      },
-    ]
     jest
-      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve(draftSentencePlan))
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve({ hasAgreedPlan: false, lastUpdatedDate: '2025-10-01T16:39:23Z' }))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',
@@ -576,8 +566,8 @@ describe('/middleware/getPersonalDetails', () => {
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
     jest
-      .spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn')
-      .mockImplementationOnce(() => Promise.resolve(mockSentencePlans))
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(mockSentencePlanResult))
     req = httpMocks.createRequest({
       params: {
         crn: 'X000001',
@@ -604,7 +594,7 @@ describe('/middleware/getPersonalDetails', () => {
     expect(res.locals.sentencePlan).toStrictEqual({
       showLink: false,
       showText: true,
-      lastUpdatedDate: mockSentencePlans[1].lastUpdatedDate,
+      lastUpdatedDate: mockSentencePlanResult.lastUpdatedDate,
     })
   })
 
@@ -612,7 +602,9 @@ describe('/middleware/getPersonalDetails', () => {
     jest
       .spyOn(MasApiClient.prototype, 'getPersonalDetails')
       .mockImplementationOnce(() => Promise.resolve(overview('X000002')))
-    jest.spyOn(SentencePlanApiClient.prototype, 'getPlanByCrn').mockImplementationOnce(() => Promise.resolve([]))
+    jest
+      .spyOn(ArnsAssessmentPlatformApiClient.prototype, 'getSentencePlanByCrn')
+      .mockImplementationOnce(() => Promise.resolve(null))
     req = getReq()
     res = mockAppResponse({
       user: {
