@@ -3,16 +3,18 @@
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
-  {{ mojTicketPanel({
+  {% if appointmentOutcome.contactId %}
+    {{ mojTicketPanel({
   attributes: {
     "data-qa": "ticket"
   },
   items: [{
-    html: ' <h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.forename + ' has until 13 February to submit evidence (5 days remaining)</h2>
+    html: ' <h2 class="govuk-heading-m govuk-!-margin-bottom-2">' + appointmentOutcome.forename + ' has until ' + appointmentOutcome.enforcementAction.responseByDate + ' to submit evidence (' + appointmentOutcome.enforcementAction.responseByDays + ' day' + ('s' if appointmentOutcome.enforcementAction.responseByDays != 1) + ' remaining)</h2>
     <p class="govuk-body">This appointment has been marked as failed to attend until evidence is provided. It will be added to the NDelius Enforcement Diary.</p>',
     classes: "moj-ticket-panel__content--red"
   }]
 }) }}
+  {% endif %}
   {{ govukRadios({
     name: "enforcementAction",
     fieldset: {

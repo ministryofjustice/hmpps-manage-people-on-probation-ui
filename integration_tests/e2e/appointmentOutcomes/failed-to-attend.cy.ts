@@ -1,3 +1,4 @@
+import { DateTime } from 'luxon'
 import { checkPopHeader } from '../appointments/imports'
 import { crn, uuid, appointmentId } from '../appointments/imports/common'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
@@ -14,13 +15,21 @@ let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
 let failedToAttendPage: FailedToAttendPage
 
-const loadPage = ({ manageJourney = true, isProbationPractitioner = false } = {}): void => {
+const now = DateTime.now()
+const date = now.plus({ days: 2 })
+const responseByDate = date.toFormat('yyyy-MM-dd')
+
+const loadPage = ({
+  manageJourney = true,
+  isProbationPractitioner = false,
+  enforcementActionResponseByDate = responseByDate,
+} = {}): void => {
   cy.request({
     method: 'POST',
     url: 'http://localhost:3007/__test/clear-session',
   })
   cy.task('stubEnableNonCompliance')
-  cy.task('stubAppointment', { eventId: '2501192724', isFuture: false })
+  cy.task('stubAppointment', { eventId: '2501192724', isFuture: false, enforcementActionResponseByDate })
   if (isProbationPractitioner) {
     cy.task('stubProbationPractitioner', { username: 'USER1' })
   }
@@ -72,17 +81,37 @@ const getExpectedOptions = ({ isProbationPractitioner = false } = {}): ExpectedO
 }
 
 const checkPage = ({ manageJourney = true } = {}) => {
-  it('should render the page if user is not probation practitioner', () => {
+  it(`should render the page if user is not probation practitioner${manageJourney ? ' and submit evidence in 2 days' : ''}`, () => {
     loadPage({ manageJourney })
     failedToAttendPage = new FailedToAttendPage()
     failedToAttendPage.checkPageTitle('Enforcement action for Alton’s absence')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
+    if (manageJourney) {
+      cy.get('[data-qa="ticket"]')
+        .find('h2')
+        .should('contain.text', `Alton has until ${date.toFormat('d LLLL')} to submit evidence (2 days remaining)`)
+      cy.get('[data-qa="ticket"]')
+        .find('p')
+        .should(
+          'contain.text',
+          'This appointment has been marked as failed to attend until evidence is provided. It will be added to the NDelius Enforcement Diary.',
+        )
+    } else {
+      cy.get('[data-qa="ticket"]').should('not.exist')
+    }
     cy.get('legend').should('contain.text', 'Select an enforcement action for Alton’s absence')
     const options = getExpectedOptions()
     checkOptions(options)
   })
-  it('should render the page if user is probation practitioner', () => {
-    loadPage({ manageJourney, isProbationPractitioner: true })
+  it(`should render the page if user is probation practitioner${manageJourney ? ' and submit evidence in 1 day' : ''}`, () => {
+    const tomorrow = now.plus({ days: 1 })
+    const enforcementActionResponseByDate = tomorrow.toFormat('yyyy-MM-dd')
+    loadPage({ manageJourney, isProbationPractitioner: true, enforcementActionResponseByDate })
+    if (manageJourney) {
+      cy.get('[data-qa="ticket"]')
+        .find('h2')
+        .should('contain.text', `Alton has until ${tomorrow.toFormat('d LLLL')} to submit evidence (1 day remaining)`)
+    }
     const options = getExpectedOptions({ isProbationPractitioner: true })
     checkOptions(options)
   })
