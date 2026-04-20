@@ -17,9 +17,11 @@ import {
   getAppointmentOutcomeBackLink,
   getAppointmentAcceptableAbsenceOptions,
   getAppointmentOutcomeEvidenceBy,
+  parseMultipartBody,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import { getAppointmentFailedToAttendOptions } from '../middleware/getAppointmentFailedToAttendOptions'
+import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const get = (path: string | string[], handler: Route<void>) => router.get(path, asyncMiddleware(handler))
@@ -60,6 +62,13 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
       `${manageBasePath}/unacceptable-absence`,
     ],
     getAppointmentAttendedFailedToComplyOptions,
+  )
+
+  router.post(
+    `${manageBasePath}/add-note`,
+    multerErrorHandler('fileUpload'),
+    parseMultipartBody,
+    controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 
   router.all(
