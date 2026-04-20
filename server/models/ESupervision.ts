@@ -24,6 +24,7 @@ export interface CheckinUserDetails {
   settingsUpdated?: boolean
   eligibility?: string[]
   eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
+  eligibilitySPOApproval?: any
 }
 
 export interface ManageQuestionsSession {

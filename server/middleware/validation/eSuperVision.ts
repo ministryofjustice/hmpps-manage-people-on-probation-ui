@@ -76,6 +76,19 @@ const eSuperVision: Route<void> = (req, res, next) => {
       )
     }
   }
+  const validateSPOApproval = () => {
+    if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/spo-approval`)) {
+      render = `pages/check-in/spo-approval`
+      errorMessages = validateWithSpec(
+        req,
+        eSuperVisionValidation({
+          crn,
+          id,
+          page: 'spo-approval',
+        }),
+      )
+    }
+  }
 
   const validateDateFrequency = () => {
     if (baseUrl.includes(`/case/${crn}/appointments/${id}/check-in/date-frequency`)) {
@@ -306,6 +319,7 @@ const eSuperVision: Route<void> = (req, res, next) => {
   let errorMessages: Record<string, string> = {}
   validateEligibilityCheck()
   validateEligibilityChoice()
+  validateSPOApproval()
   validateDateFrequency()
   validateContactPreference()
   validateEditContactPreference()

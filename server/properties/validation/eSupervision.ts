@@ -47,6 +47,16 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][checkins][eligibilitySPOApproval]`]: {
+      optional: page !== 'spo-approval',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select to confirm SPO approval',
+          log: 'SPO approval not confirmed',
+        },
+      ],
+    },
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
       checks: [
