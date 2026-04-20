@@ -57,6 +57,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       ;({ time: end } = isoToDateTime(appointment.endDateTime))
     }
     const externalReference = appointment?.externalReference || ''
+    const enforcementAction = appointment?.enforcementAction || null
     if (!eventId) {
       type = ''
     }
@@ -85,6 +86,7 @@ export const createAppointmentSession = (req: Request, res: AppResponse, next: N
       username: res.locals.user.username,
       uuid: '',
       externalReference,
+      enforcementAction,
     }
     if (visorReport) {
       appointmentSession.visorReport = visorReport

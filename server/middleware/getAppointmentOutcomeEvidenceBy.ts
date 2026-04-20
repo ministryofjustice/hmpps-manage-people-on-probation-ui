@@ -1,15 +1,12 @@
 import { DateTime } from 'luxon'
 import { Route } from '../@types'
-import { Activity } from '../data/model/schedule'
 import { AppointmentOutcomeEnforcementAction } from '../models/Locals'
 
 export const getAppointmentOutcomeEvidenceBy: Route<void> = (req, res, next) => {
-  const { appointment } = res.locals.appointmentOutcome
+  const { appointmentSession } = res.locals.appointmentOutcome
+  const enforcementActionResponseByDate = appointmentSession?.enforcementAction?.responseByDate ?? null
   let enforcementAction: AppointmentOutcomeEnforcementAction = null
-  if ((appointment as Activity)?.enforcementAction?.responseByDate) {
-    const {
-      enforcementAction: { responseByDate: enforcementActionResponseByDate },
-    } = appointment as Activity
+  if (enforcementActionResponseByDate) {
     const dt = DateTime.fromISO(enforcementActionResponseByDate)
     const today = DateTime.now().startOf('day')
     const responseByDate = dt.toFormat('d LLLL')

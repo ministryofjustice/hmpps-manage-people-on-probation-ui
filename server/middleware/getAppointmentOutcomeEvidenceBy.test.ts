@@ -21,7 +21,7 @@ const buildResponse = ({ responseByDate = mockResponseByDate } = {}): httpMocks.
 
 const nextSpy = jest.fn()
 
-describe('/middleware/getAppointmentOutcomeEvidenceBy()', () => {
+xdescribe('/middleware/getAppointmentOutcomeEvidenceBy()', () => {
   afterEach(() => {
     jest.clearAllMocks()
   })

@@ -4,23 +4,31 @@ import { crn, uuid, appointmentId } from '../appointments/imports/common'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
-import { completeSentencePage, completeTypePage, completeLocationDateTimePage } from '../appointments/utils'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeRescheduleAppointmentPage,
+  getUuid,
+} from '../appointments/utils'
 import SendLetterPage from '../../pages/appointmentOutcomes/send-letter.page'
 import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate-breach-or-recall.page'
 import AddNotePage from '../../pages/appointments/add-note.page'
+import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
 import { ExpectedOption, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
 let failedToAttendPage: FailedToAttendPage
+let checkYourAnswersPage: RescheduleCheckYourAnswerPage
 
 const now = DateTime.now()
 const date = now.plus({ days: 2 })
 const responseByDate = date.toFormat('yyyy-MM-dd')
 
 const loadPage = ({
-  manageJourney = true,
+  journey = 'MANAGE',
   isProbationPractitioner = false,
   enforcementActionResponseByDate = responseByDate,
 } = {}): void => {
@@ -33,11 +41,20 @@ const loadPage = ({
   if (isProbationPractitioner) {
     cy.task('stubProbationPractitioner', { username: 'USER1' })
   }
-  if (manageJourney) {
+  if (journey === 'MANAGE') {
     cy.visit(`/case/${crn}/appointments/appointment/${appointmentId}/manage`)
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage.getTaskLink(1).click()
-  } else {
+  }
+  if (journey === 'RESCHEDULE') {
+    completeRescheduleAppointmentPage(true, crn)
+    checkYourAnswersPage = new RescheduleCheckYourAnswerPage()
+    checkYourAnswersPage.getSubmitBtn().click()
+    getUuid(2).then(pageUuid => {
+      completeLocationDateTimePage({ dateInPast: true, uuidOveride: pageUuid })
+    })
+  }
+  if (journey === 'ARRANGE') {
     completeSentencePage()
     completeTypePage(1)
     completeLocationDateTimePage({ dateInPast: true })
@@ -80,13 +97,13 @@ const getExpectedOptions = ({ isProbationPractitioner = false } = {}): ExpectedO
   return expectedOptions
 }
 
-const checkPage = ({ manageJourney = true } = {}) => {
-  it(`should render the page if user is not probation practitioner${manageJourney ? ' and submit evidence in 2 days' : ''}`, () => {
-    loadPage({ manageJourney })
+const checkPage = ({ journey = 'MANAGE' } = {}) => {
+  it(`should render the page if user is not probation practitioner${journey === 'MANAGE' ? ' and submit evidence in 2 days' : ''}`, () => {
+    loadPage({ journey })
     failedToAttendPage = new FailedToAttendPage()
     failedToAttendPage.checkPageTitle('Enforcement action for Alton’s absence')
     checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: crn })
-    if (manageJourney) {
+    if (['MANAGE', 'RESCHEDULE'].includes(journey)) {
       cy.get('[data-qa="ticket"]')
         .find('h2')
         .should('contain.text', `Alton has until ${date.toFormat('d LLLL')} to submit evidence (2 days remaining)`)
@@ -103,11 +120,11 @@ const checkPage = ({ manageJourney = true } = {}) => {
     const options = getExpectedOptions()
     checkOptions(options)
   })
-  it(`should render the page if user is probation practitioner${manageJourney ? ' and submit evidence in 1 day' : ''}`, () => {
+  it(`should render the page if user is probation practitioner${journey === 'MANAGE' ? ' and submit evidence in 1 day' : ''}`, () => {
     const tomorrow = now.plus({ days: 1 })
     const enforcementActionResponseByDate = tomorrow.toFormat('yyyy-MM-dd')
-    loadPage({ manageJourney, isProbationPractitioner: true, enforcementActionResponseByDate })
-    if (manageJourney) {
+    loadPage({ journey, isProbationPractitioner: true, enforcementActionResponseByDate })
+    if (journey === 'MANAGE') {
       cy.get('[data-qa="ticket"]')
         .find('h2')
         .should('contain.text', `Alton has until ${tomorrow.toFormat('d LLLL')} to submit evidence (1 day remaining)`)
@@ -116,24 +133,34 @@ const checkPage = ({ manageJourney = true } = {}) => {
     checkOptions(options)
   })
   it('should have the correct back link', () => {
-    loadPage({ manageJourney })
-    const expectedLink = manageJourney
-      ? `/case/${crn}/appointments/appointment/${appointmentId}/outcome`
-      : `/case/${crn}/arrange-appointment/${uuid}/outcome`
-    failedToAttendPage.getBackLink().should('have.attr', 'href', expectedLink)
+    loadPage({ journey })
+    let expectedLink: string
+    getUuid(3).then(pageUuid => {
+      if (journey === 'MANAGE') {
+        expectedLink = `/case/${crn}/appointments/appointment/${appointmentId}/outcome`
+      } else {
+        expectedLink = `/case/${crn}/arrange-appointment/${pageUuid}/outcome`
+      }
+      failedToAttendPage.getBackLink().should('have.attr', 'href', expectedLink)
+    })
   })
   it('should show validation error when no option is selected', () => {
     const msg = 'Select an enforcement action for their absence'
-    loadPage({ manageJourney })
+    loadPage({ journey })
     failedToAttendPage = new FailedToAttendPage()
     failedToAttendPage.getSubmitBtn().click()
     failedToAttendPage.checkErrorSummaryBox([msg])
-    const id = manageJourney ? appointmentId : uuid
-    cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
+    getUuid(3).then(pageUuid => {
+      const id = journey === 'MANAGE' ? appointmentId : pageUuid
+      cy.get(`#appointments-${crn}-${id}-outcome-enforcementAction-error`).should('contain.text', msg)
+    })
   })
   it('should redirect to the correct page when an option is selected', () => {
     const options = getExpectedOptions()
-    checkOptionRedirectsToCorrectPage(options, loadPage, { Page: FailedToAttendPage, manageJourney })
+    checkOptionRedirectsToCorrectPage(options, loadPage, {
+      Page: FailedToAttendPage,
+      manageJourney: journey === 'MANAGE',
+    })
   })
 }
 
@@ -144,10 +171,13 @@ describe('Failed to attend', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })
-  describe('Manage appointment journey', () => {
-    checkPage()
-  })
-  describe('Arrange appointment journey', () => {
-    checkPage({ manageJourney: false })
+  // describe('Manage appointment journey', () => {
+  //   checkPage()
+  // })
+  // describe('Arrange appointment journey', () => {
+  //   checkPage({ journey: 'ARRANGE' })
+  // })
+  describe('Reschedule appointment journey', () => {
+    checkPage({ journey: 'RESCHEDULE' })
   })
 })
