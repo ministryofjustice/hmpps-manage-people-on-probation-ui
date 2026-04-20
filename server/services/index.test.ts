@@ -211,6 +211,13 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
         ],
       })
       expect(result.searchService).toBeInstanceOf(CaseSearchService)
+      expect(result.searchServiceWithoutExtraColumns).toBeInstanceOf(CaseSearchService)
+
+      expect(CaseSearchServiceMock).toHaveBeenCalledWith({
+        oauthClient: hmppsAuthClient,
+        environment: config.env,
+        extraColumns: [],
+      })
     })
 
     it('should correctly configure extraColumns value functions', () => {

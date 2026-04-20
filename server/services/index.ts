@@ -56,6 +56,12 @@ export const services = () => {
     ],
   })
 
+  const searchServiceWithoutExtraColumns = new CaseSearchService({
+    oauthClient: hmppsAuthClient,
+    environment: config.env,
+    extraColumns: [],
+  })
+
   const flagService = new FlagService()
   const technicalUpdatesService = new TechnicalUpdatesService()
 
@@ -66,6 +72,7 @@ export const services = () => {
     hmppsAuthClient,
     userService,
     searchService,
+    searchServiceWithoutExtraColumns,
     flagService,
     probationComponentsApiService,
     technicalUpdatesService,
