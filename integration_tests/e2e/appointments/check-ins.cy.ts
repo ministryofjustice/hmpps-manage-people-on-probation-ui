@@ -34,6 +34,7 @@ import PreviewFeelingPage from '../../pages/check-ins/questions/preview/feeling'
 import PreviewSupportPage from '../../pages/check-ins/questions/preview/support'
 import EditQuestionPage from '../../pages/check-ins/questions/edit-question'
 import ListQuestionsPage from '../../pages/check-ins/questions/list-questions'
+import EligibilitySPOApprovalPage from '../../pages/check-ins/eligibility-spo-approval'
 
 const loadPage = () => {
   cy.task('resetMocks')
@@ -108,13 +109,8 @@ context('Appointment check-ins', () => {
     checkPage.getSubmitBtn().click()
 
     const fullPage = new EligibilityFullPage()
-    fullPage.getReplacementRadio().check()
-    fullPage.getSubmitBtn().click()
-
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
   })
-  it('should navigate to date frequency when "To replace some face-to-face contact" radio is selected', () => {
+  it('should navigate to SPO approval when "To replace some face-to-face contact" radio is selected', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
 
@@ -126,8 +122,26 @@ context('Appointment check-ins', () => {
     fullPage.getReplacementRadio().check()
     fullPage.getSubmitBtn().click()
 
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
+    const spoApprovalPage = new EligibilitySPOApprovalPage()
+    spoApprovalPage.checkOnPage()
+  })
+
+  it('should navigate to date frequency when SPO approval checkbox is checked', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getNoneOption().check()
+    checkPage.getSubmitBtn().click()
+
+    const fullPage = new EligibilityFullPage()
+    fullPage.getReplacementRadio().check()
+    fullPage.getSubmitBtn().click()
+
+    const spoApprovalPage = new EligibilitySPOApprovalPage()
+    spoApprovalPage.checkOnPage()
+    spoApprovalPage.getCheckbox()
+    spoApprovalPage.getSubmitBtn()
   })
 
   it('should navigate to date frequency when "As well as existing face-to-face contact" radio is selected', () => {

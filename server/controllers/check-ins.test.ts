@@ -264,6 +264,71 @@ describe('checkInsController', () => {
       })
     })
 
+    describe('getSPOApprovalPage', () => {
+      it('renders spo approval page when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        const { id } = req.params as Record<string, string>
+        await controllers.checkIns.getSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(renderSpy).toHaveBeenCalledWith('pages/check-in/spo-approval.njk', {
+          crn,
+          id,
+          back: req.query.back,
+          isApproved: false,
+        })
+        expect(mockRenderError).not.toHaveBeenCalled()
+        checkSendAuditMessage(res, 'VIEW_MAS_SPO_APPROVAL_TO_USE_CHECK_INS', crn, SubjectType.CRN)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.getSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
+    describe('postSPOApprovalPage', () => {
+      it('redirects to date frequency when CRN and id are valid', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(redirectSpy).toHaveBeenCalledWith(`/case/${crn}/appointments/${uuid}/check-in/date-frequency`)
+      })
+
+      it('returns 404 when CRN is invalid', async () => {
+        mockIsValidCrn.mockReturnValue(false)
+        mockIsValidUUID.mockReturnValue(true)
+
+        const req = baseReq()
+        await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+
+      it('returns 404 when id is not a valid UUID', async () => {
+        mockIsValidCrn.mockReturnValue(true)
+        mockIsValidUUID.mockReturnValue(false)
+
+        const req = baseReq()
+        await controllers.checkIns.postSPOApprovalPage(hmppsAuthClient)(req, res)
+
+        expect(mockRenderError).toHaveBeenCalledWith(404)
+        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
+      })
+    })
+
     describe('getSupplementaryEligibilityPage', () => {
       it('Renders supplementary eligibility page when CRN and id are valid', async () => {
         mockIsValidCrn.mockReturnValue(true)

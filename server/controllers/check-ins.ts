@@ -50,6 +50,8 @@ const routes = [
   'postFullEligibilityPage',
   'getSupplementaryEligibilityPage',
   'postSupplementaryEligibilityPage',
+  'getSPOApprovalPage',
+  'postSPOApprovalPage',
   'getDateFrequencyPage',
   'postDateFrequencyPage',
   'getContactPreferencePage',
@@ -220,6 +222,12 @@ const checkInsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
       setDataValue(data, ['esupervision', crn, id, 'checkins', 'id'], id)
+      const eligibilityChoice: string | any[] =
+        req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilityChoice || []
+
+      if (eligibilityChoice === 'replacement-contact') {
+        return res.redirect(`/case/${crn}/appointments/${id}/check-in/spo-approval`)
+      }
       return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
     }
   },
@@ -248,6 +256,41 @@ const checkInsController: Controller<typeof routes, void> = {
     }
   },
 
+  getSPOApprovalPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { back } = req.query
+
+      await sendAuditMessage(res, 'VIEW_MAS_SPO_APPROVAL_TO_USE_CHECK_INS', crn, SubjectType.CRN)
+      if (!isValidCrn(crn) || !isValidUUID(id)) return renderError(404)(req, res)
+
+      const answer = req.session.data?.esupervision?.[crn]?.[id]?.checkins?.eligibilitySPOApproval
+      const isApproved = answer === 'spo-approval' || (Array.isArray(answer) && answer.includes('spo-approval'))
+
+      return res.render('pages/check-in/spo-approval.njk', {
+        crn,
+        id,
+        back,
+        isApproved,
+      })
+    }
+  },
+
+  postSPOApprovalPage: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn, id } = req.params as Record<string, string>
+      const { data } = req.session
+      if (!isValidCrn(crn) || !isValidUUID(id)) {
+        return renderError(404)(req, res)
+      }
+      const approval = req.body?.esupervision?.[crn]?.[id]?.checkins?.eligibilitySPOApproval
+      if (approval) {
+        setDataValue(data, ['esupervision', crn, id, 'checkins', 'eligibilitySPOApproval'], approval)
+      }
+      return res.redirect(`/case/${crn}/appointments/${id}/check-in/date-frequency`)
+    }
+  },
+
   getDateFrequencyPage: hmppsAuthClient => {
     return async (req, res) => {
       const { crn, id } = req.params as Record<string, string>
@@ -262,7 +305,7 @@ const checkInsController: Controller<typeof routes, void> = {
       if (cya) {
         backLink = `/case/${crn}/appointments/${id}/check-in/checkin-summary`
       } else if (eligibilityArray.includes('eligibility-none')) {
-        backLink = `/case/${crn}/appointments/${id}/check-in/full-eligibility`
+        backLink = `/case/${crn}/appointments/${id}/check-in/spo-approval`
       } else {
         backLink = `/case/${crn}/appointments/${id}/check-in/supplementary-eligibility`
       }
