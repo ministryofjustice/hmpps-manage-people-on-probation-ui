@@ -15,6 +15,28 @@ services:
     env_file:
       - .env
 
+  waf:
+    image: owasp/modsecurity-crs:4.25-nginx-lts
+    container_name: modsec-waf
+    networks:
+      - hmpps
+    ports:
+      - "8080:8080"
+    environment:
+      BACKEND: "http://app:3000"
+      SERVER_NAME: "localhost"
+      MODSEC_RULE_ENGINE: "On"
+      MODSEC_AUDIT_ENGINE: "On"
+      MODSEC_AUDIT_LOG: "/var/log/nginx/error.log"
+      MODSEC_AUDIT_LOG_TYPE: "Serial"
+      BLOCKING_PARANOIA: "2"
+      DETECTION_PARANOIA: "2"
+    volumes:
+      - ./waf-conf/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/REQUEST-900-EXCLUSION-RULES-BEFORE-CRS.conf:ro
+      - ./waf-conf/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:/etc/modsecurity.d/owasp-crs/rules/RESPONSE-999-EXCLUSION-RULES-AFTER-CRS.conf:ro
+    depends_on:
+      - app
+
 networks:
   hmpps:
 

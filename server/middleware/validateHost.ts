@@ -2,6 +2,7 @@ import { Route } from '../@types'
 import { AppResponse } from '../models/Locals'
 
 export const allowedHosts = [
+  'localhost',
   'localhost:3007',
   'localhost:3000',
   'sign-in-dev.hmpps.service.justice.gov.uk',
