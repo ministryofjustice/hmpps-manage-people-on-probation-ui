@@ -9,7 +9,6 @@ export const completeRescheduleAppointmentPage = (enableNonCompliance = false, c
   manageAppointmentPage.getAppointmentDetailsListItem(index, 'actions').find('a').click()
   getUuid(1).then(pageUuid => {
     const rescheduleAppointmentPage = new RescheduleAppointmentPage()
-    cy.pause()
     rescheduleAppointmentPage
       .getWhoNeedsToReschedule()
       .find('.govuk-radios__item')

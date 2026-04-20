@@ -171,12 +171,12 @@ describe('Failed to attend', () => {
   afterEach(() => {
     cy.task('resetMocks')
   })
-  // describe('Manage appointment journey', () => {
-  //   checkPage()
-  // })
-  // describe('Arrange appointment journey', () => {
-  //   checkPage({ journey: 'ARRANGE' })
-  // })
+  describe('Manage appointment journey', () => {
+    checkPage()
+  })
+  describe('Arrange appointment journey', () => {
+    checkPage({ journey: 'ARRANGE' })
+  })
   describe('Reschedule appointment journey', () => {
     checkPage({ journey: 'RESCHEDULE' })
   })

@@ -3,7 +3,7 @@
 {% set backLink = appointmentOutcome.backLink %}
 
 {% block form %}
-  {% if appointmentOutcome.contactId %}
+  {% if appointmentOutcome.enforcementAction.responseByDate %}
     {{ mojTicketPanel({
   attributes: {
     "data-qa": "ticket"

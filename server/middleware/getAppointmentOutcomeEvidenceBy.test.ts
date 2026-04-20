@@ -9,7 +9,7 @@ const mockResponseByDate: string | null = null
 const buildResponse = ({ responseByDate = mockResponseByDate } = {}): httpMocks.MockResponse<any> => {
   const locals = {
     appointmentOutcome: {
-      appointment: {
+      appointmentSession: {
         enforcementAction: {
           responseByDate,
         },

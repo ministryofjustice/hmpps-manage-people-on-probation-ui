@@ -171,6 +171,7 @@ const expectedSession = (
     start,
     end,
     eventId: eventId.toString(),
+    enforcementAction: null,
     username,
     uuid: '',
     externalReference,
@@ -179,7 +180,7 @@ const expectedSession = (
   }
 }
 
-xdescribe('/middleware/createAppointmentSession', () => {
+describe('/middleware/createAppointmentSession', () => {
   const mockReq = (nextAppointment = 'KEEP_TYPE') => {
     return httpMocks.createRequest({
       params: {
@@ -225,6 +226,27 @@ xdescribe('/middleware/createAppointmentSession', () => {
     expect(res.locals.appointmentSession).toStrictEqual(
       expectedSession({
         eventId: '49',
+      }),
+    )
+    expect(nextSpy).toHaveBeenCalled()
+  })
+
+  it('should set the enforcementAction', () => {
+    const mockAppt = mockPersonAppointmentResponse({
+      eventId: 0,
+      eventNumber: '1234567',
+      enforcementAction: { responseByDate: '2026-04-20' },
+    })
+    const req = mockReq()
+    const res = mockAppResponse({
+      personAppointment: mockAppt,
+      appointmentTypes: mockTypes,
+    })
+    createAppointmentSession(req, res, nextSpy)
+    expect(res.locals.appointmentSession).toStrictEqual(
+      expectedSession({
+        eventId: '49',
+        enforcementAction: { responseByDate: '2026-04-20' },
       }),
     )
     expect(nextSpy).toHaveBeenCalled()
