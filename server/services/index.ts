@@ -22,9 +22,9 @@ export const getManagedBy = (result: any): string => {
   if (activeManager?.staff?.unallocated || !activeManager) {
     return UNALLOCATED
   }
-  const { forenames, surname } = activeManager.staff || {}
+  const { surname, forenames } = activeManager.staff || {}
 
-  return [forenames, surname]
+  return [surname, forenames]
     .filter(Boolean)
     .map(s => convertToTitleCase(s))
     .join(' ')

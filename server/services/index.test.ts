@@ -112,7 +112,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
           },
         ],
       }
-      expect(getManagedBy(result)).toBe('Pacocha Leigh')
+      expect(getManagedBy(result)).toBe('Leigh Pacocha')
     })
 
     it('should return only the staff name if borough description is missing', () => {
@@ -130,7 +130,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
           },
         ],
       }
-      expect(getManagedBy(result)).toBe('John Smith')
+      expect(getManagedBy(result)).toBe('Smith John')
     })
 
     it('should return "Unallocated" if no active manager is found', () => {
@@ -236,7 +236,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
       const pduColumn = extraColumns.find((c: any) => c.header === 'PDU')
 
       const record = { offenderManagers: [{ active: true, staff: { forenames: 'John', surname: 'Smith' } }] }
-      expect(managedByColumn.value(record)).toBe('John Smith')
+      expect(managedByColumn.value(record)).toBe('Smith John')
 
       const pduRecord = {
         offenderManagers: [{ active: true, team: { borough: { description: 'test borough' } } }],
