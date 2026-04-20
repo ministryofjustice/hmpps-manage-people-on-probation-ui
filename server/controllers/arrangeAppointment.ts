@@ -588,9 +588,11 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
       }
       // fetching backendId (appointmentId) to create 'anotherAppointment' link in confirmation.njk
       const backendId = getDataValue(data, ['appointments', crn, id, 'backendId'])
-      const { isOutLookEventFailed } = data
+      const { isOutLookEventFailed, isEnglishNotificationFailed, isWelshNotificationFailed } = data
       const isInPast = appointmentDateIsInPast(req)
       delete req.session.data.isOutLookEventFailed
+      delete req.session.data.isEnglishNotificationFailed
+      delete req.session.data.isWelshNotificationFailed
       let appointmentType = null
 
       if (req.url.includes('reschedule')) {
@@ -606,6 +608,8 @@ const arrangeAppointmentController: Controller<typeof routes, void | AppResponse
         isInPast,
         appointmentType,
         smsSent,
+        isEnglishNotificationFailed,
+        isWelshNotificationFailed,
       })
     }
   },
