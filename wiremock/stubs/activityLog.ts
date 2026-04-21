@@ -197,7 +197,7 @@ const stubAppointmentDeepLinkWithOutcome = (): SuperAgentRequest =>
         },
         appointment: {
           id: 12,
-          type: 'Drug Test Appointment (NS)',
+          type: 'Drug Test Details',
           startDateTime: '2023-02-12T10:15:00.382936Z[Europe/London]',
           endDateTime: '2023-02-12T10:30:00.382936Z[Europe/London]',
           isSensitive: false,
