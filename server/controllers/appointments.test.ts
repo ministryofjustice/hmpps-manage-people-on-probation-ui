@@ -4,35 +4,15 @@ import { Request } from 'express'
 import { ParamsDictionary } from 'express-serve-static-core'
 import { ParsedQs } from 'qs'
 import controllers from '.'
-import logger from '../../logger'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import MasApiClient from '../data/masApiClient'
 import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import {
-  toRoshWidget,
-  toPredictors,
-  isValidCrn,
-  isNumericString,
-  setDataValue,
-  canRescheduleAppointment,
-} from '../utils'
-import {
-  mockTierCalculation,
-  mockRisks,
-  mockPredictors,
-  mockAppResponse,
-  mockPersonSchedule,
-  mockPersonAppointment,
-} from './mocks'
+import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
+import { mockTierCalculation, mockRisks, mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
-import {
-  cloneAppointmentAndRedirect,
-  renderError,
-  getAttendedCompliedProps,
-  AttendedCompliedAppointment,
-} from '../middleware'
-import { AppointmentSession, NextAppointmentResponse } from '../models/Appointments'
+import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
@@ -58,6 +38,7 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/arnsApiClient')
+jest.mock('../data/eSupervisionClient')
 
 jest.mock('../utils', () => {
   const actualUtils = jest.requireActual('../utils')
@@ -76,7 +57,6 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
-  getAttendedCompliedProps: jest.fn(),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -92,7 +72,6 @@ const mockIsNumericString = isNumericString as jest.MockedFunction<typeof isNume
 const mockCloneAppointmentAndRedirect = cloneAppointmentAndRedirect as jest.MockedFunction<
   typeof cloneAppointmentAndRedirect
 >
-const mockGetAttendedCompliedProps = getAttendedCompliedProps as jest.MockedFunction<typeof getAttendedCompliedProps>
 const mockSetDataValue = setDataValue as jest.MockedFunction<typeof setDataValue>
 const mockCanRescheduleAppointment = canRescheduleAppointment as jest.MockedFunction<typeof canRescheduleAppointment>
 
@@ -131,18 +110,17 @@ const mockAppointment: AttendedCompliedAppointment | Activity = {
   startDateTime: '2025-11-20',
 }
 
-mockGetAttendedCompliedProps.mockImplementation(() => ({
-  forename: 'Forename',
-  surname: 'Surname',
-  appointment: mockAppointment,
-}))
-
 const res = mockAppResponse({
   user: {
     username: 'user-1',
   },
   case: {
     mainAddress: {},
+  },
+  appointmentOutcome: {
+    forename: 'Forename',
+    surname: 'Surname',
+    appointment: mockAppointment,
   },
 })
 
@@ -160,7 +138,6 @@ const getPersonAppointmentSpy = jest
 const getPersonAppointmentNoteSpy = jest
   .spyOn(MasApiClient.prototype, 'getPersonAppointmentNote')
   .mockImplementation(() => Promise.resolve(mockPersonAppointment))
-const loggerSpy = jest.spyOn(logger, 'info')
 
 const nextApptResponse = (appointment = {} as Activity | null): NextAppointmentResponse => ({
   appointment,
@@ -186,9 +163,6 @@ const getCalculationDetailsSpy = jest
   .mockImplementation(() => Promise.resolve(mockTierCalculation))
 
 const getRisksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const getPredictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 
 const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
@@ -210,26 +184,12 @@ describe('controllers/appointments', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0')
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'previous', '0')
     })
-    it('should request risks from the api', () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request tier calculation details from the api', () => {
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request predictors from the api', () => {
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request the probation practitioner from the api', () => {
-      expect(getProbationPractitionerSpy).toHaveBeenCalledWith(crn)
-    })
+
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         personRisks: undefined,
         hasDeceased: false,
         hasPractitioner: true,
@@ -242,15 +202,12 @@ describe('controllers/appointments', () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(undefined))
       await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
     })
+
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/appointments', {
         upcomingAppointments: mockPersonSchedule,
         pastAppointments: mockPersonSchedule,
         crn,
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
-        personRisks: undefined,
         hasDeceased: false,
         hasPractitioner: false,
         url: '',
@@ -265,23 +222,11 @@ describe('controllers/appointments', () => {
     it('should request previous and upcoming appointments from the api', () => {
       expect(getPersonScheduleSpy).toHaveBeenCalledWith(crn, 'upcoming', '0', '&sortBy=date&ascending=true')
     })
-    it('should request risks from the api', () => {
-      expect(getRisksSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request tier calculation details from the api', () => {
-      expect(getCalculationDetailsSpy).toHaveBeenCalledWith(crn)
-    })
-    it('should request predictors from the api', () => {
-      expect(getPredictorsSpy).toHaveBeenCalledWith(crn)
-    })
     it('should render the appointments page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/upcoming-appointments', {
         upcomingAppointments: mockPersonSchedule,
         crn,
         url: '',
-        tierCalculation: mockTierCalculation,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
         sortedBy: 'date.asc',
         pagination: {
           from: '1',
@@ -413,6 +358,8 @@ describe('controllers/appointments', () => {
     })
   })
 
+  /* Delete these tests after enableNonCompliance feature flag is removed 👇 */
+
   describe('get attended and complied', () => {
     beforeEach(async () => {
       await controllers.appointments.getAttendedComplied(hmppsAuthClient)(req, res)
@@ -481,6 +428,9 @@ describe('controllers/appointments', () => {
       })
     })
   })
+
+  /* ----------------- 👆 -----------------  */
+
   describe('get add note', () => {
     const uploadedFiles = [{ filename: 'mock-file.pdf' }] as Express.Multer.File[]
     const errorMessages = {
@@ -573,7 +523,7 @@ describe('controllers/appointments', () => {
         })
         it('should send the patch request to the api', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId, 10),
+            id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
             sensitive: true,
             outcomeRecorded: false,
@@ -621,7 +571,7 @@ describe('controllers/appointments', () => {
         })
         it('should send the patch request to the api', () => {
           expect(patchAppointmentSpy).toHaveBeenCalledWith({
-            id: parseInt(mockReq.params.contactId, 10),
+            id: parseInt(mockReq.params.contactId as string, 10),
             notes: mockReq.body.notes,
             sensitive: true,
             outcomeRecorded: true,
@@ -689,7 +639,7 @@ describe('controllers/appointments', () => {
         },
       })
       const mockRes = mockAppResponse({
-        nextAppointmentSession: {} as AppointmentSession,
+        appointmentSession: {} as AppointmentSession,
       })
       controllers.appointments.postNextAppointment(hmppsAuthClient)(mockReq, mockRes)
       expect(mockCloneAppointmentAndRedirect).toHaveBeenCalledWith({})

@@ -1,13 +1,15 @@
 import { DateTime } from 'luxon'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentConfirmationPage from '../../pages/appointments/confirmation.page'
+import { statusErrors } from '../../../server/properties/statusErrors'
+import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
+import AddNotePage from '../../pages/appointments/add-note.page'
+import AppointmentNotePage from '../../pages/appointments/note.page'
+import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import IndexPage from '../../pages'
 
 import {
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeTypePage,
-  completeSupportingInformationPage,
   checkPopHeader,
   checkAppointmentSummary,
   checkUpdateDateTime,
@@ -16,19 +18,19 @@ import {
   checkUpdateSensitivity,
   checkUpdateSentence,
   checkUpdateType,
-  completeAttendedCompliedPage,
-  completeAddNotePage,
-  crn,
-  uuid,
-  completeTextMessageConfirmationPage,
   checkUpdateTextMessageConfirmation,
 } from './imports'
-import { statusErrors } from '../../../server/properties/statusErrors'
-import AttendedCompliedPage from '../../pages/appointments/attended-complied.page'
-import AddNotePage from '../../pages/appointments/add-note.page'
-import AppointmentNotePage from '../../pages/appointments/note.page'
-import EditContactDetails from '../../pages/personalDetails/editContactDetails'
-import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+  completeSupportingInformationPage,
+  completeAttendedCompliedPage,
+  completeAddNotePage,
+} from './utils'
+import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
 
 const loadPage = ({
   hasVisor = false,
@@ -67,11 +69,12 @@ describe('Check your answers then confirm the appointment', () => {
   beforeEach(() => {
     cy.task('resetMocks')
   })
+
   describe('Appointment date is in the future', () => {
     it('should render the page', () => {
       loadPage()
       const cyaPage = new AppointmentCheckYourAnswersPage()
-      checkPopHeader('Alton Berge', true, 'X778160')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
       const showsProbationPractitioner = true
       checkAppointmentSummary({ page: cyaPage, probationPractitioner: showsProbationPractitioner })
       cy.get('[data-qa="calendarInviteInset"]').should(
@@ -119,6 +122,7 @@ describe('Check your answers then confirm the appointment', () => {
     describe('Change appointment values', () => {
       let cyaPage: AppointmentCheckYourAnswersPage
       beforeEach(() => {
+        cy.task('resetMocks')
         loadPage()
         cyaPage = new AppointmentCheckYourAnswersPage()
       })
@@ -132,7 +136,7 @@ describe('Check your answers then confirm the appointment', () => {
         checkUpdateLocation(cyaPage)
       })
       it('should update the date when value is changed', () => {
-        checkUpdateDateTime(cyaPage)
+        checkUpdateDateTime(cyaPage, DateTime.now().plus({ days: 2 }))
       })
       it('should update the text message confirmation when value is changed', () => {
         checkUpdateTextMessageConfirmation(cyaPage)
@@ -253,7 +257,7 @@ describe('Check your answers then confirm the appointment', () => {
       beforeEach(() => {
         changeDate()
         const now = DateTime.now()
-        const dateOverride = now.plus({ days: 2 })
+        const dateOverride = now.plus({ days: 3 })
         completeLocationDateTimePage({ dateOverride })
       })
       it('should redirect back to the cya page', () => {
@@ -266,7 +270,6 @@ describe('Check your answers then confirm the appointment', () => {
       const dateInPast = true
       beforeEach(() => {
         changeDate(dateInPast)
-        changeDate()
         const now = DateTime.now()
         const dateOverride = now.minus({ days: 2 })
         completeLocationDateTimePage({ dateOverride })
@@ -307,6 +310,23 @@ describe('Check your answers then confirm the appointment', () => {
         cyaPage = new AppointmentCheckYourAnswersPage()
         cyaPage.checkOnPage()
       })
+    })
+  })
+  describe('Should not navigate to the text message confirmation page if feature flag is disabled', () => {
+    beforeEach(() => {
+      cy.task('stubDisableSmsReminders')
+      loadPage({ textMessageFeatureFlag: false })
+      cy.go('back')
+      const supportingInfoPage = new AppointmentNotePage()
+      supportingInfoPage.getBackLink().click()
+      const locationDateTimePage = new AppointmentLocationDateTimePage()
+      locationDateTimePage.getSubmitBtn().click()
+      locationDateTimePage.getSubmitBtn().click()
+      supportingInfoPage.getSubmitBtn().click()
+    })
+    it('should be on the cya page', () => {
+      const cyaPage = new AppointmentCheckYourAnswersPage()
+      cyaPage.checkOnPage()
     })
   })
 })

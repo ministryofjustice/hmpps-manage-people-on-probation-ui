@@ -27,6 +27,36 @@ export interface ESupervisionValidationArgs {
 export const eSuperVisionValidation = (args: ESupervisionValidationArgs): ValidationSpec => {
   const { crn, id, page, checkInEmail, checkInMobile, editCheckInEmail, editCheckInMobile, change, stopCheckIn } = args
   return {
+    [`[esupervision][${crn}][${id}][checkins][eligibility]`]: {
+      optional: page !== 'eligibility-check',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if any of these apply to the person',
+          log: 'Eligibility criteria not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][eligibilityChoice]`]: {
+      optional: page !== 'full-eligibility',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select how you will use online check ins',
+          log: 'Check in option not selected',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][checkins][eligibilitySPOApproval]`]: {
+      optional: page !== 'spo-approval',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select to confirm SPO approval',
+          log: 'SPO approval not confirmed',
+        },
+      ],
+    },
     [`[esupervision][${crn}][${id}][checkins][date]`]: {
       optional: page !== 'date-frequency',
       checks: [
@@ -333,6 +363,16 @@ export const eSuperVisionValidation = (args: ESupervisionValidationArgs): Valida
           validator: isEmail,
           msg: 'Enter an email address in the correct format.',
           log: 'Email address not in correct format in restart process',
+        },
+      ],
+    },
+    [`[esupervision][${crn}][${id}][manageQuestions][draftQuestionInput]`]: {
+      optional: page !== 'edit-question',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Enter what you want to ask',
+          log: 'Question text not entered',
         },
       ],
     },

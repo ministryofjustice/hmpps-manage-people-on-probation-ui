@@ -1,8 +1,6 @@
 import Page from '../pages/page'
 import ActivityLogPage from '../pages/activityLog'
 import ErrorPage from '../pages/error'
-import { activityLogValidation } from '../../server/properties/validation/activityLog'
-import { getErrorMessage } from '../utils/index'
 import ManageAppointmentPage from '../pages/appointments/manage-appointment.page'
 
 const keywords = 'Phone call'
@@ -43,6 +41,7 @@ context('Contacts', () => {
     const page = new ErrorPage()
     page.checkPageTitle('Page not found')
   })
+
   it('should render the contacts results', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -50,7 +49,7 @@ context('Contacts', () => {
     cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
     cy.get('.govuk-table__header').eq(1).should('contain.text', 'Contact')
     cy.get('.govuk-table__header').eq(2).should('contain.text', 'Actions')
-    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'MS teams meeting')
     page.getActivityTitle(2).should('contain.text', 'Phone call')
     page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/case/X000001/')
   })
@@ -59,6 +58,7 @@ context('Contacts', () => {
     cy.visit('/case/X000001/activity-log')
     cy.get('[data-qa="dateOfDeathWarning"]').should('contain.text', 'There is a date of death recorded for Caroline.')
   })
+
   it('should render the filter menu', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -81,23 +81,26 @@ context('Contacts', () => {
     })
     page.getActivityViewLink(0).should('exist')
   })
+
   it('should show the correct validation if date to is selected, but no date from is selected', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
+
     page.getDateToToggle().click()
     page.getDateToDialog().should('be.visible').find(`button[data-testid="${date}"]`).click()
+
     page.getDateToInput().should('have.value', date)
     page.getDateToDialog().should('not.be.visible')
+
     page.getApplyFiltersButton().click()
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
     page.getErrorSummaryLink(0).click()
     page.getDateFromInput().should('be.focused')
   })
+
   it('should show the correct validation if date from is selected, but no date to is selected', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -109,10 +112,11 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page.getErrorSummaryLink(0).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date to')
     page.getErrorSummaryLink(0).click()
     page.getDateToInput().should('be.focused')
   })
+
   it('should show the correct validation if an invalid date from is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -121,11 +125,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if an invalid date to is entered', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -134,13 +137,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
   })
+
   it('should show the correct validation if date from doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -149,11 +149,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isValidDate'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if date to doesnt exist', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -162,13 +161,10 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isValidDate'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter a date in the correct format, for example 17/5/2024')
   })
+
   it('should show the correct validation if date to is before date from', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -178,9 +174,7 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 1)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThan'))
+    page.getErrorSummaryLink(0).should('contain.text', 'The date to must be on or after the date from')
   })
 
   it('should show the correct validation if date from is in the future', () => {
@@ -190,11 +184,10 @@ context('Contacts', () => {
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotLaterThanToday'))
-    page.getErrorSummaryLink(1).should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotEmpty'))
+    page.getErrorSummaryLink(0).should('contain.text', 'The date from must be today or in the past')
+    page.getErrorSummaryLink(1).should('contain.text', 'Enter or select a date to')
   })
+
   it('should show the correct validation if date to is in the future', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
@@ -202,13 +195,10 @@ context('Contacts', () => {
     page.getApplyFiltersButton().click()
     page.getErrorSummaryBox().should('be.visible')
     page.getAllErrorSummaryLinks().should('have.length', 2)
-    page
-      .getErrorSummaryLink(0)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateFrom', 'isNotEmpty'))
-    page
-      .getErrorSummaryLink(1)
-      .should('contain.text', getErrorMessage(activityLogValidation(), 'dateTo', 'isNotLaterThanToday'))
+    page.getErrorSummaryLink(0).should('contain.text', 'Enter or select a date from')
+    page.getErrorSummaryLink(1).should('contain.text', 'The date to must be today or in the past')
   })
+
   it('should display the filter tag and filter the list if a keyword value is submitted', () => {
     cy.visit('/case/X000001/activity-log')
     const value = 'Phone call'
@@ -232,7 +222,7 @@ context('Contacts', () => {
     page.getSelectedFilterTag(1).should('not.exist')
     page.getSelectedFiltersBox().should('not.exist')
     page.getKeywordsInput().should('have.value', '')
-    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'MS teams meeting')
   })
   it('should display the filter tag and filter the list if a date from and date to are submitted', () => {
     cy.visit('/case/X000001/activity-log')
@@ -265,7 +255,7 @@ context('Contacts', () => {
     page.getSelectedFiltersBox().should('not.exist')
     page.getDateFromInput().should('have.value', '')
     page.getDateToInput().should('have.value', '')
-    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'MS teams meeting')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '25')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
@@ -359,17 +349,41 @@ context('Contacts', () => {
     page.getComplianceFilter(1).should('not.be.checked')
     page.getComplianceFilter(2).should('not.be.checked')
     page.getComplianceFilter(3).should('not.be.checked')
-    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'MS teams meeting')
     cy.get('[data-qa="results-count-start"]').should('contain.text', '1')
     cy.get('[data-qa="results-count-end"]').should('contain.text', '25')
     cy.get('[data-qa="results-count-total"]').should('contain.text', '54')
     cy.get('.govuk-pagination').should('exist')
   })
+  it('should display the outcome field above the note in the contact log compact view details panel', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Outcome:')
+    cy.get('.govuk-table')
+      .find('tr')
+      .eq(5)
+      .find('.govuk-details__text')
+      .should('contain.text', 'User-generated free text content')
+    cy.get('.govuk-table').find('tr').eq(5).find('.govuk-details__text').should('contain.text', 'Turned up')
+
+    cy.get('.govuk-table').find('tr').eq(10).click()
+    cy.get('.govuk-details__text')
+      .find('[class*="govuk-!-font-weight-bold"]')
+      .should('contain.text', 'Enforcement Action:')
+  })
+
+  it('should not display the outcome field when the activity has no outcome', () => {
+    cy.visit('/case/X000001/activity-log')
+    Page.verifyOnPage(ActivityLogPage)
+    cy.get('.govuk-table').find('tr').eq(6).find('.govuk-details__text').should('not.contain.text', 'Outcome:')
+    cy.get('.govuk-table').find('tr').eq(6).find('.govuk-details__text').should('contain.text', 'Some notes')
+  })
+
   it('Contacts page renders activities with View and Manage links', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.govuk-table').should('exist')
-    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'MS teams meeting')
     page.getActivityTitle(2).should('contain.text', 'Phone call')
     page.getActivityViewNoNotes(3).should('contain.text', 'Planned appointment')
     page.getActivityViewNotes(4).should('contain.text', 'Some notes')
@@ -510,7 +524,7 @@ context('Contacts', () => {
     cy.visit('/case/X000001/activity-log')
     const page = Page.verifyOnPage(ActivityLogPage)
     cy.get('.govuk-table').should('exist')
-    page.getActivity(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivity(1).should('contain.text', 'MS teams meeting')
     page.getActivity(2).should('contain.text', 'Phone call')
     page.getActivity(3).should('contain.text', 'Planned appointment')
     page.getActivity(4).should('contain.text', 'Initial appointment')
@@ -565,7 +579,7 @@ context('Contacts', () => {
     cy.get('.govuk-table__header').eq(0).should('contain.text', 'Date')
     cy.get('.govuk-table__header').eq(1).should('contain.text', 'Contact')
     cy.get('.govuk-table__header').eq(2).should('contain.text', 'Actions')
-    page.getActivityViewNoNotes(1).should('contain.text', 'Planned video contact (NS)')
+    page.getActivityViewNoNotes(1).should('contain.text', 'MS teams meeting')
     page.getActivityTitle(2).should('contain.text', 'Phone call')
     page.getActivityViewLink(0).should('have.attr', 'href').and('include', '/case/X000001/')
     page.getElementByDataQA('esup-manage-link').should('be.visible')

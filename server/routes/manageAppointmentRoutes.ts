@@ -8,12 +8,13 @@ import {
   redirectWizard,
   getAppointment,
   autoStoreSessionData,
+  getAppointmentOutcomeProps,
 } from '../middleware'
 import validate from '../middleware/validation/index'
 import config from '../config'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
-export default function manageAppointmentRoutes(router: Router, { hmppsAuthClient }: Services) {
+export default function manageAppointmentRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
   const upload = multer({
     storage: multer.memoryStorage(),
     limits: {
@@ -24,8 +25,9 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
 
   router.all(
     '/case/:crn/appointments/appointment/:contactId/add-note',
-    getPersonalDetails(hmppsAuthClient),
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
     getPersonAppointment(hmppsAuthClient),
+    getAppointmentOutcomeProps,
   )
   router.get(
     '/case/:crn/appointments/appointment/:contactId/add-note',
@@ -52,8 +54,9 @@ export default function manageAppointmentRoutes(router: Router, { hmppsAuthClien
   router.all(
     '/case/:crn/arrange-appointment/:id/add-note',
     redirectWizard(['eventId', 'type', 'date', 'outcomeRecorded']),
-    getPersonalDetails(hmppsAuthClient),
+    getPersonalDetails(hmppsAuthClient, arnsComponents),
     getAppointment(hmppsAuthClient),
+    getAppointmentOutcomeProps,
   )
   router.get('/case/:crn/arrange-appointment/:id/add-note', controllers.arrangeAppointments.getAddNote())
 

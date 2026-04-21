@@ -59,22 +59,15 @@ const buildRequest = ({
   return httpMocks.createRequest(req)
 }
 
-jest.mock('../utils', () => {
-  const actualUtils = jest.requireActual('../utils')
-  return {
-    ...actualUtils,
-    getDataValue: jest.fn(),
-  }
-})
-
 const res = httpMocks.createResponse()
-
-const mockGetDataValue = getDataValue as jest.MockedFunction<typeof getDataValue>
 
 const now = DateTime.now()
 const date = now.plus({ days: 1 }).toFormat('d/M/yyyy')
 
 describe('/middleware/appointmentDateIsInPast()', () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
   it('should return true if post request and date in past is in request body', () => {
     const req = buildRequest({
       body: {
@@ -108,19 +101,16 @@ describe('/middleware/appointmentDateIsInPast()', () => {
     })
     expect(appointmentDateIsInPast(req, res)).toEqual(false)
   })
-  it('should return true if not post request and past date set in appointment session', () => {
+  it('should return true if get request and past date set in appointment session', () => {
     const req = buildRequest({ method: 'GET', appointment: { date: '2025-08-09', start: '10:00', end: '10:30' } })
-    mockGetDataValue.mockReturnValueOnce(req.session.data.appointments[crn][id])
     expect(appointmentDateIsInPast(req, res)).toEqual(true)
   })
   it('should return false if not post request and future date set in appointment session', () => {
     const req = buildRequest({ method: 'GET', appointment: { date, start: '10:00', end: '10:30' } })
-    mockGetDataValue.mockReturnValueOnce(req.session.data.appointments[crn][id])
     expect(appointmentDateIsInPast(req, res)).toEqual(false)
   })
   it('should return false if not post request and no date set in appointment session', () => {
     const req = buildRequest({ method: 'GET', appointment: { date: '', start: '', end: '' } })
-    mockGetDataValue.mockReturnValueOnce(req.session.data.appointments[crn][id])
     expect(appointmentDateIsInPast(req, res)).toEqual(false)
   })
 })

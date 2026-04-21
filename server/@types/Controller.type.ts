@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/no-cycle
 import { HmppsAuthClient } from '../data'
 import { Route } from './Route.type'
 

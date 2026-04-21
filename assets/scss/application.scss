@@ -16,22 +16,23 @@ $no-score-border-colour: #505a5f;
 $no-score-background-colour: #ffffff;
 $mappa-colour: #4c2c92;
 
-@import '../../node_modules/govuk-frontend/dist/govuk/all';
+@import '../../node_modules/govuk-frontend/dist/govuk/index';
 @import '../../node_modules/@ministryofjustice/frontend/moj/all';
-
+@import '../../node_modules/@ministryofjustice/hmpps-arns-frontend-components-lib/dist/all';
 @import './components/header-bar';
 @import './components/summary-card';
 @import './components/card';
 @import 'assets/scss/local';
 @import './components/photo';
 @import './components/sortable-table';
-@import '../../node_modules/govuk-frontend/dist/govuk/base';
+@import '../../node_modules/govuk-frontend/dist/govuk/_base';
 @import '../../node_modules/@ministryofjustice/frontend/moj/components/sortable-table/_sortable-table';
 @import './components/predictor-scores';
 @import './components/risk-flag-widget';
 @import './components/timeline';
 @import './components/flex';
 @import './components/note';
+@import './components/checkboxes';
 
 .secondary-text {
   color: $govuk-secondary-text-colour; /* Using a GOV.UK Design System color */
@@ -610,6 +611,38 @@ body.feature-disabled {
   padding: 10px 0 10px 0;
 }
 
+.feedback-prompt {
+  background-color: #f3f2f1;
+  color: #0b0c0c;
+  border-top: 1px solid #b1b4b6;
+  outline: 0;
+  margin-top: 60px;
+}
+
+.feedback-prompt-text {
+  font-size: 16px;
+  line-height: 1.25;
+  margin: 0 15px;
+  padding: 20px 0;
+}
+
+.feedback-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.feedback-container .govuk-button {
+  margin-bottom: 0;
+  border: 1px #0b0c0c solid;
+  min-width: 100px;
+  box-shadow: 0px 3px 0px 0px #0b0c0c;
+}
+
+.feedback-container .govuk-label {
+  text-decoration: none !important;
+}
+
 .govuk-grid-row {
   margin-right: -15px;
   margin-left: -15px;
@@ -681,13 +714,12 @@ body.feature-disabled {
     }
   }
 
-    &--noNotes {
-      display: block;
-    }
+  &--noNotes {
+    display: block;
   }
+}
 
 .contact-log-compact {
-
   .govuk-details {
     margin-bottom: 5px;
   }
@@ -711,7 +743,7 @@ body.feature-disabled {
   &-row {
     border: 0;
     &--last {
-      border-bottom: 1px solid #b1b4b6;;
+      border-bottom: 1px solid #b1b4b6;
     }
   }
   .app-compliance-tag--compact {
@@ -723,17 +755,70 @@ body.feature-disabled {
 }
 
 .flex__item-full-width-mobile {
-  @include govuk-media-query($until: tablet ) {
+  @include govuk-media-query($until: tablet) {
     width: 100%;
   }
 }
 
 .flex--col-mobile {
-  @include govuk-media-query($until: tablet ) {
+  @include govuk-media-query($until: tablet) {
     flex-direction: column;
   }
 }
 
 .flex--gap-3 {
   gap: govuk-spacing(3);
+}
+
+[data-predictor-badge] {
+  margin: 0 10px 10px 0;
+  &:last-child {
+    margin: 0;
+  }
+}
+
+.table-cell-link-content {
+  flex: 1;
+  min-width: 0;
+  max-width: 280px;
+}
+
+.table-cell-link-content a {
+  display: inline-block;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.icon-container-right-aligned {
+  display: flex;
+  gap: 5px;
+  margin-left: auto;
+}
+
+@media (min-width: 40.0625em) {
+  section[data-qa='appointmentDetails'] {
+    .govuk-summary-list__actions {
+      width: 25%;
+    }
+    .govuk-table__cell {
+      a {
+        max-width: 100%;
+        display: block;
+        word-break: break-word;
+      }
+    }
+  }
+}
+
+.app-back-to-top__icon {
+  display: inline-block;
+  width: .8em;
+  height: 1em;
+  margin-top: -5px;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+
+.arns-summary-card-expanded-badge-spacing{
+  padding-bottom: 15px;
 }

@@ -6,7 +6,7 @@ import { AppResponse } from '../models/Locals'
 export default function evaluateFeatureFlags(flagService: FlagService): RequestHandler {
   return async (req, res: AppResponse, next) => {
     try {
-      const flags = await flagService.getFlags()
+      const flags = await flagService.getFlags({ email: res.locals.user.email })
       if (flags) {
         res.locals.flags = flags
 

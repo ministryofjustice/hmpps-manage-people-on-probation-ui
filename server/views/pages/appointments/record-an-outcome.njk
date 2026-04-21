@@ -10,7 +10,7 @@
     {% set appointmentRadioItems = [] %}
     {% for appointment in contactResponse.content %}
         {% set appointmentRadioItems = (appointmentRadioItems.push({
-            html: '<strong>' + appointment.type.description + '</strong><br />' + appointment.date | dateWithDayAndWithoutYear + ' from ' + timeFromTo(appointment.start, appointment.end),
+            html: '<strong>' + appointment.type.description + '</strong><br />' + appointment.date | dateWithDayAndWithYear + ' from ' + timeFromTo(appointment.start, appointment.end),
             value: appointment.id,
             checked: contactId == appointment.id
         }), appointmentRadioItems) %}

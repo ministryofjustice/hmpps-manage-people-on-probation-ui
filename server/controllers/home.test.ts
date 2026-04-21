@@ -8,13 +8,15 @@ import DeliusClient from '../data/deliusClient'
 import homeRoutes from '../routes/home'
 import config from '../config'
 import { mockHomepage, mockAppResponse } from './mocks'
+import { checkSendAuditMessage } from './testutils'
+import { SubjectType } from '../middleware/sendAuditMessage'
 
+jest.mock('uuid', () => ({
+  v4: () => 'f1654ea3-0abb-46eb-860b-654a96edbe20',
+}))
+jest.mock('@ministryofjustice/hmpps-audit-client')
 jest.mock('../data/deliusClient')
 jest.mock('../data/tokenStore/redisTokenStore')
-jest.mock('@ministryofjustice/hmpps-audit-client')
-jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'f1654ea3-0abb-46eb-860b-654a96edbe20'),
-}))
 jest.mock('../data/hmppsAuthClient', () => {
   return jest.fn().mockImplementation(() => {
     return {
@@ -61,6 +63,7 @@ describe('homeController', () => {
       })
 
       it('should render the home page with the esupervision link', () => {
+        checkSendAuditMessage(res, 'VIEW_MAS_HOME', res.locals.user.username, SubjectType.USER)
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           upcomingAppointments,
           appointmentsRequiringOutcome,
@@ -94,6 +97,7 @@ describe('homeController', () => {
       })
       it('should render the page with no esupervision link', async () => {
         await controllers.home.getHome(hmppsAuthClient)(mockReq, res)
+
         expect(renderSpy).toHaveBeenCalledWith('pages/homepage/homepage', {
           upcomingAppointments,
           appointmentsRequiringOutcome,

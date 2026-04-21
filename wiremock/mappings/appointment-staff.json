@@ -12,101 +12,201 @@
             {
               "staffCode": "N07B722",
               "username": "peter-parker",
+              "name": {
+                "forename": "Peter",
+                "surname": "Parker"
+              },
+              "email": "peter.parker@testemail.com",
               "nameAndRole": "Peter Parker (PS-PSO)"
             },
             {
               "staffCode": "N57A054",
               "username": "IainChambers",
+              "name": {
+                "forename": "Iain",
+                "surname": "Chamber"
+              },
+              "email": "iain.chambersr@testemail.com",
               "nameAndRole": "Iain Chambers (PS - Other)"
             },
             {
               "staffCode": "N07B786",
               "username": "AmardeepChimber",
+              "name": {
+                "forename": "Amardeep",
+                "surname": "Chimber"
+              },
+              "email": "amardeep.chimber@testemail.com",
               "nameAndRole": "Amardeep Chimber (PS - Other)"
             },
             {
               "staffCode": "N07B897",
               "username": "Anand.Elangovan",
+              "name": {
+                "forename": "Anand",
+                "surname": "Elangovan"
+              },
+              "email": "anand.elangovan@testemail.com",
               "nameAndRole": "Anand Elangovan (PS - Other)"
             },
             {
               "staffCode": "N07B787",
               "username": "tkexpired",
+              "name": {
+                "forename": "TK",
+                "surname": "Expired"
+              },
+              "email": "tk.expired@testemail.com",
               "nameAndRole": "tk expired (CRC - Additional Grade)"
             },
             {
               "staffCode": "N07B795",
               "username": "DeborahFern",
+              "name": {
+                "forename": "Deborah",
+                "surname": "Fern"
+              },
+              "email": "deborah.fern@testemail.com",
               "nameAndRole": "Deborah Fern (PS - Other)"
             },
             {
               "staffCode": "N07B794",
               "username": "JamesForster",
+              "name": {
+                "forename": "James",
+                "surname": "Forster"
+              },
+              "email": "james.foster@testemail.com",
               "nameAndRole": "James Forster (PS - Other)"
             },
             {
               "staffCode": "N07B738",
               "username": "ThomasGeraghty",
+              "name": {
+                "forename": "Thomas",
+                "surname": "Geraghty"
+              },
+              "email": "thomas.geraghty@testemail.com",
               "nameAndRole": "Thomas Geraghty (PS - Other)"
             },
             {
               "staffCode": "N07B899",
               "username": "mairegrant",
+              "name": {
+                "forename": "Maire",
+                "surname": "Grant"
+              },
+              "email": "maire.grant@testemail.com",
               "nameAndRole": "maire grant (PS - Other)"
             },
             {
               "staffCode": "N07B792",
               "username": "MaryamHassan",
+              "name": {
+                "forename": "Maryam",
+                "surname": "Hassan"
+              },
+              "email": "maryam.hassan@testemail.com",
               "nameAndRole": "Maryam Hassan (PS - Other)"
             },
             {
               "staffCode": "N07B743",
               "username": "PaulMcPhee",
+              "name": {
+                "forename": "Paul",
+                "surname": "McPhee"
+              },
+              "email": "paul.mcphee@testemail.com",
               "nameAndRole": "Paul McPhee (PS - PO)"
             },
             {
               "staffCode": "N07B898",
               "username": "NeilMills",
+              "name": {
+                "forename": "Neil",
+                "surname": "Mills"
+              },
+              "email": "neil.mills@testemail.com",
               "nameAndRole": "Neil Mills (PS - PO)"
             },
             {
               "staffCode": "N07B793",
               "username": "AbdirizakObsiye",
+              "name": {
+                "forename": "Abdirizak",
+                "surname": "Obsiye"
+              },
+              "email": "abdirizak.obsiye@testemail.com",
               "nameAndRole": "Abdirizak Obsiye (PS - Other)"
             },
             {
               "staffCode": "N07B736",
               "username": "SwethaPalreddy",
+              "name": {
+                "forename": "Swetha",
+                "surname": "Palreddy"
+              },
+              "email": "swetha.palreddy@testemail.com",
               "nameAndRole": "swetha palreddy (PS - Other)"
             },
             {
               "staffCode": "N07B901",
               "username": "lee.porter",
+              "name": {
+                "forename": "Lee",
+                "surname": "Porter"
+              },
+              "email": "lee.porter@testemail.com",
               "nameAndRole": "Lee Porter (PS - Other)"
             },
             {
               "staffCode": "N55A032",
               "username": "LyndseyPotter",
+              "name": {
+                "forename": "Lyndey",
+                "surname": "Potter"
+              },
+              "email": "lyndsay.potter@testemail.com",
               "nameAndRole": "Lyndsey Potter (NPS - Other)"
             },
             {
               "staffCode": "N07B791",
               "username": "MarcinPrzybyla",
+              "name": {
+                "forename": "Marcin",
+                "surname": "Przybyla"
+              },
+              "email": "marcin.przybyla@testemail.com",
               "nameAndRole": "Marcin Przybyla (PS - Other)"
             },
             {
               "staffCode": "N07B733",
               "username": "MARD_SUPPORT",
+              "name": {
+                "forename": "Main",
+                "surname": "Support"
+              },
+              "email": "support@testemail.com",
               "nameAndRole": "Make Support User (PS - Other)"
             },
             {
               "staffCode": "N07B739",
               "username": "jsftest",
+              "name": {
+                "forename": "JSF",
+                "surname": "Test"
+              },
+              "email": "test@testemail.com",
               "nameAndRole": "jsf test (CRC - Additional Grade)"
             },
             {
               "staffCode": "N07B825",
               "username": "Test_Hrishi_New",
+              "name": {
+                "forename": "Test",
+                "surname": "Hrishi"
+              },
+              "email": "test.hrishi@testemail.com",
               "nameAndRole": "Test_Hrishi_New Test (PS - Other)"
             }
           ]

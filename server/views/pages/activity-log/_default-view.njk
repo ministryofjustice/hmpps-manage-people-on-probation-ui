@@ -11,9 +11,7 @@
   {% if entry.isAppointment %}
     {% include "./_appointment-timeline-entry.njk" %}
   {% elif entry.esupervisionId %}
-    {% if flags.enableESuperVision %}
       {% include "./_online-checkin-entry.njk" %}
-    {% endif %}
   {% elif entry.isCommunication %}
     {% include "./_communication-timeline-entry.njk" %}
   {% elif entry.isSystemContact %}

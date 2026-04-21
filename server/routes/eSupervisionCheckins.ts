@@ -7,13 +7,55 @@ import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
-  router.get('/case/:crn/appointments/check-in/instructions', [controllers.checkIns.getStartSetup(hmppsAuthClient)])
-  router.get('/case/:crn/appointments/:id/check-in/instructions', [controllers.checkIns.getIntroPage(hmppsAuthClient)])
+  router.get('/case/:crn/appointments/check-in/eligibility-check', [
+    controllers.checkIns.getStartSetup(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/:id/check-in/eligibility-check', [
+    controllers.checkIns.getEligibilityPage(hmppsAuthClient),
+  ])
   router.post(
-    '/case/:crn/appointments/:id/check-in/instructions',
+    '/case/:crn/appointments/:id/check-in/eligibility-check',
     validate.eSuperVision,
     autoStoreSessionData(hmppsAuthClient),
-    controllers.checkIns.postIntroPage(hmppsAuthClient),
+    controllers.checkIns.postEligibilityPage(hmppsAuthClient),
+  )
+  router.get('/case/:crn/appointments/:id/check-in/denied-eligibility', [
+    controllers.checkIns.getEligibilityDeniedPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/denied-eligibility',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postEligibilityDeniedPage(hmppsAuthClient),
+  )
+  router.get('/case/:crn/appointments/:id/check-in/full-eligibility', [
+    controllers.checkIns.getFullEligibilityPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/full-eligibility',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postFullEligibilityPage(hmppsAuthClient),
+  )
+  router.get('/case/:crn/appointments/:id/check-in/supplementary-eligibility', [
+    controllers.checkIns.getSupplementaryEligibilityPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/supplementary-eligibility',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postSupplementaryEligibilityPage(hmppsAuthClient),
+  )
+
+  router.get('/case/:crn/appointments/:id/check-in/spo-approval', [
+    controllers.checkIns.getSPOApprovalPage(hmppsAuthClient),
+  ])
+  router.post(
+    '/case/:crn/appointments/:id/check-in/spo-approval',
+    validate.eSuperVision,
+    autoStoreSessionData(hmppsAuthClient),
+    postRedirectWizard(),
+    controllers.checkIns.postSPOApprovalPage(hmppsAuthClient),
   )
 
   router.get('/case/:crn/appointments/:id/check-in/date-frequency', [
@@ -107,11 +149,6 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     '/case/:crn/appointments/:id/check-in/confirm-end',
     controllers.checkIns.getConfirmationPage(hmppsAuthClient),
   )
-
-  router.get('/case/:crn/appointments/:id/check-in/video', [
-    getCheckIn(hmppsAuthClient),
-    controllers.checkIns.getCheckinVideoPage(hmppsAuthClient),
-  ])
 
   router.get('/case/:crn/appointments/check-in/manage/:id', [
     controllers.checkIns.getManageCheckinPage(hmppsAuthClient),
@@ -262,5 +299,56 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
     autoStoreSessionData(hmppsAuthClient),
     getCheckIn(hmppsAuthClient),
     controllers.checkIns.postReviewCheckIn(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    controllers.checkIns.getStartQuestionsPage(hmppsAuthClient),
+  ])
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/start', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postStartQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/add', [
+    controllers.checkIns.getAddQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/add', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postAddQuestionsPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/list', [
+    controllers.checkIns.getQuestionsListPage(hmppsAuthClient),
+  ])
+
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/list', [
+    autoStoreSessionData(hmppsAuthClient),
+    controllers.checkIns.postQuestionsListPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit', [
+    controllers.checkIns.getEditQuestionPage(hmppsAuthClient),
+  ])
+
+  router.post('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/edit', [
+    autoStoreSessionData(hmppsAuthClient),
+    validate.eSuperVision,
+    controllers.checkIns.postEditQuestionPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/:templateId/select', [
+    controllers.checkIns.getSelectQuestionPage(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/:questionId/delete', [
+    controllers.checkIns.getDeleteQuestion(hmppsAuthClient),
+  ])
+
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/feeling', [
+    controllers.checkIns.getPreviewFeelingPage(hmppsAuthClient),
+  ])
+  router.get('/case/:crn/appointments/check-in/manage/:id/questions/preview/support', [
+    controllers.checkIns.getPreviewSupportPage(hmppsAuthClient),
   ])
 }

@@ -1,0 +1,42 @@
+{% extends "../partials/layout.njk" %}
+{% from "govuk/components/back-link/macro.njk" import govukBackLink %}
+
+{% set title = "Manage people on probation cookie policy" %}
+{% set hideUpdateAndUserNav = true %}
+{% set hideSurveyUsefulSections = true %}
+
+{% block beforeContent %}
+    <nav id="js-back-wrapper" class="govuk-width-container" data-qa= "back-link"></nav>
+{% endblock %}
+
+{% block content %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h1 class="govuk-heading-xl govuk-!-margin-bottom-6" data-qa="pageHeading">Cookies policy for Manage people on probation</h1>
+            <p class="govuk-body">Last reviewed: 2 March 2026</p>
+            <p class="govuk-body">Manage people on probation stores small pieces of data (known as 'cookies') on your computer in order to operate, and to collect information about how you browse the service.
+            </p>
+            <p class="govuk-body">Cookies are used to: </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>keep you logged in </li>
+                <li>measure how you use the service so they can be updated and improved based on your needs </li>
+
+            </ul>
+            <p class="govuk-body">Third-party cookies are not used to identify you personally.  </p>
+            <h2 class="govuk-heading-l">Session cookies </h2>
+            <p class="govuk-body">Manage people on probation may store a cookie when you log in to open a session. The cookies used are classed as essential cookies. This means they are necessary to provide the online service, where they are used to transmit, carry out or facilitate the transmission of communications over a network. </p>
+
+            <h2 class="govuk-heading-l">Analytics cookies </h2>
+            <p class="govuk-body">Manage people on probation may use Application Insights software to collect information about how you use the service. We do this to help make sure the service is meeting the needs of users, and to help us make improvements. </p>
+            <p class="govuk-body">Application Insights stores information about: </p>
+            <ul class="govuk-list govuk-list--bullet">
+                <li>the pages you visit  </li>
+                <li>how long you spend on each page</li>
+                <li>what you click on while you’re visiting the service </li>
+            </ul>
+            <p class="govuk-body">We do not allow Application Insights to collect or store your personal information (for example, your name or address). However, it does collect your NDelius username, which can be used to identify you. </p>
+            <p class="govuk-body">We do not allow Application Insights to use or share our analytics data. </p>
+        </div>
+    </div>
+{% endblock %}

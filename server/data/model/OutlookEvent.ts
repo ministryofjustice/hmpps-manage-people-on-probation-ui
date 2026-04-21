@@ -6,6 +6,9 @@ export interface SmsEventRequest {
   mobileNumber?: string
   crn: string
   smsOptIn: boolean
+  includeWelshTranslation: boolean
+  appointmentLocation?: string
+  appointmentTypeCode?: string
 }
 export interface OutlookEventRequestBody {
   recipients: Recipient[]
@@ -28,6 +31,7 @@ export interface OutlookEventResponse {
   startDate: string
   endDate: string
   attendees: string[]
+  smsResponse?: SmsResponse
 }
 
 export interface RescheduleEventRequest {
@@ -52,6 +56,10 @@ export interface EventResponse {
   endDate: string
 }
 
+export interface SmsResponse {
+  englishNotificationId?: string
+  welshNotificationId?: string
+}
 export type SmsOptInOptions = 'YES' | 'YES_ADD_MOBILE_NUMBER' | 'YES_UPDATE_MOBILE_NUMBER' | 'NO' | null | undefined
 
 export interface SmsPreviewRequest {

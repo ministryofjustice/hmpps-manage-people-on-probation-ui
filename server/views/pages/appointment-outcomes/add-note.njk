@@ -1,0 +1,169 @@
+{% extends "../_form.njk" %}
+{% from "_components/note/macro.njk" import appNote %}
+{% set title = 'Add a note' %}
+{% set appointment = personAppointment.appointment %}
+{% set multipartForm = false if appointmentOutcome.uuid else 
+    true %}
+{% set hasNotes = appointment.appointmentNotes.length > 0 %}
+{% set notes = '' %}
+{% set submitButtonId = 'continueButton' %}
+{% if hasNotes %}
+    {% for appointmentNote in appointment.appointmentNotes %}
+        {% if appointmentNote.note %}
+            {% set notes = notes.concat(appNote(appointmentNote, '/case/' + crn + '/appointments/appointment/' + appointment.id + '/manage/note/' + appointmentNote.id + '?back=' + url)) %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
+{% from "govuk/components/error-summary/macro.njk" import govukErrorSummary %}
+
+{% block form %}
+    {% set notesConfig = {
+    rows: '10',
+    maxlength: maxCharCount,
+    classes: "",
+    formGroup: {
+        attributes: { "data-qa": "notes" }
+    }
+} %}
+    {% if errorMessages.notes %}
+        {% set errorMsgNotes = {
+            text: "Note must be " + maxCharCount + " characters or less"
+        } %}
+    {% else %}
+        {% set errorMsgNotes = null %}
+    {% endif %}
+    {% set notesConfig = notesConfig | merge({value: 'arse'}) | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id, 'notes']) %}
+
+    {% set sensitivityConfig = {
+    fieldset: {
+        legend: {
+            text: 'Does this contact include sensitive information?',
+            classes: "govuk-fieldset__legend--m",
+            isPageHeading: false
+        }
+    },
+    formGroup: {
+        attributes: {
+            'data-qa': 'sensitiveInformation'
+        }
+    },
+    hint: {
+        text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+    },
+    items: [
+        {
+            value: 'Yes',
+            text: "Yes, it includes sensitive information",
+            checked: body.sensitivity == 'Yes'
+        },
+        {
+            value: 'No',
+            text: "No, it is not sensitive",
+            checked: body.sensitivity == 'No'
+        }
+    ]
+} %}
+    {% if errorMessages.sensitivity %}
+        {% set errorMsgSensitivity = {
+            text: errorMessages.sensitivity
+        } %}
+    {% else %}
+        {% set errorMsgSensitivity = null %}
+    {% endif %}
+
+    {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id, 'sensitivity']) %}
+
+    <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
+    {{ govukDetails({
+        classes: 'govuk-!-margin-bottom-6',
+        summaryText: 'Take notes using CRISS',
+        html: '<p class="govuk-body govuk-!-margin-bottom-1">CRISS stands for:</p><ul class="govuk-list govuk-list--bullet"><li>Check in with the person on probation</li><li>Review their progress from the last session</li><li>Intervention - target their criminogenic needs and risk</li><li>Summarise what you discussed in this session</li><li>Set tasks to review in the next session</li></ul>'
+    }) }}
+    {% if hasNotes %}
+        <section data-qa="previousNotes">
+            <h3 class="govuk-heading-m">Previous notes</h3>
+            {{ govukInsetText({
+                html: notes
+            }) }}
+        </section>
+    {% endif %}
+    {{ govukButton({
+        text: "Show CRISS headers",
+        classes: "govuk-button--secondary",
+        id: "crissButton",
+        attributes: {
+            'data-qa': 'crissButton'
+        },
+        type: 'button'
+    }) }}
+    {% if errorMessages.fileOrNote %}
+        <div class="govuk-form-group govuk-form-group--error" id="fileOrNote" data-qa="fileOrNote">
+            <p id="file-error" class="govuk-error-message">
+                <span class="govuk-visually-hidden">Error:</span>
+                {{ errorMessages.fileOrNote }}
+            </p>
+        {% else %}
+            <div class="govuk-form-group" id="fileOrNote" data-qa="fileOrNote">
+            {% endif %}
+            {{ govukCharacterCount(notesConfig) }}
+            <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
+            {% if not appointmentOutcome.uuid %}
+                <div class="govuk-!-margin-bottom-6">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="fileUpload">
+                Upload a file (optional)
+            </label>
+                        {% if errorMessages.fileUpload %}
+                            <p id="fileUpload-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span>
+                                {{ errorMessages.fileUpload }}
+                            </p>
+                        {% endif %}
+                        <div class="govuk-drop-zone" data-module="govuk-file-upload">
+                            {{ govukFileUpload({
+                    id: "fileUpload",
+                    name: "fileUpload",
+                    classes: "govuk-file-upload",
+                    attributes: {
+                        accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                    }
+                }) }}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        {% if not appointmentOutcome.uuid %}
+            {% set uploadHtml %}
+            <div class="govuk-grid-row govuk-body">
+                <div class="govuk-grid-column-full" data-qa="fileUpload">
+
+                    {{ govukFileUpload({
+                            id: "file-upload-1",
+                            name: "file",
+                            classes: 'moj-multi-file-upload__input',
+                            label: {
+                                text: "Upload files",
+                                classes: 'govuk-label--m'
+                            },
+                            attributes: { multiple: '' }
+                        }) }}
+
+                    {{ govukButton({
+                            text: 'Upload file',
+                            classes: 'govuk-button--secondary moj-multi-file-upload__button'
+                        }) }}
+                </div>
+            </div>
+            {% endset %}
+
+            {% set errors = [] %}
+            {% if patchResponse.errors.length > 0 %}
+                {% set errors = errors.concat(patchResponse.errors) %}
+            {% endif %}
+            {% if errors.length > 0 %}
+                <span data-qa="errors">{{ govukErrorSummary({ titleText: "There is a problem", errorList: errors }) }}</span>
+            {% endif %}
+        {% endif %}
+        {{ govukRadios(sensitivityConfig) }}
+    {% endblock %}

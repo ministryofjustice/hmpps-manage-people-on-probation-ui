@@ -1,18 +1,19 @@
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import RescheduleAppointmentPage from '../../pages/appointments/reschedule-appointment.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
-import { getUuid } from './imports'
+import { getUuid } from './utils'
 
 describe('Reschedule Appointment', () => {
   let manageAppointmentPage: ManageAppointmentPage
   let rescheduleAppointmentPage: RescheduleAppointmentPage
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
 
-  const loadPage = () => {
+  const loadPage = (enableNonCompliance = false) => {
     cy.visit('/case/X000001/appointments/appointment/6/manage')
+    const index = enableNonCompliance ? 2 : 1
     manageAppointmentPage = new ManageAppointmentPage()
     manageAppointmentPage
-      .getAppointmentDetailsListItem(1, 'actions')
+      .getAppointmentDetailsListItem(index, 'actions')
       .find('a')
       .should('contain.text', 'Reschedule')
       .should('have.attr', 'href', `/case/X000001/appointment/6/reschedule`)

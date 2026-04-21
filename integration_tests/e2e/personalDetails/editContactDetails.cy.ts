@@ -2,14 +2,14 @@ import AppointmentNotePage from '../../pages/appointments/note.page'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import Page from '../../pages/page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import { uuid } from '../appointments/imports/common'
 import {
-  uuid,
+  normalise,
   completeSentencePage,
   completeTypePage,
   completeLocationDateTimePage,
   completeTextMessageConfirmationPage,
-  normalise,
-} from '../appointments/imports'
+} from '../appointments/utils'
 
 const submitInvalidPhoneNumber = (page: EditContactDetails, field: string) => {
   page.getElementInput(field).clear().type('1-2345X')
@@ -46,7 +46,7 @@ context('Edit contact details', () => {
       .should('be.visible')
       .and(
         'contain',
-        'If you change contact details here, this will update the record in NDelius. The mobile number and email address must belong to the person.',
+        'If you change contact details here, this will update the record in NDelius. The contact details must belong to the person.',
       )
     page.getElement('submitBtn').should('contain.text', 'Save changes')
     page

@@ -1,5 +1,23 @@
 [
   {
+    "heading": "Search and filter contacts more easily",
+    "summary": "13 March 2026",
+    "whatsNew": [
+      "Search and filter contacts more easily",
+      [
+        "To make it easier for you to see contacts on a case, there is now only one view of contacts. This view includes more contacts so that you quickly scan through what’s been happening on a case.\n\nYou can click on a contact name to read more about it without having to open the contact on a new page.\n\nWe’ve also added new categories to the filters to help you find previously added contacts, and you can toggle system-generated contacts on or off."
+      ],
+      "Tier explanation",
+      [
+        "To help you understand someone’s tier score, we’ve added a link in the header to an explanation of their tier calculation (for example, ‘B2’). This also explains tier history, protect and change factors."
+      ],
+      "New Probation Digital Services header",
+      [
+        "To make your experience of digital probation services more consistent, the title (known as the header) at the top of the Manage people on probation pages now says Probation Digital Services. Some other digital services already use this header."
+      ]
+    ]
+  },
+  {
     "heading": "Reschedule appointments created on this service",
     "summary": "10 February 2026",
     "whatsNew": [
@@ -68,7 +86,6 @@
     "heading": "View all outcomes to log on one page and other service improvements",
     "summary": "11 December 2025",
     "whatsNew": [
-      "View all outcomes to log on one page",
       [
         "The ‘You need to record an outcome for xx appointments’ link now goes to a page that lists every appointment without an outcome, so you can view them quicker."
       ],

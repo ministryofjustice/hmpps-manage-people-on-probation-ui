@@ -4,7 +4,7 @@ import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { AppointmentSession } from '../models/Appointments'
 
 export const findUncompleted = (req: Request, res: Response): string => {
-  const { crn, id } = req.params
+  const { crn, id } = req.params as Record<string, string>
   const { change } = req.query as Record<string, string>
   const data = req?.session?.data ?? {}
   const appointment = getDataValue<AppointmentSession>(data, ['appointments', crn, id])

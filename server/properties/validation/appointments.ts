@@ -2,15 +2,14 @@ import {
   isNotEmpty,
   isValidDate,
   isValidDateFormat,
-  isStringNumber,
   timeIsNotLaterThan,
   isNotEarlierThan,
   isValidCharCount,
   timeIsValid24HourFormat,
-  isTodayOrLater,
-  timeIsNowOrInFuture,
+  isValidRescheduledDateTime,
 } from '../../utils/validationUtils'
 import { ValidationSpec } from '../../models/Errors'
+import { dateWithDayAndWithoutYear, shortTime } from '../../utils'
 
 export interface AppointmentsValidationArgs {
   crn: string
@@ -20,12 +19,14 @@ export interface AppointmentsValidationArgs {
   contactId?: string
   notes?: string
   maxCharCount?: number
-  enablePastAppointments?: boolean
+  previousStart?: string
   fileOrNote?: boolean
 }
 
 export const appointmentsValidation = (args: AppointmentsValidationArgs): ValidationSpec => {
-  const { crn, id, contactId, page, visor, notes, maxCharCount, enablePastAppointments } = args
+  const { crn, id, contactId, page, visor, notes, maxCharCount, previousStart } = args
+  const appointmentStartDate = previousStart ? dateWithDayAndWithoutYear(previousStart) : ''
+  const appointmentStartTime = previousStart ? shortTime(previousStart) : ''
   return {
     [`[appointments][${crn}][${id}][type]`]: {
       optional: page !== 'type',
@@ -81,15 +82,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'The date must not be later than 31/12/2199',
           crossField: `_maxDate`,
         },
-        ...(!enablePastAppointments
-          ? [
-              {
-                validator: isTodayOrLater,
-                msg: 'Date must be today or in the future',
-                log: 'Date must be today or in the future',
-              },
-            ]
-          : []),
+        {
+          validator: isValidRescheduledDateTime,
+          msg: `The original appointment was also arranged for ${appointmentStartTime} on ${appointmentStartDate}. If the original date is incorrect, select a new date.`,
+          log: 'Rescheduled appointment date and time is not valid',
+        },
       ],
     },
     [`[appointments][${crn}][${id}][start]`]: {
@@ -106,16 +103,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           log: 'Enter a time in the 24-hour format, for example 16:30',
           crossField: `[appointments][${crn}][${id}][date]`,
         },
-        ...(!enablePastAppointments
-          ? [
-              {
-                validator: timeIsNowOrInFuture,
-                msg: 'The start time must be now or in the future',
-                log: 'The start time must be now or in the future',
-                crossField: `[appointments][${crn}][${id}][date]`,
-              },
-            ]
-          : []),
+        {
+          validator: isValidRescheduledDateTime,
+          msg: `The original appointment was also arranged for ${appointmentStartTime} on ${appointmentStartDate}. If the original date is correct, select a new start time.`,
+          log: 'Rescheduled appointment date and time is not valid',
+        },
       ],
     },
     [`[appointments][${crn}][${id}][end]`]: {
@@ -137,6 +129,11 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           msg: 'The end time must be after the start time',
           log: 'The end time must be after the start time',
           crossField: `[appointments][${crn}][${id}][start]`,
+        },
+        {
+          validator: isValidRescheduledDateTime,
+          msg: `The original appointment was also arranged for ${appointmentStartTime} on ${appointmentStartDate}. If the original date is correct, select a new end time.`,
+          log: 'Rescheduled appointment date and time is not valid',
         },
       ],
     },
@@ -281,6 +278,16 @@ export const appointmentsValidation = (args: AppointmentsValidationArgs): Valida
           validator: isNotEmpty,
           msg: 'Select if they attended and complied',
           log: 'Attended and complied not selected',
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][enforcementAction]`]: {
+      optional: page !== 'attended-failed-to-comply',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select an action for their failure to comply',
+          log: 'Enforcement action not selected',
         },
       ],
     },

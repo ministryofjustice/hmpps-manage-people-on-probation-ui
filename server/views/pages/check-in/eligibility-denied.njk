@@ -1,0 +1,14 @@
+{% extends "../_form.njk" %}
+{% set title = case.name.forename + " is not eligible to use online check ins"  %}
+{% set back = back if back else '' %}
+{% set backLink = '/case/' + crn + '/appointments/' + id + '/check-in/eligibility-check' %}
+{% set buttonText = "Go to " + case.name.forename + "'s overview" %}
+
+
+{% block form %}
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            <p class="govuk-body">This is because {{case.name.forename}} is on the Intensive Supervision Court pilot.</p>
+        </div>
+    </div>
+{% endblock %}

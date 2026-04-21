@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import MasApiClient from '../data/masApiClient'
-import { fullName, getDataValue, handleQuotes } from '../utils'
+import { firstInitialLastName, getDataValue, handleQuotes, toSentenceCase } from '../utils'
 import { HmppsAuthClient } from '../data'
 import { Route } from '../@types'
 import {
@@ -21,25 +21,15 @@ export const postRescheduleAppointments = (
   hmppsAuthClient: HmppsAuthClient,
 ): Route<Promise<RescheduleAppointmentResponse | PersonAppointment>> => {
   return async (req, res) => {
-    const { crn, id: uuid, contactId } = req.params
+    const { crn, id: uuid, contactId } = req.params as Record<string, string>
     const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
     const masClient = new MasApiClient(token)
     const masOutlookClient = new SupervisionAppointmentClient(token)
     const { externalReference: oldSupervisionAppointmentUrn } = res.locals.personAppointment.appointment
 
     const { data } = req.session
-    const {
-      date,
-      start,
-      end,
-      type,
-      notes,
-      sensitivity,
-      visorReport,
-      rescheduleAppointment,
-      outcomeRecorded,
-      user: { username },
-    } = getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
+    const { date, start, end, type, notes, sensitivity, visorReport, rescheduleAppointment, outcomeRecorded } =
+      getDataValue<AppointmentSession>(data, ['appointments', crn, uuid])
     const selectedTeam = getDataValue(data, ['appointments', crn, uuid, 'user', 'teamCode'])
     const selectedLocation = getDataValue(data, ['appointments', crn, uuid, 'user', 'locationCode'])
     const staffCode = getDataValue(data, ['appointments', crn, uuid, 'user', 'staffCode'])
@@ -64,9 +54,9 @@ export const postRescheduleAppointments = (
       body.reasonForRecreate = handleQuotes(rescheduleAppointment.reason)
     }
     const response = await masClient.putRescheduleAppointment(contactId, body)
-    const userDetails = await masClient.getUserDetails(username)
+    const { firstName, surname, email } = res.locals.user
     let eventResponse: EventResponse
-    if (userDetails?.email) {
+    if (email && res.locals.flags.enableCalendarEvents) {
       const startTime = DateTime.fromISO(start)
       const endTime = DateTime.fromISO(end)
       const dt = DateTime.fromISO(`${date}T${start}`)
@@ -75,13 +65,13 @@ export const postRescheduleAppointments = (
       const appointmentTypes: AppointmentType[] = getDataValue<AppointmentType[]>(data, ['appointmentTypes'])
       const apptDescription = appointmentTypes.find(entry => entry.code === type).description
       const message = buildCaseLink(config.domain, crn, contactId.toString())
-      const subject = `${apptDescription} with ${fullName(getDataValue<Name>(data, ['personalDetails', crn, 'name']))}`
+      const subject: string = `${firstInitialLastName(getDataValue<Name>(data, ['personalDetails', crn, 'overview', 'name']))}: ${toSentenceCase(apptDescription, [], null, false, true)}`
       const rescheduleEventRequest: RescheduleEventRequest = {
         rescheduledEventRequest: {
           recipients: [
             {
-              emailAddress: userDetails.email,
-              name: `${userDetails.firstName} ${userDetails.surname}`,
+              emailAddress: email,
+              name: `${firstName} ${surname}`,
             },
           ],
           message,
@@ -96,7 +86,7 @@ export const postRescheduleAppointments = (
     }
 
     // Setting isOutLookEventFailed to display error based on API responses.
-    if (!userDetails?.email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
+    if (!email || (!isInPast && !eventResponse?.id)) data.isOutLookEventFailed = true
 
     return response
   }

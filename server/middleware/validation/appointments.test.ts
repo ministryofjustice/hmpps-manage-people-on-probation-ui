@@ -48,9 +48,6 @@ describe('/controllers/arrangeAppointmentController', () => {
           dateTo: '',
           keywords: '',
         },
-        flags: {
-          enablePastAppointments: true,
-        },
       })
   })
 

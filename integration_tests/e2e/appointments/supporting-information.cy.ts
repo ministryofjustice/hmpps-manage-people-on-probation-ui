@@ -1,15 +1,13 @@
-import {
-  crn,
-  uuid,
-  completeTypePage,
-  completeSentencePage,
-  checkPopHeader,
-  completeLocationDateTimePage,
-  checkRiskToStaffAlert,
-  completeTextMessageConfirmationPage,
-} from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
 import AppointmentCheckYourAnswersPage from '../../pages/appointments/check-your-answers.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
+import { crn, uuid } from './imports/common'
+import {
+  completeSentencePage,
+  completeTypePage,
+  completeLocationDateTimePage,
+  completeTextMessageConfirmationPage,
+} from './utils'
 
 const loadPage = (_crn = crn) => {
   cy.visit(`/case/${crn}/arrange-appointment/${uuid}/sentence`)
@@ -31,10 +29,9 @@ describe('Add supporting information (optional)', () => {
     appointmentNotePage.checkOnPage()
   })
   it('should render the pop header', () => {
-    checkPopHeader('Alton Berge', true, 'X778160')
+    checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
   })
   it('should display validation errors if note is more than 12000 character', () => {
-    loadPage()
     const note = 'x'.repeat(12001)
     cy.get(`#appointments-${crn}-${uuid}-notes`).invoke('val', note).trigger('input')
     cy.get(`#appointments-${crn}-${uuid}-sensitivity-2`).click()
@@ -47,7 +44,6 @@ describe('Add supporting information (optional)', () => {
   })
 
   it('should count a return as 1 character', () => {
-    loadPage()
     cy.get(`#appointments-${crn}-${uuid}-notes`).then($el => {
       const paragraph = 'x'.repeat(6000)
       const value = `${paragraph}\n\n${paragraph}`

@@ -240,11 +240,11 @@
                           },
                           {
                               key: { html: '<span data-qa="offenceNotesLabel">Notes</span>' },
-                              value: { html: '<span data-qa="offenceNotesValue">' + sentence.offenceDetails.notes | nl2br if sentence.offenceDetails.notes else 'No notes' + '</span>' }
+                              value: { html: '<span data-qa="offenceNotesValue">' + (sentence.offenceDetails.notes | nl2br if sentence.offenceDetails.notes else 'No notes') + '</span>' }
                           },
                           {
                               key: { html: '<span data-qa="additionalOffencesLabel">Additional offences</span>' },
-                              value: { html: '<span data-qa="additionalOffencesValue">' + additionalOffences if hasAdditionalOffences else 'No additional offences' + '</span>' }
+                              value: { html: '<span data-qa="additionalOffencesValue">' + (additionalOffences if hasAdditionalOffences else 'No additional offences') + '</span>' }
                           }
                       ]
                   }) }}
@@ -255,19 +255,19 @@
                       rows: [
                           {
                               key: { html: '<span data-qa="sentencingCourtLabel">Sentencing court</span>' },
-                              value: { html: '<span data-qa="sentencingCourtValue">' + sentence.conviction.sentencingCourt | nl2br if sentence.conviction.sentencingCourt else 'No court details' + '</span>' }
+                              value: { html: '<span data-qa="sentencingCourtValue">' + (sentence.conviction.sentencingCourt | nl2br if sentence.conviction.sentencingCourt else 'No court details') + '</span>' }
                           },
                           {
                               key: { html: '<span data-qa="responsibleCourtLabel">Responsible court</span>' },
-                              value: { html: '<span data-qa="responsibleCourtValue">' + sentence.conviction.responsibleCourt | nl2br if sentence.conviction.responsibleCourt else 'No court details' + '</span>' }
+                              value: { html: '<span data-qa="responsibleCourtValue">' + (sentence.conviction.responsibleCourt | nl2br if sentence.conviction.responsibleCourt else 'No court details') + '</span>' }
                           },
                           {
                               key: { html: '<span data-qa="convictionDateLabel">Conviction date</span>' },
-                              value: { html: '<span data-qa="convictionDateValue">' + sentence.conviction.convictionDate | dateWithYear | nl2br if sentence.conviction.convictionDate  else 'No conviction date' + '</span>'}
+                              value: { html: '<span data-qa="convictionDateValue">' + (sentence.conviction.convictionDate | dateWithYear | nl2br if sentence.conviction.convictionDate  else 'No conviction date') + '</span>'}
                           },
                           {
                               key: { html: '<span data-qa="additionalSentencesLabel">Additional sentences</span>' },
-                              value: { html: '<span data-qa="additionalSentencesValue">' + additionalSentences if hasAdditionalSentences else 'No additional sentences' + '</span>'}
+                              value: { html: '<span data-qa="additionalSentencesValue">' + (additionalSentences if hasAdditionalSentences else 'No additional sentences') + '</span>'}
                           }
                       ]
                   }) }}

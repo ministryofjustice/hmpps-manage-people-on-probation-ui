@@ -1,16 +1,9 @@
-import {
-  completeLocationDateTimePage,
-  completeSentencePage,
-  completeTypePage,
-  checkRiskToStaffAlert,
-  checkPopHeader,
-  uuid,
-  normalise,
-} from './imports'
-
+import { checkRiskToStaffAlert, checkPopHeader } from './imports'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
 import AppointmentNotePage from '../../pages/appointments/note.page'
 import EditContactDetails from '../../pages/personalDetails/editContactDetails'
+import { completeLocationDateTimePage, completeSentencePage, completeTypePage, normalise } from './utils'
+import { uuid } from './imports/common'
 
 const crn = 'X000001'
 

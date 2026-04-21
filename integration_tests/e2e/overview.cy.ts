@@ -12,7 +12,6 @@ context('Overview', () => {
     page.headerCrn().should('contain.text', 'X000001')
     page.headerName().should('contain.text', 'Caroline Wolff')
     page.pageHeading().should('contain.text', 'Overview')
-    page.assertRiskTags()
     page.getTab('overview').should('contain.text', 'Overview')
     page.getTab('personalDetails').should('contain.text', 'Personal details')
     page.getTab('risk').should('contain.text', 'Risk')
@@ -21,7 +20,6 @@ context('Overview', () => {
     page.getTab('compliance').should('contain.text', 'Compliance')
     page.getCardHeader('schedule').should('contain.text', 'Appointments')
     checkPopHeader()
-
     page
       .getAppointmentsLink('X000001')
       .should('exist')
@@ -140,10 +138,10 @@ context('Overview', () => {
         expect(expected, recentCase)
       })
   })
-  it('Should render overview page without tier link when feature flag disabled', () => {
-    cy.task('stubDisableTierLink')
+  it('Overview page is rendered with OGRS4 risk predictor scores', () => {
+    cy.task('stubPredictorScoresOGRS4')
     cy.visit('/case/X000001')
-    checkPopHeader('Caroline Wolff', false, 'X000001', false)
+    checkPopHeader({ ogrs4: true })
   })
 
   it('Overview page is rendered with date of death', () => {
@@ -213,5 +211,11 @@ context('Overview', () => {
     cy.visit('/case/X000001', { failOnStatusCode: false })
     Page.verifyOnPage(OverviewPage)
     checkRiskToStaffAlert('X000001', 'Caroline', 'medium')
+  })
+
+  it('Overview page with risk to probation staff is rendered', () => {
+    cy.visit('/case/X777916', { failOnStatusCode: false })
+    Page.verifyOnPage(OverviewPage)
+    checkRiskToStaffAlert('X777916', 'Wendell', 'very high', true)
   })
 })

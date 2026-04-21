@@ -32,28 +32,172 @@ const mockRiskFlags: RiskFlag[] = mockRiskData.mappings.find(
   (mapping: any) => mapping.request.urlPattern === '/mas/risk-flags/X000001',
 ).response.jsonBody.riskFlags
 
-const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLink = true, sentencePlanText = false) => {
+interface Args {
+  page: RiskPage
+  sanIndicator?: boolean
+  sentencePlanLink?: boolean
+  sentencePlanText?: boolean
+  ogrs4?: boolean
+  ogrs4Enabled?: boolean
+  sentencePlanUrlEnabled?: boolean
+  ogrs4SummaryCardDetailEnabled?: boolean
+}
+
+const checkRiskPageView = ({
+  page,
+  sanIndicator = false,
+  sentencePlanLink = true,
+  sentencePlanText = false,
+  ogrs4 = false,
+  ogrs4Enabled = true,
+  sentencePlanUrlEnabled = true,
+  ogrs4SummaryCardDetailEnabled = false,
+}: Args) => {
   const headingLevel = !sentencePlanLink && !sentencePlanText ? '3' : '4'
-  page.getElementData('rsr').should('exist')
-  page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
-
-  page.getElementData('ogrs').should('exist')
-  page.getElementData('ogrs').get(`h${headingLevel}`).should('contain.text', 'OGRS (offender group reconviction scale)')
-  page.getElementData('ogrs-1yr').should('have.text', '3%')
-  page.getElementData('ogrs-2yr').should('have.text', '6%')
-  page.getElementData('ogrs-level').should('have.text', 'Low')
-
-  page.getElementData('ovp').should('exist')
-  page.getElementData('ovp').get(`h${headingLevel}`).should('contain.text', 'OVP (OASys violent predictor score)')
-  page.getElementData('ovp-1yr').should('have.text', '4%')
-  page.getElementData('ovp-2yr').should('have.text', '10.2%')
-  page.getElementData('ovp-level').should('have.text', 'Medium')
-
-  page.getElementData('ogp').should('exist')
-  page.getElementData('ogp').get(`h${headingLevel}`).should('contain.text', 'OGP (OASys general predictor score)')
-  page.getElementData('ogp-1yr').should('have.text', '5%')
-  page.getElementData('ogp-2yr').should('have.text', '28.8%')
-  page.getElementData('ogp-level').should('have.text', 'High')
+  const subHeadingLevel = !sentencePlanLink && !sentencePlanText ? '4' : '5'
+  if (ogrs4Enabled) {
+    page.getElementData('riskScoresCard').should('exist')
+    page.getElementData('riskScoresCard').get(`header`).should('contain.text', 'Risk predictor scores')
+    if (ogrs4) {
+      if (ogrs4SummaryCardDetailEnabled) {
+        page.getElementData('viewRiskPredictorScoreDetails').should('exist')
+        page
+          .getElementData('combinedSeriousReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Combined serious reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Combined serious reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="All reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'All reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="All reoffending predictor LOW"]')
+          .get('[data-test-id=staticOrDynamic]')
+          .should('contain.text', 'Dynamic')
+        page
+          .getElementData('directContactSexualReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Direct contact \u2013 sexual reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('indirectImageContactSexualReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Images and indirect contact \u2013 sexual reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Images and indirect contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('violentReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Violent reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Violent reoffending predictor')
+        page
+          .getElementData('seriousViolentReoffendingPredictor')
+          .get('[data-expanded-predictor-badge="Serious violent reoffending predictor LOW"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Serious violent reoffending predictor')
+      } else {
+        page
+          .getElementData('combinedSeriousReoffendingPredictor')
+          .get('[data-predictor-scale="Combined serious reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Combined serious reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-predictor-scale="All reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'All reoffending predictor')
+        page
+          .getElementData('allReoffendingPredictor')
+          .get('[data-predictor-scale="All reoffending predictor"]')
+          .get('[data-test-id=staticOrDynamic]')
+          .should('contain.text', 'Dynamic')
+        page
+          .getElementData('directContactSexualReoffendingPredictor')
+          .get('[data-predictor-scale="Direct contact \u2013 sexual reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Direct contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('indirectImageContactSexualReoffendingPredictor')
+          .get('[data-predictor-scale="Images and indirect contact \u2013 sexual reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Images and indirect contact \u2013 sexual reoffending predictor')
+        page
+          .getElementData('violentReoffendingPredictor')
+          .get('[data-predictor-scale="Violent reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Violent reoffending predictor')
+        page
+          .getElementData('seriousViolentReoffendingPredictor')
+          .get('[data-predictor-scale="Serious violent reoffending predictor"]')
+          .get('[data-test-id="name"]')
+          .should('contain.text', 'Serious violent reoffending predictor')
+      }
+      page
+        .getElementData('oasysScoreHistory')
+        .find('.govuk-heading-m')
+        .should('contain.text', 'Risk predictor scores history')
+      page.getElementData('oasysScoreHistory').find('.arns-predictor-timeline-link-btn').eq(0).click()
+      page
+        .getElementData('oasysScoreHistory')
+        .find('.arns-predictor-timeline-link-btn')
+        .eq(0)
+        .should('contain.text', 'Close')
+      page.getElementData('oasysScoreHistory').find('.arns-predictor-timeline-section').eq(0).should('be.visible')
+      page
+        .getElementData('oasysScoreHistory')
+        .find('.arns-predictor-timeline-section')
+        .eq(0)
+        .find('.arns-predictor-timeline-item--low')
+        .eq(0)
+        .should('contain.text', 'All reoffending predictor')
+    } else {
+      page.getElementData('ovp').should('exist')
+      page.getElementData('rsr').should('contain.text', 'RSR')
+      page.getElementData('ogrs').should('contain.text', 'OGRS')
+      page.getElementData('ogp').should('contain.text', 'OGP')
+      page.getElementData('ovp').should('contain.text', 'OVP')
+      if (!sanIndicator) {
+        page
+          .getElementData('oasysScoreHistory')
+          .find('.arns-predictor-timeline-section')
+          .eq(0)
+          .find('.arns-legacy-predictor-timeline-item--low')
+          .eq(0)
+          .should('contain.text', 'OGRS')
+      }
+    }
+  } else {
+    page.getElementData('riskScoresCard').should('not.exist')
+    page.getElementData('rsr').get(`h${headingLevel}`).should('contain.text', 'RSR (risk of serious recidivism)')
+    page
+      .getElementData('ogrs')
+      .get(`h${headingLevel}`)
+      .should('contain.text', 'OGRS (offender group reconviction scale)')
+    page.getElementData('ogrs-1yr').should('have.text', '3%')
+    page.getElementData('ogrs-2yr').should('have.text', '6%')
+    page.getElementData('ogrs-level').should('have.text', 'Low')
+    page.getElementData('ogp').get(`h${headingLevel}`).should('contain.text', 'OGP (OASys general predictor score)')
+    page.getElementData('ogp-1yr').should('have.text', '5%')
+    page.getElementData('ogp-2yr').should('have.text', '28.8%')
+    page.getElementData('ogp-level').should('have.text', 'High')
+    page.getElementData('osp').get(`h${headingLevel}`).should('contain.text', 'OSP (OASys sexual predictor scores)')
+    page
+      .getElementData('osp')
+      .get(`h${subHeadingLevel}`)
+      .eq(0)
+      .should('contain.text', 'OSP/I (internet-related offences) or OSP/IIC (internet-involved child offences)')
+    page
+      .getElementData('osp')
+      .get(`h${subHeadingLevel}`)
+      .eq(1)
+      .should('contain.text', 'OSP/C (contact-related sexual reoffending) or OSP/DC (direct contact)')
+    page.getElementData('ovp').get(`h${headingLevel}`).should('contain.text', 'OVP (OASys violent predictor score)')
+    page.getElementData('ovp-1yr').should('have.text', '4%')
+    page.getElementData('ovp-2yr').should('have.text', '10.2%')
+    page.getElementData('ovp-level').should('have.text', 'Medium')
+    page.getElementData('oasysScoreHistory').find('h3').should('contain.text', 'OASys score history')
+  }
 
   page.getElementData('riskFlagsCard').should('exist')
   for (let i = 0; i < mockRiskFlags.length; i += 1) {
@@ -133,7 +277,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLin
     page.getElementData('lowScoringNeedsValue').should('contain.text', 'Accommodation')
     page.getElementData('noScoreNeedsValue').should('contain.text', 'Emotional wellbeing')
     page.getInsetText().should('contain.text', 'Last updated: 24 January 2024')
-    page.getElementData('osp').should('exist')
+    // page.getElementData('osp').should('exist')
     page.getElementData('riskFlagsCard').then($riskFlagsCard => {
       page.getElementData('opd').then($opd => {
         expect(Cypress.$($riskFlagsCard).index()).to.be.lessThan(Cypress.$($opd).index())
@@ -161,12 +305,19 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLin
     page.getElementData('plan').get('h3').should('contain.text', 'Plan')
     page.getElementData('plan').find('p').eq(0).should('contain.text', 'Last updated: 10 October 2025')
     page.getElementData('plan').find('a').should('contain.text', 'View the sentence plan (opens in new tab)')
-
-    page
-      .getElementData('plan')
-      .find('a')
-      .should('have.attr', 'target', '_blank')
-      .should('have.attr', 'href', 'https://sentence-plan-dummy-url/crn/X000001/plan')
+    if (sentencePlanUrlEnabled) {
+      page
+        .getElementData('plan')
+        .find('a')
+        .should('have.attr', 'target', '_blank')
+        .should('have.attr', 'href', 'https://sentence-plan-dummy-url-v2/crn/X000001')
+    } else {
+      page
+        .getElementData('plan')
+        .find('a')
+        .should('have.attr', 'target', '_blank')
+        .should('have.attr', 'href', 'https://sentence-plan-dummy-url/crn/X000001/plan')
+    }
   }
   if (!sentencePlanLink && !sentencePlanText) {
     page.checkPageTitle('Risk')
@@ -192,7 +343,7 @@ const checkRiskPageView = (page: RiskPage, sanIndicator = false, sentencePlanLin
 }
 
 context('Risk', () => {
-  beforeEach(() => {
+  afterEach(() => {
     cy.task('resetMocks')
   })
 
@@ -207,7 +358,7 @@ context('Risk', () => {
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    checkRiskPageView(page)
+    checkRiskPageView({ page })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is false', () => {
@@ -215,9 +366,9 @@ context('Risk', () => {
     cy.task('stubUserCaseloadSearch')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    const sentencePlan = false
+    const sentencePlanLink = false
     const sanIndicator = false
-    checkRiskPageView(page, sanIndicator, sentencePlan)
+    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload and san indicator is true', () => {
@@ -227,7 +378,17 @@ context('Risk', () => {
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
     const sanIndicator = true
-    checkRiskPageView(page, sanIndicator)
+    checkRiskPageView({ page, sanIndicator })
+  })
+  it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true, sentence plan link v2 disabled', () => {
+    cy.task('stubSanIndicatorTrue')
+    cy.task('stubUserCaseloadSearch')
+    cy.task('stubAuthSentencePlan')
+    cy.task('stubDisableSentencePlanUrl')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    const sanIndicator = true
+    checkRiskPageView({ page, sanIndicator, sentencePlanUrlEnabled: false })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and san indicator feature flag is disabled', () => {
@@ -237,7 +398,7 @@ context('Risk', () => {
     cy.task('stubAuthSentencePlan')
     cy.visit('/case/X000001/risk')
     const page = new RiskPage()
-    checkRiskPageView(page)
+    checkRiskPageView({ page })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is DRAFT, pop in users caseload and san indicator is true', () => {
@@ -248,7 +409,7 @@ context('Risk', () => {
     const page = new RiskPage()
     const sanIndicator = true
     const sentencePlanLink = false
-    checkRiskPageView(page, sanIndicator, sentencePlanLink)
+    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop not in users caseload and san indicator is true', () => {
@@ -261,7 +422,7 @@ context('Risk', () => {
     const sanIndicator = true
     const sentencePlanLink = false
     const sentencePlanText = true
-    checkRiskPageView(page, sanIndicator, sentencePlanLink, sentencePlanText)
+    checkRiskPageView({ page, sanIndicator, sentencePlanLink, sentencePlanText })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and sentence plan feature flag is not enabled', () => {
@@ -273,7 +434,7 @@ context('Risk', () => {
     const page = new RiskPage()
     const sanIndicator = true
     const sentencePlanLink = false
-    checkRiskPageView(page, sanIndicator, sentencePlanLink)
+    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
   })
 
   it('Risk overview page is rendered when sentence plan agreement status is AGREED, pop in users caseload, san indicator is true and both sentence plan and san indicator feature flags are disabled', () => {
@@ -285,7 +446,35 @@ context('Risk', () => {
     const page = new RiskPage()
     const sanIndicator = false
     const sentencePlanLink = false
-    checkRiskPageView(page, sanIndicator, sentencePlanLink)
+    checkRiskPageView({ page, sanIndicator, sentencePlanLink })
+  })
+
+  it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data', () => {
+    cy.task('stubPredictorScoresOGRS4')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView({ page, sentencePlanLink: false, ogrs4: true })
+  })
+
+  it('Risk overview page is rendered with OGRS4 predictor components and OGRS4 data and expanded badge', () => {
+    cy.task('stubPredictorScoresOGRS4')
+    cy.task('stubOgrs4SummaryCardEnabled')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView({
+      page,
+      sentencePlanLink: false,
+      ogrs4Enabled: true,
+      ogrs4: true,
+      ogrs4SummaryCardDetailEnabled: true,
+    })
+  })
+
+  it('Risk overview page is rendered with OGRS4 feature flag disabled', () => {
+    cy.task('stubDisableOGRS4')
+    cy.visit('/case/X000001/risk')
+    const page = new RiskPage()
+    checkRiskPageView({ page, sentencePlanLink: false, ogrs4Enabled: false })
   })
 
   it('Should persist Risk and plan nav link for all case pages', () => {
@@ -364,12 +553,21 @@ context('Risk', () => {
         'href',
         'https://justiceuk.sharepoint.com/sites/HMPPS-HQ-NDST-ATW/Shared%20Documents/Forms/AllItems.aspx?csf=1&web=1&e=iEFxub&CID=82b28f43%2Dc021%2D465a%2Dbce3%2D11c8eb64c791&FolderCTID=0x012000789EB5A24184864D90305EEA82661286&id=%2Fsites%2FHMPPS%2DHQ%2DNDST%2DATW%2FShared%20Documents%2FNational%20Delius%20Guidance%2FNational%20Delius%20Case%20Recording%20Instructions%2FCRI019%20Registrations&sortField=Modified&isAscending=false&viewid=330f3b0b%2D9b57%2D4427%2Dad3f%2D8d5cffdc3885',
       )
+    page.getElementData('riskFlagLevel').should('not.exist')
   })
   it('Risk Detail page is rendered with expired review date', () => {
     cy.visit('/case/X000001/risk/flag/1')
     const page = new RiskDetailPage()
     page.checkPageTitle('Risk to Staff')
     page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
+  })
+
+  it('Risk Detail page is rendered with risk level for Risk to Staff flag', () => {
+    cy.visit('/case/X000001/risk/flag/1')
+    const page = new RiskDetailPage()
+    page.checkPageTitle('Risk to Staff')
+    page.getRowData('riskFlag', 'nextReviewDate', 'Value').find('.govuk-tag--red').should('contain.text', 'Overdue')
+    page.getElementData('riskFlagLevel').should('contain.text', 'Medium')
   })
   it('Risk page is rendered with create a risk assessment on OASys link', () => {
     cy.visit('/case/X801756/risk')

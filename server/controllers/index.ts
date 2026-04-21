@@ -18,6 +18,8 @@ import alertsController from './alerts'
 import checkInsController from './check-ins'
 import rescheduleAppointmentController from './rescheduleAppointments'
 import whatsNewController from './whatsNewController'
+import appointmentOutcomesController from './appointmentOutcomes'
+import footerController from './footerController'
 
 export default {
   caseload: caseloadController,
@@ -29,6 +31,7 @@ export default {
   compliance: complianceController,
   home: homeController,
   whatsNew: whatsNewController,
+  footer: footerController,
   interventions: interventionsController,
   risk: riskController,
   sentence: sentenceController,
@@ -40,4 +43,5 @@ export default {
   fileUpload: fileUploadController,
   alerts: alertsController,
   checkIns: checkInsController,
+  appointmentOutcomes: appointmentOutcomesController,
 }

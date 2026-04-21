@@ -14,7 +14,7 @@
 
 {% macro rendersummaryText(activity) %}
   <span>
-    {{ activity.type | toSentenceCase }}
+    {{ (activity.description or activity.type) | toSentenceCase }}
   </span>
 {% endmacro %}
 
@@ -56,6 +56,10 @@
                     lastUpdatedBy: activity.lastUpdatedBy,
                     lastUpdated: activity.lastUpdated
                   }, '/case/' + crn + '/appointments/appointment/' + activity.id + '/manage/note/' + appointmentNote.id + '?back=' + url, 'View full contact', 'Latest update: ') %}
+                  {% if activity.outcome %}
+                    {% set outcomeHtml = '<p class="govuk-body govuk-!-margin-bottom-3"><span class="govuk-!-font-weight-bold">Outcome:</span> ' + activity.outcome + '</p>' %}
+                    {% set notes = outcomeHtml + notes %}
+                  {% endif %}
               {{ govukDetails({
                   summaryHtml: rendersummaryText(activity),
                   html: notes,
@@ -63,7 +67,7 @@
                 }) }}
               {% else %}
                 <div class="govuk-!-margin-bottom-6 contact-activity--noNotes">
-                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ activity.type | toSentenceCase }}</a>
+                  <a href="{{ link }}" rel="noopener noreferrer" class="govuk-link" data-qa="summry-text-link">{{ (activity.description or activity.type) | toSentenceCase }}</a>
                 </div>
               {% endif %}
             </div>

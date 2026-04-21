@@ -10,7 +10,7 @@
 {% set overViewLink = "/case/" + crn %}
 {% set anotherAppointment = "/case/"+ crn + "/appointments/appointment/" + backendId + "/next-appointment"%}
 {% set overViewPage = "/case/" + crn %}
-
+{% set questionsStartPage = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
 {% set panelHtml %}
 <div class="govuk-!-font-size-36">
     Starting {{ userDetails.displayDay }}
@@ -42,7 +42,11 @@
         {{case.name.forename}} will receive a message to their preferred contact method each time they need to submit an online check in. They will have 3 days to complete and submit their check in.
         </p>
       <p class="govuk-body">You will get an email when they have submitted a check in or if they miss a check in. The email will include a link to review the check in or add any actions you will take for a missed check in.</p>
-
+      {% if flags.enableESupervisionCustomQuestions === true %}
+      <h2 class="govuk-heading-m govuk-!-margin-top-6">Add additional questions to {{case.name.forename}}'s online check in</h2>
+      <p class="govuk-body">You can add up to 3 additional questions to {{case.name.forename}}'s next online check in, you will have until 23:59 the day before the next check in to add questions. We will send you a reminder before their next check in.</p>
+      <p class="govuk-body"><a class="govuk-link" data-qa="add-additional-questions" href="{{questionsStartPage}}">Add additional questions to {{case.name.forename}}'s first online check in</a></p>
+      {% endif %}
     </div>
   </div>
   <div class="govuk-button-group">

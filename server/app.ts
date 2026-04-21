@@ -25,6 +25,7 @@ import config from './config'
 import './sentry'
 import sentryMiddleware from './middleware/sentryMiddleware'
 import setUpFlags from './middleware/setUpFlags'
+import setUpSuccessBanner from './middleware/setUpSuccessBanner'
 import baseController from './baseController'
 import manageAppointmentRoutes from './routes/manageAppointmentRoutes'
 import testRoutes from './routes/testRoutes'
@@ -44,6 +45,13 @@ export default function createApp(services: Services): express.Application {
 
   app.use(sentryMiddleware())
   app.use(metricsMiddleware)
+
+  app.use((req, res, next) => {
+    res.locals.pageUrl = encodeURI(`https://manage-people-on-probation.hmpps.service.justice.gov.uk${req.url}`) // ignores ENV
+    res.locals.feedbackEmail = config.feedbackEmail
+    next()
+  })
+
   app.use(setUpHealthChecks(services.applicationInfo))
   app.use(setUpWebSecurity())
   app.use(setUpWebSession())
@@ -54,10 +62,11 @@ export default function createApp(services: Services): express.Application {
   const apiRouter = Router()
   app.use(testRoutes(apiRouter))
   app.use(setUpAuthentication())
-  app.use(getFrontendComponents(services.probationComponentsApiService))
+  app.use(setUpSuccessBanner())
   app.use(authorisationMiddleware(['ROLE_MANAGE_SUPERVISIONS']))
   app.use(setUpCurrentUser(services))
   app.use(setUpFlags(services))
+  app.use(getFrontendComponents(services.probationComponentsApiService))
   const { hmppsAuthClient } = services
   app.use(getUserAlertsCount(hmppsAuthClient))
   app.use(['/case/:crn', '/case/:crn/*path'], limitedAccess(services))

@@ -1,6 +1,7 @@
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import AppointmentTypePage from '../../pages/appointments/type.page'
-import { crn, uuid, checkPopHeader, checkRiskToStaffAlert } from './imports'
+import { checkPopHeader, checkRiskToStaffAlert } from './imports'
+import { crn, uuid } from './imports/common'
 
 const loadPage = (_crn = crn) => {
   cy.visit(`/case/${_crn}/arrange-appointment/${uuid}/sentence`)
@@ -14,7 +15,7 @@ describe('What is this appointment for?', () => {
       sentencePage = new AppointmentSentencePage()
     })
     it('should render the pop header', () => {
-      checkPopHeader('Alton Berge', true, 'X778160')
+      checkPopHeader({ name: 'Alton Berge', appointments: true, headerCrn: 'X778160' })
     })
     it('should display 4 sentences that are not selected', () => {
       const radios = sentencePage.getElement(`input[data-sentence="true"]`)

@@ -25,7 +25,7 @@
             {% endif %}
             <span class="govuk-visually-hidden"> on {{ thisDate }}
             </a>
-            {% if entry.esupervisionId and flags.enableESuperVision  %}
+            {% if entry.esupervisionId %}
                   <br/><a href="{{ link }}" class="govuk-!-margin-left-2 govuk-!-font-weight-bold">Update</a>
             {% elif shouldPromptToRecordAnOutcome %}
                   <br/>{% include './_log-outcome-link.njk' %}

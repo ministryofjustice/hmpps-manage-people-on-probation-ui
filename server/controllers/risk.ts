@@ -5,8 +5,7 @@ import MasApiClient from '../data/masApiClient'
 import config from '../config'
 import ArnsApiClient from '../data/arnsApiClient'
 import { PersonRiskFlag, TimelineItem } from '../data/model/risk'
-import TierApiClient from '../data/tierApiClient'
-import { toTimeline, toRoshWidget, findReplace } from '../utils'
+import { toTimeline, findReplace } from '../utils'
 
 const routes = [
   'getRisk',
@@ -14,12 +13,20 @@ const routes = [
   'getRiskFlagSingleNote',
   'getRiskRemovalFlagSingleNote',
   'getRemovedRiskFlags',
+  'getRiskPredictorScoresDetail',
 ] as const
 
+const riskFlagTypes: Set<string> = new Set([
+  'Risk to Staff',
+  'Risk to Children',
+  'Risk to Known Adult',
+  'Risk to Prisoner',
+  'Risk to Public',
+])
 const riskController: Controller<typeof routes, void> = {
   getRisk: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { username } = res.locals.user
       const token = await hmppsAuthClient.getSystemClientToken(username)
       await auditService.sendAuditMessage({
@@ -31,10 +38,9 @@ const riskController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       const arnsClient = new ArnsApiClient(token)
-      const tierClient = new TierApiClient(token)
-      const [risks, tierCalculation, predictors, needs, sanIndicatorResponse] = await Promise.all([
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
+
+      // remove predictors below with migration to ARNS predictor timeline component
+      const [predictors, needs, sanIndicatorResponse] = await Promise.all([
         arnsClient.getPredictorsAll(crn),
         arnsClient.getNeeds(crn),
         arnsClient.getSanIndicator(crn),
@@ -48,14 +54,9 @@ const riskController: Controller<typeof routes, void> = {
       if (timeline.length > 0) {
         ;[predictorScores] = timeline
       }
-      const risksWidget = toRoshWidget(risks)
       const oasysLink = config.oaSys.link
       return res.render('pages/risk', {
-        risks,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         timeline,
         needs,
         oasysLink,
@@ -65,7 +66,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRiskFlag: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -86,13 +87,14 @@ const riskController: Controller<typeof routes, void> = {
       })
       return res.render('pages/risk/flag', {
         personRiskFlag,
+        showRiskLevel: riskFlagTypes.has(personRiskFlag.riskFlag.description),
         crn,
       })
     }
   },
   getRiskFlagSingleNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, noteId } = req.params
+      const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -112,7 +114,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRiskRemovalFlagSingleNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, noteId } = req.params
+      const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -132,7 +134,7 @@ const riskController: Controller<typeof routes, void> = {
   },
   getRemovedRiskFlags: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_REMOVED_RISKS',
         who: res.locals.user.username,
@@ -142,6 +144,22 @@ const riskController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       res.render('pages/risk/removed-risk-flags', {
+        crn,
+      })
+    }
+  },
+  getRiskPredictorScoresDetail: hmppsAuthClient => {
+    return async (req, res) => {
+      const { crn } = req.params as Record<string, string>
+      await auditService.sendAuditMessage({
+        action: 'VIEW_MAS_RISKS_DETAIL',
+        who: res.locals.user.username,
+        subjectId: crn,
+        subjectType: 'CRN',
+        correlationId: v4(),
+        service: 'hmpps-manage-people-on-probation-ui',
+      })
+      return res.render('pages/risk/risk-predictor-scores-detail', {
         crn,
       })
     }

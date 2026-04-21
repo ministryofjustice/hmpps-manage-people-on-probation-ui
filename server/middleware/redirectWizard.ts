@@ -19,7 +19,7 @@ export const redirectWizard = (
   route: RouteKey = 'appointments',
 ): Route<Promise<void>> => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { crn, id } = req.params
+    const { crn, id } = req.params as Record<string, string>
     const mapping: Mapping = {
       appointments: {
         dataPath: ['appointments', crn, id],
@@ -28,7 +28,7 @@ export const redirectWizard = (
       },
       setupcheckins: {
         dataPath: ['esupervision', crn, id, 'checkins'],
-        redirectPath: `/case/${crn}/appointments/${id}/check-in/instructions`,
+        redirectPath: `/case/${crn}/appointments/${id}/check-in/eligibility-check`,
         queryParam: 'cya',
       },
     }

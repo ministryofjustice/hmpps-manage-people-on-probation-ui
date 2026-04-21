@@ -1,5 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
+import { Request } from 'express'
 import { Route } from '../../@types'
 import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
@@ -8,14 +9,13 @@ import { validateWithSpec } from '../../utils/validationUtils'
 import { LocalParams } from '../../models/Appointments'
 import config from '../../config'
 import { getMockedTime } from '../../routes/testRoutes'
-import { getAttendedCompliedProps } from '../getAttendedCompliedProps'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
-  const { crn, id, contactId, actionType } = params
+  const { crn, id, contactId, actionType } = params as Record<string, string>
   const { data, alertDismissed = false } = session
   const { back = '', change = '' } = req.query as Record<string, string>
   const { maxCharCount } = config
@@ -41,20 +41,18 @@ const appointments: Route<void> = (req, res, next) => {
   if (
     [`/arrange-appointment/${id}/attended-complied`, '/location-date-time'].some(urlPart => req.url.includes(urlPart))
   ) {
-    const { enablePastAppointments } = res.locals.flags
-    const { _minDate, _maxDate } = getMinMaxDates()
+    const { _maxDate } = getMinMaxDates()
 
     localParams = {
       ...localParams,
       isReschedule: isRescheduleAppointment(req),
       isInPast: appointmentDateIsInPast(req),
-      ...(enablePastAppointments ? {} : { _minDate }),
       _maxDate,
     }
   }
 
   if (req.url.includes('/attended-complied')) {
-    localParams = { ...localParams, ...getAttendedCompliedProps(req, res) }
+    localParams = { ...localParams, ...res.locals.appointmentOutcome }
   }
 
   if (
@@ -80,7 +78,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -96,7 +94,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -117,12 +115,12 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
           page: 'location-date-time',
-          enablePastAppointments: res.locals.flags.enablePastAppointments,
+          previousStart: req?.session?.data?.appointments?.[crn]?.[id]?.rescheduleAppointment?.previousStart || null,
         }),
         { now },
       ),
@@ -137,7 +135,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -154,7 +152,7 @@ const appointments: Route<void> = (req, res, next) => {
     render = 'pages/appointments/attended-complied'
 
     errorMessages = validateWithSpec(
-      req.body,
+      req,
       appointmentsValidation({
         crn,
         id,
@@ -171,7 +169,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -188,7 +186,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -207,7 +205,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -226,7 +224,7 @@ const appointments: Route<void> = (req, res, next) => {
     render = 'pages/appointments/add-note'
 
     errorMessages = validateWithSpec(
-      req.body,
+      req,
       appointmentsValidation({
         crn,
         id,
@@ -246,7 +244,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,
@@ -266,7 +264,7 @@ const appointments: Route<void> = (req, res, next) => {
       errorMessages = {
         ...errorMessages,
         ...validateWithSpec(
-          unflattenBracketKeys(req.body),
+          { ...req, body: unflattenBracketKeys(req.body) } as Request,
           appointmentsValidation({
             crn,
             id,
@@ -284,7 +282,7 @@ const appointments: Route<void> = (req, res, next) => {
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
-        req.body,
+        req,
         appointmentsValidation({
           crn,
           id,

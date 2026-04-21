@@ -5,13 +5,58 @@ import FlagService from './flagService'
 import TechnicalUpdatesService from './technicalUpdatesService'
 import config from '../config'
 import ProbationComponentsApiService from './ProbationComponentsService'
+import { convertToTitleCase } from '../utils'
+
+const UNALLOCATED: string = 'Unallocated'
+export const getPdu = (result: any): string => {
+  const activeManager = result?.offenderManagers?.find((item: any) => item?.active)
+  if (!activeManager) {
+    return UNALLOCATED
+  }
+  const pdu = activeManager?.team?.borough?.description
+  return pdu?.includes(UNALLOCATED) ? UNALLOCATED : convertToTitleCase(pdu) || UNALLOCATED
+}
+
+export const getManagedBy = (result: any): string => {
+  const activeManager = result?.offenderManagers?.find((item: any) => item?.active)
+  if (activeManager?.staff?.unallocated || !activeManager) {
+    return UNALLOCATED
+  }
+  const { surname, forenames } = activeManager.staff || {}
+
+  return [surname, forenames]
+    .filter(Boolean)
+    .map(s => convertToTitleCase(s))
+    .join(' ')
+}
 
 export const services = () => {
-  const { applicationInfo, hmppsAuthClient, manageUsersApiClient, probationFrontendComponentsApiClient } = dataAccess()
+  const {
+    applicationInfo,
+    hmppsAuthClient,
+    manageUsersApiClient,
+    probationFrontendComponentsApiClient,
+    arnsComponents,
+  } = dataAccess()
 
   const userService = new UserService(manageUsersApiClient)
 
   const searchService = new CaseSearchService({
+    oauthClient: hmppsAuthClient,
+    environment: config.env,
+    extraColumns: [
+      {
+        header: 'Managed By',
+        value: result => getManagedBy(result),
+      },
+      {
+        header: 'PDU',
+        value: result => getPdu(result),
+      },
+    ],
+  })
+
+  const searchServiceWithoutExtraColumns = new CaseSearchService({
     oauthClient: hmppsAuthClient,
     environment: config.env,
     extraColumns: [],
@@ -27,9 +72,11 @@ export const services = () => {
     hmppsAuthClient,
     userService,
     searchService,
+    searchServiceWithoutExtraColumns,
     flagService,
     probationComponentsApiService,
     technicalUpdatesService,
+    arnsComponents,
   }
 }
 

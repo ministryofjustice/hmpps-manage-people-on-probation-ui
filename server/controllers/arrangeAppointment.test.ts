@@ -2,7 +2,7 @@ import { DateTime } from 'luxon'
 import httpMocks from 'node-mocks-http'
 import { v4 as uuidv4 } from 'uuid'
 import controllers from '.'
-import { dateIsInPast, isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
+import { isNumericString, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { mockAppResponse } from './mocks'
 import HmppsAuthClient from '../data/hmppsAuthClient'
 import {
@@ -18,7 +18,10 @@ import {
 import { AppointmentSession } from '../models/Appointments'
 import { Data } from '../models/Data'
 import { AppResponse } from '../models/Locals'
-import { ArrangedSession } from '../models/ArrangedSession'
+import { checkSendAuditMessage } from './testutils'
+import { SubjectType } from '../middleware/sendAuditMessage'
+
+jest.mock('@ministryofjustice/hmpps-audit-client')
 
 const uuid = 'f1654ea3-0abb-46eb-860b-654a96edbe20'
 const uuid2 = 'f1654ea3-0abb-46eb-860b-654a96edbe21'
@@ -76,6 +79,12 @@ jest.mock('../data/masApiClient', () => {
     return {
       getPersonRiskFlags: jest.fn(),
       getUserDetails: jest.fn().mockImplementation(() => Promise.resolve({ firstName: 'first' })),
+      getProbationPractitioner: jest.fn().mockImplementation(() =>
+        Promise.resolve({
+          name: { forename: 'first', surname: 'last' },
+          unallocated: false,
+        }),
+      ),
     }
   })
 })
@@ -168,9 +177,6 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
       dateTo: '',
       keywords: '',
     },
-    flags: {
-      enablePastAppointments: true,
-    },
     user: {
       username,
     },
@@ -180,6 +186,7 @@ const createMockResponse = (localsResponse?: Record<string, any>): AppResponse =
         surname: 'Wolff',
       },
     },
+    flags: { enableMAN2344: true },
     ...(localsResponse || {}),
   })
 
@@ -245,12 +252,14 @@ describe('controllers/arrangeAppointment', () => {
         },
       },
     })
+
     it('should delete the session errors', async () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
       expect(mockReq.session.data.errors).toBeUndefined()
     })
     it('should render the sentence page', async () => {
       await controllers.arrangeAppointments.getSentence()(mockReq, res)
+      checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_FOR', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/sentence`, {
         crn,
         id: uuid,
@@ -346,6 +355,7 @@ describe('controllers/arrangeAppointment', () => {
         await controllers.arrangeAppointments.getTypeAttendance()(mockReq, res)
       })
       it('should render the type page', () => {
+        checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_TYPE_AND_ATTENDANCE', crn, SubjectType.CRN)
         expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/type-attendance`, {
           crn,
           id: uuid,
@@ -391,6 +401,7 @@ describe('controllers/arrangeAppointment', () => {
       expect(mockReq.session.data.errors).toBeUndefined()
     })
     it('should render the attendance page', () => {
+      checkSendAuditMessage(res, 'SELECT_MAS_APPOINTMENT_ATTENDANCE', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/attendance`, {
         crn,
         id: uuid,
@@ -479,6 +490,7 @@ describe('controllers/arrangeAppointment', () => {
       await controllers.arrangeAppointments.getLocationNotInList()(mockReq, res)
     })
     it('should render the location not in list page', () => {
+      checkSendAuditMessage(res, 'VIEW_MAS_APPOINTMENT_UNLISTED_LOCATION', crn, SubjectType.CRN)
       expect(renderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-not-in-list`, {
         crn,
         id: uuid,
@@ -490,7 +502,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getLocationDateTime', () => {
     beforeAll(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+      jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
     })
     afterAll(() => {
       jest.useRealTimers()
@@ -511,6 +523,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse({ appointment: { type: { isLocationRequired: false } } })
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
+      checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_DATE_TIME_LOCATION', crn, SubjectType.CRN)
       expect(mockRenderSpy).toHaveBeenCalledWith(`pages/arrange-appointment/location-date-time`, {
         crn,
         id: uuid,
@@ -527,9 +540,6 @@ describe('controllers/arrangeAppointment', () => {
       const mockReq = createMockRequest({ query: {} })
       const mockRes = createMockResponse({
         appointment: { type: { isLocationRequired: false } },
-        flags: {
-          enablePastAppointments: false,
-        },
       })
       await controllers.arrangeAppointments.getLocationDateTime(hmppsAuthClient)(mockReq, mockRes)
       const mockRenderSpy = jest.spyOn(mockRes, 'render')
@@ -537,7 +547,6 @@ describe('controllers/arrangeAppointment', () => {
         crn,
         id: uuid,
         _maxDate: '31/12/2199',
-        _minDate: '1/7/2025',
         change: undefined,
         showValidation: false,
         personRisks: undefined,
@@ -652,7 +661,7 @@ describe('controllers/arrangeAppointment', () => {
   describe('getLocationDateTime for double digit date', () => {
     beforeAll(() => {
       jest.useFakeTimers()
-      jest.setSystemTime(new Date('2025-07-10T09:00:00Z')) // 10:00 BST
+      jest.setSystemTime(new Date('2025-07-10T09:00:00Z').getTime()) // 10:00 BST
     })
     afterAll(() => {
       jest.useRealTimers()
@@ -845,6 +854,123 @@ describe('controllers/arrangeAppointment', () => {
         null,
       )
     })
+    it('should set the SMS opt in appointment session value to NO and delete the sms preview if updated appointment date is in the past', async () => {
+      const mockReq = createMockRequest({
+        query: { change },
+        appointmentSession: {
+          date: '2029-07-07',
+          smsOptIn: 'YES',
+          temp: {
+            date: tomorrow,
+            isInPast: false,
+          },
+        },
+      })
+      const mockRes = createMockResponse()
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      mockedAppointmentDateIsInPast.mockReturnValueOnce(true)
+      await controllers.arrangeAppointments.postLocationDateTime()(mockReq, mockRes)
+      expect(mockedSetDataValue).toHaveBeenCalledWith(
+        mockReq.session.data,
+        ['appointments', crn, uuid, 'smsOptIn'],
+        'NO',
+      )
+      expect(mockReq.session.data.appointments[crn][uuid].smsPreview).toBeUndefined()
+    })
+  })
+
+  describe('getTextMessageConfirmation', () => {
+    const mockReq = createMockRequest({ query: { change } })
+    it('should render the text message confirmation page if feature flag enabled', async () => {
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'render')
+      await controllers.arrangeAppointments.getTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith('pages/arrange-appointment/text-message-confirmation', {
+        crn,
+        id: uuid,
+        change,
+      })
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+    it('should redirect to the location date time page if feature flag is disabled', async () => {
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: false } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.getTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(`/case/${crn}/arrange-appointment/${uuid}/location-date-time`)
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('postTextMessageConfirmtion', () => {
+    it('if CRN or UUID in request params are invalid, it should return a 404 status and render the error page', async () => {
+      mockedIsValidCrn.mockReturnValue(false)
+      mockedIsValidUUID.mockReturnValue(false)
+      const mockReq = createMockRequest({ query: { change } })
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, res)
+      expect(mockRenderError).toHaveBeenCalledWith(404)
+      expect(mockMiddlewareFn).toHaveBeenCalledWith(mockReq, res)
+      expect(redirectSpy).not.toHaveBeenCalled()
+    })
+    it('should redirect to correct url if change query in url', async () => {
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        query: { change },
+      })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(redirectUrl)
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+    it('should redirect to correct url if editing mobile number', async () => {
+      const url = '/text-message-confirmation'
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        query: { change },
+        request: { url },
+        appointmentBody: { smsOptIn: 'YES_UPDATE_MOBILE_NUMBER' },
+      })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/personal-details/${uuid}/edit-contact-details?origin=appointments&back=${encodeURIComponent(url)}&change=${change}`,
+      )
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+    it('should redirect to correct url if adding mobile number', async () => {
+      const url = '/text-message-confirmation'
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({
+        query: { change },
+        request: { url },
+        appointmentBody: { smsOptIn: 'YES_ADD_MOBILE_NUMBER' },
+      })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/personal-details/${uuid}/edit-contact-details?origin=appointments&back=${encodeURIComponent(url)}&change=${change}`,
+      )
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
+    it('should redirect to the supporting information page', async () => {
+      const url = '/text-message-confirmation'
+      mockedIsValidCrn.mockReturnValue(true)
+      mockedIsValidUUID.mockReturnValue(true)
+      const mockReq = createMockRequest({ request: { url } })
+      const mockRes = createMockResponse({ flags: { enableSmsReminders: true } })
+      const spy = jest.spyOn(mockRes, 'redirect')
+      await controllers.arrangeAppointments.postTextMessageConfirmation(hmppsAuthClient)(mockReq, mockRes)
+      expect(spy).toHaveBeenCalledWith(
+        `/case/${crn}/arrange-appointment/${uuid}/supporting-information?back=${encodeURIComponent(url)}`,
+      )
+      expect(spy).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe('getSupportingInformation', () => {
@@ -853,6 +979,7 @@ describe('controllers/arrangeAppointment', () => {
       const mockRes = createMockResponse()
       const spy = jest.spyOn(mockRes, 'render')
       await controllers.arrangeAppointments.getSupportingInformation(hmppsAuthClient)(mockReq, mockRes)
+      checkSendAuditMessage(res, 'ADD_MAS_APPOINTMENT_SUPPORTING_INFO', crn, SubjectType.CRN)
       expect(spy).toHaveBeenCalledWith(`pages/arrange-appointment/supporting-information`, {
         crn,
         id: uuid,
@@ -936,8 +1063,10 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: null,
+        isEnglishNotificationFailed: undefined,
+        isWelshNotificationFailed: undefined,
         smsSent: true,
-        attendingName: 'Caroline´s',
+        attendingName: 'First’s',
         url: '',
       })
     })
@@ -954,7 +1083,7 @@ describe('controllers/arrangeAppointment', () => {
         backendId: 1234,
         isOutLookEventFailed: false,
         appointmentType: 'RESCHEDULE',
-        attendingName: 'Caroline´s',
+        attendingName: 'First’s',
         url: encodeURIComponent('/reschedule/url'),
       })
     })

@@ -3,12 +3,8 @@ import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
 import { Controller, FileCache } from '../@types'
-import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import {
-  toRoshWidget,
-  toPredictors,
   isNumericString,
   isValidCrn,
   isMatchingAddress,
@@ -17,7 +13,7 @@ import {
   getDataValue,
   canRescheduleAppointment,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect, getAttendedCompliedProps } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
 import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
@@ -44,9 +40,7 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn } = req.params as Record<string, string>
       const url = encodeURIComponent(req.url)
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_APPOINTMENTS',
         who: res.locals.user.username,
@@ -56,18 +50,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, pastAppointments, risks, tierCalculation, predictors, practitioner] =
-        await Promise.all([
-          masClient.getPersonSchedule(crn, 'upcoming', '0'),
-          masClient.getPersonSchedule(crn, 'previous', '0'),
-          arnsClient.getRisks(crn),
-          tierClient.getCalculationDetails(crn),
-          arnsClient.getPredictorsAll(crn),
-          masClient.getProbationPractitioner(crn),
-        ])
+      const [upcomingAppointments, pastAppointments, practitioner] = await Promise.all([
+        masClient.getPersonSchedule(crn, 'upcoming', '0'),
+        masClient.getPersonSchedule(crn, 'previous', '0'),
+        masClient.getProbationPractitioner(crn),
+      ])
 
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
@@ -76,9 +64,6 @@ const appointmentsController: Controller<typeof routes, void> = {
         pastAppointments,
         crn,
         url,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         hasDeceased,
         hasPractitioner,
       })
@@ -95,9 +80,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         sortName === 'time' ? `&sortBy=date&ascending=${isAscending}` : `&sortBy=${sortName}&ascending=${isAscending}`
       const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
 
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ALL_UPCOMING_APPOINTMENTS',
@@ -108,14 +91,12 @@ const appointmentsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
 
-      const [upcomingAppointments, risks, tierCalculation, predictors] = await Promise.all([
-        masClient.getPersonSchedule(crn, 'upcoming', (pageNum - 1).toString(), sortQuery),
-        arnsClient.getRisks(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const upcomingAppointments = await masClient.getPersonSchedule(
+        crn,
+        'upcoming',
+        (pageNum - 1).toString(),
+        sortQuery,
+      )
 
       const pagination: Pagination = getPaginationLinks(
         req.query.page ? pageNum : 1,
@@ -128,9 +109,6 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.render('pages/upcoming-appointments', {
         upcomingAppointments,
         crn,
-        tierCalculation,
-        risksWidget,
-        predictorScores,
         sortedBy,
         url,
         pagination,
@@ -139,7 +117,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postAppointments: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const url = encodeURIComponent(req.url)
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
@@ -149,7 +127,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getManageAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn, contactId } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'VIEW_MANAGE_APPOINTMENT',
         who: res.locals.user.username,
@@ -193,7 +171,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   getRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const actionType = 'outcome'
       const { contactId } = req.query
       await auditService.sendAuditMessage({
@@ -211,10 +189,9 @@ const appointmentsController: Controller<typeof routes, void> = {
       })
     }
   },
-
   postRecordAnOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, actionType } = req.params
+      const { crn, actionType } = req.params as Record<string, string>
       const appointmentId = req?.body?.['appointment-id'] as string
       if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
         return renderError(404)(req, res)
@@ -224,9 +201,10 @@ const appointmentsController: Controller<typeof routes, void> = {
       )
     }
   },
+  /* Delete these controllers after enableNonCompliance feature flag is removed 👇 */
   getAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const { alertDismissed = false } = req.session
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
@@ -236,7 +214,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const { forename, surname, appointment } = getAttendedCompliedProps(req, res)
+      const { forename, surname, appointment } = res.locals.appointmentOutcome
       const headerPersonName = { forename, surname }
       res.render('pages/appointments/attended-complied', {
         crn,
@@ -251,7 +229,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postAttendedComplied: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId: id } = req.params
+      const { crn, contactId: id } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
       }
@@ -260,9 +238,10 @@ const appointmentsController: Controller<typeof routes, void> = {
       return res.redirect(`/case/${crn}/appointments/appointment/${id}/add-note`)
     }
   },
+  /* ----------------- 👆 -----------------  */
   getAddNote: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       await auditService.sendAuditMessage({
         action: 'ADD_APPOINTMENT_NOTES',
         who: res.locals.user.username,
@@ -299,7 +278,7 @@ const appointmentsController: Controller<typeof routes, void> = {
   },
   postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId: id } = req.params
+      const { crn, contactId: id } = req.params as Record<string, string>
 
       if (!isValidCrn(crn) || !isNumericString(id)) {
         return renderError(404)(req, res)
@@ -344,7 +323,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   getNextAppointment: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId } = req.params
+      const { crn, contactId } = req.params as Record<string, string>
       const { data } = req.session
       let { back } = req.query
       if (back) {
@@ -374,29 +353,26 @@ const appointmentsController: Controller<typeof routes, void> = {
 
   postNextAppointment: _hmppsAuthClient => {
     return async (req, res) => {
-      const {
-        params: { crn, contactId },
-        body,
-        url,
-      } = req
+      const { body, url } = req
+      const { crn, contactId } = req.params as Record<string, string>
       if (!isValidCrn(crn) || !isNumericString(contactId)) {
         return renderError(404)(req, res)
       }
       const nextAppointment = body.nextAppointment as 'CHANGE_TYPE' | 'KEEP_TYPE' | 'NO'
-      const { nextAppointmentSession } = res.locals
+      const { appointmentSession } = res.locals
       if (nextAppointment === 'CHANGE_TYPE') {
         const uuid = v4()
         return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/sentence?back=${url}`)
       }
       if (nextAppointment === 'KEEP_TYPE') {
-        return cloneAppointmentAndRedirect(nextAppointmentSession)(req, res)
+        return cloneAppointmentAndRedirect(appointmentSession)(req, res)
       }
       return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage/`)
     }
   },
   getAppointmentNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId, noteId } = req.params
+      const { crn, contactId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const personAppointment = await masClient.getPersonAppointmentNote(crn, contactId, noteId)

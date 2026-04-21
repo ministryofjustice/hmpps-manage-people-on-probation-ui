@@ -18,12 +18,13 @@ generic-service:
     TIER_API_URL: 'https://hmpps-tier-preprod.hmpps.service.justice.gov.uk'
     INTERVENTIONS_API_URL: 'https://hmpps-interventions-service-preprod.apps.live-1.cloud-platform.service.justice.gov.uk'
     SUPERVISION_API_URL: 'https://probation-supervision-appointments-api-preprod.hmpps.service.justice.gov.uk'
-    SENTENCE_PLAN_API_URL: 'https://sentence-plan-api-preprod.hmpps.service.justice.gov.uk'
+    ARNS_ASSESSMENT_PLATFORM_API_URL: 'https://arns-assessment-platform-api-preprod.hmpps.service.justice.gov.uk'
     PROBATION_FRONTEND_COMPONENTS_API_URL: 'https://probation-frontend-components-preprod.hmpps.service.justice.gov.uk'
     PROBATION_FRONTEND_COMPONENTS_CONNECT_SRC: 'https://probation-frontend-components-preprod.hmpps.service.justice.gov.uk'
     PROBATION_FRONTEND_COMPONENTS_FONT_SRC: 'https://probation-frontend-components-preprod.hmpps.service.justice.gov.uk'
     FLIPT_URL: 'https://feature-flags-manage-people-on-probation-preprod.hmpps.service.justice.gov.uk'
     INTERVENTIONS_LINK: 'https://hmpps-interventions-ui-preprod.apps.live-1.cloud-platform.service.justice.gov.uk'
+    SUPERVISION_CONTACTS_LINK: 'https://probation-supervision-contacts-ui-preprod.hmpps.service.justice.gov.uk'
     DELIUS_LINK: 'https://ndelius.pre-prod.delius.probation.hmpps.dsd.io'
     OASYS_LINK: 'https://pp-int.oasys.service.justice.gov.uk'
     RECALL_LINK: 'https://consider-a-recall-preprod.hmpps.service.justice.gov.uk/'
@@ -33,11 +34,15 @@ generic-service:
     EPF2_LINK: '/'
     TIER_LINK: 'https://tier-preprod.hmpps.service.justice.gov.uk/case'
     SENTENCE_PLAN_LINK: 'https://sentence-plan-preprod.hmpps.service.justice.gov.uk'
+    SENTENCE_PLAN_LINK_V2: 'https://arns-assessment-platform-preprod.hmpps.service.justice.gov.uk/access/sentence-plan/crn'
     E_SUPERVISION_API_URL: 'https://esupervision-api-preprod.hmpps.service.justice.gov.uk'
     ESUPERVISION_GUIDANCE_LINK: 'https://probation-check-in-preprod.hmpps.service.justice.gov.uk'
     CHAR_COUNT: 4000
     ENVIRONMENT_NAME: PRE-PRODUCTION
     ENVIRONMENT: preprod
+
+  scheduledDowntime:
+    enabled: true
 
 generic-prometheus-alerts:
   alertSeverity: manage-people-on-probation-preprod

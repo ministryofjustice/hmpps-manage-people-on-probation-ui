@@ -3,15 +3,15 @@ import { v4 } from 'uuid'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
 import { DeliusRoleEnum } from '../data/model/deliusRoles'
-import TierApiClient, { TierCalculation } from '../data/tierApiClient'
+import TierApiClient from '../data/tierApiClient'
 import RoleService from '../services/roleService'
-import { toRoshWidget, toPredictors, toIsoDateFromPicker, isValidCrn, setDataValue } from '../utils'
+import { toIsoDateFromPicker, isValidCrn, setDataValue } from '../utils'
 import type { Controller } from '../@types'
 import { type PersonalDetails, type PersonalDetailsUpdateRequest, type Origin } from '../data/model/personalDetails'
 import { personDetailsValidation } from '../properties'
 import { validateWithSpec } from '../utils/validationUtils'
 import { findUncompleted, renderError } from '../middleware'
-import { type Needs, type RoshRiskWidgetDto, type TimelineItem } from '../data/model/risk'
+import { type Needs } from '../data/model/risk'
 
 const routes = [
   'getPersonalDetails',
@@ -35,7 +35,7 @@ const routes = [
 const personalDetailsController: Controller<typeof routes, void> = {
   getPersonalDetails: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       if (!isValidCrn(crn)) {
         return renderError(404)(req, res)
       }
@@ -45,7 +45,6 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
-      const tierClient = new TierApiClient(token)
       const roleService = new RoleService(masClient)
       const manageUsersAccess = await roleService.hasAccess(DeliusRoleEnum.MANAGE_USERS, res.locals.user.username)
       let action = 'VIEW_MAS_PERSONAL_DETAILS'
@@ -82,24 +81,16 @@ const personalDetailsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [personalDetails, risks, needs, tierCalculation, predictors, sanIndicatorResponse] = await Promise.all([
+      const [personalDetails, needs, sanIndicatorResponse] = await Promise.all([
         masClient.getPersonalDetails(crn),
-        arnsClient.getRisks(crn),
         arnsClient.getNeeds(crn),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getPredictorsAll(crn),
         arnsClient.getSanIndicator(crn),
       ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
 
       interface Props {
         personalDetails: PersonalDetails
         needs: Needs
-        tierCalculation: TierCalculation
         crn: string
-        risksWidget: RoshRiskWidgetDto
-        predictorScores: TimelineItem
         success: string
         backLink: string
         hidePageHeader: boolean
@@ -111,10 +102,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       const props: Props = {
         personalDetails,
         needs: needs as Needs,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
         success: success as string,
         backLink,
         hidePageHeader,
@@ -131,10 +119,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
     return async (req, res) => {
       const editingMainAddress = req.path.includes('personal-details/edit-main-address')
       const { origin = '' } = req.query as Record<string, string>
-      const errorMessages = validateWithSpec(
-        req.body,
-        personDetailsValidation({ ...req.body, editingMainAddress, origin }),
-      )
+      const errorMessages = validateWithSpec(req, personDetailsValidation({ ...req.body, editingMainAddress, origin }))
       res.locals.errorMessages = errorMessages
       const updateFn = editingMainAddress ? 'updatePersonalDetailsAddress' : 'updatePersonalDetailsContact'
       let request: PersonalDetailsUpdateRequest = {
@@ -183,7 +168,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
       }
       const warningDisplayed: boolean = !request.endDate || Object.hasOwn(req.body, 'endDateWarningDisplayed')
       const isValid = Object.keys(errorMessages).length === 0 && warningDisplayed
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       const arnsClient = new ArnsApiClient(token)
@@ -197,15 +182,10 @@ const personalDetailsController: Controller<typeof routes, void> = {
         service: 'hmpps-manage-people-on-probation-ui',
       })
       if (!isValid) {
-        const [personalDetails, risks, needs, tierCalculation, predictors] = await Promise.all([
+        const [personalDetails, needs] = await Promise.all([
           masClient.getPersonalDetails(crn),
-          arnsClient.getRisks(crn),
           arnsClient.getNeeds(crn),
-          tierClient.getCalculationDetails(crn),
-          arnsClient.getPredictorsAll(crn),
         ])
-        const risksWidget = toRoshWidget(risks)
-        const predictorScores = toPredictors(predictors)
         let personalDetailsData = { ...personalDetails }
         if (editingMainAddress) {
           personalDetailsData = {
@@ -238,10 +218,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
         res.render(`pages/edit-contact-details/${renderPage}`, {
           personalDetails: personalDetailsData,
           needs,
-          tierCalculation,
           crn,
-          risksWidget,
-          predictorScores,
           hidePageHeader: true,
           backLink: `/case/${crn}/personal-details`,
           origin,
@@ -273,7 +250,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getStaffContacts: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_SENTENCE_PROFESSIONAL_CONTACTS',
@@ -299,11 +276,9 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getPersonalContact: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_PERSONAL_CONTACT',
         who: res.locals.user.username,
@@ -312,26 +287,16 @@ const personalDetailsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [personalContact, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getPersonalContact(crn, id),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const personalContact = await masClient.getPersonalContact(crn, id)
       return res.render('pages/personal-details/contact', {
         personalContact,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
       })
     }
   },
   getPersonalContactNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id, noteId } = req.params
+      const { crn, id, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
@@ -344,30 +309,19 @@ const personalDetailsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [personalContact, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getPersonalContactNote(crn, id, noteId),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const personalContact = await masClient.getPersonalContactNote(crn, id, noteId)
+
       return res.render('pages/personal-details/contact/contact-note', {
         personalContact,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
       })
     }
   },
   getMainAddressNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, noteId } = req.params
+      const { crn, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_PERSONAL_CONTACT_NOTE',
         who: res.locals.user.username,
@@ -376,26 +330,16 @@ const personalDetailsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [personalDetails, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getMainAddressNote(crn, noteId),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const personalDetails = await masClient.getMainAddressNote(crn, noteId)
       res.render('pages/personal-details/main-address/address-note', {
         personalDetails,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
       })
     }
   },
   getAddresses: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -415,11 +359,9 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getAddressesNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, addressId, noteId } = req.params
+      const { crn, addressId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const masClient = new MasApiClient(token)
-      const tierClient = new TierApiClient(token)
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_VIEW_ALL_ADDRESSES_NOTE',
         who: res.locals.user.username,
@@ -428,27 +370,17 @@ const personalDetailsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const [addressOverview, tierCalculation, risks, predictors] = await Promise.all([
-        masClient.getPersonalAddressesNote(crn, addressId, noteId),
-        tierClient.getCalculationDetails(crn),
-        arnsClient.getRisks(crn),
-        arnsClient.getPredictorsAll(crn),
-      ])
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+      const addressOverview = await masClient.getPersonalAddressesNote(crn, addressId, noteId)
       return res.render('pages/personal-details/addresses/address-note', {
         addressOverview,
-        tierCalculation,
         crn,
-        risksWidget,
-        predictorScores,
       })
     }
   },
   getDocumentsDownload: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
-      const { documentId } = req.params
+      const { crn } = req.params as Record<string, string>
+      const { documentId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -466,8 +398,8 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getHandoff: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
-      const { system } = req.params
+      const { crn } = req.params as Record<string, string>
+      const { system } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -487,7 +419,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getDisabilities: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -507,7 +439,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getDisabilitiesNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, disabilityId, noteId } = req.params
+      const { crn, disabilityId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -527,7 +459,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getAdjustments: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -547,7 +479,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getAdjustmentsNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, adjustmentId, noteId } = req.params
+      const { crn, adjustmentId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -567,7 +499,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getCircumstances: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn } = req.params
+      const { crn } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({
@@ -587,7 +519,7 @@ const personalDetailsController: Controller<typeof routes, void> = {
   },
   getCircumstancesNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, circumstanceId, noteId } = req.params
+      const { crn, circumstanceId, noteId } = req.params as Record<string, string>
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
       const masClient = new MasApiClient(token)
       await auditService.sendAuditMessage({

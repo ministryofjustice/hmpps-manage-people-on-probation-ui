@@ -1,8 +1,7 @@
 import { v4 } from 'uuid'
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import type { Controller } from '../@types'
-import ArnsApiClient from '../data/arnsApiClient'
-import { toPredictors, toRoshWidget, groupActivitiesByDate } from '../utils'
+import { groupActivitiesByDate } from '../utils'
 import MasApiClient from '../data/masApiClient'
 import { getPersonActivity } from '../middleware'
 
@@ -26,8 +25,19 @@ export const getQueryString = (params: Record<string, string>): string[] => {
 const activityLogController: Controller<typeof routes, void> = {
   getOrPostActivityLog: hmppsAuthClient => {
     return async (req, res) => {
-      const { query, body, params } = req
-      const { crn } = params
+      const { params } = req
+      const { crn } = params as Record<string, string>
+
+      if (req.query?.showSuccessBanner) {
+        req.flash('contactCreated', req.query?.uploadFailed ? 'uploadFailed' : 'success')
+        const cleanParams = new URLSearchParams(req.query as Record<string, string>)
+        cleanParams.delete('showSuccessBanner')
+        cleanParams.delete('uploadFailed')
+        const cleanQuery = cleanParams.toString()
+        return res.redirect(cleanQuery ? `${req.path}?${cleanQuery}` : req.path)
+      }
+
+      const { query, body } = req
       const { page = '0', view = '' } = query
       let currentView = view ?? req?.body?.view
       if (req?.query?.view === 'compact' || req?.body?.view === 'compact') {
@@ -39,8 +49,6 @@ const activityLogController: Controller<typeof routes, void> = {
 
       const [tierCalculation, personActivity] = await getPersonActivity(req, res, hmppsAuthClient)
       const queryParams = getQueryString(body)
-      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
-      const arnsClient = new ArnsApiClient(token)
       const currentPage = parseInt(page as string, 10)
       const pageSize = res.locals?.flags?.enableContactLog === true ? 25 : 10
       const resultsStart = currentPage > 0 ? pageSize * currentPage + 1 : 1
@@ -48,7 +56,7 @@ const activityLogController: Controller<typeof routes, void> = {
       if (personActivity?.totalResults >= resultsStart && personActivity?.totalResults <= resultsEnd) {
         resultsEnd = personActivity.totalResults
       }
-      const [risks, predictors] = await Promise.all([arnsClient.getRisks(crn), arnsClient.getPredictorsAll(crn)])
+
       await auditService.sendAuditMessage({
         action: 'VIEW_MAS_ACTIVITY_LOG',
         who: res.locals.user.username,
@@ -57,11 +65,10 @@ const activityLogController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      const risksWidget = toRoshWidget(risks)
-      const predictorScores = toPredictors(predictors)
+
       const baseUrl = req.url.split('?')[0]
       const template = res.locals?.flags?.enableContactLog === true ? 'pages/contact-log' : 'pages/activity-log'
-      res.render(template, {
+      return res.render(template, {
         personActivity,
         crn,
         query: req.session.activityLogFilters,
@@ -69,8 +76,6 @@ const activityLogController: Controller<typeof routes, void> = {
         page,
         view: currentView,
         tierCalculation,
-        risksWidget,
-        predictorScores,
         url: encodeURIComponent(req.url),
         baseUrl,
         resultsStart,
@@ -82,7 +87,7 @@ const activityLogController: Controller<typeof routes, void> = {
   },
   getActivity: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, id } = req.params
+      const { crn, id } = req.params as Record<string, string>
       const { back } = req.query
       let { url } = req
       url = encodeURIComponent(url)

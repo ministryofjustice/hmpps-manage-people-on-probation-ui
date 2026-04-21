@@ -1,21 +1,15 @@
 import { DateTime } from 'luxon'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import AppointmentLocationDateTimePage from '../../pages/appointments/location-date-time.page'
-import {
-  checkAppointmentSummary,
-  checkPopHeader,
-  getUuid,
-  to24HourTimeWithMinutes,
-  completeRescheduling,
-  completeRescheduleAppointmentPage,
-} from './imports'
+import { checkAppointmentSummary, checkPopHeader } from './imports'
 import { dateWithYear, dayOfWeek } from '../../../server/utils'
+import { completeRescheduleAppointmentPage, getUuid, completeRescheduling, to24HourTimeWithMinutes } from './utils'
 
 describe('Change appointment details and reschedule', () => {
   let checkYourAnswerPage: RescheduleCheckYourAnswerPage
   let dateTimePage: AppointmentLocationDateTimePage
   const crn = 'X000001'
-  const tomorrow = DateTime.now().plus({ days: 1 })
+  const future = DateTime.now().plus({ days: 2 })
   const startTime = '09:10'
   const endTime = '10:30'
 
@@ -36,7 +30,7 @@ describe('Change appointment details and reschedule', () => {
     })
 
     cy.get('p')
-      .eq(0)
+      .eq(1)
       .should(
         'contain.text',
         'Use the saved details of the previously created appointment to reschedule it. You can amend any of the details.',
@@ -90,7 +84,7 @@ describe('Change appointment details and reschedule', () => {
           .then(text => {
             const normalizedText = text.replace(/\s+/g, ' ').trim()
             expect(normalizedText).to.include(
-              `${dayOfWeek(tomorrow.toISODate())} ${dateWithYear(tomorrow.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
+              `${dayOfWeek(future.toISODate())} ${dateWithYear(future.toISODate())} at ${to24HourTimeWithMinutes(startTime)} to ${to24HourTimeWithMinutes(endTime)}`,
             )
           })
         cy.get('[data-qa="calendarInviteInset"]').should('be.visible')

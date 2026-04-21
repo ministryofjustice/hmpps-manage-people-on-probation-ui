@@ -22,9 +22,6 @@ const res = {
       username,
     },
     case: { name: { forename: 'Test', surname: 'User' } },
-    flags: {
-      enablePastAppointments: true,
-    },
   },
   render: jest.fn().mockReturnThis(),
   redirect: jest.fn().mockReturnThis(),
@@ -99,14 +96,14 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
   }
   beforeAll(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
   })
   afterAll(() => {
     jest.useRealTimers()
   })
   beforeEach(async () => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
     spy = jest
       .spyOn(MasApiClient.prototype, 'checkAppointments')
       .mockImplementation(() => Promise.resolve(mockAppointmentChecks))
@@ -139,7 +136,7 @@ describe('/middleware/checkAppointments shows warnings the first time', () => {
 describe('/middleware/checkAppointments shows warnings the for a colleague', () => {
   beforeAll(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
   })
   afterAll(() => {
     jest.useRealTimers()
@@ -190,9 +187,6 @@ describe('past appointments feature flag is disabled', () => {
         username,
       },
       case: { name: { forename: 'Test', surname: 'User' } },
-      flags: {
-        enablePastAppointments: false,
-      },
     },
     render: jest.fn().mockReturnThis(),
     redirect: jest.fn().mockReturnThis(),
@@ -200,7 +194,7 @@ describe('past appointments feature flag is disabled', () => {
   const mockRenderSpy = jest.spyOn(mockRes, 'render')
   beforeAll(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
   })
   afterAll(() => {
     jest.useRealTimers()
@@ -237,7 +231,6 @@ describe('past appointments feature flag is disabled', () => {
       },
       isInPast: true,
       _maxDate: '31/12/2199',
-      _minDate: '1/7/2025',
     })
   })
 })
@@ -245,7 +238,7 @@ describe('past appointments feature flag is disabled', () => {
 describe('/middleware/checkAppointments does not show warnings the second time', () => {
   beforeAll(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
   })
   afterAll(() => {
     jest.useRealTimers()
@@ -300,7 +293,7 @@ describe('/middleware/checkAppointments does not show any warnings if none are r
 describe('/middleware/checkAppointments does not show any warnings if checks do not return the required warnings, but shows errors', () => {
   beforeAll(() => {
     jest.useFakeTimers()
-    jest.setSystemTime(new Date('2025-07-01T09:00:00Z')) // 10:00 BST
+    jest.setSystemTime(new Date('2025-07-01T09:00:00Z').getTime()) // 10:00 BST
   })
   afterAll(() => {
     jest.useRealTimers()

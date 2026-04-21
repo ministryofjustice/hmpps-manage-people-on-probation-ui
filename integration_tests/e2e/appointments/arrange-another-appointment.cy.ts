@@ -7,8 +7,6 @@ import AppointmentSentencePage from '../../pages/appointments/sentence.page'
 import SupportingInformationPage from '../../pages/appointments/note.page'
 import {
   checkAppointmentSummary,
-  getUuid,
-  crn,
   checkUpdateType,
   checkUpdateSentence,
   checkUpdateLocation,
@@ -18,6 +16,8 @@ import {
   checkUpdateBackLinkRefresh,
 } from './imports'
 import TextMessageConfirmationPage from '../../pages/appointments/text-message-confirmation.page'
+import { crn } from './imports/common'
+import { getUuid } from './utils'
 
 const loadPage = (c: string = crn) => {
   cy.visit(`/case/${c}/appointments/appointment/6/next-appointment`)
@@ -77,10 +77,10 @@ describe('Arrange another appointment', () => {
     it('should display the outlook invite inset text', () => {
       getUuid().then(uuid => {
         dateTimePage.getElement(`#appointments-${crn}-${uuid}-user-locationCode`).click()
-        const tomorrow = DateTime.now().plus({ days: 1 }).toFormat('d/M/yyyy')
-        dateTimePage.getDatePickerInput().clear().type(tomorrow)
-        dateTimePage.getElementInput(`startTime`).type('09:10')
-        dateTimePage.getElementInput(`endTime`).focus().type('10:30')
+        const future = DateTime.now().plus({ days: 2 }).toFormat('d/M/yyyy')
+        dateTimePage.getDatePickerInput().clear().type(future)
+        dateTimePage.getElementInput(`startTime`).clear().type('09:10')
+        dateTimePage.getElementInput(`endTime`).focus().clear().type('10:30')
         dateTimePage.getSubmitBtn().click()
         dateTimePage.getSubmitBtn().click()
         textMessageConfirmPage = new TextMessageConfirmationPage()

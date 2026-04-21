@@ -31,7 +31,7 @@
           {% endif %}
         {% endblock %}
 
-        <div class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the video is the person who should be checking in.</div>
+        <div class="govuk-body">You need to confirm the system identity check result is correct and confirm whether the person in the image is the person who should be checking in.</div>
 
         <dl class="govuk-summary-list">
             <div class="govuk-summary-list__row" data-qa="datetimeSummary">
@@ -48,10 +48,10 @@
         <hr class="govuk-section-break govuk-section-break--visible">
         <dl class="govuk-summary-list govuk-!-margin-top-0" data-qa="identitySummary">
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">System ID check result</dt>
-                <dd class="govuk-summary-list__value">{{"Pass" if checkIn.autoIdCheck == "MATCH" else "Fail"}}</dd>
+                <dt class="govuk-summary-list__key">{{"System ID and liveness check result" if checkIn.livenessEnabled else "System ID check result"}}</dt>
+                <dd class="govuk-summary-list__value">{{"Pass" if systemIdCheckPass else "Fail"}}</dd>
                 <dd class="govuk-summary-list__actions">
-                    {% if checkIn.autoIdCheck != "MATCH" %}
+                    {% if not systemIdCheckPass %}
                         {{ govukTag({ text: "Needs attention", classes: "govuk-tag govuk-tag--red" }) }}
                     {% endif %}
                 </dd>
@@ -67,23 +67,17 @@
                 </dd>
             </div>
             <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Image from check in video</dt>
+                <dt class="govuk-summary-list__key">Image from check in</dt>
                 <dd class="govuk-summary-list__value">
                     {% if checkIn.snapshotUrl %}
                         <img
                         src="{{ checkIn.snapshotUrl }}"
                         class="es-profile-image es-profile-image--small"
-                        alt="Snapshot from video of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
+                        alt="Image from identity check of {{ checkIn.personalDetails.name.forename }} {{ checkIn.personalDetails.name.surname }}"
                         crossorigin />
                     {% else %}
                     <span>No image available</span>
                     {% endif %}
-                </dd>
-            </div>
-            <div class="govuk-summary-list__row">
-                <dt class="govuk-summary-list__key">Check in video</dt>
-                <dd class="govuk-summary-list__value">
-                    <a href="{{ videoLink }}" class="govuk-link">View video</a>
                 </dd>
             </div>
         </dl>
@@ -92,7 +86,7 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
-                        text: 'Is the person in the video ' + checkIn.personalDetails.name.forename + '?',
+                        text: 'Is the person in the image from the check in ' + checkIn.personalDetails.name.forename + '?',
                         classes: "govuk-label--m govuk-!-font-weight-bold"
                     }
                 },

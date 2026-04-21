@@ -1,20 +1,50 @@
-import { type AttendedCompliedAppointment } from '../middleware'
 import { type Name } from '../data/model/personalDetails'
 import { type Activity } from '../data/model/schedule'
 import { type Errors } from './Errors'
 import { type SmsPreviewSession, type SmsOptInOptions } from '../data/model/OutlookEvent'
+import { Option } from './Option'
 
 export type YesNo = '' | 'Yes' | 'No'
 
 export type AppointmentInterval = 'DAY' | 'WEEK' | 'FORTNIGHT' | 'FOUR_WEEKS'
 
+export type AppointmentSessionSelection = 'KEEP_TYPE' | 'CHANGE_TYPE' | 'RESCHEDULE' | 'NO'
+
+export type AppointmentOutcomeType =
+  | 'ATTENDED_COMPLIED'
+  | 'ATTENDED_FAILED_TO_COMPLY'
+  | 'ATTENDED_SENT_HOME_BEHAVIOUR'
+  | 'ATTENDED_SENT_HOME_SERVICE_ISSUES'
+  | 'ACCEPTABLE_ABSENCE'
+  | 'UNACCEPTABLE_ABSENCE'
+  | 'FAILED_TO_ATTEND'
+  | 'WILL_BE_RESCHEDULED'
+
+export type AppointmentEnforcementAction =
+  | 'SEND_LETTER'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
+  | 'REFER_TO_OFFENDER_MANAGER'
+  | 'NO_FURTHER_ACTION'
+  | 'DIFFERENT_ACTION'
+
+export interface AppointmentOutcome {
+  type: AppointmentOutcomeType
+  complied: 'YES' | 'NO'
+}
+
+export interface AppointmentOutcomeOption extends Option {
+  value: AppointmentOutcomeType
+}
+
 export interface AppointmentSessionUser {
   providerCode?: string
   teamCode?: string
   username?: string
-  name?: Name
   locationCode?: string
   staffCode?: string
+  name?: Name
+  email?: string
 }
 
 export interface AppointmentSession {
@@ -45,6 +75,10 @@ export interface AppointmentSession {
     username?: string
     isInPast?: boolean
     date?: string
+  }
+  outcome?: {
+    type: AppointmentOutcomeType
+    enforcementAction: AppointmentEnforcementAction
   }
 }
 
@@ -181,11 +215,12 @@ export interface AppointmentsPostResponse {
 export interface LocalParams {
   crn: string
   id: string
+  contactId?: string
+  uuid?: string
   errors?: Errors
   body?: Record<string, string | string[]>
   _minDate?: string
   _maxDate?: string
-  contactId?: string
   uploadedFiles?: any
   personLevel?: boolean
   maxCharCount?: number
@@ -198,6 +233,7 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
+  options?: AppointmentOutcomeOption[]
 }
 
 export interface MasUserDetails {
@@ -208,4 +244,12 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+}
+
+export interface AttendedCompliedAppointment {
+  type: string
+  officer: {
+    name: Name
+  }
+  startDateTime: string
 }

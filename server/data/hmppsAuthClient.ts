@@ -6,7 +6,6 @@ import type TokenStore from './tokenStore/tokenStore'
 import logger from '../../logger'
 import config from '../config'
 import generateOauthClientToken from '../authentication/clientCredentials'
-// eslint-disable-next-line import/no-cycle
 import RestClient from './restClient'
 
 const timeoutSpec = config.apis.hmppsAuth.timeout

@@ -4,14 +4,14 @@ import AppointmentConfirmationPage from '../../pages/appointments/confirmation.p
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import NextAppointmentPage from '../../pages/appointments/next-appointment.page'
 import AppointmentSentencePage from '../../pages/appointments/sentence.page'
+import { checkPopHeader } from './imports'
 import {
-  checkPopHeader,
-  completeCYAPage,
-  completeSupportingInformationPage,
   completeSentencePage,
   completeTypePage,
   completeLocationDateTimePage,
-} from './imports'
+  completeSupportingInformationPage,
+  completeCYAPage,
+} from './utils'
 
 const crn = 'X000001'
 const appointmentId = '2'
@@ -36,7 +36,7 @@ describe('Create next appointment', () => {
   })
 
   it('should render the pop header', () => {
-    checkPopHeader('Caroline Wolff', false)
+    checkPopHeader()
   })
   it('should display the options', () => {
     nextAppointmentPage.getRadioLabel('option', 1).should('contain.text', 'Yes - another planned office visit (NS)')

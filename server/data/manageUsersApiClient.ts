@@ -1,6 +1,5 @@
 import logger from '../../logger'
 import config from '../config'
-// eslint-disable-next-line import/no-cycle
 import RestClient from './restClient'
 
 export interface User {

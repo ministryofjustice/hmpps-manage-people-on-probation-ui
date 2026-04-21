@@ -1,4 +1,6 @@
 {% set changePath = "/case/" + crn + "/arrange-appointment/"  + id %}
+{% set changeOutcomePath = (changePath + "/outcome")if flags.enableNonCompliance else 
+    changePath %}
 {% set insertText = "You'll receive a calendar invite for the appointment." %}
 {% set sentenceHtml %}
 {% if appointment.appointmentFor.sentence %}
@@ -152,7 +154,7 @@
     visuallyHiddenText: "text message confirmation"
      } 
      ] 
-     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true, 
+     } if showAction and appointment.date } if appointment.textMessageConfirmation is defined and flags.enableSmsReminders == true and not isInPast, 
        { key: { text: "Attended and complied" },
     value: { html: appointment.outcomeRecorded },
     actions: {
@@ -167,7 +169,7 @@
     value: { html: "Not entered" if not appointment.notes else appointment.notes | nl2br },
     actions: {
     items: [ { 
-    href: changePath + ("/add-note" if appointment.outcomeRecorded else "/supporting-information") + "?change=" + url, 
+    href: changeOutcomePath + ("/add-note" if isInPast else "/supporting-information") + "?change=" + url, 
     text: "Change", 
     visuallyHiddenText: "notes"
      } 
@@ -177,7 +179,7 @@
     value: { text: "Not entered" if not appointment.sensitivity else appointment.sensitivity | safe },
     actions: {
     items: [ { 
-    href: changePath + ("/add-note" if appointment.outcomeRecorded else "/supporting-information") + "?change=" + url, 
+    href: changeOutcomePath + ("/add-note" if isInPast else "/supporting-information") + "?change=" + url, 
     text: "Choose sensitivity" if not appointment.sensitivity else "Change", 
     visuallyHiddenText: "sensitivity"
      } 

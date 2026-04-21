@@ -1,4 +1,5 @@
 {% extends "../partials/case.njk" %}
+{% from "moj/components/banner/macro.njk" import mojBanner %}
 {% from "govuk/components/notification-banner/macro.njk" import govukNotificationBanner %}
 {% from "govuk/components/pagination/macro.njk" import govukPagination %}
 {% set pageTitle = makePageTitle({pageHeading: "Contacts"}) %}
@@ -6,7 +7,7 @@
 {% set currentSectionName = 'Contacts' %}
 {% if flags.enableCreateContact == true %}
   {% set headerActionText = 'Add a contact' %}
-  {% set headerActionHref = '/case/' + crn + '/add-contact' %}
+  {% set headerActionHref = supervisionContactsAddLink(crn) %}
 {% endif %}
 {% set headerCRN = personActivity.personSummary.crn %}
 {% set headerDob = personActivity.personSummary.dateOfBirth %}
@@ -42,8 +43,26 @@
       }) }}
     {% endif %}
   {% endif %}
+ {% if flags.enableCreateContact and showSuccessBanner %}
+   {% set bannerType = 'warning' if uploadFailed else 'success' %}
+   {% set bannerSharedParagraph %}<p class="govuk-body">You may need to refresh the page to see the contact in the contacts list. You can use NDelius to add files to the contact.</p>{% endset %}
+   {% set bannerHtml %}
+     {% if uploadFailed %}
+       <h2 class="govuk-heading-m govuk-!-margin-bottom-1">The contact was created but the files did not upload</h2>
+     {% else %}
+       <h2 class="govuk-heading-m govuk-!-margin-bottom-1">Contact created</h2>
+     {% endif %}
+     {{ bannerSharedParagraph | safe }}
+   {% endset %}
+   {{ mojBanner({
+       type: bannerType,
+       html: bannerHtml,
+       classes: 'govuk-!-margin-bottom-2',
+       attributes: { "data-qa": "uploadFailed" if uploadFailed else "contactCreated" },
+       iconFallbackText: 'Success' if not uploadFailed
+   }) }}
+ {% endif %}
 {% endblock %}
-
 {% block pageContent %}
 
   <div class="govuk-grid-row govuk-!-margin-top-4">

@@ -1,7 +1,6 @@
 import Page from '../pages'
 import AlertsPage from '../pages/alerts'
 import OverviewPage from '../pages/overview'
-import { apiErrors } from '../../server/properties'
 
 context('Alerts Dashboard', () => {
   afterEach(() => {
@@ -20,7 +19,10 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsUnavailable')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    cy.get('.govuk-error-summary__list').should(
+      'contain.text',
+      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 
@@ -35,7 +37,10 @@ context('Alerts Dashboard', () => {
     cy.task('stubArnsServerError')
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
-    cy.get('.govuk-error-summary__list').should('contain.text', apiErrors.risks)
+    cy.get('.govuk-error-summary__list').should(
+      'contain.text',
+      'OASys is experiencing technical difficulties. It has not been possible to provide the Risk information held in OASys',
+    )
     page.getElement('[data-qa="alertRisk"]').should('contain.text', 'UNKNOWN')
   })
 
@@ -43,7 +48,32 @@ context('Alerts Dashboard', () => {
     cy.visit('/alerts')
     const page = Page.verifyOnPage(AlertsPage)
     page.noAlertsMessage().should('not.exist')
-    page.getElement('[data-qa="alertsTable"]').should('be.visible')
+    page
+      .getElement('[data-qa="alertsTable"]')
+      .should('be.visible')
+      .within(() => {
+        cy.get('tbody tr')
+          .first()
+          .within(() => {
+            cy.get('[data-qa="alertPerson"]').invoke('text').should('contain', 'Wolff, Caroline')
+            cy.get('[data-qa="alertDate"]').invoke('text').should('contain', '10 Jul 2025')
+
+            cy.get('.alert-checkbox')
+              .invoke('attr', 'aria-label')
+              .should('equal', 'Select alert for Caroline Wolff on 10 July 2025')
+          })
+        cy.get('tbody tr')
+          .eq(3)
+          .within(() => {
+            cy.get('[data-qa="alertPerson"]').invoke('text').should('contain', 'Berge, Alton')
+            cy.get('[data-qa="alertDate"]').invoke('text').should('contain', '9 Jul 2025')
+
+            cy.get('.alert-checkbox')
+              .invoke('attr', 'aria-label')
+              .should('equal', 'Select alert for Alton Berge on 9 July 2025')
+          })
+      })
+
     page.getElement('[data-qa="clearSelectedAlerts"]').should('be.visible')
   })
 

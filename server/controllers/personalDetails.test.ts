@@ -5,17 +5,9 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import RoleService from '../services/roleService'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
-import TierApiClient from '../data/tierApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import {
-  mockTierCalculation,
-  mockRisks,
-  mockPredictors,
-  mockContacts,
-  mockAppResponse,
-  mockSanIndicatorResponse,
-} from './mocks'
-import { toRoshWidget, toPredictors, isValidCrn } from '../utils'
+import { mockContacts, mockAppResponse, mockSanIndicatorResponse } from './mocks'
+import { isValidCrn } from '../utils'
 import * as validationUtils from '../utils/validationUtils'
 import { renderError } from '../middleware'
 import {
@@ -117,14 +109,6 @@ const redirectSpy = jest.spyOn(res, 'redirect')
 const getContactsSpy = jest
   .spyOn(MasApiClient.prototype, 'getContacts')
   .mockImplementation(() => Promise.resolve(mockContacts))
-
-const tierCalculationSpy = jest
-  .spyOn(TierApiClient.prototype, 'getCalculationDetails')
-  .mockImplementation(() => Promise.resolve(mockTierCalculation))
-const risksSpy = jest.spyOn(ArnsApiClient.prototype, 'getRisks').mockImplementation(() => Promise.resolve(mockRisks))
-const predictorsSpy = jest
-  .spyOn(ArnsApiClient.prototype, 'getPredictorsAll')
-  .mockImplementation(() => Promise.resolve(mockPredictors))
 const getSanIndicatorSpy = jest
   .spyOn(ArnsApiClient.prototype, 'getSanIndicator')
   .mockImplementation(() => Promise.resolve(mockSanIndicatorResponse))
@@ -136,15 +120,6 @@ const getPersonalDetailsSpy = jest
 const getNeedsSpy = jest.spyOn(ArnsApiClient.prototype, 'getNeeds').mockImplementation(() => Promise.resolve(mockNeeds))
 
 const checkApiRequests = (sanIndicator = false): void => {
-  it('should request tier calculation details from the api', () => {
-    expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-  })
-  it('should request risks from the api', () => {
-    expect(risksSpy).toHaveBeenCalledWith(crn)
-  })
-  it('should request predictors from the api', () => {
-    expect(predictorsSpy).toHaveBeenCalledWith(crn)
-  })
   if (sanIndicator) {
     it('should request the san indicator from the api', () => {
       expect(getSanIndicatorSpy).toHaveBeenCalledWith(crn)
@@ -191,10 +166,7 @@ describe('/controllers/personalDetails', () => {
           expect(renderSpy).toHaveBeenCalledWith('pages/edit-contact-details/edit-contact-details', {
             personalDetails: mockPersonalDetails,
             needs: mockNeeds,
-            tierCalculation: mockTierCalculation,
             crn,
-            risksWidget: toRoshWidget(mockRisks),
-            predictorScores: toPredictors(mockPredictors),
             success: true,
             backLink: `/case/${crn}/personal-details`,
             hidePageHeader: true,
@@ -204,7 +176,6 @@ describe('/controllers/personalDetails', () => {
         })
       })
       describe('CRN in url parameter is not valid', () => {
-        const statusSpy = jest.spyOn(res, 'status')
         beforeEach(async () => {
           mockedIsValidCrn.mockReturnValue(false)
           jest.spyOn(RoleService.prototype, 'hasAccess').mockImplementation(() => Promise.resolve(true))
@@ -246,10 +217,7 @@ describe('/controllers/personalDetails', () => {
           expect(renderSpy).toHaveBeenCalledWith('pages/edit-contact-details/edit-main-address', {
             personalDetails: mockPersonalDetails,
             needs: mockNeeds,
-            tierCalculation: mockTierCalculation,
             crn,
-            risksWidget: toRoshWidget(mockRisks),
-            predictorScores: toPredictors(mockPredictors),
             success: true,
             backLink: `/case/${crn}/personal-details`,
             hidePageHeader: true,
@@ -314,10 +282,7 @@ describe('/controllers/personalDetails', () => {
         checkAuditMessage(res, 'SAVE_EDIT_MAIN_ADDRESS', uuidv4(), crn, 'CRN')
         it('should request the page data from the api', () => {
           expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
-          expect(risksSpy).toHaveBeenCalledWith(crn)
           expect(getNeedsSpy).toHaveBeenCalledWith(crn)
-          expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-          expect(predictorsSpy).toHaveBeenCalledWith(crn)
         })
         it('should re-render the edit main address page', () => {
           expect(renderSpy).toHaveBeenCalledWith(`pages/edit-contact-details/edit-main-address`, {
@@ -340,10 +305,7 @@ describe('/controllers/personalDetails', () => {
             },
             needs: mockNeeds,
             origin: '',
-            tierCalculation: mockTierCalculation,
             crn,
-            risksWidget: toRoshWidget(mockRisks),
-            predictorScores: toPredictors(mockPredictors),
             hidePageHeader: true,
             backLink: `/case/${crn}/personal-details`,
           })
@@ -441,10 +403,7 @@ describe('/controllers/personalDetails', () => {
         checkAuditMessage(res, 'SAVE_EDIT_PERSONAL_DETAILS', uuidv4(), crn, 'CRN')
         it('should request the page data from the api', () => {
           expect(getPersonalDetailsSpy).toHaveBeenCalledWith(crn)
-          expect(risksSpy).toHaveBeenCalledWith(crn)
           expect(getNeedsSpy).toHaveBeenCalledWith(crn)
-          expect(tierCalculationSpy).toHaveBeenCalledWith(crn)
-          expect(predictorsSpy).toHaveBeenCalledWith(crn)
         })
         it('should re-render the edit contact details page', () => {
           expect(renderSpy).toHaveBeenCalledWith(`pages/edit-contact-details/edit-contact-details`, {
@@ -455,10 +414,7 @@ describe('/controllers/personalDetails', () => {
             },
             needs: mockNeeds,
             origin: 'appointments',
-            tierCalculation: mockTierCalculation,
             crn,
-            risksWidget: toRoshWidget(mockRisks),
-            predictorScores: toPredictors(mockPredictors),
             hidePageHeader: true,
             backLink: `/case/${crn}/personal-details`,
           })
@@ -532,10 +488,7 @@ describe('/controllers/personalDetails', () => {
     it('should render the contact page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/personal-details/contact', {
         personalContact: mockPersonalContact,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
       })
     })
   })
@@ -555,10 +508,7 @@ describe('/controllers/personalDetails', () => {
     it('should render the contact page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/personal-details/contact/contact-note', {
         personalContact: mockPersonalContactNote,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
       })
     })
   })
@@ -578,10 +528,7 @@ describe('/controllers/personalDetails', () => {
     it('should render the main address note page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/personal-details/main-address/address-note', {
         personalDetails: mockMainAddressNote,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
       })
     })
   })
@@ -620,10 +567,7 @@ describe('/controllers/personalDetails', () => {
     it('should render the address note page', () => {
       expect(renderSpy).toHaveBeenCalledWith('pages/personal-details/addresses/address-note', {
         addressOverview: mockAddressesNote,
-        tierCalculation: mockTierCalculation,
         crn,
-        risksWidget: toRoshWidget(mockRisks),
-        predictorScores: toPredictors(mockPredictors),
       })
     })
   })

@@ -180,15 +180,15 @@
         text: "Use the 24-hour format, for example 09:30 or 16:30."
     },
     attributes: {
-        size: 5,
-        maxlength: 5
+        size: 7,
+        maxlength: 7
     },
     formGroup: {
     attributes: {
         'data-qa': 'startTime'
     }
     },
-    classes: "govuk-input--width-3"
+    classes: "govuk-input--width-4"
    } | decorateFormAttributes(['appointments', crn, id, 'start'])) }}
 
     {{ govukInput({
@@ -200,15 +200,15 @@
             text: "Use the 24-hour format, for example 09:30 or 16:30."
         },
         attributes: {
-            maxlength: 5,
-            size: 5
+            maxlength: 7,
+            size: 7
         },
         formGroup: {
         attributes: {
             'data-qa': 'endTime'
         }
         },
-        classes: "govuk-input--width-3"
+        classes: "govuk-input--width-4"
      } | decorateFormAttributes(['appointments', crn, id, 'end'])) }}
 
     {{ govukRadios({

@@ -1,4 +1,4 @@
-import { Contact } from '../data/model/professionalContact'
+import { Contact } from '../data/model/personalDetails'
 
 export const roleDescription = (contact: Contact, addBreak?: boolean): string => {
   const breakTag = addBreak ? '<br>' : ' '
