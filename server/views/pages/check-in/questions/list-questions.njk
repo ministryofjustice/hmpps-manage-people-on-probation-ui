@@ -1,0 +1,61 @@
+{% extends "../../_form.njk" %}
+{% set notStandardForm = true %}
+{% set title = "Choose a question to add" %}
+{% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/add" %}
+{% set addQuestionLinkBase = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" %}
+{% set addQuestionText = "Add" %}
+{% set templates = templatesList.templates %}
+
+{% set tableData = {
+  firstCellIsHeader: true,
+  captionClasses: "govuk-table__caption--m",
+  head: [
+    {
+      text: "Question",
+      classes: "govuk-!-width-one-half"
+    },
+    {
+      text: "Example",
+      classes: "govuk-!-width-one-half"
+    },
+    {
+      text: "Action",
+      classes: "govuk-!-width-one-half"
+    }
+  ],
+  rows: []
+} %}
+
+{% for template in templates %}
+    {% set row = tableData.rows.push([
+        {
+            html: '<strong>' + template.displayTemplate + '</strong>'
+        },
+        {
+            text: template.example
+        },
+        {
+            html: '<a href="' + addQuestionLinkBase + template.id + '/select" class="govuk-link" data-qa="add-question-link">' + addQuestionText +'</a>'
+        }
+    ]) %}
+{% endfor %}
+
+{% block primary %}
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-two-thirds">
+            <h2 class="govuk-heading-l govuk-!-margin-bottom-6" data-qa="pageHeading">
+                {{ title }}
+            </h2>
+            <p class="govuk-body">You can add up to 3 questions. They will be asked in the order you select them.</p>
+        </div>
+    </div>
+
+    <div class="govuk-grid-row">
+        <div class="govuk-grid-column-full">
+            {{ govukTable(tableData) }}    
+        </div>
+    </div>
+
+{% endblock %}

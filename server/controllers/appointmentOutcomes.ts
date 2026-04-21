@@ -1,12 +1,12 @@
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
-import { getDataValue } from '../utils'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentPatch } from '../models/Appointments'
+import { getDataValue, handleQuotes } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
 import MasApiClient from '../data/masApiClient'
-import { Sentence } from '../data/model/sentenceDetails'
+import { isSuccessfulUpload } from './appointments'
 
 const routes = [
   'getOutcome',
@@ -86,7 +86,6 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       await sendAuditMessage(res, 'ADD_MAS_APPOINTMENT_NOTE', crn, SubjectType.CRN)
       const { validMimeTypes, maxFileSize, fileUploadLimit, maxCharCount } = config
       return res.render('pages/appointment-outcomes/add-note', {
-        useDecorator: true,
         errorMessages,
         body,
         validMimeTypes: Object.entries(validMimeTypes).map(([_key, value]) => value),
@@ -97,17 +96,41 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
       })
     }
   },
-  postAddNote: _hmppsAuthClient => {
+  postAddNote: hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, isValidParams, contactId, uuid } = res.locals.appointmentOutcome
-      const { change } = req.query as Record<string, string>
+      const { crn, isValidParams, contactId, uuid, appointmentSession } = res.locals.appointmentOutcome
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
-      const redirect = uuid
-        ? `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`
-        : `/case/${crn}/appointments/appointment/${contactId}/manage`
-      return res.redirect(change ?? redirect)
+      // if not manage journey, redirect to CYA page
+      if (uuid) {
+        return res.redirect(`/case/${crn}/arrange-appointment/${uuid}/check-your-answers`)
+      }
+      // if manage journey, patch appointment then redirect to manage page
+      const { notes, sensitivity } = appointmentSession
+      const sensitive = sensitivity === 'Yes'
+      const file = req.file as Express.Multer.File
+      const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)
+      const masClient = new MasApiClient(token)
+      const body: AppointmentPatch = {
+        id: parseInt(contactId, 10),
+        notes: handleQuotes(notes),
+        sensitive,
+        outcomeRecorded: true,
+      }
+      await masClient.patchAppointment(body)
+      if (file) {
+        const patchResponse = await masClient.patchDocuments(crn, contactId, file)
+        if (!isSuccessfulUpload(patchResponse)) {
+          return res.render('pages/appointment-outcomes/add-note', {
+            uploadError: 'File not uploaded. Please try again.',
+            patchResponse,
+            sensitive,
+            notes,
+          })
+        }
+      }
+      return res.redirect(`/case/${crn}/appointments/appointment/${contactId}/manage`)
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => {

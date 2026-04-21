@@ -5,9 +5,14 @@ import {
   CheckinScheduleRequest,
   CheckinScheduleResponse,
   DeactivateOffenderRequest,
+  EsupervisionAssignQuestionsRequest,
+  EsupervisionAssignQuestionsResponse,
   ESupervisionCheckIn,
   ESupervisionNote,
+  EsupervisionQuestionTemplatesResponse,
   ESupervisionReview,
+  EsupervisionUpcomingQuestionItemsResponse,
+  EsupervisionUpcomingQuestionsResponse,
   LocationInfo,
   OffenderCheckinsByCRNResponse,
   OffenderInfo,
@@ -16,6 +21,7 @@ import {
   ReactivateOffenderRequest,
 } from './model/esupervision'
 import { ErrorSummary } from './model/common'
+import { esupervisionAdditionalQuestions } from '../controllers/mocks/esupervisionAdditionalQuestions'
 
 export default class ESupervisionClient extends RestClient {
   constructor(token: string) {
@@ -104,6 +110,51 @@ export default class ESupervisionClient extends RestClient {
     return this.post({
       path: `/v2/offenders/${uuid}/reactivate`,
       data: reactivateOffenderRequest,
+    })
+  }
+
+  // GET /v2/questions/templates (use in the list questions page)
+  async getQuestionsTemplates(language: string = 'en-GB'): Promise<EsupervisionQuestionTemplatesResponse> {
+    return this.get({
+      path: `/v2/questions/templates?language=${language}`,
+    })
+  }
+
+  // PUT /v2/questions/assignment (use to assign questions to next check in)
+  async putAssignQuestionsToCheckIn(
+    crn: string,
+    assignQuestionsRequest: EsupervisionAssignQuestionsRequest,
+  ): Promise<EsupervisionAssignQuestionsResponse> {
+    return this.put({
+      path: `/v2/questions/assignment?crn=${crn}`,
+      data: assignQuestionsRequest,
+    })
+  }
+
+  // GET /v2/questions/upcoming/{crn}/question-items (use in the add/edit questions pages)
+  async getUpcomingCheckinQuestionItems(
+    crn: string,
+    language: string = 'en-GB',
+  ): Promise<EsupervisionUpcomingQuestionItemsResponse> {
+    return this.get({
+      path: `/v2/questions/upcoming/${crn}/question-items?language=${language}`,
+    })
+  }
+
+  // GET /v2/questions/upcoming/{crn}/offender-questions (use in the manage check in page)
+  async getUpcomingCheckinQuestions(
+    crn: string,
+    language: string = 'en-GB',
+  ): Promise<EsupervisionUpcomingQuestionsResponse> {
+    return this.get({
+      path: `/v2/questions/upcoming/${crn}/offender-questions?language=${language}`,
+    })
+  }
+
+  // DELETE /v2/questions/upcoming/{crn}/question-items (use in the add questions pages if all existing questions are removed and submitted as empty)
+  async deleteAssignedQuestionsFromCheckIn(crn: string): Promise<{ message: string }> {
+    return this.delete({
+      path: `/v2/questions/assignment?crn=${crn}`,
     })
   }
 }

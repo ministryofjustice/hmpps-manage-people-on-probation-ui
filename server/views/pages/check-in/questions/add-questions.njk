@@ -4,13 +4,13 @@
 {% set showAnchorLink = true %}
 {% set formAnchorLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
 {% set formAnchorText = "Cancel and go back" %}
-{% set back = back if back else '' %}
-{% set backLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
+{% set backLink = back if back else "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/start" %}
 {% set addQuestionButtonText = "Add question" %}
+{% set addQuestionButtonLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/list" %}
 {% set buttonText = "Save questions" %}
 {% set previewFeelingPageLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/preview/feeling" %}
 {% set previewSupportPageLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/preview/support" %}
-
+{% set expectedCheckinDateValue = expectedCheckinDate | dateWithYear %}
 
 {% block primary %}
 
@@ -33,10 +33,12 @@
             captionClasses: "govuk-table__caption--m",
             head: [
                 {
-                text: "Question"
+                text: "Question",
+                classes: "govuk-!-width-three-quarters"
                 },
                 {
-                text: "Action"
+                text: "Action",
+                classes: "govuk-!-width-one-quarter"
                 }
             ],
             rows: [
@@ -63,22 +65,61 @@
         <div class="govuk-grid-column-two-thirds">
 
             <h2 class="govuk-heading-m">Additional questions</h2>
-            <p class="govuk-body">You can add up to 3 questions to {{case.name.forename}}'s online check in. These will only apply to their next online check in on <b>{day month year}</b>.</p>
+            <p class="govuk-body">You can add up to 3 questions to {{case.name.forename}}'s online check in. These will only apply to their next online check in on {{expectedCheckinDateValue}}.</p>
         </div>
     </div>
     <div class="govuk-grid-row">
         <div class="govuk-grid-column-full">
 
 
+{% if addedQuestions | length > 0 %}
+                {% set additionalRows = [] %}
+                {% for question in addedQuestions %}
+                    {% set editLink = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" + question.id + "/edit" %}
+                    {% set deleteLink = "/case/" + crn + "/appointments/check-in/manage/" + id + "/questions/" + question.id + "/delete" %}
+                    
+                    {% set row = additionalRows.push([
+                        {
+                            text: question.fullText
+                        },
+                        {
+                            html: '<a href="' + editLink + '" class="govuk-link govuk-!-display-inline-block" data-qa="edit-question-link">Edit</a> | ' +
+                                '<a href="' + deleteLink + '" class="govuk-link govuk-!-display-inline-block" data-qa="delete-question-link">Delete</a>'
+                        }
+                    ]) %}
+                {% endfor %}
 
+                {{ govukTable({
+                    attributes: {
+                        "data-qa": "custom-questions-table"
+                    },
+                    head: [
+                    { 
+                      text: "Question", 
+                      classes: "govuk-!-width-three-quarters" 
+                    },
+                    { 
+                      text: "Actions",
+                      classes: "govuk-!-width-one-quarter" 
+                    }
+                    ],
+                    rows: additionalRows
+                }) }}
+            {% endif %}
+
+        {% if addedQuestions | length < 3 %}
             <div class="govuk-button-group">
                 {{ govukButton({
                     text: addQuestionButtonText,
                     type: "submit",
                     classes: "govuk-button--secondary",
+                    href: addQuestionButtonLink,
                     attributes: { "data-qa": "add-question-btn" }
                 }) }}
             </div>
+        {% endif %}
+        <form method="post" autocomplete="off" action="{{ paths.current }}">
+            <input type="hidden" name="_csrf" value="{{ csrfToken }}">
             <div class="govuk-button-group">
                 {{ govukButton({
                     text: buttonText,
@@ -89,6 +130,7 @@
                     {{ formAnchorText }}
                 </a>
             </div>
+            </form>
         </div>
     </div>
 {% endblock %}

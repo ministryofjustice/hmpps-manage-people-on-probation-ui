@@ -32,10 +32,15 @@ import AddQuestionsPage from '../../pages/check-ins/questions/add-questions'
 import InstructionsPage from '../../pages/check-ins/questions/instructions'
 import PreviewFeelingPage from '../../pages/check-ins/questions/preview/feeling'
 import PreviewSupportPage from '../../pages/check-ins/questions/preview/support'
+import EditQuestionPage from '../../pages/check-ins/questions/edit-question'
+import ListQuestionsPage from '../../pages/check-ins/questions/list-questions'
+import EligibilitySPOApprovalPage from '../../pages/check-ins/eligibility-spo-approval'
 
 const loadPage = () => {
   cy.task('resetMocks')
   cy.visit(`/case/X000001/appointments`)
+  cy.task('stubGetQuestionsTemplates')
+  cy.task('stubEnableESupervisionCustomQuestions')
 }
 
 const clickNextDayButton = () => {
@@ -105,13 +110,8 @@ context('Appointment check-ins', () => {
     checkPage.getSubmitBtn().click()
 
     const fullPage = new EligibilityFullPage()
-    fullPage.getReplacementRadio().check()
-    fullPage.getSubmitBtn().click()
-
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
   })
-  it('should navigate to date frequency when "To replace some face-to-face contact" radio is selected', () => {
+  it('should navigate to SPO approval when "To replace some face-to-face contact" radio is selected', () => {
     loadPage()
     cy.get('[data-qa="online-checkin-btn"]').click()
 
@@ -123,8 +123,26 @@ context('Appointment check-ins', () => {
     fullPage.getReplacementRadio().check()
     fullPage.getSubmitBtn().click()
 
-    const dateFrequencyPage = new DateFrequencyPage()
-    dateFrequencyPage.checkOnPage()
+    const spoApprovalPage = new EligibilitySPOApprovalPage()
+    spoApprovalPage.checkOnPage()
+  })
+
+  it('should navigate to date frequency when SPO approval checkbox is checked', () => {
+    loadPage()
+    cy.get('[data-qa="online-checkin-btn"]').click()
+
+    const checkPage = new EligibilityCheckPage()
+    checkPage.getNoneOption().check()
+    checkPage.getSubmitBtn().click()
+
+    const fullPage = new EligibilityFullPage()
+    fullPage.getReplacementRadio().check()
+    fullPage.getSubmitBtn().click()
+
+    const spoApprovalPage = new EligibilitySPOApprovalPage()
+    spoApprovalPage.checkOnPage()
+    spoApprovalPage.getCheckbox()
+    spoApprovalPage.getSubmitBtn()
   })
 
   it('should navigate to date frequency when "As well as existing face-to-face contact" radio is selected', () => {
@@ -847,6 +865,7 @@ context('check-ins error scenario ', () => {
 context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -867,6 +886,7 @@ context('check-ins overview and manage pages', () => {
 
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -885,7 +905,7 @@ context('check-ins overview and manage pages', () => {
 
   it('should show checkin details', () => {
     cy.task('resetMocks')
-
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
     appointmentsPage.checkOnPage()
@@ -908,8 +928,8 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
-    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
-    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'Next check in')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 20 April')
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
     manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
@@ -1055,6 +1075,9 @@ context('check-ins add questions pages', () => {
   it('should allow a user to start the add questions to online check ins journey', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
     const instructionsPage = new InstructionsPage()
     instructionsPage.clickContinue()
@@ -1065,6 +1088,10 @@ context('check-ins add questions pages', () => {
   it('should allow a user to view the default questions preview pages', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
     const instructionsPage = new InstructionsPage()
     instructionsPage.clickContinue()
@@ -1090,22 +1117,147 @@ context('check-ins add questions pages', () => {
   it('should show the "Add question" button for additional custom questions', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="add-question-btn"]').should('be.visible')
   })
+
   it('should show the "Save questions" button', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="save-questions-btn"]').should('be.visible')
   })
+
   it('should show the "cancel and go back" button ', () => {
     cy.task('resetMocks')
     cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
     cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
     const addQuestionsPage = new AddQuestionsPage()
     addQuestionsPage.getElement('[data-qa="cancel-link"]').should('be.visible')
+  })
+
+  it('should trigger validation errors when trying to save a blank custom question', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/add')
+
+    const addQuestionsPage = new AddQuestionsPage()
+    addQuestionsPage.clickAddQuestion()
+
+    const listQuestionsPage = new ListQuestionsPage()
+    listQuestionsPage.clickAddTemplateByIndex(0)
+
+    const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.clickContinue()
+
+    editQuestionPage.checkValidationError('Enter what you want to ask')
+  })
+
+  it('should allow a user to add, edit, and delete a custom question', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+
+    const addQuestionsPage = new AddQuestionsPage()
+
+    // Add "How has [your unpaid work] been going recently?"
+    addQuestionsPage.clickAddQuestion()
+    const listQuestionsPage = new ListQuestionsPage()
+    listQuestionsPage.clickAddTemplateByIndex(0)
+
+    const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.enterDraftQuestionInput('your unpaid work')
+    editQuestionPage.clickContinue()
+
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionInList('your unpaid work')
+
+    // Edit "How has [your college course] been going recently?"
+    addQuestionsPage.clickEditForQuestion(0)
+
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('your college course')
+    editQuestionPage.clickContinue()
+
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionInList('your college course')
+    addQuestionsPage.verifyQuestionNotInList('your unpaid work')
+
+    // Delete
+    addQuestionsPage.clickDeleteForQuestion(0)
+
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionNotInList('your college course')
+  })
+
+  it('should enforce the maximum limit of 3 custom questions', () => {
+    cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
+    cy.task('stubGetQuestionsTemplates')
+    cy.task('stubGetUpcomingCheckinQuestions')
+    cy.task('stubGetUpcomingCheckinQuestionItems')
+    cy.task('stubAssignQuestions')
+    cy.visit('/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start')
+    const instructionsPage = new InstructionsPage()
+    instructionsPage.clickContinue()
+
+    const addQuestionsPage = new AddQuestionsPage()
+
+    // Add "How has [your apprenticeship] been going recently?"
+    addQuestionsPage.clickAddQuestion()
+    const listQuestionsPage = new ListQuestionsPage()
+    listQuestionsPage.clickAddTemplateByIndex(0)
+    const editQuestionPage = new EditQuestionPage()
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('your apprenticeship')
+    editQuestionPage.clickContinue()
+
+    // Add "How have things been feeling [at home] recently?"
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickAddQuestion()
+    listQuestionsPage.checkOnPage()
+    listQuestionsPage.clickAddTemplateByIndex(1)
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('at home')
+    editQuestionPage.clickContinue()
+
+    // Add "How is [your physical health]?"
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.clickAddQuestion()
+    listQuestionsPage.checkOnPage()
+    listQuestionsPage.clickAddTemplateByIndex(1)
+    editQuestionPage.checkOnPage()
+    editQuestionPage.enterDraftQuestionInput('your physical health')
+    editQuestionPage.clickContinue()
+    addQuestionsPage.checkOnPage()
+    addQuestionsPage.verifyQuestionInList('your apprenticeship')
+    addQuestionsPage.verifyQuestionInList('at home')
+    addQuestionsPage.verifyQuestionInList('your physical health')
+    addQuestionsPage.verifyAddQuestionButtonHidden()
   })
 })

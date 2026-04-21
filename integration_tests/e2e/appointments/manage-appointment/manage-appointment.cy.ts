@@ -160,5 +160,55 @@ describe('Manage an appointment', () => {
       appointmentDetails(false)
       checkRescheduleLink(false)
     })
+    describe('enableDeepLinks feature flag is enabled', () => {
+      describe('drug test appointment type', () => {
+        beforeEach(() => {
+          cy.task('stubEnableDeepLinks')
+          cy.task('stubAppointment', { deliusManaged: true, contactType: 'Drug Test Appointment (NS)' })
+          loadPage()
+          manageAppointmentPage = new ManageAppointmentPage()
+        })
+        it('should display the drug history deep link with correct wording', () => {
+          manageAppointmentPage
+            .getAppointmentDetails()
+            .find('.govuk-body')
+            .should('contain.text', 'You can manage this appointment through the')
+          manageAppointmentPage
+            .getAppointmentDetails()
+            .find('.govuk-body a')
+            .should('contain.text', "person's drug history in NDelius (opens in a new tab)")
+            .should('have.attr', 'target', '_blank')
+            .should(
+              'have.attr',
+              'href',
+              `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=DrugHistory&CRN=${crn}&EventNumber=7654321`,
+            )
+        })
+      })
+      describe('CP/UPW appointment type', () => {
+        beforeEach(() => {
+          cy.task('stubEnableDeepLinks')
+          cy.task('stubAppointment', { deliusManaged: true, contactType: 'CP/UPW - Appointment/Attendance (NS)' })
+          loadPage()
+          manageAppointmentPage = new ManageAppointmentPage()
+        })
+        it('should display the UPW worksheet deep link with correct wording', () => {
+          manageAppointmentPage
+            .getAppointmentDetails()
+            .find('.govuk-body')
+            .should('contain.text', 'You can manage this appointment through the')
+          manageAppointmentPage
+            .getAppointmentDetails()
+            .find('.govuk-body a')
+            .should('contain.text', 'unpaid work worksheet summary in NDelius (opens in a new tab)')
+            .should('have.attr', 'target', '_blank')
+            .should(
+              'have.attr',
+              'href',
+              `https://ndelius-dummy-url/NDelius-war/delius/JSP/deeplink.xhtml?component=UPWWorksheet&CRN=${crn}&EventNumber=7654321`,
+            )
+        })
+      })
+    })
   })
 })

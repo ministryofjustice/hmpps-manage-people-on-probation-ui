@@ -10,6 +10,7 @@ import { MpopSortableTable } from './mpop-sortable-table.mjs'
 import setupAlertsPage from './alerts'
 import setupTechnicalUpdates from './technical-updates'
 import './photo'
+import initGovUkBackLink from './back-link'
 
 arnsFrontend.initAll()
 
@@ -374,4 +375,5 @@ crissHeaders()
 recentCaseDisplay()
 setupAlertsPage()
 setupTechnicalUpdates()
+initGovUkBackLink()
 new ServiceAlert()
