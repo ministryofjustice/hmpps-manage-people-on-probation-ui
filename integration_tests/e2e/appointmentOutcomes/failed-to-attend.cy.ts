@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon'
 import { checkPopHeader } from '../appointments/imports'
-import { crn, uuid, appointmentId } from '../appointments/imports/common'
+import { crn, appointmentId } from '../appointments/imports/common'
 import FailedToAttendPage from '../../pages/appointmentOutcomes/attended-failed-to-comply.page'
 import ManageAppointmentPage from '../../pages/appointments/manage-appointment.page'
 import OutcomePage from '../../pages/appointmentOutcomes/outcome.page'
@@ -16,7 +16,7 @@ import InitiateBreachOrRecallPage from '../../pages/appointmentOutcomes/initiate
 import AddNotePage from '../../pages/appointments/add-note.page'
 import RescheduleCheckYourAnswerPage from '../../pages/appointments/reschedule-check-your-answer.page'
 import EnforcementActionPage from '../../pages/appointmentOutcomes/enforcement-action.page'
-import { ExpectedOption, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
+import { ExpectedOption, Journey, checkOptionRedirectsToCorrectPage, checkOptions } from './imports'
 
 let manageAppointmentPage: ManageAppointmentPage
 let outcomePage: OutcomePage
@@ -27,11 +27,17 @@ const now = DateTime.now()
 const date = now.plus({ days: 2 })
 const responseByDate = date.toFormat('yyyy-MM-dd')
 
+interface Args {
+  journey?: Journey
+  isProbationPractitioner?: boolean
+  enforcementActionResponseByDate?: string
+}
+
 const loadPage = ({
   journey = 'MANAGE',
   isProbationPractitioner = false,
   enforcementActionResponseByDate = responseByDate,
-} = {}): void => {
+}: Args = {}): void => {
   cy.request({
     method: 'POST',
     url: 'http://localhost:3007/__test/clear-session',
@@ -97,7 +103,7 @@ const getExpectedOptions = ({ isProbationPractitioner = false } = {}): ExpectedO
   return expectedOptions
 }
 
-const checkPage = ({ journey = 'MANAGE' } = {}) => {
+const checkPage = ({ journey = 'MANAGE' }: { journey?: Journey } = {}) => {
   it(`should render the page if user is not probation practitioner${journey === 'MANAGE' ? ' and submit evidence in 2 days' : ''}`, () => {
     loadPage({ journey })
     failedToAttendPage = new FailedToAttendPage()
@@ -159,7 +165,7 @@ const checkPage = ({ journey = 'MANAGE' } = {}) => {
     const options = getExpectedOptions()
     checkOptionRedirectsToCorrectPage(options, loadPage, {
       Page: FailedToAttendPage,
-      manageJourney: journey === 'MANAGE',
+      journey,
     })
   })
 }
