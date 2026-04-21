@@ -98,4 +98,19 @@ describe('FlagService', () => {
       enableSanIndicator: false,
     })
   })
+
+  it('normalises email to lowercase before sending to Flipt', async () => {
+    const mixedCaseEmail = 'Test.User@Example.COM'
+
+    await service.getFlags({ email: mixedCaseEmail })
+
+    expect(mockEvaluateBatch).toHaveBeenCalledWith(
+        expect.arrayContaining([
+          expect.objectContaining({
+            entityId: mixedCaseEmail.toLowerCase(),
+            context: { email: mixedCaseEmail.toLowerCase() },
+          }),
+        ]),
+    )
+  })
 })
