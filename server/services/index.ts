@@ -46,7 +46,7 @@ export const services = () => {
     environment: config.env,
     extraColumns: [
       {
-        header: 'Managed by',
+        header: 'Managed By',
         value: result => getManagedBy(result),
       },
       {

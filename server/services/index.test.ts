@@ -201,7 +201,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
         environment: config.env,
         extraColumns: [
           {
-            header: 'Managed by',
+            header: 'Managed By',
             value: expect.any(Function),
           },
           {
@@ -232,7 +232,7 @@ describe('Probation search component extra columns:Managed by and PDU', () => {
       services()
 
       const { extraColumns } = CaseSearchServiceMock.mock.calls[0][0]
-      const managedByColumn = extraColumns.find((c: any) => c.header === 'Managed by')
+      const managedByColumn = extraColumns.find((c: any) => c.header === 'Managed By')
       const pduColumn = extraColumns.find((c: any) => c.header === 'PDU')
 
       const record = { offenderManagers: [{ active: true, staff: { forenames: 'John', surname: 'Smith' } }] }
