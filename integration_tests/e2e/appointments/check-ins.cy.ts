@@ -40,6 +40,7 @@ const loadPage = () => {
   cy.task('resetMocks')
   cy.visit(`/case/X000001/appointments`)
   cy.task('stubGetQuestionsTemplates')
+  cy.task('stubEnableESupervisionCustomQuestions')
 }
 
 const clickNextDayButton = () => {
@@ -864,6 +865,7 @@ context('check-ins error scenario ', () => {
 context('check-ins overview and manage pages', () => {
   it('should show online check ins section with check in details', () => {
     cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X778160`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -884,6 +886,7 @@ context('check-ins overview and manage pages', () => {
 
   it('should show online check ins due section ', () => {
     cy.task('resetMocks')
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X000001`)
     const overviewPage = new OverviewPage()
     overviewPage.checkOnPage()
@@ -902,7 +905,7 @@ context('check-ins overview and manage pages', () => {
 
   it('should show checkin details', () => {
     cy.task('resetMocks')
-
+    cy.task('stubEnableESupervisionCustomQuestions')
     cy.visit(`/case/X778160/appointments`)
     const appointmentsPage = new AppointmentsPage()
     appointmentsPage.checkOnPage()
@@ -925,8 +928,8 @@ context('check-ins overview and manage pages', () => {
 
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
-    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'First check in')
-    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 3 November')
+    manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'Next check in')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 20 April')
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
     manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')

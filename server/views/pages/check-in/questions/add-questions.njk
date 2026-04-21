@@ -10,7 +10,7 @@
 {% set buttonText = "Save questions" %}
 {% set previewFeelingPageLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/preview/feeling" %}
 {% set previewSupportPageLink = "/case/"+  crn + "/appointments/check-in/manage/" + id + "/questions/preview/support" %}
-
+{% set expectedCheckinDateValue = expectedCheckinDate | dateWithYear %}
 
 {% block primary %}
 
@@ -65,7 +65,7 @@
         <div class="govuk-grid-column-two-thirds">
 
             <h2 class="govuk-heading-m">Additional questions</h2>
-            <p class="govuk-body">You can add up to 3 questions to {{case.name.forename}}'s online check in. These will only apply to their next online check in.</p>
+            <p class="govuk-body">You can add up to 3 questions to {{case.name.forename}}'s online check in. These will only apply to their next online check in on {{expectedCheckinDateValue}}.</p>
         </div>
     </div>
     <div class="govuk-grid-row">

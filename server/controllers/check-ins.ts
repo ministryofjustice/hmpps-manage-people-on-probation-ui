@@ -1,22 +1,13 @@
 import { v4 as uuidv4 } from 'uuid'
 import { DateTime } from 'luxon'
 import { Controller } from '../@types'
-import {
-  dateWithDayAndWithYear,
-  dayOfWeek,
-  getDataValue,
-  handleQuotes,
-  isValidCrn,
-  isValidUUID,
-  setDataValue,
-} from '../utils'
+import { dateWithYear, dayOfWeek, getDataValue, handleQuotes, isValidCrn, isValidUUID, setDataValue } from '../utils'
 import { renderError } from '../middleware'
 import MasApiClient from '../data/masApiClient'
 import { PersonalDetails, PersonalDetailsUpdateRequest } from '../data/model/personalDetails'
 import {
   CheckinScheduleRequest,
   DeactivateOffenderRequest,
-  EsupervisionAssignQuestionsRequest,
   ESupervisionCheckIn,
   ESupervisionNote,
   ESupervisionReview,
@@ -759,8 +750,12 @@ const checkInsController: Controller<typeof routes, void> = {
           savedUserDetails.preferredComs === 'EMAIL' ? savedUserDetails.checkInEmail : savedUserDetails.checkInMobile,
         displayDay: dayOfWeek(DateTime.fromFormat(savedUserDetails.date, 'd/M/yyyy').toFormat('yyyy-MM-dd')),
       }
+      const today = DateTime.now().startOf('day')
+      const checkInDate = DateTime.fromFormat(userDetails.date, 'd/M/yyyy').startOf('day')
+      const isFutureCheckinDate = checkInDate > today
+
       await sendAuditMessage(res, 'VIEW_MAS_CHECK_IN_CONFIRMATION', crn, SubjectType.CRN)
-      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails })
+      return res.render('pages/check-in/confirmation.njk', { crn, id, userDetails, isFutureCheckinDate })
     }
   },
 
@@ -822,7 +817,7 @@ const checkInsController: Controller<typeof routes, void> = {
         res.locals.success = true
         const forename = personalDetails?.name?.forename || 'the person'
         const rawCheckinDate = upcomingCheckin?.expectedCheckinDate
-        const nextCheckinDate = dateWithDayAndWithYear(rawCheckinDate)
+        const nextCheckinDate = dateWithYear(rawCheckinDate)
         successMessageHtml = `
           <strong>You have added additional questions to ${forename}’s next online check in</strong>
           <br>
@@ -1433,12 +1428,14 @@ const checkInsController: Controller<typeof routes, void> = {
         'manageQuestions',
         'questionTemplateAndInputs',
       ])
+      let expectedCheckinDate = getDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'expectedCheckinDate'])
       // Fetch current check in questions if they have already been submitted
       if (!questionTemplateAndInputs) {
         questionTemplateAndInputs = {}
         try {
           const eSupClient = new ESupervisionClient(token)
           const response = await eSupClient.getUpcomingCheckinQuestionItems(crn, 'en-GB')
+          expectedCheckinDate = response?.upcoming?.expectedCheckinDate
           const items = response?.upcoming?.items || []
 
           items.forEach((item: any) => {
@@ -1462,6 +1459,7 @@ const checkInsController: Controller<typeof routes, void> = {
           ['esupervision', crn, id, 'manageQuestions', 'questionTemplateAndInputs'],
           questionTemplateAndInputs,
         )
+        setDataValue(data, ['esupervision', crn, id, 'manageQuestions', 'expectedCheckinDate'], expectedCheckinDate)
       }
 
       const addedQuestions = Object.entries(questionTemplateAndInputs)
@@ -1487,6 +1485,7 @@ const checkInsController: Controller<typeof routes, void> = {
         case: personalDetails,
         addedQuestions,
         data,
+        expectedCheckinDate,
       })
     }
   },
