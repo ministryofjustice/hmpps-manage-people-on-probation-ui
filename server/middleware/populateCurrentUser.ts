@@ -18,13 +18,18 @@ export default function populateCurrentUser(
           userService.getUser(res.locals.user.token),
           masClient.getUserDetails(res.locals.user.username),
         ])
+        const normalisedUserDetails = {
+          ...userDetails,
+          email: userDetails.email?.toLowerCase(),
+        }
+
         if (user) {
           localsUser = { ...user, ...localsUser }
         } else {
           logger.info('No user available')
         }
-        if (userDetails) {
-          localsUser = { ...userDetails, ...localsUser, userId: userDetails?.userId?.toString() }
+        if (normalisedUserDetails) {
+          localsUser = { ...normalisedUserDetails, ...localsUser, userId: normalisedUserDetails?.userId?.toString() }
         } else {
           logger.info('No user details available')
         }
