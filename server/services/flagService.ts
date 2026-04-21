@@ -19,12 +19,14 @@ export default class FlagService {
       }
     })
     const requests = flagList.map(flag => {
+      const pduCodes = context.pduCodes.join(',')
+      console.log(`Requesting flag ${flag} for ${pduCodes}`)
       const request: EvaluationRequest = {
         flagKey: flag,
         entityId: context?.email ? context.email || 'anonymous' : flag,
         context: {
           ...(context?.email ? { email: context.email } : {}),
-          ...(context?.pduCodes?.length ? { pduCodes: context.pduCodes.join(',') } : {}),
+          ...(context?.pduCodes?.length ? { pduCodes: pduCodes } : {}),
         },
       }
       return request
@@ -41,6 +43,7 @@ export default class FlagService {
 
     flagList.forEach(f => {
       featureFlags[f] = result(flags.responses, f)
+      console.log(`Flag ${f} is ${featureFlags[f]}`)
     })
     return featureFlags
   }

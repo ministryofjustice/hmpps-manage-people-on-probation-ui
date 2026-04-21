@@ -58,6 +58,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
+      console.log('flags: ' + JSON.stringify(res.locals.flags))
       const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/appointments', {
