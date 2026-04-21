@@ -1,6 +1,7 @@
 import { EvaluationRequest, EvaluationResponse, FliptEvaluationClient } from '@flipt-io/flipt-client'
 import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
+import logger from '../../logger'
 
 export default class FlagService {
   async getFlags(context: { email?: string; pduCodes?: string[] }): Promise<FeatureFlags> {
@@ -20,13 +21,13 @@ export default class FlagService {
     })
     const requests = flagList.map(flag => {
       const pduCodes = context.pduCodes.join(',')
-      console.log(`Requesting flag ${flag} for ${pduCodes}`)
+      logger.info(`Requesting flag ${flag} for ${pduCodes}`)
       const request: EvaluationRequest = {
         flagKey: flag,
         entityId: context?.email ? context.email || 'anonymous' : flag,
         context: {
           ...(context?.email ? { email: context.email } : {}),
-          ...(context?.pduCodes?.length ? { pduCodes: pduCodes } : {}),
+          ...(context?.pduCodes?.length ? { pduCodes } : {}),
         },
       }
       return request
@@ -43,7 +44,7 @@ export default class FlagService {
 
     flagList.forEach(f => {
       featureFlags[f] = result(flags.responses, f)
-      console.log(`Flag ${f} is ${featureFlags[f]}`)
+      logger.info(`Flag ${f} is ${featureFlags[f]}`)
     })
     return featureFlags
   }
