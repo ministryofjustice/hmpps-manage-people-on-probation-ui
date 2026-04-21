@@ -20,6 +20,14 @@ export type AppointmentOutcomeType =
   | 'FAILED_TO_ATTEND'
   | 'WILL_BE_RESCHEDULED'
 
+export type AppointmentEnforcementAction =
+  | 'SEND_LETTER'
+  | 'BREACH_RECALL_INITIATED'
+  | 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
+  | 'REFER_TO_OFFENDER_MANAGER'
+  | 'NO_FURTHER_ACTION'
+  | 'DIFFERENT_ACTION'
+
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
   complied: 'YES' | 'NO'
@@ -70,6 +78,7 @@ export interface AppointmentSession {
   }
   outcome?: {
     type: AppointmentOutcomeType
+    enforcementAction: AppointmentEnforcementAction
   }
 }
 

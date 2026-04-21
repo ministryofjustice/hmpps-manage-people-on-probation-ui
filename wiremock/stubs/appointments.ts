@@ -25,6 +25,7 @@ interface Args {
   outcome?: string
   inOffice?: boolean
   contactId?: string
+  contactType?: string
 }
 
 const getAppointmentStub = (
@@ -51,6 +52,7 @@ const getAppointmentStub = (
     outcome = '',
     inOffice = true,
     contactId = '6',
+    contactType = undefined,
   }: Args = {} as Args,
 ): WiremockMapping => {
   const mapping: WiremockMapping = {
@@ -230,6 +232,9 @@ const getAppointmentStub = (
   }
   if (noType) {
     mapping.response.jsonBody.appointment.type = ''
+  }
+  if (contactType) {
+    mapping.response.jsonBody.appointment.type = contactType
   }
   if (noEventId) {
     mapping.response.jsonBody.appointment.eventId = 0

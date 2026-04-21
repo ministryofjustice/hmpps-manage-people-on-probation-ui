@@ -474,4 +474,9 @@ export default class MasApiClient extends RestClient {
   async getProbationPractitioner(crn: string): Promise<ProbationPractitioner> {
     return this.get({ path: `/case/${crn}/probation-practitioner` })
   }
+
+  async getBreachRecallInformation(crn: string): Promise<string> {
+    const response: string = await this.get({ path: `/breachRecall`, handle404: true })
+    return response
+  }
 }

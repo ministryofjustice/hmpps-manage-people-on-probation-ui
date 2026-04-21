@@ -6,6 +6,7 @@ import { convertToTitleCase } from '../utils/convertToTitleCase'
 import { appointmentDateIsInPast } from './appointmentDateIsInPast'
 import { Route } from '../@types'
 import { isNumericString, isValidCrn, isValidUUID } from '../utils'
+import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 
 export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   const { crn, id: uuid, contactId } = req.params as Record<string, string>
@@ -18,9 +19,9 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
   let appointment: AttendedCompliedAppointment | Activity
   const { forename, surname } = res.locals.case.name
   const reqUrl = req.url.split('?')[0]
-  const baseUrl = uuid
-    ? `/case/${crn}/arrange-appointment/${id}/outcome`
-    : `/case/${crn}/appointments/appointment/${id}/outcome`
+  const baseUrl = uuid ? `/case/${crn}/arrange-appointment/${id}` : `/case/${crn}/appointments/appointment/${id}`
+  const baseOutcomeUrl = `${baseUrl}/outcome`
+  const completedUrl = uuid ? `${baseUrl}/check-your-answers` : `${baseUrl}/manage`
   if (contactId) {
     ;({ appointment } = res.locals.personAppointment)
   } else {
@@ -44,7 +45,13 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     }
   }
   const isInPast = appointmentDateIsInPast(req)
-
+  const sentences = getDataValue<Sentence[]>(data, ['sentences', crn])
+  const eventId = appointmentSession?.eventId
+  const sentenceType: SentenceType = eventId
+    ? sentences.find(_sentence => _sentence.id.toString() === eventId)?.sentenceType
+    : null
+  const probationPractitioner = getDataValue(data, ['personalDetails', crn, 'probationPractitioner'])
+  const isProbationPractitioner = probationPractitioner?.username === res.locals.user.username
   res.locals.appointmentOutcome = {
     forename,
     surname,
@@ -57,7 +64,11 @@ export const getAppointmentOutcomeProps: Route<void> = (req, res, next) => {
     isInPast,
     reqUrl,
     baseUrl,
+    baseOutcomeUrl,
+    completedUrl,
     appointmentSession,
+    sentenceType,
+    isProbationPractitioner,
   }
   return next()
 }

@@ -2,7 +2,7 @@ import { RiskData } from '@ministryofjustice/hmpps-arns-frontend-components-lib'
 import { Response } from 'express'
 import { PersonalDetails } from '../data/model/personalDetails'
 import { FeatureFlags } from '../data/model/featureFlags'
-import { Sentence } from '../data/model/sentenceDetails'
+import { Sentence, SentenceType } from '../data/model/sentenceDetails'
 import { DefaultUserDetails, Location, Provider, Team, User } from '../data/model/caseload'
 import { SentryConfig } from '../config'
 import { ActivityLogFiltersResponse } from './ActivityLog'
@@ -163,9 +163,13 @@ export interface AppointmentOutcomeProps {
   isValidParams: boolean
   reqUrl: string
   baseUrl: string
+  baseOutcomeUrl: string
+  completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
   options?: AppointmentOutcomeOption[]
+  sentenceType?: SentenceType
+  isProbationPractitioner?: boolean
 }
 
 export interface AppResponse extends Response {

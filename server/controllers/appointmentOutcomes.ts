@@ -1,7 +1,7 @@
 import { Controller, FileCache } from '../@types'
 import { renderError } from '../middleware'
 import { AppResponse } from '../models/Locals'
-import { AppointmentOutcomeType, AppointmentPatch } from '../models/Appointments'
+import { AppointmentEnforcementAction, AppointmentOutcomeType, AppointmentPatch } from '../models/Appointments'
 import { getDataValue, handleQuotes } from '../utils'
 import config from '../config'
 import sendAuditMessage, { SubjectType } from '../middleware/sendAuditMessage'
@@ -31,8 +31,11 @@ const routes = [
   'postUpdateEnforcementAction',
 ] as const
 
-type RedirectMap = {
+type OutcomeRedirectMap = {
   [K in AppointmentOutcomeType]: string
+}
+type EnforcementRedirectMap = {
+  [K in AppointmentEnforcementAction]?: string
 }
 
 const appointmentOutcomesController: Controller<typeof routes, void | AppResponse> = {
@@ -43,20 +46,20 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
   },
   postOutcome: _hmppsAuthClient => {
     return async (req, res) => {
-      const { crn, contactId, isValidParams, baseUrl, id } = res.locals.appointmentOutcome
+      const { crn, contactId, isValidParams, baseOutcomeUrl, id } = res.locals.appointmentOutcome
       if (!isValidParams) {
         return renderError(404)(req, res)
       }
       const { data } = req.session
       const type = getDataValue<AppointmentOutcomeType>(data, ['appointments', crn, id, 'outcome', 'type'])
-      const redirectMap: RedirectMap = {
-        ATTENDED_COMPLIED: `${baseUrl}/add-note`,
-        ATTENDED_FAILED_TO_COMPLY: `${baseUrl}/attended-failed-to-comply`,
-        ATTENDED_SENT_HOME_BEHAVIOUR: `${baseUrl}/attended-failed-to-comply`,
-        ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseUrl}/attended-failed-to-comply`,
-        ACCEPTABLE_ABSENCE: `${baseUrl}/acceptable-absence`,
-        UNACCEPTABLE_ABSENCE: `${baseUrl}/unacceptable-absence`,
-        FAILED_TO_ATTEND: `${baseUrl}/failed-to-attend`,
+      const redirectMap: OutcomeRedirectMap = {
+        ATTENDED_COMPLIED: `${baseOutcomeUrl}/add-note`,
+        ATTENDED_FAILED_TO_COMPLY: `${baseOutcomeUrl}/attended-failed-to-comply`,
+        ATTENDED_SENT_HOME_BEHAVIOUR: `${baseOutcomeUrl}/attended-failed-to-comply`,
+        ATTENDED_SENT_HOME_SERVICE_ISSUES: `${baseOutcomeUrl}/attended-failed-to-comply`,
+        ACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/acceptable-absence`,
+        UNACCEPTABLE_ABSENCE: `${baseOutcomeUrl}/unacceptable-absence`,
+        FAILED_TO_ATTEND: `${baseOutcomeUrl}/failed-to-attend`,
         WILL_BE_RESCHEDULED: `/case/${crn}/appointment/${contactId}/reschedule`,
       }
       return res.redirect(redirectMap[type])
@@ -131,10 +134,31 @@ const appointmentOutcomesController: Controller<typeof routes, void | AppRespons
     }
   },
   getAttendedFailedToComply: _hmppsAuthClient => {
-    return async (req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
+    return async (req, res) => {
+      return res.render('pages/appointment-outcomes/attended-failed-to-comply')
+    }
   },
   postAttendedFailedToComply: () => {
-    return async (req, res) => res.render('pages/appointment-outcomes/attended-failed-to-comply')
+    return async (req, res) => {
+      const { data } = req.session
+      const { crn, id, baseOutcomeUrl, completedUrl } = res.locals.appointmentOutcome
+      const enforcementAction = getDataValue<AppointmentEnforcementAction>(data, [
+        'appointments',
+        crn,
+        id,
+        'outcome',
+        'enforcementAction',
+      ])
+      const redirectMap: EnforcementRedirectMap = {
+        SEND_LETTER: `${baseOutcomeUrl}/send-letter`,
+        BREACH_RECALL_INITIATED: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+        BREACH_RECALL_INITIATED_AND_SEND_LETTER: `${baseOutcomeUrl}/initiate-breach-or-recall`,
+        REFER_TO_OFFENDER_MANAGER: `${baseOutcomeUrl}/add-note`,
+        NO_FURTHER_ACTION: `${baseOutcomeUrl}/add-note`,
+        DIFFERENT_ACTION: `${baseOutcomeUrl}/enforcement-action`,
+      }
+      return res.redirect(redirectMap[enforcementAction])
+    }
   },
   getAcceptableAbsence: () => {
     return async (req, res) => res.render('pages/appointment-outcomes/acceptable-absence')

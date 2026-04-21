@@ -4,9 +4,9 @@ export interface ExpectedOption<TPage extends Page> {
   value: string
   text: string
   hint?: string
-  Page: Constructor<TPage>
-  pageName: string
-  pageTitle?: string
+  RedirectPage: Constructor<TPage>
+  redirectPageName: string
+  redirectPageTitle?: string
 }
 
 type Constructor<T = any> = new (...args: any[]) => T
@@ -26,12 +26,12 @@ export const checkOptionRedirectsToCorrectPage = <TPage extends Page, TArgs exte
   loadPageFunc: (args: any) => void,
   args: TArgs = {} as TArgs,
 ): void => {
-  options.forEach(({ value, Page: RedirectPage, pageTitle }) => {
+  options.forEach(({ value, RedirectPage, redirectPageTitle }) => {
     loadPageFunc(args)
     const outcomePage = new args.Page()
     cy.get(`.govuk-radios__input[value=${value}]`).click()
     outcomePage.getSubmitBtn().click()
     const page = new RedirectPage()
-    page.checkPageTitle(pageTitle!)
+    page.checkPageTitle(redirectPageTitle!)
   })
 }
