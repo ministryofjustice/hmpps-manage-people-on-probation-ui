@@ -105,12 +105,12 @@ describe('FlagService', () => {
     await service.getFlags({ email: mixedCaseEmail })
 
     expect(mockEvaluateBatch).toHaveBeenCalledWith(
-        expect.arrayContaining([
-          expect.objectContaining({
-            entityId: mixedCaseEmail.toLowerCase(),
-            context: { email: mixedCaseEmail.toLowerCase() },
-          }),
-        ]),
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: mixedCaseEmail.toLowerCase(),
+          context: { email: mixedCaseEmail.toLowerCase() },
+        }),
+      ]),
     )
   })
 })
