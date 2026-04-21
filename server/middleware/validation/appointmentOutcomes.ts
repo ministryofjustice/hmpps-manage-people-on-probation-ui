@@ -101,6 +101,24 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
     }
   }
 
+  const validateEnforcementAction = (): void => {
+    if (!req.url.includes(`${baseOutcomeUrl}/enforcement-action`)) return
+    render = 'pages/appointment-outcomes/enforcement-action'
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/enforcement-action`,
+          msg: 'Select an enforcement action for their failure to comply',
+          log: 'Enforcement action not selected',
+        }),
+      ),
+    }
+  }
+
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
@@ -121,6 +139,7 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   validateAcceptableAbsence()
   validateUnacceptableAbsence()
   validateFailedToAttend()
+  validateEnforcementAction()
   validateAddNote()
 
   if (Object.keys(errorMessages).length) {
