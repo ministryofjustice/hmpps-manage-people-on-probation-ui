@@ -71,27 +71,27 @@ context('check in reviews', () => {
     const page = Page.verifyOnPage(CheckInReviewIdentityPage)
 
     page
-      .getSummaryListRow(2, 'identitySummary')
+      .getSummaryListRow(1, 'identitySummary')
       .find('.govuk-summary-list__key')
       .should('contain.text', 'System ID and liveness check result')
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-tag--red').should('not.exist')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('not.exist')
   })
 
   it('System ID check shows Fail when liveness enabled but user fell back to video', () => {
     cy.visit(`/case/${crn}/appointments/${livenessFallbackId}/check-in/update`)
     const page = Page.verifyOnPage(CheckInReviewIdentityPage)
 
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Fail')
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-tag--red').should('contain.text', 'Needs attention')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Fail')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('contain.text', 'Needs attention')
   })
 
   it('System ID check shows Fail when liveness enabled with LIVE result but face NO_MATCH', () => {
     cy.visit(`/case/${crn}/appointments/${livenessNoMatchId}/check-in/update`)
     const page = Page.verifyOnPage(CheckInReviewIdentityPage)
 
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Fail')
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-tag--red').should('contain.text', 'Needs attention')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Fail')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('contain.text', 'Needs attention')
   })
 
   it('System ID check shows Pass when liveness not enabled and face MATCH', () => {
@@ -99,12 +99,12 @@ context('check in reviews', () => {
     const page = Page.verifyOnPage(CheckInReviewIdentityPage)
 
     page
-      .getSummaryListRow(2, 'identitySummary')
+      .getSummaryListRow(1, 'identitySummary')
       .find('.govuk-summary-list__key')
       .should('contain.text', 'System ID check result')
       .should('not.contain.text', 'liveness')
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
-    page.getSummaryListRow(2, 'identitySummary').find('.govuk-tag--red').should('not.exist')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-summary-list__value').should('contain.text', 'Pass')
+    page.getSummaryListRow(1, 'identitySummary').find('.govuk-tag--red').should('not.exist')
   })
 
   it('Reviewed check-in view page shows Pass when liveness enabled with LIVE result and face MATCH', () => {
