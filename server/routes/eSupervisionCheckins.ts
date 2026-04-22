@@ -8,13 +8,13 @@ import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
 import { AppResponse } from '../models/Locals'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
-  router.use('/case/:crn/appointments/check-in{/*path}', (req, res: AppResponse, next) => {
+  router.use('/case/:crn/appointments/check-in', (req, res: AppResponse, next) => {
     if (res.locals.flags?.enableESupervisionCheckins !== true) {
       return renderError(403)(req, res)
     }
     return next()
   })
-  router.use('/case/:crn/appointments/:id/check-in{/*path}', (req, res: AppResponse, next) => {
+  router.use('/case/:crn/appointments/:id/check-in', (req, res: AppResponse, next) => {
     if (res.locals.flags?.enableESupervisionCheckins !== true) {
       return renderError(403)(req, res)
     }

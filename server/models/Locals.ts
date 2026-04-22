@@ -13,6 +13,7 @@ import {
   YesNo,
   AttendedCompliedAppointment,
   AppointmentOutcomeOption,
+  ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -76,7 +77,7 @@ export interface LocalsUser {
   uuid?: string
   displayName?: string
   token: string
-  probationDeliveryUnits?: Array<{ code: string; description: string }>
+  probationDeliveryUnits?: ProbationDeliveryUnit[]
 }
 
 interface Locals {
