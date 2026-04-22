@@ -16,6 +16,7 @@ import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointmen
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
 import { ProbationPractitioner } from '../models/CaseDetail'
+import { getErrorMessage } from '../../integration_tests/utils'
 
 const crn = 'X000001'
 const id = '1234'
@@ -305,55 +306,8 @@ describe('controllers/appointments', () => {
         crn,
         actionType: outcomeActionType,
         contactId,
-      })
-    })
-  })
-
-  describe('post record an outcome', () => {
-    describe('CRN request parameter is invalid', () => {
-      beforeEach(() => {
-        mockIsValidCrn.mockReturnValue(false)
-        mockIsNumericString.mockReturnValue(true)
-        controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(req, res)
-      })
-      it('should return a 404 status and render the error page', () => {
-        expect(mockRenderError).toHaveBeenCalledWith(404)
-        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-      })
-    })
-    describe('appointment id is invalid', () => {
-      beforeEach(() => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(false)
-        controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(req, res)
-      })
-      it('should return a 404 status and render the error page', () => {
-        expect(mockRenderError).toHaveBeenCalledWith(404)
-        expect(mockMiddlewareFn).toHaveBeenCalledWith(req, res)
-      })
-    })
-    describe('If appointment is selected', () => {
-      beforeEach(async () => {
-        mockIsValidCrn.mockReturnValue(true)
-        mockIsNumericString.mockReturnValue(true)
-        const mockReq = httpMocks.createRequest({
-          params: {
-            crn,
-            id,
-            contactId,
-            actionType,
-          },
-          query: { page: '', view: 'default', category: 'mock-category' },
-          body: {
-            'appointment-id': contactId,
-          },
-        })
-        await controllers.appointments.postRecordAnOutcome(hmppsAuthClient)(mockReq, res)
-      })
-      it('should redirect to the manage appointment page', () => {
-        expect(redirectSpy).toHaveBeenCalledWith(
-          `/case/${crn}/appointments/appointment/${contactId}/manage?back=/case/${crn}/record-an-outcome/${actionType}?contactId=${contactId}`,
-        )
+        baseUrl: '',
+        outcomesFilter: '2Years',
       })
     })
   })

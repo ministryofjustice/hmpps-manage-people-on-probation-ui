@@ -22,6 +22,10 @@ const appointments: Route<void> = (req, res, next) => {
 
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
 
+  if (req.query.filter === 'true') {
+    return next()
+  }
+
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
 
@@ -306,6 +310,9 @@ const appointments: Route<void> = (req, res, next) => {
   validateTextMessageConfirmation()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+    if (req.query.filter === 'false') {
+      return next()
+    }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

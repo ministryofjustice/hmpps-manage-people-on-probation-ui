@@ -95,7 +95,7 @@ const mockPersonalDetails: PersonalDetailsSession = {
   riskData: mockRiskData,
 }
 const mockOverdueOutcomesResponse = {
-  content: [{}, {}, {}],
+  content: [{ date: '2021-01-01' }, { date: '2025-01-02' }, { date: '2025-01-03' }],
 }
 const getOverviewSpy = jest
   .spyOn(MasApiClient.prototype, 'getOverview')
@@ -157,7 +157,7 @@ describe('caseController', () => {
         crn,
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: 3,
+        appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
       })
@@ -195,7 +195,7 @@ describe('caseController', () => {
         crn,
         sanIndicator: true,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: 3,
+        appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
       })
