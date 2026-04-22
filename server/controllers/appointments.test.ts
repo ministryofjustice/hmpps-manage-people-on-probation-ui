@@ -11,7 +11,7 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
 import { mockTierCalculation, mockRisks, mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, renderError, getCheckinOffenderDetails } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
@@ -66,7 +66,6 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
-const mockGetCheckinOffenderDetails = getCheckinOffenderDetails as jest.MockedFunction<typeof getCheckinOffenderDetails>
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
@@ -225,10 +224,6 @@ describe('controllers/appointments', () => {
     })
     afterEach(() => {
       res.locals.flags = undefined
-    })
-
-    it('should call getCheckinOffenderDetails', () => {
-      expect(mockGetCheckinOffenderDetails).toHaveBeenCalledWith(hmppsAuthClient)
     })
 
     it('should render the appointments page with canAccessCheckins true', () => {

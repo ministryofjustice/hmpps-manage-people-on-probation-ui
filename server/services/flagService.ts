@@ -1,6 +1,7 @@
 import { EvaluationRequest, EvaluationResponse, FliptEvaluationClient } from '@flipt-io/flipt-client'
 import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
+import logger from '../../logger'
 
 const PDU_GATED_FLAGS = new Set(['enableESupervisionCheckins'])
 
@@ -52,8 +53,12 @@ export default class FlagService {
       const matching = responsesFor(flags.responses, f)
       if (PDU_GATED_FLAGS.has(f)) {
         featureFlags[f] = matching.some(r => r.booleanEvaluationResponse?.enabled === true)
+      } else if (matching.length === 1) {
+        featureFlags[f] = matching[0].booleanEvaluationResponse.enabled === true
       } else {
-        featureFlags[f] = matching[0]?.booleanEvaluationResponse?.enabled === true
+        // Fail closed: unexpected response shape from Flipt for a non-PDU-gated flag.
+        logger.warn(`Expected exactly 1 response for flag ${f}, got ${matching.length} — defaulting to false`)
+        featureFlags[f] = false
       }
     })
     return featureFlags

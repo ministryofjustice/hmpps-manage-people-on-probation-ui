@@ -5,7 +5,6 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
-import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 import {
   mockAppResponse,
   mockTierCalculation,
@@ -46,10 +45,6 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/eSupervisionClient')
-jest.mock('../middleware/getCheckinOffenderDetails', () => ({
-  getCheckinOffenderDetails: jest.fn(() => jest.fn()),
-}))
-const mockGetCheckinOffenderDetails = getCheckinOffenderDetails as jest.MockedFunction<typeof getCheckinOffenderDetails>
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -227,10 +222,6 @@ describe('caseController', () => {
     })
     afterEach(() => {
       res.locals.flags = undefined
-    })
-
-    it('should call getCheckinOffenderDetails', () => {
-      expect(mockGetCheckinOffenderDetails).toHaveBeenCalledWith(hmppsAuthClient)
     })
 
     it('should render the overview page with canAccessCheckins true', () => {

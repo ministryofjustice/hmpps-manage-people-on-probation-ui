@@ -142,6 +142,20 @@ describe('FlagService', () => {
       ]),
     )
   })
+  it('fails closed for non-PDU-gated flags with unexpected response count', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+      ],
+    })
+
+    const result = await service.getFlags({ email })
+
+    expect(result.enableSentencePlan).toBe(false)
+    expect(result.enableSanIndicator).toBe(true)
+  })
   it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [
