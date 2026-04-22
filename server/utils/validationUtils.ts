@@ -209,7 +209,7 @@ export function validateWithSpec(request: Request, validationSpec: ValidationSpe
         errors[formattedFieldName] = error
       }
     } else if (checks?.optional === false) {
-      errors[formattedFieldName] = checks.checks[0].msg
+      errors[formattedFieldName] = Array.isArray(checks.checks[0].msg) ? checks.checks[0].msg[0] : checks.checks[0].msg
       if (checks?.checks?.[0]?.log) {
         logger.info(checks.checks[0].log)
       }

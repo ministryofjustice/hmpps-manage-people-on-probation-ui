@@ -370,4 +370,22 @@ describe('controllers/appointmentOutcomes', () => {
       expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
     })
   })
+  describe('getInitiateBreachOrRecall', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/initiate-breach-or-recall')
+    })
+  })
+  describe('postInitiateBreachOrRecall', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postInitiateBreachOrRecall()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
 })

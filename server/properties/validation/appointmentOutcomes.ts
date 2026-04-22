@@ -4,8 +4,9 @@ import { AppointmentsValidationArgs } from './appointments'
 
 interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
   isInPast?: boolean
-  msg?: string
-  log?: string
+  msg?: string | string[]
+  log?: string | string[]
+  sendLetter?: boolean
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
@@ -16,7 +17,9 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
     'outcome/failed-to-attend',
     'outcome/enforcement-action',
   ]
-  const { crn, id, page, isInPast, msg, log } = args
+  const { crn, id, page, isInPast, msg, log, sendLetter } = args
+  const msgs = Array.isArray(msg) ? msg : [msg]
+  const logs = Array.isArray(log) ? log : [log]
   return {
     [`[appointments][${crn}][${id}][outcome][type]`]: {
       optional: page !== `outcome/index`,
@@ -33,8 +36,40 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       checks: [
         {
           validator: isNotEmpty,
-          msg,
-          log,
+          msg: msgs[0],
+          log: logs[0],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][breachNSICreatedBy]`]: {
+      optional: page !== 'outcome/initiate-breach-or-recall',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: msgs[0],
+          log: logs[0],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][letterSentBy]`]: {
+      optional:
+        page !== 'outcome/initiate-breach-or-recall' || (page === 'outcome/initiate-breach-or-recall' && !sendLetter),
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: msgs[1],
+          log: logs[1],
+        },
+      ],
+    },
+    [`[appointments][${crn}][${id}][outcome][letterType]`]: {
+      optional:
+        page !== 'outcome/initiate-breach-or-recall' || (page === 'outcome/initiate-breach-or-recall' && !sendLetter),
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: msgs[2],
+          log: logs[2],
         },
       ],
     },

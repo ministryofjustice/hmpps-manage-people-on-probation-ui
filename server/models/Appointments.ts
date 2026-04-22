@@ -70,6 +70,14 @@ export interface AppointmentEnforcementActionOption extends Option {
   value?: AppointmentEnforcementAction | ''
 }
 
+export interface EnforcementActionCreatedByOption extends Option {
+  value?: EnforcementActionCreatedBy
+}
+
+export interface EnforcementActionLetterTypeOption extends Option {
+  value?: EnforcementActionLetterType
+}
+
 export interface AppointmentSessionUser {
   providerCode?: string
   teamCode?: string
@@ -113,8 +121,15 @@ export interface AppointmentSession {
   outcome?: {
     type: AppointmentOutcomeType
     enforcementAction: AppointmentEnforcementAction
+    breachNSICreatedBy?: EnforcementActionCreatedBy
+    letterSentBy?: EnforcementActionCreatedBy
+    letterType?: EnforcementActionLetterType
   }
 }
+
+export type EnforcementActionCreatedBy = 'CASE_ADMIN' | 'USER'
+
+export type EnforcementActionLetterType = 'LICENCE_COMPLIANCE_LETTER' | 'DIFFERENT_ENFORCEMENT_LETTER'
 
 export interface AppointmentType {
   code: string
@@ -267,7 +282,7 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
-  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[] | EnforcementActionCreatedByOption[]
 }
 
 export interface MasUserDetails {
