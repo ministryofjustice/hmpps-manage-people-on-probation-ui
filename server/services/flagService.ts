@@ -24,19 +24,22 @@ export default class FlagService {
 
     const pduCodes: string[] = context?.pduCodes ?? []
 
+    const buildRequest = (flag: string, pduCode?: string): EvaluationRequest => {
+      return {
+        flagKey: flag,
+        entityId: context?.email ? context.email || 'anonymous' : flag,
+        context: {
+          ...(context?.email ? { email: context.email } : {}),
+          ...(pduCode ? { pduCode } : {}),
+        },
+      }
+    }
+
     const requests: EvaluationRequest[] = flagList.flatMap(flag => {
-      const pduCodesForFlag = PDU_GATED_FLAGS.has(flag) && pduCodes.length > 0 ? pduCodes : [undefined]
-      return pduCodesForFlag.map(pduCode => {
-        logger.info(`Requesting flag ${flag}${pduCode ? ` for ${pduCode}` : ''}`)
-        return {
-          flagKey: flag,
-          entityId: context?.email ? context.email || 'anonymous' : flag,
-          context: {
-            ...(context?.email ? { email: context.email } : {}),
-            ...(pduCode ? { pduCode } : {}),
-          },
-        }
-      })
+      if (PDU_GATED_FLAGS.has(flag) && pduCodes.length > 0) {
+        return pduCodes.map(pduCode => buildRequest(flag, pduCode))
+      }
+      return [buildRequest(flag)]
     })
 
     const flags = fliptEvaluationClient.evaluateBatch(requests)
@@ -52,7 +55,6 @@ export default class FlagService {
       } else {
         featureFlags[f] = matching[0]?.booleanEvaluationResponse?.enabled === true
       }
-      logger.info(`Flag ${f} is ${featureFlags[f]}`)
     })
     return featureFlags
   }
