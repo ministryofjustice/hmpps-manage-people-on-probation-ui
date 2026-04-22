@@ -42,14 +42,14 @@
       {% if flags.enableESupervisionCustomQuestions === true %}
           {% set checkinLabel = 'Next check in' %}
           {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
-              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithDayAndWithoutYear %}
+              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
           {% else %}
-              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
           {% endif %}
           
       {% else %}
           {% set checkinLabel = 'First check in' %}
-          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
       {% endif %}
         {% if flags.enableManageCheckins === true %}
             <div class="moj-button-group__item">
@@ -67,7 +67,7 @@
         {% endif %}
     {% endif %}
     {% if flags.enableESupervisionCustomQuestions === true %}
-        {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithDayAndWithoutYear %}
+        {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
         {% set rows = [
             {
                 key: { html: '<span data-qa="nextCheckInDueLabel">Next check in</span>' },
