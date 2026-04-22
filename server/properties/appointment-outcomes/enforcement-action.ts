@@ -1,7 +1,8 @@
 import { AppointmentEnforcementActionOption } from '../../models/Appointments'
 
 export const enforcementActionOptions = (name: string): AppointmentEnforcementActionOption[] => [
-  { text: '', value: 'BREACH_REQUESTED' },
+  { text: 'Select enforcement action', value: '' },
+  { text: 'Breach requested', value: 'BREACH_REQUESTED' },
   { text: 'Breach/recall initiated', value: 'BREACH_RECALL_INITIATED' },
   { text: 'Breach confirmation sent', value: 'BREACH_CONFIRMATION_SENT' },
   { text: 'Breach letter sent', value: 'BREACH_LETTER_SENT' },

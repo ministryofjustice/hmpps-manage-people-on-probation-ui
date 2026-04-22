@@ -4,8 +4,8 @@
 {% block form %}
   {{ govukSelect({
   label: {
-    text: "Select an enforcement action for " + appointmentOutcome.forename "’s failure to comply",
-    classes: "",
+    text: "Select an enforcement action for " + appointmentOutcome.forename + "’s failure to comply",
+    classes: "govuk-label--l",
     attributes: { 'data-qa': 'pageHeading' }
   },
   items: appointmentOutcome.options

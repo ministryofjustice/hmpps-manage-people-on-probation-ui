@@ -352,4 +352,22 @@ describe('controllers/appointmentOutcomes', () => {
       checkRedirects('postFailedToAttend', expectedOptions)
     })
   })
+  describe('getEnforcementAction', () => {
+    it('should render the correct view', async () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'render')
+      controllers.appointmentOutcomes.getEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith('pages/appointment-outcomes/enforcement-action')
+    })
+  })
+  describe('postEnforcementAction', () => {
+    it('should redirect to the add note page', () => {
+      const req = mockReq()
+      const res = mockRes()
+      const spy = jest.spyOn(res, 'redirect')
+      controllers.appointmentOutcomes.postEnforcementAction()(req, res)
+      expect(spy).toHaveBeenCalledWith(`${baseOutcomeUrl}/add-note`)
+    })
+  })
 })

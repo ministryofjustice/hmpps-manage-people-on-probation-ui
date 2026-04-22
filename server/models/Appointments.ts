@@ -67,7 +67,7 @@ export interface AppointmentOutcomeOption extends Option {
 }
 
 export interface AppointmentEnforcementActionOption extends Option {
-  value?: AppointmentEnforcementAction
+  value?: AppointmentEnforcementAction | ''
 }
 
 export interface AppointmentSessionUser {

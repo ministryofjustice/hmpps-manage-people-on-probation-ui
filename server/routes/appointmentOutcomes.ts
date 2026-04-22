@@ -36,8 +36,11 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getPersonAppointment(hmppsAuthClient),
     getAppointmentTypes(hmppsAuthClient),
     getSentences(hmppsAuthClient),
-    createAppointmentSession,
   )
+
+  /* create appointment session in manage journey */
+
+  router.get(manageBasePath, createAppointmentSession)
 
   /* redirect page if required session data is not present */
 
