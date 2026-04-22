@@ -35,7 +35,8 @@ export default class FlagService {
     }
 
     const requests: EvaluationRequest[] = flagList.flatMap(flag => {
-      if (PDU_GATED_FLAGS.has(flag) && pduCodes.length > 0) {
+      if (PDU_GATED_FLAGS.has(flag)) {
+        // Fail closed: if the user has no PDUs, don't evaluate — the flag resolves to false.
         return pduCodes.map(pduCode => buildRequest(flag, pduCode))
       }
       return [buildRequest(flag)]

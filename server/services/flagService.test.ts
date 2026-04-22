@@ -142,6 +142,20 @@ describe('FlagService', () => {
       ]),
     )
   })
+  it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
+      ],
+    })
+
+    const result = await service.getFlags({ email, pduCodes: [] })
+
+    const requests = mockEvaluateBatch.mock.calls[0][0]
+    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(0)
+    expect(result.enableESupervisionCheckins).toBe(false)
+  })
   it('calls evaluateBatch with correct requests if context.email does not exist', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [],
