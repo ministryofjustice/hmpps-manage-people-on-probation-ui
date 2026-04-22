@@ -75,34 +75,34 @@
             }
         ] %}
         {% if upcomingCheckin %}
-        {% for item in upcomingCheckin.questions %}
-                {% set questionNumber = loop.index %}
-                {% set rows = (rows.push({
-                    key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
-                    value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
-                }), rows) %}
-        {% endfor %}
-        {% endif %}
-        {% set nextCheckinQuestionsText %}
-            {{ govukSummaryList({
-                rows: rows
+            {% for item in upcomingCheckin.questions %}
+                    {% set questionNumber = loop.index %}
+                    {% set rows = (rows.push({
+                        key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
+                        value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
+                    }), rows) %}
+            {% endfor %}
+            {% set nextCheckinQuestionsText %}
+                {{ govukSummaryList({
+                    rows: rows
+                }) }}
+            {% endset %}
+            {{ appSummaryCard({
+                titleText: 'Upcoming online check in',
+                headingLevel: 3,
+                classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+                attributes: {'data-qa': 'checkinQuestionsCard'},
+                html: nextCheckinQuestionsText,
+                actions: {
+                    items: [
+                        {
+                            text: 'Change questions',
+                            href: changeQuestionsLink
+                        }
+                    ]
+                } if showChange and canEditQuestions
             }) }}
-        {% endset %}
-        {{ appSummaryCard({
-            titleText: 'Upcoming online check in',
-            headingLevel: 3,
-            classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
-            attributes: {'data-qa': 'checkinQuestionsCard'},
-            html: nextCheckinQuestionsText,
-            actions: {
-                items: [
-                    {
-                        text: 'Change questions',
-                        href: changeQuestionsLink
-                    }
-                ]
-            } if showChange and canEditQuestions
-        }) }}
+        {% endif %}
     {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}
