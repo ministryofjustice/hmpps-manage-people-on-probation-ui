@@ -1,7 +1,6 @@
 import { EvaluationRequest, EvaluationResponse, FliptEvaluationClient } from '@flipt-io/flipt-client'
 import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
-import logger from '../../logger'
 
 const PDU_GATED_FLAGS = new Set(['enableESupervisionCheckins'])
 
@@ -27,9 +26,9 @@ export default class FlagService {
     const buildRequest = (flag: string, pduCode?: string): EvaluationRequest => {
       return {
         flagKey: flag,
-        entityId: context?.email ? context.email || 'anonymous' : flag,
+        entityId: context?.email ? context.email.toLowerCase() || 'anonymous' : flag,
         context: {
-          ...(context?.email ? { email: context.email } : {}),
+          ...(context?.email ? { email: context.email.toLowerCase() } : {}),
           ...(pduCode ? { pduCode } : {}),
         },
       }

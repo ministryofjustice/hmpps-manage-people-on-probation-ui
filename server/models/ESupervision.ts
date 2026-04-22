@@ -31,6 +31,7 @@ export interface ManageQuestionsSession {
   availableTemplates?: EsupervisionQuestionTemplatesList[]
   questionTemplateAndInputs?: Record<string, string>
   draftQuestionInput?: string
+  expectedCheckinDate?: string
 }
 export interface LocalParams {
   crn: string

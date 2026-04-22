@@ -13,6 +13,7 @@
 {% block form %}
 
   {% set detailsHtml %}
+  <div class="govuk-!-width-two-thirds">
     <p class="govuk-body"><b>You should:</b></p>
     <ul class="govuk-list govuk-list--bullet">
       <li>consider if a question is appropriate for an online service</li>
@@ -21,9 +22,7 @@
       <li>avoid using complicated language or words that have a simpler alternative</li>
       <li>check spelling and grammar</li>
     </ul>
-    <p class="govuk-body"><br>For example:</p>
-    <p class="govuk-body">Have you been able to follow up with the housing service we referred you to recently?</p>
-    <p class="govuk-body">Have you been able to book a doctor’s appointment?</p>
+  </div>
   {% endset %}
 
   {{ govukDetails({
