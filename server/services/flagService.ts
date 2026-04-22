@@ -3,6 +3,8 @@ import config from '../config'
 import { FeatureFlags } from '../data/model/featureFlags'
 import logger from '../../logger'
 
+const PDU_GATED_FLAGS = new Set(['enableESupervisionCheckins'])
+
 export default class FlagService {
   async getFlags(context: { email?: string; pduCodes?: string[] }): Promise<FeatureFlags> {
     const namespace = 'manage-people-on-probation-ui'
@@ -19,31 +21,37 @@ export default class FlagService {
         flagList.push(key)
       }
     })
-    const requests = flagList.map(flag => {
-      const pduCodes = context.pduCodes.join(',')
-      logger.info(`Requesting flag ${flag} for ${pduCodes}`)
-      const request: EvaluationRequest = {
-        flagKey: flag,
-        entityId: context?.email ? context.email || 'anonymous' : flag,
-        context: {
-          ...(context?.email ? { email: context.email } : {}),
-          ...(context?.pduCodes?.length ? { pduCodes } : {}),
-        },
-      }
-      return request
+
+    const pduCodes: string[] = context?.pduCodes ?? []
+
+    const requests: EvaluationRequest[] = flagList.flatMap(flag => {
+      const pduCodesForFlag = PDU_GATED_FLAGS.has(flag) && pduCodes.length > 0 ? pduCodes : [undefined]
+      return pduCodesForFlag.map(pduCode => {
+        logger.info(`Requesting flag ${flag}${pduCode ? ` for ${pduCode}` : ''}`)
+        return {
+          flagKey: flag,
+          entityId: context?.email ? context.email || 'anonymous' : flag,
+          context: {
+            ...(context?.email ? { email: context.email } : {}),
+            ...(pduCode ? { pduCode } : {}),
+          },
+        }
+      })
     })
+
     const flags = fliptEvaluationClient.evaluateBatch(requests)
 
-    function result(results: EvaluationResponse[], key: string) {
-      const filtered = results.filter(flag => flag.booleanEvaluationResponse?.flagKey === key)
-      if (filtered.length === 1) {
-        return filtered[0].booleanEvaluationResponse.enabled
-      }
-      return false
+    function responsesFor(results: EvaluationResponse[], key: string) {
+      return results.filter(r => r.booleanEvaluationResponse?.flagKey === key)
     }
 
     flagList.forEach(f => {
-      featureFlags[f] = result(flags.responses, f)
+      const matching = responsesFor(flags.responses, f)
+      if (PDU_GATED_FLAGS.has(f)) {
+        featureFlags[f] = matching.some(r => r.booleanEvaluationResponse?.enabled === true)
+      } else {
+        featureFlags[f] = matching[0]?.booleanEvaluationResponse?.enabled === true
+      }
       logger.info(`Flag ${f} is ${featureFlags[f]}`)
     })
     return featureFlags

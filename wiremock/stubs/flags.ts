@@ -402,6 +402,17 @@ const stubEnableESupervisionCustomQuestions = (): SuperAgentRequest =>
             rules: [],
             rollouts: [],
           },
+          {
+            key: 'enableESupervisionCheckins',
+            name: 'enableESupervisionCheckins',
+            description: '',
+            enabled: true,
+            type: 'BOOLEAN_FLAG_TYPE',
+            createdAt: '2026-04-16T12:00:00.000000Z',
+            updatedAt: '2026-04-16T12:00:00.000000Z',
+            rules: [],
+            rollouts: [],
+          },
         ],
       },
       headers: {
