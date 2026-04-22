@@ -5,6 +5,7 @@ import HmppsAuthClient from '../data/hmppsAuthClient'
 import TokenStore from '../data/tokenStore/redisTokenStore'
 import MasApiClient from '../data/masApiClient'
 import ArnsApiClient from '../data/arnsApiClient'
+import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 import {
   mockAppResponse,
   mockTierCalculation,
@@ -45,6 +46,10 @@ jest.mock('../data/hmppsAuthClient', () => {
   })
 })
 jest.mock('../data/eSupervisionClient')
+jest.mock('../middleware/getCheckinOffenderDetails', () => ({
+  getCheckinOffenderDetails: jest.fn(() => jest.fn()),
+}))
+const mockGetCheckinOffenderDetails = getCheckinOffenderDetails as jest.MockedFunction<typeof getCheckinOffenderDetails>
 
 const token = { access_token: 'token-1', expires_in: 300 }
 const tokenStore = new TokenStore(null) as jest.Mocked<TokenStore>
@@ -201,6 +206,41 @@ describe('caseController', () => {
         hasPractitioner: false,
         canAccessCheckins: false,
       })
+    })
+  })
+  describe('getCase - checkins flag enabled and practitioner allocated', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
+      res.locals.flags = { enableESupervisionCheckins: true }
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = undefined
+    })
+
+    it('should call getCheckinOffenderDetails', () => {
+      expect(mockGetCheckinOffenderDetails).toHaveBeenCalledWith(hmppsAuthClient)
+    })
+
+    it('should render the overview page with canAccessCheckins true', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          hasPractitioner: true,
+          canAccessCheckins: true,
+        }),
+      )
     })
   })
   it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {

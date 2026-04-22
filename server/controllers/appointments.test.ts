@@ -11,7 +11,7 @@ import ArnsApiClient from '../data/arnsApiClient'
 import { isValidCrn, isNumericString, setDataValue, canRescheduleAppointment } from '../utils'
 import { mockTierCalculation, mockRisks, mockAppResponse, mockPersonSchedule, mockPersonAppointment } from './mocks'
 import { checkAuditMessage } from './testutils'
-import { cloneAppointmentAndRedirect, renderError } from '../middleware'
+import { cloneAppointmentAndRedirect, renderError, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentSession, NextAppointmentResponse, AttendedCompliedAppointment } from '../models/Appointments'
 import { Activity } from '../data/model/schedule'
 import { isSuccessfulUpload } from './appointments'
@@ -66,6 +66,7 @@ jest.mock('./arrangeAppointment', () => ({
 }))
 
 const mockRenderError = renderError as jest.MockedFunction<typeof renderError>
+const mockGetCheckinOffenderDetails = getCheckinOffenderDetails as jest.MockedFunction<typeof getCheckinOffenderDetails>
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>
 const mockIsValidCrn = isValidCrn as jest.MockedFunction<typeof isValidCrn>
@@ -215,6 +216,29 @@ describe('controllers/appointments', () => {
         canAccessCheckins: false,
         url: '',
       })
+    })
+  })
+  describe('get appointments - checkins flag enabled and practitioner allocated', () => {
+    beforeEach(async () => {
+      res.locals.flags = { enableESupervisionCheckins: true }
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = undefined
+    })
+
+    it('should call getCheckinOffenderDetails', () => {
+      expect(mockGetCheckinOffenderDetails).toHaveBeenCalledWith(hmppsAuthClient)
+    })
+
+    it('should render the appointments page with canAccessCheckins true', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/appointments',
+        expect.objectContaining({
+          hasPractitioner: true,
+          canAccessCheckins: true,
+        }),
+      )
     })
   })
   describe('get upcoming appointments', () => {
