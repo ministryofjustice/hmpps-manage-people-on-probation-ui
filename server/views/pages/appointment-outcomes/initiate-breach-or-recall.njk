@@ -1,6 +1,5 @@
 {% extends "../_form.njk" %}
-{# placeholder title below - will be removed #}
-{% set initiateText = 'breach' if appointmentOutcome.sentenceType == 'COMMUNITY' else 
+{% set initiateText = 'breach' if appointmentOutcome.sentence.type == 'COMMUNITY' else 
     'recall' %}
 {% set title = 'Initiate a ' + initiateText %}
 {% set backLink = appointmentOutcome.backLink %}

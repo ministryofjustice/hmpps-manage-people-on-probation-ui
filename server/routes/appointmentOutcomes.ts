@@ -13,11 +13,12 @@ import {
   getAppointmentOutcomeOptions,
   redirectWizard,
   getPersonalDetails,
-  checkAnswers,
+  getAppointmentAttendedFailedToComplyOptions,
+  getAppointmentOutcomeBackLink,
+  getAppointmentAcceptableAbsenceOptions,
   parseMultipartBody,
 } from '../middleware'
 import validate from '../middleware/validation/index'
-import { getAppointmentOutcomeBackLink } from '../middleware/getAppointmentOutcomeBackLink'
 import { multerErrorHandler } from '../middleware/validation/multerErrorHandler'
 
 export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthClient, arnsComponents }: Services) {
@@ -47,10 +48,19 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     getAppointmentOutcomeBackLink,
   )
 
-  /* get outcome options only on the outcome page */
+  /* run the outcome options middleware before validation */
 
   router.all([arrangeBasePath, manageBasePath], getAppointmentOutcomeOptions)
 
+  router.all(
+    [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
+    getAppointmentAttendedFailedToComplyOptions,
+  )
+
+  router.all(
+    [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
+    getAppointmentAcceptableAbsenceOptions,
+  )
   /* run multer file upload error handler before validation */
 
   router.post([`${manageBasePath}/add-note`], multerErrorHandler('fileUpload'), parseMultipartBody)
@@ -82,7 +92,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     controllers.appointmentOutcomes.postAddNote(hmppsAuthClient),
   )
 
-  /* Failed to comply */
+  /* Attended - failed to comply */
 
   router.all(
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
@@ -96,6 +106,9 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/attended-failed-to-comply`, `${manageBasePath}/attended-failed-to-comply`],
     controllers.appointmentOutcomes.postAttendedFailedToComply(),
   )
+
+  /* Acceptable absence */
+
   router.get(
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     controllers.appointmentOutcomes.getAcceptableAbsence(),
@@ -104,6 +117,7 @@ export default function appointmentOutcomesRoutes(router: Router, { hmppsAuthCli
     [`${arrangeBasePath}/acceptable-absence`, `${manageBasePath}/acceptable-absence`],
     controllers.appointmentOutcomes.postAcceptableAbsence(),
   )
+
   router.get(
     [`${arrangeBasePath}/unacceptable-absence`, `${manageBasePath}/unacceptable-absence`],
     controllers.appointmentOutcomes.getUnacceptableAbsence(),

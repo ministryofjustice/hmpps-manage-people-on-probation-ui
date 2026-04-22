@@ -1,4 +1,4 @@
-import { AppointmentOutcomeOption } from '../models/Appointments'
+import { AppointmentOutcomeOption } from '../../models/Appointments'
 
 export const outcomeOptions: AppointmentOutcomeOption[] = [
   {

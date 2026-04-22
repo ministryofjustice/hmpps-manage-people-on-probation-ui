@@ -4,7 +4,7 @@
 
 {% block form %}
   {{ govukRadios({
-    formGroup: {
+  formGroup: {
       attributes: {
         'data-qa': 'outcome'
       } 
@@ -16,7 +16,7 @@
       }
     },
  hint: {
-        text: "Appointment: " + appointmentOutcome.appointment.type + " with " + appointmentOutcome.appointment.officer.name | fullName | convertToTitleCase + " on " + appointmentOutcome.appointment.startDateTime | dateWithDayAndWithYear + "."
+        text: appointmentOutcome.appointmentHintText
     },
     items: appointmentOutcome.options
    } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'type'])) }}

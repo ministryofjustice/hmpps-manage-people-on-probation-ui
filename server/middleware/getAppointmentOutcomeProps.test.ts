@@ -19,7 +19,7 @@ const end = '10:00'
 const url = '/mock/url'
 const nextSpy = jest.fn()
 
-const mockSentences: Sentence[] = [
+const mockSentences = (endDate: string): Sentence[] => [
   {
     id: 49,
     eventNumber: '1234567',
@@ -27,7 +27,7 @@ const mockSentences: Sentence[] = [
     order: {
       description: 'Pre-Sentence',
       startDate: '2025-05-31',
-      endDate: '2025-05-31',
+      endDate,
     },
     nsis: [],
     licenceConditions: [],
@@ -40,7 +40,7 @@ const mockSentences: Sentence[] = [
     order: {
       description: 'Pre-Sentence',
       startDate: '2025-05-31',
-      endDate: '2025-05-31',
+      endDate,
     },
     nsis: [],
     licenceConditions: [],
@@ -54,6 +54,7 @@ const buildRequest = ({
   id = uuid,
   type = 'COPT',
   eventId = '48',
+  sentenceEndDate = '2026-05-31',
 } = {}): httpMocks.MockRequest<any> => {
   const req = {
     params: {
@@ -66,7 +67,7 @@ const buildRequest = ({
     session: {
       data: {
         sentences: {
-          [crn]: mockSentences,
+          [crn]: mockSentences(sentenceEndDate),
         },
         appointments: {
           [crn]: {
@@ -171,7 +172,11 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          sentenceType: 'COMMUNITY',
+          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          sentence: {
+            type: 'COMMUNITY',
+            length: 12,
+          },
           isProbationPractitioner: false,
         }),
       )
@@ -179,8 +184,8 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
       expect(nextSpy).toHaveBeenCalledTimes(1)
     })
 
-    it('should add the correct values to res.locals.appointmentOutcome if user is probation practitioner and sentence type is CUSTODY', () => {
-      const req = buildRequest({ params: { contactId: undefined }, eventId: '49' })
+    it('should add the correct values to res.locals.appointmentOutcome if user is probation practitioner and sentence type is CUSTODY and sentence length is 24 months', () => {
+      const req = buildRequest({ params: { contactId: undefined }, eventId: '49', sentenceEndDate: '2027-05-31' })
       const res = buildResponse({ username: 'DeborahFern' })
       mockAppointmentDateIsInPast.mockReturnValueOnce(true)
       jest.spyOn(DateTime.prototype, 'toISO').mockImplementation(() => '2025-10-11T09:00:00Z')
@@ -201,7 +206,11 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
           baseOutcomeUrl: `/case/${crn}/arrange-appointment/${uuid}/outcome`,
           completedUrl: `/case/${crn}/arrange-appointment/${uuid}/check-your-answers`,
           appointmentSession: req.session.data.appointments[crn][uuid],
-          sentenceType: 'CUSTODY',
+          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
+          sentence: {
+            type: 'CUSTODY',
+            length: 24,
+          },
           isProbationPractitioner: true,
         }),
       )
@@ -229,8 +238,12 @@ describe('/middleware/getAppointmentOutcomeProps()', () => {
           baseUrl: `/case/${crn}/appointments/appointment/${contactId}`,
           baseOutcomeUrl: `/case/${crn}/appointments/appointment/${contactId}/outcome`,
           completedUrl: `/case/${crn}/appointments/appointment/${contactId}/manage`,
+          appointmentHintText: 'Appointment: 3 Way Meeting (NS) with John Smith on Saturday 11 October 2025.',
           appointmentSession: req.session.data.appointments[crn][contactId],
-          sentenceType: 'COMMUNITY',
+          sentence: {
+            type: 'COMMUNITY',
+            length: 12,
+          },
           isProbationPractitioner: false,
         }),
       )

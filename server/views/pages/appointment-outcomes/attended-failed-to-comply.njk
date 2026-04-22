@@ -1,10 +1,6 @@
 {% extends "../_form.njk" %}
 {% set title = 'Enforcement action for ' + appointmentOutcome.forename + '’s failure to comply' %}
 {% set backLink = appointmentOutcome.backLink %}
-{% set initiateText = 'Initiate a ' + (
-'breach' if appointmentOutcome.sentenceType == 'COMMUNITY' else 
-  'recall'
-) %}
 
 {% block form %}
   {{ govukRadios({
@@ -16,37 +12,6 @@
         classes: "govuk-fieldset__legend--m"
       }
     },
-    items: [
-      {
-        value: "SEND_LETTER",
-        text: "Send a letter"
-      },
-      {
-        value: "BREACH_RECALL_INITIATED",
-        text: initiateText
-      }  if appointmentOutcome.sentenceType in ['COMMUNITY', 'CUSTODY'],
-      {
-        value: "BREACH_RECALL_INITIATED_AND_SEND_LETTER",
-        text: initiateText + " and send a letter"
-      }  if appointmentOutcome.sentenceType in ['COMMUNITY', 'CUSTODY'],
-      {
-        value: "REFER_TO_OFFENDER_MANAGER",
-        text: "Refer to probation practitioner",
-        hint: {
-          text: "Notify the allocated probation practitioner so they can take action."
-        }
-      } if not appointmentOutcome.isProbationPractitioner,
-      {
-        value: "NO_FURTHER_ACTION",
-        text: "No further action"
-      },
-      {
-        divider: "or"
-      },
-      {
-        value: "DIFFERENT_ACTION",
-        text: "I want to add a different action"
-      }
-    ]
+    items: appointmentOutcome.options
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'enforcementAction'])) }}
 {% endblock %}
