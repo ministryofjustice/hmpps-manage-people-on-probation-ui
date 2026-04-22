@@ -4,10 +4,13 @@ import { AppointmentsValidationArgs } from './appointments'
 
 interface AppointmentOutcomesValidationArgs extends AppointmentsValidationArgs {
   isInPast?: boolean
+  msg?: string
+  log?: string
 }
 
 export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidationArgs): ValidationSpec => {
-  const { crn, id, page, isInPast } = args
+  const enforcementActionRoutes = ['outcome/attended-failed-to-comply', 'outcome/acceptable-absence']
+  const { crn, id, page, isInPast, msg, log } = args
   return {
     [`[appointments][${crn}][${id}][outcome][type]`]: {
       optional: page !== `outcome/index`,
@@ -20,12 +23,12 @@ export const appointmentOutcomesValidation = (args: AppointmentOutcomesValidatio
       ],
     },
     [`[appointments][${crn}][${id}][outcome][enforcementAction]`]: {
-      optional: page !== `outcome/attended-failed-to-comply`,
+      optional: !enforcementActionRoutes.includes(page),
       checks: [
         {
           validator: isNotEmpty,
-          msg: 'Select an action for this failure to comply',
-          log: 'Appointment enforcement action not selected',
+          msg,
+          log,
         },
       ],
     },

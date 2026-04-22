@@ -13,6 +13,7 @@ import {
   YesNo,
   AttendedCompliedAppointment,
   AppointmentOutcomeOption,
+  AppointmentEnforcementActionOption,
   ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
@@ -152,6 +153,11 @@ interface Locals {
   appointmentOutcome?: AppointmentOutcomeProps
 }
 
+export interface AppointmentOutcomeSentence {
+  type: SentenceType
+  length: number | null
+}
+
 export interface AppointmentOutcomeProps {
   forename: string
   surname: string
@@ -168,9 +174,11 @@ export interface AppointmentOutcomeProps {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  options?: AppointmentOutcomeOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  sentence?: AppointmentOutcomeSentence
   sentenceType?: SentenceType
   isProbationPractitioner?: boolean
+  appointmentHintText?: string
 }
 
 export interface AppResponse extends Response {
