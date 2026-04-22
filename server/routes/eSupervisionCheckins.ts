@@ -48,6 +48,7 @@ export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthCl
   )
 
   router.get('/case/:crn/appointments/:id/check-in/spo-approval', [
+    redirectWizard(['eligibility', 'eligibilityChoice'], 'setupcheckins'),
     controllers.checkIns.getSPOApprovalPage(hmppsAuthClient),
   ])
   router.post(

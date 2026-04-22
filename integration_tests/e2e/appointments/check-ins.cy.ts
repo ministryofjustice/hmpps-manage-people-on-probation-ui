@@ -929,7 +929,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
     manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'Next check in')
-    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 20 April')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', '20 April 2026')
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
     manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
