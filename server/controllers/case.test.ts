@@ -113,7 +113,11 @@ const getProbationPractitionerSpy = jest
   .spyOn(MasApiClient.prototype, 'getProbationPractitioner')
   .mockImplementation(() => Promise.resolve(undefined))
 
-const res = mockAppResponse()
+const res = mockAppResponse({
+  flags: {
+    enableOutcomesV1: true,
+  },
+})
 const renderSpy = jest.spyOn(res, 'render')
 
 const hmppsAuthClient = new HmppsAuthClient(null) as jest.Mocked<HmppsAuthClient>

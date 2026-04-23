@@ -32,11 +32,14 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
-      const last2Years = contactResponse?.content?.filter(contact => {
-        const contactDate = DateTime.fromISO(contact.date)
-        const twoYearsAgo = DateTime.now().minus({ years: 2 })
-        return contactDate >= twoYearsAgo
-      })
+      let outcomes = contactResponse?.content
+      if (res.locals.flags.enableOutcomesV1) {
+        outcomes = outcomes?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.date)
+          const twoYearsAgo = DateTime.now().minus({ years: 2 })
+          return contactDate >= twoYearsAgo
+        })
+      }
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
@@ -46,7 +49,7 @@ const caseController: Controller<typeof routes, void> = {
         crn,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: last2Years?.length ?? 0,
+        appointmentsWithoutAnOutcomeCount: outcomes?.length ?? 0,
         hasDeceased,
         hasPractitioner,
       })

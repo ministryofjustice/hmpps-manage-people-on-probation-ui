@@ -138,6 +138,9 @@ const res = mockAppResponse({
     surname: 'Surname',
     appointment: mockAppointment,
   },
+  flags: {
+    enableOutcomesV1: true,
+  },
 })
 
 const renderSpy = jest.spyOn(res, 'render')

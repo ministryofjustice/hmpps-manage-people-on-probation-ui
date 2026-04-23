@@ -194,6 +194,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
+
       req.session.outcomesFilter = req?.body?.outcomesFilter ?? req.session.outcomesFilter
       const content = res.locals.contactResponse?.content
       let outcomes = content?.filter(contact => {
@@ -216,7 +217,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         contactId,
         baseUrl,
         errorMessages: res?.locals?.errorMessages,
-        outcomes,
+        outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
         outcomesFilter: req.session.outcomesFilter ?? '2Years',
       })
     }

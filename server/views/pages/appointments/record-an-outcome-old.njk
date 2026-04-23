@@ -30,14 +30,10 @@
 
   <div class="govuk-grid-row govuk-!-margin-top-4">
 
-    {% if flags.enableOutcomesV1 %}
     <div class="govuk-grid-column-one-quarter govuk-!-margin-left-0">
       {% include "./_outcome-filters.njk" %}
     </div>
     <div class="govuk-grid-column-three-quarters">
-    {% else %}
-    <div>
-    {% endif %}
 
         {% if outcomes.length > 0 %}
             {% set appointmentRadioItems = [] %}
@@ -48,7 +44,7 @@
                     checked: contactId == appointment.id
                 }), appointmentRadioItems) %}
             {% endfor %}
-            <form method="post" autocomplete="off" data-qa="outcomes-form" action="{{ baseUrl }}?filter=false">
+             <form method="post" autocomplete="off" data-qa="outcomes-form" action="{{ baseUrl }}?filter=false">
                 {% if not multipartForm %}<input type="hidden" name="_csrf" value="{{ csrfToken }}">{% endif %}
                 {{ govukRadios({
                     name: "appointment-id",
