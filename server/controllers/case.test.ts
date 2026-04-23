@@ -221,11 +221,11 @@ describe('caseController', () => {
     })
     beforeEach(async () => {
       getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
-      res.locals.flags = { enableESupervisionCheckins: true }
+      res.locals.flags = { enableESupervisionCheckins: true, enableOutcomesV1: true }
       await controllers.case.getCase(hmppsAuthClient)(req, res)
     })
     afterEach(() => {
-      res.locals.flags = undefined
+      res.locals.flags = { enableOutcomesV1: true }
     })
 
     it('should render the overview page with canAccessCheckins true', () => {

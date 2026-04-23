@@ -139,9 +139,6 @@ const res = mockAppResponse({
     surname: 'Surname',
     appointment: mockAppointment,
   },
-  flags: {
-    enableOutcomesV1: true,
-  },
 })
 
 const renderSpy = jest.spyOn(res, 'render')
@@ -337,7 +334,7 @@ describe('controllers/appointments', () => {
 
   describe('get record an outcome', () => {
     beforeEach(() => {
-      jest.clearAllMocks()
+      res.locals.flags = { enableOutcomesV1: true }
     })
     it('should render the record an outcome page', async () => {
       await controllers.appointments.getRecordAnOutcome(hmppsAuthClient)(req, res)
