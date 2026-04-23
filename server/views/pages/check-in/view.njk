@@ -74,9 +74,6 @@
         <h2 class="govuk-heading-m">Add further information</h2>
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
-                hint: {
-                    text: "This information will be added to contact notes."
-                },
                 rows: '10',
                 maxlength: maxCharCount,
                 formGroup: {
