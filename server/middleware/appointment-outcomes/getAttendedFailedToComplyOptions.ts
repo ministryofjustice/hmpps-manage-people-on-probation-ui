@@ -1,7 +1,7 @@
-import { Route } from '../@types'
-import { attendedFailedToComplyOptions } from '../properties/appointment-outcomes'
+import { Route } from '../../@types'
+import { attendedFailedToComplyOptions } from '../../properties/appointment-outcomes'
 
-export const getAppointmentAttendedFailedToComplyOptions: Route<void> = (_req, res, next) => {
+export const getAttendedFailedToComplyOptions: Route<void> = (_req, res, next) => {
   const {
     sentence: { type },
     isProbationPractitioner,

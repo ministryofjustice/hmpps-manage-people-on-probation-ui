@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
-import { getAppointmentAcceptableAbsenceOptions } from './getAppointmentAcceptableAbsenceOptions'
-import { mockAppResponse } from '../controllers/mocks'
+import { getAcceptableAbsenceOptions } from './getAcceptableAbsenceOptions'
+import { mockAppResponse } from '../../controllers/mocks'
 
 const nextSpy = jest.fn()
 
@@ -13,14 +13,14 @@ const buildResponse = ({ sentenceLength = 12 } = {}): httpMocks.MockResponse<any
   return mockAppResponse(locals)
 }
 
-describe('/middleware/getAppointmentAcceptableAbsenceOptions()', () => {
+describe('/middleware/appointment-outcomes/getAcceptableAbsenceOptions', () => {
   const req = httpMocks.createRequest()
   afterEach(() => {
     jest.clearAllMocks()
   })
   it('should return the correct options if sentence is over 24 months', () => {
     const res = buildResponse({ sentenceLength: 25 })
-    getAppointmentAcceptableAbsenceOptions(req, res, nextSpy)
+    getAcceptableAbsenceOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'COURT_LEGAL' }),
@@ -39,7 +39,7 @@ describe('/middleware/getAppointmentAcceptableAbsenceOptions()', () => {
   })
   it('should return the correct options if sentence is 24 months or less', () => {
     const res = buildResponse({ sentenceLength: 12 })
-    getAppointmentAcceptableAbsenceOptions(req, res, nextSpy)
+    getAcceptableAbsenceOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'COURT_LEGAL' }),

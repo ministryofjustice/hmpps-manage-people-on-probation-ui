@@ -1,6 +1,6 @@
 import httpMocks from 'node-mocks-http'
-import { getAppointmentFailedToAttendOptions } from './getAppointmentFailedToAttendOptions'
-import { mockAppResponse } from '../controllers/mocks'
+import { getFailedToAttendOptions } from './getFailedToAttendOptions'
+import { mockAppResponse } from '../../controllers/mocks'
 
 const nextSpy = jest.fn()
 
@@ -14,14 +14,14 @@ const buildResponse = ({ isProbationPractitioner = false } = {}): httpMocks.Mock
   return mockAppResponse(locals)
 }
 
-describe('/middleware/getAppointmentFailedToAttendOptions()', () => {
+describe('/middleware/appointment-outcomes/getFailedToAttendOptions', () => {
   const req = httpMocks.createRequest()
   afterEach(() => {
     jest.clearAllMocks()
   })
   it('should return the correct options if user is not probation practitioner', () => {
     const res = buildResponse()
-    getAppointmentFailedToAttendOptions(req, res, nextSpy)
+    getFailedToAttendOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),
@@ -36,7 +36,7 @@ describe('/middleware/getAppointmentFailedToAttendOptions()', () => {
   })
   it('should return the correct options for a custody sentence and user is probation practitioner', () => {
     const res = buildResponse({ isProbationPractitioner: true })
-    getAppointmentFailedToAttendOptions(req, res, nextSpy)
+    getFailedToAttendOptions(req, res, nextSpy)
     expect(res.locals.appointmentOutcome.options).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ value: 'SEND_LETTER' }),

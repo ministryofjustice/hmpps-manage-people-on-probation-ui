@@ -14,8 +14,8 @@ import {
   getSmsPreview,
   getPersonRiskFlags,
   getOverdueOutcomes,
-  getAppointmentOutcomeProps,
 } from '../middleware'
+import { getOutcomeProps } from '../middleware/appointment-outcomes'
 import type { Services } from '../services'
 import validate from '../middleware/validation/index'
 import { getTimeOptions } from '../middleware/getTimeOptions'
@@ -106,7 +106,7 @@ const arrangeAppointmentRoutes = async (router: Router, { hmppsAuthClient, arnsC
     controllers.arrangeAppointments.getLocationNotInList(),
   )
 
-  router.all(['/case/:crn/arrange-appointment/:id/attended-complied'], getAppointmentOutcomeProps)
+  router.all(['/case/:crn/arrange-appointment/:id/attended-complied'], getOutcomeProps)
 
   router.get(
     '/case/:crn/arrange-appointment/:id/attended-complied',

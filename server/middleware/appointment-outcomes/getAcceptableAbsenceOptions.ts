@@ -1,7 +1,7 @@
-import { Route } from '../@types'
-import { acceptableAbsenceOptions } from '../properties/appointment-outcomes'
+import { Route } from '../../@types'
+import { acceptableAbsenceOptions } from '../../properties/appointment-outcomes'
 
-export const getAppointmentAcceptableAbsenceOptions: Route<void> = (_req, res, next) => {
+export const getAcceptableAbsenceOptions: Route<void> = (_req, res, next) => {
   const {
     sentence: { length },
   } = res.locals.appointmentOutcome

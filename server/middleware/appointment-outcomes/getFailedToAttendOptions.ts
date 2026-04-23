@@ -1,7 +1,7 @@
-import { Route } from '../@types'
-import { failedToAttendOptions } from '../properties/appointment-outcomes'
+import { Route } from '../../@types'
+import { failedToAttendOptions } from '../../properties/appointment-outcomes'
 
-export const getAppointmentFailedToAttendOptions: Route<void> = (_req, res, next) => {
+export const getFailedToAttendOptions: Route<void> = (_req, res, next) => {
   const { forename, isProbationPractitioner } = res.locals.appointmentOutcome
   let options = failedToAttendOptions(forename)
   if (isProbationPractitioner) {

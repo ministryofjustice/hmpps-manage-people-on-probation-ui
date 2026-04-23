@@ -11,8 +11,8 @@ import {
   getNextComAppointment,
   getOverdueOutcomes,
   getPersonRiskFlags,
-  getAppointmentOutcomeProps,
 } from '../middleware'
+import { getOutcomeProps } from '../middleware/appointment-outcomes'
 import validate from '../middleware/validation/index'
 import { getPersonAppointment } from '../middleware/getPersonAppointment'
 
@@ -44,7 +44,7 @@ export default function scheduleRoutes(router: Router, { hmppsAuthClient }: Serv
   router.all(
     '/case/:crn/appointments/appointment/:contactId/attended-complied',
     getPersonAppointment(hmppsAuthClient),
-    getAppointmentOutcomeProps,
+    getOutcomeProps,
   )
 
   get(

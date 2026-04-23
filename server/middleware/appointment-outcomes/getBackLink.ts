@@ -1,8 +1,8 @@
-import { Route } from '../@types'
-import { AppointmentOutcomeType } from '../models/Appointments'
-import { getDataValue } from '../utils'
+import { Route } from '../../@types'
+import { AppointmentOutcomeType } from '../../models/Appointments'
+import { getDataValue } from '../../utils'
 
-export const getAppointmentOutcomeBackLink: Route<void> = (req, res, next) => {
+export const getBackLink: Route<void> = (req, res, next) => {
   const { baseOutcomeUrl, reqUrl, uuid, baseUrl, crn, id } = res.locals.appointmentOutcome
   let backLink = baseOutcomeUrl
   if (reqUrl === baseOutcomeUrl) {
