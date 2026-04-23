@@ -1,4 +1,5 @@
 import superagent, { SuperAgentRequest } from 'superagent'
+import { esupervisionAdditionalQuestions } from '../../server/controllers/mocks/esupervisionAdditionalQuestions'
 
 const stubOffenderSetup500Response = (): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
@@ -65,4 +66,109 @@ const stubOffenderSetupComplete500Response = (): SuperAgentRequest =>
       },
     },
   })
-export default { stubOffenderSetup422Response, stubOffenderSetup500Response, stubOffenderSetupComplete500Response }
+export const stubGetQuestionsTemplates = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'GET',
+      urlPattern: '/check-in/questions\\?locale=en-GB',
+    },
+    response: {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json;charset=UTF-8',
+      },
+      jsonBody: {
+        esupervisionAdditionalQuestions,
+      },
+    },
+  })
+}
+
+const stubAssignQuestions = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'PUT',
+      urlPathPattern: '/v2/questions/assignment',
+      queryParameters: {
+        crn: {
+          matches: '.*',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        listId: 3,
+      },
+    },
+  })
+}
+
+const stubGetUpcomingCheckinQuestions = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'GET',
+      urlPattern: '/v2/questions/upcoming/.+?/offender-questions\\?language=en-GB',
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+        questions: [],
+      },
+    },
+  })
+}
+
+const stubGetUpcomingCheckinQuestionItems = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'GET',
+      urlPattern: '/v2/questions/upcoming/.+?/question-items\\?language=en-GB',
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        upcoming: {
+          expectedCheckinDate: '2026-04-20T10:00:00+01:00',
+          items: [],
+        },
+      },
+    },
+  })
+}
+
+const stubDeleteAssignedQuestionsFromCheckIn = () => {
+  return superagent.post('http://localhost:9091/__admin/mappings').send({
+    request: {
+      method: 'DELETE',
+      urlPathPattern: '/v2/questions/assignment',
+      queryParameters: {
+        crn: {
+          matches: '.*',
+        },
+      },
+    },
+    response: {
+      status: 200,
+      headers: { 'Content-Type': 'application/json;charset=UTF-8' },
+      jsonBody: {
+        message: 'deleted',
+      },
+    },
+  })
+}
+export default {
+  stubOffenderSetup422Response,
+  stubOffenderSetup500Response,
+  stubOffenderSetupComplete500Response,
+  stubGetQuestionsTemplates,
+  stubGetUpcomingCheckinQuestionItems,
+  stubGetUpcomingCheckinQuestions,
+  stubAssignQuestions,
+  stubDeleteAssignedQuestionsFromCheckIn,
+}

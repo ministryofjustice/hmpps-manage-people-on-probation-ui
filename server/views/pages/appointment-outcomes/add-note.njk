@@ -2,10 +2,8 @@
 {% from "_components/note/macro.njk" import appNote %}
 {% set title = 'Add a note' %}
 {% set appointment = personAppointment.appointment %}
-{% set multipartForm = true %}
-{% if useDecorator %}
-    {% set multipartForm = false %}
-{% endif %}
+{% set multipartForm = false if appointmentOutcome.uuid else 
+    true %}
 {% set hasNotes = appointment.appointmentNotes.length > 0 %}
 {% set notes = '' %}
 {% set submitButtonId = 'continueButton' %}
@@ -34,12 +32,7 @@
     {% else %}
         {% set errorMsgNotes = null %}
     {% endif %}
-    {% if not useDecorator %}
-        {% set notesConfig = notesConfig | merge({id: "notes", name: "notes", value: body.notes, errorMessage: errorMsgNotes}) %}
-    {% endif %}
-    {% if useDecorator %}
-        {% set notesConfig = notesConfig | merge({value: 'arse'}) | decorateFormAttributes(['appointments', crn, id, 'notes']) %}
-    {% endif %}
+    {% set notesConfig = notesConfig | merge({value: 'arse'}) | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id, 'notes']) %}
 
     {% set sensitivityConfig = {
     fieldset: {
@@ -77,13 +70,8 @@
     {% else %}
         {% set errorMsgSensitivity = null %}
     {% endif %}
-    {% if not useDecorator %}
-        {% set sensitivityConfig = sensitivityConfig | merge({name: 'sensitivity', id: 'sensitivity', errorMessage: errorMsgSensitivity}) %}
-    {% endif %}
 
-    {% if useDecorator %}
-        {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', crn, id, 'sensitivity']) %}
-    {% endif %}
+    {% set sensitivityConfig = sensitivityConfig | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id, 'sensitivity']) %}
 
     <p class="govuk-body">Use paragraphs and formatting to make your notes easy to read. You may want to record notes in the CRISS format.</p>
     {{ govukDetails({
@@ -119,20 +107,20 @@
             {% endif %}
             {{ govukCharacterCount(notesConfig) }}
             <div id="crissStatus" role="status" aria-live="polite" class="govuk-visually-hidden"></div>
-
-            <div class="govuk-!-margin-bottom-6">
-                <div class="govuk-form-group">
-                    <label class="govuk-label govuk-label--m" for="fileUpload">
+            {% if not appointmentOutcome.uuid %}
+                <div class="govuk-!-margin-bottom-6">
+                    <div class="govuk-form-group">
+                        <label class="govuk-label govuk-label--m" for="fileUpload">
                 Upload a file (optional)
             </label>
-                    {% if errorMessages.fileUpload %}
-                        <p id="fileUpload-error" class="govuk-error-message">
-                            <span class="govuk-visually-hidden">Error:</span>
-                            {{ errorMessages.fileUpload }}
-                        </p>
-                    {% endif %}
-                    <div class="govuk-drop-zone" data-module="govuk-file-upload">
-                        {{ govukFileUpload({
+                        {% if errorMessages.fileUpload %}
+                            <p id="fileUpload-error" class="govuk-error-message">
+                                <span class="govuk-visually-hidden">Error:</span>
+                                {{ errorMessages.fileUpload }}
+                            </p>
+                        {% endif %}
+                        <div class="govuk-drop-zone" data-module="govuk-file-upload">
+                            {{ govukFileUpload({
                     id: "fileUpload",
                     name: "fileUpload",
                     classes: "govuk-file-upload",
@@ -140,15 +128,14 @@
                         accept: "application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
                     }
                 }) }}
+                        </div>
                     </div>
                 </div>
-
-            </div>
+            {% endif %}
         </div>
-        {% if not useDecorator %}
+        {% if not appointmentOutcome.uuid %}
             {% set uploadHtml %}
             <div class="govuk-grid-row govuk-body">
-
                 <div class="govuk-grid-column-full" data-qa="fileUpload">
 
                     {{ govukFileUpload({

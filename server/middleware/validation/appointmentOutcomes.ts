@@ -31,7 +31,9 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
 
   const validateAttendedFailedToComply = (): void => {
     if (!req.url.includes(`${baseOutcomeUrl}/attended-failed-to-comply`)) return
+
     render = 'pages/appointment-outcomes/attended-failed-to-comply'
+
     errorMessages = {
       ...errorMessages,
       ...validateWithSpec(
@@ -40,6 +42,8 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
           crn,
           id,
           page: `outcome/attended-failed-to-comply`,
+          msg: 'Select an action for this failure to comply',
+          log: 'Action for failure to comply not selected',
         }),
       ),
     }
@@ -84,16 +88,19 @@ const appointmentOutcomes: Route<void> = (req, res, next) => {
   const validateAddNote = (): void => {
     if (!reqUrl.includes(`${baseOutcomeUrl}/add-note`)) return
     render = 'pages/appointment-outcomes/add-note'
-    errorMessages = validateWithSpec(
-      req,
-      appointmentOutcomesValidation({
-        crn,
-        id,
-        page: `outcome/add-note`,
-        notes: req.body.appointments[crn][id].notes,
-        maxCharCount: maxCharCount as number,
-      }),
-    )
+    errorMessages = {
+      ...errorMessages,
+      ...validateWithSpec(
+        req,
+        appointmentOutcomesValidation({
+          crn,
+          id,
+          page: `outcome/add-note`,
+          notes: req.body.appointments[crn][id].notes,
+          maxCharCount: maxCharCount as number,
+        }),
+      ),
+    }
   }
 
   validateOutcome()

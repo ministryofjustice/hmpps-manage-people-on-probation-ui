@@ -1,9 +1,12 @@
+import { EsupervisionQuestionTemplatesList } from '../data/model/esupervision'
 import { Errors } from './Errors'
 
 export interface ESupervisionSession {
   checkins?: CheckinUserDetails
   manageCheckin?: CheckinUserDetails
   restartCheckin?: CheckinUserDetails
+  manageQuestions?: ManageQuestionsSession
+  questionsAdded?: boolean
 }
 
 export interface CheckinUserDetails {
@@ -21,6 +24,14 @@ export interface CheckinUserDetails {
   settingsUpdated?: boolean
   eligibility?: string[]
   eligibilityChoice?: 'replacement-contact' | 'supplementary-contact'
+  eligibilitySPOApproval?: any
+}
+
+export interface ManageQuestionsSession {
+  availableTemplates?: EsupervisionQuestionTemplatesList[]
+  questionTemplateAndInputs?: Record<string, string>
+  draftQuestionInput?: string
+  expectedCheckinDate?: string
 }
 export interface LocalParams {
   crn: string
@@ -36,4 +47,9 @@ export interface LocalParams {
   contactSaved?: string
   editCheckInMobile?: string
   editCheckInEmail?: string
+  questionId?: string
+  question?: {
+    prefix: string
+    suffix: string
+  }
 }
