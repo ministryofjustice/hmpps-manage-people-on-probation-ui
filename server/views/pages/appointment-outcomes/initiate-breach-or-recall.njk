@@ -18,27 +18,6 @@
     items: appointmentOutcome.options
   } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'breachNSICreatedBy'])) }}
   {% if sendLetter %}
-    {{ govukRadios({
-    fieldset: {
-      legend: {
-        text: "Who will send the letter?",
-        isPageHeading: false,
-        classes: "govuk-fieldset__legend--m"
-      }
-    },
-    items: appointmentOutcome.letterSentByOptions
-  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'letterSentBy'])) }}
-
-    {{ govukRadios({
-    fieldset: {
-      legend: {
-        text: "Select the type of letter",
-        isPageHeading: false,
-        classes: "govuk-fieldset__legend--m"
-      }
-    },
-    items: appointmentOutcome.letterTypeOptions
-  } | decorateFormAttributes(['appointments', appointmentOutcome.crn, appointmentOutcome.id,  'outcome', 'letterType'])) }}
+    {% include './_send-letter-radios.njk' %}
   {% endif %}
-
 {% endblock %}
