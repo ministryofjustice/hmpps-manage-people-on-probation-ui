@@ -176,7 +176,7 @@
     "url-value-parser": "^2.2.0",
     "util": "^0.12.5",
     "util.inherits": "^1.0.3",
-    "uuid": "^13.0.0",
+    "uuid": "^14.0.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2",
     "wiremock": "^3.13.1",
