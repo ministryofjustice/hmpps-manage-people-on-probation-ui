@@ -208,7 +208,7 @@ const appointmentsController: Controller<typeof routes, void> = {
           const twoYearsAgo = DateTime.now().minus({ years: 2 })
           return contactDate < twoYearsAgo
         })
-      } else {
+      } else if (req.session.outcomesFilter === 'All') {
         outcomes = content
       }
       return res.render('pages/appointments/record-an-outcome', {

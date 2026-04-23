@@ -1,5 +1,5 @@
 {% extends "../../partials/case.njk" %}
-{% set title = "Which appointment are you recording an outcome for?" if actionType == "outcome" else 
+{% set currentSectionName = "Which appointment are you recording an outcome for?" if actionType == "outcome" else 
     "Which appointment?" %}
 {% set pageTitle = makePageTitle({
     pageHeading: ["Record an outcome", "Outcome"]
@@ -27,7 +27,6 @@
 {% endblock %}
 
 {% block pageContent %}
-
   <div class="govuk-grid-row govuk-!-margin-top-4">
 
     {% if flags.enableOutcomesV1 %}
