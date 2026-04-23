@@ -929,7 +929,7 @@ context('check-ins overview and manage pages', () => {
     manageCheckins.checkOnPage()
     manageCheckins.getElementData('checkinSettingsCard').should('contain.text', 'Check in settings')
     manageCheckins.getElementData('firstCheckInDueLabel').should('contain.text', 'Next check in')
-    manageCheckins.getElementData('firstCheckInValue').should('contain.text', 'Monday 20 April')
+    manageCheckins.getElementData('firstCheckInValue').should('contain.text', '20 April 2026')
     manageCheckins.getElementData('frequencyLabel').should('contain.text', 'Frequency')
     manageCheckins.getElementData('frequencyValue').should('contain.text', 'Every week')
     manageCheckins.getElementData('checkinSettingsCard').find('.govuk-link').should('contain.text', 'Change')
@@ -1259,5 +1259,30 @@ context('check-ins add questions pages', () => {
     addQuestionsPage.verifyQuestionInList('at home')
     addQuestionsPage.verifyQuestionInList('your physical health')
     addQuestionsPage.verifyAddQuestionButtonHidden()
+  })
+})
+
+context('check-ins flag guard', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+    cy.task('stubDisableESupervisionCheckins')
+  })
+
+  it('returns 403 for a /check-in/manage subpath when the flag is disabled', () => {
+    cy.request({
+      url: '/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start',
+      failOnStatusCode: false,
+    }).then(response => {
+      expect(response.status).to.eq(403)
+    })
+  })
+
+  it('returns 403 for an /:id/check-in subpath when the flag is disabled', () => {
+    cy.request({
+      url: '/case/X000001/appointments/3fa85f64-5717-4562-b3fc-2c963f66afa7/check-in/eligibility-check',
+      failOnStatusCode: false,
+    }).then(response => {
+      expect(response.status).to.eq(403)
+    })
   })
 })

@@ -59,6 +59,7 @@ const mockMiddlewareFn = jest.fn()
 jest.mock('../middleware', () => ({
   cloneAppointmentAndRedirect: jest.fn(() => mockMiddlewareFn),
   renderError: jest.fn(() => mockMiddlewareFn),
+  getCheckinOffenderDetails: jest.fn(() => mockMiddlewareFn),
 }))
 
 jest.mock('./arrangeAppointment', () => ({
@@ -212,6 +213,7 @@ describe('controllers/appointments', () => {
         personRisks: undefined,
         hasDeceased: false,
         hasPractitioner: true,
+        canAccessCheckins: false,
         url: '',
       })
     })
@@ -229,8 +231,28 @@ describe('controllers/appointments', () => {
         crn,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
         url: '',
       })
+    })
+  })
+  describe('get appointments - checkins flag enabled and practitioner allocated', () => {
+    beforeEach(async () => {
+      res.locals.flags = { enableESupervisionCheckins: true }
+      await controllers.appointments.getAppointments(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = undefined
+    })
+
+    it('should render the appointments page with canAccessCheckins true', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/appointments',
+        expect.objectContaining({
+          hasPractitioner: true,
+          canAccessCheckins: true,
+        }),
+      )
     })
   })
   describe('get upcoming appointments', () => {

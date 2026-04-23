@@ -51,14 +51,14 @@ const getExpectedOptions = ({
   const expectedOptions: ExpectedOption<RedirectPages>[] = [
     { value: 'SEND_LETTER', text: 'Send a letter', RedirectPage: SendLetterPage, redirectPageName: 'Send a letter' },
     {
-      value: 'BREACH_RECALL_INITIATED',
+      value: 'INITIATE_BREACH_RECALL',
       text: `Initiate a ${text}`,
       RedirectPage: InitiateBreachOrRecallPage,
       redirectPageName: `Initiate a ${text}`,
       redirectPageTitle: `Initiate a ${text}`,
     },
     {
-      value: 'BREACH_RECALL_INITIATED_AND_SEND_LETTER',
+      value: 'INITIATE_BREACH_RECALL_AND_SEND_LETTER',
       text: `Initiate a ${text} and send a letter`,
       RedirectPage: InitiateBreachOrRecallPage,
       redirectPageName: `Initiate a ${text}`,
@@ -68,7 +68,7 @@ const getExpectedOptions = ({
   if (!isProbationPractitioner) {
     expectedOptions.push({
       value: 'REFER_TO_OFFENDER_MANAGER',
-      text: 'Refer to probation practitioner',
+      text: 'Refer to offender manager',
       hint: 'Notify the allocated probation practitioner so they can take action.',
       redirectPageName: 'Add a note',
       RedirectPage: AddNotePage,

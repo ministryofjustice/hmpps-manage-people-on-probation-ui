@@ -83,6 +83,49 @@ describe('/middleware/evaluateFeatureFlags', () => {
     })
   })
 
+  describe('PDU codes passed as context', () => {
+    it('should pass pduCodes to getFlags when user has probation delivery units', async () => {
+      const resWithPdus = {
+        locals: {
+          user: {
+            username: 'user-1',
+            email: 'test@example.com',
+            probationDeliveryUnits: [
+              { code: 'PDU001', description: 'Test PDU' },
+              { code: 'PDU002', description: 'Another PDU' },
+            ],
+          },
+        },
+        redirect: jest.fn().mockReturnThis(),
+      } as unknown as AppResponse
+      const getFlagsSpy = jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(mockFlags))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(req, resWithPdus, nextSpy)
+
+      expect(getFlagsSpy).toHaveBeenCalledWith({
+        email: 'test@example.com',
+        pduCodes: ['PDU001', 'PDU002'],
+      })
+    })
+
+    it('should pass empty pduCodes array when user has no probation delivery units', async () => {
+      const getFlagsSpy = jest
+        .spyOn(FlagService.prototype, 'getFlags')
+        .mockImplementationOnce(() => Promise.resolve(mockFlags))
+      const flagService = new FlagService()
+
+      await evaluateFeatureFlags(flagService)(req, res, nextSpy)
+
+      expect(getFlagsSpy).toHaveBeenCalledWith({
+        email: undefined,
+        pduCodes: [],
+      })
+    })
+  })
+
   describe('enableDeliusClient query parameter', () => {
     it('should override enableDeliusClient to true when query parameter is "true"', async () => {
       const reqWithQuery = httpMocks.createRequest({

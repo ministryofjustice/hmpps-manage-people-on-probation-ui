@@ -27,6 +27,7 @@ jest.mock('../data/model/featureFlags', () => ({
   FeatureFlags: jest.fn().mockImplementation(() => ({
     enableSentencePlan: undefined,
     enableSanIndicator: undefined,
+    enableESupervisionCheckins: undefined,
   })),
 }))
 
@@ -54,6 +55,12 @@ describe('FlagService', () => {
             enabled: false,
           },
         },
+        {
+          booleanEvaluationResponse: {
+            flagKey: 'enableESupervisionCheckins',
+            enabled: false,
+          },
+        },
       ],
     })
   })
@@ -78,6 +85,91 @@ describe('FlagService', () => {
       ]),
     )
   })
+  it('fans out pduCode requests only for PDU-gated flags', async () => {
+    await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })
+    const requests = mockEvaluateBatch.mock.calls[0][0]
+    expect(requests).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          flagKey: 'enableSentencePlan',
+          entityId: email,
+          context: { email },
+        }),
+        expect.objectContaining({
+          flagKey: 'enableSanIndicator',
+          entityId: email,
+          context: { email },
+        }),
+        expect.objectContaining({
+          flagKey: 'enableESupervisionCheckins',
+          entityId: email,
+          context: { email, pduCode: 'PDU001' },
+        }),
+        expect.objectContaining({
+          flagKey: 'enableESupervisionCheckins',
+          entityId: email,
+          context: { email, pduCode: 'PDU002' },
+        }),
+      ]),
+    )
+    expect(requests).toHaveLength(4)
+    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableSentencePlan')).toHaveLength(1)
+    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(2)
+  })
+  it('resolves a PDU-gated flag to true if any pduCode evaluation is enabled', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: false } },
+        { booleanEvaluationResponse: { flagKey: 'enableESupervisionCheckins', enabled: true } },
+      ],
+    })
+    expect(await service.getFlags({ email, pduCodes: ['PDU001', 'PDU002'] })).toStrictEqual({
+      enableSentencePlan: false,
+      enableSanIndicator: false,
+      enableESupervisionCheckins: true,
+    })
+  })
+  it('does not include pduCodes in context when empty array', async () => {
+    await service.getFlags({ email, pduCodes: [] })
+    expect(mockEvaluateBatch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: email,
+          context: { email },
+        }),
+      ]),
+    )
+  })
+  it('fails closed for non-PDU-gated flags with unexpected response count', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: true } },
+      ],
+    })
+
+    const result = await service.getFlags({ email })
+
+    expect(result.enableSentencePlan).toBe(false)
+    expect(result.enableSanIndicator).toBe(true)
+  })
+  it('fails closed for PDU-gated flags when pduCodes is empty', async () => {
+    mockEvaluateBatch.mockReturnValue({
+      responses: [
+        { booleanEvaluationResponse: { flagKey: 'enableSentencePlan', enabled: true } },
+        { booleanEvaluationResponse: { flagKey: 'enableSanIndicator', enabled: false } },
+      ],
+    })
+
+    const result = await service.getFlags({ email, pduCodes: [] })
+
+    const requests = mockEvaluateBatch.mock.calls[0][0]
+    expect(requests.filter((r: { flagKey: string }) => r.flagKey === 'enableESupervisionCheckins')).toHaveLength(0)
+    expect(result.enableESupervisionCheckins).toBe(false)
+  })
   it('calls evaluateBatch with correct requests if context.email does not exist', async () => {
     mockEvaluateBatch.mockReturnValue({
       responses: [],
@@ -96,6 +188,22 @@ describe('FlagService', () => {
     expect(await service.getFlags({ email: undefined })).toStrictEqual({
       enableSentencePlan: true,
       enableSanIndicator: false,
+      enableESupervisionCheckins: false,
     })
+  })
+
+  it('normalises email to lowercase before sending to Flipt', async () => {
+    const mixedCaseEmail = 'Test.User@Example.COM'
+
+    await service.getFlags({ email: mixedCaseEmail })
+
+    expect(mockEvaluateBatch).toHaveBeenCalledWith(
+      expect.arrayContaining([
+        expect.objectContaining({
+          entityId: mixedCaseEmail.toLowerCase(),
+          context: { email: mixedCaseEmail.toLowerCase() },
+        }),
+      ]),
+    )
   })
 })

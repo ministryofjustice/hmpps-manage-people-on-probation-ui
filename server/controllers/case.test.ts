@@ -164,6 +164,7 @@ describe('caseController', () => {
         appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
     })
   })
@@ -202,7 +203,39 @@ describe('caseController', () => {
         appointmentsWithoutAnOutcomeCount: 2,
         hasDeceased: false,
         hasPractitioner: false,
+        canAccessCheckins: false,
       })
+    })
+  })
+  describe('getCase - checkins flag enabled and practitioner allocated', () => {
+    const req = httpMocks.createRequest({
+      params: { crn },
+      url: '/caseload/appointments/upcoming',
+      session: {
+        data: {
+          personalDetails: {
+            [crn]: mockPersonalDetails,
+          },
+        },
+      },
+    })
+    beforeEach(async () => {
+      getProbationPractitionerSpy.mockImplementationOnce(() => Promise.resolve(mockPractitioner))
+      res.locals.flags = { enableESupervisionCheckins: true }
+      await controllers.case.getCase(hmppsAuthClient)(req, res)
+    })
+    afterEach(() => {
+      res.locals.flags = undefined
+    })
+
+    it('should render the overview page with canAccessCheckins true', () => {
+      expect(renderSpy).toHaveBeenCalledWith(
+        'pages/overview',
+        expect.objectContaining({
+          hasPractitioner: true,
+          canAccessCheckins: true,
+        }),
+      )
     })
   })
   it('should default appointmentsWithoutAnOutcomeCount to 0 when no content is returned', async () => {

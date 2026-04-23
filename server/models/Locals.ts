@@ -13,6 +13,8 @@ import {
   YesNo,
   AttendedCompliedAppointment,
   AppointmentOutcomeOption,
+  AppointmentEnforcementActionOption,
+  ProbationDeliveryUnit,
 } from './Appointments'
 import { Option } from './Option'
 import { Errors } from './Errors'
@@ -76,6 +78,7 @@ export interface LocalsUser {
   uuid?: string
   displayName?: string
   token: string
+  probationDeliveryUnits?: ProbationDeliveryUnit[]
 }
 
 interface Locals {
@@ -150,6 +153,11 @@ interface Locals {
   appointmentOutcome?: AppointmentOutcomeProps
 }
 
+export interface AppointmentOutcomeSentence {
+  type: SentenceType
+  length: number | null
+}
+
 export interface AppointmentOutcomeProps {
   forename: string
   surname: string
@@ -166,9 +174,11 @@ export interface AppointmentOutcomeProps {
   completedUrl: string
   appointmentSession?: AppointmentSession
   backLink?: string
-  options?: AppointmentOutcomeOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+  sentence?: AppointmentOutcomeSentence
   sentenceType?: SentenceType
   isProbationPractitioner?: boolean
+  appointmentHintText?: string
 }
 
 export interface AppResponse extends Response {

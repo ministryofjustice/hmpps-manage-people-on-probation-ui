@@ -22,4 +22,5 @@ export class FeatureFlags {
   enableDeepLinks?: boolean = undefined
   enablePoPSearchExtraColumns?: boolean = undefined
   enableOutcomesV1?: boolean = undefined
+  enableESupervisionCheckins?: boolean = undefined
 }

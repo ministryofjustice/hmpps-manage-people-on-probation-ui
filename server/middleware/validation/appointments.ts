@@ -1,8 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Request } from 'express'
+import { get } from 'lodash'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
+import { getDataValue, getPersonLevelTypes, setDataValue, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
@@ -12,6 +13,7 @@ import { getMockedTime } from '../../routes/testRoutes'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
+import { standardiseDateValue } from '../../utils/standardiseDateValue'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
