@@ -17,7 +17,7 @@ const definitions: Record<string, string> = {
   DRUGS: 'Drugs',
   HOUSING: 'Housing',
   MONEY: 'Money',
-  SUPPORT_SYSTEM: 'Support system',
+  SUPPORT_SYSTEM: 'Relationships (family, friends, partner)',
   EMPLOYMENT_EDU: 'Employment and education',
   OTHER: 'Other',
   NO_HELP: 'No, I do not need help',
