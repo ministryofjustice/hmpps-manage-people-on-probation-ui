@@ -32,11 +32,14 @@ export interface Rar {
 }
 
 export interface Order {
+  eventNumber?: string
+  description: string
+  length?: number
+  endDate?: string
+  releaseDate?: string
+  startDate: string
   status?: string
   mainOffence?: string
-  description: string
-  endDate?: string
-  startDate: string
   breaches?: number
 }
 

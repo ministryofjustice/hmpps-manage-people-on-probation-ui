@@ -19,7 +19,7 @@ import {
 import { SentenceDetails, Sentences } from './model/sentenceDetails'
 import { PersonActivity } from './model/activityLog'
 import { PersonRiskFlag, PersonRiskFlags } from './model/risk'
-import { PersonCompliance } from './model/compliance'
+import { Breach, PersonCompliance } from './model/compliance'
 import { PreviousOrderHistory } from './model/previousOrderHistory'
 import { Offences } from './model/offences'
 import { TeamCaseload, UserAppontment, UserCaseload, UserLocations, UserProviders, UserTeam } from './model/caseload'
@@ -252,6 +252,14 @@ export default class MasApiClient extends RestClient {
       handle404: false,
       handle500: false,
     })
+  }
+
+  async getPersonActivity(crn: string): Promise<PersonActivity> {
+    return this.get({ path: `/activity/${crn}` })
+  }
+
+  async getBreach(crn: string): Promise<Breach> {
+    return this.get({ path: `/breach/${crn}` })
   }
 
   async getPersonRiskFlags(crn: string): Promise<PersonRiskFlags> {

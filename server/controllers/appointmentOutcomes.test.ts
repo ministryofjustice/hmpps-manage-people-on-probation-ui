@@ -6,8 +6,13 @@ import { renderError } from '../middleware'
 import { mockAppResponse } from './mocks'
 import { AppointmentOutcomeProps, AppResponse } from '../models/Locals'
 import { checkAuditMessage } from './testutils'
-import { AppointmentEnforcementAction, AppointmentOutcomeType } from '../models/Appointments'
+import {
+  AppointmentEnforcementAction,
+  AppointmentOutcomeType,
+  AttendedCompliedAppointment,
+} from '../models/Appointments'
 import { appointmentOutcomeRequests } from './appointmentOutcomes'
+import { Activity } from '../data/model/schedule'
 
 const crn = 'X000001'
 const id = '1234'
@@ -67,7 +72,7 @@ const mockRes = ({
   appointmentOutcome,
   appointmentCase,
 }: {
-  appointmentOutcome?: Partial<AppointmentOutcomeProps>
+  appointmentOutcome?: Partial<AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>>
   appointmentCase?: Record<string, any>
 } = {}) => {
   return mockAppResponse({

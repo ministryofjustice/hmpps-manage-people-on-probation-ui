@@ -150,7 +150,7 @@ interface Locals {
   riskToProbationStaff?: { id: number }
   smsConfirmationOptions?: Option[]
   feedbackEmail?: string
-  appointmentOutcome?: AppointmentOutcomeProps
+  appointmentOutcome?: AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>
 }
 
 export interface AppointmentOutcomeSentence {
@@ -163,10 +163,20 @@ export interface AppointmentOutcomeEnforcementAction {
   responseByDays?: number
 }
 
-export interface AppointmentOutcomeProps {
+export interface AppointmentOutcomeBreach {
+  order: string
+  date: string
+}
+
+export interface AppointmentOutcomeTicket {
+  title: string
+  text: string[]
+}
+
+export interface AppointmentOutcomeProps<TAppointment> {
   forename: string
   surname: string
-  appointment: AttendedCompliedAppointment | Activity
+  appointment: TAppointment
   crn: string
   uuid: string | undefined
   contactId: string | undefined
@@ -186,6 +196,8 @@ export interface AppointmentOutcomeProps {
   enforcementAction?: AppointmentOutcomeEnforcementAction
   isProbationPractitioner?: boolean
   appointmentHintText?: string
+  breach?: AppointmentOutcomeBreach | null
+  ticket?: AppointmentOutcomeTicket | null
 }
 
 export interface AppResponse extends Response {

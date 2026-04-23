@@ -3,17 +3,19 @@ import { ActivityCount, Compliance, Offence, Order, PreviousOrders } from './ove
 
 export interface PersonCompliance {
   personSummary: PersonSummary
-  previousOrders: PreviousOrders
   currentSentences: SentenceCompliance[]
+  previousOrders: PreviousOrders
 }
 
 export interface SentenceCompliance {
-  activity: ActivityCount
-  compliance: Compliance
+  eventNumber: string
   mainOffence: Offence
   order: Order
   activeBreach?: Breach
   rarDescription?: string
+  rarCategory?: string
+  compliance: Compliance
+  activity: ActivityCount
 }
 
 export interface Breach {

@@ -1,8 +1,9 @@
 import httpMocks from 'node-mocks-http'
 import { getBackLink } from './getBackLink'
-import { AppointmentOutcomeType } from '../../models/Appointments'
+import { AppointmentOutcomeType, AttendedCompliedAppointment } from '../../models/Appointments'
 import { AppointmentOutcomeProps } from '../../models/Locals'
 import { getDataValue } from '../../utils'
+import { Activity } from '../../data/model/schedule'
 
 const nextSpy = jest.fn()
 const crn = 'X000001'
@@ -57,7 +58,9 @@ const mockReq = ({
   return httpMocks.createRequest(req)
 }
 
-const mockRes = (appointmentOutcome: Partial<AppointmentOutcomeProps> = {}): httpMocks.MockResponse<any> => {
+const mockRes = (
+  appointmentOutcome: Partial<AppointmentOutcomeProps<AttendedCompliedAppointment | Activity>> = {},
+): httpMocks.MockResponse<any> => {
   const res = {
     locals: {
       appointmentOutcome: {

@@ -6,3 +6,7 @@ export interface AppointmentTeams {
 export interface AppointmentStaff {
   users: User[]
 }
+export interface Breach {
+  active: boolean
+  createdDate: string
+}
