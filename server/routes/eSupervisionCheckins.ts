@@ -2,11 +2,21 @@ import { type Router } from 'express'
 import type { Services } from '../services'
 import controllers from '../controllers'
 import validate from '../middleware/validation'
-import { autoStoreSessionData, redirectWizard } from '../middleware'
+import { autoStoreSessionData, redirectWizard, renderError } from '../middleware'
 import { getCheckIn } from '../middleware/getCheckIn'
 import { postRedirectWizard } from '../middleware/checkinCyaRedirect'
+import { AppResponse } from '../models/Locals'
 
 export default function eSuperVisionCheckInsRoutes(router: Router, { hmppsAuthClient }: Services) {
+  router.use(
+    ['/case/:crn/appointments/check-in', '/case/:crn/appointments/:id/check-in'],
+    (req, res: AppResponse, next) => {
+      if (res.locals.flags?.enableESupervisionCheckins !== true) {
+        return renderError(403)(req, res)
+      }
+      return next()
+    },
+  )
   router.get('/case/:crn/appointments/check-in/eligibility-check', [
     controllers.checkIns.getStartSetup(hmppsAuthClient),
   ])

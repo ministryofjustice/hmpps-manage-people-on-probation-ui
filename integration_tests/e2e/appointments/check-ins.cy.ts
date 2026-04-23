@@ -1261,3 +1261,28 @@ context('check-ins add questions pages', () => {
     addQuestionsPage.verifyAddQuestionButtonHidden()
   })
 })
+
+context('check-ins flag guard', () => {
+  beforeEach(() => {
+    cy.task('resetMocks')
+    cy.task('stubDisableESupervisionCheckins')
+  })
+
+  it('returns 403 for a /check-in/manage subpath when the flag is disabled', () => {
+    cy.request({
+      url: '/case/X000001/appointments/check-in/manage/3fa85f64-5717-4562-b3fc-2c963f66afa7/questions/start',
+      failOnStatusCode: false,
+    }).then(response => {
+      expect(response.status).to.eq(403)
+    })
+  })
+
+  it('returns 403 for an /:id/check-in subpath when the flag is disabled', () => {
+    cy.request({
+      url: '/case/X000001/appointments/3fa85f64-5717-4562-b3fc-2c963f66afa7/check-in/eligibility-check',
+      failOnStatusCode: false,
+    }).then(response => {
+      expect(response.status).to.eq(403)
+    })
+  })
+})
