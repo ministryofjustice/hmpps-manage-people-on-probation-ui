@@ -36,6 +36,29 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
       req.session.activityLogFilters.hideContact = hideContactFilters
       req.session.activityLogFilters.crn = crn
     }
+    const filterQueries = ['keywords', 'dateFrom', 'dateTo', 'compliance', 'category']
+
+    const formatQueryParamValue = (value: string | string[] | undefined) => (Array.isArray(value) ? value : [value])
+
+    if (filterQueries.some(filterQuery => Object.keys(req.query).includes(filterQuery))) {
+      const keywordFilters = req?.query?.keywords || ''
+      const dateFromFilters = req?.query?.dateFrom || ''
+      const dateToFilters = req?.query?.dateTo || ''
+      const categoryFilters = Array.isArray(req?.query?.category)
+        ? formatQueryParamValue(req.query.category as string | string[])
+        : []
+      const complianceFilters = req?.query?.compliance
+        ? formatQueryParamValue(req.query.compliance as string | string[])
+        : []
+      if (!req?.session?.activityLogFilters) req.session.activityLogFilters = {}
+      if (keywordFilters) req.session.activityLogFilters.keywords = keywordFilters
+      if (categoryFilters.length) req.session.activityLogFilters.category = categoryFilters
+      if (complianceFilters.length) req.session.activityLogFilters.compliance = complianceFilters
+      if (dateFromFilters) req.session.activityLogFilters.dateFrom = dateFromFilters
+      if (dateToFilters) req.session.activityLogFilters.dateTo = dateToFilters
+      req.session.activityLogFilters.crn = crn
+    }
+
     if (req.session.activityLogFilters) {
       checkClearFilterKeys()
     }
@@ -107,17 +130,22 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
         for (const text of filterValue) {
           if (filterKey === 'compliance') {
             value.push({
-              text: complianceFilterOptions.find(option => option.value === text).text,
+              text: complianceFilterOptions.find(
+                option => option.value.toLowerCase() === (text as string).toLowerCase(),
+              ).text,
               href: filterHref(filterKey, text),
             })
           } else if (filterKey === 'category') {
             value.push({
-              text: categoryFilterOptions.find(option => option.value === text).text,
+              text: categoryFilterOptions.find(option => option.value.toLowerCase() === (text as string).toLowerCase())
+                .text,
               href: filterHref(filterKey, text),
             })
           } else if (filterKey === 'hideContact') {
             value.push({
-              text: hideContactsFilterOptions.find(option => option.value === text).text,
+              text: hideContactsFilterOptions.find(
+                option => option.value.toLowerCase() === (text as string).toLowerCase(),
+              ).text,
               href: filterHref(filterKey, text),
             })
           }
@@ -138,19 +166,19 @@ export const filterActivityLog: Route<void> = (req, res, next): void => {
   const complianceOptions: Option[] = complianceFilterOptions.map(({ text, value }) => ({
     text,
     value,
-    checked: filters.compliance.includes(value),
+    checked: filters.compliance.map(val => val.toLowerCase()).includes(value.toLowerCase()),
   }))
 
   const categoryOptions: Option[] = categoryFilterOptions.map(({ text, value }) => ({
     text,
     value,
-    checked: filters.category.includes(value),
+    checked: filters.category.map(val => val.toLowerCase()).includes(value.toLowerCase()),
   }))
 
   const hideContactOptions: Option[] = hideContactsFilterOptions.map(({ text, value }) => ({
     text,
     value,
-    checked: filters.hideContact.includes(value),
+    checked: filters.hideContact.map(val => val.toLowerCase()).includes(value.toLowerCase()),
   }))
 
   const today = new Date()

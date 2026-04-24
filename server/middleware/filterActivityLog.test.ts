@@ -37,13 +37,16 @@ const categeoryList = [
   'safeguarding',
 ]
 
-const defaultRequest: Args = {
-  page: undefined,
+const defaultFilters = {
   keywords: 'test',
   dateFrom: '21/03/2025',
   dateTo: '22/03/2025',
   compliance: ['no outcome', 'complied', 'not complied'],
   category: categeoryList,
+}
+
+const defaultRequest: Args = {
+  page: undefined,
   hideContact: ['hide NDelius system generated contacts'],
   clearFilterKey: '',
   clearFilterValue: '',
@@ -64,6 +67,7 @@ const getRequest = (args?: Args) => {
   return httpMocks.createRequest({
     body: {
       ...defaultRequest,
+      ...defaultFilters,
       ...(args || {}),
     },
     query,
@@ -217,24 +221,24 @@ describe('/middleware/filterActivityLog()', () => {
       filterActivityLog(req, res, nextSpy)
     })
     it('should clear session and assign the correct values to res.locals.filters', () => {
-      const query = req.query as Record<string, string | string[]>
+      const query = { ...req.query } as Record<string, string | string[]>
       const url = `/case/${crn}/activity-log`
       const expectedResponse: ActivityLogFiltersResponse = {
         selectedFilterItems: {
           keywords: [
             {
-              text: req.query.keywords as string,
+              text: defaultFilters.keywords as string,
               href: `${url}?clearFilterKey=keywords`,
             },
           ],
           compliance: [
-            ...(query.compliance as string[]).map((item, i) => ({
+            ...(defaultFilters.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
               href: `${url}?clearFilterKey=compliance&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           category: [
-            ...(query.category as string[]).map((item, i) => ({
+            ...(defaultFilters.category as string[]).map((item, i) => ({
               text: categoryFilterOptions[i].text,
               href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
             })),
@@ -247,7 +251,7 @@ describe('/middleware/filterActivityLog()', () => {
           ],
           dateRange: [
             {
-              text: `${req.query.dateFrom} - ${req.query.dateTo}`,
+              text: `${defaultFilters.dateFrom} - ${defaultFilters.dateTo}`,
               href: `/case/X000001/activity-log?clearFilterKey=dateRange`,
             },
           ],
@@ -256,12 +260,12 @@ describe('/middleware/filterActivityLog()', () => {
         categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
-        keywords: req.query.keywords as string,
-        compliance: req.query.compliance as string[],
-        category: req.query.category as string[],
+        keywords: defaultFilters.keywords as string,
+        compliance: defaultFilters.compliance as string[],
+        category: defaultFilters.category as string[],
         hideContact: req.query.hideContact as string[],
-        dateFrom: req.query.dateFrom as string,
-        dateTo: req.query.dateTo as string,
+        dateFrom: defaultFilters.dateFrom as string,
+        dateTo: defaultFilters.dateTo as string,
         maxDate,
         crn,
       }
@@ -270,7 +274,7 @@ describe('/middleware/filterActivityLog()', () => {
   })
 
   describe('Selected compliance filter tag is clicked', () => {
-    const req = getRequest({ clearFilterKey: 'compliance', clearFilterValue: defaultRequest.compliance[1] })
+    const req = getRequest({ clearFilterKey: 'compliance', clearFilterValue: defaultFilters.compliance[1] })
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
@@ -280,7 +284,7 @@ describe('/middleware/filterActivityLog()', () => {
   })
 
   describe('Selected keywords filter tag is clicked', () => {
-    const req = getRequest({ clearFilterKey: 'keywords', clearFilterValue: defaultRequest.keywords })
+    const req = getRequest({ clearFilterKey: 'keywords', clearFilterValue: defaultFilters.keywords })
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
@@ -290,7 +294,7 @@ describe('/middleware/filterActivityLog()', () => {
   })
 
   describe('Selected date range filter tag is clicked', () => {
-    const req = getRequest({ clearFilterKey: 'dateRange', clearFilterValue: defaultRequest.dateFrom })
+    const req = getRequest({ clearFilterKey: 'dateRange', clearFilterValue: defaultFilters.dateFrom })
     beforeEach(() => {
       filterActivityLog(req, res, nextSpy)
     })
@@ -312,18 +316,18 @@ describe('/middleware/filterActivityLog()', () => {
         selectedFilterItems: {
           keywords: [
             {
-              text: req.query.keywords as string,
+              text: defaultFilters.keywords as string,
               href: `${url}?clearFilterKey=keywords`,
             },
           ],
           compliance: [
-            ...(query.compliance as string[]).map((item, i) => ({
+            ...(defaultFilters.compliance as string[]).map((item, i) => ({
               text: filterOptions[i].text,
               href: `${url}?clearFilterKey=compliance&clearFilterValue=${encodeURIComponent(item)}`,
             })),
           ],
           category: [
-            ...(query.category as string[]).map((item, i) => ({
+            ...(defaultFilters.category as string[]).map((item, i) => ({
               text: categoryFilterOptions[i].text,
               href: `${url}?clearFilterKey=category&clearFilterValue=${encodeURIComponent(item)}`,
             })),
@@ -339,9 +343,9 @@ describe('/middleware/filterActivityLog()', () => {
         categoryOptions: categoryFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         hideContactOptions: hideContactsFilterOptions.map(({ text, value }) => ({ text, value, checked: true })),
         baseUrl: `/case/${crn}/activity-log`,
-        keywords: req.query.keywords as string,
-        compliance: req.query.compliance as string[],
-        category: req.query.category as string[],
+        keywords: defaultFilters.keywords as string,
+        compliance: defaultFilters.compliance as string[],
+        category: defaultFilters.category as string[],
         hideContact: req.query.hideContact as string[],
         dateFrom: '',
         dateTo: '',
