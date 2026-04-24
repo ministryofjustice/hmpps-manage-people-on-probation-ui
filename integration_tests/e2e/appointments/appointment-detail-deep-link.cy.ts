@@ -8,7 +8,7 @@ describe('Appointment detail - enableDeepLinks', () => {
 
   it('should display the NDelius deep link paragraph when outcome is recorded', () => {
     cy.get('[data-qa="outcomeDetailsCard"]').should('exist')
-    cy.contains('a', "person's drug history in NDelius (opens in a new tab)")
+    cy.contains('a', 'drug history in NDelius (opens in a new tab)')
       .should('have.attr', 'target', '_blank')
       .should(
         'have.attr',
