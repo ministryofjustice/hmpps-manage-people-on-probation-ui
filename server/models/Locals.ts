@@ -170,7 +170,7 @@ export interface AppointmentOutcomeBreach {
 
 export interface AppointmentOutcomeTicket {
   title: string
-  text: string[]
+  html: string
 }
 
 export interface AppointmentOutcomeProps<TAppointment> {
