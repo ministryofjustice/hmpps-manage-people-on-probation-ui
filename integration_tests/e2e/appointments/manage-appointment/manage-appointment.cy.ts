@@ -176,7 +176,7 @@ describe('Manage an appointment', () => {
           manageAppointmentPage
             .getAppointmentDetails()
             .find('.govuk-body a')
-            .should('contain.text', "person's drug history in NDelius (opens in a new tab)")
+            .should('contain.text', 'drug history in NDelius (opens in a new tab)')
             .should('have.attr', 'target', '_blank')
             .should(
               'have.attr',
