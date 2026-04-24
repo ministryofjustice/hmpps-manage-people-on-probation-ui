@@ -1,0 +1,56 @@
+{% from "govuk/components/table/macro.njk" import govukTable %}
+
+{% set tableData = {
+  firstCellIsHeader: true,
+  classes: 'govuk-!-margin-bottom-0',
+  head: [
+    {
+      text: "Person on probation"
+    },
+    {
+      text: "Appointment details"
+    },
+    {
+      text: "Appointment outcome"
+    },
+    {
+        text: "Enforcement action"
+    },
+    {
+        classes: 'govuk-!-text-align-right',
+        text: "Action"
+    }
+  ],
+  rows: []
+} %}
+
+{% if upcomingAppointments.length > 0 %}
+  {% for appointment in upcomingAppointments %}
+      {% set dateAndTime %}
+      {% endset %}
+      {% set row = tableData.rows.push([
+          {
+              html: '<a class="govuk-!-font-weight-regular" href="/case/' + appointment.crn + '">' + appointment.name.surname + ', ' + appointment.name.forename + '</a><br><span class="govuk-!-font-weight-bold secondary-text">' + appointment.crn + '</span>'
+          },
+          {
+              html: '<a class="govuk-link" href="/case/' + appointment.crn + '/appointments/appointment/' + appointment.id + '/manage?back=' + url + '">' + appointment.type + '</a>'
+          },
+          {
+              text: appointment.location if appointment.location else 'Not Provided'
+          },
+          {
+              classes: 'govuk-!-text-align-right',
+              html: appointment.startDateTime | dateWithYear + '<br /><span class="secondary-text">' + appointment.startDateTime | shortTime + (' to ' + appointment.endDateTime | shortTime if appointment.endDateTime else '') + '</span>'
+          },
+          {
+              classes: 'govuk-!-text-align-right',
+              html: '<a class="govuk-link" href="/case/' + outcome.crn + '/appointments/appointment/' + outcome.id + '/manage?back=' + url + '" rel="external noopener noreferrer">Manage</a>'
+          }
+      ]) %}
+  {% endfor %}
+  <div class="govuk-!-padding-3 govuk-!-padding-top-1">
+    {{ govukTable(tableData) }}
+  </div>
+{% else %}
+  <p class="govuk-body govuk-!-padding-3">There are no upcoming appointments.</p>
+{% endif %}
