@@ -43,5 +43,15 @@ export const checkInReviewValidation = (args: CheckInReviewValidationArgs): Vali
         },
       ],
     },
+    [`[esupervision][${crn}][${id}][checkins][sensitiveContact]`]: {
+      optional: page !== 'notes',
+      checks: [
+        {
+          validator: isNotEmpty,
+          msg: 'Select if this online check in includes sensitive information',
+          log: 'Sensitive contact selection not completed',
+        },
+      ],
+    },
   }
 }

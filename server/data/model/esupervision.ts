@@ -57,6 +57,7 @@ export interface ESupervisionReview {
   notes?: string
   missedCheckinComment?: string
   riskManagementFeedback?: boolean
+  sensitiveContact?: boolean
 }
 
 export interface ESupervisionNote {

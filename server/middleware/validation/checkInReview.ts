@@ -65,9 +65,23 @@ const checkInReview: Route<void> = (req, res, next) => {
       )
     }
   }
+  const validateCheckInReviewNotes = () => {
+    if (baseUrl.includes(`case/${crn}/appointments/${id}/check-in/review/notes`)) {
+      render = `pages/check-in/review/notes`
+      errorMessages = validateWithSpec(
+        req,
+        checkInReviewValidation({
+          crn,
+          id,
+          page: 'notes',
+        }),
+      )
+    }
+  }
   let errorMessages: Record<string, string> = {}
   validateCheckInReviewIdentity()
   validateCheckInReviewExpired()
+  validateCheckInReviewNotes()
   validateCheckInView()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages

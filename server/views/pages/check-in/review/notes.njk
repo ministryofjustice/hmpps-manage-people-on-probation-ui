@@ -11,7 +11,7 @@
     <div class="govuk-grid-column-full">
 
         {% include "../../../partials/pop-header.njk" %}
-        <hr class="govuk-section-break--l">
+        <hr class="govuk-section-break govuk-section-break--visible govuk-section-break--l" />
 
         {% if errorMessages %}
           {% set errorList = errorMessages | toErrorList %}
@@ -165,11 +165,18 @@
             {% endif %}
         </dl>
 
-        <h2 class="govuk-heading-m">What action are you taking after reviewing this check in? (optional)</h2>
+   </div>
+</div>
+<div class="govuk-grid-row">
+   <div class="govuk-grid-column-two-thirds">
         <form method="post" autocomplete="off" action="{{ paths.current  }}">
             {{ govukCharacterCount({
                 hint: {
                     text: "This information will be added to the contact"
+                },
+                label: {
+                    text: "What action are you taking after reviewing this check in? (optional)",
+                    classes: "govuk-label--m"
                 },
                 rows: '10',
                 maxlength: maxCharCount,
@@ -181,8 +188,35 @@
             {{ govukRadios({
                 fieldset: {
                     legend: {
+                        text: 'Does this contact include sensitive information?',
+                        classes: "govuk-fieldset__legend govuk-fieldset__legend--m"
+                    }
+                },
+                hint: {
+                    text: 'This is information that you believe must be recorded but not shared with a person on probation. If they make a request for their record, the Data Protection Team will decide whether the information can be shared.'
+                },
+                formGroup: {
+                    attributes: {
+                        'data-qa': 'sensitiveContact'
+                    }
+                },
+                items: [
+                    {
+                        value: "yes",
+                        text: "Yes, it includes sensitive information"
+                    },
+                    {
+                        value: "no",
+                        text: "No, it is not sensitive"
+                    }
+                ]
+            } | decorateFormAttributes(['esupervision', crn, id, 'checkins', 'sensitiveContact'])) }}
+
+            {{ govukRadios({
+                fieldset: {
+                    legend: {
                         text: 'Did the check in help you with risk management? (optional)',
-                        classes: "govuk-label--m govuk-!-font-weight-bold",
+                        classes: "govuk-fieldset__legend govuk-fieldset__legend--m",
                         hint: 'This information is only used to help us learn about how you use this system.'
                     }
                 },

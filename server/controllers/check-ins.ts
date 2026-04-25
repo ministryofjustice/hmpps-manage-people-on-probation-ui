@@ -688,6 +688,7 @@ const checkInsController: Controller<typeof routes, void> = {
         missedCheckinComment: checkIn?.missedCheckinComment,
         notes: checkIn?.furtherActions,
         riskManagementFeedback: risk,
+        sensitiveContact: checkIn?.sensitiveContact === 'yes',
       }
       const eSupervisionClient = new ESupervisionClient(token)
       await eSupervisionClient.postOffenderCheckInReview(id, review)
