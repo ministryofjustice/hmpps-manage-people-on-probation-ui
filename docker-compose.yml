@@ -17,7 +17,6 @@ services:
 
   waf:
     image: owasp/modsecurity-crs:4.25-nginx-lts
-    container_name: modsec-waf
     networks:
       - hmpps
     ports:
