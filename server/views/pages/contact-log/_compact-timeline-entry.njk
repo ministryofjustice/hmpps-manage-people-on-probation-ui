@@ -11,11 +11,11 @@
 {% set titleHtml %}
     <ul class="govuk-list contact-activity__actions govuk-!-margin-bottom-0">
     {% if entry.esupervisionId %}
-      <li><a href="{{ link }}" data-qa="esup-manage-link">Manage<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
+      <li><a href="{{ link }}" data-qa="esup-manage-link">Manage<span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span></a></li>
       {% elif shouldPromptToRecordAnOutcome %}
         {% include './_log-outcome-link.njk' %}
       {% else %}
-      <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.type }}</span></a></li>
+      <li><a href="{{ link }}" rel="noopener noreferrer" class="govuk-!-margin-right-6" data-qa="view-link">View<span class="govuk-visually-hidden"> {{ entry.displayName or entry.type }}</span></a></li>
     {% endif %}
   </ul>
 {% endset %}

@@ -1,8 +1,9 @@
 {% extends "../../partials/layout.njk" %}
 {% set appointment = personAppointment.appointment %}
 {% set personSummary = personAppointment.personSummary %}
+{% set appointmentDisplayName = appointment.displayName or appointment.type %}
 {% set pageTitle = makePageTitle({
-  pageHeading: [appointment.type, 'note']}) %}
+  pageHeading: [appointmentDisplayName, 'note']}) %}
 {% set extraBreadcrumb = '?' + queryParams.join('&')if queryParams.length > 0 else 
   '' %}
 {% set backLink = back + extraBreadcrumb if back else '/case/' + crn + '/activity-log' + extraBreadcrumb%}
@@ -18,7 +19,7 @@
 
 {% set appointmentType = 'Previous' if isInThePast(appointment.startDateTime)else 
   'Upcoming' %}
-{% set title = appointment.type + ' with ' + appointment.officer.name | fullName %}
+{% set title = appointmentDisplayName + ' with ' + appointment.officer.name | fullName %}
 {% set isOutcomeRecorded = appointment.hasOutcome %}
 
 {% block content %}
