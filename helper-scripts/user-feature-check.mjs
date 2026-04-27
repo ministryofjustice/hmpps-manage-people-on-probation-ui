@@ -12,7 +12,7 @@ async function main() {
       },
     })
 
-    console.log("Flipt client initialized")
+    console.log('Flipt client initialized')
 
     const flagKey = process.env.FLIPT_FLAG
     const entityId = process.env.FLIPT_ENTITY_ID
