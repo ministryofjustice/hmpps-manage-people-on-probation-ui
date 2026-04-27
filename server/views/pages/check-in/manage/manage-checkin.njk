@@ -39,8 +39,18 @@
 
 {% block pageContent %}
   {% if offenderCheckinsByCRNResponse.status === 'VERIFIED' %}
-      {% set checkinLabel = 'First check in' %}
-      {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithDayAndWithoutYear %}
+      {% if flags.enableESupervisionCustomQuestions === true %}
+          {% set checkinLabel = 'Next check in' %}
+          {% if upcomingCheckin and upcomingCheckin.expectedCheckinDate %}
+              {% set checkinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
+          {% else %}
+              {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+          {% endif %}
+          
+      {% else %}
+          {% set checkinLabel = 'First check in' %}
+          {% set checkinText = offenderCheckinsByCRNResponse.firstCheckin | dateWithYear %}
+      {% endif %}
         {% if flags.enableManageCheckins === true %}
             <div class="moj-button-group__item">
                 <a href="{{ stopCheckinLink }}" class="govuk-button govuk-button--warning govuk-!-margin-left"  data-qa="stop-checkin-btn" >Stop online check ins</a>
@@ -57,7 +67,7 @@
         {% endif %}
     {% endif %}
     {% if flags.enableESupervisionCustomQuestions === true %}
-        {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithDayAndWithoutYear %}
+        {% set nextCheckinText = upcomingCheckin.expectedCheckinDate | dateWithYear %}
         {% set rows = [
             {
                 key: { html: '<span data-qa="nextCheckInDueLabel">Next check in</span>' },
@@ -65,34 +75,34 @@
             }
         ] %}
         {% if upcomingCheckin %}
-        {% for item in upcomingCheckin.questions %}
-                {% set questionNumber = loop.index %}
-                {% set rows = (rows.push({
-                    key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
-                    value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
-                }), rows) %}
-        {% endfor %}
-        {% endif %}
-        {% set nextCheckinQuestionsText %}
-            {{ govukSummaryList({
-                rows: rows
+            {% for item in upcomingCheckin.questions %}
+                    {% set questionNumber = loop.index %}
+                    {% set rows = (rows.push({
+                        key: { html: '<span data-qa="question' + questionNumber + 'Label">Question ' + questionNumber + '</span>' },
+                        value: { html: '<span data-qa="question' + questionNumber + 'Value">' + item.question + '</span>' }
+                    }), rows) %}
+            {% endfor %}
+            {% set nextCheckinQuestionsText %}
+                {{ govukSummaryList({
+                    rows: rows
+                }) }}
+            {% endset %}
+            {{ appSummaryCard({
+                titleText: 'Upcoming online check in',
+                headingLevel: 3,
+                classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
+                attributes: {'data-qa': 'checkinQuestionsCard'},
+                html: nextCheckinQuestionsText,
+                actions: {
+                    items: [
+                        {
+                            text: 'Change questions',
+                            href: changeQuestionsLink
+                        }
+                    ]
+                } if showChange and canEditQuestions
             }) }}
-        {% endset %}
-        {{ appSummaryCard({
-            titleText: 'Upcoming online check in',
-            headingLevel: 3,
-            classes: ['govuk-!-margin-bottom-6 app-summary-card--large-title'],
-            attributes: {'data-qa': 'checkinQuestionsCard'},
-            html: nextCheckinQuestionsText,
-            actions: {
-                items: [
-                    {
-                        text: 'Change questions',
-                        href: changeQuestionsLink
-                    }
-                ]
-            } if showChange and canEditQuestions
-        }) }}
+        {% endif %}
     {% endif %}
     {% set checkin %}
     {% set nextCheckin = offenderCheckinsByCRNResponse %}

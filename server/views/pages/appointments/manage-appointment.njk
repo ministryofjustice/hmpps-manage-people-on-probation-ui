@@ -222,7 +222,7 @@
               {% if appointment.type === 'CP/UPW - Appointment/Attendance (NS)' %}
                 You can manage this appointment through the <a href="{{ deliusDeepLinkUrl('UPWWorksheet', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">unpaid work worksheet summary in NDelius (opens in a new tab)</a>.
               {% else %}
-                You can manage this appointment through the <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">person's drug history in NDelius (opens in a new tab)</a>.
+                You can manage this appointment through the person's <a href="{{ deliusDeepLinkUrl('DrugHistory', crn, appointment.eventNumber) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">drug history in NDelius (opens in a new tab)</a>.
               {% endif %}
             {% else %}
               <a href="{{ deliusDeepLinkUrl('UpdateContact', crn, appointment.id) }}" class="govuk-link" target="_blank" rel="external noopener noreferrer">Manage this appointment on NDelius (opens in a new tab)</a>.

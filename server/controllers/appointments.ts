@@ -2,6 +2,7 @@ import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
 import getPaginationLinks, { Pagination } from '@ministryofjustice/probation-search-frontend/utils/pagination'
 import { addParameters } from '@ministryofjustice/probation-search-frontend/utils/url'
+import { DateTime } from 'luxon'
 import { Controller, FileCache } from '../@types'
 import MasApiClient from '../data/masApiClient'
 import {
@@ -13,17 +14,15 @@ import {
   getDataValue,
   canRescheduleAppointment,
 } from '../utils'
-import { renderError, cloneAppointmentAndRedirect } from '../middleware'
+import { renderError, cloneAppointmentAndRedirect, getCheckinOffenderDetails } from '../middleware'
 import { AppointmentPatch } from '../models/Appointments'
 import config from '../config'
-import { getCheckinOffenderDetails } from '../middleware/getCheckinOffenderDetails'
 
 const routes = [
   'getAppointments',
   'getAllUpcomingAppointments',
   'postAppointments',
   'getRecordAnOutcome',
-  'postRecordAnOutcome',
   'getAttendedComplied',
   'postAttendedComplied',
   'getAddNote',
@@ -58,6 +57,7 @@ const appointmentsController: Controller<typeof routes, void> = {
 
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
+      const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/appointments', {
         upcomingAppointments,
@@ -66,6 +66,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         url,
         hasDeceased,
         hasPractitioner,
+        canAccessCheckins,
       })
     }
   },
@@ -174,6 +175,18 @@ const appointmentsController: Controller<typeof routes, void> = {
       const { crn } = req.params as Record<string, string>
       const actionType = 'outcome'
       const { contactId } = req.query
+      const baseUrl = req.url.split('?')[0]
+      if (req?.query?.filter === 'false') {
+        const appointmentId = req?.body?.['appointment-id'] as string
+        if (appointmentId) {
+          if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
+            return renderError(404)(req, res)
+          }
+          return res.redirect(
+            `/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/record-an-outcome/${actionType}`,
+          )
+        }
+      }
       await auditService.sendAuditMessage({
         action: 'VIEW_RECORD_AN_OUTCOME',
         who: res.locals.user.username,
@@ -182,23 +195,32 @@ const appointmentsController: Controller<typeof routes, void> = {
         correlationId: v4(),
         service: 'hmpps-manage-people-on-probation-ui',
       })
-      res.render('pages/appointments/record-an-outcome', {
+
+      req.session.outcomesFilter = req?.body?.outcomesFilter ?? req.session.outcomesFilter
+      const content = res.locals.contactResponse?.content
+      let outcomes = content?.filter(contact => {
+        const contactDate = DateTime.fromISO(contact.date)
+        const twoYearsAgo = DateTime.now().minus({ years: 2 })
+        return contactDate >= twoYearsAgo
+      })
+      if (req.session.outcomesFilter === 'Older') {
+        outcomes = content?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.date)
+          const twoYearsAgo = DateTime.now().minus({ years: 2 })
+          return contactDate < twoYearsAgo
+        })
+      } else if (req.session.outcomesFilter === 'All') {
+        outcomes = content
+      }
+      return res.render('pages/appointments/record-an-outcome', {
         crn,
         actionType,
         contactId,
+        baseUrl,
+        errorMessages: res?.locals?.errorMessages,
+        outcomes: res.locals.flags?.enableOutcomesV1 ? outcomes : content,
+        outcomesFilter: req.session.outcomesFilter ?? '2Years',
       })
-    }
-  },
-  postRecordAnOutcome: _hmppsAuthClient => {
-    return async (req, res) => {
-      const { crn, actionType } = req.params as Record<string, string>
-      const appointmentId = req?.body?.['appointment-id'] as string
-      if (!isValidCrn(crn) || !isNumericString(appointmentId)) {
-        return renderError(404)(req, res)
-      }
-      return res.redirect(
-        `/case/${crn}/appointments/appointment/${appointmentId}/manage?back=/case/${crn}/record-an-outcome/${actionType}?contactId=${appointmentId}`,
-      )
     }
   },
   /* Delete these controllers after enableNonCompliance feature flag is removed 👇 */
@@ -284,7 +306,7 @@ const appointmentsController: Controller<typeof routes, void> = {
         return renderError(404)(req, res)
       }
 
-      const { notes, sensitive } = req.body
+      const { notes, sensitive } = req.body as Record<string, string>
       const outcomeRecorded = res?.locals?.personAppointment?.appointment?.hasOutcome === true
       const file = req.file as Express.Multer.File
       const token = await hmppsAuthClient.getSystemClientToken(res.locals.user.username)

@@ -1,0 +1,45 @@
+{%- from "moj/components/filter/macro.njk" import mojFilter -%}
+{% from "govuk/components/radios/macro.njk" import govukRadios %}
+
+<form method="post" autocomplete="off" data-qa="filter-form" action="{{ baseUrl }}?filter=true">
+<div class="moj-filter" data-module="moj-filter">
+  <div class="moj-filter__header">
+    <div class="moj-filter__header-title">
+      <h2 class="govuk-heading-s">Filter appointments</h2>
+    </div>
+    <div class="moj-filter__header-action">
+    </div>
+  </div>
+  <div class="moj-filter__content">
+    <div class="moj-filter__options">
+        {{ govukRadios({
+            name: "outcomesFilter",
+            classes: "govuk-radios--small",
+            value: outcomesFilter,
+            items: [
+                {
+                    value: '2years',
+                    text: "Past 2 years",
+                    checked: true
+                },
+                {
+                    value: 'Older',
+                    text: "Older than 2 years"
+                },
+                {
+                    value: 'All',
+                    text: "All"
+                }
+            ]
+        }) }}
+        <div class="govuk-button-group">
+            <button type="submit" class="govuk-button govuk-button--secondary govuk-!-margin-top-4 govuk-!-margin-bottom-0" data-module="govuk-button" data-qa="submit-button">
+                Apply filter
+            </button>
+        </div>
+    </div>
+  </div>
+</div>
+</form>
+
+

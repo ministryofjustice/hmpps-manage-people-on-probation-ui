@@ -1,5 +1,6 @@
 import { auditService } from '@ministryofjustice/hmpps-audit-client'
 import { v4 } from 'uuid'
+import { DateTime } from 'luxon'
 import { Controller } from '../@types'
 import ArnsApiClient from '../data/arnsApiClient'
 import MasApiClient from '../data/masApiClient'
@@ -31,8 +32,17 @@ const caseController: Controller<typeof routes, void> = {
         masClient.getOverdueOutcomes(crn),
         masClient.getProbationPractitioner(crn),
       ])
+      let outcomes = contactResponse?.content
+      if (res.locals.flags.enableOutcomesV1) {
+        outcomes = outcomes?.filter(contact => {
+          const contactDate = DateTime.fromISO(contact.date)
+          const twoYearsAgo = DateTime.now().minus({ years: 2 })
+          return contactDate >= twoYearsAgo
+        })
+      }
       const hasDeceased = req.session.data.personalDetails?.[crn]?.overview?.dateOfDeath !== undefined
       const hasPractitioner = practitioner ? !practitioner.unallocated : false
+      const canAccessCheckins = hasPractitioner && res.locals.flags?.enableESupervisionCheckins === true
       await getCheckinOffenderDetails(hmppsAuthClient)(req, res)
       return res.render('pages/overview', {
         overview,
@@ -40,9 +50,10 @@ const caseController: Controller<typeof routes, void> = {
         crn,
         sanIndicator: sanIndicatorResponse?.sanIndicator,
         personalDetails: req.session.data.personalDetails[crn].overview,
-        appointmentsWithoutAnOutcomeCount: contactResponse?.content?.length ?? 0,
+        appointmentsWithoutAnOutcomeCount: outcomes?.length ?? 0,
         hasDeceased,
         hasPractitioner,
+        canAccessCheckins,
       })
     }
   },

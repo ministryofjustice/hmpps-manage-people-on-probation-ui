@@ -1,8 +1,9 @@
 /* eslint-disable no-underscore-dangle */
 import { DateTime } from 'luxon'
 import { Request } from 'express'
+import { get } from 'lodash'
 import { Route } from '../../@types'
-import { getDataValue, getPersonLevelTypes, unflattenBracketKeys } from '../../utils'
+import { getDataValue, getPersonLevelTypes, setDataValue, unflattenBracketKeys } from '../../utils'
 import { appointmentsValidation } from '../../properties'
 import { appointmentDateIsInPast } from '../appointmentDateIsInPast'
 import { validateWithSpec } from '../../utils/validationUtils'
@@ -12,6 +13,7 @@ import { getMockedTime } from '../../routes/testRoutes'
 import { isRescheduleAppointment } from '../isRescheduleAppointment'
 import { getMinMaxDates } from '../../utils/getMinMaxDates'
 import { urlToRenderPath } from '../../utils/urlToRenderPath'
+import { standardiseDateValue } from '../../utils/standardiseDateValue'
 
 const appointments: Route<void> = (req, res, next) => {
   const { params, body, session } = req
@@ -21,6 +23,10 @@ const appointments: Route<void> = (req, res, next) => {
   const { maxCharCount } = config
 
   req.body.fileOrNote = req.file || res?.locals?.errorMessages?.fileUpload ? 'has_file' : req.body.notes
+
+  if (req.query.filter === 'true') {
+    return next()
+  }
 
   const eventId = getDataValue(data, ['appointments', crn, id, 'eventId'])
   const personLevel = eventId === 'PERSON_LEVEL_CONTACT'
@@ -306,6 +312,9 @@ const appointments: Route<void> = (req, res, next) => {
   validateTextMessageConfirmation()
   if (Object.keys(errorMessages).length) {
     res.locals.errorMessages = errorMessages
+    if (req.query.filter === 'false') {
+      return next()
+    }
     return res.render(render, { errorMessages, ...localParams })
   }
   return next()

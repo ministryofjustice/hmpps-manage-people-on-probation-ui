@@ -21,4 +21,6 @@ export class FeatureFlags {
   enableSentencePlanUrl?: boolean = undefined
   enableDeepLinks?: boolean = undefined
   enablePoPSearchExtraColumns?: boolean = undefined
+  enableOutcomesV1?: boolean = undefined
+  enableESupervisionCheckins?: boolean = undefined
 }

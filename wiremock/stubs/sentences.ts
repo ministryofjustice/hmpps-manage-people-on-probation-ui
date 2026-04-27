@@ -1,6 +1,11 @@
 import superagent, { SuperAgentRequest } from 'superagent'
 
-const stubSentences = ({ crn = 'X778160', sentenceType = 'COMMUNITY' }): SuperAgentRequest =>
+const stubSentences = ({
+  crn = 'X778160',
+  sentenceType = 'COMMUNITY',
+  startDate = '2023-12-01',
+  endDate = '2026-01-01',
+}): SuperAgentRequest =>
   superagent.post('http://localhost:9091/__admin/mappings').send({
     request: {
       urlPathPattern: '/mas/sentences/X778160',
@@ -28,8 +33,8 @@ const stubSentences = ({ crn = 'X778160', sentenceType = 'COMMUNITY' }): SuperAg
             },
             order: {
               description: '12 month Community order',
-              endDate: '2024-12-01',
-              startDate: '2023-12-01',
+              startDate,
+              endDate,
             },
             licenceConditions: [
               {
@@ -99,8 +104,8 @@ const stubSentences = ({ crn = 'X778160', sentenceType = 'COMMUNITY' }): SuperAg
             },
             order: {
               description: 'ORA Community Order',
-              endDate: '2024-09-01',
-              startDate: '2020-03-02',
+              endDate,
+              startDate,
             },
             requirements: [
               {
@@ -154,8 +159,8 @@ const stubSentences = ({ crn = 'X778160', sentenceType = 'COMMUNITY' }): SuperAg
             },
             order: {
               description: 'ORA Community Order',
-              endDate: '2024-09-01',
-              startDate: '2020-03-02',
+              endDate,
+              startDate,
             },
             nsis: [
               {

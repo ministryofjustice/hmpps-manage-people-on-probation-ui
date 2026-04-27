@@ -22,11 +22,20 @@ export type AppointmentOutcomeType =
 
 export type AppointmentEnforcementAction =
   | 'SEND_LETTER'
-  | 'BREACH_RECALL_INITIATED'
-  | 'BREACH_RECALL_INITIATED_AND_SEND_LETTER'
+  | 'INITIATE_BREACH_RECALL'
+  | 'INITIATE_BREACH_RECALL_AND_SEND_LETTER'
   | 'REFER_TO_OFFENDER_MANAGER'
   | 'NO_FURTHER_ACTION'
   | 'DIFFERENT_ACTION'
+  | 'COURT_LEGAL'
+  | 'EMPLOYMENT'
+  | 'FAMILY_CHILDCARE'
+  | 'HOLIDAY'
+  | 'MEDICAL'
+  | 'RELIGIOUS'
+  | 'RIC'
+  | 'PROFESSIONAL_JUDGEMENT_DECISION'
+  | 'ACCEPTABLE_FAILURE'
 
 export interface AppointmentOutcome {
   type: AppointmentOutcomeType
@@ -34,7 +43,11 @@ export interface AppointmentOutcome {
 }
 
 export interface AppointmentOutcomeOption extends Option {
-  value: AppointmentOutcomeType
+  value?: AppointmentOutcomeType
+}
+
+export interface AppointmentEnforcementActionOption extends Option {
+  value?: AppointmentEnforcementAction
 }
 
 export interface AppointmentSessionUser {
@@ -233,7 +246,12 @@ export interface LocalParams {
   appointment?: AttendedCompliedAppointment | Activity
   useDecorator?: boolean
   isReschedule?: boolean
-  options?: AppointmentOutcomeOption[]
+  options?: AppointmentOutcomeOption[] | AppointmentEnforcementActionOption[]
+}
+
+export interface ProbationDeliveryUnit {
+  code: string
+  description: string
 }
 
 export interface MasUserDetails {
@@ -244,6 +262,9 @@ export interface MasUserDetails {
   email?: string
   enabled: boolean
   roles: string[]
+  staff?: {
+    probationDeliveryUnits?: ProbationDeliveryUnit[]
+  }
 }
 
 export interface AttendedCompliedAppointment {

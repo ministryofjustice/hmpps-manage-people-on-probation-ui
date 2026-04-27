@@ -137,6 +137,7 @@
     "@sentry/cli": "^2.46.0",
     "@sentry/node": "^10.47.0",
     "@types/cypress__code-coverage": "^3.10.2",
+    "@types/qs": "6.15.0",
     "agentkeepalive": "^4.6.0",
     "applicationinsights": "^2.9.5",
     "assert": "^2.1.0",
@@ -176,11 +177,10 @@
     "url-value-parser": "^2.2.0",
     "util": "^0.12.5",
     "util.inherits": "^1.0.3",
-    "uuid": "^13.0.0",
+    "uuid": "14.0.0",
     "webpack": "^5.105.4",
     "webpack-cli": "^7.0.2",
-    "wiremock": "^3.13.1",
-    "@types/qs": "6.15.0"
+    "wiremock": "^3.13.1"
   },
   "devDependencies": {
     "@babel/core": "^7.29.0",
@@ -265,7 +265,7 @@
     "@istanbuljs/load-nyc-config": {
       "js-yaml": "^3.14.0"
     },
-    "fast-xml-parser": "5.5.6",
+    "fast-xml-parser": "5.5.7",
     "serialize-javascript": "^7.0.3"
   }
 }
