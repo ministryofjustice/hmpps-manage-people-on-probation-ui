@@ -2,15 +2,14 @@ import { Route } from '../@types'
 import { AppResponse } from '../models/Locals'
 
 export const allowedHosts = [
-  'localhost',
-  'localhost:3007',
-  'localhost:3000',
   'sign-in-dev.hmpps.service.justice.gov.uk',
   'sign-in.hmpps.service.justice.gov.uk',
   'manage-people-on-probation-dev.hmpps.service.justice.gov.uk',
   'manage-people-on-probation-preprod.hmpps.service.justice.gov.uk',
   'manage-people-on-probation.hmpps.service.justice.gov.uk',
 ]
+
+if (process.env.ENVIRONMENT_NAME === 'local') allowedHosts.push('localhost', 'localhost:3000', 'localhost:3007')
 
 export default function validateHost(): Route<void> {
   return (req, res, next): AppResponse | void => {

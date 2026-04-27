@@ -4,9 +4,48 @@
 generic-service:
   replicaCount: 2
 
-  ingress:
-    host: manage-people-on-probation-dev.hmpps.service.justice.gov.uk
-    className: modsec-non-prod
+ingress:
+  host: manage-people-on-probation-dev.hmpps.service.justice.gov.uk
+  className: modsec-non-prod
+  modsecurity_snippet: |
+    SecRuleEngine On
+    SecAuditEngine On
+    SecAuditLog /var/log/nginx/error.log
+    SecAuditLogType Serial
+    SecDefaultAction "phase:2,pass,log,tag:github_team=hmpps-manage-people-on-probation,tag:namespace=hmpps-manage-people-on-probation-dev"
+    SecRuleUpdateActionById 949110 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
+    SecRuleUpdateActionById 959100 "t:none,deny,status:406,logdata:%{SERVER_NAME}"
+    SecAction \
+      "id:900000,\
+       phase:1,\
+       nolog,\
+       pass,\
+       t:none,\
+       setvar:tx.paranoia_level=2"
+
+    SecRule REQUEST_URI "@rx ^/case/[^/]+/appointments/appointment/[^/]+/add-note$" \
+      "id:100101,phase:1,pass,nolog,\
+      ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
+      ctl:ruleRemoveTargetById=942430;ARGS:notes,\
+      ctl:ruleRemoveTargetById=942200;ARGS:notes"
+
+    SecRule REQUEST_URI "@rx ^/case/[^/]+/arrange-appointment/[^/]+/supporting-information$" \
+      "id:100104,phase:1,pass,nolog,\
+      ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
+      ctl:ruleRemoveTargetById=942430;ARGS:notes,\
+      ctl:ruleRemoveTargetById=942200;ARGS:notes"
+
+    SecRule REQUEST_URI "@rx ^/case/[^/]+/personal-details/edit-main-address$" \
+      "id:100102,phase:1,pass,nolog,\
+      ctl:ruleRemoveTargetByTag=attack-rce;ARGS:notes,\
+      ctl:ruleRemoveTargetById=942430;ARGS:notes,\
+      ctl:ruleRemoveTargetById=942200;ARGS:notes"
+
+    SecRule REQUEST_FILENAME "@rx ^/case/[^/]+/appointments/[^/]+/check-in(?:/.*)?$" \
+      "id:100105,phase:1,pass,nolog,\
+      ctl:ruleRemoveTargetByTag=attack-rce;ARGS,\
+      ctl:ruleRemoveTargetById=942430;ARGS,\
+      ctl:ruleRemoveTargetById=942200;ARGS"
 
   env:
     INGRESS_URL: 'https://manage-people-on-probation-dev.hmpps.service.justice.gov.uk'
