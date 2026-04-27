@@ -120,21 +120,49 @@ const approvedContactDisplayNames: Record<string, string> = {
   'ViSOR Information Contact': 'ViSOR information contact',
 }
 
+const isWhitespace = (character: string): boolean =>
+  character === ' ' ||
+  character === '\n' ||
+  character === '\r' ||
+  character === '\t' ||
+  character === '\f' ||
+  character === '\v'
+
+export function normalizeContactDisplayNameKey(value: string): string {
+  const normalized = value.trim().replace(/[–—]/g, '-')
+  let result = ''
+  let previousWasWhitespace = false
+
+  for (let index = 0; index < normalized.length; index += 1) {
+    const character = normalized[index]
+
+    if (isWhitespace(character)) {
+      previousWasWhitespace = true
+    } else if (character === '/') {
+      if (result && !result.endsWith(' ')) {
+        result += ' '
+      }
+      result += '/ '
+      previousWasWhitespace = false
+    } else {
+      if (previousWasWhitespace && result && !result.endsWith(' ')) {
+        result += ' '
+      }
+
+      result += character
+      previousWasWhitespace = false
+    }
+  }
+
+  return result.trimEnd().toLowerCase()
+}
+
 const normalizedApprovedContactDisplayNames = Object.fromEntries(
   Object.entries(approvedContactDisplayNames).map(([legacyName, displayName]) => [
     normalizeContactDisplayNameKey(legacyName),
     displayName,
   ]),
 )
-
-export function normalizeContactDisplayNameKey(value: string): string {
-  return value
-    .trim()
-    .replace(/[–—]/g, '-')
-    .replace(/\s*\/\s*/g, ' / ')
-    .replace(/\s+/g, ' ')
-    .toLowerCase()
-}
 
 export function getApprovedContactDisplayName(value?: string): string | undefined {
   if (!value) {
