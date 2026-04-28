@@ -420,5 +420,18 @@ describe('middleware/postRescheduleAppointments', () => {
         }),
       )
     })
+    it('should not include smsEventRequest when smsOptIn is not YES', async () => {
+      const [req] = buildRequest({ smsOptIn: undefined as any })
+
+      await postRescheduleAppointments(hmppsAuthClient)(req, res)
+
+      expect(postRescheduleAppointmentEventSpy).toHaveBeenCalledWith(
+        expect.objectContaining({
+          rescheduledEventRequest: expect.not.objectContaining({
+            smsEventRequest: expect.anything(),
+          }),
+        }),
+      )
+    })
   })
 })
